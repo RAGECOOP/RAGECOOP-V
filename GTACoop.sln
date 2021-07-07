@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31423.177
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoopServer", "Server\CoopServer.csproj", "{84AB99D9-5E00-4CA2-B1DD-56B8419AAD24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoopClient", "Client\CoopClient.csproj", "{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84AB99D9-5E00-4CA2-B1DD-56B8419AAD24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84AB99D9-5E00-4CA2-B1DD-56B8419AAD24}.Debug|x64.Build.0 = Debug|Any CPU
+		{84AB99D9-5E00-4CA2-B1DD-56B8419AAD24}.Release|x64.ActiveCfg = Release|Any CPU
+		{84AB99D9-5E00-4CA2-B1DD-56B8419AAD24}.Release|x64.Build.0 = Release|Any CPU
+		{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}.Debug|x64.Build.0 = Debug|Any CPU
+		{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}.Release|x64.ActiveCfg = Release|Any CPU
+		{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6CC7EA75-E4FF-4534-8EB6-0AEECF2620B7}
+	EndGlobalSection
+EndGlobal
