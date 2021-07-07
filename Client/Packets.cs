@@ -113,12 +113,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.HandshakePacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -128,11 +123,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            HandshakePacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<HandshakePacket>(stream);
-            }
+            HandshakePacket data = CoopSerializer.Deserialize<HandshakePacket>(message.ReadBytes(len));
 
             ID = data.ID;
             SocialClubName = data.SocialClubName;
@@ -158,12 +149,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.PlayerConnectPacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -173,11 +159,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            PlayerConnectPacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<PlayerConnectPacket>(stream);
-            }
+            PlayerConnectPacket data = CoopSerializer.Deserialize<PlayerConnectPacket>(message.ReadBytes(len));
 
             Player = data.Player;
             SocialClubName = data.SocialClubName;
@@ -195,12 +177,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.PlayerDisconnectPacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -210,11 +187,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            PlayerDisconnectPacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<PlayerDisconnectPacket>(stream);
-            }
+            PlayerDisconnectPacket data = CoopSerializer.Deserialize<PlayerDisconnectPacket>(message.ReadBytes(len));
 
             Player = data.Player;
         }
@@ -260,12 +233,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.FullSyncPlayerPacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -275,11 +243,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            FullSyncPlayerPacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<FullSyncPlayerPacket>(stream);
-            }
+            FullSyncPlayerPacket data = CoopSerializer.Deserialize<FullSyncPlayerPacket>(message.ReadBytes(len));
 
             Player = data.Player;
             ModelHash = data.ModelHash;
@@ -335,12 +299,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.FullSyncNpcPacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -350,11 +309,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            FullSyncNpcPacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<FullSyncNpcPacket>(stream);
-            }
+            FullSyncNpcPacket data = CoopSerializer.Deserialize<FullSyncNpcPacket>(message.ReadBytes(len));
 
             ID = data.ID;
             ModelHash = data.ModelHash;
@@ -404,12 +359,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.LightSyncPlayerPacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -419,11 +369,7 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            LightSyncPlayerPacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<LightSyncPlayerPacket>(stream);
-            }
+            LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
 
             Player = data.Player;
             Health = data.Health;
@@ -450,12 +396,7 @@ namespace CoopClient
         {
             message.Write((byte)PacketTypes.ChatMessagePacket);
 
-            byte[] result;
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, this);
-                result = stream.ToArray();
-            }
+            byte[] result = CoopSerializer.Serialize(this);
 
             message.Write(result.Length);
             message.Write(result);
@@ -465,14 +406,37 @@ namespace CoopClient
         {
             int len = message.ReadInt32();
 
-            ChatMessagePacket data;
-            using (MemoryStream stream = new MemoryStream(message.ReadBytes(len)))
-            {
-                data = Serializer.Deserialize<ChatMessagePacket>(stream);
-            }
+            ChatMessagePacket data = CoopSerializer.Deserialize<ChatMessagePacket>(message.ReadBytes(len));
 
             Username = data.Username;
             Message = data.Message;
+        }
+    }
+
+    class CoopSerializer
+    {
+        public static T Deserialize<T>(byte[] data) where T : new()
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(data))
+                {
+                    return Serializer.Deserialize<T>(stream);
+                }
+            }
+            catch
+            {
+                throw new Exception(string.Format("The deserialization of the packet {0} failed!", typeof(T).Name));
+            }
+        }
+
+        public static byte[] Serialize<T>(T packet)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                Serializer.Serialize(stream, packet);
+                return stream.ToArray();
+            }
         }
     }
 }

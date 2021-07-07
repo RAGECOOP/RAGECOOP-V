@@ -23,7 +23,7 @@ namespace CoopClient
                 Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
                 Client.FlushSendQueue();
 
-                Client.Disconnect("Disconnected");
+                Client.Disconnect("Bye!");
             }
             else
             {
@@ -143,7 +143,7 @@ namespace CoopClient
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
-                                GTA.UI.Notification.Show("~r~" + reason);
+                                GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 // Reset all values
                                 FullPlayerSync = true;

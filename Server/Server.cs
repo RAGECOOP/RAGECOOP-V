@@ -124,34 +124,33 @@ namespace CoopServer
                             Logging.Info("New incoming connection from: " + message.SenderConnection.RemoteEndPoint.ToString());
                             if (message.ReadByte() != (byte)PacketTypes.HandshakePacket)
                             {
+                                Logging.Info(string.Format("Player with IP {0} blocked, reason: Wrong packet!", message.SenderConnection.RemoteEndPoint.ToString()));
                                 message.SenderConnection.Deny("Wrong packet!");
                             }
                             else
                             {
-                                Packet approvalPacket;
-                                approvalPacket = new HandshakePacket();
-                                approvalPacket.NetIncomingMessageToPacket(message);
-                                GetHandshake(message.SenderConnection, (HandshakePacket)approvalPacket);
+                                try
+                                {
+                                    Packet approvalPacket;
+                                    approvalPacket = new HandshakePacket();
+                                    approvalPacket.NetIncomingMessageToPacket(message);
+                                    GetHandshake(message.SenderConnection, (HandshakePacket)approvalPacket);
+                                }
+                                catch (Exception e)
+                                {
+                                    Logging.Info(string.Format("Player with IP {0} blocked, reason: {1}", message.SenderConnection.RemoteEndPoint.ToString(), e.Message));
+                                    message.SenderConnection.Deny(e.Message);
+                                }
                             }
                             break;
                         case NetIncomingMessageType.StatusChanged:
                             NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
 
-                            string reason = message.ReadString();
                             string player = NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier);
-                            //Logging.Debug(NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier) + " " + status + ": " + reason);
 
-                            switch (status)
+                            if (status == NetConnectionStatus.Disconnected && Players.ContainsKey(player))
                             {
-                                case NetConnectionStatus.Connected:
-                                    //Logging.Info("New incoming connection from: " + message.SenderConnection.RemoteEndPoint.ToString());
-                                    break;
-                                case NetConnectionStatus.Disconnected:
-                                    if (Players.ContainsKey(player))
-                                    {
-                                        SendPlayerDisconnectPacket(new PlayerDisconnectPacket() { Player = player }, reason);
-                                    }
-                                    break;
+                                SendPlayerDisconnectPacket(new PlayerDisconnectPacket() { Player = player }, message.ReadString());
                             }
                             break;
                         case NetIncomingMessageType.Data:
@@ -164,42 +163,83 @@ namespace CoopServer
                             switch (type)
                             {
                                 case (byte)PacketTypes.PlayerConnectPacket:
-                                    packet = new PlayerConnectPacket();
-                                    packet.NetIncomingMessageToPacket(message);
-                                    SendPlayerConnectPacket(message.SenderConnection, (PlayerConnectPacket)packet);
+                                    try
+                                    {
+                                        packet = new PlayerConnectPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        SendPlayerConnectPacket(message.SenderConnection, (PlayerConnectPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
                                     break;
                                 case (byte)PacketTypes.PlayerDisconnectPacket:
-                                    packet = new PlayerDisconnectPacket();
-                                    packet.NetIncomingMessageToPacket(message);
-                                    SendPlayerDisconnectPacket((PlayerDisconnectPacket)packet);
+                                    try
+                                    {
+                                        packet = new PlayerDisconnectPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        SendPlayerDisconnectPacket((PlayerDisconnectPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
                                     break;
                                 case (byte)PacketTypes.FullSyncPlayerPacket:
-                                    packet = new FullSyncPlayerPacket();
-                                    packet.NetIncomingMessageToPacket(message);
-                                    FullSyncPlayer((FullSyncPlayerPacket)packet);
+                                    try
+                                    {
+                                        packet = new FullSyncPlayerPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        FullSyncPlayer((FullSyncPlayerPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
                                     break;
                                 case (byte)PacketTypes.FullSyncNpcPacket:
                                     if (MainSettings.NpcsAllowed)
                                     {
-                                        packet = new FullSyncNpcPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        FullSyncNpc(message.SenderConnection, (FullSyncNpcPacket)packet);
+                                        try
+                                        {
+                                            packet = new FullSyncNpcPacket();
+                                            packet.NetIncomingMessageToPacket(message);
+                                            FullSyncNpc(message.SenderConnection, (FullSyncNpcPacket)packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     else
                                     {
-                                        Logging.Warning(Players[NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier)].Username + " tries to send Npcs!");
                                         message.SenderConnection.Disconnect("Npcs are not allowed!");
                                     }
                                     break;
                                 case (byte)PacketTypes.LightSyncPlayerPacket:
-                                    packet = new LightSyncPlayerPacket();
-                                    packet.NetIncomingMessageToPacket(message);
-                                    LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                    try
+                                    {
+                                        packet = new LightSyncPlayerPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
                                     break;
                                 case (byte)PacketTypes.ChatMessagePacket:
-                                    packet = new ChatMessagePacket();
-                                    packet.NetIncomingMessageToPacket(message);
-                                    SendChatMessage((ChatMessagePacket)packet);
+                                    try
+                                    {
+                                        packet = new ChatMessagePacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        SendChatMessage((ChatMessagePacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
                                     break;
                                 default:
                                     Logging.Error("Unhandled Data / Packet type");
