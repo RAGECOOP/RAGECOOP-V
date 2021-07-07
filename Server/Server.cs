@@ -233,20 +233,17 @@ namespace CoopServer
         }
 
         // Get all players in range of ...
-        private static List<NetConnection> GetAllInRange(LVector3 position, float range, string local = null)
+        private static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            if (local == null)
+            return new List<NetConnection>(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
+        }
+        private static List<NetConnection> GetAllInRange(LVector3 position, float range, string local)
+        {
+            return new List<NetConnection>(MainNetServer.Connections.FindAll(e =>
             {
-                return new List<NetConnection>(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
-            }
-            else
-            {
-                return new List<NetConnection>(MainNetServer.Connections.FindAll(e =>
-                {
-                    string target = NetUtility.ToHexString(e.RemoteUniqueIdentifier);
-                    return target != local && Players[target].Ped.IsInRangeOf(position, range);
-                }));
-            }
+                string target = NetUtility.ToHexString(e.RemoteUniqueIdentifier);
+                return target != local && Players[target].Ped.IsInRangeOf(position, range);
+            }));
         }
 
         // Before we approve the connection, we must shake hands

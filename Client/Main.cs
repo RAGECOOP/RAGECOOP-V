@@ -263,71 +263,7 @@ namespace CoopClient
             {
                 ArtificialLagCounter = DateTime.Now;
 
-                #region SPEED
-                byte speed = 0;
-                if (Game.Player.Character.IsWalking)
-                {
-                    speed = 1;
-                }
-                else if (Game.Player.Character.IsRunning)
-                {
-                    speed = 2;
-                }
-                else if (Game.Player.Character.IsSprinting || Game.IsControlPressed(GTA.Control.Sprint))
-                {
-                    speed = 3;
-                }
-                #endregion
-
-                #region SHOOTING - AIMING
-                bool aiming = player.IsAiming;
-                bool shooting = player.IsShooting && player.Weapons.Current?.AmmoInClip != 0;
-
-                GTA.Math.Vector3 aimCoord = new GTA.Math.Vector3();
-                if (aiming || shooting)
-                {
-                    aimCoord = Util.RaycastEverything(new GTA.Math.Vector2(0, 0));
-                }
-                #endregion
-
-                #region FLAG
-                byte? flags = 0;
-
-                if (FullDebugSync)
-                {
-                    flags |= (byte)PedDataFlags.LastSyncWasFull;
-                }
-
-                if (aiming)
-                {
-                    flags |= (byte)PedDataFlags.IsAiming;
-                }
-
-                if (shooting)
-                {
-                    flags |= (byte)PedDataFlags.IsShooting;
-                }
-
-                if (player.IsReloading)
-                {
-                    flags |= (byte)PedDataFlags.IsReloading;
-                }
-
-                if (player.IsJumping)
-                {
-                    flags |= (byte)PedDataFlags.IsJumping;
-                }
-
-                if (player.IsRagdoll)
-                {
-                    flags |= (byte)PedDataFlags.IsRagdoll;
-                }
-
-                if (player.IsOnFire)
-                {
-                    flags |= (byte)PedDataFlags.IsOnFire;
-                }
-                #endregion
+                byte? flags = Util.GetPedFlags(player, FullDebugSync);
 
                 if (FullDebugSync)
                 {
@@ -338,8 +274,8 @@ namespace CoopClient
                 DebugSyncPed.Position = player.Position;
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
-                DebugSyncPed.Speed = speed;
-                DebugSyncPed.AimCoords = aimCoord;
+                DebugSyncPed.Speed = Util.GetPedSpeed(player);
+                DebugSyncPed.AimCoords = Util.GetPedAimCoords(player, false);
                 DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;

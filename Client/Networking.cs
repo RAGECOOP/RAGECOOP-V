@@ -346,72 +346,6 @@ namespace CoopClient
         {
             Ped player = Game.Player.Character;
 
-            #region SPEED
-            byte speed = 0;
-            if (Game.Player.Character.IsWalking)
-            {
-                speed = 1;
-            }
-            else if (Game.Player.Character.IsRunning)
-            {
-                speed = 2;
-            }
-            else if (Game.Player.Character.IsSprinting)
-            {
-                speed = 3;
-            }
-            #endregion
-
-            #region SHOOTING - AIMING
-            bool aiming = player.IsAiming;
-            bool shooting = player.IsShooting && player.Weapons.Current?.AmmoInClip != 0;
-
-            Vector3 aimCoord = new Vector3();
-            if (aiming || shooting)
-            {
-                aimCoord = Util.RaycastEverything(new Vector2(0, 0));
-            }
-            #endregion
-
-            #region Flags
-            byte? flags = 0;
-
-            if (FullPlayerSync)
-            {
-                flags |= (byte)PedDataFlags.LastSyncWasFull;
-            }
-
-            if (aiming)
-            {
-                flags |= (byte)PedDataFlags.IsAiming;
-            }
-
-            if (shooting)
-            {
-                flags |= (byte)PedDataFlags.IsShooting;
-            }
-
-            if (player.IsReloading)
-            {
-                flags |= (byte)PedDataFlags.IsReloading;
-            }
-
-            if (player.IsJumping)
-            {
-                flags |= (byte)PedDataFlags.IsJumping;
-            }
-
-            if (player.IsRagdoll)
-            {
-                flags |= (byte)PedDataFlags.IsRagdoll;
-            }
-
-            if (player.IsOnFire)
-            {
-                flags |= (byte)PedDataFlags.IsOnFire;
-            }
-            #endregion
-
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
             if (FullPlayerSync)
@@ -425,10 +359,10 @@ namespace CoopClient
                     Position = player.Position.ToLVector(),
                     Rotation = player.Rotation.ToLVector(),
                     Velocity = player.Velocity.ToLVector(),
-                    Speed = speed,
-                    AimCoords = aimCoord.ToLVector(),
+                    Speed = Util.GetPedSpeed(player),
+                    AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
                     CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = flags
+                    Flag = Util.GetPedFlags(player, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else
@@ -440,10 +374,10 @@ namespace CoopClient
                     Position = player.Position.ToLVector(),
                     Rotation = player.Rotation.ToLVector(),
                     Velocity = player.Velocity.ToLVector(),
-                    Speed = speed,
-                    AimCoords = aimCoord.ToLVector(),
+                    Speed = Util.GetPedSpeed(player),
+                    AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
                     CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = flags
+                    Flag = Util.GetPedFlags(player, false)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
@@ -455,70 +389,6 @@ namespace CoopClient
 
         public void SendNpcData(Ped npc)
         {
-            #region SPEED
-            byte speed = 0;
-            if (npc.IsWalking)
-            {
-                speed = 1;
-            }
-            else if (npc.IsRunning)
-            {
-                speed = 2;
-            }
-            else if (npc.IsSprinting)
-            {
-                speed = 3;
-            }
-            #endregion
-
-            #region SHOOTING - AIMING
-            bool aiming = npc.IsAiming;
-            bool shooting = npc.IsShooting && npc.Weapons.Current?.AmmoInClip != 0;
-
-            Vector3 aimCoord = new Vector3();
-            if (aiming || shooting)
-            {
-                aimCoord = Util.GetLastWeaponImpact(npc);
-            }
-            #endregion
-
-            #region Flags
-            byte? flags = 0;
-
-            // FullSync = true
-            flags |= (byte)PedDataFlags.LastSyncWasFull;
-
-            if (shooting)
-            {
-                flags |= (byte)PedDataFlags.IsShooting;
-            }
-
-            if (aiming)
-            {
-                flags |= (byte)PedDataFlags.IsAiming;
-            }
-
-            if (npc.IsReloading)
-            {
-                flags |= (byte)PedDataFlags.IsReloading;
-            }
-
-            if (npc.IsJumping)
-            {
-                flags |= (byte)PedDataFlags.IsJumping;
-            }
-
-            if (npc.IsRagdoll)
-            {
-                flags |= (byte)PedDataFlags.IsRagdoll;
-            }
-
-            if (npc.IsOnFire)
-            {
-                flags |= (byte)PedDataFlags.IsOnFire;
-            }
-            #endregion
-
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
             new FullSyncNpcPacket()
@@ -530,10 +400,10 @@ namespace CoopClient
                 Position = npc.Position.ToLVector(),
                 Rotation = npc.Rotation.ToLVector(),
                 Velocity = npc.Velocity.ToLVector(),
-                Speed = speed,
-                AimCoords = aimCoord.ToLVector(),
+                Speed = Util.GetPedSpeed(npc),
+                AimCoords = Util.GetPedAimCoords(npc, true).ToLVector(),
                 CurrentWeaponHash = (int)npc.Weapons.Current.Hash,
-                Flag = flags
+                Flag = Util.GetPedFlags(npc, true)
             }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);

@@ -11,6 +11,71 @@ namespace CoopClient
 {
     class Util
     {
+        public static byte GetPedSpeed(Ped ped)
+        {
+            if (ped.IsWalking)
+            {
+                return 1;
+            }
+            else if (ped.IsRunning)
+            {
+                return 2;
+            }
+            else if (ped.IsSprinting)
+            {
+                return 3;
+            }
+            return 0;
+        }
+
+        public static Vector3 GetPedAimCoords(Ped ped, bool isNpc)
+        {
+            bool aimOrShoot = ped.IsAiming || ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0;
+            return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
+        }
+
+        public static byte? GetPedFlags(Ped ped, bool fullSync)
+        {
+            byte? flags = 0;
+
+            if (fullSync)
+            {
+                flags |= (byte)PedDataFlags.LastSyncWasFull;
+            }
+
+            if (ped.IsAiming)
+            {
+                flags |= (byte)PedDataFlags.IsAiming;
+            }
+
+            if (ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0)
+            {
+                flags |= (byte)PedDataFlags.IsShooting;
+            }
+
+            if (ped.IsReloading)
+            {
+                flags |= (byte)PedDataFlags.IsReloading;
+            }
+
+            if (ped.IsJumping)
+            {
+                flags |= (byte)PedDataFlags.IsJumping;
+            }
+
+            if (ped.IsRagdoll)
+            {
+                flags |= (byte)PedDataFlags.IsRagdoll;
+            }
+
+            if (ped.IsOnFire)
+            {
+                flags |= (byte)PedDataFlags.IsOnFire;
+            }
+
+            return flags;
+        }
+
         public static Dictionary<int, int> GetPedProps(Ped ped)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
