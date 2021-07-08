@@ -234,13 +234,11 @@ namespace CoopClient
 
             if (IsShooting)
             {
-                Function.Call(Hash.SET_PED_INFINITE_AMMO_CLIP, Character, true);
-
                 if (!Character.IsInRange(Position, 0.5f))
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 2f, 2f, false, 0, false,
-                                    unchecked((int)FiringPattern.FullAuto));
+                                    (uint)FiringPattern.FullAuto);
                 }
                 else
                 {
@@ -253,7 +251,7 @@ namespace CoopClient
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 2f, 2f, false, 512, false,
-                                    unchecked((int)FiringPattern.FullAuto));
+                                    (uint)FiringPattern.FullAuto);
                 }
                 else
                 {
@@ -278,6 +276,8 @@ namespace CoopClient
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
             Character.Health = Health;
+            Character.CanBeTargetted = true;
+            Character.IsEnemy = false;
 
             if (username != null)
             {
@@ -292,6 +292,10 @@ namespace CoopClient
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
             }
+            
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character, Game.Player, true);
+            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character, false);
+            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character, true, true);
         }
 
         private bool LastMoving;

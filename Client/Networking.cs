@@ -244,6 +244,13 @@ namespace CoopClient
         {
             if (Main.Players.ContainsKey(packet.Player))
             {
+                EntitiesPlayer player = Main.Players[packet.Player];
+                if (player.Character != null && player.Character.Exists())
+                {
+                    player.Character.Kill();
+                    player.Character.Delete();
+                }
+
                 Main.Players.Remove(packet.Player);
 
                 Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
@@ -262,6 +269,7 @@ namespace CoopClient
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
+                player.CurrentWeaponHash = packet.CurrentWeaponHash;
                 player.AimCoords = packet.AimCoords.ToVector();
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
@@ -286,6 +294,7 @@ namespace CoopClient
                 npc.Rotation = packet.Rotation.ToVector();
                 npc.Velocity = packet.Velocity.ToVector();
                 npc.Speed = packet.Speed;
+                npc.CurrentWeaponHash = packet.CurrentWeaponHash;
                 npc.AimCoords = packet.AimCoords.ToVector();
                 npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 npc.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
@@ -307,6 +316,7 @@ namespace CoopClient
                     Rotation = packet.Rotation.ToVector(),
                     Velocity = packet.Velocity.ToVector(),
                     Speed = packet.Speed,
+                    CurrentWeaponHash = packet.CurrentWeaponHash,
                     AimCoords = packet.AimCoords.ToVector(),
                     LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
                     IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0,
@@ -329,6 +339,8 @@ namespace CoopClient
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
+                player.CurrentWeaponHash = packet.CurrentWeaponHash;
+                player.AimCoords = packet.AimCoords.ToVector();
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
                 player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
