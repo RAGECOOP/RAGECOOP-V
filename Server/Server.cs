@@ -446,20 +446,7 @@ namespace CoopServer
             }
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new FullSyncPlayerPacket()
-            {
-                Player = packet.Player,
-                ModelHash = packet.ModelHash,
-                Props = packet.Props,
-                Health = packet.Health,
-                Position = packet.Position,
-                Rotation = packet.Rotation,
-                Velocity = packet.Velocity,
-                Speed = packet.Speed,
-                AimCoords = packet.AimCoords,
-                CurrentWeaponHash = packet.CurrentWeaponHash,
-                Flag = packet.Flag
-            }.PacketToNetOutGoingMessage(outgoingMessage);
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
@@ -474,20 +461,7 @@ namespace CoopServer
             }
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new FullSyncNpcPacket()
-            {
-                ID = packet.ID,
-                ModelHash = packet.ModelHash,
-                Props = packet.Props,
-                Health = packet.Health,
-                Position = packet.Position,
-                Rotation = packet.Rotation,
-                Velocity = packet.Velocity,
-                Speed = packet.Speed,
-                AimCoords = packet.AimCoords,
-                CurrentWeaponHash = packet.CurrentWeaponHash,
-                Flag = packet.Flag
-            }.PacketToNetOutGoingMessage(outgoingMessage);
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
@@ -503,34 +477,19 @@ namespace CoopServer
             }
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new FullSyncPlayerPacket()
-            {
-                Player = packet.Player,
-                Health = packet.Health,
-                Position = packet.Position,
-                Rotation = packet.Rotation,
-                Velocity = packet.Velocity,
-                Speed = packet.Speed,
-                AimCoords = packet.AimCoords,
-                CurrentWeaponHash = packet.CurrentWeaponHash,
-                Flag = packet.Flag
-            }.PacketToNetOutGoingMessage(outgoingMessage);
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
         // Send a message to targets or all players
         private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
         {
-            string filteredMessage = packet.Message.Replace("~", "");
+            packet.Message = packet.Message.Replace("~", "");
 
-            Logging.Info(packet.Username + ": " + filteredMessage);
+            Logging.Info(packet.Username + ": " + packet.Message);
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new ChatMessagePacket()
-            {
-                Username = packet.Username,
-                Message = filteredMessage
-            }.PacketToNetOutGoingMessage(outgoingMessage);
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
     }
