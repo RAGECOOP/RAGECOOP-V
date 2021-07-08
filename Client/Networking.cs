@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using CoopClient.Entities;
 
@@ -163,12 +164,29 @@ namespace CoopClient
                                 Main.MainMenu.Items[2].Title = "Connect";
                                 Main.MainSettingsMenu.Items[0].Enabled = false;
 
-                                Main.Players.Clear();
-                                Main.Npcs.Clear();
+                                foreach (KeyValuePair<string, EntitiesPlayer> player in Main.Players)
+                                {
+                                    if (player.Value.Character != null && player.Value.Character.Exists())
+                                    {
+                                        player.Value.Character.Kill();
+                                        player.Value.Character.Delete();
+                                    }
 
-                                Vector3 pos = Game.Player.Character.Position;
-                                Function.Call(Hash.CLEAR_AREA_OF_PEDS, pos.X, pos.Y, pos.Z, 300.0f, 0);
-                                Function.Call(Hash.CLEAR_AREA_OF_VEHICLES, pos.X, pos.Y, pos.Z, 300.0f, 0);
+                                    player.Value.PedBlip?.Delete();
+                                }
+
+                                Main.Players.Clear();
+
+                                foreach (KeyValuePair<string, EntitiesNpc> npc in Main.Npcs)
+                                {
+                                    if (npc.Value.Character != null && npc.Value.Character.Exists())
+                                    {
+                                        npc.Value.Character.Kill();
+                                        npc.Value.Character.Delete();
+                                    }
+                                }
+
+                                Main.Npcs.Clear();
                                 break;
                         }
                         break;
@@ -251,10 +269,12 @@ namespace CoopClient
                     player.Character.Delete();
                 }
 
-                Main.Players.Remove(packet.Player);
+                player.PedBlip?.Delete();
 
-                Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
+                Main.Players.Remove(packet.Player);
             }
+
+            Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
         }
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)

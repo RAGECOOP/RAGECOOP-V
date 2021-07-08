@@ -21,9 +21,6 @@ namespace CoopClient
             }
 
             Function.Call((Hash)0xB96B00E976BE977F, 0.0f); // _SET_WAVES_INTENSITY
-
-            Game.Player.Character.CanBeTargetted = true;
-            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character, true, true);
         }
     }
 }

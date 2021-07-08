@@ -267,30 +267,30 @@ namespace CoopServer
         }
 
         // Return a list of all connections but not the local connection
+        private static List<NetConnection> FilterAllLocal(NetConnection local)
+        {
+            return new(MainNetServer.Connections.Where(e => e != local));
+        }
         private static List<NetConnection> FilterAllLocal(string local)
         {
-            return new List<NetConnection>(MainNetServer.Connections.FindAll(e => !NetUtility.ToHexString(e.RemoteUniqueIdentifier).Equals(local)));
+            return new(MainNetServer.Connections.Where(e => NetUtility.ToHexString(e.RemoteUniqueIdentifier) != local));
         }
 
-        // Get all players in range of ...
+        // Return a list of players within range of ...
         private static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            return new List<NetConnection>(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
+            return new(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
         }
-        private static List<NetConnection> GetAllInRange(LVector3 position, float range, string local)
+
+        // Return a list of players within range of ... but not the local one
+        private static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
-            return new List<NetConnection>(MainNetServer.Connections.FindAll(e =>
-            {
-                string target = NetUtility.ToHexString(e.RemoteUniqueIdentifier);
-                return target != local && Players[target].Ped.IsInRangeOf(position, range);
-            }));
+            return new(MainNetServer.Connections.Where(e => e != local && Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
         }
 
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, HandshakePacket packet)
         {
-            string localPlayerID = NetUtility.ToHexString(local.RemoteUniqueIdentifier);
-
             Logging.Debug("New handshake from: [" + packet.SocialClubName + " | " + packet.Username + "]");
 
             if (string.IsNullOrWhiteSpace(packet.Username))
@@ -349,6 +349,8 @@ namespace CoopServer
                 }
             }
 
+            string localPlayerID = NetUtility.ToHexString(local.RemoteUniqueIdentifier);
+
             // Add the player to Players
             Players.Add(localPlayerID,
                 new EntitiesPlayer()
@@ -384,7 +386,7 @@ namespace CoopServer
                 SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
             }
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            List<NetConnection> playerList = FilterAllLocal(local);
             if (playerList.Count == 0)
             {
                 return;
@@ -422,7 +424,6 @@ namespace CoopServer
         private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet, string reason = "Disconnected")
         {
             List<NetConnection> playerList = FilterAllLocal(packet.Player);
-
             if (playerList.Count != 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -439,7 +440,6 @@ namespace CoopServer
             Players[packet.Player].Ped.Position = packet.Position;
 
             List<NetConnection> playerList = FilterAllLocal(packet.Player);
-
             if (playerList.Count == 0)
             {
                 return;
@@ -452,9 +452,7 @@ namespace CoopServer
 
         private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
         {
-            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, NetUtility.ToHexString(local.RemoteUniqueIdentifier));
-
-            // No connection found in this area
+            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
             if (playerList.Count == 0)
             {
                 return;
@@ -470,7 +468,6 @@ namespace CoopServer
             Players[packet.Player].Ped.Position = packet.Position;
 
             List<NetConnection> playerList = FilterAllLocal(packet.Player);
-
             if (playerList.Count == 0)
             {
                 return;

@@ -35,7 +35,7 @@ namespace CoopClient
         public bool IsReloading { get; set; }
         public int CurrentWeaponHash { get; set; }
 
-        private Blip PedBlip;
+        public Blip PedBlip;
 
         public void DisplayLocally(string username)
         {
@@ -276,8 +276,6 @@ namespace CoopClient
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
             Character.Health = Health;
-            Character.CanBeTargetted = true;
-            Character.IsEnemy = false;
 
             if (username != null)
             {
@@ -286,16 +284,15 @@ namespace CoopClient
                 Character.AttachedBlip.Color = BlipColor.White;
                 Character.AttachedBlip.Scale = 0.8f;
                 Character.AttachedBlip.Name = username;
+
+                Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character, false);
+                Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character, false);
             }
 
             foreach (KeyValuePair<int, int> prop in Props)
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
             }
-            
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character, Game.Player, true);
-            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character, false);
-            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character, true, true);
         }
 
         private bool LastMoving;
