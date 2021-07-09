@@ -394,7 +394,7 @@ namespace CoopClient
                     Speed = Util.GetPedSpeed(player),
                     AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
                     CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = Util.GetPedFlags(player, true)
+                    Flag = Util.GetPedFlags(player, true, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else
@@ -409,7 +409,7 @@ namespace CoopClient
                     Speed = Util.GetPedSpeed(player),
                     AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
                     CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = Util.GetPedFlags(player, false)
+                    Flag = Util.GetPedFlags(player, false, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 

@@ -13,18 +13,19 @@ namespace CoopClient
     {
         public static byte GetPedSpeed(Ped ped)
         {
-            if (ped.IsWalking)
+            if (ped.IsSprinting)
             {
-                return 1;
+                return 3;
             }
             else if (ped.IsRunning)
             {
                 return 2;
             }
-            else if (ped.IsSprinting)
+            else if (ped.IsWalking)
             {
-                return 3;
+                return 1;
             }
+            
             return 0;
         }
 
@@ -34,7 +35,7 @@ namespace CoopClient
             return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
         }
 
-        public static byte? GetPedFlags(Ped ped, bool fullSync)
+        public static byte? GetPedFlags(Ped ped, bool fullSync, bool isPlayer = false)
         {
             byte? flags = 0;
 
@@ -48,7 +49,7 @@ namespace CoopClient
                 flags |= (byte)PedDataFlags.IsAiming;
             }
 
-            if (ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0)
+            if ((ped.IsShooting || isPlayer && Game.IsControlPressed(Control.Attack)) && ped.Weapons.Current?.AmmoInClip != 0)
             {
                 flags |= (byte)PedDataFlags.IsShooting;
             }

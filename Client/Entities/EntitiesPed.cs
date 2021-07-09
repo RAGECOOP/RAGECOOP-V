@@ -154,11 +154,11 @@ namespace CoopClient
             {
                 Character.IsInvincible = false;
 
-                Function.Call(Hash.START_ENTITY_FIRE, Character);
+                Function.Call(Hash.START_ENTITY_FIRE, Character.Handle);
             }
             else if (!IsOnFire && Character.IsOnFire)
             {
-                Function.Call(Hash.STOP_ENTITY_FIRE, Character);
+                Function.Call(Hash.STOP_ENTITY_FIRE, Character.Handle);
 
                 Character.IsInvincible = true;
 
@@ -236,26 +236,26 @@ namespace CoopClient
             {
                 if (!Character.IsInRange(Position, 0.5f))
                 {
-                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 2f, 2f, false, 0, false,
-                                    (uint)FiringPattern.FullAuto);
+                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, true, 0x3F000000, 0x40800000, false, 0, false,
+                                    unchecked((int)FiringPattern.FullAuto));
                 }
                 else
                 {
-                    Function.Call(Hash.TASK_SHOOT_AT_COORD, Character, AimCoords.X, AimCoords.Y, AimCoords.Z, 1500, (uint)FiringPattern.FullAuto);
+                    Function.Call(Hash.TASK_SHOOT_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z, 1500, unchecked((int)FiringPattern.FullAuto));
                 }
             }
             else if (IsAiming)
             {
                 if (!Character.IsInRange(Position, 0.5f))
                 {
-                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 2f, 2f, false, 512, false,
-                                    (uint)FiringPattern.FullAuto);
+                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, false, 0x3F000000, 0x40800000, false, 512, false,
+                                    unchecked((int)FiringPattern.FullAuto));
                 }
                 else
                 {
-                    Character.Task.AimAt(AimCoords, -1);
+                    Character.Task.AimAt(AimCoords, 100);
                 }
             }
             else
@@ -285,8 +285,8 @@ namespace CoopClient
                 Character.AttachedBlip.Scale = 0.8f;
                 Character.AttachedBlip.Name = username;
 
-                Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character, false);
-                Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character, false);
+                Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
+                Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character.Handle, false);
             }
 
             foreach (KeyValuePair<int, int> prop in Props)
@@ -320,22 +320,22 @@ namespace CoopClient
                             }
 
                             Character.Task.GoStraightTo(predictPosition);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, nrange);
+                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, nrange);
                         }
                         break;
                     case 2:
                         if ((!Character.IsRunning || range > 0.50f) && (LastMoving = true))
                         {
                             Character.Task.RunTo(predictPosition, true);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, 1.0f);
+                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
                         }
                         break;
                     case 3:
                         if ((!Character.IsSprinting || range > 0.75f) && (LastMoving = true))
                         {
-                            Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character, predictPosition.X, predictPosition.Y, predictPosition.Z, 3.0f, -1, 0.0f, 0.0f);
-                            Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, Character, 1.49f);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character, 1.0f);
+                            Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character.Handle, predictPosition.X, predictPosition.Y, predictPosition.Z, 3.0f, -1, 0.0f, 0.0f);
+                            Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, Character.Handle, 1.49f);
+                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
                         }
                         break;
                     default:

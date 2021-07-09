@@ -263,7 +263,7 @@ namespace CoopClient
             {
                 ArtificialLagCounter = DateTime.Now;
 
-                byte? flags = Util.GetPedFlags(player, FullDebugSync);
+                byte? flags = Util.GetPedFlags(player, FullDebugSync, true);
 
                 if (FullDebugSync)
                 {
