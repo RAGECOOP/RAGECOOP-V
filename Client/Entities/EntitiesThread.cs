@@ -36,6 +36,11 @@ namespace CoopClient.Entities
                             npc.Value.Character.Delete();
                         }
 
+                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.PassengerCount == 0)
+                        {
+                            npc.Value.MainVehicle.Delete();
+                        }
+
                         Main.Npcs.Remove(npc.Key);
                     }
                     else

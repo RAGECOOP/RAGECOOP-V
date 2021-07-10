@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 
 using GTA;
 using GTA.Native;
@@ -22,6 +23,8 @@ namespace CoopClient
         private Dictionary<int, int> LastProps = new Dictionary<int, int>();
         public Dictionary<int, int> Props { get; set; }
         public Vector3 Position { get; set; }
+
+        #region -- ON FOOT --
         public Vector3 Rotation { get; set; }
         public Vector3 Velocity { get; set; }
         public byte Speed { get; set; }
@@ -34,8 +37,18 @@ namespace CoopClient
         public bool IsShooting { get; set; }
         public bool IsReloading { get; set; }
         public int CurrentWeaponHash { get; set; }
+        #endregion
 
         public Blip PedBlip;
+
+        #region -- VEHICLE --
+        public bool IsInVehicle { get; set; }
+        public int VehicleModelHash { get; set; }
+        public int VehicleSeatIndex { get; set; }
+        public Vehicle MainVehicle { get; set; }
+        public Vector3 VehiclePosition { get; set; }
+        public Quaternion VehicleRotation { get; set; }
+        #endregion
 
         public void DisplayLocally(string username)
         {
@@ -61,6 +74,12 @@ namespace CoopClient
             #region NOT_IN_RANGE
             if (!Game.Player.Character.IsInRange(Position, 250f))
             {
+                if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.PassengerCount <= 1)
+                {
+                    MainVehicle.Delete();
+                    MainVehicle = null;
+                }
+
                 if (Character != null && Character.Exists())
                 {
                     Character.Kill();
@@ -121,7 +140,7 @@ namespace CoopClient
                 }
             }
 
-            if (username != null && Character.IsInRange(Game.Player.Character.Position, 20f))
+            if (username != null && Character.IsVisible && Character.IsInRange(Game.Player.Character.Position, 20f))
             {
                 float sizeOffset;
                 if (GameplayCamera.IsFirstPersonAimCamActive)
@@ -188,6 +207,50 @@ namespace CoopClient
                     Character.Kill();
                     return;
                 }
+            }
+
+            if (IsInVehicle)
+            {
+                DisplayInVehicle();
+            }
+            else
+            {
+                DisplayOnFoot();
+            }
+            #endregion
+        }
+
+        private void DisplayInVehicle()
+        {
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
+            {
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
+
+                if (vehs.Count == 0 || !vehs[0].IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                {
+                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition, VehicleRotation.Z);
+                }
+                else
+                {
+                    MainVehicle = vehs[0];
+                }
+            }
+
+            if (!Character.IsInVehicle())
+            {
+                Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
+                Character.IsVisible = true;
+            }
+
+            MainVehicle.Position = VehiclePosition;
+            MainVehicle.Quaternion = VehicleRotation;
+        }
+
+        private void DisplayOnFoot()
+        {
+            if (Character.IsInVehicle())
+            {
+                Character.Task.LeaveVehicle();
             }
 
             if (IsJumping && !LastIsJumping)
@@ -262,7 +325,6 @@ namespace CoopClient
             {
                 WalkTo();
             }
-            #endregion
         }
 
         private void CreateCharacter(string username)
@@ -272,6 +334,10 @@ namespace CoopClient
 
             Character = World.CreatePed(new Model(ModelHash), Position, Rotation.Z);
             Character.RelationshipGroup = Main.RelationshipGroup;
+            if (IsInVehicle)
+            {
+                Character.IsVisible = false;
+            }
             Character.BlockPermanentEvents = true;
             Character.CanRagdoll = false;
             Character.IsInvincible = true;

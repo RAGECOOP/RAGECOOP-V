@@ -259,19 +259,25 @@ namespace CoopClient
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if (!player.IsInVehicle() && DateTime.Now.Subtract(ArtificialLagCounter).TotalMilliseconds >= 300)
+            if (DateTime.Now.Subtract(ArtificialLagCounter).TotalMilliseconds < 300)
             {
-                ArtificialLagCounter = DateTime.Now;
+                return;
+            }
 
-                byte? flags = Util.GetPedFlags(player, FullDebugSync, true);
+            ArtificialLagCounter = DateTime.Now;
 
-                if (FullDebugSync)
-                {
-                    DebugSyncPed.ModelHash = player.Model.Hash;
-                    DebugSyncPed.Props = Util.GetPedProps(player);
-                }
-                DebugSyncPed.Health = player.Health;
-                DebugSyncPed.Position = player.Position;
+            byte? flags = Util.GetPedFlags(player, FullDebugSync, true);
+
+            if (FullDebugSync)
+            {
+                DebugSyncPed.ModelHash = player.Model.Hash;
+                DebugSyncPed.Props = Util.GetPedProps(player);
+            }
+            DebugSyncPed.Health = player.Health;
+            DebugSyncPed.Position = player.Position;
+
+            if (!player.IsInVehicle())
+            {
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
                 DebugSyncPed.Speed = Util.GetPedSpeed(player);
@@ -285,11 +291,27 @@ namespace CoopClient
                 DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
             }
+            else
+            {
+                Vehicle veh = player.CurrentVehicle;
+                DebugSyncPed.VehicleModelHash = veh.Model.Hash;
+                DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
+                DebugSyncPed.VehiclePosition = veh.Position;
+                DebugSyncPed.VehicleRotation = veh.Quaternion;
+            }
+
+            DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
 
             if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
             {
                 Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
                 Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
+            }
+
+            if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
+            {
+                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, player.CurrentVehicle.Handle, false);
+                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.CurrentVehicle.Handle, DebugSyncPed.MainVehicle.Handle, false);
             }
 
             FullDebugSync = !FullDebugSync;

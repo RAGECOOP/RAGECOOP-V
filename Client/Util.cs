@@ -74,6 +74,11 @@ namespace CoopClient
                 flags |= (byte)PedDataFlags.IsOnFire;
             }
 
+            if (ped.IsInVehicle())
+            {
+                flags |= (byte)PedDataFlags.IsInVehicle;
+            }
+
             return flags;
         }
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 
 namespace CoopServer
@@ -9,7 +10,7 @@ namespace CoopServer
         {
             XmlSerializer ser = new(typeof(T));
 
-            string path = Directory.GetCurrentDirectory() + "\\" + file;
+            string path = AppContext.BaseDirectory + "\\" + file;
             T settings;
 
             if (File.Exists(path))

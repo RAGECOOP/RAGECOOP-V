@@ -32,6 +32,30 @@ namespace CoopServer
         #endregion
     }
 
+    [ProtoContract]
+    public struct LQuaternion
+    {
+        public LQuaternion(float X, float Y, float Z, float W)
+        {
+            this.X = X;
+            this.Y = Y;
+            this.Z = Z;
+            this.W = W;
+        }
+
+        [ProtoMember(1)]
+        public float X { get; set; }
+
+        [ProtoMember(2)]
+        public float Y { get; set; }
+
+        [ProtoMember(3)]
+        public float Z { get; set; }
+
+        [ProtoMember(4)]
+        public float W { get; set; }
+    }
+
     public enum ModVersion
     {
         V0_1_0
@@ -45,6 +69,7 @@ namespace CoopServer
         FullSyncPlayerPacket,
         FullSyncNpcPacket,
         LightSyncPlayerPacket,
+        FullSyncNpcVehPacket,
         ChatMessagePacket
     }
 
@@ -57,7 +82,8 @@ namespace CoopServer
         IsReloading = 1 << 3,
         IsJumping = 1 << 4,
         IsRagdoll = 1 << 5,
-        IsOnFire = 1 << 6
+        IsOnFire = 1 << 6,
+        IsInVehicle = 1 << 7
     }
 
     public interface IPacket
@@ -360,6 +386,68 @@ namespace CoopServer
             Speed = data.Speed;
             AimCoords = data.AimCoords;
             CurrentWeaponHash = data.CurrentWeaponHash;
+            Flag = data.Flag;
+        }
+    }
+
+    [ProtoContract]
+    public class FullSyncNpcVehPacket : Packet
+    {
+        [ProtoMember(1)]
+        public string ID { get; set; }
+
+        [ProtoMember(2)]
+        public int ModelHash { get; set; }
+
+        [ProtoMember(3)]
+        public Dictionary<int, int> Props { get; set; }
+
+        [ProtoMember(4)]
+        public int Health { get; set; }
+
+        [ProtoMember(5)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(6)]
+        public int VehModelHash { get; set; }
+
+        [ProtoMember(7)]
+        public int VehSeatIndex { get; set; }
+
+        [ProtoMember(8)]
+        public LVector3 VehPosition { get; set; }
+
+        [ProtoMember(9)]
+        public LQuaternion VehRotation { get; set; }
+
+        [ProtoMember(10)]
+        public byte? Flag { get; set; } = 0;
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.FullSyncNpcVehPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            FullSyncNpcVehPacket data = CoopSerializer.Deserialize<FullSyncNpcVehPacket>(message.ReadBytes(len));
+
+            ID = data.ID;
+            ModelHash = data.ModelHash;
+            Props = data.Props;
+            Health = data.Health;
+            Position = data.Position;
+            VehModelHash = data.VehModelHash;
+            VehSeatIndex = data.VehSeatIndex;
+            VehPosition = data.VehPosition;
+            VehRotation = data.VehRotation;
             Flag = data.Flag;
         }
     }

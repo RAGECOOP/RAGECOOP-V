@@ -229,6 +229,25 @@ namespace CoopServer
                                         message.SenderConnection.Disconnect(e.Message);
                                     }
                                     break;
+                                case (byte)PacketTypes.FullSyncNpcVehPacket:
+                                    if (MainSettings.NpcsAllowed)
+                                    {
+                                        try
+                                        {
+                                            packet = new FullSyncNpcVehPacket();
+                                            packet.NetIncomingMessageToPacket(message);
+                                            FullSyncNpcVeh(message.SenderConnection, (FullSyncNpcVehPacket)packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        message.SenderConnection.Disconnect("Npcs are not allowed!");
+                                    }
+                                    break;
                                 case (byte)PacketTypes.ChatMessagePacket:
                                     try
                                     {
@@ -468,6 +487,19 @@ namespace CoopServer
             Players[packet.Player].Ped.Position = packet.Position;
 
             List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            if (playerList.Count == 0)
+            {
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+
+        private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
+        {
+            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
             if (playerList.Count == 0)
             {
                 return;
