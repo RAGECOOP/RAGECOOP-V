@@ -424,6 +424,9 @@ namespace CoopServer
         public float VehSpeed { get; set; }
 
         [ProtoMember(11)]
+        public float VehSteeringAngle { get; set; }
+
+        [ProtoMember(12)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -452,6 +455,7 @@ namespace CoopServer
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
             VehSpeed = data.VehSpeed;
+            VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;
         }
     }

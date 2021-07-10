@@ -49,6 +49,7 @@ namespace CoopClient
         public Vector3 VehiclePosition { get; set; }
         public Quaternion VehicleRotation { get; set; }
         public float VehicleSpeed { get; set; }
+        public float VehicleSteeringAngle { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -242,6 +243,8 @@ namespace CoopClient
                 Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
                 Character.IsVisible = true;
             }
+
+            MainVehicle.SteeringAngle = VehicleSteeringAngle;
 
             float range = MainVehicle.Position.DistanceTo(VehiclePosition);
 

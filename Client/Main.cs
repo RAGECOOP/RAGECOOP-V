@@ -299,6 +299,7 @@ namespace CoopClient
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
+                DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
             }
 
             DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
