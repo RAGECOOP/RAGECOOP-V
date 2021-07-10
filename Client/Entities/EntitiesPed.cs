@@ -274,8 +274,6 @@ namespace CoopClient
 
             MainVehicle.SteeringAngle = VehicleSteeringAngle;
 
-            float range = MainVehicle.Position.DistanceTo(VehiclePosition);
-
             // Good enough for now, but we need to create a better sync
             MainVehicle.Position = VehiclePosition;
             MainVehicle.Quaternion = VehicleRotation;
