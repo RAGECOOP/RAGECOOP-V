@@ -458,6 +458,9 @@ namespace CoopClient
         public LQuaternion VehRotation { get; set; }
 
         [ProtoMember(10)]
+        public float VehSpeed { get; set; }
+
+        [ProtoMember(11)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -485,6 +488,7 @@ namespace CoopClient
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
+            VehSpeed = data.VehSpeed;
             Flag = data.Flag;
         }
     }

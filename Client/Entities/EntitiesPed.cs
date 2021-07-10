@@ -41,13 +41,14 @@ namespace CoopClient
 
         public Blip PedBlip;
 
-        #region -- VEHICLE --
+        #region -- IN VEHICLE --
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
         public Quaternion VehicleRotation { get; set; }
+        public float VehicleSpeed { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -242,7 +243,20 @@ namespace CoopClient
                 Character.IsVisible = true;
             }
 
-            MainVehicle.Position = VehiclePosition;
+            float range = MainVehicle.Position.DistanceTo(VehiclePosition);
+
+            // Good enough for now, but we need to create a better sync
+            if (range > 0.8f && range <= 15f && VehicleSpeed >= 1)
+            {
+                Vector3 dir = VehiclePosition - MainVehicle.Position;
+                dir.Normalize();
+                Vector3 vect = dir * Math.Abs(VehicleSpeed - MainVehicle.Speed);
+                MainVehicle.ApplyForce(vect);
+            }
+            else
+            {
+                MainVehicle.Position = VehiclePosition;
+            }
             MainVehicle.Quaternion = VehicleRotation;
         }
 

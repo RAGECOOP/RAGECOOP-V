@@ -298,6 +298,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
+                DebugSyncPed.VehicleSpeed = veh.Speed;
             }
 
             DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;

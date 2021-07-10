@@ -392,6 +392,7 @@ namespace CoopClient
                 npc.VehicleSeatIndex = packet.VehSeatIndex;
                 npc.VehiclePosition = packet.VehPosition.ToVector();
                 npc.VehicleRotation = packet.VehRotation.ToQuaternion();
+                npc.VehicleSpeed = packet.VehSpeed;
                 npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 npc.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
             }
@@ -408,6 +409,7 @@ namespace CoopClient
                     VehicleSeatIndex = packet.VehSeatIndex,
                     VehiclePosition = packet.VehPosition.ToVector(),
                     VehicleRotation = packet.VehRotation.ToQuaternion(),
+                    VehicleSpeed = packet.VehSpeed,
                     LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
                     IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0
                 });
