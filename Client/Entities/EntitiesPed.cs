@@ -48,6 +48,7 @@ namespace CoopClient
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
         public Quaternion VehicleRotation { get; set; }
+        public Vector3 VehicleVelocity { get; set; }
         public float VehicleSpeed { get; set; }
         public float VehicleSteeringAngle { get; set; }
         private bool LastVehIsEngineRunning { get; set; }
@@ -274,8 +275,15 @@ namespace CoopClient
 
             MainVehicle.SteeringAngle = VehicleSteeringAngle;
 
-            // Good enough for now, but we need to create a better sync
-            MainVehicle.Position = VehiclePosition;
+            if (VehicleSpeed > 0.2f)
+            {
+                MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
+            }
+            else
+            {
+                MainVehicle.Position = VehiclePosition;
+            }
+
             MainVehicle.Quaternion = VehicleRotation;
             #endregion
         }

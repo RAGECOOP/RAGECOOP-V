@@ -431,12 +431,15 @@ namespace CoopServer
         public LQuaternion VehRotation { get; set; }
 
         [ProtoMember(10)]
-        public float VehSpeed { get; set; }
+        public LVector3 VehVelocity { get; set; }
 
         [ProtoMember(11)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
+        public float VehSteeringAngle { get; set; }
+
+        [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -464,6 +467,7 @@ namespace CoopServer
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
+            VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;

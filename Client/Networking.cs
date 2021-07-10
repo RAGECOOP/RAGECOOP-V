@@ -392,6 +392,7 @@ namespace CoopClient
                 npc.VehicleSeatIndex = packet.VehSeatIndex;
                 npc.VehiclePosition = packet.VehPosition.ToVector();
                 npc.VehicleRotation = packet.VehRotation.ToQuaternion();
+                npc.VehicleVelocity = packet.VehVelocity.ToVector();
                 npc.VehicleSpeed = packet.VehSpeed;
                 npc.VehicleSteeringAngle = packet.VehSteeringAngle;
                 npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
@@ -413,6 +414,7 @@ namespace CoopClient
                     VehicleSeatIndex = packet.VehSeatIndex,
                     VehiclePosition = packet.VehPosition.ToVector(),
                     VehicleRotation = packet.VehRotation.ToQuaternion(),
+                    VehicleVelocity = packet.VehVelocity.ToVector(),
                     VehicleSpeed = packet.VehSpeed,
                     VehicleSteeringAngle = packet.VehSteeringAngle,
                     LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
@@ -506,6 +508,9 @@ namespace CoopClient
                     VehSeatIndex = (int)npc.SeatIndex,
                     VehPosition = npc.CurrentVehicle.Position.ToLVector(),
                     VehRotation = npc.CurrentVehicle.Quaternion.ToLQuaternion(),
+                    VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
+                    VehSpeed = npc.CurrentVehicle.Speed,
+                    VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
                     Flag = Util.GetPedFlags(npc, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
