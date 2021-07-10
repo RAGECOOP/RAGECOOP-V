@@ -50,6 +50,36 @@ namespace CoopClient
         public Quaternion VehicleRotation { get; set; }
         public float VehicleSpeed { get; set; }
         public float VehicleSteeringAngle { get; set; }
+        private bool LastVehIsEngineRunning { get; set; }
+        private bool CurrentVehIsEngineRunning { get; set; }
+        public bool VehIsEngineRunning
+        {
+            set
+            {
+                LastVehIsEngineRunning = CurrentVehIsEngineRunning;
+                CurrentVehIsEngineRunning = value;
+            }
+        }
+        private bool LastVehAreLightsOn { get; set; }
+        private bool CurrentVehAreLightsOn { get; set; }
+        public bool VehAreLightsOn
+        {
+            set
+            {
+                LastVehAreLightsOn = CurrentVehAreLightsOn;
+                CurrentVehAreLightsOn = value;
+            }
+        }
+        private bool LastVehAreHighBeamsOn { get; set; }
+        private bool CurrentVehAreHighBeamsOn { get; set; }
+        public bool VehAreHighBeamsOn
+        {
+            set
+            {
+                LastVehAreHighBeamsOn = CurrentVehAreHighBeamsOn;
+                CurrentVehAreHighBeamsOn = value;
+            }
+        }
         #endregion
 
         public void DisplayLocally(string username)
@@ -171,24 +201,6 @@ namespace CoopClient
                 Function.Call(Hash.CLEAR_DRAW_ORIGIN);
             }
 
-            if (IsOnFire && !Character.IsOnFire)
-            {
-                Character.IsInvincible = false;
-
-                Function.Call(Hash.START_ENTITY_FIRE, Character.Handle);
-            }
-            else if (!IsOnFire && Character.IsOnFire)
-            {
-                Function.Call(Hash.STOP_ENTITY_FIRE, Character.Handle);
-
-                Character.IsInvincible = true;
-
-                if (Character.IsDead)
-                {
-                    Character.Resurrect();
-                }
-            }
-
             if (Character.IsDead)
             {
                 if (Health <= 0)
@@ -244,23 +256,30 @@ namespace CoopClient
                 Character.IsVisible = true;
             }
 
+            #region -- VEHICLE SYNC --
+            if (CurrentVehIsEngineRunning != LastVehIsEngineRunning)
+            {
+                MainVehicle.IsEngineRunning = CurrentVehIsEngineRunning;
+            }
+
+            if (CurrentVehAreLightsOn != LastVehAreLightsOn)
+            {
+                MainVehicle.AreLightsOn = CurrentVehAreLightsOn;
+            }
+
+            if (CurrentVehAreHighBeamsOn != LastVehAreHighBeamsOn)
+            {
+                MainVehicle.AreHighBeamsOn = CurrentVehAreHighBeamsOn;
+            }
+
             MainVehicle.SteeringAngle = VehicleSteeringAngle;
 
             float range = MainVehicle.Position.DistanceTo(VehiclePosition);
 
             // Good enough for now, but we need to create a better sync
-            if (range > 0.8f && range <= 15f && VehicleSpeed >= 1)
-            {
-                Vector3 dir = VehiclePosition - MainVehicle.Position;
-                dir.Normalize();
-                Vector3 vect = dir * Math.Abs(VehicleSpeed - MainVehicle.Speed);
-                MainVehicle.ApplyForce(vect);
-            }
-            else
-            {
-                MainVehicle.Position = VehiclePosition;
-            }
+            MainVehicle.Position = VehiclePosition;
             MainVehicle.Quaternion = VehicleRotation;
+            #endregion
         }
 
         private void DisplayOnFoot()
@@ -268,6 +287,26 @@ namespace CoopClient
             if (Character.IsInVehicle())
             {
                 Character.Task.LeaveVehicle();
+            }
+
+            if (IsOnFire && !Character.IsOnFire)
+            {
+                Character.IsInvincible = false;
+
+                Function.Call(Hash.START_ENTITY_FIRE, Character.Handle);
+
+                return;
+            }
+            else if (!IsOnFire && Character.IsOnFire)
+            {
+                Function.Call(Hash.STOP_ENTITY_FIRE, Character.Handle);
+
+                Character.IsInvincible = true;
+
+                if (Character.IsDead)
+                {
+                    Character.Resurrect();
+                }
             }
 
             if (IsJumping && !LastIsJumping)

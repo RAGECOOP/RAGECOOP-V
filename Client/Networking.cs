@@ -394,8 +394,11 @@ namespace CoopClient
                 npc.VehicleRotation = packet.VehRotation.ToQuaternion();
                 npc.VehicleSpeed = packet.VehSpeed;
                 npc.VehicleSteeringAngle = packet.VehSteeringAngle;
-                npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
-                npc.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
+                npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
+                npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
+                npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
             }
             else
             {
@@ -412,8 +415,11 @@ namespace CoopClient
                     VehicleRotation = packet.VehRotation.ToQuaternion(),
                     VehicleSpeed = packet.VehSpeed,
                     VehicleSteeringAngle = packet.VehSteeringAngle,
-                    LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
-                    IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0
+                    LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
+                    IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
+                    VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
+                    VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
+                    VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0
                 });
             }
         }

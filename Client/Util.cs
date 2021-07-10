@@ -35,6 +35,38 @@ namespace CoopClient
             return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
         }
 
+        public static byte? GetVehicleFlags(Ped ped, Vehicle veh, bool fullSync)
+        {
+            byte? flags = 0;
+
+            if (fullSync)
+            {
+                flags |= (byte)VehicleDataFlags.LastSyncWasFull;
+            }
+
+            if (ped.IsInVehicle())
+            {
+                flags |= (byte)VehicleDataFlags.IsInVehicle;
+            }
+
+            if (veh.IsEngineRunning)
+            {
+                flags |= (byte)VehicleDataFlags.IsEngineRunning;
+            }
+
+            if (veh.AreLightsOn)
+            {
+                flags |= (byte)VehicleDataFlags.AreLightsOn;
+            }
+
+            if (veh.AreHighBeamsOn)
+            {
+                flags |= (byte)VehicleDataFlags.AreHighBeamsOn;
+            }
+
+            return flags;
+        }
+
         public static byte? GetPedFlags(Ped ped, bool fullSync, bool isPlayer = false)
         {
             byte? flags = 0;

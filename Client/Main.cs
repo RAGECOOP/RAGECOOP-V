@@ -266,8 +266,6 @@ namespace CoopClient
 
             ArtificialLagCounter = DateTime.Now;
 
-            byte? flags = Util.GetPedFlags(player, FullDebugSync, true);
-
             if (FullDebugSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
@@ -276,8 +274,12 @@ namespace CoopClient
             DebugSyncPed.Health = player.Health;
             DebugSyncPed.Position = player.Position;
 
+            byte? flags;
+
             if (!player.IsInVehicle())
             {
+                flags = Util.GetPedFlags(player, FullDebugSync, true);
+
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
                 DebugSyncPed.Speed = Util.GetPedSpeed(player);
@@ -290,19 +292,25 @@ namespace CoopClient
                 DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
                 DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
+                DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
             }
             else
             {
                 Vehicle veh = player.CurrentVehicle;
+                flags = Util.GetVehicleFlags(player, veh, FullDebugSync);
+
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
+                DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
+                DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
             }
-
-            DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
 
             if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
             {

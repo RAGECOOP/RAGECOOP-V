@@ -123,6 +123,16 @@ namespace CoopClient
         IsInVehicle = 1 << 7
     }
 
+    [Flags]
+    public enum VehicleDataFlags
+    {
+        LastSyncWasFull = 1 << 0,
+        IsInVehicle = 1 << 1,
+        IsEngineRunning = 1 << 2,
+        AreLightsOn = 1 << 3,
+        AreHighBeamsOn = 1 << 4
+    }
+
     public interface IPacket
     {
         void PacketToNetOutGoingMessage(NetOutgoingMessage message);
