@@ -245,7 +245,7 @@ namespace CoopClient
             }
         }
 
-        private DateTime ArtificialLagCounter = DateTime.MinValue;
+        private int ArtificialLagCounter;
         private EntitiesPlayer DebugSyncPed;
         private bool FullDebugSync = true;
         private bool UseDebug = false;
@@ -259,12 +259,10 @@ namespace CoopClient
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if (DateTime.Now.Subtract(ArtificialLagCounter).TotalMilliseconds < 300)
+            if ((Environment.TickCount - ArtificialLagCounter) < 42)
             {
                 return;
             }
-
-            ArtificialLagCounter = DateTime.Now;
 
             if (FullDebugSync)
             {
@@ -326,6 +324,7 @@ namespace CoopClient
             }
 
             FullDebugSync = !FullDebugSync;
+            ArtificialLagCounter = Environment.TickCount;
         }
     }
 }

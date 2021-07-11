@@ -277,6 +277,7 @@ namespace CoopClient
 
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
+                // The angle 0.0f does not work in debug mode ??
                 MainVehicle.SteeringAngle = VehicleSteeringAngle;
             }
 
