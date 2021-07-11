@@ -11,6 +11,21 @@ namespace CoopClient
 {
     class Util
     {
+        public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, int currentTime, int duration)
+        {
+            return new Vector3()
+            {
+                X = LinearFloatLerp(start.X, end.X, currentTime, duration),
+                Y = LinearFloatLerp(start.Y, end.Y, currentTime, duration),
+                Z = LinearFloatLerp(start.Z, end.Z, currentTime, duration),
+            };
+        }
+
+        public static float LinearFloatLerp(float start, float end, int currentTime, int duration)
+        {
+            return (end - start) * currentTime / duration + start;
+        }
+
         public static byte GetPedSpeed(Ped ped)
         {
             if (ped.IsSprinting)

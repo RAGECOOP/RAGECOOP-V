@@ -42,6 +42,8 @@ namespace CoopClient
         public Blip PedBlip;
 
         #region -- IN VEHICLE --
+        private int VehicleStopTime { get; set; }
+
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
         public int VehicleSeatIndex { get; set; }
@@ -273,18 +275,30 @@ namespace CoopClient
                 MainVehicle.AreHighBeamsOn = CurrentVehAreHighBeamsOn;
             }
 
-            MainVehicle.SteeringAngle = VehicleSteeringAngle;
+            if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
+            {
+                MainVehicle.SteeringAngle = VehicleSteeringAngle;
+            }
 
-            if (VehicleSpeed > 0.2f)
+            // Good enough for now, but we need to create a better sync
+            if (VehicleSpeed > 0.2f && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.25f);
+
+                VehicleStopTime = Environment.TickCount;
+            }
+            else if ((Environment.TickCount - VehicleStopTime) <= 1000)
+            {
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), (Environment.TickCount - VehicleStopTime), 1000);
+                MainVehicle.PositionNoOffset = posTarget;
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }
             else
             {
                 MainVehicle.Position = VehiclePosition;
+                MainVehicle.Quaternion = VehicleRotation;
             }
-
-            MainVehicle.Quaternion = VehicleRotation;
             #endregion
         }
 
@@ -293,6 +307,11 @@ namespace CoopClient
             if (Character.IsInVehicle())
             {
                 Character.Task.LeaveVehicle();
+            }
+
+            if (MainVehicle != null)
+            {
+                MainVehicle = null;
             }
 
             if (IsOnFire && !Character.IsOnFire)
