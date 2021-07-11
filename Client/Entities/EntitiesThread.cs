@@ -28,7 +28,9 @@ namespace CoopClient.Entities
                 // Remove all NPCs with a last update older than npcThreshold or display this npc
                 foreach (KeyValuePair<string, EntitiesNpc> npc in new Dictionary<string, EntitiesNpc>(Main.Npcs))
                 {
-                    if ((Environment.TickCount - npc.Value.LastUpdateReceived) > npcThreshold)
+                    int tickCount = Environment.TickCount - npc.Value.LastUpdateReceived;
+
+                    if (tickCount > 3500) // If the last update is older than 3.5s, then delete this npc completely
                     {
                         if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
                         {
@@ -42,6 +44,19 @@ namespace CoopClient.Entities
                         }
 
                         Main.Npcs.Remove(npc.Key);
+                    }
+                    else if (tickCount > 1500) // If the last update is older than 1.5s, then delete this npc temporarily
+                    {
+                        if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
+                        {
+                            npc.Value.Character.Kill();
+                            npc.Value.Character.Delete();
+                        }
+
+                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.PassengerCount == 0)
+                        {
+                            npc.Value.MainVehicle.Delete();
+                        }
                     }
                     else
                     {
@@ -57,7 +72,7 @@ namespace CoopClient.Entities
                 foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 150f)
                     .Where(p => p.Handle != Game.Player.Character.Handle && !p.IsDead && p.RelationshipGroup != Main.RelationshipGroup)
                     .OrderBy(p => (p.Position - Game.Player.Character.Position).Length())
-                    .Take(10)) // only 10 for now
+                    .Take((Main.MainSettings.StreamedNpc > 20 || Main.MainSettings.StreamedNpc < 0) ? 0 : Main.MainSettings.StreamedNpc))
                 {
                     Main.MainNetworking.SendNpcData(ped);
                 }

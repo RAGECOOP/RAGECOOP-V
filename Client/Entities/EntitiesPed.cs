@@ -360,15 +360,18 @@ namespace CoopClient
                 return;
             }
 
-            if (IsReloading && !Character.IsReloading)
-            {
-                Character.Task.ClearAll();
-                Character.Task.ReloadWeapon();
-            }
-
             if (IsReloading)
             {
-                return;
+                if (!Character.IsReloading)
+                {
+                    Character.Task.ClearAll();
+                    Character.Task.ReloadWeapon();
+                }
+
+                if (Character.IsInRange(Position, 0.5f))
+                {
+                    return;
+                }
             }
 
             if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash)

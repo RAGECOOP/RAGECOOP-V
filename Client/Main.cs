@@ -98,6 +98,13 @@ namespace CoopClient
             };
             shareNpcsItem.Enabled = false;
 
+            NativeSliderItem streamedNpcsItem = new NativeSliderItem("Streamed Npcs", 20, MainSettings.StreamedNpc);
+            streamedNpcsItem.ValueChanged += (item, value) =>
+            {
+                MainSettings.StreamedNpc = streamedNpcsItem.Value;
+                Util.SaveSettings();
+            };
+
             NativeCheckboxItem flipMenuItem = new NativeCheckboxItem("Flip menu", MainSettings.FlipMenu);
             flipMenuItem.CheckboxChanged += (item, check) =>
             {
@@ -139,6 +146,7 @@ namespace CoopClient
             MainMenu.Add(serverConnectItem);
             MainMenu.AddSubMenu(MainSettingsMenu);
             MainSettingsMenu.Add(shareNpcsItem);
+            MainSettingsMenu.Add(streamedNpcsItem);
             MainSettingsMenu.Add(flipMenuItem);
 #if DEBUG
             MainSettingsMenu.Add(useDebugItem);
