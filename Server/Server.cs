@@ -40,7 +40,7 @@ namespace CoopServer
                         "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\"" +
                         " }";
             
-                    HttpResponseMessage response = await client.PostAsync("http://localhost:8081/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
+                    HttpResponseMessage response = await client.PostAsync(Server.MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
 
                     string responseContent = await response.Content.ReadAsStringAsync();
 
