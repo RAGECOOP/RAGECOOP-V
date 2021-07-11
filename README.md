@@ -25,12 +25,18 @@ This modification was completely rewritten and NOT revised
 - [Protobuf-net](https://www.nuget.org/packages/protobuf-net/2.4.6)
 
 # ♻️ Synchronization
-- Player & Npc
+- Pedestrians
   - Model
   - Props
   - Health
+  - Jumping, Reloading and some other syncs
   - Movement (Not finished yet)
   - Weapons (Not finished yet)
+- Vehicles (Currently only for Npcs)
+  - Engine
+  - Light
+  - High beam
+  - Movement (Not finished yet)
 
 # 📝 License
 This project is licensed under [MIT license](https://github.com/EntenKoeniq/GTACoop-R/blob/main/LICENSE)
