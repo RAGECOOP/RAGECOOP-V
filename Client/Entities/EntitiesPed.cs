@@ -243,13 +243,21 @@ namespace CoopClient
             {
                 List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
 
-                if (vehs.Count == 0 || !vehs[0].IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                bool vehFound = false;
+
+                foreach (Vehicle veh in vehs)
+                {
+                    if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                    {
+                        MainVehicle = veh;
+                        vehFound = true;
+                        break;
+                    }
+                }
+
+                if (!vehFound)
                 {
                     MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition, VehicleRotation.Z);
-                }
-                else
-                {
-                    MainVehicle = vehs[0];
                 }
             }
 

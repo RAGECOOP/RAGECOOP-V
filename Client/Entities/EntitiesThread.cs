@@ -8,8 +8,6 @@ namespace CoopClient.Entities
 {
     public class EntitiesThread : Script
     {
-        const int npcThreshold = 2500; // 2.5 seconds timeout
-
         public EntitiesThread()
         {
             Tick += OnTick;
