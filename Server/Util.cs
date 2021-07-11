@@ -10,7 +10,7 @@ namespace CoopServer
         {
             XmlSerializer ser = new(typeof(T));
 
-            string path = AppContext.BaseDirectory + "\\" + file;
+            string path = AppContext.BaseDirectory + file;
             T settings;
 
             if (File.Exists(path))
