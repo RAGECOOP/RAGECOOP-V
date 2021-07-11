@@ -511,7 +511,7 @@ namespace CoopClient
                     VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
                     VehSpeed = npc.CurrentVehicle.Speed,
                     VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
-                    Flag = Util.GetPedFlags(npc, true)
+                    Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 

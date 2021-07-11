@@ -241,7 +241,7 @@ namespace CoopClient
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - VehiclePosition).Length()).Take(3).ToList();
 
                 bool vehFound = false;
 
@@ -435,6 +435,7 @@ namespace CoopClient
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
             Character.Health = Health;
+            Character.CanBeTargetted = true;
 
             if (username != null)
             {

@@ -2,9 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
+using System.Net.Http;
 
 using Lidgren.Network;
 
@@ -22,48 +21,35 @@ namespace CoopServer
             MainThread.Start();
         }
 
-        private void Listen()
+        private async void Listen()
         {
-            try
-            {
-                IPHostEntry host = Dns.GetHostEntry(Server.MainSettings.MasterServer);
-                IPAddress ipAddress = host.AddressList[0];
-                IPEndPoint remoteEP = new(ipAddress, 11000);
-
-                // Create a TCP/IP socket
-                Socket sender = new(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-
-                sender.Connect(remoteEP);
-
-                Logging.Info("Server connected to MasterServer");
-
-                while (sender.Connected)
-                {
-                    // Encode the data string into a byte array
-                    byte[] msg = Encoding.ASCII.GetBytes(
-                        "{ \"method\": \"POST\", \"data\": { " +
-                        "\"Port\": \"" + Server.MainSettings.ServerPort + "\", " +
-                        "\"Name\": \"" + Server.MainSettings.ServerName + "\", " +
-                        "\"Version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
-                        "\"Players\": " + Server.MainNetServer.ConnectionsCount + ", " +
-                        "\"MaxPlayers\": " + Server.MainSettings.MaxPlayers + ", " +
-                        "\"NpcsAllowed\": \"" + Server.MainSettings.NpcsAllowed + "\" } }");
-
-                    // Send the data
-                    sender.Send(msg);
-
-                    // Sleep for 15 seconds
-                    Thread.Sleep(15000);
-                }
-            }
-            catch (SocketException se)
-            {
-                Logging.Error(se.Message);
-            }
-            catch (Exception e)
-            {
-                Logging.Error(e.Message);
-            }
+            //try
+            //{
+            //    HttpClient client = new();
+            //
+            //    while (true)
+            //    {
+            //        // Encode the data string into a byte array
+            //        string msg =
+            //            "{ " +
+            //            "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
+            //            "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
+            //            "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
+            //            "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
+            //            "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
+            //            "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\"" +
+            //            " }";
+            //
+            //        HttpResponseMessage response = await client.PostAsync("http://localhost:8081/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
+            //
+            //        // Sleep for 10s
+            //        Thread.Sleep(10000);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Logging.Error(ex.Message);
+            //}
         }
     }
 
