@@ -14,9 +14,13 @@
 This modification was completely rewritten and NOT revised
 
 # 📋 Requirements
-- Visual Studio 2022
-  - Untested on other development environments
-- .NET 6.0 & Framework 4.8
+- Visual Studio
+  - 2019
+  - 2020
+- .NET
+  - 5.0
+  - 6.0
+- .NET Framework 4.8
 
 # 📚 Libraries
 - [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/0333095099a20a266c4f17dc52d21c608d1082de)
