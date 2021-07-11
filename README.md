@@ -16,7 +16,7 @@ This modification was completely rewritten and NOT revised
 # 📋 Requirements
 - Visual Studio
   - 2019
-  - 2020
+  - 2022
 - .NET
   - 5.0
   - 6.0
