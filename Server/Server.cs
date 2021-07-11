@@ -108,7 +108,7 @@ namespace CoopServer
                 }
             }
 
-            if (MainSettings.UPnP && MainNetServer.UPnP.Status == UPnPStatus.Available && MainSettings.AnnounceSelf)
+            if (MainSettings.AnnounceSelf)
             {
                 MainMasterServer.Start();
             }
