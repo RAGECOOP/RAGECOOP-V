@@ -10,6 +10,7 @@
         public bool NpcsAllowed { get; set; } = true;
         public string MasterServer { get; set; } = "https://gtacoopr.entenkoeniq.de/servers";
         public bool AnnounceSelf { get; set; } = true;
+        public bool UPnP { get; set; } = true;
         public bool DebugMode { get; set; } = false;
     }
 }

@@ -83,7 +83,8 @@ namespace CoopServer
             NetPeerConfiguration config = new("6d4ec318f1c43bd62fe13d5a7ab28650")
             {
                 MaximumConnections = MainSettings.MaxPlayers,
-                Port = MainSettings.ServerPort
+                Port = MainSettings.ServerPort,
+                EnableUPnP = MainSettings.UPnP
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -93,7 +94,21 @@ namespace CoopServer
 
             Logging.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
 
-            if (MainSettings.AnnounceSelf)
+            if (MainSettings.UPnP)
+            {
+                Logging.Info(string.Format("Attempting to forward port {0}", MainSettings.ServerPort));
+
+                if (MainNetServer.UPnP.ForwardPort(MainSettings.ServerPort, "GTACOOP:R server"))
+                {
+                    Logging.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
+                }
+                else
+                {
+                    Logging.Error("Port forwarding failed!");
+                }
+            }
+
+            if (MainSettings.UPnP && MainNetServer.UPnP.Status == UPnPStatus.Available && MainSettings.AnnounceSelf)
             {
                 MainMasterServer.Start();
             }
