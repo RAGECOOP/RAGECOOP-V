@@ -23,33 +23,43 @@ namespace CoopServer
 
         private async void Listen()
         {
-            //try
-            //{
-            //    HttpClient client = new();
-            //
-            //    while (true)
-            //    {
-            //        // Encode the data string into a byte array
-            //        string msg =
-            //            "{ " +
-            //            "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
-            //            "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
-            //            "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
-            //            "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
-            //            "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
-            //            "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\"" +
-            //            " }";
-            //
-            //        HttpResponseMessage response = await client.PostAsync("http://localhost:8081/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
-            //
-            //        // Sleep for 10s
-            //        Thread.Sleep(10000);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Logging.Error(ex.Message);
-            //}
+            try
+            {
+                bool responseError = false;
+                HttpClient client = new();
+            
+                while (!responseError)
+                {
+                    string msg =
+                        "{ " +
+                        "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
+                        "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
+                        "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
+                        "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
+                        "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
+                        "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\"" +
+                        " }";
+            
+                    HttpResponseMessage response = await client.PostAsync("http://localhost:8081/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
+
+                    string responseContent = await response.Content.ReadAsStringAsync();
+
+                    if (responseContent != "OK!")
+                    {
+                        Logging.Error(responseContent);
+                        responseError = true;
+                    }
+                    else
+                    {
+                        // Sleep for 10s
+                        Thread.Sleep(10000);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex.Message);
+            }
         }
     }
 
