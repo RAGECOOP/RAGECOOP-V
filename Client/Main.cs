@@ -26,12 +26,12 @@ namespace CoopClient
 
         public static Settings MainSettings = Util.ReadSettings();
         public static ObjectPool MainMenuPool = new ObjectPool();
-        public static NativeMenu MainMenu = new NativeMenu("GTACoop:R", CurrentModVersion.Replace("_", "."))
+        public static NativeMenu MainMenu = new NativeMenu("GTACOOP:R", CurrentModVersion.Replace("_", "."))
         {
             UseMouse = false,
             Alignment = MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        public static NativeMenu MainSettingsMenu = new NativeMenu("GTACoop:R", "Settings", "Go to the settings")
+        public static NativeMenu MainSettingsMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
         {
             UseMouse = false,
             Alignment = MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
@@ -82,7 +82,6 @@ namespace CoopClient
                     serverIpItem.AltTitle = newServerIp;
                     MainMenuPool.RefreshAll();
                 }
-
             };
 
             NativeItem serverConnectItem = new NativeItem("Connect");
@@ -98,11 +97,12 @@ namespace CoopClient
             };
             shareNpcsItem.Enabled = false;
 
-            NativeSliderItem streamedNpcsItem = new NativeSliderItem("Streamed Npcs", 20, MainSettings.StreamedNpc);
+            NativeSliderItem streamedNpcsItem = new NativeSliderItem(string.Format("Streamed Npcs ({0})", MainSettings.StreamedNpc), 20, MainSettings.StreamedNpc);
             streamedNpcsItem.ValueChanged += (item, value) =>
             {
                 MainSettings.StreamedNpc = streamedNpcsItem.Value;
                 Util.SaveSettings();
+                streamedNpcsItem.Title = string.Format("Streamed Npcs ({0})", MainSettings.StreamedNpc);
             };
 
             NativeCheckboxItem flipMenuItem = new NativeCheckboxItem("Flip menu", MainSettings.FlipMenu);
@@ -115,7 +115,7 @@ namespace CoopClient
                 Util.SaveSettings();
             };
 
-            NativeItem aboutItem = new NativeItem("About", "~g~GTACoop~s~:~b~R ~s~by ~o~EntenKoeniq")
+            NativeItem aboutItem = new NativeItem("About", "~g~GTACOOP~s~:~b~R ~s~by EntenKoeniq")
             {
                 LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star")
             };
@@ -262,7 +262,7 @@ namespace CoopClient
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 42)
+            if ((Environment.TickCount - ArtificialLagCounter) < 247)
             {
                 return;
             }
@@ -298,6 +298,8 @@ namespace CoopClient
             else
             {
                 Vehicle veh = player.CurrentVehicle;
+                veh.Opacity = 75;
+
                 flags = Util.GetVehicleFlags(player, veh, FullDebugSync);
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;

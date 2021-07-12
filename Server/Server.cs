@@ -67,10 +67,12 @@ namespace CoopServer
                 {
                     try
                     {
+                        HttpClient httpClient = new();
+
                         IpInfo info;
+
                         try
                         {
-                            using HttpClient httpClient = new();
                             string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
 
                             info = JsonConvert.DeserializeObject<IpInfo>(data);
@@ -81,22 +83,21 @@ namespace CoopServer
                         }
 
                         bool responseError = false;
-                        HttpClient client = new();
 
                         while (!responseError)
                         {
                             string msg =
                                 "{ " +
-                                "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
-                                "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
-                                "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
-                                "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
-                                "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
-                                "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\", " +
+                                "\"port\": \"" + MainSettings.ServerPort + "\", " +
+                                "\"name\": \"" + MainSettings.ServerName + "\", " +
+                                "\"version\": \"" + CurrentModVersion.Replace("_", ".") + "\", " +
+                                "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
+                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
+                                "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
                                 "\"country\": \"" + info.Country + "\"" +
                                 " }";
 
-                            HttpResponseMessage response = await client.PostAsync(Server.MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+                            HttpResponseMessage response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
 
                             string responseContent = await response.Content.ReadAsStringAsync();
 
