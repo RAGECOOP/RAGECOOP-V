@@ -20,9 +20,28 @@ namespace CoopClient
             get { return CurrentFocused; }
             set
             {
+                if (value && Hidden)
+                {
+                    Hidden = false;
+                }
+
                 MainScaleForm.CallFunction("SET_FOCUS", value ? 2 : 1, 2, "ALL");
 
                 CurrentFocused = value;
+            }
+        }
+
+        private DateTime LastMessageTime { get; set; }
+
+        private bool CurrentHidden { get; set; }
+        private bool Hidden
+        {
+            get { return CurrentHidden; }
+            set
+            {
+                MainScaleForm.CallFunction(value ? "hide" : "showFeed");
+
+                CurrentHidden = value;
             }
         }
 
@@ -44,7 +63,15 @@ namespace CoopClient
 
         public void Tick()
         {
-            MainScaleForm.Render2D();
+            if (LastMessageTime.AddSeconds(15) < DateTime.UtcNow && !Focused && !Hidden)
+            {
+                Hidden = true;
+            }
+
+            if (!Hidden)
+            {
+                MainScaleForm.Render2D();
+            }
 
             if (!CurrentFocused)
             {
@@ -57,6 +84,8 @@ namespace CoopClient
         public void AddMessage(string sender, string msg)
         {
             MainScaleForm.CallFunction("ADD_MESSAGE", sender + ":", msg);
+            LastMessageTime = DateTime.UtcNow;
+            Hidden = false;
         }
 
         public void OnKeyDown(Keys key)
@@ -89,11 +118,8 @@ namespace CoopClient
                 case (char)8:
                     if (CurrentInput.Length > 0)
                     {
-                        MainScaleForm.CallFunction("SET_FOCUS", 1, 2, "ALL");
-                        MainScaleForm.CallFunction("SET_FOCUS", 2, 2, "ALL");
-
-                        CurrentInput = CurrentInput.Substring(0, CurrentInput.Length - 1);
-                        MainScaleForm.CallFunction("ADD_TEXT", CurrentInput);
+                        CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1);
+                        MainScaleForm.CallFunction("DELETE_TEXT");
                     }
                     return;
                 case (char)13:
