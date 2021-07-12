@@ -17,72 +17,6 @@ namespace CoopServer
         public string Country { get; set; }
     }
 
-    class MasterServer
-    {
-        private Thread MainThread;
-
-        public void Start()
-        {
-            MainThread = new Thread(Listen);
-            MainThread.Start();
-        }
-
-        private async void Listen()
-        {
-            try
-            {
-                IpInfo info;
-                try
-                {
-                    using HttpClient httpClient = new();
-                    string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
-
-                    info = JsonConvert.DeserializeObject<IpInfo>(data);
-                }
-                catch
-                {
-                    info = new() { Country = "?" };
-                }
-
-                bool responseError = false;
-                HttpClient client = new();
-            
-                while (!responseError)
-                {
-                    string msg =
-                        "{ " +
-                        "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
-                        "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
-                        "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
-                        "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
-                        "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
-                        "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\", " +
-                        "\"country\": \"" + info.Country + "\"" +
-                        " }";
-            
-                    HttpResponseMessage response = await client.PostAsync(Server.MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
-
-                    string responseContent = await response.Content.ReadAsStringAsync();
-
-                    if (responseContent != "OK!")
-                    {
-                        Logging.Error(responseContent);
-                        responseError = true;
-                    }
-                    else
-                    {
-                        // Sleep for 10s
-                        Thread.Sleep(10000);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Logging.Error(ex.Message);
-            }
-        }
-    }
-
     class Server
     {
         public static readonly string CurrentModVersion = Enum.GetValues(typeof(ModVersion)).Cast<ModVersion>().Last().ToString();
@@ -92,8 +26,6 @@ namespace CoopServer
         private readonly Allowlist MainAllowlist = Util.Read<Allowlist>("Allowlist.xml");
 
         public static NetServer MainNetServer;
-
-        private readonly MasterServer MainMasterServer = new();
 
         private static readonly Dictionary<string, EntitiesPlayer> Players = new();
 
@@ -130,7 +62,62 @@ namespace CoopServer
 
             if (MainSettings.AnnounceSelf)
             {
-                MainMasterServer.Start();
+                #region -- MASTERSERVER --
+                new Thread(async () =>
+                {
+                    try
+                    {
+                        IpInfo info;
+                        try
+                        {
+                            using HttpClient httpClient = new();
+                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+
+                            info = JsonConvert.DeserializeObject<IpInfo>(data);
+                        }
+                        catch
+                        {
+                            info = new() { Country = "?" };
+                        }
+
+                        bool responseError = false;
+                        HttpClient client = new();
+
+                        while (!responseError)
+                        {
+                            string msg =
+                                "{ " +
+                                "\"port\": \"" + Server.MainSettings.ServerPort + "\", " +
+                                "\"name\": \"" + Server.MainSettings.ServerName + "\", " +
+                                "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
+                                "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
+                                "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
+                                "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\", " +
+                                "\"country\": \"" + info.Country + "\"" +
+                                " }";
+
+                            HttpResponseMessage response = await client.PostAsync(Server.MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+
+                            string responseContent = await response.Content.ReadAsStringAsync();
+
+                            if (responseContent != "OK!")
+                            {
+                                Logging.Error(responseContent);
+                                responseError = true;
+                            }
+                            else
+                            {
+                                // Sleep for 10s
+                                Thread.Sleep(10000);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Error(ex.Message);
+                    }
+                }).Start();
+                #endregion
             }
 
             Listen();
