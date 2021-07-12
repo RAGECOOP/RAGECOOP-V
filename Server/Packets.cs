@@ -58,7 +58,8 @@ namespace CoopServer
 
     public enum ModVersion
     {
-        V0_1_0
+        V0_1_0,
+        V0_2_0
     }
 
     public enum PacketTypes
@@ -67,8 +68,10 @@ namespace CoopServer
         PlayerConnectPacket,
         PlayerDisconnectPacket,
         FullSyncPlayerPacket,
-        FullSyncNpcPacket,
+        FullSyncPlayerVehPacket,
         LightSyncPlayerPacket,
+        LightSyncPlayerVehPacket,
+        FullSyncNpcPacket,
         FullSyncNpcVehPacket,
         ChatMessagePacket
     }
@@ -108,6 +111,7 @@ namespace CoopServer
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
     }
 
+    #region -- PLAYER --
     [ProtoContract]
     public class HandshakePacket : Packet
     {
@@ -277,6 +281,240 @@ namespace CoopServer
     }
 
     [ProtoContract]
+    public class FullSyncPlayerVehPacket : Packet
+    {
+        [ProtoMember(1)]
+        public string Player { get; set; }
+
+        [ProtoMember(2)]
+        public int ModelHash { get; set; }
+
+        [ProtoMember(3)]
+        public Dictionary<int, int> Props { get; set; }
+
+        [ProtoMember(4)]
+        public int Health { get; set; }
+
+        [ProtoMember(5)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(6)]
+        public int VehModelHash { get; set; }
+
+        [ProtoMember(7)]
+        public int VehSeatIndex { get; set; }
+
+        [ProtoMember(8)]
+        public LVector3 VehPosition { get; set; }
+
+        [ProtoMember(9)]
+        public LQuaternion VehRotation { get; set; }
+
+        [ProtoMember(10)]
+        public LVector3 VehVelocity { get; set; }
+
+        [ProtoMember(11)]
+        public float VehSpeed { get; set; }
+
+        [ProtoMember(12)]
+        public float VehSteeringAngle { get; set; }
+
+        [ProtoMember(13)]
+        public byte? Flag { get; set; } = 0;
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.FullSyncPlayerVehPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            FullSyncPlayerVehPacket data = CoopSerializer.Deserialize<FullSyncPlayerVehPacket>(message.ReadBytes(len));
+
+            Player = data.Player;
+            ModelHash = data.ModelHash;
+            Props = data.Props;
+            Health = data.Health;
+            Position = data.Position;
+            VehModelHash = data.VehModelHash;
+            VehSeatIndex = data.VehSeatIndex;
+            VehPosition = data.VehPosition;
+            VehRotation = data.VehRotation;
+            VehVelocity = data.VehVelocity;
+            VehSpeed = data.VehSpeed;
+            VehSteeringAngle = data.VehSteeringAngle;
+            Flag = data.Flag;
+        }
+    }
+
+    [ProtoContract]
+    public class LightSyncPlayerPacket : Packet
+    {
+        [ProtoMember(1)]
+        public string Player { get; set; }
+
+        [ProtoMember(2)]
+        public int Health { get; set; }
+
+        [ProtoMember(3)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(4)]
+        public LVector3 Rotation { get; set; }
+
+        [ProtoMember(5)]
+        public LVector3 Velocity { get; set; }
+
+        [ProtoMember(6)]
+        public byte Speed { get; set; }
+
+        [ProtoMember(7)]
+        public LVector3 AimCoords { get; set; }
+
+        [ProtoMember(8)]
+        public int CurrentWeaponHash { get; set; }
+
+        [ProtoMember(9)]
+        public byte? Flag { get; set; } = 0;
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.LightSyncPlayerPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
+
+            Player = data.Player;
+            Health = data.Health;
+            Position = data.Position;
+            Rotation = data.Rotation;
+            Velocity = data.Velocity;
+            Speed = data.Speed;
+            AimCoords = data.AimCoords;
+            CurrentWeaponHash = data.CurrentWeaponHash;
+            Flag = data.Flag;
+        }
+    }
+
+    [ProtoContract]
+    public class LightSyncPlayerVehPacket : Packet
+    {
+        [ProtoMember(1)]
+        public string Player { get; set; }
+
+        [ProtoMember(2)]
+        public int ModelHash { get; set; }
+
+        [ProtoMember(3)]
+        public int Health { get; set; }
+
+        [ProtoMember(4)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(5)]
+        public int VehModelHash { get; set; }
+
+        [ProtoMember(6)]
+        public int VehSeatIndex { get; set; }
+
+        [ProtoMember(7)]
+        public LVector3 VehPosition { get; set; }
+
+        [ProtoMember(8)]
+        public LQuaternion VehRotation { get; set; }
+
+        [ProtoMember(9)]
+        public LVector3 VehVelocity { get; set; }
+
+        [ProtoMember(10)]
+        public float VehSpeed { get; set; }
+
+        [ProtoMember(11)]
+        public float VehSteeringAngle { get; set; }
+
+        [ProtoMember(12)]
+        public byte? Flag { get; set; } = 0;
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.LightSyncPlayerVehPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            LightSyncPlayerVehPacket data = CoopSerializer.Deserialize<LightSyncPlayerVehPacket>(message.ReadBytes(len));
+
+            Player = data.Player;
+            ModelHash = data.ModelHash;
+            Health = data.Health;
+            Position = data.Position;
+            VehModelHash = data.VehModelHash;
+            VehSeatIndex = data.VehSeatIndex;
+            VehPosition = data.VehPosition;
+            VehRotation = data.VehRotation;
+            VehVelocity = data.VehVelocity;
+            VehSpeed = data.VehSpeed;
+            VehSteeringAngle = data.VehSteeringAngle;
+            Flag = data.Flag;
+        }
+    }
+
+    [ProtoContract]
+    public class ChatMessagePacket : Packet
+    {
+        [ProtoMember(1)]
+        public string Username { get; set; }
+
+        [ProtoMember(2)]
+        public string Message { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.ChatMessagePacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            ChatMessagePacket data = CoopSerializer.Deserialize<ChatMessagePacket>(message.ReadBytes(len));
+
+            Username = data.Username;
+            Message = data.Message;
+        }
+    }
+    #endregion
+
+    #region -- NPC --
+    [ProtoContract]
     public class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
@@ -331,64 +569,6 @@ namespace CoopServer
             ID = data.ID;
             ModelHash = data.ModelHash;
             Props = data.Props;
-            Health = data.Health;
-            Position = data.Position;
-            Rotation = data.Rotation;
-            Velocity = data.Velocity;
-            Speed = data.Speed;
-            AimCoords = data.AimCoords;
-            CurrentWeaponHash = data.CurrentWeaponHash;
-            Flag = data.Flag;
-        }
-    }
-
-    [ProtoContract]
-    public class LightSyncPlayerPacket : Packet
-    {
-        [ProtoMember(1)]
-        public string Player { get; set; }
-
-        [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(4)]
-        public LVector3 Rotation { get; set; }
-
-        [ProtoMember(5)]
-        public LVector3 Velocity { get; set; }
-
-        [ProtoMember(6)]
-        public byte Speed { get; set; }
-
-        [ProtoMember(7)]
-        public LVector3 AimCoords { get; set; }
-
-        [ProtoMember(8)]
-        public int CurrentWeaponHash { get; set; }
-
-        [ProtoMember(9)]
-        public byte? Flag { get; set; } = 0;
-
-        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
-        {
-            message.Write((byte)PacketTypes.LightSyncPlayerPacket);
-
-            byte[] result = CoopSerializer.Serialize(this);
-
-            message.Write(result.Length);
-            message.Write(result);
-        }
-
-        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
-        {
-            int len = message.ReadInt32();
-
-            LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
-
-            Player = data.Player;
             Health = data.Health;
             Position = data.Position;
             Rotation = data.Rotation;
@@ -473,36 +653,7 @@ namespace CoopServer
             Flag = data.Flag;
         }
     }
-
-    [ProtoContract]
-    public class ChatMessagePacket : Packet
-    {
-        [ProtoMember(1)]
-        public string Username { get; set; }
-
-        [ProtoMember(2)]
-        public string Message { get; set; }
-
-        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
-        {
-            message.Write((byte)PacketTypes.ChatMessagePacket);
-
-            byte[] result = CoopSerializer.Serialize(this);
-
-            message.Write(result.Length);
-            message.Write(result);
-        }
-
-        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
-        {
-            int len = message.ReadInt32();
-
-            ChatMessagePacket data = CoopSerializer.Deserialize<ChatMessagePacket>(message.ReadBytes(len));
-
-            Username = data.Username;
-            Message = data.Message;
-        }
-    }
+    #endregion
 
     class CoopSerializer
     {

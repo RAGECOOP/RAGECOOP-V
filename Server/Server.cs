@@ -216,6 +216,18 @@ namespace CoopServer
                                         message.SenderConnection.Disconnect(e.Message);
                                     }
                                     break;
+                                case (byte)PacketTypes.LightSyncPlayerPacket:
+                                    try
+                                    {
+                                        packet = new LightSyncPlayerPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
+                                    break;
                                 case (byte)PacketTypes.FullSyncNpcPacket:
                                     if (MainSettings.NpcsAllowed)
                                     {
@@ -233,18 +245,6 @@ namespace CoopServer
                                     else
                                     {
                                         message.SenderConnection.Disconnect("Npcs are not allowed!");
-                                    }
-                                    break;
-                                case (byte)PacketTypes.LightSyncPlayerPacket:
-                                    try
-                                    {
-                                        packet = new LightSyncPlayerPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        LightSyncPlayer((LightSyncPlayerPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
                                     }
                                     break;
                                 case (byte)PacketTypes.FullSyncNpcVehPacket:

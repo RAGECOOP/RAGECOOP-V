@@ -6,7 +6,6 @@ using CoopClient.Entities;
 using Lidgren.Network;
 
 using GTA;
-using GTA.Math;
 using GTA.Native;
 
 namespace CoopClient
