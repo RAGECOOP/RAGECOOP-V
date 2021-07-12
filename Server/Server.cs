@@ -5,12 +5,18 @@ using System.Threading;
 using System.Text;
 using System.Net.Http;
 
+using Newtonsoft.Json;
 using Lidgren.Network;
 
 using CoopServer.Entities;
 
 namespace CoopServer
 {
+    class IpInfo
+    {
+        public string Country { get; set; }
+    }
+
     class MasterServer
     {
         private Thread MainThread;
@@ -25,6 +31,19 @@ namespace CoopServer
         {
             try
             {
+                IpInfo info;
+                try
+                {
+                    using HttpClient httpClient = new();
+                    string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+
+                    info = JsonConvert.DeserializeObject<IpInfo>(data);
+                }
+                catch
+                {
+                    info = new() { Country = "?" };
+                }
+
                 bool responseError = false;
                 HttpClient client = new();
             
@@ -37,7 +56,8 @@ namespace CoopServer
                         "\"version\": \"" + Server.CurrentModVersion.Replace("_", ".") + "\", " +
                         "\"players\": \"" + Server.MainNetServer.ConnectionsCount + "\", " +
                         "\"maxPlayers\": \"" + Server.MainSettings.MaxPlayers + "\", " +
-                        "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\"" +
+                        "\"allowlist\": \"" + Server.MainSettings.Allowlist + "\", " +
+                        "\"country\": \"" + info.Country + "\"" +
                         " }";
             
                     HttpResponseMessage response = await client.PostAsync(Server.MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));

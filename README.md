@@ -29,6 +29,7 @@ WEB: https://gtacoopr.entenkoeniq.de/
 - [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/a29f73120fc4f473cdfd14104aaef77f1a1b76e5)
 - [Lidgren Network](https://github.com/lidgren/lidgren-network-gen3/tree/f99b006d9af8a9a230ba7c5ce0320fc727ebae0c)
 - [Protobuf-net](https://www.nuget.org/packages/protobuf-net/2.4.6)
+- [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 
 # ♻️ Synchronization
 - Pedestrians
