@@ -57,6 +57,7 @@ namespace CoopServer
                 else
                 {
                     Logging.Error("Port forwarding failed!");
+                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to \"false\"!");
                 }
             }
 

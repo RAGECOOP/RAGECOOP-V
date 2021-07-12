@@ -262,7 +262,7 @@ namespace CoopClient
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 247)
+            if ((Environment.TickCount - ArtificialLagCounter) < 47)
             {
                 return;
             }

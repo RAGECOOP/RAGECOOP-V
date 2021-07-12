@@ -9,7 +9,7 @@ namespace CoopServer
         {
             try
             {
-                Console.Title = "GTACoop:R Server";
+                Console.Title = "GTACOOP:R Server";
 
                 if (File.Exists("log.txt"))
                 {

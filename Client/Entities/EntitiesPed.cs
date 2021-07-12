@@ -458,7 +458,7 @@ namespace CoopClient
         private bool LastMoving;
         private void WalkTo()
         {
-            if (!Character.IsInRange(Position, 7.0f) && (LastMoving = true))
+            if (!Character.IsInRange(Position, 6.0f) && (LastMoving = true))
             {
                 Character.Position = Position;
                 Character.Rotation = Rotation;
@@ -505,7 +505,7 @@ namespace CoopClient
                         }
                         else if (LastMoving && (LastMoving = false))
                         {
-                            Character.Task.StandStill(2000);
+                            Character.Task.StandStill(1000);
                         }
                         break;
                 }
