@@ -39,7 +39,7 @@ WEB: https://gtacoopr.entenkoeniq.de/
   - Jumping, Reloading and some other syncs
   - Movement (Not finished yet)
   - Weapons (Not finished yet)
-- Vehicles (Currently only for Npcs)
+- Vehicles
   - Engine
   - Light
   - High beam

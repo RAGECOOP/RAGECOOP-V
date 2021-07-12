@@ -185,11 +185,6 @@ namespace CoopClient
                 return;
             }
 
-            if (Game.Player.Character.IsGettingIntoVehicle)
-            {
-                GTA.UI.Notification.Show("~y~Vehicles are not sync yet!", true);
-            }
-
             MainChat.Tick();
             if (!MainChat.Focused && !MainMenuPool.AreAnyVisible)
             {
