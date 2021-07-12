@@ -285,8 +285,24 @@ namespace CoopClient
 
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
-                // The angle 0.0f does not work in debug mode ??
                 MainVehicle.SteeringAngle = VehicleSteeringAngle;
+            }
+
+            if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
+            {
+                bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), PedalingAnimName(true), 3);
+                if (VehicleSpeed < 0.2f)
+                {
+                    StopPedalingAnim(isFastPedaling);
+                }
+                else if (VehicleSpeed >= 11f && !isFastPedaling)
+                {
+                    StartPedalingAnim(true);
+                }
+                else if (isFastPedaling)
+                {
+                    StartPedalingAnim(false);
+                }
             }
 
             // Good enough for now, but we need to create a better sync
@@ -310,6 +326,42 @@ namespace CoopClient
             }
             #endregion
         }
+
+        #region -- PEDALING --
+        /*
+         * Thanks to @oldnapalm.
+         */
+
+        private string PedalingAnimDict()
+        {
+            switch ((VehicleHash)VehicleModelHash)
+            {
+                case VehicleHash.Bmx:
+                    return "veh@bicycle@bmx@front@base";
+                case VehicleHash.Cruiser:
+                    return "veh@bicycle@cruiserfront@base";
+                case VehicleHash.Scorcher:
+                    return "veh@bicycle@mountainfront@base";
+                default:
+                    return "veh@bicycle@roadfront@base";
+            }
+        }
+
+        private string PedalingAnimName(bool fast)
+        {
+            return fast ? "fast_pedal_char" : "cruise_pedal_char";
+        }
+
+        private void StartPedalingAnim(bool fast)
+        {
+            Character.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1, AnimationFlags.Loop | AnimationFlags.AllowRotation, 5.0f);
+        }
+
+        private void StopPedalingAnim(bool fast)
+        {
+            Character.Task.ClearAnimation(PedalingAnimDict(), PedalingAnimName(fast));
+        }
+        #endregion
 
         private void DisplayOnFoot()
         {
