@@ -56,12 +56,6 @@ namespace CoopServer
         public float W { get; set; }
     }
 
-    public enum ModVersion
-    {
-        V0_1_0,
-        V0_2_0
-    }
-
     public enum PacketTypes
     {
         HandshakePacket,

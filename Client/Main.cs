@@ -19,7 +19,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = Enum.GetValues(typeof(ModVersion)).Cast<ModVersion>().Last().ToString();
+        public static readonly string CurrentModVersion = "V0_2_1";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;

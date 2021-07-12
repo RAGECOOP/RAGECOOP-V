@@ -19,7 +19,7 @@ namespace CoopServer
 
     class Server
     {
-        public static readonly string CurrentModVersion = Enum.GetValues(typeof(ModVersion)).Cast<ModVersion>().Last().ToString();
+        public static readonly string CurrentModVersion = "V0_2_1";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -109,8 +109,8 @@ namespace CoopServer
                             }
                             else
                             {
-                                // Sleep for 10s
-                                Thread.Sleep(10000);
+                                // Sleep for 12.5s
+                                Thread.Sleep(12500);
                             }
                         }
                     }
