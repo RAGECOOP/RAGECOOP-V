@@ -295,13 +295,13 @@ namespace CoopClient
                 {
                     StopPedalingAnim(isFastPedaling);
                 }
+                else if (VehicleSpeed < 11f && isFastPedaling)
+                {
+                    StartPedalingAnim(false);
+                }
                 else if (VehicleSpeed >= 11f && !isFastPedaling)
                 {
                     StartPedalingAnim(true);
-                }
-                else if (isFastPedaling)
-                {
-                    StartPedalingAnim(false);
                 }
             }
 
