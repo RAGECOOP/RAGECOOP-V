@@ -216,12 +216,36 @@ namespace CoopServer
                                         message.SenderConnection.Disconnect(e.Message);
                                     }
                                     break;
+                                case (byte)PacketTypes.FullSyncPlayerVehPacket:
+                                    try
+                                    {
+                                        packet = new FullSyncPlayerVehPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        FullSyncPlayerVeh((FullSyncPlayerVehPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
+                                    break;
                                 case (byte)PacketTypes.LightSyncPlayerPacket:
                                     try
                                     {
                                         packet = new LightSyncPlayerPacket();
                                         packet.NetIncomingMessageToPacket(message);
                                         LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        message.SenderConnection.Disconnect(e.Message);
+                                    }
+                                    break;
+                                case (byte)PacketTypes.LightSyncPlayerVehPacket:
+                                    try
+                                    {
+                                        packet = new LightSyncPlayerVehPacket();
+                                        packet.NetIncomingMessageToPacket(message);
+                                        LightSyncPlayerVeh((LightSyncPlayerVehPacket)packet);
                                     }
                                     catch (Exception e)
                                     {
@@ -318,13 +342,13 @@ namespace CoopServer
         {
             return new(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
         }
-
         // Return a list of players within range of ... but not the local one
         private static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
             return new(MainNetServer.Connections.Where(e => e != local && Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
         }
 
+        #region -- PLAYER --
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, HandshakePacket packet)
         {
@@ -487,9 +511,11 @@ namespace CoopServer
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
-        private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
+        private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            Players[packet.Player].Ped.Position = packet.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -515,9 +541,11 @@ namespace CoopServer
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
-        private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
+        private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            Players[packet.Player].Ped.Position = packet.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -539,5 +567,34 @@ namespace CoopServer
             packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
+        #endregion
+
+        #region -- NPC --
+        private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
+        {
+            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            if (playerList.Count == 0)
+            {
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+
+        private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
+        {
+            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            if (playerList.Count == 0)
+            {
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+        #endregion
     }
 }

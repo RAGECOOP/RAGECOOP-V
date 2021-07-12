@@ -211,15 +211,25 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
                                 FullSyncPlayer((FullSyncPlayerPacket)packet);
                                 break;
-                            case (byte)PacketTypes.FullSyncNpcPacket:
-                                packet = new FullSyncNpcPacket();
+                            case (byte)PacketTypes.FullSyncPlayerVehPacket:
+                                packet = new FullSyncPlayerVehPacket();
                                 packet.NetIncomingMessageToPacket(message);
-                                FullSyncNpc((FullSyncNpcPacket)packet);
+                                FullSyncPlayerVeh((FullSyncPlayerVehPacket)packet);
                                 break;
                             case (byte)PacketTypes.LightSyncPlayerPacket:
                                 packet = new LightSyncPlayerPacket();
                                 packet.NetIncomingMessageToPacket(message);
                                 LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                break;
+                            case (byte)PacketTypes.LightSyncPlayerVehPacket:
+                                packet = new LightSyncPlayerVehPacket();
+                                packet.NetIncomingMessageToPacket(message);
+                                LightSyncPlayerVeh((LightSyncPlayerVehPacket)packet);
+                                break;
+                            case (byte)PacketTypes.FullSyncNpcPacket:
+                                packet = new FullSyncNpcPacket();
+                                packet.NetIncomingMessageToPacket(message);
+                                FullSyncNpc((FullSyncNpcPacket)packet);
                                 break;
                             case (byte)PacketTypes.FullSyncNpcVehPacket:
                                 packet = new FullSyncNpcVehPacket();
@@ -249,6 +259,7 @@ namespace CoopClient
         }
 
         #region GET
+        #region -- PLAYER --
         private void PlayerConnect(PlayerConnectPacket packet)
         {
             EntitiesPlayer player = new EntitiesPlayer()
@@ -305,6 +316,77 @@ namespace CoopClient
             }
         }
 
+        private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
+        {
+            if (Main.Players.ContainsKey(packet.Player))
+            {
+                EntitiesPlayer player = Main.Players[packet.Player];
+                player.ModelHash = packet.ModelHash;
+                player.Props = packet.Props;
+                player.Health = packet.Health;
+                player.Position = packet.Position.ToVector();
+                player.VehicleModelHash = packet.VehModelHash;
+                player.VehicleSeatIndex = packet.VehSeatIndex;
+                player.VehiclePosition = packet.VehPosition.ToVector();
+                player.VehicleRotation = packet.VehRotation.ToQuaternion();
+                player.VehicleVelocity = packet.VehVelocity.ToVector();
+                player.VehicleSpeed = packet.VehSpeed;
+                player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
+                player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
+            }
+        }
+
+        private void LightSyncPlayer(LightSyncPlayerPacket packet)
+        {
+            if (Main.Players.ContainsKey(packet.Player))
+            {
+                EntitiesPlayer player = Main.Players[packet.Player];
+                player.Health = packet.Health;
+                player.Position = packet.Position.ToVector();
+                player.Rotation = packet.Rotation.ToVector();
+                player.Velocity = packet.Velocity.ToVector();
+                player.Speed = packet.Speed;
+                player.CurrentWeaponHash = packet.CurrentWeaponHash;
+                player.AimCoords = packet.AimCoords.ToVector();
+                player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
+                player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
+                player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
+                player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
+                player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
+                player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
+                player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
+            }
+        }
+
+        private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
+        {
+            if (Main.Players.ContainsKey(packet.Player))
+            {
+                EntitiesPlayer player = Main.Players[packet.Player];
+                player.ModelHash = packet.ModelHash;
+                player.Health = packet.Health;
+                player.Position = packet.Position.ToVector();
+                player.VehicleModelHash = packet.VehModelHash;
+                player.VehicleSeatIndex = packet.VehSeatIndex;
+                player.VehiclePosition = packet.VehPosition.ToVector();
+                player.VehicleRotation = packet.VehRotation.ToQuaternion();
+                player.VehicleVelocity = packet.VehVelocity.ToVector();
+                player.VehicleSpeed = packet.VehSpeed;
+                player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
+                player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
+            }
+        }
+        #endregion // -- PLAYER --
+
+        #region -- NPC --
         private void FullSyncNpc(FullSyncNpcPacket packet)
         {
             if (Main.Npcs.ContainsKey(packet.ID))
@@ -355,28 +437,6 @@ namespace CoopClient
             }
         }
 
-        private void LightSyncPlayer(LightSyncPlayerPacket packet)
-        {
-            if (Main.Players.ContainsKey(packet.Player))
-            {
-                EntitiesPlayer player = Main.Players[packet.Player];
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
-                player.Rotation = packet.Rotation.ToVector();
-                player.Velocity = packet.Velocity.ToVector();
-                player.Speed = packet.Speed;
-                player.CurrentWeaponHash = packet.CurrentWeaponHash;
-                player.AimCoords = packet.AimCoords.ToVector();
-                player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
-                player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
-                player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
-                player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
-                player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
-                player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-            }
-        }
-
         private void FullSyncNpcVeh(FullSyncNpcVehPacket packet)
         {
             if (Main.Npcs.ContainsKey(packet.ID))
@@ -424,6 +484,7 @@ namespace CoopClient
                 });
             }
         }
+        #endregion // -- NPC --
         #endregion
 
         #region SEND
@@ -436,35 +497,78 @@ namespace CoopClient
 
             if (FullPlayerSync)
             {
-                new FullSyncPlayerPacket()
+                if (!player.IsInVehicle())
                 {
-                    Player = Main.LocalPlayerID,
-                    ModelHash = player.Model.Hash,
-                    Props = Util.GetPedProps(player),
-                    Health = player.Health,
-                    Position = player.Position.ToLVector(),
-                    Rotation = player.Rotation.ToLVector(),
-                    Velocity = player.Velocity.ToLVector(),
-                    Speed = Util.GetPedSpeed(player),
-                    AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
-                    CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = Util.GetPedFlags(player, true, true)
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                    new FullSyncPlayerPacket()
+                    {
+                        Player = Main.LocalPlayerID,
+                        ModelHash = player.Model.Hash,
+                        Props = Util.GetPedProps(player),
+                        Health = player.Health,
+                        Position = player.Position.ToLVector(),
+                        Rotation = player.Rotation.ToLVector(),
+                        Velocity = player.Velocity.ToLVector(),
+                        Speed = Util.GetPedSpeed(player),
+                        AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
+                        CurrentWeaponHash = (int)player.Weapons.Current.Hash,
+                        Flag = Util.GetPedFlags(player, true, true)
+                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                }
+                else
+                {
+                    new FullSyncPlayerVehPacket()
+                    {
+                        Player = Main.LocalPlayerID,
+                        ModelHash = player.Model.Hash,
+                        Props = Util.GetPedProps(player),
+                        Health = player.Health,
+                        Position = player.Position.ToLVector(),
+                        VehModelHash = player.CurrentVehicle.Model.Hash,
+                        VehSeatIndex = (int)player.SeatIndex,
+                        VehPosition = player.CurrentVehicle.Position.ToLVector(),
+                        VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
+                        VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
+                        VehSpeed = player.CurrentVehicle.Speed,
+                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
+                        Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
+                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                }
             }
             else
             {
-                new LightSyncPlayerPacket()
+                if (!player.IsInVehicle())
                 {
-                    Player = Main.LocalPlayerID,
-                    Health = player.Health,
-                    Position = player.Position.ToLVector(),
-                    Rotation = player.Rotation.ToLVector(),
-                    Velocity = player.Velocity.ToLVector(),
-                    Speed = Util.GetPedSpeed(player),
-                    AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
-                    CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                    Flag = Util.GetPedFlags(player, false, true)
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                    new LightSyncPlayerPacket()
+                    {
+                        Player = Main.LocalPlayerID,
+                        Health = player.Health,
+                        Position = player.Position.ToLVector(),
+                        Rotation = player.Rotation.ToLVector(),
+                        Velocity = player.Velocity.ToLVector(),
+                        Speed = Util.GetPedSpeed(player),
+                        AimCoords = Util.GetPedAimCoords(player, false).ToLVector(),
+                        CurrentWeaponHash = (int)player.Weapons.Current.Hash,
+                        Flag = Util.GetPedFlags(player, false, true)
+                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                }
+                else
+                {
+                    new LightSyncPlayerVehPacket()
+                    {
+                        Player = Main.LocalPlayerID,
+                        ModelHash = player.Model.Hash,
+                        Health = player.Health,
+                        Position = player.Position.ToLVector(),
+                        VehModelHash = player.CurrentVehicle.Model.Hash,
+                        VehSeatIndex = (int)player.SeatIndex,
+                        VehPosition = player.CurrentVehicle.Position.ToLVector(),
+                        VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
+                        VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
+                        VehSpeed = player.CurrentVehicle.Speed,
+                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
+                        Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, false)
+                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                }
             }
 
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
