@@ -159,6 +159,8 @@ namespace CoopClient
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
+
+            Util.NativeMemory();
         }
 
         private int LastDataSend;
