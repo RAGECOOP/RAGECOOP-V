@@ -295,7 +295,7 @@ namespace CoopClient
                 {
                     StopPedalingAnim(isFastPedaling);
                 }
-                else if (VehicleSpeed < 11f && isFastPedaling)
+                else if (VehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
                 {
                     StartPedalingAnim(false);
                 }
