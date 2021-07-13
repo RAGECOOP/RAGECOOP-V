@@ -21,46 +21,48 @@ namespace CoopClient.Entities
                 return;
             }
 
+            Dictionary<string, EntitiesNpc> localNpcs = null;
             lock (Main.Npcs)
             {
-                // Remove all NPCs with a last update older than npcThreshold or display this npc
+                localNpcs = new Dictionary<string, EntitiesNpc>(Main.Npcs);
+            }
+
+            int tickCount = Environment.TickCount;
+            for (int i = localNpcs.Count - 1; i >= 0; i--)
+            {
+                string key = localNpcs.ElementAt(i).Key;
+
+                if ((tickCount - localNpcs[key].LastUpdateReceived) > 3500)
+                {
+                    if (localNpcs[key].Character != null && localNpcs[key].Character.Exists() && localNpcs[key].Health > 0)
+                    {
+                        localNpcs[key].Character.Kill();
+                        localNpcs[key].Character.Delete();
+                    }
+
+                    if (localNpcs[key].MainVehicle != null && localNpcs[key].MainVehicle.Exists() && localNpcs[key].MainVehicle.PassengerCount == 0)
+                    {
+                        localNpcs[key].MainVehicle.Delete();
+                    }
+
+                    localNpcs.Remove(key);
+                }
+            }
+
+            lock (Main.Npcs)
+            {
                 foreach (KeyValuePair<string, EntitiesNpc> npc in new Dictionary<string, EntitiesNpc>(Main.Npcs))
                 {
-                    int tickCount = Environment.TickCount - npc.Value.LastUpdateReceived;
-
-                    if (tickCount > 3500) // If the last update is older than 3.5s, then delete this npc completely
+                    if (!localNpcs.ContainsKey(npc.Key))
                     {
-                        if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
-                        {
-                            npc.Value.Character.Kill();
-                            npc.Value.Character.Delete();
-                        }
-
-                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.PassengerCount == 0)
-                        {
-                            npc.Value.MainVehicle.Delete();
-                        }
-
                         Main.Npcs.Remove(npc.Key);
                     }
-                    else if (tickCount > 1500) // If the last update is older than 1.5s, then delete this npc temporarily
-                    {
-                        if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
-                        {
-                            npc.Value.Character.Kill();
-                            npc.Value.Character.Delete();
-                        }
-
-                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.PassengerCount == 0)
-                        {
-                            npc.Value.MainVehicle.Delete();
-                        }
-                    }
-                    else
-                    {
-                        npc.Value.DisplayLocally(null);
-                    }
                 }
+            }
+
+            for (int i = 0; i < localNpcs.Count; i++)
+            {
+                localNpcs.ElementAt(i).Value.DisplayLocally(null);
             }
 
             // Only if that player wants to share his NPCs with others

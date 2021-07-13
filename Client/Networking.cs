@@ -389,99 +389,105 @@ namespace CoopClient
         #region -- NPC --
         private void FullSyncNpc(FullSyncNpcPacket packet)
         {
-            if (Main.Npcs.ContainsKey(packet.ID))
+            lock (Main.Npcs)
             {
-                EntitiesNpc npc = Main.Npcs[packet.ID];
-                npc.LastUpdateReceived = Environment.TickCount;
-                npc.ModelHash = packet.ModelHash;
-                npc.Props = packet.Props;
-                npc.Health = packet.Health;
-                npc.Position = packet.Position.ToVector();
-                npc.Rotation = packet.Rotation.ToVector();
-                npc.Velocity = packet.Velocity.ToVector();
-                npc.Speed = packet.Speed;
-                npc.CurrentWeaponHash = packet.CurrentWeaponHash;
-                npc.AimCoords = packet.AimCoords.ToVector();
-                npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
-                npc.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
-                npc.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
-                npc.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
-                npc.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
-                npc.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                npc.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                npc.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
-            }
-            else
-            {
-                Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                if (Main.Npcs.ContainsKey(packet.ID))
                 {
-                    LastUpdateReceived = Environment.TickCount,
-                    ModelHash = packet.ModelHash,
-                    Props = packet.Props,
-                    Health = packet.Health,
-                    Position = packet.Position.ToVector(),
-                    Rotation = packet.Rotation.ToVector(),
-                    Velocity = packet.Velocity.ToVector(),
-                    Speed = packet.Speed,
-                    CurrentWeaponHash = packet.CurrentWeaponHash,
-                    AimCoords = packet.AimCoords.ToVector(),
-                    LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
-                    IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0,
-                    IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0,
-                    IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0,
-                    IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0,
-                    IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0,
-                    IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0,
-                    IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0
-                });
+                    EntitiesNpc npc = Main.Npcs[packet.ID];
+                    npc.LastUpdateReceived = Environment.TickCount;
+                    npc.ModelHash = packet.ModelHash;
+                    npc.Props = packet.Props;
+                    npc.Health = packet.Health;
+                    npc.Position = packet.Position.ToVector();
+                    npc.Rotation = packet.Rotation.ToVector();
+                    npc.Velocity = packet.Velocity.ToVector();
+                    npc.Speed = packet.Speed;
+                    npc.CurrentWeaponHash = packet.CurrentWeaponHash;
+                    npc.AimCoords = packet.AimCoords.ToVector();
+                    npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
+                    npc.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
+                    npc.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
+                    npc.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
+                    npc.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
+                    npc.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
+                    npc.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
+                    npc.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
+                }
+                else
+                {
+                    Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                    {
+                        LastUpdateReceived = Environment.TickCount,
+                        ModelHash = packet.ModelHash,
+                        Props = packet.Props,
+                        Health = packet.Health,
+                        Position = packet.Position.ToVector(),
+                        Rotation = packet.Rotation.ToVector(),
+                        Velocity = packet.Velocity.ToVector(),
+                        Speed = packet.Speed,
+                        CurrentWeaponHash = packet.CurrentWeaponHash,
+                        AimCoords = packet.AimCoords.ToVector(),
+                        LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
+                        IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0,
+                        IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0,
+                        IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0,
+                        IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0,
+                        IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0,
+                        IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0,
+                        IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0
+                    });
+                }
             }
         }
 
         private void FullSyncNpcVeh(FullSyncNpcVehPacket packet)
         {
-            if (Main.Npcs.ContainsKey(packet.ID))
+            lock (Main.Npcs)
             {
-                EntitiesNpc npc = Main.Npcs[packet.ID];
-                npc.LastUpdateReceived = Environment.TickCount;
-                npc.ModelHash = packet.ModelHash;
-                npc.Props = packet.Props;
-                npc.Health = packet.Health;
-                npc.Position = packet.Position.ToVector();
-                npc.VehicleModelHash = packet.VehModelHash;
-                npc.VehicleSeatIndex = packet.VehSeatIndex;
-                npc.VehiclePosition = packet.VehPosition.ToVector();
-                npc.VehicleRotation = packet.VehRotation.ToQuaternion();
-                npc.VehicleVelocity = packet.VehVelocity.ToVector();
-                npc.VehicleSpeed = packet.VehSpeed;
-                npc.VehicleSteeringAngle = packet.VehSteeringAngle;
-                npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
-                npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
-                npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
-                npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
-                npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
-            }
-            else
-            {
-                Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                if (Main.Npcs.ContainsKey(packet.ID))
                 {
-                    LastUpdateReceived = Environment.TickCount,
-                    ModelHash = packet.ModelHash,
-                    Props = packet.Props,
-                    Health = packet.Health,
-                    Position = packet.Position.ToVector(),
-                    VehicleModelHash = packet.VehModelHash,
-                    VehicleSeatIndex = packet.VehSeatIndex,
-                    VehiclePosition = packet.VehPosition.ToVector(),
-                    VehicleRotation = packet.VehRotation.ToQuaternion(),
-                    VehicleVelocity = packet.VehVelocity.ToVector(),
-                    VehicleSpeed = packet.VehSpeed,
-                    VehicleSteeringAngle = packet.VehSteeringAngle,
-                    LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
-                    IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
-                    VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
-                    VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
-                    VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0
-                });
+                    EntitiesNpc npc = Main.Npcs[packet.ID];
+                    npc.LastUpdateReceived = Environment.TickCount;
+                    npc.ModelHash = packet.ModelHash;
+                    npc.Props = packet.Props;
+                    npc.Health = packet.Health;
+                    npc.Position = packet.Position.ToVector();
+                    npc.VehicleModelHash = packet.VehModelHash;
+                    npc.VehicleSeatIndex = packet.VehSeatIndex;
+                    npc.VehiclePosition = packet.VehPosition.ToVector();
+                    npc.VehicleRotation = packet.VehRotation.ToQuaternion();
+                    npc.VehicleVelocity = packet.VehVelocity.ToVector();
+                    npc.VehicleSpeed = packet.VehSpeed;
+                    npc.VehicleSteeringAngle = packet.VehSteeringAngle;
+                    npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                    npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                    npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
+                    npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
+                    npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
+                }
+                else
+                {
+                    Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                    {
+                        LastUpdateReceived = Environment.TickCount,
+                        ModelHash = packet.ModelHash,
+                        Props = packet.Props,
+                        Health = packet.Health,
+                        Position = packet.Position.ToVector(),
+                        VehicleModelHash = packet.VehModelHash,
+                        VehicleSeatIndex = packet.VehSeatIndex,
+                        VehiclePosition = packet.VehPosition.ToVector(),
+                        VehicleRotation = packet.VehRotation.ToQuaternion(),
+                        VehicleVelocity = packet.VehVelocity.ToVector(),
+                        VehicleSpeed = packet.VehSpeed,
+                        VehicleSteeringAngle = packet.VehSteeringAngle,
+                        LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
+                        IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
+                        VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
+                        VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
+                        VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0
+                    });
+                }
             }
         }
         #endregion // -- NPC --
