@@ -23,6 +23,7 @@ namespace CoopClient
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
+        private static bool IsGoingToCar = false;
 
         public static Settings MainSettings = Util.ReadSettings();
         public static ObjectPool MainMenuPool = new ObjectPool();
@@ -180,6 +181,11 @@ namespace CoopClient
 
             MainNetworking.ReceiveMessages();
 
+            if (IsGoingToCar && Game.Player.Character.IsInVehicle())
+            {
+                IsGoingToCar = false;
+            }
+
             if (!MainNetworking.IsOnServer())
             {
                 return;
@@ -243,6 +249,29 @@ namespace CoopClient
                         int time = Environment.TickCount;
 
                         MainPlayerList.Pressed = (time - MainPlayerList.Pressed) < 5000 ? (time - 6000) : time;
+                    }
+                    break;
+                case Keys.G:
+                    if (IsGoingToCar)
+                    {
+                        Game.Player.Character.Task.ClearAll();
+                        IsGoingToCar = false;
+                    }
+                    else if (!Game.Player.Character.IsInVehicle())
+                    {
+                        Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).First();
+                        if (veh != null)
+                        {
+                            for (int i = 0; i < veh.PassengerCapacity; i++)
+                            {
+                                if (veh.IsSeatFree((VehicleSeat)i))
+                                {
+                                    Game.Player.Character.Task.EnterVehicle(veh, (VehicleSeat)i);
+                                    IsGoingToCar = true;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     break;
             }
