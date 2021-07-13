@@ -585,7 +585,7 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.UnreliableSequenced);
             Client.FlushSendQueue();
 
             FullPlayerSync = !FullPlayerSync;
@@ -632,7 +632,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
             Client.FlushSendQueue();
         }
 

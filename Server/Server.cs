@@ -582,7 +582,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
         }
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
@@ -595,7 +595,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
         }
         #endregion
     }
