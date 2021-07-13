@@ -63,7 +63,7 @@ namespace CoopClient
 
         public void Tick()
         {
-            if (Environment.TickCount > LastMessageTime + 15000 && !Focused && !Hidden)
+            if ((Environment.TickCount - LastMessageTime) > 15000 && !Focused && !Hidden)
             {
                 Hidden = true;
             }
