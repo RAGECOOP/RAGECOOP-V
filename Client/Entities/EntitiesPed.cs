@@ -290,7 +290,7 @@ namespace CoopClient
 
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
-                bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), PedalingAnimName(true), 3);
+                bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
                 if (VehicleSpeed < 0.2f)
                 {
                     StopPedalingAnim(isFastPedaling);
