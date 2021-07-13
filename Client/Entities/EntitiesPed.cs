@@ -261,7 +261,7 @@ namespace CoopClient
                 }
             }
 
-            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex)
+            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Model.Hash != VehicleModelHash)
             {
                 Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
                 Character.IsVisible = true;
