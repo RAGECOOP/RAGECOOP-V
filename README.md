@@ -46,13 +46,13 @@ WEB: https://gtacoopr.entenkoeniq.de/
   - Movement (Not finished yet)
 
 # 📝 License
-This project is licensed under [MIT license](https://github.com/EntenKoeniq/GTACoop-R/blob/main/LICENSE)
+This project is licensed under [MIT license](https://github.com/GTACoop-R/GTACoop-R/blob/main/LICENSE)
 
-[contributors-shield]: https://img.shields.io/github/contributors/EntenKoeniq/GTACoop-R.svg?style=for-the-badge
-[contributors-url]: https://github.com/EntenKoeniq/GTACoop-R/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/EntenKoeniq/GTACoop-R.svg?style=for-the-badge
-[forks-url]: https://github.com/EntenKoeniq/GTACoop-R/network/members
-[stars-shield]: https://img.shields.io/github/stars/EntenKoeniq/GTACoop-R.svg?style=for-the-badge
-[stars-url]: https://github.com/EntenKoeniq/GTACoop-R/stargazers
-[issues-shield]: https://img.shields.io/github/issues/EntenKoeniq/GTACoop-R.svg?style=for-the-badge
-[issues-url]: https://github.com/EntenKoeniq/GTACoop-R/issues
+[contributors-shield]: https://img.shields.io/github/contributors/GTACoop-R/GTACoop-R.svg?style=for-the-badge
+[contributors-url]: https://github.com/GTACoop-R/GTACoop-R/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/GTACoop-R/GTACoop-R.svg?style=for-the-badge
+[forks-url]: https://github.com/GTACoop-R/GTACoop-R/network/members
+[stars-shield]: https://img.shields.io/github/stars/GTACoop-R/GTACoop-R.svg?style=for-the-badge
+[stars-url]: https://github.com/GTACoop-R/GTACoop-R/stargazers
+[issues-shield]: https://img.shields.io/github/issues/GTACoop-R/GTACoop-R.svg?style=for-the-badge
+[issues-url]: https://github.com/GTACoop-R/GTACoop-R/issues
