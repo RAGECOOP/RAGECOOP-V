@@ -331,7 +331,7 @@ namespace CoopClient
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
-                player.VehicleSteeringScale = packet.VehSteeringScale;
+                player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -378,7 +378,7 @@ namespace CoopClient
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
-                player.VehicleSteeringScale = packet.VehSteeringScale;
+                player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -462,7 +462,7 @@ namespace CoopClient
                     npc.VehicleRotation = packet.VehRotation.ToQuaternion();
                     npc.VehicleVelocity = packet.VehVelocity.ToVector();
                     npc.VehicleSpeed = packet.VehSpeed;
-                    npc.VehicleSteeringScale = packet.VehSteeringScale;
+                    npc.VehicleSteeringAngle = packet.VehSteeringAngle;
                     npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                     npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -486,7 +486,7 @@ namespace CoopClient
                         VehicleRotation = packet.VehRotation.ToQuaternion(),
                         VehicleVelocity = packet.VehVelocity.ToVector(),
                         VehicleSpeed = packet.VehSpeed,
-                        VehicleSteeringScale = packet.VehSteeringScale,
+                        VehicleSteeringAngle = packet.VehSteeringAngle,
                         LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
                         IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
@@ -543,7 +543,7 @@ namespace CoopClient
                         VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
                         VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
                         VehSpeed = player.CurrentVehicle.Speed,
-                        VehSteeringScale = player.CurrentVehicle.SteeringScale,
+                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -579,7 +579,7 @@ namespace CoopClient
                         VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
                         VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
                         VehSpeed = player.CurrentVehicle.Speed,
-                        VehSteeringScale = player.CurrentVehicle.SteeringScale,
+                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, false)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -627,7 +627,7 @@ namespace CoopClient
                     VehRotation = npc.CurrentVehicle.Quaternion.ToLQuaternion(),
                     VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
                     VehSpeed = npc.CurrentVehicle.Speed,
-                    VehSteeringScale = npc.CurrentVehicle.SteeringScale,
+                    VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
                     Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
