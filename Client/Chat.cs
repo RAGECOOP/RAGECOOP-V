@@ -39,7 +39,14 @@ namespace CoopClient
             get { return CurrentHidden; }
             set
             {
-                MainScaleForm.CallFunction(value ? "hide" : "showFeed");
+                if (value && !CurrentHidden)
+                {
+                    MainScaleForm.CallFunction("hide");
+                }
+                else if (!value && CurrentHidden)
+                {
+                    MainScaleForm.CallFunction("showFeed");
+                }
 
                 CurrentHidden = value;
             }
