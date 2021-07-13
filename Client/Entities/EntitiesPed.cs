@@ -263,6 +263,15 @@ namespace CoopClient
 
             if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Model.Hash != VehicleModelHash)
             {
+                if (VehicleSeatIndex == -1 &&
+                    Game.Player.Character.IsInVehicle() &&
+                    Game.Player.Character.CurrentVehicle == MainVehicle &&
+                    (int)Game.Player.Character.SeatIndex == VehicleSeatIndex)
+                {
+                    Game.Player.Character.Task.WarpOutOfVehicle(MainVehicle);
+                    GTA.UI.Notification.Show("~r~Car jacked!");
+                }
+
                 Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
                 Character.IsVisible = true;
             }
