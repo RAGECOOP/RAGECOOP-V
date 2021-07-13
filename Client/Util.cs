@@ -2,6 +2,8 @@
 using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using System.Diagnostics;
+using static System.Runtime.InteropServices.Marshal;
 
 using GTA;
 using GTA.Native;
@@ -11,6 +13,84 @@ namespace CoopClient
 {
     static class Util
     {
+        #region -- POINTER --
+        private static int SteeringAngleOffset { get; set; }
+
+        static unsafe byte* FindPattern(string pattern, string mask)
+        {
+            ProcessModule module = Process.GetCurrentProcess().MainModule;
+            return FindPattern(pattern, mask, module.BaseAddress, (ulong)module.ModuleMemorySize);
+        }
+
+        static unsafe byte* FindPattern(string pattern, string mask, IntPtr startAddress, ulong size)
+        {
+            ulong address = (ulong)startAddress.ToInt64();
+            ulong endAddress = address + size;
+
+            for (; address < endAddress; address++)
+            {
+                for (int i = 0; i < pattern.Length; i++)
+                {
+                    if (mask[i] != '?' && ((byte*)address)[i] != pattern[i])
+                    {
+                        break;
+                    }
+                    else if (i + 1 == pattern.Length)
+                    {
+                        return (byte*)address;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static unsafe void NativeMemory()
+        {
+            byte* address;
+
+            address = FindPattern("\xE8\x00\x00\x00\x00\x48\x8B\xD8\x48\x85\xC0\x74\x2E\x48\x83\x3D", "x????xxxxxxxxxxx");
+            GetEntityAddressFunc = GetDelegateForFunctionPointer<GetHandleAddressFuncDelegate>(new IntPtr(*(int*)(address + 1) + address + 5));
+
+            // use the former pattern if the version is 1.0.1604.0 or newer
+            var gameVersion = (int)Game.Version;
+            address = gameVersion >= 46 ?
+                        FindPattern("\xF3\x0F\x10\x9F\xD4\x08\x00\x00\x0F\x2F\xDF\x73\x0A", "xxxx????xxxxx") :
+                        FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", "xxxx????xxx???");
+
+            address = FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
+            if (address != null)
+            {
+                SteeringAngleOffset = *(int*)(address + 6) + 8;
+            }
+        }
+
+        delegate ulong GetHandleAddressFuncDelegate(int handle);
+        static GetHandleAddressFuncDelegate GetEntityAddressFunc;
+
+        public static IntPtr GetEntityAddress(int handle)
+        {
+            return new IntPtr((long)GetEntityAddressFunc(handle));
+        }
+
+        public static unsafe void WriteFloat(IntPtr address, float value)
+        {
+            var data = (float*)address.ToPointer();
+            *data = value;
+        }
+
+        public static unsafe void CustomSteeringAngle(int Handle, float value)
+        {
+            var address = GetEntityAddress(Handle);
+            if (address == IntPtr.Zero || SteeringAngleOffset == 0)
+            {
+                return;
+            }
+
+            WriteFloat(address + SteeringAngleOffset, value);
+        }
+        #endregion
+
         public static bool IsBetween<T>(this T item, T start, T end)
         {
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;

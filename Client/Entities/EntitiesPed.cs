@@ -61,7 +61,7 @@ namespace CoopClient
                 CurrentVehicleSpeed = value;
             }
         }
-        public float VehicleSteeringScale { get; set; }
+        public float VehicleSteeringAngle { get; set; }
         private bool LastVehIsEngineRunning { get; set; }
         private bool CurrentVehIsEngineRunning { get; set; }
         public bool VehIsEngineRunning
@@ -338,18 +338,13 @@ namespace CoopClient
                 Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
                 Character.Task.ClearAll();
             }
-
-            /*
-             * https://github.com/crosire/scripthookvdotnet/commit/3e66c2fd8ff4fe4a9a0fa4588fddcbcf7ce1db6d#diff-abc8463f031874659043ae6c76bf2ff1f92d8c4e3e5d8a70c86c4fdef5b69b7f
-             * if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
-             * {
-             *     MainVehicle.SteeringAngle = VehicleSteeringAngle.IsBetween(-5f, 5f) ? 0f : VehicleSteeringAngle;
-             * }
-             */
-
+            
+            if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
+            {
+                Util.CustomSteeringAngle(MainVehicle.Handle, (float)(Math.PI / 180) * VehicleSteeringAngle);
+            }
+            
             Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
-
-            MainVehicle.SteeringScale = (float)(Math.PI / 180) * VehicleSteeringScale;
 
             // Good enough for now, but we need to create a better sync
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))

@@ -350,7 +350,7 @@ namespace CoopClient
         public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
-        public float VehSteeringScale { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
@@ -382,7 +382,7 @@ namespace CoopClient
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringScale = data.VehSteeringScale;
+            VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;
         }
     }
@@ -479,7 +479,7 @@ namespace CoopClient
         public float VehSpeed { get; set; }
 
         [ProtoMember(11)]
-        public float VehSteeringScale { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(12)]
         public byte? Flag { get; set; } = 0;
@@ -510,7 +510,7 @@ namespace CoopClient
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringScale = data.VehSteeringScale;
+            VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;
         }
     }
@@ -650,7 +650,7 @@ namespace CoopClient
         public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
-        public float VehSteeringScale { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
@@ -682,7 +682,7 @@ namespace CoopClient
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringScale = data.VehSteeringScale;
+            VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;
         }
     }
