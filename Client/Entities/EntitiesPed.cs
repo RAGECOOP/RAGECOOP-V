@@ -265,8 +265,8 @@ namespace CoopClient
             {
                 if (VehicleSeatIndex == -1 &&
                     Game.Player.Character.IsInVehicle() &&
-                    Game.Player.Character.CurrentVehicle == MainVehicle &&
-                    (int)Game.Player.Character.SeatIndex == VehicleSeatIndex)
+                    (int)Game.Player.Character.SeatIndex == -1 &&
+                    Game.Player.Character.CurrentVehicle == MainVehicle)
                 {
                     Game.Player.Character.Task.WarpOutOfVehicle(MainVehicle);
                     GTA.UI.Notification.Show("~r~Car jacked!");
