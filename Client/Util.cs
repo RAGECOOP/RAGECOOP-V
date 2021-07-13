@@ -9,8 +9,13 @@ using GTA.Math;
 
 namespace CoopClient
 {
-    class Util
+    static class Util
     {
+        public static bool IsBetween<T>(this T item, T start, T end)
+        {
+            return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
+        }
+
         public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, int currentTime, int duration)
         {
             return new Vector3()
@@ -77,6 +82,16 @@ namespace CoopClient
             if (veh.AreHighBeamsOn)
             {
                 flags |= (byte)VehicleDataFlags.AreHighBeamsOn;
+            }
+
+            if (veh.IsInBurnout)
+            {
+                flags |= (byte)VehicleDataFlags.IsInBurnout;
+            }
+
+            if (veh.IsSirenActive)
+            {
+                flags |= (byte)VehicleDataFlags.IsSirenActive;
             }
 
             return flags;

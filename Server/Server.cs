@@ -19,7 +19,7 @@ namespace CoopServer
 
     class Server
     {
-        public static readonly string CurrentModVersion = "V0_2_1";
+        public static readonly string CurrentModVersion = "V0_3_0";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");

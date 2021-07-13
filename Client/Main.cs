@@ -19,10 +19,11 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_2_1";
+        public static readonly string CurrentModVersion = "V0_3_0";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
+        private static bool IsGoingToCar = false;
 
         public static Settings MainSettings = Util.ReadSettings();
         public static ObjectPool MainMenuPool = new ObjectPool();
@@ -180,6 +181,11 @@ namespace CoopClient
 
             MainNetworking.ReceiveMessages();
 
+            if (IsGoingToCar && Game.Player.Character.IsInVehicle())
+            {
+                IsGoingToCar = false;
+            }
+
             if (!MainNetworking.IsOnServer())
             {
                 return;
@@ -245,6 +251,29 @@ namespace CoopClient
                         MainPlayerList.Pressed = (time - MainPlayerList.Pressed) < 5000 ? (time - 6000) : time;
                     }
                     break;
+                case Keys.G:
+                    if (IsGoingToCar)
+                    {
+                        Game.Player.Character.Task.ClearAll();
+                        IsGoingToCar = false;
+                    }
+                    else if (!Game.Player.Character.IsInVehicle())
+                    {
+                        Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).First();
+                        if (veh != null)
+                        {
+                            for (int i = 0; i < veh.PassengerCapacity; i++)
+                            {
+                                if (veh.IsSeatFree((VehicleSeat)i))
+                                {
+                                    Game.Player.Character.Task.EnterVehicle(veh, (VehicleSeat)i);
+                                    IsGoingToCar = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
             }
         }
 
@@ -308,12 +337,14 @@ namespace CoopClient
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
-                DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.VehicleSteeringScale = veh.SteeringScale;
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
+                DebugSyncPed.VehIsInBurnout = (flags.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
+                DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
             }
 
             if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
