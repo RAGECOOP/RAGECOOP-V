@@ -51,8 +51,17 @@ namespace CoopClient
         public Vector3 VehiclePosition { get; set; }
         public Quaternion VehicleRotation { get; set; }
         public Vector3 VehicleVelocity { get; set; }
-        public float VehicleSpeed { get; set; }
-        public float VehicleSteeringAngle { get; set; }
+        private float LastVehicleSpeed { get; set; }
+        private float CurrentVehicleSpeed { get; set; }
+        public float VehicleSpeed
+        {
+            set
+            {
+                LastVehicleSpeed = CurrentVehicleSpeed;
+                CurrentVehicleSpeed = value;
+            }
+        }
+        public float VehicleSteeringScale { get; set; }
         private bool LastVehIsEngineRunning { get; set; }
         private bool CurrentVehIsEngineRunning { get; set; }
         public bool VehIsEngineRunning
@@ -83,6 +92,11 @@ namespace CoopClient
                 CurrentVehAreHighBeamsOn = value;
             }
         }
+
+        private bool LastVehIsInBurnout = false;
+        public bool VehIsInBurnout { get; set; }
+        private bool LastVehIsSireneActive = false;
+        public bool VehIsSireneActive { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -277,6 +291,23 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
+            {
+                bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
+                if (CurrentVehicleSpeed < 0.2f)
+                {
+                    StopPedalingAnim(isFastPedaling);
+                }
+                else if (CurrentVehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
+                {
+                    StartPedalingAnim(false);
+                }
+                else if (CurrentVehicleSpeed >= 11f && !isFastPedaling)
+                {
+                    StartPedalingAnim(true);
+                }
+            }
+
             if (CurrentVehIsEngineRunning != LastVehIsEngineRunning)
             {
                 MainVehicle.IsEngineRunning = CurrentVehIsEngineRunning;
@@ -292,34 +323,40 @@ namespace CoopClient
                 MainVehicle.AreHighBeamsOn = CurrentVehAreHighBeamsOn;
             }
 
-            if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
+            if (VehIsSireneActive != LastVehIsSireneActive)
             {
-                MainVehicle.SteeringAngle = VehicleSteeringAngle;
+                MainVehicle.IsSirenActive = LastVehIsSireneActive = VehIsSireneActive;
             }
 
-            if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
+            if (VehIsInBurnout && !LastVehIsInBurnout && (LastVehIsInBurnout = true))
             {
-                bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
-                if (VehicleSpeed < 0.2f)
-                {
-                    StopPedalingAnim(isFastPedaling);
-                }
-                else if (VehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
-                {
-                    StartPedalingAnim(false);
-                }
-                else if (VehicleSpeed >= 11f && !isFastPedaling)
-                {
-                    StartPedalingAnim(true);
-                }
+                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
+                Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
             }
+            else if (!VehIsInBurnout && LastVehIsInBurnout && (LastVehIsInBurnout = false))
+            {
+                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
+                Character.Task.ClearAll();
+            }
+
+            /*
+             * https://github.com/crosire/scripthookvdotnet/commit/3e66c2fd8ff4fe4a9a0fa4588fddcbcf7ce1db6d#diff-abc8463f031874659043ae6c76bf2ff1f92d8c4e3e5d8a70c86c4fdef5b69b7f
+             * if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
+             * {
+             *     MainVehicle.SteeringAngle = VehicleSteeringAngle.IsBetween(-5f, 5f) ? 0f : VehicleSteeringAngle;
+             * }
+             */
+
+            Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
+
+            MainVehicle.SteeringScale = (float)(Math.PI / 180) * VehicleSteeringScale;
 
             // Good enough for now, but we need to create a better sync
-            if (VehicleSpeed > 0.2f && MainVehicle.IsInRange(VehiclePosition, 7.0f))
+            if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.25f);
-
+            
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
@@ -341,7 +378,7 @@ namespace CoopClient
          * Thanks to @oldnapalm.
          */
 
-        private string PedalingAnimDict()
+            private string PedalingAnimDict()
         {
             switch ((VehicleHash)VehicleModelHash)
             {

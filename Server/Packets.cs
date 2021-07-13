@@ -90,7 +90,9 @@ namespace CoopServer
         IsInVehicle = 1 << 1,
         IsEngineRunning = 1 << 2,
         AreLightsOn = 1 << 3,
-        AreHighBeamsOn = 1 << 4
+        AreHighBeamsOn = 1 << 4,
+        IsInBurnout = 1 << 5,
+        IsSirenActive = 1 << 6
     }
 
     public interface IPacket
@@ -311,7 +313,7 @@ namespace CoopServer
         public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSteeringScale { get; set; }
 
         [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
@@ -343,7 +345,7 @@ namespace CoopServer
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
+            VehSteeringScale = data.VehSteeringScale;
             Flag = data.Flag;
         }
     }
@@ -440,7 +442,7 @@ namespace CoopServer
         public float VehSpeed { get; set; }
 
         [ProtoMember(11)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSteeringScale { get; set; }
 
         [ProtoMember(12)]
         public byte? Flag { get; set; } = 0;
@@ -471,7 +473,7 @@ namespace CoopServer
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
+            VehSteeringScale = data.VehSteeringScale;
             Flag = data.Flag;
         }
     }
@@ -611,7 +613,7 @@ namespace CoopServer
         public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSteeringScale { get; set; }
 
         [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
@@ -643,7 +645,7 @@ namespace CoopServer
             VehRotation = data.VehRotation;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
+            VehSteeringScale = data.VehSteeringScale;
             Flag = data.Flag;
         }
     }

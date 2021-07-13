@@ -19,7 +19,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_2_1";
+        public static readonly string CurrentModVersion = "V0_3_0";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
@@ -337,12 +337,14 @@ namespace CoopClient
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
-                DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.VehicleSteeringScale = veh.SteeringScale;
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
+                DebugSyncPed.VehIsInBurnout = (flags.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
+                DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
             }
 
             if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
