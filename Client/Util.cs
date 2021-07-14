@@ -73,12 +73,6 @@ namespace CoopClient
             return new IntPtr((long)GetEntityAddressFunc(handle));
         }
 
-        public static unsafe void WriteFloat(IntPtr address, float value)
-        {
-            var data = (float*)address.ToPointer();
-            *data = value;
-        }
-
         public static unsafe void CustomSteeringAngle(int Handle, float value)
         {
             var address = GetEntityAddress(Handle);
@@ -87,7 +81,21 @@ namespace CoopClient
                 return;
             }
 
-            WriteFloat(address + SteeringAngleOffset, value);
+            *(float*)(address + SteeringAngleOffset).ToPointer() = value;
+        }
+
+        public static unsafe void DisableSlowMo()
+        {
+            var address = FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
+            if (address == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                *(byte*)((IntPtr)address + i).ToPointer() = 0x90;
+            }
         }
         #endregion
 
