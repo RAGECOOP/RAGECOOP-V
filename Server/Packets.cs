@@ -415,36 +415,33 @@ namespace CoopServer
         public string Player { get; set; }
 
         [ProtoMember(2)]
-        public int ModelHash { get; set; }
-
-        [ProtoMember(3)]
         public int Health { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public LVector3 Position { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public int VehModelHash { get; set; }
 
-        [ProtoMember(6)]
+        [ProtoMember(5)]
         public int VehSeatIndex { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(6)]
         public LVector3 VehPosition { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(7)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(8)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(10)]
+        [ProtoMember(9)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(11)]
+        [ProtoMember(10)]
         public float VehSteeringAngle { get; set; }
 
-        [ProtoMember(12)]
+        [ProtoMember(11)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -464,7 +461,6 @@ namespace CoopServer
             LightSyncPlayerVehPacket data = CoopSerializer.Deserialize<LightSyncPlayerVehPacket>(message.ReadBytes(len));
 
             Player = data.Player;
-            ModelHash = data.ModelHash;
             Health = data.Health;
             Position = data.Position;
             VehModelHash = data.VehModelHash;

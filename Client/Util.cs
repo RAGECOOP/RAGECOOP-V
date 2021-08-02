@@ -53,7 +53,7 @@ namespace CoopClient
             GetEntityAddressFunc = GetDelegateForFunctionPointer<GetHandleAddressFuncDelegate>(new IntPtr(*(int*)(address + 1) + address + 5));
 
             // use the former pattern if the version is 1.0.1604.0 or newer
-            var gameVersion = (int)Game.Version;
+            int gameVersion = (int)Game.Version;
             address = gameVersion >= 46 ?
                         FindPattern("\xF3\x0F\x10\x9F\xD4\x08\x00\x00\x0F\x2F\xDF\x73\x0A", "xxxx????xxxxx") :
                         FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", "xxxx????xxx???");
@@ -62,6 +62,15 @@ namespace CoopClient
             if (address != null)
             {
                 SteeringAngleOffset = *(int*)(address + 6) + 8;
+            }
+
+            address = FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
+            if (address != null)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    *(byte*)((IntPtr)address + i).ToPointer() = 0x90;
+                }
             }
         }
 
@@ -75,27 +84,13 @@ namespace CoopClient
 
         public static unsafe void CustomSteeringAngle(int Handle, float value)
         {
-            var address = GetEntityAddress(Handle);
+            IntPtr address = GetEntityAddress(Handle);
             if (address == IntPtr.Zero || SteeringAngleOffset == 0)
             {
                 return;
             }
 
             *(float*)(address + SteeringAngleOffset).ToPointer() = value;
-        }
-
-        public static unsafe void DisableSlowMo()
-        {
-            var address = FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
-            if (address == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < 6; i++)
-            {
-                *(byte*)((IntPtr)address + i).ToPointer() = 0x90;
-            }
         }
         #endregion
 

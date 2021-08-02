@@ -350,8 +350,9 @@ namespace CoopClient
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.25f);
-            
+
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
@@ -373,7 +374,7 @@ namespace CoopClient
          * Thanks to @oldnapalm.
          */
 
-            private string PedalingAnimDict()
+        private string PedalingAnimDict()
         {
             switch ((VehicleHash)VehicleModelHash)
             {

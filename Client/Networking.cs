@@ -258,7 +258,7 @@ namespace CoopClient
             }
         }
 
-        #region GET
+        #region -- GET --
         #region -- PLAYER --
         private void PlayerConnect(PlayerConnectPacket packet)
         {
@@ -369,7 +369,6 @@ namespace CoopClient
             if (Main.Players.ContainsKey(packet.Player))
             {
                 EntitiesPlayer player = Main.Players[packet.Player];
-                player.ModelHash = packet.ModelHash;
                 player.Health = packet.Health;
                 player.Position = packet.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
@@ -501,7 +500,7 @@ namespace CoopClient
         #endregion // -- NPC --
         #endregion
 
-        #region SEND
+        #region -- SEND --
         private bool FullPlayerSync = true;
         public void SendPlayerData()
         {
@@ -570,7 +569,6 @@ namespace CoopClient
                     new LightSyncPlayerVehPacket()
                     {
                         Player = Main.LocalPlayerID,
-                        ModelHash = player.Model.Hash,
                         Health = player.Health,
                         Position = player.Position.ToLVector(),
                         VehModelHash = player.CurrentVehicle.Model.Hash,
