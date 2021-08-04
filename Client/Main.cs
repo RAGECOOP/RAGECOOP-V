@@ -161,7 +161,6 @@ namespace CoopClient
             KeyDown += OnKeyDown;
 
             Util.NativeMemory();
-            Util.DisableSlowMo();
         }
 
         private int LastDataSend;
