@@ -19,7 +19,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_3_0";
+        public static readonly string CurrentModVersion = "V0_4_0";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
@@ -325,6 +325,12 @@ namespace CoopClient
                 DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
+
+                if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
+                {
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
+                }
             }
             else
             {
@@ -347,18 +353,12 @@ namespace CoopClient
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 DebugSyncPed.VehIsInBurnout = (flags.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
-            }
 
-            if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
-            {
-                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
-                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
-            }
-
-            if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
-            {
-                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, player.CurrentVehicle.Handle, false);
-                Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.CurrentVehicle.Handle, DebugSyncPed.MainVehicle.Handle, false);
+                if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
+                {
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, player.CurrentVehicle.Handle, false);
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.CurrentVehicle.Handle, DebugSyncPed.MainVehicle.Handle, false);
+                }
             }
 
             FullDebugSync = !FullDebugSync;
