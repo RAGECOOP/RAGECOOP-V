@@ -89,6 +89,7 @@ namespace CoopClient
             serverConnectItem.Activated += (sender, item) =>
             {
                 MainNetworking.DisConnectFromServer(MainSettings.LastServerAddress);
+                MainMenu.Visible = false;
             };
 
             NativeCheckboxItem shareNpcsItem = new NativeCheckboxItem("Share Npcs", ShareNpcsWithPlayers);
@@ -159,6 +160,7 @@ namespace CoopClient
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
+            Aborted += OnAbort;
 
             Util.NativeMemory();
         }
@@ -276,6 +278,17 @@ namespace CoopClient
                         }
                     }
                     break;
+            }
+        }
+
+        private void OnAbort(object sender, EventArgs e)
+        {
+            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            {
+                player.Value.Character?.AttachedBlip?.Delete();
+                player.Value.Character?.CurrentVehicle?.Delete();
+                player.Value.Character?.Delete();
+                player.Value.PedBlip?.Delete();
             }
         }
 
