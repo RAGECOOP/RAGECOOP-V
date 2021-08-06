@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 using CoopClient.Entities;
 
@@ -80,9 +79,9 @@ namespace CoopClient
                         switch (status)
                         {
                             case NetConnectionStatus.InitiatedConnect:
-                                Main.MainMenu.Items[0].Enabled = false;
-                                Main.MainMenu.Items[1].Enabled = false;
-                                Main.MainMenu.Items[2].Enabled = false;
+                                Main.MainMenu.MainMenu.Items[0].Enabled = false;
+                                Main.MainMenu.MainMenu.Items[1].Enabled = false;
+                                Main.MainMenu.MainMenu.Items[2].Enabled = false;
                                 GTA.UI.Notification.Show("~y~Trying to connect...");
                                 break;
                             case NetConnectionStatus.Connected:
@@ -100,30 +99,11 @@ namespace CoopClient
                                     Main.LocalPlayerID = handshakePacket.ID;
                                     Main.NpcsAllowed = handshakePacket.NpcsAllowed;
 
-                                    foreach (Ped entity in World.GetAllPeds())
-                                    {
-                                        if (entity.Handle != Game.Player.Character.Handle)
-                                        {
-                                            entity.Kill();
-                                            entity.Delete();
-                                        }
-                                    }
-
-                                    foreach (Vehicle vehicle in World.GetAllVehicles())
-                                    {
-                                        if (Game.Player.Character.CurrentVehicle?.Handle != vehicle.Handle)
-                                        {
-                                            vehicle.Delete();
-                                        }
-                                    }
+                                    Main.CleanUp();
 
                                     Function.Call(Hash.SET_GARBAGE_TRUCKS, 0);
                                     Function.Call(Hash.SET_RANDOM_BOATS, 0);
                                     Function.Call(Hash.SET_RANDOM_TRAINS, 0);
-
-                                    Main.MainMenu.Items[2].Enabled = true;
-                                    Main.MainMenu.Items[2].Title = "Disconnect";
-                                    Main.MainSettingsMenu.Items[0].Enabled = Main.NpcsAllowed;
 
                                     Main.MainChat.Init();
                                     Main.MainPlayerList.Init(Main.MainSettings.Username);
@@ -140,6 +120,13 @@ namespace CoopClient
                                     Client.FlushSendQueue();
 
                                     GTA.UI.Notification.Show("~g~Connected!");
+
+                                    Main.MainMenu.MainMenu.Items[2].Enabled = true;
+                                    Main.MainMenu.MainMenu.Items[2].Title = "Disconnect";
+                                    Main.MainMenu.SubSettings.MainMenu.Items[0].Enabled = Main.NpcsAllowed;
+
+                                    Main.MainMenu.MainMenu.Visible = false;
+                                    Main.MainMenu.MenuPool.RefreshAll();
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -157,35 +144,15 @@ namespace CoopClient
 
                                 Main.MainChat.Clear();
 
-                                Main.MainMenu.Items[0].Enabled = true;
-                                Main.MainMenu.Items[1].Enabled = true;
-                                Main.MainMenu.Items[2].Enabled = true;
-                                Main.MainMenu.Items[2].Title = "Connect";
-                                Main.MainSettingsMenu.Items[0].Enabled = false;
+                                Main.CleanUp();
 
-                                foreach (KeyValuePair<string, EntitiesPlayer> player in Main.Players)
-                                {
-                                    if (player.Value.Character != null && player.Value.Character.Exists())
-                                    {
-                                        player.Value.Character.Kill();
-                                        player.Value.Character.Delete();
-                                    }
+                                Main.MainMenu.MainMenu.Items[0].Enabled = true;
+                                Main.MainMenu.MainMenu.Items[1].Enabled = true;
+                                Main.MainMenu.MainMenu.Items[2].Enabled = true;
+                                Main.MainMenu.MainMenu.Items[2].Title = "Connect";
+                                Main.MainMenu.SubSettings.MainMenu.Items[0].Enabled = false;
 
-                                    player.Value.PedBlip?.Delete();
-                                }
-
-                                Main.Players.Clear();
-
-                                foreach (KeyValuePair<string, EntitiesNpc> npc in Main.Npcs)
-                                {
-                                    if (npc.Value.Character != null && npc.Value.Character.Exists())
-                                    {
-                                        npc.Value.Character.Kill();
-                                        npc.Value.Character.Delete();
-                                    }
-                                }
-
-                                Main.Npcs.Clear();
+                                Main.MainMenu.MenuPool.RefreshAll();
                                 break;
                         }
                         break;
