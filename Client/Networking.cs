@@ -280,7 +280,7 @@ namespace CoopClient
                 player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
                 player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                player.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
             }
         }
 
@@ -329,7 +329,7 @@ namespace CoopClient
                 player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
                 player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                player.IsInVehicle = (packet.Flag.Value & (byte)PedDataFlags.IsInVehicle) > 0;
             }
         }
 
