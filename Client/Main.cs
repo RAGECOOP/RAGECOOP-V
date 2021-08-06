@@ -4,12 +4,10 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 
 using CoopClient.Entities;
+using CoopClient.Menus;
 
 using GTA;
 using GTA.Native;
-
-using LemonUI;
-using LemonUI.Menus;
 
 namespace CoopClient
 {
@@ -26,17 +24,8 @@ namespace CoopClient
         private static bool IsGoingToCar = false;
 
         public static Settings MainSettings = Util.ReadSettings();
-        public static ObjectPool MainMenuPool = new ObjectPool();
-        public static NativeMenu MainMenu = new NativeMenu("GTACOOP:R", CurrentModVersion.Replace("_", "."))
-        {
-            UseMouse = false,
-            Alignment = MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
-        };
-        public static NativeMenu MainSettingsMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
-        {
-            UseMouse = false,
-            Alignment = MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
-        };
+
+        public static MenusMain MainMenu = new MenusMain();
         public static Chat MainChat = new Chat();
         public static PlayerList MainPlayerList = new PlayerList();
 
@@ -50,113 +39,6 @@ namespace CoopClient
         {
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
             Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
-
-            NativeItem usernameItem = new NativeItem("Username")
-            {
-                AltTitle = MainSettings.Username
-            };
-            usernameItem.Activated += (menu, item) =>
-            {
-                string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, usernameItem.AltTitle, 20);
-                if (!string.IsNullOrWhiteSpace(newUsername))
-                {
-                    MainSettings.Username = newUsername;
-                    Util.SaveSettings();
-
-                    usernameItem.AltTitle = newUsername;
-                    MainMenuPool.RefreshAll();
-                }
-            };
-
-            NativeItem serverIpItem = new NativeItem("Server IP")
-            {
-                AltTitle = MainSettings.LastServerAddress
-            };
-            serverIpItem.Activated += (menu, item) =>
-            {
-                string newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, serverIpItem.AltTitle, 60);
-                if (!string.IsNullOrWhiteSpace(newServerIp) && newServerIp.Contains(":"))
-                {
-                    MainSettings.LastServerAddress = newServerIp;
-                    Util.SaveSettings();
-
-                    serverIpItem.AltTitle = newServerIp;
-                    MainMenuPool.RefreshAll();
-                }
-            };
-
-            NativeItem serverConnectItem = new NativeItem("Connect");
-            serverConnectItem.Activated += (sender, item) =>
-            {
-                MainNetworking.DisConnectFromServer(MainSettings.LastServerAddress);
-                MainMenu.Visible = false;
-            };
-
-            NativeCheckboxItem shareNpcsItem = new NativeCheckboxItem("Share Npcs", ShareNpcsWithPlayers);
-            shareNpcsItem.CheckboxChanged += (item, check) =>
-            {
-                ShareNpcsWithPlayers = shareNpcsItem.Checked;
-            };
-            shareNpcsItem.Enabled = false;
-
-            NativeSliderItem streamedNpcsItem = new NativeSliderItem(string.Format("Streamed Npcs ({0})", MainSettings.StreamedNpc), 20, MainSettings.StreamedNpc);
-            streamedNpcsItem.ValueChanged += (item, value) =>
-            {
-                MainSettings.StreamedNpc = streamedNpcsItem.Value;
-                Util.SaveSettings();
-                streamedNpcsItem.Title = string.Format("Streamed Npcs ({0})", MainSettings.StreamedNpc);
-            };
-
-            NativeCheckboxItem flipMenuItem = new NativeCheckboxItem("Flip menu", MainSettings.FlipMenu);
-            flipMenuItem.CheckboxChanged += (item, check) =>
-            {
-                MainMenu.Alignment = flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
-                MainSettingsMenu.Alignment = flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
-
-                MainSettings.FlipMenu = flipMenuItem.Checked;
-                Util.SaveSettings();
-            };
-
-            NativeItem aboutItem = new NativeItem("About", "~g~GTACOOP~s~:~b~R ~s~by EntenKoeniq")
-            {
-                LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star")
-            };
-
-#if DEBUG
-            NativeCheckboxItem useDebugItem = new NativeCheckboxItem("Debug", UseDebug);
-            useDebugItem.CheckboxChanged += (item, check) =>
-            {
-                UseDebug = useDebugItem.Checked;
-                
-                if (!useDebugItem.Checked && DebugSyncPed != null)
-                {
-                    if (DebugSyncPed.Character.Exists())
-                    {
-                        DebugSyncPed.Character.Kill();
-                        DebugSyncPed.Character.Delete();
-                    }
-
-                    DebugSyncPed = null;
-                    FullDebugSync = true;
-                    Players.Remove("DebugKey");
-                }
-            };
-#endif
-
-            MainMenu.Add(usernameItem);
-            MainMenu.Add(serverIpItem);
-            MainMenu.Add(serverConnectItem);
-            MainMenu.AddSubMenu(MainSettingsMenu);
-            MainSettingsMenu.Add(shareNpcsItem);
-            MainSettingsMenu.Add(streamedNpcsItem);
-            MainSettingsMenu.Add(flipMenuItem);
-#if DEBUG
-            MainSettingsMenu.Add(useDebugItem);
-#endif
-            MainMenu.Add(aboutItem);
-
-            MainMenuPool.Add(MainMenu);
-            MainMenuPool.Add(MainSettingsMenu);
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
@@ -176,12 +58,9 @@ namespace CoopClient
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup = RelationshipGroup;
-
-                Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character, true, true);
-                Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, true);
             }
 
-            MainMenuPool.Process();
+            MainMenu.MenuPool.Process();
 
             MainNetworking.ReceiveMessages();
 
@@ -196,7 +75,7 @@ namespace CoopClient
             }
 
             MainChat.Tick();
-            if (!MainChat.Focused && !MainMenuPool.AreAnyVisible)
+            if (!MainChat.Focused && !MainMenu.MenuPool.AreAnyVisible)
             {
                 MainPlayerList.Tick();
             }
@@ -231,14 +110,14 @@ namespace CoopClient
             switch (e.KeyCode)
             {
                 case Keys.F9:
-                    if (MainMenuPool.AreAnyVisible)
+                    if (MainMenu.MenuPool.AreAnyVisible)
                     {
-                        MainMenu.Visible = false;
-                        MainSettingsMenu.Visible = false;
+                        MainMenu.MainMenu.Visible = false;
+                        MainMenu.SubSettings.MainMenu.Visible = false;
                     }
                     else
                     {
-                        MainMenu.Visible = true;
+                        MainMenu.MainMenu.Visible = true;
                     }
                     break;
                 case Keys.T:
@@ -287,15 +166,73 @@ namespace CoopClient
             {
                 player.Value.Character?.AttachedBlip?.Delete();
                 player.Value.Character?.CurrentVehicle?.Delete();
+                player.Value.Character?.Kill();
                 player.Value.Character?.Delete();
                 player.Value.PedBlip?.Delete();
+            }
+
+            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            {
+                Npc.Value.Character?.CurrentVehicle?.Delete();
+                Npc.Value.Character?.Kill();
+                Npc.Value.Character?.Delete();
+            }
+        }
+
+        public static void CleanUp()
+        {
+            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            {
+                player.Value.Character?.AttachedBlip?.Delete();
+                player.Value.Character?.CurrentVehicle?.Delete();
+                player.Value.Character?.Kill();
+                player.Value.Character?.Delete();
+                player.Value.PedBlip?.Delete();
+            }
+            Players.Clear();
+
+            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            {
+                Npc.Value.Character?.CurrentVehicle?.Delete();
+                Npc.Value.Character?.Kill();
+                Npc.Value.Character?.Delete();
+            }
+            Npcs.Clear();
+
+            foreach (Ped entity in World.GetAllPeds())
+            {
+                if (entity.Handle != Game.Player.Character.Handle)
+                {
+                    entity.Kill();
+                    entity.Delete();
+                }
+            }
+
+            if (!Game.Player.Character.IsInVehicle())
+            {
+                foreach (Vehicle vehicle in World.GetAllVehicles())
+                {
+                    vehicle.Delete();
+                }
+            }
+            else
+            {
+                int? playerVehicleHandle = Game.Player.Character.CurrentVehicle?.Handle;
+
+                foreach (Vehicle vehicle in World.GetAllVehicles())
+                {
+                    if (playerVehicleHandle != vehicle.Handle)
+                    {
+                        vehicle.Delete();
+                    }
+                }
             }
         }
 
         private int ArtificialLagCounter;
-        private EntitiesPlayer DebugSyncPed;
-        private bool FullDebugSync = true;
-        private bool UseDebug = false;
+        public static EntitiesPlayer DebugSyncPed;
+        public static bool FullDebugSync = true;
+        public static bool UseDebug = false;
 
         private void Debug()
         {

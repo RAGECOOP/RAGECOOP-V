@@ -70,6 +70,8 @@
     <Compile Include="Entities\EntitiesPlayer.cs" />
     <Compile Include="Entities\EntitiesThread.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="Menus\MenusMain.cs" />
+    <Compile Include="Menus\Sub\Settings.cs" />
     <Compile Include="Networking.cs" />
     <Compile Include="Packets.cs" />
     <Compile Include="PlayerList.cs" />
