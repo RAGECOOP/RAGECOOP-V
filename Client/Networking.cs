@@ -306,6 +306,7 @@ namespace CoopClient
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.VehicleColors = packet.VehColors;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -452,6 +453,7 @@ namespace CoopClient
                     npc.VehicleVelocity = packet.VehVelocity.ToVector();
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
+                    npc.VehicleColors = packet.VehColors;
                     npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                     npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -477,6 +479,7 @@ namespace CoopClient
                         VehicleVelocity = packet.VehVelocity.ToVector(),
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
+                        VehicleColors = packet.VehColors,
                         LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
                         IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
@@ -520,6 +523,14 @@ namespace CoopClient
                 }
                 else
                 {
+                    int secondaryColor;
+                    int primaryColor;
+
+                    unsafe
+                    {
+                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, player.CurrentVehicle, &primaryColor, &secondaryColor);
+                    }
+
                     new FullSyncPlayerVehPacket()
                     {
                         Player = Main.LocalPlayerID,
@@ -534,6 +545,7 @@ namespace CoopClient
                         VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
                         VehSpeed = player.CurrentVehicle.Speed,
                         VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
+                        VehColors = new int[] { primaryColor, secondaryColor },
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -603,6 +615,14 @@ namespace CoopClient
             }
             else
             {
+                int secondaryColor;
+                int primaryColor;
+
+                unsafe
+                {
+                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
+                }
+
                 new FullSyncNpcVehPacket()
                 {
                     ID = Main.LocalPlayerID + npc.Handle,
@@ -617,6 +637,7 @@ namespace CoopClient
                     VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
                     VehSpeed = npc.CurrentVehicle.Speed,
                     VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
+                    VehColors = new int[] { primaryColor, secondaryColor },
                     Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }

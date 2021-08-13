@@ -283,6 +283,14 @@ namespace CoopClient
 
                 flags = Util.GetVehicleFlags(player, veh, FullDebugSync);
 
+                int secondaryColor;
+                int primaryColor;
+
+                unsafe
+                {
+                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                }
+
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
@@ -290,6 +298,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;

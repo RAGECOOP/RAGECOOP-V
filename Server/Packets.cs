@@ -316,6 +316,9 @@ namespace CoopServer
         public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
+        public int[] VehColors { get; set; }
+
+        [ProtoMember(14)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -612,6 +615,9 @@ namespace CoopServer
         public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
+        public int[] VehColors { get; set; }
+
+        [ProtoMember(14)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)

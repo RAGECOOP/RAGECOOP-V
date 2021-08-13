@@ -48,6 +48,7 @@ namespace CoopClient
 
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
+        public int[] VehicleColors { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
@@ -293,6 +294,8 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
