@@ -15,6 +15,8 @@ namespace CoopClient
     {
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
+        public int LastUpdateReceived { get; set; }
+        public int Latency { get; set; }
 
         public Ped Character { get; set; }
         public int Health { get; set; }
@@ -351,13 +353,13 @@ namespace CoopClient
             {
                 MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
 
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.0f, Latency < 0.5f ? 0.5f : Latency));
 
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), (Environment.TickCount - VehicleStopTime), 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Environment.TickCount - VehicleStopTime, 1000);
                 MainVehicle.PositionNoOffset = posTarget;
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }

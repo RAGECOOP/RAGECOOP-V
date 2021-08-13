@@ -27,7 +27,6 @@ namespace CoopClient
 
         public static MenusMain MainMenu = new MenusMain();
         public static Chat MainChat = new Chat();
-        public static PlayerList MainPlayerList = new PlayerList();
 
         public static Networking MainNetworking = new Networking();
 
@@ -75,10 +74,6 @@ namespace CoopClient
             }
 
             MainChat.Tick();
-            if (!MainChat.Focused && !MainMenu.MenuPool.AreAnyVisible)
-            {
-                MainPlayerList.Tick();
-            }
 
             // Display all players
             foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
@@ -129,9 +124,8 @@ namespace CoopClient
                 case Keys.Y:
                     if (MainNetworking.IsOnServer())
                     {
-                        int time = Environment.TickCount;
-
-                        MainPlayerList.Pressed = (time - MainPlayerList.Pressed) < 5000 ? (time - 6000) : time;
+                        int currentTimestamp = Environment.TickCount;
+                        PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                     }
                     break;
                 case Keys.G:
@@ -236,14 +230,14 @@ namespace CoopClient
 
         private void Debug()
         {
-            var player = Game.Player.Character;
+            Ped player = Game.Player.Character;
             if (!Players.ContainsKey("DebugKey"))
             {
                 Players.Add("DebugKey", new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 47)
+            if ((Environment.TickCount - ArtificialLagCounter) < 27)
             {
                 return;
             }
@@ -310,6 +304,9 @@ namespace CoopClient
                     Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.CurrentVehicle.Handle, DebugSyncPed.MainVehicle.Handle, false);
                 }
             }
+
+            DebugSyncPed.LastUpdateReceived = Environment.TickCount;
+            DebugSyncPed.Latency = Environment.TickCount - ArtificialLagCounter;
 
             FullDebugSync = !FullDebugSync;
             ArtificialLagCounter = Environment.TickCount;

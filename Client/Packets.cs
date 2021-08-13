@@ -12,13 +12,34 @@ namespace CoopClient
     #region CLIENT-ONLY
     public static class VectorExtensions
     {
+        public static Vector3 ToVector(this Quaternion vec)
+        {
+            return new Vector3()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z
+            };
+        }
+
+        public static Quaternion ToQuaternion(this Vector3 vec, float vW = 0.0f)
+        {
+            return new Quaternion()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z,
+                W = vW
+            };
+        }
+
         public static LVector3 ToLVector(this Vector3 vec)
         {
             return new LVector3()
             {
                 X = vec.X,
                 Y = vec.Y,
-                Z = vec.Z,
+                Z = vec.Z
             };
         }
 

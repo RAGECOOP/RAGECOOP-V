@@ -106,7 +106,6 @@ namespace CoopClient
                                     Function.Call(Hash.SET_RANDOM_TRAINS, 0);
 
                                     Main.MainChat.Init();
-                                    Main.MainPlayerList.Init(Main.MainSettings.Username);
 
                                     // Send player connect packet
                                     NetOutgoingMessage outgoingMessage = Client.CreateMessage();
@@ -232,12 +231,11 @@ namespace CoopClient
             EntitiesPlayer player = new EntitiesPlayer()
             {
                 SocialClubName = packet.SocialClubName,
-                Username = packet.Username
+                Username = packet.Username,
+                LastUpdateReceived = Environment.TickCount
             };
 
             Main.Players.Add(packet.Player, player);
-
-            Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
@@ -255,8 +253,6 @@ namespace CoopClient
 
                 Main.Players.Remove(packet.Player);
             }
-
-            Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
         }
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)
@@ -264,6 +260,11 @@ namespace CoopClient
             if (Main.Players.ContainsKey(packet.Player))
             {
                 EntitiesPlayer player = Main.Players[packet.Player];
+
+                int currentTimestamp = Environment.TickCount;
+                player.Latency = currentTimestamp - player.LastUpdateReceived;
+                player.LastUpdateReceived = currentTimestamp;
+
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
                 player.Health = packet.Health;
@@ -289,6 +290,11 @@ namespace CoopClient
             if (Main.Players.ContainsKey(packet.Player))
             {
                 EntitiesPlayer player = Main.Players[packet.Player];
+
+                int currentTimestamp = Environment.TickCount;
+                player.Latency = currentTimestamp - player.LastUpdateReceived;
+                player.LastUpdateReceived = currentTimestamp;
+
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
                 player.Health = packet.Health;
@@ -315,6 +321,11 @@ namespace CoopClient
             if (Main.Players.ContainsKey(packet.Player))
             {
                 EntitiesPlayer player = Main.Players[packet.Player];
+
+                int currentTimestamp = Environment.TickCount;
+                player.Latency = currentTimestamp - player.LastUpdateReceived;
+                player.LastUpdateReceived = currentTimestamp;
+
                 player.Health = packet.Health;
                 player.Position = packet.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
@@ -338,6 +349,11 @@ namespace CoopClient
             if (Main.Players.ContainsKey(packet.Player))
             {
                 EntitiesPlayer player = Main.Players[packet.Player];
+
+                int currentTimestamp = Environment.TickCount;
+                player.Latency = currentTimestamp - player.LastUpdateReceived;
+                player.LastUpdateReceived = currentTimestamp;
+
                 player.Health = packet.Health;
                 player.Position = packet.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
@@ -366,7 +382,9 @@ namespace CoopClient
                 if (Main.Npcs.ContainsKey(packet.ID))
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
+
                     npc.LastUpdateReceived = Environment.TickCount;
+
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
                     npc.Health = packet.Health;
@@ -390,6 +408,7 @@ namespace CoopClient
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Environment.TickCount,
+
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
                         Health = packet.Health,
@@ -419,7 +438,9 @@ namespace CoopClient
                 if (Main.Npcs.ContainsKey(packet.ID))
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
+
                     npc.LastUpdateReceived = Environment.TickCount;
+
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
                     npc.Health = packet.Health;
@@ -444,6 +465,7 @@ namespace CoopClient
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Environment.TickCount,
+
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
                         Health = packet.Health,
