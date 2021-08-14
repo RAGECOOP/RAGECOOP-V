@@ -10,7 +10,7 @@ using GTA.Math;
 namespace CoopClient
 {
     #region CLIENT-ONLY
-    public static class VectorExtensions
+    static class VectorExtensions
     {
         public static Vector3 ToVector(this Quaternion vec)
         {
@@ -57,7 +57,7 @@ namespace CoopClient
     #endregion
 
     [ProtoContract]
-    public struct LVector3
+    struct LVector3
     {
         #region CLIENT-ONLY
         public Vector3 ToVector()
@@ -84,7 +84,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public struct LQuaternion
+    struct LQuaternion
     {
         #region CLIENT-ONLY
         public Quaternion ToQuaternion()
@@ -114,7 +114,7 @@ namespace CoopClient
         public float W { get; set; }
     }
 
-    public enum PacketTypes
+    enum PacketTypes
     {
         HandshakePacket,
         PlayerConnectPacket,
@@ -129,7 +129,7 @@ namespace CoopClient
     }
 
     [Flags]
-    public enum PedDataFlags
+    enum PedDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsAiming = 1 << 1,
@@ -143,7 +143,7 @@ namespace CoopClient
 
     #region ===== VEHICLE DATA =====
     [Flags]
-    public enum VehicleDataFlags
+    enum VehicleDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsInVehicle = 1 << 1,
@@ -196,7 +196,7 @@ namespace CoopClient
 
     #region -- PLAYER --
     [ProtoContract]
-    public class HandshakePacket : Packet
+    class HandshakePacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }
@@ -238,7 +238,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class PlayerConnectPacket : Packet
+    class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -272,7 +272,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class PlayerDisconnectPacket : Packet
+    class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -298,7 +298,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncPlayerPacket : Packet
+    class FullSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -364,7 +364,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncPlayerVehPacket : Packet
+    class FullSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -446,7 +446,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class LightSyncPlayerPacket : Packet
+    class LightSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -504,7 +504,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class LightSyncPlayerVehPacket : Packet
+    class LightSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -570,7 +570,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class ChatMessagePacket : Packet
+    class ChatMessagePacket : Packet
     {
         [ProtoMember(1)]
         public string Username { get; set; }
@@ -602,7 +602,7 @@ namespace CoopClient
 
     #region -- NPC --
     [ProtoContract]
-    public class FullSyncNpcPacket : Packet
+    class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }
@@ -668,7 +668,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncNpcVehPacket : Packet
+    class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Text;
 using System.Net.Http;
+using System.Reflection;
+using System.IO;
 
 using Newtonsoft.Json;
 using Lidgren.Network;
@@ -28,6 +30,8 @@ namespace CoopServer
         public static NetServer MainNetServer;
 
         private static readonly Dictionary<string, EntitiesPlayer> Players = new();
+
+        private static ServerScript GameMode;
 
         public Server()
         {
@@ -120,6 +124,37 @@ namespace CoopServer
                     }
                 }).Start();
                 #endregion
+            }
+
+            try
+            {
+                Logging.Info("Loading gamemode...");
+
+                Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "gamemodes" + Path.DirectorySeparatorChar + "FirstMod.dll");
+                Type[] types = asm.GetExportedTypes();
+                IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
+                Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
+
+                if (!enumerable.Any())
+                {
+                    Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
+                }
+                else
+                {
+                    GameMode = Activator.CreateInstance(enumerable.ToArray()[0]) as ServerScript;
+                    if (GameMode == null)
+                    {
+                        Logging.Warning("Could not create gamemode: it is null.");
+                    }
+                    else
+                    {
+                        GameMode.Start();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.Error(e.Message);
             }
 
             Listen();
@@ -437,8 +472,6 @@ namespace CoopServer
 
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
-
-            Logging.Info("New player [" + packet.SocialClubName + " | " + packet.Username + "] connected!");
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
@@ -447,6 +480,11 @@ namespace CoopServer
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
                 SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
+            }
+
+            if (GameMode != null)
+            {
+                GameMode.OnPlayerConnect(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = FilterAllLocal(local);
@@ -486,6 +524,11 @@ namespace CoopServer
         // Send all players a message that someone has left the server
         private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet, string reason = "Disconnected")
         {
+            if (GameMode != null)
+            {
+                GameMode.OnPlayerDisconnect(Players[packet.Player], reason);
+            }
+
             List<NetConnection> playerList = FilterAllLocal(packet.Player);
             if (playerList.Count != 0)
             {
@@ -494,7 +537,6 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Logging.Info(Players[packet.Player].Username + " left the server, reason: " + reason);
             Players.Remove(packet.Player);
         }
 

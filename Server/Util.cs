@@ -11,27 +11,27 @@ namespace CoopServer
             XmlSerializer ser = new(typeof(T));
 
             string path = AppContext.BaseDirectory + file;
-            T settings;
+            T data;
 
             if (File.Exists(path))
             {
                 using (FileStream stream = File.OpenRead(path))
                 {
-                    settings = (T)ser.Deserialize(stream);
+                    data = (T)ser.Deserialize(stream);
                 }
 
                 using (FileStream stream = new(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
                 {
-                    ser.Serialize(stream, settings);
+                    ser.Serialize(stream, data);
                 }
             }
             else
             {
                 using FileStream stream = File.OpenWrite(path);
-                ser.Serialize(stream, settings = new T());
+                ser.Serialize(stream, data = new T());
             }
 
-            return settings;
+            return data;
         }
     }
 }

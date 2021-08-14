@@ -56,7 +56,7 @@ namespace CoopServer
         public float W { get; set; }
     }
 
-    public enum PacketTypes
+    enum PacketTypes
     {
         HandshakePacket,
         PlayerConnectPacket,
@@ -71,7 +71,7 @@ namespace CoopServer
     }
 
     [Flags]
-    public enum PedDataFlags
+    enum PedDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsAiming = 1 << 1,
@@ -85,7 +85,7 @@ namespace CoopServer
 
     #region ===== VEHICLE DATA =====
     [Flags]
-    public enum VehicleDataFlags
+    enum VehicleDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsInVehicle = 1 << 1,
@@ -98,7 +98,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public struct VehicleDoors
+    struct VehicleDoors
     {
         [ProtoMember(1)]
         public float AngleRatio { get; set; }
@@ -114,13 +114,13 @@ namespace CoopServer
     }
     #endregion
 
-    public interface IPacket
+    interface IPacket
     {
         void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         void NetIncomingMessageToPacket(NetIncomingMessage message);
     }
 
-    public abstract class Packet : IPacket
+    abstract class Packet : IPacket
     {
         public abstract void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
@@ -128,7 +128,7 @@ namespace CoopServer
 
     #region -- PLAYER --
     [ProtoContract]
-    public class HandshakePacket : Packet
+    class HandshakePacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }
@@ -170,7 +170,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class PlayerConnectPacket : Packet
+    class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -204,7 +204,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class PlayerDisconnectPacket : Packet
+    class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -230,7 +230,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class FullSyncPlayerPacket : Packet
+    class FullSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -296,7 +296,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class FullSyncPlayerVehPacket : Packet
+    class FullSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -378,7 +378,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class LightSyncPlayerPacket : Packet
+    class LightSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -436,7 +436,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class LightSyncPlayerVehPacket : Packet
+    class LightSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
         public string Player { get; set; }
@@ -502,7 +502,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class ChatMessagePacket : Packet
+    class ChatMessagePacket : Packet
     {
         [ProtoMember(1)]
         public string Username { get; set; }
@@ -534,7 +534,7 @@ namespace CoopServer
 
     #region -- NPC --
     [ProtoContract]
-    public class FullSyncNpcPacket : Packet
+    class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }
@@ -600,7 +600,7 @@ namespace CoopServer
     }
 
     [ProtoContract]
-    public class FullSyncNpcVehPacket : Packet
+    class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
         public string ID { get; set; }
