@@ -49,6 +49,9 @@ namespace CoopClient
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
         public int[] VehicleColors { get; set; }
+        private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
+        public Dictionary<int, int> VehicleMods { get; set; }
+        public bool VehicleDead { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
@@ -100,6 +103,8 @@ namespace CoopClient
         public bool VehIsInBurnout { get; set; }
         private bool LastVehIsSireneActive = false;
         public bool VehIsSireneActive { get; set; }
+        private VehicleDoors[] LastVehDoors;
+        public VehicleDoors[] VehDoors { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -294,7 +299,28 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            if (VehicleDead && !MainVehicle.IsDead)
+            {
+                MainVehicle.Explode();
+            }
+            else if (!VehicleDead && MainVehicle.IsDead)
+            {
+                MainVehicle.Repair();
+            }
+
             Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
+            // Only works for "Pfister Comet Safari"??
+            if (VehicleMods != LastVehicleMods)
+            {
+                foreach (KeyValuePair<int, int> mod in VehicleMods)
+                {
+                    MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
+                    // Same effect
+                    //Function.Call(Hash.SET_VEHICLE_MOD, MainVehicle, mod.Key, mod.Value, false);
+                }
+                LastVehicleMods = VehicleMods;
+            }
 
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
@@ -331,6 +357,56 @@ namespace CoopClient
             if (VehIsSireneActive != LastVehIsSireneActive)
             {
                 MainVehicle.IsSirenActive = LastVehIsSireneActive = VehIsSireneActive;
+            }
+
+            if (VehDoors != null && VehDoors != LastVehDoors)
+            {
+                int doorLength = VehDoors.Length;
+                if (VehDoors.Length != 0)
+                {
+                    for (int i = 0; i < (doorLength - 1); i++)
+                    {
+                        VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
+                        VehicleDoors aDoor = VehDoors[i];
+
+                        if (aDoor.Broken)
+                        {
+                            if (!door.IsBroken)
+                            {
+                                door.Break();
+                            }
+                            continue;
+                        }
+                        else if (!aDoor.Broken && door.IsBroken)
+                        {
+                            // Repair?
+                            //MainVehicle.Repair();
+                        }
+
+                        if (aDoor.FullyOpen)
+                        {
+                            if (!door.IsFullyOpen)
+                            {
+                                door.Open(false, true);
+                            }
+                            continue;
+                        }
+                        else if (aDoor.Open)
+                        {
+                            if (!door.IsOpen)
+                            {
+                                door.Open();
+                            }
+                            
+                            door.AngleRatio = aDoor.AngleRatio;
+                            continue;
+                        }
+
+                        door.Close(true);
+                    }
+                }
+                
+                LastVehDoors = VehDoors;
             }
 
             if (VehIsInBurnout && !LastVehIsInBurnout && (LastVehIsInBurnout = true))

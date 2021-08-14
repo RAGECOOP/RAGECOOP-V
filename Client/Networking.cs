@@ -307,6 +307,7 @@ namespace CoopClient
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.VehicleColors = packet.VehColors;
+                player.VehDoors = packet.VehDoors;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -314,6 +315,7 @@ namespace CoopClient
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
             }
         }
 
@@ -371,6 +373,7 @@ namespace CoopClient
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
             }
         }
         #endregion // -- PLAYER --
@@ -454,6 +457,7 @@ namespace CoopClient
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
                     npc.VehicleColors = packet.VehColors;
+                    npc.VehDoors = packet.VehDoors;
                     npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                     npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -461,6 +465,7 @@ namespace CoopClient
                     npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                     npc.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                     npc.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                    npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 }
                 else
                 {
@@ -480,13 +485,15 @@ namespace CoopClient
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
                         VehicleColors = packet.VehColors,
+                        VehDoors = packet.VehDoors,
                         LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
                         IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
                         VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
                         VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0,
                         VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0,
-                        VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0
+                        VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0,
+                        VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0
                     });
                 }
             }
@@ -546,6 +553,7 @@ namespace CoopClient
                         VehSpeed = player.CurrentVehicle.Speed,
                         VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
                         VehColors = new int[] { primaryColor, secondaryColor },
+                        VehDoors = Util.GetVehicleDoors(player.CurrentVehicle.Doors),
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -638,6 +646,7 @@ namespace CoopClient
                     VehSpeed = npc.CurrentVehicle.Speed,
                     VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
                     VehColors = new int[] { primaryColor, secondaryColor },
+                    VehDoors = Util.GetVehicleDoors(npc.CurrentVehicle.Doors),
                     Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }

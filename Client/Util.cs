@@ -162,6 +162,11 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsSirenActive;
             }
 
+            if (veh.IsDead)
+            {
+                flags |= (byte)VehicleDataFlags.IsDead;
+            }
+
             return flags;
         }
 
@@ -220,6 +225,40 @@ namespace CoopClient
                 int mod = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
                 result.Add(i, mod);
             }
+            return result;
+        }
+
+        public static Dictionary<int, int> GetVehicleMods(Vehicle veh)
+        {
+            Dictionary<int, int> result = new Dictionary<int, int>();
+            foreach (VehicleMod mod in veh.Mods.ToArray())
+            {
+                result.Add((int)mod.Type, mod.Index);
+            }
+            return result;
+        }
+
+        public static VehicleDoors[] GetVehicleDoors(VehicleDoorCollection doors)
+        {
+            int doorLength = doors.ToArray().Length;
+            if (doorLength == 0)
+            {
+                return null;
+            }
+
+            VehicleDoors[] result = new VehicleDoors[doorLength];
+            for (int i = 0; i < (doorLength - 1); i++)
+            {
+                VehicleDoors currentDoor = new VehicleDoors()
+                {
+                    AngleRatio = doors[(VehicleDoorIndex)i].AngleRatio,
+                    Broken = doors[(VehicleDoorIndex)i].IsBroken,
+                    Open = doors[(VehicleDoorIndex)i].IsOpen,
+                    FullyOpen = doors[(VehicleDoorIndex)i].IsFullyOpen
+                };
+                result[i] = currentDoor;
+            }
+
             return result;
         }
 

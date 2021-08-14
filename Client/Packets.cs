@@ -141,6 +141,7 @@ namespace CoopClient
         IsInVehicle = 1 << 7
     }
 
+    #region ===== VEHICLE DATA =====
     [Flags]
     public enum VehicleDataFlags
     {
@@ -150,8 +151,36 @@ namespace CoopClient
         AreLightsOn = 1 << 3,
         AreHighBeamsOn = 1 << 4,
         IsInBurnout = 1 << 5,
-        IsSirenActive = 1 << 6
+        IsSirenActive = 1 << 6,
+        IsDead = 1 << 7
     }
+
+    [ProtoContract]
+    public struct VehicleDoors
+    {
+        #region CLIENT-ONLY
+        public VehicleDoors(float angleRatio = 0f, bool broken = false, bool open = false, bool fullyOpen = false)
+        {
+            AngleRatio = angleRatio;
+            Broken = broken;
+            Open = open;
+            FullyOpen = fullyOpen;
+        }
+        #endregion
+
+        [ProtoMember(1)]
+        public float AngleRatio { get; set; }
+
+        [ProtoMember(2)]
+        public bool Broken { get; set; }
+
+        [ProtoMember(3)]
+        public bool Open { get; set; }
+
+        [ProtoMember(4)]
+        public bool FullyOpen { get; set; }
+    }
+    #endregion
 
     public interface IPacket
     {
@@ -377,6 +406,9 @@ namespace CoopClient
         public int[] VehColors { get; set; }
 
         [ProtoMember(14)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(15)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -407,6 +439,8 @@ namespace CoopClient
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehColors = data.VehColors;
+            VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
     }
@@ -676,6 +710,9 @@ namespace CoopClient
         public int[] VehColors { get; set; }
 
         [ProtoMember(14)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(15)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -706,6 +743,8 @@ namespace CoopClient
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehColors = data.VehColors;
+            VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
     }

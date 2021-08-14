@@ -237,7 +237,7 @@ namespace CoopClient
                 DebugSyncPed = Players["DebugKey"];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 27)
+            if ((Environment.TickCount - ArtificialLagCounter) < 37)
             {
                 return;
             }
@@ -299,6 +299,8 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
+                DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -306,6 +308,7 @@ namespace CoopClient
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 DebugSyncPed.VehIsInBurnout = (flags.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {
