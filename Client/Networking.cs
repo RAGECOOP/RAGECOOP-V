@@ -508,9 +508,12 @@ namespace CoopClient
             Ped player = Game.Player.Character;
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            NetDeliveryMethod messageType;
 
             if ((Environment.TickCount - LastFullPlayerSync) > 1500)
             {
+                messageType = NetDeliveryMethod.UnreliableSequenced;
+
                 if (!player.IsInVehicle())
                 {
                     new FullSyncPlayerPacket()
@@ -562,6 +565,8 @@ namespace CoopClient
             }
             else
             {
+                messageType = NetDeliveryMethod.ReliableSequenced;
+
                 if (!player.IsInVehicle())
                 {
                     new LightSyncPlayerPacket()
@@ -596,7 +601,7 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, messageType);
             Client.FlushSendQueue();
         }
 
@@ -651,7 +656,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
             Client.FlushSendQueue();
         }
 
