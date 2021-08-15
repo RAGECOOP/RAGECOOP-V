@@ -430,7 +430,9 @@ namespace CoopClient
             // Good enough for now, but we need to create a better sync
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
-                MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
+                int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
+
+                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
 
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateReceived) / (float)Latency));
 
