@@ -48,6 +48,7 @@ namespace CoopClient
 
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
+        private int[] LastVehicleColors = new int[] { 0, 0 };
         public int[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
         public Dictionary<int, int> VehicleMods { get; set; }
@@ -308,7 +309,12 @@ namespace CoopClient
                 MainVehicle.Repair();
             }
 
-            Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+            if (VehicleColors != LastVehicleColors)
+            {
+                Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
+                LastVehicleColors = VehicleColors;
+            }
 
             // Only works for "Pfister Comet Safari"??
             if (VehicleMods != LastVehicleMods)

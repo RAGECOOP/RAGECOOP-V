@@ -17,7 +17,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_4_0";
+        public static readonly string CurrentModVersion = "V0_5_0";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
