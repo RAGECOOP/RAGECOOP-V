@@ -432,7 +432,7 @@ namespace CoopClient
             {
                 MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
 
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.0f, Latency < 0.5f ? 0.5f : Latency));
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateReceived) / (float)Latency));
 
                 VehicleStopTime = Environment.TickCount;
             }

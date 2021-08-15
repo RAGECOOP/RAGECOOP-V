@@ -560,7 +560,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
         }
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
@@ -575,7 +575,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
         }
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
@@ -590,7 +590,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
         }
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
@@ -605,7 +605,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
         }
 
         // Send a message to targets or all players
@@ -637,7 +637,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
         }
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
@@ -650,7 +650,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.ReliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
         }
         #endregion
     }

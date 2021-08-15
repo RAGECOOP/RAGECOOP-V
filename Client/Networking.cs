@@ -132,7 +132,7 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 // Reset all values
-                                FullPlayerSync = true;
+                                LastFullPlayerSync = 0;
 
                                 Main.NpcsAllowed = false;
 
@@ -502,14 +502,14 @@ namespace CoopClient
         #endregion
 
         #region -- SEND --
-        private bool FullPlayerSync = true;
+        private int LastFullPlayerSync = 0;
         public void SendPlayerData()
         {
             Ped player = Game.Player.Character;
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
-            if (FullPlayerSync)
+            if ((Environment.TickCount - LastFullPlayerSync) > 1500)
             {
                 if (!player.IsInVehicle())
                 {
@@ -557,6 +557,8 @@ namespace CoopClient
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
+
+                LastFullPlayerSync = Environment.TickCount;
             }
             else
             {
@@ -594,10 +596,8 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.UnreliableSequenced);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
             Client.FlushSendQueue();
-
-            FullPlayerSync = !FullPlayerSync;
         }
 
         public void SendNpcData(Ped npc)
@@ -651,7 +651,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
             Client.FlushSendQueue();
         }
 

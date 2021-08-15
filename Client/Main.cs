@@ -225,7 +225,7 @@ namespace CoopClient
 
         private int ArtificialLagCounter;
         public static EntitiesPlayer DebugSyncPed;
-        public static bool FullDebugSync = true;
+        public static int LastFullDebugSync = 0;
         public static bool UseDebug = false;
 
         private void Debug()
@@ -242,7 +242,9 @@ namespace CoopClient
                 return;
             }
 
-            if (FullDebugSync)
+            bool fullSync = (Environment.TickCount - LastFullDebugSync) > 1500;
+
+            if (fullSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
                 DebugSyncPed.Props = Util.GetPedProps(player);
@@ -254,7 +256,7 @@ namespace CoopClient
 
             if (!player.IsInVehicle())
             {
-                flags = Util.GetPedFlags(player, FullDebugSync, true);
+                flags = Util.GetPedFlags(player, fullSync, true);
 
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
@@ -281,7 +283,7 @@ namespace CoopClient
                 Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = Util.GetVehicleFlags(player, veh, FullDebugSync);
+                flags = Util.GetVehicleFlags(player, veh, fullSync);
 
                 int secondaryColor;
                 int primaryColor;
@@ -317,11 +319,17 @@ namespace CoopClient
                 }
             }
 
-            DebugSyncPed.LastUpdateReceived = Environment.TickCount;
-            DebugSyncPed.Latency = Environment.TickCount - ArtificialLagCounter;
+            int currentTimestamp = Environment.TickCount;
 
-            FullDebugSync = !FullDebugSync;
-            ArtificialLagCounter = Environment.TickCount;
+            DebugSyncPed.LastUpdateReceived = currentTimestamp;
+            DebugSyncPed.Latency = currentTimestamp - ArtificialLagCounter;
+
+            ArtificialLagCounter = currentTimestamp;
+
+            if (fullSync)
+            {
+                LastFullDebugSync = currentTimestamp;
+            }
         }
     }
 }
