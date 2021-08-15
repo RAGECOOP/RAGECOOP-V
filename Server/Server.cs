@@ -29,7 +29,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        private static readonly Dictionary<string, EntitiesPlayer> Players = new();
+        public static readonly Dictionary<string, EntitiesPlayer> Players = new();
 
         private static ServerScript GameMode;
 
@@ -126,35 +126,43 @@ namespace CoopServer
                 #endregion
             }
 
-            try
+            if (MainSettings.DefaultGameMode)
             {
-                Logging.Info("Loading gamemode...");
-
-                Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "gamemodes" + Path.DirectorySeparatorChar + "FirstMod.dll");
-                Type[] types = asm.GetExportedTypes();
-                IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
-                Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
-
-                if (!enumerable.Any())
+                GameMode = new DefaultScript();
+                GameMode.Start();
+            }
+            else if (!string.IsNullOrEmpty(MainSettings.GameMode))
+            {
+                try
                 {
-                    Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
-                }
-                else
-                {
-                    GameMode = Activator.CreateInstance(enumerable.ToArray()[0]) as ServerScript;
-                    if (GameMode == null)
+                    Logging.Info("Loading gamemode...");
+
+                    Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "gamemodes" + Path.DirectorySeparatorChar + MainSettings.GameMode + ".dll");
+                    Type[] types = asm.GetExportedTypes();
+                    IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
+                    Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
+
+                    if (!enumerable.Any())
                     {
-                        Logging.Warning("Could not create gamemode: it is null.");
+                        Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
                     }
                     else
                     {
-                        GameMode.Start();
+                        GameMode = Activator.CreateInstance(enumerable.ToArray()[0]) as ServerScript;
+                        if (GameMode == null)
+                        {
+                            Logging.Warning("Could not create gamemode: it is null.");
+                        }
+                        else
+                        {
+                            GameMode.Start();
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Logging.Error(e.Message);
+                catch (Exception e)
+                {
+                    Logging.Error(e.Message);
+                }
             }
 
             Listen();
@@ -603,6 +611,11 @@ namespace CoopServer
         // Send a message to targets or all players
         private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
         {
+            if (GameMode != null && GameMode.OnChatMessage(packet.Username, packet.Message))
+            {
+                return;
+            }
+
             packet.Message = packet.Message.Replace("~", "");
 
             Logging.Info(packet.Username + ": " + packet.Message);
