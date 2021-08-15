@@ -301,7 +301,6 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
-                DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
                 DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;

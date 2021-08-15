@@ -50,8 +50,6 @@ namespace CoopClient
         public int VehicleModelHash { get; set; }
         private int[] LastVehicleColors = new int[] { 0, 0 };
         public int[] VehicleColors { get; set; }
-        private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
-        public Dictionary<int, int> VehicleMods { get; set; }
         public bool VehicleDead { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
@@ -316,18 +314,6 @@ namespace CoopClient
                 LastVehicleColors = VehicleColors;
             }
 
-            // Only works for "Pfister Comet Safari"??
-            if (VehicleMods != LastVehicleMods)
-            {
-                foreach (KeyValuePair<int, int> mod in VehicleMods)
-                {
-                    MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
-                    // Same effect
-                    //Function.Call(Hash.SET_VEHICLE_MOD, MainVehicle, mod.Key, mod.Value, false);
-                }
-                LastVehicleMods = VehicleMods;
-            }
-
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
@@ -437,10 +423,13 @@ namespace CoopClient
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
-
+                
                 MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
+                
+                // BUGGY
+                //MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateReceived) / (float)Latency));
 
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateReceived) / (float)Latency));
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Environment.TickCount;
             }
