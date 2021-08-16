@@ -99,6 +99,29 @@ namespace CoopClient
             return (end - start) * currentTime / duration + start;
         }
 
+        public static Ped GetResponsiblePed(Vehicle veh)
+        {
+            if (veh == null || veh.Handle == 0 || !veh.Exists())
+            {
+                return null;
+            }
+
+            if (veh.GetPedOnSeat(VehicleSeat.Driver).Handle != 0)
+            {
+                return veh.GetPedOnSeat(VehicleSeat.Driver);
+            }
+
+            for (int i = 0; i < veh.PassengerCapacity; i++)
+            {
+                if (veh.GetPedOnSeat((VehicleSeat)i).Handle != 0)
+                {
+                    return veh.GetPedOnSeat((VehicleSeat)i);
+                }
+            }
+
+            return null;
+        }
+
         public static byte GetPedSpeed(Ped ped)
         {
             if (ped.IsSprinting)

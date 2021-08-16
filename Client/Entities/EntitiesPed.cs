@@ -298,6 +298,11 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            if (Util.GetResponsiblePed(MainVehicle).Handle != Character.Handle)
+            {
+                return;
+            }
+
             if (VehicleDead && !MainVehicle.IsDead)
             {
                 MainVehicle.Explode();
@@ -425,9 +430,6 @@ namespace CoopClient
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
                 
                 MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
-                
-                // BUGGY
-                //MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateReceived) / (float)Latency));
 
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
