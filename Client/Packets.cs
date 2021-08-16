@@ -298,10 +298,26 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    class FullSyncPlayerPacket : Packet
+    struct PlayerPacket
     {
         [ProtoMember(1)]
         public string Player { get; set; }
+
+        [ProtoMember(2)]
+        public int Health { get; set; }
+
+        [ProtoMember(3)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(4)]
+        public float Latency { get; set; }
+    }
+
+    [ProtoContract]
+    class FullSyncPlayerPacket : Packet
+    {
+        [ProtoMember(1)]
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -310,27 +326,21 @@ namespace CoopClient
         public Dictionary<int, int> Props { get; set; }
 
         [ProtoMember(4)]
-        public int Health { get; set; }
-
-        [ProtoMember(5)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(6)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public byte Speed { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(10)]
+        [ProtoMember(8)]
         public int CurrentWeaponHash { get; set; }
 
-        [ProtoMember(11)]
+        [ProtoMember(9)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -349,11 +359,9 @@ namespace CoopClient
 
             FullSyncPlayerPacket data = CoopSerializer.Deserialize<FullSyncPlayerPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            Extra = data.Extra;
             ModelHash = data.ModelHash;
             Props = data.Props;
-            Health = data.Health;
-            Position = data.Position;
             Rotation = data.Rotation;
             Velocity = data.Velocity;
             Speed = data.Speed;
@@ -367,7 +375,7 @@ namespace CoopClient
     class FullSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -376,39 +384,33 @@ namespace CoopClient
         public Dictionary<int, int> Props { get; set; }
 
         [ProtoMember(4)]
-        public int Health { get; set; }
-
-        [ProtoMember(5)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(6)]
         public int VehModelHash { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public int VehSeatIndex { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public LVector3 VehPosition { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(10)]
+        [ProtoMember(8)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(11)]
+        [ProtoMember(9)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(12)]
+        [ProtoMember(10)]
         public float VehSteeringAngle { get; set; }
 
-        [ProtoMember(13)]
+        [ProtoMember(11)]
         public int[] VehColors { get; set; }
 
-        [ProtoMember(14)]
+        [ProtoMember(12)]
         public VehicleDoors[] VehDoors { get; set; }
 
-        [ProtoMember(15)]
+        [ProtoMember(13)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -427,11 +429,9 @@ namespace CoopClient
 
             FullSyncPlayerVehPacket data = CoopSerializer.Deserialize<FullSyncPlayerVehPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            Extra = data.Extra;
             ModelHash = data.ModelHash;
             Props = data.Props;
-            Health = data.Health;
-            Position = data.Position;
             VehModelHash = data.VehModelHash;
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
@@ -449,30 +449,24 @@ namespace CoopClient
     class LightSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(4)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(3)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(6)]
+        [ProtoMember(4)]
         public byte Speed { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public int CurrentWeaponHash { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -491,9 +485,7 @@ namespace CoopClient
 
             LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
-            Health = data.Health;
-            Position = data.Position;
+            Extra = data.Extra;
             Rotation = data.Rotation;
             Velocity = data.Velocity;
             Speed = data.Speed;
@@ -507,13 +499,7 @@ namespace CoopClient
     class LightSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
-
-        [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(4)]
         public int VehModelHash { get; set; }
@@ -555,9 +541,7 @@ namespace CoopClient
 
             LightSyncPlayerVehPacket data = CoopSerializer.Deserialize<LightSyncPlayerVehPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
-            Health = data.Health;
-            Position = data.Position;
+            Extra = data.Extra;
             VehModelHash = data.VehModelHash;
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;

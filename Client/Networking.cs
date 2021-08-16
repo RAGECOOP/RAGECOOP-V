@@ -12,6 +12,7 @@ namespace CoopClient
     public class Networking
     {
         public NetClient Client;
+        public float Latency;
 
         public void DisConnectFromServer(string address)
         {
@@ -31,6 +32,8 @@ namespace CoopClient
                 {
                     AutoFlushSendQueue = false
                 };
+
+                config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 
                 Client = new NetClient(config);
 
@@ -132,7 +135,7 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 // Reset all values
-                                LastPlayerSyncWasFull = false;
+                                LastPlayerFullSync = 0;
 
                                 Main.NpcsAllowed = false;
 
@@ -211,6 +214,9 @@ namespace CoopClient
                                 break;
                         }
                         break;
+                    case NetIncomingMessageType.ConnectionLatencyUpdated:
+                        Latency = message.ReadFloat();
+                        break;
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.ErrorMessage:
                     case NetIncomingMessageType.WarningMessage:
@@ -257,18 +263,17 @@ namespace CoopClient
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
 
-                int currentTimestamp = Environment.TickCount;
-                player.Latency = currentTimestamp - player.LastUpdateReceived;
-                player.LastUpdateReceived = currentTimestamp;
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
 
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -287,18 +292,17 @@ namespace CoopClient
 
         private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
 
-                int currentTimestamp = Environment.TickCount;
-                player.Latency = currentTimestamp - player.LastUpdateReceived;
-                player.LastUpdateReceived = currentTimestamp;
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
 
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.VehiclePosition = packet.VehPosition.ToVector();
@@ -321,16 +325,15 @@ namespace CoopClient
 
         private void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
 
-                int currentTimestamp = Environment.TickCount;
-                player.Latency = currentTimestamp - player.LastUpdateReceived;
-                player.LastUpdateReceived = currentTimestamp;
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
 
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -349,16 +352,15 @@ namespace CoopClient
 
         private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
 
-                int currentTimestamp = Environment.TickCount;
-                player.Latency = currentTimestamp - player.LastUpdateReceived;
-                player.LastUpdateReceived = currentTimestamp;
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
 
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.VehiclePosition = packet.VehPosition.ToVector();
@@ -502,7 +504,7 @@ namespace CoopClient
         #endregion
 
         #region -- SEND --
-        private bool LastPlayerSyncWasFull = false;
+        private int LastPlayerFullSync = 0;
         public void SendPlayerData()
         {
             Ped player = Game.Player.Character;
@@ -510,7 +512,7 @@ namespace CoopClient
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             NetDeliveryMethod messageType;
 
-            if (!LastPlayerSyncWasFull)
+            if ((Environment.TickCount - LastPlayerFullSync) > 500)
             {
                 messageType = NetDeliveryMethod.UnreliableSequenced;
 
@@ -518,11 +520,14 @@ namespace CoopClient
                 {
                     new FullSyncPlayerPacket()
                     {
-                        Player = Main.LocalPlayerID,
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         ModelHash = player.Model.Hash,
                         Props = Util.GetPedProps(player),
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = Util.GetPedSpeed(player),
@@ -543,11 +548,14 @@ namespace CoopClient
 
                     new FullSyncPlayerVehPacket()
                     {
-                        Player = Main.LocalPlayerID,
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         ModelHash = player.Model.Hash,
                         Props = Util.GetPedProps(player),
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
                         VehPosition = player.CurrentVehicle.Position.ToLVector(),
@@ -560,6 +568,8 @@ namespace CoopClient
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
+
+                LastPlayerFullSync = Environment.TickCount;
             }
             else
             {
@@ -569,9 +579,12 @@ namespace CoopClient
                 {
                     new LightSyncPlayerPacket()
                     {
-                        Player = Main.LocalPlayerID,
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = Util.GetPedSpeed(player),
@@ -584,9 +597,12 @@ namespace CoopClient
                 {
                     new LightSyncPlayerVehPacket()
                     {
-                        Player = Main.LocalPlayerID,
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
                         VehPosition = player.CurrentVehicle.Position.ToLVector(),
@@ -601,8 +617,6 @@ namespace CoopClient
 
             Client.SendMessage(outgoingMessage, messageType);
             Client.FlushSendQueue();
-
-            LastPlayerSyncWasFull = !LastPlayerSyncWasFull;
         }
 
         public void SendNpcData(Ped npc)

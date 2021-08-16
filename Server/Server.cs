@@ -44,6 +44,7 @@ namespace CoopServer
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
@@ -181,6 +182,8 @@ namespace CoopServer
 
                 while ((message = MainNetServer.ReadMessage()) != null)
                 {
+                    string player;
+
                     switch (message.MessageType)
                     {
                         case NetIncomingMessageType.ConnectionApproval:
@@ -209,7 +212,7 @@ namespace CoopServer
                         case NetIncomingMessageType.StatusChanged:
                             NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
 
-                            string player = NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier);
+                            player = NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier);
 
                             if (status == NetConnectionStatus.Disconnected && Players.ContainsKey(player))
                             {
@@ -351,6 +354,9 @@ namespace CoopServer
                                     Logging.Error("Unhandled Data / Packet type");
                                     break;
                             }
+                            break;
+                        case NetIncomingMessageType.ConnectionLatencyUpdated:
+                            Players[NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier)].Latency = message.ReadFloat();
                             break;
                         case NetIncomingMessageType.ErrorMessage:
                             Logging.Error(message.ReadString());
@@ -550,13 +556,20 @@ namespace CoopServer
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Players[packet.Player].Ped.Position = packet.Position;
+            EntitiesPlayer player = Players[packet.Extra.Player];
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            player.Ped.Position = packet.Extra.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
             }
+
+            PlayerPacket localPacket = packet.Extra;
+            localPacket.Latency = player.Latency;
+
+            packet.Extra = localPacket;
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
@@ -565,13 +578,20 @@ namespace CoopServer
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Players[packet.Player].Ped.Position = packet.Position;
+            EntitiesPlayer player = Players[packet.Extra.Player];
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            player.Ped.Position = packet.Extra.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
             }
+
+            PlayerPacket localPacket = packet.Extra;
+            localPacket.Latency = player.Latency;
+
+            packet.Extra = localPacket;
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
@@ -580,13 +600,20 @@ namespace CoopServer
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Players[packet.Player].Ped.Position = packet.Position;
+            EntitiesPlayer player = Players[packet.Extra.Player];
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            player.Ped.Position = packet.Extra.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
             }
+
+            PlayerPacket localPacket = packet.Extra;
+            localPacket.Latency = player.Latency;
+
+            packet.Extra = localPacket;
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
@@ -595,13 +622,20 @@ namespace CoopServer
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Players[packet.Player].Ped.Position = packet.Position;
+            EntitiesPlayer player = Players[packet.Extra.Player];
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            player.Ped.Position = packet.Extra.Position;
+
+            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
             }
+
+            PlayerPacket localPacket = packet.Extra;
+            localPacket.Latency = player.Latency;
+
+            packet.Extra = localPacket;
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);

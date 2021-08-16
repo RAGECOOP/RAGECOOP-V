@@ -52,7 +52,7 @@ namespace CoopClient
             LastUpdate = Environment.TickCount;
 
             MainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            MainScaleform.CallFunction("SET_DATA_SLOT", 0, "", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
+            MainScaleform.CallFunction("SET_DATA_SLOT", 0, Main.MainNetworking.Latency + "ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
 
             int i = 1;
             

@@ -16,7 +16,7 @@ namespace CoopClient
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
         public int LastUpdateReceived { get; set; }
-        public int Latency { get; set; }
+        public float Latency { get; set; }
 
         public Ped Character { get; set; }
         public int Health { get; set; }
