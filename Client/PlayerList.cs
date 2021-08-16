@@ -52,13 +52,13 @@ namespace CoopClient
             LastUpdate = Environment.TickCount;
 
             MainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            MainScaleform.CallFunction("SET_DATA_SLOT", 0, Main.MainNetworking.Latency + "ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
+            MainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Main.MainNetworking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
 
             int i = 1;
             
             foreach (KeyValuePair<string, EntitiesPlayer> player in players)
             {
-                MainScaleform.CallFunction("SET_DATA_SLOT", i++, player.Value.Latency + "ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
+                MainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
             MainScaleform.CallFunction("SET_TITLE", "Player list", (players.Count + 1) + " players");
