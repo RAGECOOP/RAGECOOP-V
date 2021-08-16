@@ -293,12 +293,12 @@ namespace CoopClient
                     GTA.UI.Notification.Show("~r~Car jacked!");
                 }
 
-                Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
+                Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
                 Character.IsVisible = true;
             }
 
             #region -- VEHICLE SYNC --
-            if (Util.GetResponsiblePed(MainVehicle).Handle != Character.Handle)
+            if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
             {
                 return;
             }
