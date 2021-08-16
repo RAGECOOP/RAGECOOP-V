@@ -51,6 +51,7 @@ namespace CoopClient
         private int[] LastVehicleColors = new int[] { 0, 0 };
         public int[] VehicleColors { get; set; }
         public bool VehicleDead { get; set; }
+        public float VehicleEngineHealth { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
@@ -302,6 +303,8 @@ namespace CoopClient
             {
                 return;
             }
+
+            MainVehicle.EngineHealth = VehicleEngineHealth;
 
             if (VehicleDead && !MainVehicle.IsDead)
             {

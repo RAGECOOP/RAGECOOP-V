@@ -340,6 +340,7 @@ namespace CoopClient
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.VehiclePosition = packet.VehPosition.ToVector();
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
+                player.VehicleEngineHealth = packet.VehEngineHealth;
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
@@ -488,6 +489,7 @@ namespace CoopClient
                     npc.VehicleSeatIndex = packet.VehSeatIndex;
                     npc.VehiclePosition = packet.VehPosition.ToVector();
                     npc.VehicleRotation = packet.VehRotation.ToQuaternion();
+                    npc.VehicleEngineHealth = packet.VehEngineHealth;
                     npc.VehicleVelocity = packet.VehVelocity.ToVector();
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
@@ -516,6 +518,7 @@ namespace CoopClient
                         VehicleSeatIndex = packet.VehSeatIndex,
                         VehiclePosition = packet.VehPosition.ToVector(),
                         VehicleRotation = packet.VehRotation.ToQuaternion(),
+                        VehicleEngineHealth = packet.VehEngineHealth,
                         VehicleVelocity = packet.VehVelocity.ToVector(),
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
@@ -593,6 +596,7 @@ namespace CoopClient
                         VehSeatIndex = (int)player.SeatIndex,
                         VehPosition = player.CurrentVehicle.Position.ToLVector(),
                         VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
+                        VehEngineHealth = player.CurrentVehicle.EngineHealth,
                         VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
                         VehSpeed = player.CurrentVehicle.Speed,
                         VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
@@ -694,6 +698,7 @@ namespace CoopClient
                     VehSeatIndex = (int)npc.SeatIndex,
                     VehPosition = npc.CurrentVehicle.Position.ToLVector(),
                     VehRotation = npc.CurrentVehicle.Quaternion.ToLQuaternion(),
+                    VehEngineHealth = npc.CurrentVehicle.EngineHealth,
                     VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
                     VehSpeed = npc.CurrentVehicle.Speed,
                     VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
