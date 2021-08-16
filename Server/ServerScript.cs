@@ -125,17 +125,17 @@ namespace CoopServer
         }
 
         protected static int GetAllPlayersCount() { lock (Server.Players) return Server.Players.Count; }
-        protected static Dictionary<string, Entities.EntitiesPlayer> GetAllPlayers() { lock (Server.Players) return Server.Players; }
+        protected static Dictionary<long, Entities.EntitiesPlayer> GetAllPlayers() { lock (Server.Players) return Server.Players; }
 
         protected static void KickPlayerByUsername(string username, string reason)
         {
             lock (Server.Players)
             {
-                foreach (KeyValuePair<string, Entities.EntitiesPlayer> player in Server.Players)
+                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Server.Players)
                 {
                     if (player.Value.Username == username)
                     {
-                        Server.MainNetServer.Connections.Find(e => NetUtility.ToHexString(e.RemoteUniqueIdentifier) == player.Key).Disconnect(reason);
+                        Server.MainNetServer.Connections.Find(e => e.RemoteUniqueIdentifier == player.Key).Disconnect(reason);
                         return;
                     }
                 }
@@ -163,7 +163,7 @@ namespace CoopServer
         {
             lock (Server.Players)
             {
-                foreach (KeyValuePair<string, Entities.EntitiesPlayer> player in Server.Players)
+                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Server.Players)
                 {
                     if (player.Value.Username == username)
                     {
@@ -177,7 +177,7 @@ namespace CoopServer
 
                         NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                         packet.PacketToNetOutGoingMessage(outgoingMessage);
-                        Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections.Find(con => NetUtility.ToHexString(con.RemoteUniqueIdentifier) == player.Key), NetDeliveryMethod.ReliableOrdered, 0);
+                        Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections.Find(con => con.RemoteUniqueIdentifier == player.Key), NetDeliveryMethod.ReliableOrdered, 0);
                         return;
                     }
                 }

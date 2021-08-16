@@ -45,7 +45,7 @@ namespace CoopClient
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                 new HandshakePacket()
                 {
-                    ID = string.Empty,
+                    ID = 0,
                     SocialClubName = Game.Player.Name,
                     Username = Main.MainSettings.Username,
                     ModVersion = Main.CurrentModVersion,
@@ -259,6 +259,39 @@ namespace CoopClient
 
                 Main.Players.Remove(packet.Player);
             }
+
+            //if (!Main.NpcsAllowed)
+            //{
+            //    return;
+            //}
+            //
+            //lock (Main.Npcs)
+            //{
+            //    for (int i = 0; i < Main.Npcs.Count; i++)
+            //    {
+            //        long key = Main.Npcs.ElementAt(i).Key;
+            //
+            //        if (!key.ToString().StartsWith(packet.Player.ToString()))
+            //        {
+            //            return;
+            //        }
+            //
+            //        EntitiesNpc npcData = Main.Npcs[key];
+            //
+            //        if (npcData.Character != null && npcData.Character.Exists() && npcData.Health > 0)
+            //        {
+            //            npcData.Character.Kill();
+            //            npcData.Character.Delete();
+            //        }
+            //
+            //        if (npcData.MainVehicle != null && npcData.MainVehicle.Exists() && npcData.MainVehicle.PassengerCount == 0)
+            //        {
+            //            npcData.MainVehicle.Delete();
+            //        }
+            //
+            //        Main.Npcs.Remove(key);
+            //    }
+            //}
         }
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)

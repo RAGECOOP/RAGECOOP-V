@@ -30,9 +30,9 @@ namespace CoopClient
 
         public static Networking MainNetworking = new Networking();
 
-        public static string LocalPlayerID = null;
-        public static readonly Dictionary<string, EntitiesPlayer> Players = new Dictionary<string, EntitiesPlayer>();
-        public static readonly Dictionary<string, EntitiesNpc> Npcs = new Dictionary<string, EntitiesNpc>();
+        public static long LocalPlayerID = 0;
+        public static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
+        public static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
 
         public Main()
         {
@@ -76,7 +76,7 @@ namespace CoopClient
             MainChat.Tick();
 
             // Display all players
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.DisplayLocally(player.Value.Username);
             }
@@ -156,7 +156,7 @@ namespace CoopClient
 
         private void OnAbort(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.Character?.AttachedBlip?.Delete();
                 player.Value.Character?.CurrentVehicle?.Delete();
@@ -165,7 +165,7 @@ namespace CoopClient
                 player.Value.PedBlip?.Delete();
             }
 
-            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
@@ -175,7 +175,7 @@ namespace CoopClient
 
         public static void CleanUp()
         {
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.Character?.AttachedBlip?.Delete();
                 player.Value.Character?.CurrentVehicle?.Delete();
@@ -185,7 +185,7 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
@@ -231,10 +231,10 @@ namespace CoopClient
         private void Debug()
         {
             Ped player = Game.Player.Character;
-            if (!Players.ContainsKey("DebugKey"))
+            if (!Players.ContainsKey(0))
             {
-                Players.Add("DebugKey", new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
-                DebugSyncPed = Players["DebugKey"];
+                Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
+                DebugSyncPed = Players[0];
             }
 
             if ((Environment.TickCount - ArtificialLagCounter) < 37)

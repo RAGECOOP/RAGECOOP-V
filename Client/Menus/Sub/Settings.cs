@@ -62,7 +62,7 @@ namespace CoopClient.Menus.Sub
 
                 Main.DebugSyncPed = null;
                 Main.LastFullDebugSync = 0;
-                Main.Players.Remove("DebugKey");
+                Main.Players.Remove(0);
             }
         }
     }

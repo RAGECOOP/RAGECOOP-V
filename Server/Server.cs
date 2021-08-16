@@ -29,7 +29,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static readonly Dictionary<string, EntitiesPlayer> Players = new();
+        public static readonly Dictionary<long, EntitiesPlayer> Players = new();
 
         private static ServerScript GameMode;
 
@@ -182,7 +182,7 @@ namespace CoopServer
 
                 while ((message = MainNetServer.ReadMessage()) != null)
                 {
-                    string player;
+                    long player;
 
                     switch (message.MessageType)
                     {
@@ -212,7 +212,7 @@ namespace CoopServer
                         case NetIncomingMessageType.StatusChanged:
                             NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
 
-                            player = NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier);
+                            player = message.SenderConnection.RemoteUniqueIdentifier;
 
                             if (status == NetConnectionStatus.Disconnected && Players.ContainsKey(player))
                             {
@@ -356,7 +356,7 @@ namespace CoopServer
                             }
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
-                            Players[NetUtility.ToHexString(message.SenderConnection.RemoteUniqueIdentifier)].Latency = message.ReadFloat();
+                            Players[message.SenderConnection.RemoteUniqueIdentifier].Latency = message.ReadFloat();
                             break;
                         case NetIncomingMessageType.ErrorMessage:
                             Logging.Error(message.ReadString());
@@ -383,20 +383,20 @@ namespace CoopServer
         {
             return new(MainNetServer.Connections.Where(e => e != local));
         }
-        private static List<NetConnection> FilterAllLocal(string local)
+        private static List<NetConnection> FilterAllLocal(long local)
         {
-            return new(MainNetServer.Connections.Where(e => NetUtility.ToHexString(e.RemoteUniqueIdentifier) != local));
+            return new(MainNetServer.Connections.Where(e => e.RemoteUniqueIdentifier != local));
         }
 
         // Return a list of players within range of ...
         private static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            return new(MainNetServer.Connections.FindAll(e => Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
+            return new(MainNetServer.Connections.FindAll(e => Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
         }
         // Return a list of players within range of ... but not the local one
         private static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
-            return new(MainNetServer.Connections.Where(e => e != local && Players[NetUtility.ToHexString(e.RemoteUniqueIdentifier)].Ped.IsInRangeOf(position, range)));
+            return new(MainNetServer.Connections.Where(e => e != local && Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
         }
 
         #region -- PLAYER --
@@ -447,7 +447,7 @@ namespace CoopServer
                 return;
             }
 
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 if (player.Value.SocialClubName == packet.SocialClubName)
                 {
@@ -461,7 +461,7 @@ namespace CoopServer
                 }
             }
 
-            string localPlayerID = NetUtility.ToHexString(local.RemoteUniqueIdentifier);
+            long localPlayerID = local.RemoteUniqueIdentifier;
 
             // Add the player to Players
             Players.Add(localPlayerID,
@@ -510,7 +510,7 @@ namespace CoopServer
             // Send all players to local
             playerList.ForEach(targetPlayer =>
             {
-                string targetPlayerID = NetUtility.ToHexString(targetPlayer.RemoteUniqueIdentifier);
+                long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
                 EntitiesPlayer targetEntity = Players[targetPlayerID];
 

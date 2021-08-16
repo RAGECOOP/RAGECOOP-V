@@ -131,7 +131,7 @@ namespace CoopServer
     class HandshakePacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -173,7 +173,7 @@ namespace CoopServer
     class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -207,7 +207,7 @@ namespace CoopServer
     class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -233,7 +233,7 @@ namespace CoopServer
     struct PlayerPacket
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
 
         [ProtoMember(2)]
         public int Health { get; set; }
@@ -521,7 +521,7 @@ namespace CoopServer
     class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -587,7 +587,7 @@ namespace CoopServer
     class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }

@@ -47,7 +47,7 @@ namespace CoopClient
             MainScaleform.CallFunction("DISPLAY_VIEW");
         }
 
-        private void Update(Dictionary<string, EntitiesPlayer> players, string localUsername)
+        private void Update(Dictionary<long, EntitiesPlayer> players, string localUsername)
         {
             LastUpdate = Environment.TickCount;
 
@@ -56,7 +56,7 @@ namespace CoopClient
 
             int i = 1;
             
-            foreach (KeyValuePair<string, EntitiesPlayer> player in players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in players)
             {
                 MainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
