@@ -15,35 +15,7 @@ namespace CoopClient
     {
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
-        private long LastUpdateFrom = 0;
-        public long LastUpdateReceived
-        {
-            get
-            {
-                return LastUpdateFrom;
-            }
-            set
-            {
-                if (LastUpdateFrom != 0)
-                {
-                    LatencyAverager.Enqueue(value - LastUpdateFrom);
-                    if (LatencyAverager.Count >= 10)
-                    {
-                        LatencyAverager.Dequeue();
-                    }
-                }
-
-                LastUpdateFrom = value;
-            }
-        }
-        private readonly Queue<double> LatencyAverager = new Queue<double>();
-        private double AverageLatency
-        {
-            get
-            {
-                return LatencyAverager.Count == 0 ? 0 : LatencyAverager.Average();
-            }
-        }
+        public long LastUpdateReceived { get; set; }
         public float Latency { get; set; }
 
         public Ped Character { get; set; }
@@ -99,6 +71,7 @@ namespace CoopClient
         public bool VehIsEngineRunning { get; set; }
         public bool VehAreLightsOn { get; set; }
         public bool VehAreHighBeamsOn { get; set; }
+        private bool LastVehIsInBurnout = false;
         public bool VehIsInBurnout { get; set; }
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
@@ -411,7 +384,18 @@ namespace CoopClient
                     LastVehDoors = VehDoors;
                 }
 
-                // BURNOUT SYNC
+                if (VehIsInBurnout && !LastVehIsInBurnout)
+                {
+                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
+                    Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
+                }
+                else if (!VehIsInBurnout && LastVehIsInBurnout)
+                {
+                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
+                    Function.Call(Hash.CLEAR_PED_TASKS_IMMEDIATELY, Character); // Buggy but we need this to stop this burnout
+                }
+
+                LastVehIsInBurnout = VehIsInBurnout;
             }
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
@@ -423,22 +407,22 @@ namespace CoopClient
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
-                
-                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
 
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateFrom) / (float)AverageLatency));
+                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition, Environment.TickCount - VehicleStopTime, 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Environment.TickCount - VehicleStopTime, 1000);
+
                 MainVehicle.PositionNoOffset = posTarget;
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateFrom) / (float)AverageLatency));
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }
             else
             {
-                MainVehicle.Position = VehiclePosition;
+                MainVehicle.PositionNoOffset = VehiclePosition;
                 MainVehicle.Quaternion = VehicleRotation;
             }
             #endregion
