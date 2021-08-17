@@ -10,15 +10,36 @@ using GTA.Math;
 namespace CoopClient
 {
     #region CLIENT-ONLY
-    public static class VectorExtensions
+    static class VectorExtensions
     {
+        public static Vector3 ToVector(this Quaternion vec)
+        {
+            return new Vector3()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z
+            };
+        }
+
+        public static Quaternion ToQuaternion(this Vector3 vec, float vW = 0.0f)
+        {
+            return new Quaternion()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z,
+                W = vW
+            };
+        }
+
         public static LVector3 ToLVector(this Vector3 vec)
         {
             return new LVector3()
             {
                 X = vec.X,
                 Y = vec.Y,
-                Z = vec.Z,
+                Z = vec.Z
             };
         }
 
@@ -36,7 +57,7 @@ namespace CoopClient
     #endregion
 
     [ProtoContract]
-    public struct LVector3
+    struct LVector3
     {
         #region CLIENT-ONLY
         public Vector3 ToVector()
@@ -63,7 +84,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public struct LQuaternion
+    struct LQuaternion
     {
         #region CLIENT-ONLY
         public Quaternion ToQuaternion()
@@ -93,7 +114,7 @@ namespace CoopClient
         public float W { get; set; }
     }
 
-    public enum PacketTypes
+    enum PacketTypes
     {
         HandshakePacket,
         PlayerConnectPacket,
@@ -108,7 +129,7 @@ namespace CoopClient
     }
 
     [Flags]
-    public enum PedDataFlags
+    enum PedDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsAiming = 1 << 1,
@@ -120,8 +141,9 @@ namespace CoopClient
         IsInVehicle = 1 << 7
     }
 
+    #region ===== VEHICLE DATA =====
     [Flags]
-    public enum VehicleDataFlags
+    enum VehicleDataFlags
     {
         LastSyncWasFull = 1 << 0,
         IsInVehicle = 1 << 1,
@@ -129,8 +151,36 @@ namespace CoopClient
         AreLightsOn = 1 << 3,
         AreHighBeamsOn = 1 << 4,
         IsInBurnout = 1 << 5,
-        IsSirenActive = 1 << 6
+        IsSirenActive = 1 << 6,
+        IsDead = 1 << 7
     }
+
+    [ProtoContract]
+    public struct VehicleDoors
+    {
+        #region CLIENT-ONLY
+        public VehicleDoors(float angleRatio = 0f, bool broken = false, bool open = false, bool fullyOpen = false)
+        {
+            AngleRatio = angleRatio;
+            Broken = broken;
+            Open = open;
+            FullyOpen = fullyOpen;
+        }
+        #endregion
+
+        [ProtoMember(1)]
+        public float AngleRatio { get; set; }
+
+        [ProtoMember(2)]
+        public bool Broken { get; set; }
+
+        [ProtoMember(3)]
+        public bool Open { get; set; }
+
+        [ProtoMember(4)]
+        public bool FullyOpen { get; set; }
+    }
+    #endregion
 
     public interface IPacket
     {
@@ -146,10 +196,10 @@ namespace CoopClient
 
     #region -- PLAYER --
     [ProtoContract]
-    public class HandshakePacket : Packet
+    class HandshakePacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -188,10 +238,10 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class PlayerConnectPacket : Packet
+    class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -222,10 +272,10 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class PlayerDisconnectPacket : Packet
+    class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -248,10 +298,26 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncPlayerPacket : Packet
+    struct PlayerPacket
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public long Player { get; set; }
+
+        [ProtoMember(2)]
+        public int Health { get; set; }
+
+        [ProtoMember(3)]
+        public LVector3 Position { get; set; }
+
+        [ProtoMember(4)]
+        public float Latency { get; set; }
+    }
+
+    [ProtoContract]
+    class FullSyncPlayerPacket : Packet
+    {
+        [ProtoMember(1)]
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -260,27 +326,21 @@ namespace CoopClient
         public Dictionary<int, int> Props { get; set; }
 
         [ProtoMember(4)]
-        public int Health { get; set; }
-
-        [ProtoMember(5)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(6)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public byte Speed { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(10)]
+        [ProtoMember(8)]
         public int CurrentWeaponHash { get; set; }
 
-        [ProtoMember(11)]
+        [ProtoMember(9)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -299,11 +359,9 @@ namespace CoopClient
 
             FullSyncPlayerPacket data = CoopSerializer.Deserialize<FullSyncPlayerPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            Extra = data.Extra;
             ModelHash = data.ModelHash;
             Props = data.Props;
-            Health = data.Health;
-            Position = data.Position;
             Rotation = data.Rotation;
             Velocity = data.Velocity;
             Speed = data.Speed;
@@ -314,10 +372,10 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncPlayerVehPacket : Packet
+    class FullSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -326,33 +384,36 @@ namespace CoopClient
         public Dictionary<int, int> Props { get; set; }
 
         [ProtoMember(4)]
-        public int Health { get; set; }
-
-        [ProtoMember(5)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(6)]
         public int VehModelHash { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public int VehSeatIndex { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public LVector3 VehPosition { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(10)]
+        [ProtoMember(8)]
+        public float VehEngineHealth { get; set; }
+
+        [ProtoMember(9)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(11)]
+        [ProtoMember(10)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(12)]
+        [ProtoMember(11)]
         public float VehSteeringAngle { get; set; }
 
+        [ProtoMember(12)]
+        public int[] VehColors { get; set; }
+
         [ProtoMember(13)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(14)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -371,50 +432,45 @@ namespace CoopClient
 
             FullSyncPlayerVehPacket data = CoopSerializer.Deserialize<FullSyncPlayerVehPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            Extra = data.Extra;
             ModelHash = data.ModelHash;
             Props = data.Props;
-            Health = data.Health;
-            Position = data.Position;
             VehModelHash = data.VehModelHash;
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
+            VehEngineHealth = data.VehEngineHealth;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehColors = data.VehColors;
+            VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
     }
 
     [ProtoContract]
-    public class LightSyncPlayerPacket : Packet
+    class LightSyncPlayerPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(4)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(3)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(6)]
+        [ProtoMember(4)]
         public byte Speed { get; set; }
 
-        [ProtoMember(7)]
+        [ProtoMember(5)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(8)]
+        [ProtoMember(6)]
         public int CurrentWeaponHash { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(7)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -433,9 +489,7 @@ namespace CoopClient
 
             LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
-            Health = data.Health;
-            Position = data.Position;
+            Extra = data.Extra;
             Rotation = data.Rotation;
             Velocity = data.Velocity;
             Speed = data.Speed;
@@ -446,16 +500,10 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class LightSyncPlayerVehPacket : Packet
+    class LightSyncPlayerVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string Player { get; set; }
-
-        [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
+        public PlayerPacket Extra { get; set; }
 
         [ProtoMember(4)]
         public int VehModelHash { get; set; }
@@ -497,9 +545,7 @@ namespace CoopClient
 
             LightSyncPlayerVehPacket data = CoopSerializer.Deserialize<LightSyncPlayerVehPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
-            Health = data.Health;
-            Position = data.Position;
+            Extra = data.Extra;
             VehModelHash = data.VehModelHash;
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
@@ -512,7 +558,7 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class ChatMessagePacket : Packet
+    class ChatMessagePacket : Packet
     {
         [ProtoMember(1)]
         public string Username { get; set; }
@@ -544,10 +590,10 @@ namespace CoopClient
 
     #region -- NPC --
     [ProtoContract]
-    public class FullSyncNpcPacket : Packet
+    class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -610,10 +656,10 @@ namespace CoopClient
     }
 
     [ProtoContract]
-    public class FullSyncNpcVehPacket : Packet
+    class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
-        public string ID { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -640,15 +686,24 @@ namespace CoopClient
         public LQuaternion VehRotation { get; set; }
 
         [ProtoMember(10)]
-        public LVector3 VehVelocity { get; set; }
+        public float VehEngineHealth { get; set; }
 
         [ProtoMember(11)]
-        public float VehSpeed { get; set; }
+        public LVector3 VehVelocity { get; set; }
 
         [ProtoMember(12)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSpeed { get; set; }
 
         [ProtoMember(13)]
+        public float VehSteeringAngle { get; set; }
+
+        [ProtoMember(14)]
+        public int[] VehColors { get; set; }
+
+        [ProtoMember(15)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(16)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -676,9 +731,12 @@ namespace CoopClient
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
+            VehEngineHealth = data.VehEngineHealth;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehColors = data.VehColors;
+            VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
     }

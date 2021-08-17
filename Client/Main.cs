@@ -17,7 +17,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_4_0";
+        public static readonly string CurrentModVersion = "V0_5_0";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool NpcsAllowed = false;
@@ -27,13 +27,12 @@ namespace CoopClient
 
         public static MenusMain MainMenu = new MenusMain();
         public static Chat MainChat = new Chat();
-        public static PlayerList MainPlayerList = new PlayerList();
 
         public static Networking MainNetworking = new Networking();
 
-        public static string LocalPlayerID = null;
-        public static readonly Dictionary<string, EntitiesPlayer> Players = new Dictionary<string, EntitiesPlayer>();
-        public static readonly Dictionary<string, EntitiesNpc> Npcs = new Dictionary<string, EntitiesNpc>();
+        public static long LocalPlayerID = 0;
+        public static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
+        public static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
 
         public Main()
         {
@@ -75,13 +74,9 @@ namespace CoopClient
             }
 
             MainChat.Tick();
-            if (!MainChat.Focused && !MainMenu.MenuPool.AreAnyVisible)
-            {
-                MainPlayerList.Tick();
-            }
 
             // Display all players
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.DisplayLocally(player.Value.Username);
             }
@@ -129,9 +124,8 @@ namespace CoopClient
                 case Keys.Y:
                     if (MainNetworking.IsOnServer())
                     {
-                        int time = Environment.TickCount;
-
-                        MainPlayerList.Pressed = (time - MainPlayerList.Pressed) < 5000 ? (time - 6000) : time;
+                        int currentTimestamp = Environment.TickCount;
+                        PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                     }
                     break;
                 case Keys.G:
@@ -162,7 +156,7 @@ namespace CoopClient
 
         private void OnAbort(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.Character?.AttachedBlip?.Delete();
                 player.Value.Character?.CurrentVehicle?.Delete();
@@ -171,7 +165,7 @@ namespace CoopClient
                 player.Value.PedBlip?.Delete();
             }
 
-            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
@@ -181,7 +175,7 @@ namespace CoopClient
 
         public static void CleanUp()
         {
-            foreach (KeyValuePair<string, EntitiesPlayer> player in Players)
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.Character?.AttachedBlip?.Delete();
                 player.Value.Character?.CurrentVehicle?.Delete();
@@ -191,7 +185,7 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<string, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
@@ -231,24 +225,26 @@ namespace CoopClient
 
         private int ArtificialLagCounter;
         public static EntitiesPlayer DebugSyncPed;
-        public static bool FullDebugSync = true;
+        public static int LastFullDebugSync = 0;
         public static bool UseDebug = false;
 
         private void Debug()
         {
-            var player = Game.Player.Character;
-            if (!Players.ContainsKey("DebugKey"))
+            Ped player = Game.Player.Character;
+            if (!Players.ContainsKey(0))
             {
-                Players.Add("DebugKey", new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
-                DebugSyncPed = Players["DebugKey"];
+                Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
+                DebugSyncPed = Players[0];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 47)
+            if ((Environment.TickCount - ArtificialLagCounter) < 157)
             {
                 return;
             }
 
-            if (FullDebugSync)
+            bool fullSync = (Environment.TickCount - LastFullDebugSync) > 1500;
+
+            if (fullSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
                 DebugSyncPed.Props = Util.GetPedProps(player);
@@ -260,7 +256,7 @@ namespace CoopClient
 
             if (!player.IsInVehicle())
             {
-                flags = Util.GetPedFlags(player, FullDebugSync, true);
+                flags = Util.GetPedFlags(player, fullSync, true);
 
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
@@ -287,15 +283,26 @@ namespace CoopClient
                 Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = Util.GetVehicleFlags(player, veh, FullDebugSync);
+                flags = Util.GetVehicleFlags(player, veh, fullSync);
+
+                int secondaryColor;
+                int primaryColor;
+
+                unsafe
+                {
+                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                }
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
+                DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -303,6 +310,7 @@ namespace CoopClient
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 DebugSyncPed.VehIsInBurnout = (flags.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {
@@ -311,8 +319,17 @@ namespace CoopClient
                 }
             }
 
-            FullDebugSync = !FullDebugSync;
-            ArtificialLagCounter = Environment.TickCount;
+            int currentTimestamp = Environment.TickCount;
+
+            DebugSyncPed.LastUpdateReceived = currentTimestamp;
+            DebugSyncPed.Latency = currentTimestamp - ArtificialLagCounter;
+
+            ArtificialLagCounter = currentTimestamp;
+
+            if (fullSync)
+            {
+                LastFullDebugSync = currentTimestamp;
+            }
         }
     }
 }

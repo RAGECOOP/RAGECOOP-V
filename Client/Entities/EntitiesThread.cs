@@ -21,16 +21,16 @@ namespace CoopClient.Entities
                 return;
             }
 
-            Dictionary<string, EntitiesNpc> localNpcs = null;
+            Dictionary<long, EntitiesNpc> localNpcs = null;
             lock (Main.Npcs)
             {
-                localNpcs = new Dictionary<string, EntitiesNpc>(Main.Npcs);
+                localNpcs = new Dictionary<long, EntitiesNpc>(Main.Npcs);
             }
 
             int tickCount = Environment.TickCount;
             for (int i = localNpcs.Count - 1; i >= 0; i--)
             {
-                string key = localNpcs.ElementAt(i).Key;
+                long key = localNpcs.ElementAt(i).Key;
 
                 if ((tickCount - localNpcs[key].LastUpdateReceived) > 3500)
                 {
@@ -51,7 +51,7 @@ namespace CoopClient.Entities
 
             lock (Main.Npcs)
             {
-                foreach (KeyValuePair<string, EntitiesNpc> npc in new Dictionary<string, EntitiesNpc>(Main.Npcs))
+                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(Main.Npcs))
                 {
                     if (!localNpcs.ContainsKey(npc.Key))
                     {

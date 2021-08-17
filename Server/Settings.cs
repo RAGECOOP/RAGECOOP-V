@@ -6,6 +6,8 @@
         public int MaxPlayers { get; set; } = 16;
         public string ServerName { get; set; } = "GTACoop:R server";
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
+        public bool DefaultGameMode { get; set; } = true;
+        public string GameMode { get; set; } = "";
         public bool Allowlist { get; set; } = false;
         public bool NpcsAllowed { get; set; } = true;
         public string MasterServer { get; set; } = "https://gtacoopr.entenkoeniq.de/servers";

@@ -12,6 +12,7 @@ namespace CoopClient
     public class Networking
     {
         public NetClient Client;
+        public float Latency;
 
         public void DisConnectFromServer(string address)
         {
@@ -32,6 +33,8 @@ namespace CoopClient
                     AutoFlushSendQueue = false
                 };
 
+                config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
+
                 Client = new NetClient(config);
 
                 Client.Start();
@@ -42,7 +45,7 @@ namespace CoopClient
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                 new HandshakePacket()
                 {
-                    ID = string.Empty,
+                    ID = 0,
                     SocialClubName = Game.Player.Name,
                     Username = Main.MainSettings.Username,
                     ModVersion = Main.CurrentModVersion,
@@ -106,7 +109,6 @@ namespace CoopClient
                                     Function.Call(Hash.SET_RANDOM_TRAINS, 0);
 
                                     Main.MainChat.Init();
-                                    Main.MainPlayerList.Init(Main.MainSettings.Username);
 
                                     // Send player connect packet
                                     NetOutgoingMessage outgoingMessage = Client.CreateMessage();
@@ -133,7 +135,7 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 // Reset all values
-                                FullPlayerSync = true;
+                                LastPlayerFullSync = 0;
 
                                 Main.NpcsAllowed = false;
 
@@ -212,6 +214,9 @@ namespace CoopClient
                                 break;
                         }
                         break;
+                    case NetIncomingMessageType.ConnectionLatencyUpdated:
+                        Latency = message.ReadFloat();
+                        break;
                     case NetIncomingMessageType.DebugMessage:
                     case NetIncomingMessageType.ErrorMessage:
                     case NetIncomingMessageType.WarningMessage:
@@ -232,12 +237,11 @@ namespace CoopClient
             EntitiesPlayer player = new EntitiesPlayer()
             {
                 SocialClubName = packet.SocialClubName,
-                Username = packet.Username
+                Username = packet.Username,
+                LastUpdateReceived = Environment.TickCount
             };
 
             Main.Players.Add(packet.Player, player);
-
-            Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
@@ -256,18 +260,53 @@ namespace CoopClient
                 Main.Players.Remove(packet.Player);
             }
 
-            Main.MainPlayerList.Update(Main.Players, Main.MainSettings.Username);
+            //if (!Main.NpcsAllowed)
+            //{
+            //    return;
+            //}
+            //
+            //lock (Main.Npcs)
+            //{
+            //    for (int i = 0; i < Main.Npcs.Count; i++)
+            //    {
+            //        long key = Main.Npcs.ElementAt(i).Key;
+            //
+            //        if (!key.ToString().StartsWith(packet.Player.ToString()))
+            //        {
+            //            return;
+            //        }
+            //
+            //        EntitiesNpc npcData = Main.Npcs[key];
+            //
+            //        if (npcData.Character != null && npcData.Character.Exists() && npcData.Health > 0)
+            //        {
+            //            npcData.Character.Kill();
+            //            npcData.Character.Delete();
+            //        }
+            //
+            //        if (npcData.MainVehicle != null && npcData.MainVehicle.Exists() && npcData.MainVehicle.PassengerCount == 0)
+            //        {
+            //            npcData.MainVehicle.Delete();
+            //        }
+            //
+            //        Main.Npcs.Remove(key);
+            //    }
+            //}
         }
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
+
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
+
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -286,20 +325,27 @@ namespace CoopClient
 
         private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
+
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
+
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.VehiclePosition = packet.VehPosition.ToVector();
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
+                player.VehicleEngineHealth = packet.VehEngineHealth;
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.VehicleColors = packet.VehColors;
+                player.VehDoors = packet.VehDoors;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -307,16 +353,21 @@ namespace CoopClient
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
             }
         }
 
         private void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
+
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
+
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -335,11 +386,15 @@ namespace CoopClient
 
         private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Player))
+            if (Main.Players.ContainsKey(packet.Extra.Player))
             {
-                EntitiesPlayer player = Main.Players[packet.Player];
-                player.Health = packet.Health;
-                player.Position = packet.Position.ToVector();
+                EntitiesPlayer player = Main.Players[packet.Extra.Player];
+
+                player.Latency = packet.Extra.Latency;
+                player.LastUpdateReceived = Environment.TickCount;
+
+                player.Health = packet.Extra.Health;
+                player.Position = packet.Extra.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.VehiclePosition = packet.VehPosition.ToVector();
@@ -354,6 +409,7 @@ namespace CoopClient
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
             }
         }
         #endregion // -- PLAYER --
@@ -366,7 +422,9 @@ namespace CoopClient
                 if (Main.Npcs.ContainsKey(packet.ID))
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
+
                     npc.LastUpdateReceived = Environment.TickCount;
+
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
                     npc.Health = packet.Health;
@@ -390,6 +448,7 @@ namespace CoopClient
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Environment.TickCount,
+
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
                         Health = packet.Health,
@@ -419,7 +478,9 @@ namespace CoopClient
                 if (Main.Npcs.ContainsKey(packet.ID))
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
+
                     npc.LastUpdateReceived = Environment.TickCount;
+
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
                     npc.Health = packet.Health;
@@ -428,9 +489,12 @@ namespace CoopClient
                     npc.VehicleSeatIndex = packet.VehSeatIndex;
                     npc.VehiclePosition = packet.VehPosition.ToVector();
                     npc.VehicleRotation = packet.VehRotation.ToQuaternion();
+                    npc.VehicleEngineHealth = packet.VehEngineHealth;
                     npc.VehicleVelocity = packet.VehVelocity.ToVector();
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
+                    npc.VehicleColors = packet.VehColors;
+                    npc.VehDoors = packet.VehDoors;
                     npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                     npc.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -438,12 +502,14 @@ namespace CoopClient
                     npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                     npc.VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0;
                     npc.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
+                    npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 }
                 else
                 {
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Environment.TickCount,
+
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
                         Health = packet.Health,
@@ -452,16 +518,20 @@ namespace CoopClient
                         VehicleSeatIndex = packet.VehSeatIndex,
                         VehiclePosition = packet.VehPosition.ToVector(),
                         VehicleRotation = packet.VehRotation.ToQuaternion(),
+                        VehicleEngineHealth = packet.VehEngineHealth,
                         VehicleVelocity = packet.VehVelocity.ToVector(),
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
+                        VehicleColors = packet.VehColors,
+                        VehDoors = packet.VehDoors,
                         LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
                         IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
                         VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
                         VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0,
                         VehIsInBurnout = (packet.Flag.Value & (byte)VehicleDataFlags.IsInBurnout) > 0,
-                        VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0
+                        VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0,
+                        VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0
                     });
                 }
             }
@@ -470,24 +540,30 @@ namespace CoopClient
         #endregion
 
         #region -- SEND --
-        private bool FullPlayerSync = true;
+        private int LastPlayerFullSync = 0;
         public void SendPlayerData()
         {
             Ped player = Game.Player.Character;
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            NetDeliveryMethod messageType;
 
-            if (FullPlayerSync)
+            if ((Environment.TickCount - LastPlayerFullSync) > 500)
             {
+                messageType = NetDeliveryMethod.UnreliableSequenced;
+
                 if (!player.IsInVehicle())
                 {
                     new FullSyncPlayerPacket()
                     {
-                        Player = Main.LocalPlayerID,
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         ModelHash = player.Model.Hash,
                         Props = Util.GetPedProps(player),
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = Util.GetPedSpeed(player),
@@ -498,33 +574,54 @@ namespace CoopClient
                 }
                 else
                 {
+                    int secondaryColor;
+                    int primaryColor;
+
+                    unsafe
+                    {
+                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, player.CurrentVehicle, &primaryColor, &secondaryColor);
+                    }
+
                     new FullSyncPlayerVehPacket()
                     {
-                        Player = Main.LocalPlayerID,
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         ModelHash = player.Model.Hash,
                         Props = Util.GetPedProps(player),
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
                         VehPosition = player.CurrentVehicle.Position.ToLVector(),
                         VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
+                        VehEngineHealth = player.CurrentVehicle.EngineHealth,
                         VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
                         VehSpeed = player.CurrentVehicle.Speed,
                         VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
+                        VehColors = new int[] { primaryColor, secondaryColor },
+                        VehDoors = Util.GetVehicleDoors(player.CurrentVehicle.Doors),
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
+
+                LastPlayerFullSync = Environment.TickCount;
             }
             else
             {
+                messageType = NetDeliveryMethod.ReliableSequenced;
+
                 if (!player.IsInVehicle())
                 {
                     new LightSyncPlayerPacket()
                     {
-                        Player = Main.LocalPlayerID,
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = Util.GetPedSpeed(player),
@@ -537,9 +634,12 @@ namespace CoopClient
                 {
                     new LightSyncPlayerVehPacket()
                     {
-                        Player = Main.LocalPlayerID,
-                        Health = player.Health,
-                        Position = player.Position.ToLVector(),
+                        Extra = new PlayerPacket()
+                        {
+                            Player = Main.LocalPlayerID,
+                            Health = player.Health,
+                            Position = player.Position.ToLVector()
+                        },
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
                         VehPosition = player.CurrentVehicle.Position.ToLVector(),
@@ -552,10 +652,8 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.UnreliableSequenced);
+            Client.SendMessage(outgoingMessage, messageType);
             Client.FlushSendQueue();
-
-            FullPlayerSync = !FullPlayerSync;
         }
 
         public void SendNpcData(Ped npc)
@@ -581,6 +679,14 @@ namespace CoopClient
             }
             else
             {
+                int secondaryColor;
+                int primaryColor;
+
+                unsafe
+                {
+                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
+                }
+
                 new FullSyncNpcVehPacket()
                 {
                     ID = Main.LocalPlayerID + npc.Handle,
@@ -592,9 +698,12 @@ namespace CoopClient
                     VehSeatIndex = (int)npc.SeatIndex,
                     VehPosition = npc.CurrentVehicle.Position.ToLVector(),
                     VehRotation = npc.CurrentVehicle.Quaternion.ToLQuaternion(),
+                    VehEngineHealth = npc.CurrentVehicle.EngineHealth,
                     VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
                     VehSpeed = npc.CurrentVehicle.Speed,
                     VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
+                    VehColors = new int[] { primaryColor, secondaryColor },
+                    VehDoors = Util.GetVehicleDoors(npc.CurrentVehicle.Doors),
                     Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }

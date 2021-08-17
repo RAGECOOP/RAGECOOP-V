@@ -16,16 +16,15 @@ namespace CoopClient
         #region -- POINTER --
         private static int SteeringAngleOffset { get; set; }
 
+        delegate ulong GetHandleAddressFuncDelegate(int handle);
+        static GetHandleAddressFuncDelegate GetEntityAddressFunc;
+
         static unsafe byte* FindPattern(string pattern, string mask)
         {
             ProcessModule module = Process.GetCurrentProcess().MainModule;
-            return FindPattern(pattern, mask, module.BaseAddress, (ulong)module.ModuleMemorySize);
-        }
 
-        static unsafe byte* FindPattern(string pattern, string mask, IntPtr startAddress, ulong size)
-        {
-            ulong address = (ulong)startAddress.ToInt64();
-            ulong endAddress = address + size;
+            ulong address = (ulong)module.BaseAddress.ToInt64();
+            ulong endAddress = address + (ulong)module.ModuleMemorySize;
 
             for (; address < endAddress; address++)
             {
@@ -52,12 +51,6 @@ namespace CoopClient
             address = FindPattern("\xE8\x00\x00\x00\x00\x48\x8B\xD8\x48\x85\xC0\x74\x2E\x48\x83\x3D", "x????xxxxxxxxxxx");
             GetEntityAddressFunc = GetDelegateForFunctionPointer<GetHandleAddressFuncDelegate>(new IntPtr(*(int*)(address + 1) + address + 5));
 
-            // use the former pattern if the version is 1.0.1604.0 or newer
-            int gameVersion = (int)Game.Version;
-            address = gameVersion >= 46 ?
-                        FindPattern("\xF3\x0F\x10\x9F\xD4\x08\x00\x00\x0F\x2F\xDF\x73\x0A", "xxxx????xxxxx") :
-                        FindPattern("\xF3\x0F\x10\x8F\x68\x08\x00\x00\x88\x4D\x8C\x0F\x2F\xCF", "xxxx????xxx???");
-
             address = FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
             if (address != null)
             {
@@ -74,17 +67,9 @@ namespace CoopClient
             }
         }
 
-        delegate ulong GetHandleAddressFuncDelegate(int handle);
-        static GetHandleAddressFuncDelegate GetEntityAddressFunc;
-
-        public static IntPtr GetEntityAddress(int handle)
+        public static unsafe void CustomSteeringAngle(int handle, float value)
         {
-            return new IntPtr((long)GetEntityAddressFunc(handle));
-        }
-
-        public static unsafe void CustomSteeringAngle(int Handle, float value)
-        {
-            IntPtr address = GetEntityAddress(Handle);
+            IntPtr address = new IntPtr((long)GetEntityAddressFunc(handle));
             if (address == IntPtr.Zero || SteeringAngleOffset == 0)
             {
                 return;
@@ -112,6 +97,29 @@ namespace CoopClient
         public static float LinearFloatLerp(float start, float end, int currentTime, int duration)
         {
             return (end - start) * currentTime / duration + start;
+        }
+
+        public static int GetResponsiblePedHandle(Vehicle veh)
+        {
+            if (veh == null || veh.Handle == 0 || !veh.Exists())
+            {
+                return 0;
+            }
+
+            if (!veh.IsSeatFree(VehicleSeat.Driver))
+            {
+                return veh.GetPedOnSeat(VehicleSeat.Driver).Handle;
+            }
+
+            for (int i = 0; i < veh.PassengerCapacity; i++)
+            {
+                if (!veh.IsSeatFree((VehicleSeat)i))
+                {
+                    return veh.GetPedOnSeat((VehicleSeat)i).Handle;
+                }
+            }
+
+            return 0;
         }
 
         public static byte GetPedSpeed(Ped ped)
@@ -177,6 +185,11 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsSirenActive;
             }
 
+            if (veh.IsDead)
+            {
+                flags |= (byte)VehicleDataFlags.IsDead;
+            }
+
             return flags;
         }
 
@@ -235,6 +248,40 @@ namespace CoopClient
                 int mod = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
                 result.Add(i, mod);
             }
+            return result;
+        }
+
+        public static Dictionary<int, int> GetVehicleMods(Vehicle veh)
+        {
+            Dictionary<int, int> result = new Dictionary<int, int>();
+            foreach (VehicleMod mod in veh.Mods.ToArray())
+            {
+                result.Add((int)mod.Type, mod.Index);
+            }
+            return result;
+        }
+
+        public static VehicleDoors[] GetVehicleDoors(VehicleDoorCollection doors)
+        {
+            int doorLength = doors.ToArray().Length;
+            if (doorLength == 0)
+            {
+                return null;
+            }
+
+            VehicleDoors[] result = new VehicleDoors[doorLength];
+            for (int i = 0; i < (doorLength - 1); i++)
+            {
+                VehicleDoors currentDoor = new VehicleDoors()
+                {
+                    AngleRatio = doors[(VehicleDoorIndex)i].AngleRatio,
+                    Broken = doors[(VehicleDoorIndex)i].IsBroken,
+                    Open = doors[(VehicleDoorIndex)i].IsOpen,
+                    FullyOpen = doors[(VehicleDoorIndex)i].IsFullyOpen
+                };
+                result[i] = currentDoor;
+            }
+
             return result;
         }
 

@@ -15,6 +15,8 @@ namespace CoopClient
     {
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
+        public long LastUpdateReceived { get; set; }
+        public float Latency { get; set; }
 
         public Ped Character { get; set; }
         public int Health { get; set; }
@@ -46,6 +48,10 @@ namespace CoopClient
 
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
+        private int[] LastVehicleColors = new int[] { 0, 0 };
+        public int[] VehicleColors { get; set; }
+        public bool VehicleDead { get; set; }
+        public float VehicleEngineHealth { get; set; }
         public int VehicleSeatIndex { get; set; }
         public Vehicle MainVehicle { get; set; }
         public Vector3 VehiclePosition { get; set; }
@@ -62,41 +68,14 @@ namespace CoopClient
             }
         }
         public float VehicleSteeringAngle { get; set; }
-        private bool LastVehIsEngineRunning { get; set; }
-        private bool CurrentVehIsEngineRunning { get; set; }
-        public bool VehIsEngineRunning
-        {
-            set
-            {
-                LastVehIsEngineRunning = CurrentVehIsEngineRunning;
-                CurrentVehIsEngineRunning = value;
-            }
-        }
-        private bool LastVehAreLightsOn { get; set; }
-        private bool CurrentVehAreLightsOn { get; set; }
-        public bool VehAreLightsOn
-        {
-            set
-            {
-                LastVehAreLightsOn = CurrentVehAreLightsOn;
-                CurrentVehAreLightsOn = value;
-            }
-        }
-        private bool LastVehAreHighBeamsOn { get; set; }
-        private bool CurrentVehAreHighBeamsOn { get; set; }
-        public bool VehAreHighBeamsOn
-        {
-            set
-            {
-                LastVehAreHighBeamsOn = CurrentVehAreHighBeamsOn;
-                CurrentVehAreHighBeamsOn = value;
-            }
-        }
-
+        public bool VehIsEngineRunning { get; set; }
+        public bool VehAreLightsOn { get; set; }
+        public bool VehAreHighBeamsOn { get; set; }
         private bool LastVehIsInBurnout = false;
         public bool VehIsInBurnout { get; set; }
-        private bool LastVehIsSireneActive = false;
         public bool VehIsSireneActive { get; set; }
+        private VehicleDoors[] LastVehDoors;
+        public VehicleDoors[] VehDoors { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -255,7 +234,7 @@ namespace CoopClient
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - VehiclePosition).Length()).Take(3).ToList();
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
 
                 bool vehFound = false;
 
@@ -271,7 +250,8 @@ namespace CoopClient
 
                 if (!vehFound)
                 {
-                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition, VehicleRotation.Z);
+                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition);
+                    MainVehicle.Quaternion = VehicleRotation;
                 }
             }
 
@@ -286,11 +266,18 @@ namespace CoopClient
                     GTA.UI.Notification.Show("~r~Car jacked!");
                 }
 
-                Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
+                Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
                 Character.IsVisible = true;
             }
 
             #region -- VEHICLE SYNC --
+            if (VehicleColors != LastVehicleColors)
+            {
+                Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
+                LastVehicleColors = VehicleColors;
+            }
+
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
@@ -307,63 +294,135 @@ namespace CoopClient
                     StartPedalingAnim(true);
                 }
             }
+            else
+            {
+                if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
+                {
+                    return;
+                }
 
-            if (CurrentVehIsEngineRunning != LastVehIsEngineRunning)
-            {
-                MainVehicle.IsEngineRunning = CurrentVehIsEngineRunning;
-            }
+                MainVehicle.EngineHealth = VehicleEngineHealth;
 
-            if (CurrentVehAreLightsOn != LastVehAreLightsOn)
-            {
-                MainVehicle.AreLightsOn = CurrentVehAreLightsOn;
-            }
+                if (VehicleDead && !MainVehicle.IsDead)
+                {
+                    MainVehicle.Explode();
+                }
+                else if (!VehicleDead && MainVehicle.IsDead)
+                {
+                    MainVehicle.Repair();
+                }
 
-            if (CurrentVehAreHighBeamsOn != LastVehAreHighBeamsOn)
-            {
-                MainVehicle.AreHighBeamsOn = CurrentVehAreHighBeamsOn;
-            }
+                if (VehIsEngineRunning != MainVehicle.IsEngineRunning)
+                {
+                    MainVehicle.IsEngineRunning = VehIsEngineRunning;
+                }
 
-            if (VehIsSireneActive != LastVehIsSireneActive)
-            {
-                MainVehicle.IsSirenActive = LastVehIsSireneActive = VehIsSireneActive;
-            }
+                if (VehAreLightsOn != MainVehicle.AreLightsOn)
+                {
+                    MainVehicle.AreLightsOn = VehAreLightsOn;
+                }
 
-            if (VehIsInBurnout && !LastVehIsInBurnout && (LastVehIsInBurnout = true))
-            {
-                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
-                Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
-            }
-            else if (!VehIsInBurnout && LastVehIsInBurnout && (LastVehIsInBurnout = false))
-            {
-                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
-                Character.Task.ClearAll();
+                if (VehAreHighBeamsOn != MainVehicle.AreHighBeamsOn)
+                {
+                    MainVehicle.AreHighBeamsOn = VehAreHighBeamsOn;
+                }
+
+                if (VehIsSireneActive != MainVehicle.IsSirenActive)
+                {
+                    MainVehicle.IsSirenActive = VehIsSireneActive;
+                }
+
+                Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
+
+                if (VehDoors != null && VehDoors != LastVehDoors)
+                {
+                    int doorLength = VehDoors.Length;
+                    if (VehDoors.Length != 0)
+                    {
+                        for (int i = 0; i < (doorLength - 1); i++)
+                        {
+                            VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
+                            VehicleDoors aDoor = VehDoors[i];
+
+                            if (aDoor.Broken)
+                            {
+                                if (!door.IsBroken)
+                                {
+                                    door.Break();
+                                }
+                                continue;
+                            }
+                            else if (!aDoor.Broken && door.IsBroken)
+                            {
+                                // Repair?
+                                //MainVehicle.Repair();
+                            }
+
+                            if (aDoor.FullyOpen)
+                            {
+                                if (!door.IsFullyOpen)
+                                {
+                                    door.Open(false, true);
+                                }
+                                continue;
+                            }
+                            else if (aDoor.Open)
+                            {
+                                if (!door.IsOpen)
+                                {
+                                    door.Open();
+                                }
+
+                                door.AngleRatio = aDoor.AngleRatio;
+                                continue;
+                            }
+
+                            door.Close(true);
+                        }
+                    }
+
+                    LastVehDoors = VehDoors;
+                }
+
+                if (VehIsInBurnout && !LastVehIsInBurnout)
+                {
+                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
+                    Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
+                }
+                else if (!VehIsInBurnout && LastVehIsInBurnout)
+                {
+                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
+                    Function.Call(Hash.CLEAR_PED_TASKS_IMMEDIATELY, Character); // Buggy but we need this to stop this burnout
+                }
+
+                LastVehIsInBurnout = VehIsInBurnout;
             }
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
                 Util.CustomSteeringAngle(MainVehicle.Handle, (float)(Math.PI / 180) * VehicleSteeringAngle);
             }
-            
-            Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
 
             // Good enough for now, but we need to create a better sync
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
-                MainVehicle.Velocity = VehicleVelocity + (VehiclePosition - MainVehicle.Position);
+                int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
+                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), (Environment.TickCount - VehicleStopTime), 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Environment.TickCount - VehicleStopTime, 1000);
+
                 MainVehicle.PositionNoOffset = posTarget;
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }
             else
             {
-                MainVehicle.Position = VehiclePosition;
+                MainVehicle.PositionNoOffset = VehiclePosition;
                 MainVehicle.Quaternion = VehicleRotation;
             }
             #endregion

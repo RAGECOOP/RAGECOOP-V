@@ -1,6 +1,6 @@
 ﻿namespace CoopServer.Entities
 {
-    struct EntitiesPed
+    public struct EntitiesPed
     {
         public LVector3 Position { get; set; }
 
