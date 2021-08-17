@@ -237,7 +237,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 37)
+            if ((Environment.TickCount - ArtificialLagCounter) < 23)
             {
                 return;
             }
@@ -297,6 +297,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
+                DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;

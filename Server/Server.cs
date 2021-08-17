@@ -356,7 +356,10 @@ namespace CoopServer
                             }
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
-                            Players[message.SenderConnection.RemoteUniqueIdentifier].Latency = message.ReadFloat();
+                            if (Players.ContainsKey(message.SenderConnection.RemoteUniqueIdentifier))
+                            {
+                                Players[message.SenderConnection.RemoteUniqueIdentifier].Latency = message.ReadFloat();
+                            }
                             break;
                         case NetIncomingMessageType.ErrorMessage:
                             Logging.Error(message.ReadString());

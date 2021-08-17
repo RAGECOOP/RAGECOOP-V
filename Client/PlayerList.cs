@@ -23,14 +23,14 @@ namespace CoopClient
 
         private void OnTick(object sender, EventArgs e)
         {
-            if ((Environment.TickCount - LastUpdate) >= 1000)
-            {
-                Update(Main.Players, Main.MainSettings.Username);
-            }
-
             if (!Main.MainNetworking.IsOnServer())
             {
                 return;
+            }
+
+            if ((Environment.TickCount - LastUpdate) >= 1000)
+            {
+                Update(Main.Players, Main.MainSettings.Username);
             }
 
             if ((Environment.TickCount - Pressed) < 5000 && !Main.MainChat.Focused && !Main.MainMenu.MenuPool.AreAnyVisible)

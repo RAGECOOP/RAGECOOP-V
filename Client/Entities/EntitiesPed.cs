@@ -15,7 +15,35 @@ namespace CoopClient
     {
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
-        public int LastUpdateReceived { get; set; }
+        private long LastUpdateFrom = 0;
+        public long LastUpdateReceived
+        {
+            get
+            {
+                return LastUpdateFrom;
+            }
+            set
+            {
+                if (LastUpdateFrom != 0)
+                {
+                    LatencyAverager.Enqueue(value - LastUpdateFrom);
+                    if (LatencyAverager.Count >= 10)
+                    {
+                        LatencyAverager.Dequeue();
+                    }
+                }
+
+                LastUpdateFrom = value;
+            }
+        }
+        private readonly Queue<double> LatencyAverager = new Queue<double>();
+        private double AverageLatency
+        {
+            get
+            {
+                return LatencyAverager.Count == 0 ? 0 : LatencyAverager.Average();
+            }
+        }
         public float Latency { get; set; }
 
         public Ped Character { get; set; }
@@ -68,40 +96,10 @@ namespace CoopClient
             }
         }
         public float VehicleSteeringAngle { get; set; }
-        private bool LastVehIsEngineRunning { get; set; }
-        private bool CurrentVehIsEngineRunning { get; set; }
-        public bool VehIsEngineRunning
-        {
-            set
-            {
-                LastVehIsEngineRunning = CurrentVehIsEngineRunning;
-                CurrentVehIsEngineRunning = value;
-            }
-        }
-        private bool LastVehAreLightsOn { get; set; }
-        private bool CurrentVehAreLightsOn { get; set; }
-        public bool VehAreLightsOn
-        {
-            set
-            {
-                LastVehAreLightsOn = CurrentVehAreLightsOn;
-                CurrentVehAreLightsOn = value;
-            }
-        }
-        private bool LastVehAreHighBeamsOn { get; set; }
-        private bool CurrentVehAreHighBeamsOn { get; set; }
-        public bool VehAreHighBeamsOn
-        {
-            set
-            {
-                LastVehAreHighBeamsOn = CurrentVehAreHighBeamsOn;
-                CurrentVehAreHighBeamsOn = value;
-            }
-        }
-
-        private bool LastVehIsInBurnout = false;
+        public bool VehIsEngineRunning { get; set; }
+        public bool VehAreLightsOn { get; set; }
+        public bool VehAreHighBeamsOn { get; set; }
         public bool VehIsInBurnout { get; set; }
-        private bool LastVehIsSireneActive = false;
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         public VehicleDoors[] VehDoors { get; set; }
@@ -263,7 +261,7 @@ namespace CoopClient
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 3f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - VehiclePosition).Length()).Take(3).ToList();
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
 
                 bool vehFound = false;
 
@@ -279,7 +277,8 @@ namespace CoopClient
 
                 if (!vehFound)
                 {
-                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition, VehicleRotation.Z);
+                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition);
+                    MainVehicle.Quaternion = VehicleRotation;
                 }
             }
 
@@ -299,22 +298,6 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
-            if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
-            {
-                return;
-            }
-
-            MainVehicle.EngineHealth = VehicleEngineHealth;
-
-            if (VehicleDead && !MainVehicle.IsDead)
-            {
-                MainVehicle.Explode();
-            }
-            else if (!VehicleDead && MainVehicle.IsDead)
-            {
-                MainVehicle.Repair();
-            }
-
             if (VehicleColors != LastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
@@ -338,94 +321,103 @@ namespace CoopClient
                     StartPedalingAnim(true);
                 }
             }
-
-            if (CurrentVehIsEngineRunning != LastVehIsEngineRunning)
+            else
             {
-                MainVehicle.IsEngineRunning = CurrentVehIsEngineRunning;
-            }
-
-            if (CurrentVehAreLightsOn != LastVehAreLightsOn)
-            {
-                MainVehicle.AreLightsOn = CurrentVehAreLightsOn;
-            }
-
-            if (CurrentVehAreHighBeamsOn != LastVehAreHighBeamsOn)
-            {
-                MainVehicle.AreHighBeamsOn = CurrentVehAreHighBeamsOn;
-            }
-
-            if (VehIsSireneActive != LastVehIsSireneActive)
-            {
-                MainVehicle.IsSirenActive = LastVehIsSireneActive = VehIsSireneActive;
-            }
-
-            if (VehDoors != null && VehDoors != LastVehDoors)
-            {
-                int doorLength = VehDoors.Length;
-                if (VehDoors.Length != 0)
+                if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
                 {
-                    for (int i = 0; i < (doorLength - 1); i++)
-                    {
-                        VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
-                        VehicleDoors aDoor = VehDoors[i];
-
-                        if (aDoor.Broken)
-                        {
-                            if (!door.IsBroken)
-                            {
-                                door.Break();
-                            }
-                            continue;
-                        }
-                        else if (!aDoor.Broken && door.IsBroken)
-                        {
-                            // Repair?
-                            //MainVehicle.Repair();
-                        }
-
-                        if (aDoor.FullyOpen)
-                        {
-                            if (!door.IsFullyOpen)
-                            {
-                                door.Open(false, true);
-                            }
-                            continue;
-                        }
-                        else if (aDoor.Open)
-                        {
-                            if (!door.IsOpen)
-                            {
-                                door.Open();
-                            }
-                            
-                            door.AngleRatio = aDoor.AngleRatio;
-                            continue;
-                        }
-
-                        door.Close(true);
-                    }
+                    return;
                 }
-                
-                LastVehDoors = VehDoors;
-            }
 
-            if (VehIsInBurnout && !LastVehIsInBurnout && (LastVehIsInBurnout = true))
-            {
-                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
-                Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
-            }
-            else if (!VehIsInBurnout && LastVehIsInBurnout && (LastVehIsInBurnout = false))
-            {
-                Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
-                Character.Task.ClearAll();
+                MainVehicle.EngineHealth = VehicleEngineHealth;
+
+                if (VehicleDead && !MainVehicle.IsDead)
+                {
+                    MainVehicle.Explode();
+                }
+                else if (!VehicleDead && MainVehicle.IsDead)
+                {
+                    MainVehicle.Repair();
+                }
+
+                if (VehIsEngineRunning != MainVehicle.IsEngineRunning)
+                {
+                    MainVehicle.IsEngineRunning = VehIsEngineRunning;
+                }
+
+                if (VehAreLightsOn != MainVehicle.AreLightsOn)
+                {
+                    MainVehicle.AreLightsOn = VehAreLightsOn;
+                }
+
+                if (VehAreHighBeamsOn != MainVehicle.AreHighBeamsOn)
+                {
+                    MainVehicle.AreHighBeamsOn = VehAreHighBeamsOn;
+                }
+
+                if (VehIsSireneActive != MainVehicle.IsSirenActive)
+                {
+                    MainVehicle.IsSirenActive = VehIsSireneActive;
+                }
+
+                Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
+
+                if (VehDoors != null && VehDoors != LastVehDoors)
+                {
+                    int doorLength = VehDoors.Length;
+                    if (VehDoors.Length != 0)
+                    {
+                        for (int i = 0; i < (doorLength - 1); i++)
+                        {
+                            VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
+                            VehicleDoors aDoor = VehDoors[i];
+
+                            if (aDoor.Broken)
+                            {
+                                if (!door.IsBroken)
+                                {
+                                    door.Break();
+                                }
+                                continue;
+                            }
+                            else if (!aDoor.Broken && door.IsBroken)
+                            {
+                                // Repair?
+                                //MainVehicle.Repair();
+                            }
+
+                            if (aDoor.FullyOpen)
+                            {
+                                if (!door.IsFullyOpen)
+                                {
+                                    door.Open(false, true);
+                                }
+                                continue;
+                            }
+                            else if (aDoor.Open)
+                            {
+                                if (!door.IsOpen)
+                                {
+                                    door.Open();
+                                }
+
+                                door.AngleRatio = aDoor.AngleRatio;
+                                continue;
+                            }
+
+                            door.Close(true);
+                        }
+                    }
+
+                    LastVehDoors = VehDoors;
+                }
+
+                // BURNOUT SYNC
             }
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
                 Util.CustomSteeringAngle(MainVehicle.Handle, (float)(Math.PI / 180) * VehicleSteeringAngle);
             }
-            
-            Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
 
             // Good enough for now, but we need to create a better sync
             if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
@@ -434,15 +426,15 @@ namespace CoopClient
                 
                 MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
 
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateFrom) / (float)AverageLatency));
 
                 VehicleStopTime = Environment.TickCount;
             }
             else if ((Environment.TickCount - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Environment.TickCount - VehicleStopTime, 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition, Environment.TickCount - VehicleStopTime, 1000);
                 MainVehicle.PositionNoOffset = posTarget;
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, (Environment.TickCount - LastUpdateFrom) / (float)AverageLatency));
             }
             else
             {
