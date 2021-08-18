@@ -289,7 +289,7 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
-            if (VehicleColors != LastVehicleColors)
+            if (VehicleColors != null && VehicleColors != LastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
 
