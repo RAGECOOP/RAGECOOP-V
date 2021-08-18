@@ -14,6 +14,11 @@ namespace CoopClient
         public NetClient Client;
         public float Latency;
 
+        public bool ShowNetworkInfo = false;
+
+        public int BytesReceived = 0;
+        public int BytesSend = 0;
+
         public void DisConnectFromServer(string address)
         {
             if (IsOnServer())
@@ -72,6 +77,8 @@ namespace CoopClient
 
             while ((message = Client.ReadMessage()) != null)
             {
+                BytesReceived += message.LengthBytes;
+
                 switch (message.MessageType)
                 {
                     case NetIncomingMessageType.StatusChanged:
@@ -125,7 +132,7 @@ namespace CoopClient
 
                                     Main.MainMenu.MainMenu.Items[2].Enabled = true;
                                     Main.MainMenu.MainMenu.Items[2].Title = "Disconnect";
-                                    Main.MainMenu.SubSettings.MainMenu.Items[0].Enabled = Main.NpcsAllowed;
+                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DeactivateTraffic && Main.NpcsAllowed;
 
                                     Main.MainMenu.MainMenu.Visible = false;
                                     Main.MainMenu.MenuPool.RefreshAll();
@@ -144,15 +151,13 @@ namespace CoopClient
                                     Main.MainChat.Focused = false;
                                 }
 
-                                Main.MainChat.Clear();
-
                                 Main.CleanUp();
 
                                 Main.MainMenu.MainMenu.Items[0].Enabled = true;
                                 Main.MainMenu.MainMenu.Items[1].Enabled = true;
                                 Main.MainMenu.MainMenu.Items[2].Enabled = true;
                                 Main.MainMenu.MainMenu.Items[2].Title = "Connect";
-                                Main.MainMenu.SubSettings.MainMenu.Items[0].Enabled = false;
+                                Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = false;
 
                                 Main.MainMenu.MenuPool.RefreshAll();
                                 break;
@@ -654,6 +659,13 @@ namespace CoopClient
 
             Client.SendMessage(outgoingMessage, messageType);
             Client.FlushSendQueue();
+
+#if DEBUG
+            if (ShowNetworkInfo)
+            {
+                BytesSend += outgoingMessage.LengthBytes;
+            }
+#endif
         }
 
         public void SendNpcData(Ped npc)
@@ -710,6 +722,13 @@ namespace CoopClient
 
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
             Client.FlushSendQueue();
+
+#if DEBUG
+            if (ShowNetworkInfo)
+            {
+                BytesSend += outgoingMessage.LengthBytes;
+            }
+#endif
         }
 
         public void SendChatMessage(string message)
@@ -722,6 +741,13 @@ namespace CoopClient
             }.PacketToNetOutGoingMessage(outgoingMessage);
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
             Client.FlushSendQueue();
+
+#if DEBUG
+            if (ShowNetworkInfo)
+            {
+                BytesSend += outgoingMessage.LengthBytes;
+            }
+#endif
         }
         #endregion
     }

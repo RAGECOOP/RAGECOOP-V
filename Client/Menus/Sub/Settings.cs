@@ -9,26 +9,32 @@ namespace CoopClient.Menus.Sub
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        
+
+        private readonly NativeCheckboxItem DeactivateTraffic = new NativeCheckboxItem("Deactivate Traffic", Main.DeactivateTraffic);
         private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share Npcs", Main.ShareNpcsWithPlayers) { Enabled = false };
         private readonly NativeSliderItem StreamedNpcsItem = new NativeSliderItem(string.Format("Streamed Npcs ({0})", Main.MainSettings.StreamedNpc), 20, Main.MainSettings.StreamedNpc);
         private readonly NativeCheckboxItem FlipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
         private readonly NativeCheckboxItem UseDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
+        private readonly NativeCheckboxItem ShowNetworkInfo = new NativeCheckboxItem("Show Network Info", Main.MainNetworking.ShowNetworkInfo);
 
         public Settings()
         {
+            DeactivateTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
             ShareNpcsItem.CheckboxChanged += (item, check) => { Main.ShareNpcsWithPlayers = ShareNpcsItem.Checked; };
             StreamedNpcsItem.ValueChanged += StreamedNpcsValueChanged;
             FlipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
 #if DEBUG
             UseDebugItem.CheckboxChanged += UseDebugCheckboxChanged;
+            ShowNetworkInfo.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
 #endif
 
+            MainMenu.Add(DeactivateTraffic);
             MainMenu.Add(ShareNpcsItem);
             MainMenu.Add(StreamedNpcsItem);
             MainMenu.Add(FlipMenuItem);
 #if DEBUG
             MainMenu.Add(UseDebugItem);
+            MainMenu.Add(ShowNetworkInfo);
 #endif
         }
 
@@ -63,6 +69,36 @@ namespace CoopClient.Menus.Sub
                 Main.DebugSyncPed = null;
                 Main.LastFullDebugSync = 0;
                 Main.Players.Remove(0);
+            }
+        }
+
+        public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
+        {
+            Main.MainNetworking.ShowNetworkInfo = ShowNetworkInfo.Checked;
+
+            if (!Main.MainNetworking.ShowNetworkInfo)
+            {
+                Main.MainNetworking.BytesReceived = 0;
+                Main.MainNetworking.BytesSend = 0;
+            }
+        }
+
+        public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
+        {
+            Main.DeactivateTraffic = DeactivateTraffic.Checked;
+
+            if (DeactivateTraffic.Checked)
+            {
+                if (ShareNpcsItem.Checked)
+                {
+                    ShareNpcsItem.Checked = false;
+                }
+
+                ShareNpcsItem.Enabled = false;
+            }
+            else if (Main.NpcsAllowed && !ShareNpcsItem.Enabled)
+            {
+                ShareNpcsItem.Enabled = true;
             }
         }
     }
