@@ -235,42 +235,34 @@ namespace CoopClient
 
         private void DisplayInVehicle()
         {
-            try
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
-                if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
+                bool vehFound = false;
+
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
+
+                foreach (Vehicle veh in vehs)
                 {
-                    bool vehFound = false;
-
-                    List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
-
-                    foreach (Vehicle veh in vehs)
+                    if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
                     {
-                        if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
-                        {
-                            MainVehicle = veh;
-                            vehFound = true;
-                            break;
-                        }
-                    }
-
-                    if (!vehFound)
-                    {
-                        Model vehicleModel = Util.ModelRequest(VehicleModelHash);
-                        if (vehicleModel == null)
-                        {
-                            GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
-                            return;
-                        }
-
-                        MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
-                        MainVehicle.Quaternion = VehicleRotation;
+                        MainVehicle = veh;
+                        vehFound = true;
+                        break;
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                GTA.UI.Notification.Show("~r~" + e.Message);
-                return;
+
+                if (!vehFound)
+                {
+                    Model vehicleModel = Util.ModelRequest(VehicleModelHash);
+                    if (vehicleModel == null)
+                    {
+                        GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
+                        return;
+                    }
+
+                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
+                    MainVehicle.Quaternion = VehicleRotation;
+                }
             }
 
             if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle?.Model.Hash != VehicleModelHash)

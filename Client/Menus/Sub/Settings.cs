@@ -10,7 +10,7 @@ namespace CoopClient.Menus.Sub
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
-        private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic", Main.DisableTraffic);
+        private readonly NativeCheckboxItem DeactivateTraffic = new NativeCheckboxItem("Deactivate Traffic", Main.DeactivateTraffic);
         private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share Npcs", Main.ShareNpcsWithPlayers) { Enabled = false };
         private readonly NativeSliderItem StreamedNpcsItem = new NativeSliderItem(string.Format("Streamed Npcs ({0})", Main.MainSettings.StreamedNpc), 20, Main.MainSettings.StreamedNpc);
         private readonly NativeCheckboxItem FlipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
@@ -19,7 +19,7 @@ namespace CoopClient.Menus.Sub
 
         public Settings()
         {
-            DisableTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
+            DeactivateTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
             ShareNpcsItem.CheckboxChanged += (item, check) => { Main.ShareNpcsWithPlayers = ShareNpcsItem.Checked; };
             StreamedNpcsItem.ValueChanged += StreamedNpcsValueChanged;
             FlipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
@@ -28,7 +28,7 @@ namespace CoopClient.Menus.Sub
             ShowNetworkInfo.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
 #endif
 
-            MainMenu.Add(DisableTraffic);
+            MainMenu.Add(DeactivateTraffic);
             MainMenu.Add(ShareNpcsItem);
             MainMenu.Add(StreamedNpcsItem);
             MainMenu.Add(FlipMenuItem);
@@ -85,9 +85,9 @@ namespace CoopClient.Menus.Sub
 
         public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
-            Main.DisableTraffic = DisableTraffic.Checked;
+            Main.DeactivateTraffic = DeactivateTraffic.Checked;
 
-            if (DisableTraffic.Checked)
+            if (DeactivateTraffic.Checked)
             {
                 if (ShareNpcsItem.Checked)
                 {

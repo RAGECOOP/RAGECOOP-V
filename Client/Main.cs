@@ -18,10 +18,10 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_5_0";
+        public static readonly string CurrentModVersion = "V0_5_1";
 
         public static bool ShareNpcsWithPlayers = false;
-        public static bool DisableTraffic = false;
+        public static bool DeactivateTraffic = false;
         public static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 

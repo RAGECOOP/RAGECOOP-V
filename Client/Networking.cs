@@ -132,7 +132,7 @@ namespace CoopClient
 
                                     Main.MainMenu.MainMenu.Items[2].Enabled = true;
                                     Main.MainMenu.MainMenu.Items[2].Title = "Disconnect";
-                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
+                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DeactivateTraffic && Main.NpcsAllowed;
 
                                     Main.MainMenu.MainMenu.Visible = false;
                                     Main.MainMenu.MenuPool.RefreshAll();

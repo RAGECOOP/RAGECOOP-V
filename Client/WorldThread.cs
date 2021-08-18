@@ -35,7 +35,7 @@ namespace CoopClient
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character.Handle, true, false);
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Game.Player.Character.Handle, true);
 
-            if (Main.DisableTraffic)
+            if (Main.DeactivateTraffic)
             {
                 if (!LastDisableTraffic)
                 {
@@ -55,7 +55,7 @@ namespace CoopClient
                 Traffic(true);
             }
 
-            LastDisableTraffic = Main.DisableTraffic;
+            LastDisableTraffic = Main.DeactivateTraffic;
         }
 
         private static void Traffic(bool enable)
