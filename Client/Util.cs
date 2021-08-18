@@ -79,6 +79,26 @@ namespace CoopClient
         }
         #endregion
 
+        public static Model ModelRequest(int hash)
+        {
+            Model model = new Model(hash);
+            short counter = 0;
+
+            while (counter++ < 1000)
+            {
+                model.Request();
+
+                Script.Yield();
+
+                if (model.IsLoaded)
+                {
+                    return model;
+                }
+            }
+
+            return null;
+        }
+
         public static bool IsBetween<T>(this T item, T start, T end)
         {
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
@@ -438,7 +458,7 @@ namespace CoopClient
             dir.Normalize();
             RaycastResult raycastResults = World.Raycast(source3D + dir * raycastFromDist,
                 source3D + dir * raycastToDist,
-                (IntersectFlags)(1 | 16 | 256 | 2 | 4 | 8), // | peds + vehicles
+                IntersectFlags.Everything,
                 ignoreEntity);
 
             if (raycastResults.DidHit)

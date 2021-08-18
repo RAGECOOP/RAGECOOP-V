@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Drawing;
 
 using CoopClient.Entities;
 using CoopClient.Menus;
@@ -20,15 +21,17 @@ namespace CoopClient
         public static readonly string CurrentModVersion = "V0_5_0";
 
         public static bool ShareNpcsWithPlayers = false;
+        public static bool DisableTraffic = false;
         public static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 
         public static Settings MainSettings = Util.ReadSettings();
 
-        public static MenusMain MainMenu = new MenusMain();
-        public static Chat MainChat = new Chat();
-
         public static Networking MainNetworking = new Networking();
+
+        public static MenusMain MainMenu = new MenusMain();
+
+        public static Chat MainChat = new Chat();
 
         public static long LocalPlayerID = 0;
         public static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
@@ -73,6 +76,15 @@ namespace CoopClient
                 return;
             }
 
+#if DEBUG
+            if (MainNetworking.ShowNetworkInfo)
+            {
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {MainNetworking.BytesReceived} bytes", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {MainNetworking.BytesSend} bytes", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+            }
+#endif
+
             MainChat.Tick();
 
             // Display all players
@@ -81,10 +93,12 @@ namespace CoopClient
                 player.Value.DisplayLocally(player.Value.Username);
             }
 
+#if DEBUG
             if (UseDebug)
             {
                 Debug();
             }
+#endif
 
             if ((Environment.TickCount - LastDataSend) >= (1000 / 60))
             {
@@ -156,25 +170,13 @@ namespace CoopClient
 
         private void OnAbort(object sender, EventArgs e)
         {
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
-            {
-                player.Value.Character?.AttachedBlip?.Delete();
-                player.Value.Character?.CurrentVehicle?.Delete();
-                player.Value.Character?.Kill();
-                player.Value.Character?.Delete();
-                player.Value.PedBlip?.Delete();
-            }
-
-            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
-            {
-                Npc.Value.Character?.CurrentVehicle?.Delete();
-                Npc.Value.Character?.Kill();
-                Npc.Value.Character?.Delete();
-            }
+            CleanUp();
         }
 
         public static void CleanUp()
         {
+            MainChat.Clear();
+
             foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
                 player.Value.Character?.AttachedBlip?.Delete();
@@ -193,33 +195,15 @@ namespace CoopClient
             }
             Npcs.Clear();
 
-            foreach (Ped entity in World.GetAllPeds())
+            foreach (Ped entity in World.GetAllPeds().Where(p => p.Handle != Game.Player.Character.Handle))
             {
-                if (entity.Handle != Game.Player.Character.Handle)
-                {
-                    entity.Kill();
-                    entity.Delete();
-                }
+                entity.Kill();
+                entity.Delete();
             }
 
-            if (!Game.Player.Character.IsInVehicle())
+            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.Handle))
             {
-                foreach (Vehicle vehicle in World.GetAllVehicles())
-                {
-                    vehicle.Delete();
-                }
-            }
-            else
-            {
-                int? playerVehicleHandle = Game.Player.Character.CurrentVehicle?.Handle;
-
-                foreach (Vehicle vehicle in World.GetAllVehicles())
-                {
-                    if (playerVehicleHandle != vehicle.Handle)
-                    {
-                        vehicle.Delete();
-                    }
-                }
+                veh.Delete();
             }
         }
 

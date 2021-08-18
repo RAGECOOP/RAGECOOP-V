@@ -32,6 +32,7 @@ namespace CoopServer
         public static readonly Dictionary<long, EntitiesPlayer> Players = new();
 
         private static ServerScript GameMode;
+        public static readonly Dictionary<Command, Action<CommandContext>> Commands = new Dictionary<Command, Action<CommandContext>>();
 
         public Server()
         {
@@ -127,12 +128,7 @@ namespace CoopServer
                 #endregion
             }
 
-            if (MainSettings.DefaultGameMode)
-            {
-                GameMode = new DefaultScript();
-                GameMode.Start();
-            }
-            else if (!string.IsNullOrEmpty(MainSettings.GameMode))
+            if (!string.IsNullOrEmpty(MainSettings.GameMode))
             {
                 try
                 {
@@ -381,27 +377,6 @@ namespace CoopServer
             }
         }
 
-        // Return a list of all connections but not the local connection
-        private static List<NetConnection> FilterAllLocal(NetConnection local)
-        {
-            return new(MainNetServer.Connections.Where(e => e != local));
-        }
-        private static List<NetConnection> FilterAllLocal(long local)
-        {
-            return new(MainNetServer.Connections.Where(e => e.RemoteUniqueIdentifier != local));
-        }
-
-        // Return a list of players within range of ...
-        private static List<NetConnection> GetAllInRange(LVector3 position, float range)
-        {
-            return new(MainNetServer.Connections.FindAll(e => Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
-        }
-        // Return a list of players within range of ... but not the local one
-        private static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
-        {
-            return new(MainNetServer.Connections.Where(e => e != local && Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
-        }
-
         #region -- PLAYER --
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, HandshakePacket packet)
@@ -504,7 +479,7 @@ namespace CoopServer
                 GameMode.OnPlayerConnect(Players[packet.Player]);
             }
 
-            List<NetConnection> playerList = FilterAllLocal(local);
+            List<NetConnection> playerList = Util.FilterAllLocal(local);
             if (playerList.Count == 0)
             {
                 return;
@@ -546,7 +521,7 @@ namespace CoopServer
                 GameMode.OnPlayerDisconnect(Players[packet.Player], reason);
             }
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Player);
+            List<NetConnection> playerList = Util.FilterAllLocal(packet.Player);
             if (playerList.Count != 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -563,7 +538,7 @@ namespace CoopServer
 
             player.Ped.Position = packet.Extra.Position;
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
+            List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -585,7 +560,7 @@ namespace CoopServer
 
             player.Ped.Position = packet.Extra.Position;
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
+            List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -607,7 +582,7 @@ namespace CoopServer
 
             player.Ped.Position = packet.Extra.Position;
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
+            List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -629,7 +604,7 @@ namespace CoopServer
 
             player.Ped.Position = packet.Extra.Position;
 
-            List<NetConnection> playerList = FilterAllLocal(packet.Extra.Player);
+            List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
             {
                 return;
@@ -648,25 +623,62 @@ namespace CoopServer
         // Send a message to targets or all players
         private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
         {
-            if (GameMode != null && GameMode.OnChatMessage(packet.Username, packet.Message))
+            NetOutgoingMessage outgoingMessage;
+
+            if (GameMode != null)
             {
-                return;
+                if (packet.Message.StartsWith("/"))
+                {
+                    string[] cmdArgs = packet.Message.Split(" ");
+                    string cmdName = cmdArgs[0].Remove(0, 1);
+                    if (Commands.Any(x => x.Key.Name == cmdName))
+                    {
+                        CommandContext ctx = new()
+                        {
+                            Player = Players.First(x => x.Value.Username == packet.Username).Value,
+                            Args = cmdArgs.Skip(1).ToArray()
+                        };
+
+                        KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
+                        command.Value.Invoke(ctx);
+                    }
+                    else
+                    {
+                        string username = packet.Username;
+
+                        packet = new()
+                        {
+                            Username = "Server",
+                            Message = "Command not found!"
+                        };
+
+                        outgoingMessage = MainNetServer.CreateMessage();
+                        packet.PacketToNetOutGoingMessage(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections.Find(con => con.RemoteUniqueIdentifier == Players.First(x => x.Value.Username == username).Key), NetDeliveryMethod.ReliableOrdered, 0);
+                    }
+
+                    return;
+                }
+                else if (GameMode.OnChatMessage(packet.Username, packet.Message))
+                {
+                    return;
+                }
             }
 
             packet.Message = packet.Message.Replace("~", "");
 
-            Logging.Info(packet.Username + ": " + packet.Message);
-
-            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+
+            Logging.Info(packet.Username + ": " + packet.Message);
         }
         #endregion
 
         #region -- NPC --
         private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
         {
-            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            List<NetConnection> playerList = Util.GetAllInRange(packet.Position, 300f, local);
             if (playerList.Count == 0)
             {
                 return;
@@ -679,7 +691,7 @@ namespace CoopServer
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
         {
-            List<NetConnection> playerList = GetAllInRange(packet.Position, 300f, local);
+            List<NetConnection> playerList = Util.GetAllInRange(packet.Position, 300f, local);
             if (playerList.Count == 0)
             {
                 return;
@@ -690,5 +702,29 @@ namespace CoopServer
             MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
         }
         #endregion
+
+        public static void RegisterCommand(string name, Action<CommandContext> callback)
+        {
+            Command command = new() { Name = name };
+
+            if (Commands.ContainsKey(command))
+            {
+                throw new Exception("Command \"" + command.Name + "\" was already been registered!");
+            }
+
+            Commands.Add(command, callback);
+        }
+
+        public static void RegisterCommands<T>()
+        {
+            IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(CommandAttribute), false).Any());
+
+            foreach (MethodInfo method in commands)
+            {
+                CommandAttribute attribute = method.GetCustomAttribute<CommandAttribute>(true);
+
+                RegisterCommand(attribute.Name, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
+            }
+        }
     }
 }

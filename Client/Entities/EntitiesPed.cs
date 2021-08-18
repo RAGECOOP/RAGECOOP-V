@@ -143,19 +143,22 @@ namespace CoopClient
 
             if (!characterExist)
             {
-                CreateCharacter(username);
+                if (!CreateCharacter(username))
+                {
+                    return;
+                }
             }
             else if (LastSyncWasFull)
             {
                 if (ModelHash != LastModelHash)
                 {
-                    if (characterExist)
-                    {
-                        Character.Kill();
-                        Character.Delete();
-                    }
+                    Character.Kill();
+                    Character.Delete();
 
-                    CreateCharacter(username);
+                    if (!CreateCharacter(username))
+                    {
+                        return;
+                    }
                 }
                 else if (Props != LastProps)
                 {
@@ -232,30 +235,45 @@ namespace CoopClient
 
         private void DisplayInVehicle()
         {
-            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
+            try
             {
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
-
-                bool vehFound = false;
-
-                foreach (Vehicle veh in vehs)
+                if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
                 {
-                    if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                    bool vehFound = false;
+
+                    List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
+
+                    foreach (Vehicle veh in vehs)
                     {
-                        MainVehicle = veh;
-                        vehFound = true;
-                        break;
+                        if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                        {
+                            MainVehicle = veh;
+                            vehFound = true;
+                            break;
+                        }
+                    }
+
+                    if (!vehFound)
+                    {
+                        Model vehicleModel = Util.ModelRequest(VehicleModelHash);
+                        if (vehicleModel == null)
+                        {
+                            GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
+                            return;
+                        }
+
+                        MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
+                        MainVehicle.Quaternion = VehicleRotation;
                     }
                 }
-
-                if (!vehFound)
-                {
-                    MainVehicle = World.CreateVehicle(new Model(VehicleModelHash), VehiclePosition);
-                    MainVehicle.Quaternion = VehicleRotation;
-                }
+            }
+            catch (Exception e)
+            {
+                GTA.UI.Notification.Show("~r~" + e.Message);
+                return;
             }
 
-            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Model.Hash != VehicleModelHash)
+            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle?.Model.Hash != VehicleModelHash)
             {
                 if (VehicleSeatIndex == -1 &&
                     Game.Player.Character.IsInVehicle() &&
@@ -573,12 +591,20 @@ namespace CoopClient
             }
         }
 
-        private void CreateCharacter(string username)
+        private bool CreateCharacter(string username)
         {
             LastModelHash = ModelHash;
             LastProps = Props;
 
-            Character = World.CreatePed(new Model(ModelHash), Position, Rotation.Z);
+            Model characterModel = Util.ModelRequest(ModelHash);
+
+            if (characterModel == null)
+            {
+                GTA.UI.Notification.Show($"~r~Model ({ModelHash}) cannot be loaded!");
+                return false;
+            }
+
+            Character = World.CreatePed(characterModel, Position, Rotation.Z);
             Character.RelationshipGroup = Main.RelationshipGroup;
             if (IsInVehicle)
             {
@@ -606,6 +632,8 @@ namespace CoopClient
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
             }
+
+            return true;
         }
 
         private bool LastMoving;
