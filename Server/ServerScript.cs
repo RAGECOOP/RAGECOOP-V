@@ -1,29 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Lidgren.Network;
 
 namespace CoopServer
 {
-    public class ServerScript
+    public abstract class ServerScript
     {
-        public virtual void Start() { }
+        public API API = new();
+    }
 
-        public virtual void OnPlayerConnect(Entities.EntitiesPlayer player)
+    public class API
+    {
+        #region DELEGATES
+        public delegate void ChatEvent(string username, string message, CancelEventArgs cancel);
+        public delegate void PlayerEvent(Entities.EntitiesPlayer player);
+        #endregion
+
+        #region EVENTS
+        public event EventHandler OnStart;
+        public event ChatEvent OnChatMessage;
+        public event PlayerEvent OnPlayerConnected;
+        public event PlayerEvent OnPlayerDisconnected;
+
+        internal void InvokeStart()
         {
-            Logging.Info("New player [" + player.SocialClubName + " | " + player.Username + "] connected!");
+            OnStart?.Invoke(this, EventArgs.Empty);
         }
 
-        public virtual void OnPlayerDisconnect(Entities.EntitiesPlayer player, string reason)
+        internal void InvokePlayerConnect(Entities.EntitiesPlayer player)
         {
-            Logging.Info(player.Username + " left the server, reason: " + reason);
+            OnPlayerConnected?.Invoke(player);
         }
 
-        public virtual bool OnChatMessage(string username, string message)
+        internal void InvokePlayerDisconnect(Entities.EntitiesPlayer player, string reason)
         {
-            return false;
+            OnPlayerDisconnected?.Invoke(player);
         }
 
+        internal bool InvokeChatMessage(string username, string message)
+        {
+            var args = new CancelEventArgs(false);
+            OnChatMessage?.Invoke(username, message, args);
+            return args.Cancel;
+        }
+        #endregion
+
+        #region FUNCTIONS
         public static List<long> GetAllConnections()
         {
             List<long> result = new();
@@ -121,6 +145,7 @@ namespace CoopServer
         {
             Server.RegisterCommands<T>();
         }
+        #endregion
     }
 
     public class Command

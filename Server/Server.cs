@@ -152,7 +152,7 @@ namespace CoopServer
                         }
                         else
                         {
-                            GameMode.Start();
+                            GameMode.API.InvokeStart();
                         }
                     }
                 }
@@ -476,7 +476,7 @@ namespace CoopServer
 
             if (GameMode != null)
             {
-                GameMode.OnPlayerConnect(Players[packet.Player]);
+                GameMode.API.InvokePlayerConnect(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(local);
@@ -518,7 +518,7 @@ namespace CoopServer
         {
             if (GameMode != null)
             {
-                GameMode.OnPlayerDisconnect(Players[packet.Player], reason);
+                GameMode.API.InvokePlayerDisconnect(Players[packet.Player], reason);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Player);
@@ -644,22 +644,24 @@ namespace CoopServer
                     }
                     else
                     {
-                        string username = packet.Username;
+                        NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
+                        if (userConnection == null)
+                        {
+                            return;
+                        }
 
-                        packet = new()
+                        outgoingMessage = MainNetServer.CreateMessage();
+                        new ChatMessagePacket()
                         {
                             Username = "Server",
                             Message = "Command not found!"
-                        };
-
-                        outgoingMessage = MainNetServer.CreateMessage();
-                        packet.PacketToNetOutGoingMessage(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections.Find(con => con.RemoteUniqueIdentifier == Players.First(x => x.Value.Username == username).Key), NetDeliveryMethod.ReliableOrdered, 0);
+                        }.PacketToNetOutGoingMessage(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
                     }
 
                     return;
                 }
-                else if (GameMode.OnChatMessage(packet.Username, packet.Message))
+                else if (GameMode.API.InvokeChatMessage(packet.Username, packet.Message))
                 {
                     return;
                 }

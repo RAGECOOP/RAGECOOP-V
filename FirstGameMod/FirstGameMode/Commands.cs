@@ -9,7 +9,7 @@ namespace FirstGameMode
         [Command("hello")]
         public static void HelloCommand(CommandContext ctx)
         {
-            ServerScript.SendChatMessageToPlayer(ctx.Player.Username, "Hello " + ctx.Player.Username + " :)");
+            API.SendChatMessageToPlayer(ctx.Player.Username, "Hello " + ctx.Player.Username + " :)");
         }
 
         [Command("inrange")]
@@ -17,18 +17,18 @@ namespace FirstGameMode
         {
             if (ctx.Player.Ped.IsInRangeOf(new LVector3(0f, 0f, 75f), 7f))
             {
-                ServerScript.SendChatMessageToPlayer(ctx.Player.Username, "You are in range! :)");
+                API.SendChatMessageToPlayer(ctx.Player.Username, "You are in range! :)");
             }
             else
             {
-                ServerScript.SendChatMessageToPlayer(ctx.Player.Username, "You are not in range! :(");
+                API.SendChatMessageToPlayer(ctx.Player.Username, "You are not in range! :(");
             }
         }
 
         [Command("online")]
         public static void OnlineCommand(CommandContext ctx)
         {
-            ServerScript.SendChatMessageToPlayer(ctx.Player.Username, ServerScript.GetAllPlayersCount() + " player online!");
+            API.SendChatMessageToPlayer(ctx.Player.Username, API.GetAllPlayersCount() + " player online!");
         }
 
         [Command("kick")]
@@ -36,11 +36,11 @@ namespace FirstGameMode
         {
             if (ctx.Args.Length < 2)
             {
-                ServerScript.SendChatMessageToPlayer(ctx.Player.Username, "Please use \"/kick <USERNAME> <REASON>\"");
+                API.SendChatMessageToPlayer(ctx.Player.Username, "Please use \"/kick <USERNAME> <REASON>\"");
                 return;
             }
 
-            ServerScript.KickPlayerByUsername(ctx.Args[0], ctx.Args.Skip(1).ToArray());
+            API.KickPlayerByUsername(ctx.Args[0], ctx.Args.Skip(1).ToArray());
         }
     }
 }
