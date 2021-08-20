@@ -39,12 +39,12 @@ namespace CoopServer
         // Return a list of players within range of ...
         public static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            return new(Server.MainNetServer.Connections.FindAll(e => Server.Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.FindAll(e => Server.Players[e.RemoteUniqueIdentifier].IsInRangeOf(position, range)));
         }
         // Return a list of players within range of ... but not the local one
         public static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
-            return new(Server.MainNetServer.Connections.Where(e => e != local && Server.Players[e.RemoteUniqueIdentifier].Ped.IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.Where(e => e != local && Server.Players[e.RemoteUniqueIdentifier].IsInRangeOf(position, range)));
         }
 
         public static T Read<T>(string file) where T : new()

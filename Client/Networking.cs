@@ -6,6 +6,7 @@ using Lidgren.Network;
 
 using GTA;
 using GTA.Native;
+using System.Collections.Generic;
 
 namespace CoopClient
 {
@@ -217,6 +218,11 @@ namespace CoopClient
                                 ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
                                 Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
                                 break;
+                            case (byte)PacketTypes.NativeCallPacket:
+                                packet = new NativeCallPacket();
+                                packet.NetIncomingMessageToPacket(message);
+                                DecodeNativeCall((NativeCallPacket)packet);
+                                break;
                         }
                         break;
                     case NetIncomingMessageType.ConnectionLatencyUpdated:
@@ -416,6 +422,42 @@ namespace CoopClient
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
             }
+        }
+
+        private void DecodeNativeCall(NativeCallPacket packet)
+        {
+            List<InputArgument> arguments = new List<InputArgument>();
+
+            packet.Args.ForEach(arg =>
+            {
+                Type typeOf = arg.GetType();
+
+                if (typeOf == typeof(IntArgument))
+                {
+                    arguments.Add(((IntArgument)arg).Data);
+                }
+                else if (typeOf == typeof(BoolArgument))
+                {
+                    arguments.Add(((BoolArgument)arg).Data);
+                }
+                else if (typeOf == typeof(FloatArgument))
+                {
+                    arguments.Add(((FloatArgument)arg).Data);
+                }
+                else if (typeOf == typeof(LVector3Argument))
+                {
+                    arguments.Add(((LVector3Argument)arg).Data.X);
+                    arguments.Add(((LVector3Argument)arg).Data.Y);
+                    arguments.Add(((LVector3Argument)arg).Data.Z);
+                }
+                else
+                {
+                    GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                    return;
+                }
+            });
+
+            Function.Call((Hash)packet.Hash, arguments.ToArray());
         }
         #endregion // -- PLAYER --
 

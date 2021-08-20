@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <Reference Include="CoopServer">
-      <HintPath>..\..\Server\bin\Release\net5.0\CoopServer.dll</HintPath>
+      <HintPath>..\..\Server\bin\Debug\net5.0\CoopServer.dll</HintPath>
     </Reference>
   </ItemGroup>
 

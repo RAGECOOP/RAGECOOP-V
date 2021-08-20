@@ -125,7 +125,8 @@ namespace CoopClient
         LightSyncPlayerVehPacket,
         FullSyncNpcPacket,
         FullSyncNpcVehPacket,
-        ChatMessagePacket
+        ChatMessagePacket,
+        NativeCallPacket
     }
 
     [Flags]
@@ -586,6 +587,73 @@ namespace CoopClient
             Message = data.Message;
         }
     }
+
+    #region ===== NATIVECALL =====
+    [ProtoContract]
+    class NativeCallPacket : Packet
+    {
+        [ProtoMember(1)]
+        public ulong Hash { get; set; }
+
+        [ProtoMember(2)]
+        public List<NativeArgument> Args { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.NativeCallPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            NativeCallPacket data = CoopSerializer.Deserialize<NativeCallPacket>(message.ReadBytes(len));
+
+            Hash = data.Hash;
+            Args = data.Args;
+        }
+    }
+
+    [ProtoContract]
+    [ProtoInclude(1, typeof(IntArgument))]
+    [ProtoInclude(2, typeof(BoolArgument))]
+    [ProtoInclude(3, typeof(FloatArgument))]
+    [ProtoInclude(4, typeof(LVector3Argument))]
+    class NativeArgument { }
+
+    [ProtoContract]
+    class IntArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public int Data { get; set; }
+    }
+
+    [ProtoContract]
+    class BoolArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public bool Data { get; set; }
+    }
+
+    [ProtoContract]
+    class FloatArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public float Data { get; set; }
+    }
+
+    [ProtoContract]
+    class LVector3Argument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public LVector3 Data { get; set; }
+    }
+    #endregion // ===== NATIVECALL =====
     #endregion
 
     #region -- NPC --

@@ -8,7 +8,7 @@ namespace CoopServer
 {
     public abstract class ServerScript
     {
-        public API API = new();
+        public API API { get; } = new();
     }
 
     public class API
@@ -23,18 +23,19 @@ namespace CoopServer
         public event ChatEvent OnChatMessage;
         public event PlayerEvent OnPlayerConnected;
         public event PlayerEvent OnPlayerDisconnected;
+        public event PlayerEvent OnPlayerPositionUpdate;
 
         internal void InvokeStart()
         {
             OnStart?.Invoke(this, EventArgs.Empty);
         }
 
-        internal void InvokePlayerConnect(Entities.EntitiesPlayer player)
+        internal void InvokePlayerConnected(Entities.EntitiesPlayer player)
         {
             OnPlayerConnected?.Invoke(player);
         }
 
-        internal void InvokePlayerDisconnect(Entities.EntitiesPlayer player, string reason)
+        internal void InvokePlayerDisconnected(Entities.EntitiesPlayer player)
         {
             OnPlayerDisconnected?.Invoke(player);
         }
@@ -45,95 +46,179 @@ namespace CoopServer
             OnChatMessage?.Invoke(username, message, args);
             return args.Cancel;
         }
+
+        internal void InvokePlayerPositionUpdate(Entities.EntitiesPlayer player)
+        {
+            OnPlayerPositionUpdate?.Invoke(player);
+        }
         #endregion
 
         #region FUNCTIONS
+        public static void SendNativeCallToAll(ulong hash, params object[] args)
+        {
+            List<NetConnection> connections = Server.MainNetServer.Connections;
+            if (connections.Count == 0)
+            {
+                return;
+            }
+
+            List<NativeArgument> arguments = new();
+
+            foreach (object arg in args)
+            {
+                Type typeOf = arg.GetType();
+
+                if (typeOf == typeof(int))
+                {
+                    arguments.Add(new IntArgument() { Data = (int)arg });
+                }
+                else if (typeOf == typeof(bool))
+                {
+                    arguments.Add(new BoolArgument() { Data = (bool)arg });
+                }
+                else if (typeOf == typeof(float))
+                {
+                    arguments.Add(new FloatArgument() { Data = (float)arg });
+                }
+                else if (typeOf == typeof(LVector3))
+                {
+                    arguments.Add(new LVector3Argument() { Data = (LVector3)arg });
+                }
+                else
+                {
+                    Logging.Error("[ServerScript->SendNativeCallToAll(" + hash + ", params object[] args)]: Type of argument not found!");
+                    return;
+                }
+            }
+
+            NativeCallPacket packet = new()
+            {
+                Hash = hash,
+                Args = arguments
+            };
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+
+        public static void SendNativeCallToPlayer(string username, ulong hash, params object[] args)
+        {
+            NetConnection userConnection = Util.GetConnectionByUsername(username);
+            if (userConnection == null)
+            {
+                Logging.Warning("[ServerScript->SendNativeCallToPlayer(\"" + username + "\", \"" + hash + "\", params object[] args)]: User not found!");
+                return;
+            }
+
+            List<NativeArgument> arguments = new();
+
+            foreach (object arg in args)
+            {
+                Type typeOf = arg.GetType();
+
+                if (typeOf == typeof(int))
+                {
+                    arguments.Add(new IntArgument() { Data = (int)arg });
+                }
+                else if (typeOf == typeof(bool))
+                {
+                    arguments.Add(new BoolArgument() { Data = (bool)arg });
+                }
+                else if (typeOf == typeof(float))
+                {
+                    arguments.Add(new FloatArgument() { Data = (float)arg });
+                }
+                else if (typeOf == typeof(LVector3))
+                {
+                    arguments.Add(new LVector3Argument() { Data = (LVector3)arg });
+                }
+                else
+                {
+                    Logging.Error("[ServerScript->SendNativeCallToAll(" + hash + ", params object[] args)]: Type of argument not found!");
+                    return;
+                }
+            }
+
+            NativeCallPacket packet = new()
+            {
+                Hash = hash,
+                Args = arguments
+            };
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+        }
+
         public static List<long> GetAllConnections()
         {
             List<long> result = new();
 
-            lock (Server.MainNetServer.Connections)
-            {
-                Server.MainNetServer.Connections.ForEach(x => result.Add(x.RemoteUniqueIdentifier));
-            }
+            Server.MainNetServer.Connections.ForEach(x => result.Add(x.RemoteUniqueIdentifier));
 
             return result;
         }
 
         public static int GetAllPlayersCount()
         {
-            lock (Server.Players)
-            {
-                return Server.Players.Count;
-            }
+            return Server.Players.Count;
         }
 
         public static Dictionary<long, Entities.EntitiesPlayer> GetAllPlayers()
         {
-            lock (Server.Players)
-            {
-                return Server.Players;
-            }
+            return Server.Players;
         }
 
         public static void KickPlayerByUsername(string username, string[] reason)
         {
-            lock (Server.MainNetServer.Connections)
+            NetConnection userConnection = Util.GetConnectionByUsername(username);
+            if (userConnection == null)
             {
-                NetConnection userConnection = Util.GetConnectionByUsername(username);
-                if (userConnection == null)
-                {
-                    Logging.Warning("[ServerScript->KickPlayerByUsername(\"" + username + "\", \"" + string.Join(" ", reason) + "\")]: User not found!");
-                    return;
-                }
-
-                userConnection.Disconnect(string.Join(" ", reason));
+                Logging.Warning("[ServerScript->KickPlayerByUsername(\"" + username + "\", \"" + string.Join(" ", reason) + "\")]: User not found!");
+                return;
             }
+
+            userConnection.Disconnect(string.Join(" ", reason));
         }
 
         public static void SendChatMessageToAll(string message, string username = "Server")
         {
             List<NetConnection> connections = Server.MainNetServer.Connections;
-
-            if (connections.Count != 0)
+            if (connections.Count == 0)
             {
-                ChatMessagePacket packet = new()
-                {
-                    Username = username,
-                    Message = message
-                };
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                return;
             }
 
-            Logging.Info(username + ": " + message);
+            ChatMessagePacket packet = new()
+            {
+                Username = username,
+                Message = message
+            };
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
         public static void SendChatMessageToPlayer(string username, string message, string from = "Server")
         {
-            lock (Server.MainNetServer.Connections)
+            NetConnection userConnection = Util.GetConnectionByUsername(username);
+            if (userConnection == null)
             {
-                NetConnection userConnection = Util.GetConnectionByUsername(username);
-                if (userConnection == null)
-                {
-                    Logging.Warning("[ServerScript->SendChatMessageToPlayer(\"" + username + "\", \"" + message + "\", \"" + from + "\")]: User not found!");
-                    return;
-                }
-
-                ChatMessagePacket packet = new()
-                {
-                    Username = from,
-                    Message = message
-                };
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Logging.Warning("[ServerScript->SendChatMessageToPlayer(\"" + username + "\", \"" + message + "\", \"" + from + "\")]: User not found!");
+                return;
             }
 
-            Logging.Info(from + ": " + message);
+            ChatMessagePacket packet = new()
+            {
+                Username = from,
+                Message = message
+            };
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            packet.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
         public static void RegisterCommand(string name, Action<CommandContext> callback)

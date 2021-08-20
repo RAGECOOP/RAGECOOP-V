@@ -31,7 +31,7 @@ namespace CoopServer
 
         public static readonly Dictionary<long, EntitiesPlayer> Players = new();
 
-        private static ServerScript GameMode;
+        public static ServerScript GameMode;
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new Dictionary<Command, Action<CommandContext>>();
 
         public Server()
@@ -476,7 +476,7 @@ namespace CoopServer
 
             if (GameMode != null)
             {
-                GameMode.API.InvokePlayerConnect(Players[packet.Player]);
+                GameMode.API.InvokePlayerConnected(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(local);
@@ -518,7 +518,7 @@ namespace CoopServer
         {
             if (GameMode != null)
             {
-                GameMode.API.InvokePlayerDisconnect(Players[packet.Player], reason);
+                GameMode.API.InvokePlayerDisconnected(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Player);
@@ -536,7 +536,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -558,7 +558,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -580,7 +580,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -602,7 +602,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
