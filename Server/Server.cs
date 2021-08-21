@@ -425,18 +425,15 @@ namespace CoopServer
                 return;
             }
 
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
+            if (Players.Any(x => x.Value.SocialClubName == packet.SocialClubName))
             {
-                if (player.Value.SocialClubName == packet.SocialClubName)
-                {
-                    local.Deny("The name of the Social Club is already taken!");
-                    return;
-                }
-                else if (player.Value.Username == packet.Username)
-                {
-                    local.Deny("Username is already taken!");
-                    return;
-                }
+                local.Deny("The name of the Social Club is already taken!");
+                return;
+            }
+            else if (Players.Any(x => x.Value.Username == packet.Username))
+            {
+                local.Deny("Username is already taken!");
+                return;
             }
 
             long localPlayerID = local.RemoteUniqueIdentifier;
@@ -645,7 +642,7 @@ namespace CoopServer
                     else
                     {
                         NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
-                        if (userConnection == null)
+                        if (userConnection == default)
                         {
                             return;
                         }

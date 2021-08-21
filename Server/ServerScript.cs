@@ -62,33 +62,10 @@ namespace CoopServer
                 return;
             }
 
-            List<NativeArgument> arguments = new();
-
-            foreach (object arg in args)
+            List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+            if (arguments == null)
             {
-                Type typeOf = arg.GetType();
-
-                if (typeOf == typeof(int))
-                {
-                    arguments.Add(new IntArgument() { Data = (int)arg });
-                }
-                else if (typeOf == typeof(bool))
-                {
-                    arguments.Add(new BoolArgument() { Data = (bool)arg });
-                }
-                else if (typeOf == typeof(float))
-                {
-                    arguments.Add(new FloatArgument() { Data = (float)arg });
-                }
-                else if (typeOf == typeof(LVector3))
-                {
-                    arguments.Add(new LVector3Argument() { Data = (LVector3)arg });
-                }
-                else
-                {
-                    Logging.Error("[ServerScript->SendNativeCallToAll(" + hash + ", params object[] args)]: Type of argument not found!");
-                    return;
-                }
+                return;
             }
 
             NativeCallPacket packet = new()
@@ -105,39 +82,16 @@ namespace CoopServer
         public static void SendNativeCallToPlayer(string username, ulong hash, params object[] args)
         {
             NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == null)
+            if (userConnection == default)
             {
                 Logging.Warning("[ServerScript->SendNativeCallToPlayer(\"" + username + "\", \"" + hash + "\", params object[] args)]: User not found!");
                 return;
             }
 
-            List<NativeArgument> arguments = new();
-
-            foreach (object arg in args)
+            List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+            if (arguments == null)
             {
-                Type typeOf = arg.GetType();
-
-                if (typeOf == typeof(int))
-                {
-                    arguments.Add(new IntArgument() { Data = (int)arg });
-                }
-                else if (typeOf == typeof(bool))
-                {
-                    arguments.Add(new BoolArgument() { Data = (bool)arg });
-                }
-                else if (typeOf == typeof(float))
-                {
-                    arguments.Add(new FloatArgument() { Data = (float)arg });
-                }
-                else if (typeOf == typeof(LVector3))
-                {
-                    arguments.Add(new LVector3Argument() { Data = (LVector3)arg });
-                }
-                else
-                {
-                    Logging.Error("[ServerScript->SendNativeCallToAll(" + hash + ", params object[] args)]: Type of argument not found!");
-                    return;
-                }
+                return;
             }
 
             NativeCallPacket packet = new()
@@ -173,7 +127,7 @@ namespace CoopServer
         public static void KickPlayerByUsername(string username, string[] reason)
         {
             NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == null)
+            if (userConnection == default)
             {
                 Logging.Warning("[ServerScript->KickPlayerByUsername(\"" + username + "\", \"" + string.Join(" ", reason) + "\")]: User not found!");
                 return;
@@ -204,7 +158,7 @@ namespace CoopServer
         public static void SendChatMessageToPlayer(string username, string message, string from = "Server")
         {
             NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == null)
+            if (userConnection == default)
             {
                 Logging.Warning("[ServerScript->SendChatMessageToPlayer(\"" + username + "\", \"" + message + "\", \"" + from + "\")]: User not found!");
                 return;

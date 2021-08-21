@@ -623,7 +623,8 @@ namespace CoopClient
     [ProtoInclude(1, typeof(IntArgument))]
     [ProtoInclude(2, typeof(BoolArgument))]
     [ProtoInclude(3, typeof(FloatArgument))]
-    [ProtoInclude(4, typeof(LVector3Argument))]
+    [ProtoInclude(4, typeof(StringArgument))]
+    [ProtoInclude(5, typeof(LVector3Argument))]
     class NativeArgument { }
 
     [ProtoContract]
@@ -645,6 +646,13 @@ namespace CoopClient
     {
         [ProtoMember(1)]
         public float Data { get; set; }
+    }
+
+    [ProtoContract]
+    class StringArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public string Data { get; set; }
     }
 
     [ProtoContract]

@@ -32,7 +32,7 @@ namespace CoopClient.Entities
             {
                 long key = localNpcs.ElementAt(i).Key;
 
-                if ((tickCount - localNpcs[key].LastUpdateReceived) > 3500)
+                if ((tickCount - localNpcs[key].LastUpdateReceived) > 3000)
                 {
                     if (localNpcs[key].Character != null && localNpcs[key].Character.Exists() && localNpcs[key].Health > 0)
                     {

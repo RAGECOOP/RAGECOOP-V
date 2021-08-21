@@ -10,20 +10,53 @@ namespace CoopServer
 {
     class Util
     {
+        public static List<NativeArgument> ParseNativeArguments(params object[] args)
+        {
+            List<NativeArgument> result = new();
+
+            foreach (object arg in args)
+            {
+                Type typeOf = arg.GetType();
+
+                if (typeOf == typeof(int))
+                {
+                    result.Add(new IntArgument() { Data = (int)arg });
+                }
+                else if (typeOf == typeof(bool))
+                {
+                    result.Add(new BoolArgument() { Data = (bool)arg });
+                }
+                else if (typeOf == typeof(float))
+                {
+                    result.Add(new FloatArgument() { Data = (float)arg });
+                }
+                else if (typeOf == typeof(string))
+                {
+                    result.Add(new StringArgument() { Data = (string)arg });
+                }
+                else if (typeOf == typeof(LVector3))
+                {
+                    result.Add(new LVector3Argument() { Data = (LVector3)arg });
+                }
+                else
+                {
+                    Logging.Error("[Util->ParseNativeArguments(params object[] args)]: Type of argument not found!");
+                    return null;
+                }
+            }
+
+            return result;
+        }
+
         public static NetConnection GetConnectionByUsername(string username)
         {
-            long? userID = GetIdByUsername(username);
-            if (userID == null || !Server.MainNetServer.Connections.Any(x => x.RemoteUniqueIdentifier == userID))
+            long? userID = Server.Players.FirstOrDefault(x => x.Value.Username == username).Key;
+            if (userID == default || !Server.MainNetServer.Connections.Any(x => x.RemoteUniqueIdentifier == userID))
             {
                 return null;
             }
 
-            return Server.MainNetServer.Connections.First(x => x.RemoteUniqueIdentifier == userID);
-        }
-
-        public static long? GetIdByUsername(string username)
-        {
-            return Server.Players.Any(x => x.Value.Username == username) ? Server.Players.First(x => x.Value.Username == username).Key : null;
+            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == userID);
         }
 
         // Return a list of all connections but not the local connection

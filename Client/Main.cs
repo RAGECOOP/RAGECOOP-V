@@ -44,7 +44,7 @@ namespace CoopClient
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
-            Aborted += OnAbort;
+            Aborted += (object sender, EventArgs e) => CleanUp();
 
             Util.NativeMemory();
         }
@@ -100,12 +100,14 @@ namespace CoopClient
             }
 #endif
 
-            if ((Environment.TickCount - LastDataSend) >= (1000 / 60))
+            if ((Environment.TickCount - LastDataSend) < (1000 / 60))
             {
-                MainNetworking.SendPlayerData();
-
-                LastDataSend = Environment.TickCount;
+                return;
             }
+
+            MainNetworking.SendPlayerData();
+
+            LastDataSend = Environment.TickCount;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -168,11 +170,6 @@ namespace CoopClient
             }
         }
 
-        private void OnAbort(object sender, EventArgs e)
-        {
-            CleanUp();
-        }
-
         public static void CleanUp()
         {
             MainChat.Clear();
@@ -201,7 +198,7 @@ namespace CoopClient
                 entity.Delete();
             }
 
-            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.Handle))
+            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.CurrentVehicle?.Handle))
             {
                 veh.Delete();
             }
