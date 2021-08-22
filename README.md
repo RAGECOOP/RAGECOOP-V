@@ -8,7 +8,10 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
-| :warning: The original GTACoOp can be found [HERE](https://gtacoop.com/) |
+| 🚫 No more updates! (EntenKoeniq) |
+| --- |
+
+| ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
 | --- |
 
 WEB: https://gtacoopr.entenkoeniq.de/
