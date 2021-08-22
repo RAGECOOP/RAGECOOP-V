@@ -33,9 +33,8 @@ namespace CoopClient
             Function.Call((Hash)0xB96B00E976BE977F, 0.0f); // _SET_WAVES_INTENSITY
 
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character.Handle, true, false);
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Game.Player.Character.Handle, true);
 
-            if (Main.DeactivateTraffic)
+            if (Main.DisableTraffic)
             {
                 if (!LastDisableTraffic)
                 {
@@ -55,7 +54,7 @@ namespace CoopClient
                 Traffic(true);
             }
 
-            LastDisableTraffic = Main.DeactivateTraffic;
+            LastDisableTraffic = Main.DisableTraffic;
         }
 
         private static void Traffic(bool enable)

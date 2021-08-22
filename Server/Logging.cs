@@ -3,13 +3,13 @@ using System.IO;
 
 namespace CoopServer
 {
-    class Logging
+    public class Logging
     {
-        private static readonly object _lock = new();
+        private static readonly object Lock = new();
 
         public static void Info(string message)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 string msg = string.Format("[{0}] [INFO] {1}", Date(), message);
 
@@ -24,7 +24,7 @@ namespace CoopServer
 
         public static void Warning(string message)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 string msg = string.Format("[{0}] [WARNING] {1}", Date(), message);
 
@@ -39,7 +39,7 @@ namespace CoopServer
 
         public static void Error(string message)
         {
-            lock (_lock)
+            lock (Lock)
             {
                 string msg = string.Format("[{0}] [ERROR] {1}", Date(), message);
 
@@ -59,7 +59,7 @@ namespace CoopServer
                 return;
             }
 
-            lock (_lock)
+            lock (Lock)
             {
                 string msg = string.Format("[{0}] [DEBUG] {1}", Date(), message);
 

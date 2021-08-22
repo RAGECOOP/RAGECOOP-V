@@ -18,10 +18,10 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_5_1";
+        public static readonly string CurrentModVersion = "V0_6_0";
 
         public static bool ShareNpcsWithPlayers = false;
-        public static bool DeactivateTraffic = false;
+        public static bool DisableTraffic = false;
         public static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 
@@ -44,7 +44,7 @@ namespace CoopClient
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
-            Aborted += OnAbort;
+            Aborted += (object sender, EventArgs e) => CleanUp();
 
             Util.NativeMemory();
         }
@@ -100,12 +100,14 @@ namespace CoopClient
             }
 #endif
 
-            if ((Environment.TickCount - LastDataSend) >= (1000 / 60))
+            if ((Environment.TickCount - LastDataSend) < (1000 / 60))
             {
-                MainNetworking.SendPlayerData();
-
-                LastDataSend = Environment.TickCount;
+                return;
             }
+
+            MainNetworking.SendPlayerData();
+
+            LastDataSend = Environment.TickCount;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -150,8 +152,8 @@ namespace CoopClient
                     }
                     else if (!Game.Player.Character.IsInVehicle())
                     {
-                        Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).First();
-                        if (veh != null)
+                        Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).FirstOrDefault();
+                        if (veh != default)
                         {
                             for (int i = 0; i < veh.PassengerCapacity; i++)
                             {
@@ -166,11 +168,6 @@ namespace CoopClient
                     }
                     break;
             }
-        }
-
-        private void OnAbort(object sender, EventArgs e)
-        {
-            CleanUp();
         }
 
         public static void CleanUp()
@@ -201,12 +198,13 @@ namespace CoopClient
                 entity.Delete();
             }
 
-            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.Handle))
+            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.CurrentVehicle?.Handle))
             {
                 veh.Delete();
             }
         }
 
+#if DEBUG
         private int ArtificialLagCounter;
         public static EntitiesPlayer DebugSyncPed;
         public static int LastFullDebugSync = 0;
@@ -286,6 +284,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
                 DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
@@ -315,5 +314,6 @@ namespace CoopClient
                 LastFullDebugSync = currentTimestamp;
             }
         }
+#endif
     }
 }

@@ -21,7 +21,7 @@ namespace CoopServer
 
     class Server
     {
-        public static readonly string CurrentModVersion = "V0_5_1";
+        public static readonly string CurrentModVersion = "V0_6_0";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -31,7 +31,7 @@ namespace CoopServer
 
         public static readonly Dictionary<long, EntitiesPlayer> Players = new();
 
-        private static ServerScript GameMode;
+        public static ServerScript GameMode;
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new Dictionary<Command, Action<CommandContext>>();
 
         public Server()
@@ -425,18 +425,15 @@ namespace CoopServer
                 return;
             }
 
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
+            if (Players.Any(x => x.Value.SocialClubName == packet.SocialClubName))
             {
-                if (player.Value.SocialClubName == packet.SocialClubName)
-                {
-                    local.Deny("The name of the Social Club is already taken!");
-                    return;
-                }
-                else if (player.Value.Username == packet.Username)
-                {
-                    local.Deny("Username is already taken!");
-                    return;
-                }
+                local.Deny("The name of the Social Club is already taken!");
+                return;
+            }
+            else if (Players.Any(x => x.Value.Username == packet.Username))
+            {
+                local.Deny("Username is already taken!");
+                return;
             }
 
             long localPlayerID = local.RemoteUniqueIdentifier;
@@ -476,7 +473,7 @@ namespace CoopServer
 
             if (GameMode != null)
             {
-                GameMode.API.InvokePlayerConnect(Players[packet.Player]);
+                GameMode.API.InvokePlayerConnected(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(local);
@@ -518,7 +515,7 @@ namespace CoopServer
         {
             if (GameMode != null)
             {
-                GameMode.API.InvokePlayerDisconnect(Players[packet.Player], reason);
+                GameMode.API.InvokePlayerDisconnected(Players[packet.Player]);
             }
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Player);
@@ -536,7 +533,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -558,7 +555,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -580,7 +577,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -602,7 +599,7 @@ namespace CoopServer
         {
             EntitiesPlayer player = Players[packet.Extra.Player];
 
-            player.Ped.Position = packet.Extra.Position;
+            player.Position = packet.Extra.Position;
 
             List<NetConnection> playerList = Util.FilterAllLocal(packet.Extra.Player);
             if (playerList.Count == 0)
@@ -645,7 +642,7 @@ namespace CoopServer
                     else
                     {
                         NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
-                        if (userConnection == null)
+                        if (userConnection == default)
                         {
                             return;
                         }
@@ -693,15 +690,11 @@ namespace CoopServer
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
         {
-            List<NetConnection> playerList = Util.GetAllInRange(packet.Position, 300f, local);
-            if (playerList.Count == 0)
-            {
-                return;
-            }
+
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.UnreliableSequenced, 0);
         }
         #endregion
 

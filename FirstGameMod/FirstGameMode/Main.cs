@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Timers;
 
 using CoopServer;
@@ -10,6 +11,8 @@ namespace FirstGameMode
     {
         private static readonly Timer RunningSinceTimer = new() { Interval = 1000 };
         private static int RunningSince = 0;
+        public static bool ShowPlayerPosition = false;
+        private static List<string> SecretLocation = new List<string>();
 
         public Main()
         {
@@ -19,6 +22,7 @@ namespace FirstGameMode
             API.OnPlayerConnected += OnPlayerConnected;
             API.OnPlayerDisconnected += OnPlayerDisconnected;
             API.OnChatMessage += OnChatMessage;
+            API.OnPlayerPositionUpdate += OnPlayerPositionUpdate;
 
             API.RegisterCommand("running", RunningCommand);
             API.RegisterCommands<Commands>();
@@ -29,9 +33,9 @@ namespace FirstGameMode
             API.SendChatMessageToPlayer(ctx.Player.Username, "Server has been running for: " + RunningSince + " seconds!");
         }
 
-        public static void OnPlayerConnected(EntitiesPlayer client)
+        public static void OnPlayerConnected(EntitiesPlayer player)
         {
-            API.SendChatMessageToAll("Player " + client.Username + " connected!");
+            API.SendChatMessageToAll("Player " + player.Username + " connected!");
         }
 
         public static void OnPlayerDisconnected(EntitiesPlayer player)
@@ -50,6 +54,19 @@ namespace FirstGameMode
             }
 
             API.SendChatMessageToAll(message, username);
+        }
+
+        public static void OnPlayerPositionUpdate(EntitiesPlayer player)
+        {
+            if (ShowPlayerPosition)
+            {
+                if (!SecretLocation.Contains(player.Username) && player.IsInRangeOf(new LVector3(0, 0, 75), 7f))
+                {
+                    API.SendChatMessageToPlayer(player.Username, "Hey! you find this secret location!");
+                    SecretLocation.Add(player.Username);
+                    return;
+                }
+            }
         }
     }
 }

@@ -29,6 +29,7 @@ namespace CoopServer
         #region SERVER-ONLY
         public float Length() => (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
         public static LVector3 Subtract(LVector3 pos1, LVector3 pos2) => new(pos1.X - pos2.X, pos1.Y - pos2.Y, pos1.Z - pos2.Z);
+        public static bool Equals(LVector3 value1, LVector3 value2) => value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z;
         #endregion
     }
 
@@ -67,7 +68,8 @@ namespace CoopServer
         LightSyncPlayerVehPacket,
         FullSyncNpcPacket,
         FullSyncNpcVehPacket,
-        ChatMessagePacket
+        ChatMessagePacket,
+        NativeCallPacket
     }
 
     [Flags]
@@ -343,9 +345,12 @@ namespace CoopServer
         public int[] VehColors { get; set; }
 
         [ProtoMember(13)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(14)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(15)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -376,6 +381,7 @@ namespace CoopServer
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
+            VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
@@ -518,6 +524,81 @@ namespace CoopServer
             Message = data.Message;
         }
     }
+
+    #region ===== NATIVECALL =====
+    [ProtoContract]
+    class NativeCallPacket : Packet
+    {
+        [ProtoMember(1)]
+        public ulong Hash { get; set; }
+
+        [ProtoMember(2)]
+        public List<NativeArgument> Args { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.NativeCallPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            NativeCallPacket data = CoopSerializer.Deserialize<NativeCallPacket>(message.ReadBytes(len));
+
+            Hash = data.Hash;
+            Args = data.Args;
+        }
+    }
+
+    [ProtoContract]
+    [ProtoInclude(1, typeof(IntArgument))]
+    [ProtoInclude(2, typeof(BoolArgument))]
+    [ProtoInclude(3, typeof(FloatArgument))]
+    [ProtoInclude(4, typeof(StringArgument))]
+    [ProtoInclude(5, typeof(LVector3Argument))]
+    class NativeArgument { }
+
+    [ProtoContract]
+    class IntArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public int Data { get; set; }
+    }
+
+    [ProtoContract]
+    class BoolArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public bool Data { get; set; }
+    }
+
+    [ProtoContract]
+    class FloatArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public float Data { get; set; }
+    }
+
+    [ProtoContract]
+    class StringArgument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public string Data { get; set; }
+    }
+
+    [ProtoContract]
+    class LVector3Argument : NativeArgument
+    {
+        [ProtoMember(1)]
+        public LVector3 Data { get; set; }
+    }
+    #endregion // ===== NATIVECALL =====
     #endregion
 
     #region -- NPC --
@@ -633,9 +714,12 @@ namespace CoopServer
         public int[] VehColors { get; set; }
 
         [ProtoMember(15)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(16)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(17)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -668,6 +752,7 @@ namespace CoopServer
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
+            VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
