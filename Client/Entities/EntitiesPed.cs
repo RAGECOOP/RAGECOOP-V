@@ -50,6 +50,8 @@ namespace CoopClient
         public int VehicleModelHash { get; set; }
         private int[] LastVehicleColors = new int[] { 0, 0 };
         public int[] VehicleColors { get; set; }
+        private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
+        public Dictionary<int, int> VehicleMods { get; set; }
         public bool VehicleDead { get; set; }
         public float VehicleEngineHealth { get; set; }
         public int VehicleSeatIndex { get; set; }
@@ -281,13 +283,6 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
-            if (VehicleColors != null && VehicleColors != LastVehicleColors)
-            {
-                Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
-
-                LastVehicleColors = VehicleColors;
-            }
-
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
@@ -309,6 +304,23 @@ namespace CoopClient
                 if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
                 {
                     return;
+                }
+
+                if (VehicleColors != null && VehicleColors != LastVehicleColors)
+                {
+                    Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
+                    LastVehicleColors = VehicleColors;
+                }
+
+                if (VehicleMods != null && VehicleMods != LastVehicleMods)
+                {
+                    Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
+
+                    foreach (KeyValuePair<int, int> mod in VehicleMods)
+                    {
+                        MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
+                    }
                 }
 
                 MainVehicle.EngineHealth = VehicleEngineHealth;
@@ -606,7 +618,6 @@ namespace CoopClient
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
             Character.Health = Health;
-            Character.CanBeTargetted = true;
 
             if (username != null)
             {
@@ -624,6 +635,8 @@ namespace CoopClient
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
             }
+
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Character, Game.Player, true);
 
             return true;
         }

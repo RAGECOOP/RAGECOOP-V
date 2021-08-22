@@ -133,7 +133,7 @@ namespace CoopClient
 
                                     Main.MainMenu.MainMenu.Items[2].Enabled = true;
                                     Main.MainMenu.MainMenu.Items[2].Title = "Disconnect";
-                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DeactivateTraffic && Main.NpcsAllowed;
+                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
 
                                     Main.MainMenu.MainMenu.Visible = false;
                                     Main.MainMenu.MenuPool.RefreshAll();
@@ -323,6 +323,7 @@ namespace CoopClient
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.VehicleColors = packet.VehColors;
+                player.VehicleMods = packet.VehMods;
                 player.VehDoors = packet.VehDoors;
                 player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 player.IsInVehicle = (packet.Flag.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
@@ -592,12 +593,17 @@ namespace CoopClient
                 }
                 else
                 {
-                    int secondaryColor;
-                    int primaryColor;
+                    bool isDriver = Util.GetResponsiblePedHandle(player.CurrentVehicle) == player.Handle;
 
-                    unsafe
+                    int secondaryColor = 0;
+                    int primaryColor = 0;
+
+                    if (isDriver)
                     {
-                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, player.CurrentVehicle, &primaryColor, &secondaryColor);
+                        unsafe
+                        {
+                            Function.Call<int>(Hash.GET_VEHICLE_COLOURS, player.CurrentVehicle, &primaryColor, &secondaryColor);
+                        }
                     }
 
                     new FullSyncPlayerVehPacket()
@@ -612,14 +618,15 @@ namespace CoopClient
                         Props = Util.GetPedProps(player),
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
-                        VehPosition = player.CurrentVehicle.Position.ToLVector(),
-                        VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
-                        VehEngineHealth = player.CurrentVehicle.EngineHealth,
-                        VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
-                        VehSpeed = player.CurrentVehicle.Speed,
-                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
-                        VehColors = new int[] { primaryColor, secondaryColor },
-                        VehDoors = Util.GetVehicleDoors(player.CurrentVehicle.Doors),
+                        VehPosition = isDriver ? player.CurrentVehicle.Position.ToLVector() : new LVector3(),
+                        VehRotation = isDriver ? player.CurrentVehicle.Quaternion.ToLQuaternion() : new LQuaternion(),
+                        VehEngineHealth = isDriver ? player.CurrentVehicle.EngineHealth : 0f,
+                        VehVelocity = isDriver ? player.CurrentVehicle.Velocity.ToLVector() : new LVector3(),
+                        VehSpeed = isDriver ? player.CurrentVehicle.Speed : 0f,
+                        VehSteeringAngle = isDriver ? player.CurrentVehicle.SteeringAngle : 0f,
+                        VehColors = isDriver ? new int[] { primaryColor, secondaryColor } : new int[0],
+                        VehMods = isDriver ? Util.GetVehicleMods(player.CurrentVehicle) : null,
+                        VehDoors = isDriver ? Util.GetVehicleDoors(player.CurrentVehicle.Doors) : null,
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -650,6 +657,8 @@ namespace CoopClient
                 }
                 else
                 {
+                    bool isDriver = Util.GetResponsiblePedHandle(player.CurrentVehicle) == player.Handle;
+
                     new LightSyncPlayerVehPacket()
                     {
                         Extra = new PlayerPacket()
@@ -660,11 +669,11 @@ namespace CoopClient
                         },
                         VehModelHash = player.CurrentVehicle.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
-                        VehPosition = player.CurrentVehicle.Position.ToLVector(),
-                        VehRotation = player.CurrentVehicle.Quaternion.ToLQuaternion(),
-                        VehVelocity = player.CurrentVehicle.Velocity.ToLVector(),
-                        VehSpeed = player.CurrentVehicle.Speed,
-                        VehSteeringAngle = player.CurrentVehicle.SteeringAngle,
+                        VehPosition = isDriver ? player.CurrentVehicle.Position.ToLVector() : new LVector3(),
+                        VehRotation = isDriver ? player.CurrentVehicle.Quaternion.ToLQuaternion() : new LQuaternion(),
+                        VehVelocity = isDriver ? player.CurrentVehicle.Velocity.ToLVector() : new LVector3(),
+                        VehSpeed = isDriver ? player.CurrentVehicle.Speed : 0f,
+                        VehSteeringAngle = isDriver ? player.CurrentVehicle.SteeringAngle : 0f,
                         Flag = Util.GetVehicleFlags(player, player.CurrentVehicle, false)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -704,12 +713,17 @@ namespace CoopClient
             }
             else
             {
-                int secondaryColor;
-                int primaryColor;
+                bool isDriver = Util.GetResponsiblePedHandle(npc.CurrentVehicle) == npc.Handle;
 
-                unsafe
+                int secondaryColor = 0;
+                int primaryColor = 0;
+
+                if (isDriver)
                 {
-                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
+                    unsafe
+                    {
+                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
+                    }
                 }
 
                 new FullSyncNpcVehPacket()
@@ -721,14 +735,15 @@ namespace CoopClient
                     Position = npc.Position.ToLVector(),
                     VehModelHash = npc.CurrentVehicle.Model.Hash,
                     VehSeatIndex = (int)npc.SeatIndex,
-                    VehPosition = npc.CurrentVehicle.Position.ToLVector(),
-                    VehRotation = npc.CurrentVehicle.Quaternion.ToLQuaternion(),
-                    VehEngineHealth = npc.CurrentVehicle.EngineHealth,
-                    VehVelocity = npc.CurrentVehicle.Velocity.ToLVector(),
-                    VehSpeed = npc.CurrentVehicle.Speed,
-                    VehSteeringAngle = npc.CurrentVehicle.SteeringAngle,
-                    VehColors = new int[] { primaryColor, secondaryColor },
-                    VehDoors = Util.GetVehicleDoors(npc.CurrentVehicle.Doors),
+                    VehPosition = isDriver ? npc.CurrentVehicle.Position.ToLVector() : new LVector3(),
+                    VehRotation = isDriver ? npc.CurrentVehicle.Quaternion.ToLQuaternion() : new LQuaternion(),
+                    VehEngineHealth = isDriver ? npc.CurrentVehicle.EngineHealth : 0f,
+                    VehVelocity = isDriver ? npc.CurrentVehicle.Velocity.ToLVector() : new LVector3(),
+                    VehSpeed = isDriver ? npc.CurrentVehicle.Speed : 0f,
+                    VehSteeringAngle = isDriver ? npc.CurrentVehicle.SteeringAngle : 0f,
+                    VehColors = isDriver ? new int[] { primaryColor, secondaryColor } : new int[0],
+                    VehMods = isDriver ? Util.GetVehicleMods(npc.CurrentVehicle) : null,
+                    VehDoors = isDriver ? Util.GetVehicleDoors(npc.CurrentVehicle.Doors) : null,
                     Flag = Util.GetVehicleFlags(npc, npc.CurrentVehicle, true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }

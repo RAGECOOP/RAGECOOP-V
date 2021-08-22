@@ -33,9 +33,9 @@ namespace FirstGameMode
             API.SendChatMessageToPlayer(ctx.Player.Username, "Server has been running for: " + RunningSince + " seconds!");
         }
 
-        public static void OnPlayerConnected(EntitiesPlayer client)
+        public static void OnPlayerConnected(EntitiesPlayer player)
         {
-            API.SendChatMessageToAll("Player " + client.Username + " connected!");
+            API.SendChatMessageToAll("Player " + player.Username + " connected!");
         }
 
         public static void OnPlayerDisconnected(EntitiesPlayer player)

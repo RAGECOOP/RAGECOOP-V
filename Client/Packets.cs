@@ -412,9 +412,12 @@ namespace CoopClient
         public int[] VehColors { get; set; }
 
         [ProtoMember(13)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(14)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(15)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -445,6 +448,7 @@ namespace CoopClient
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
+            VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             Flag = data.Flag;
         }
@@ -777,9 +781,12 @@ namespace CoopClient
         public int[] VehColors { get; set; }
 
         [ProtoMember(15)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(16)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(17)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -812,6 +819,7 @@ namespace CoopClient
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
+            VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             Flag = data.Flag;
         }

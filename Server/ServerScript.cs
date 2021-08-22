@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using Lidgren.Network;
 
@@ -122,6 +123,11 @@ namespace CoopServer
         public static Dictionary<long, Entities.EntitiesPlayer> GetAllPlayers()
         {
             return Server.Players;
+        }
+
+        public static Entities.EntitiesPlayer GetPlayerByUsername(string username)
+        {
+            return Server.Players.FirstOrDefault(x => x.Value.Username == username).Value;
         }
 
         public static void KickPlayerByUsername(string username, string[] reason)

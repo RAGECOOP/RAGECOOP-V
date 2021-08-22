@@ -18,10 +18,10 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentModVersion = "V0_5_1";
+        public static readonly string CurrentModVersion = "V0_6_0";
 
         public static bool ShareNpcsWithPlayers = false;
-        public static bool DeactivateTraffic = false;
+        public static bool DisableTraffic = false;
         public static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 
@@ -204,6 +204,7 @@ namespace CoopClient
             }
         }
 
+#if DEBUG
         private int ArtificialLagCounter;
         public static EntitiesPlayer DebugSyncPed;
         public static int LastFullDebugSync = 0;
@@ -283,6 +284,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
                 DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
@@ -312,5 +314,6 @@ namespace CoopClient
                 LastFullDebugSync = currentTimestamp;
             }
         }
+#endif
     }
 }

@@ -21,7 +21,7 @@ namespace CoopServer
 
     class Server
     {
-        public static readonly string CurrentModVersion = "V0_5_1";
+        public static readonly string CurrentModVersion = "V0_6_0";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -690,15 +690,11 @@ namespace CoopServer
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
         {
-            List<NetConnection> playerList = Util.GetAllInRange(packet.Position, 300f, local);
-            if (playerList.Count == 0)
-            {
-                return;
-            }
+
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, playerList, NetDeliveryMethod.UnreliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.UnreliableSequenced, 0);
         }
         #endregion
 
