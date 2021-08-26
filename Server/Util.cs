@@ -50,13 +50,13 @@ namespace CoopServer
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            long? userID = Server.Players.FirstOrDefault(x => x.Value.Username == username).Key;
-            if (userID == default || !Server.MainNetServer.Connections.Any(x => x.RemoteUniqueIdentifier == userID))
+            long clientID;
+            if ((clientID = Server.Clients.FirstOrDefault(x => x.Player.Username == username).ID) == default)
             {
                 return null;
             }
 
-            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == userID);
+            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == clientID);
         }
 
         // Return a list of all connections but not the local connection
@@ -72,12 +72,12 @@ namespace CoopServer
         // Return a list of players within range of ...
         public static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            return new(Server.MainNetServer.Connections.FindAll(e => Server.Players[e.RemoteUniqueIdentifier].IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.FindAll(e => Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier).Player.IsInRangeOf(position, range)));
         }
         // Return a list of players within range of ... but not the local one
         public static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
-            return new(Server.MainNetServer.Connections.Where(e => e != local && Server.Players[e.RemoteUniqueIdentifier].IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.Where(e => e != local && Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier).Player.IsInRangeOf(position, range)));
         }
 
         public static T Read<T>(string file) where T : new()

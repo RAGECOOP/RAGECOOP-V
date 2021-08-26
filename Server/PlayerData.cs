@@ -1,12 +1,11 @@
-﻿namespace CoopServer.Entities
+﻿namespace CoopServer
 {
-    public class EntitiesPlayer
+    public struct PlayerData
     {
         public string SocialClubName { get; set; }
         public string Username { get; set; }
-        public float Latency { get; set; }
-        private LVector3 LastPosition = new();
-        private LVector3 CurrentPosition = new();
+        private LVector3 LastPosition { get; set; }
+        private LVector3 CurrentPosition { get; set; }
         public LVector3 Position
         {
             get

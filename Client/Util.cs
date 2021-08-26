@@ -195,11 +195,6 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.AreHighBeamsOn;
             }
 
-            if (veh.IsInBurnout)
-            {
-                flags |= (byte)VehicleDataFlags.IsInBurnout;
-            }
-
             if (veh.IsSirenActive)
             {
                 flags |= (byte)VehicleDataFlags.IsSirenActive;
