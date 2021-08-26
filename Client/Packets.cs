@@ -123,6 +123,7 @@ namespace CoopClient
         FullSyncPlayerVehPacket,
         LightSyncPlayerPacket,
         LightSyncPlayerVehPacket,
+        SuperLightSyncPlayerPacket,
         FullSyncNpcPacket,
         FullSyncNpcVehPacket,
         ChatMessagePacket,
@@ -151,9 +152,8 @@ namespace CoopClient
         IsEngineRunning = 1 << 2,
         AreLightsOn = 1 << 3,
         AreHighBeamsOn = 1 << 4,
-        IsInBurnout = 1 << 5,
-        IsSirenActive = 1 << 6,
-        IsDead = 1 << 7
+        IsSirenActive = 1 << 5,
+        IsDead = 1 << 6
     }
 
     [ProtoContract]
@@ -242,7 +242,7 @@ namespace CoopClient
     class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long Player { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -266,7 +266,7 @@ namespace CoopClient
 
             PlayerConnectPacket data = CoopSerializer.Deserialize<PlayerConnectPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            ID = data.ID;
             SocialClubName = data.SocialClubName;
             Username = data.Username;
         }
@@ -276,7 +276,7 @@ namespace CoopClient
     class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long Player { get; set; }
+        public long ID { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -294,7 +294,7 @@ namespace CoopClient
 
             PlayerDisconnectPacket data = CoopSerializer.Deserialize<PlayerDisconnectPacket>(message.ReadBytes(len));
 
-            Player = data.Player;
+            ID = data.ID;
         }
     }
 
@@ -302,7 +302,7 @@ namespace CoopClient
     struct PlayerPacket
     {
         [ProtoMember(1)]
-        public long Player { get; set; }
+        public long ID { get; set; }
 
         [ProtoMember(2)]
         public int Health { get; set; }
@@ -559,6 +559,32 @@ namespace CoopClient
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             Flag = data.Flag;
+        }
+    }
+
+    [ProtoContract]
+    class SuperLightSyncPlayerPacket : Packet
+    {
+        [ProtoMember(1)]
+        public PlayerPacket Extra { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.SuperLightSyncPlayerPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            SuperLightSyncPlayerPacket data = CoopSerializer.Deserialize<SuperLightSyncPlayerPacket>(message.ReadBytes(len));
+
+            Extra = data.Extra;
         }
     }
 

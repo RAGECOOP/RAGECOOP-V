@@ -16,7 +16,7 @@ namespace CoopServer
     {
         #region DELEGATES
         public delegate void ChatEvent(string username, string message, CancelEventArgs cancel);
-        public delegate void PlayerEvent(Entities.EntitiesPlayer player);
+        public delegate void PlayerEvent(Client client);
         #endregion
 
         #region EVENTS
@@ -31,14 +31,14 @@ namespace CoopServer
             OnStart?.Invoke(this, EventArgs.Empty);
         }
 
-        internal void InvokePlayerConnected(Entities.EntitiesPlayer player)
+        internal void InvokePlayerConnected(Client client)
         {
-            OnPlayerConnected?.Invoke(player);
+            OnPlayerConnected?.Invoke(client);
         }
 
-        internal void InvokePlayerDisconnected(Entities.EntitiesPlayer player)
+        internal void InvokePlayerDisconnected(Client client)
         {
-            OnPlayerDisconnected?.Invoke(player);
+            OnPlayerDisconnected?.Invoke(client);
         }
 
         internal bool InvokeChatMessage(string username, string message)
@@ -48,23 +48,22 @@ namespace CoopServer
             return args.Cancel;
         }
 
-        internal void InvokePlayerPositionUpdate(Entities.EntitiesPlayer player)
+        internal void InvokePlayerPositionUpdate(PlayerData playerData)
         {
-            OnPlayerPositionUpdate?.Invoke(player);
+            OnPlayerPositionUpdate?.Invoke(Server.Clients.First(x => x.Player.Username == playerData.Username));
         }
         #endregion
 
         #region FUNCTIONS
         public static void SendNativeCallToAll(ulong hash, params object[] args)
         {
-            List<NetConnection> connections = Server.MainNetServer.Connections;
-            if (connections.Count == 0)
+            if (Server.MainNetServer.ConnectionsCount == 0)
             {
                 return;
             }
 
-            List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-            if (arguments == null)
+            List<NativeArgument> arguments;
+            if ((arguments = Util.ParseNativeArguments(args)) == null)
             {
                 return;
             }
@@ -80,32 +79,6 @@ namespace CoopServer
             Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
-        public static void SendNativeCallToPlayer(string username, ulong hash, params object[] args)
-        {
-            NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == default)
-            {
-                Logging.Warning("[ServerScript->SendNativeCallToPlayer(\"" + username + "\", \"" + hash + "\", params object[] args)]: User not found!");
-                return;
-            }
-
-            List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-            if (arguments == null)
-            {
-                return;
-            }
-
-            NativeCallPacket packet = new()
-            {
-                Hash = hash,
-                Args = arguments
-            };
-
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            packet.PacketToNetOutGoingMessage(outgoingMessage);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
-        }
-
         public static List<long> GetAllConnections()
         {
             List<long> result = new();
@@ -115,37 +88,24 @@ namespace CoopServer
             return result;
         }
 
-        public static int GetAllPlayersCount()
+        public static int GetAllClientsCount()
         {
-            return Server.Players.Count;
+            return Server.Clients.Count;
         }
 
-        public static Dictionary<long, Entities.EntitiesPlayer> GetAllPlayers()
+        public static List<Client> GetAllClients()
         {
-            return Server.Players;
+            return Server.Clients;
         }
 
-        public static Entities.EntitiesPlayer GetPlayerByUsername(string username)
+        public static Client GetClientByUsername(string username)
         {
-            return Server.Players.FirstOrDefault(x => x.Value.Username == username).Value;
-        }
-
-        public static void KickPlayerByUsername(string username, string[] reason)
-        {
-            NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == default)
-            {
-                Logging.Warning("[ServerScript->KickPlayerByUsername(\"" + username + "\", \"" + string.Join(" ", reason) + "\")]: User not found!");
-                return;
-            }
-
-            userConnection.Disconnect(string.Join(" ", reason));
+            return Server.Clients.FirstOrDefault(x => x.Player.Username == username);
         }
 
         public static void SendChatMessageToAll(string message, string username = "Server")
         {
-            List<NetConnection> connections = Server.MainNetServer.Connections;
-            if (connections.Count == 0)
+            if (Server.MainNetServer.ConnectionsCount == 0)
             {
                 return;
             }
@@ -159,26 +119,6 @@ namespace CoopServer
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
             Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
-        }
-
-        public static void SendChatMessageToPlayer(string username, string message, string from = "Server")
-        {
-            NetConnection userConnection = Util.GetConnectionByUsername(username);
-            if (userConnection == default)
-            {
-                Logging.Warning("[ServerScript->SendChatMessageToPlayer(\"" + username + "\", \"" + message + "\", \"" + from + "\")]: User not found!");
-                return;
-            }
-
-            ChatMessagePacket packet = new()
-            {
-                Username = from,
-                Message = message
-            };
-
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            packet.PacketToNetOutGoingMessage(outgoingMessage);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
         }
 
         public static void RegisterCommand(string name, Action<CommandContext> callback)
@@ -217,7 +157,7 @@ namespace CoopServer
         /// <summary>
         /// Gets the client which executed the command
         /// </summary>
-        public Entities.EntitiesPlayer Player { get; internal set; }
+        public Client Client { get; internal set; }
 
         /// <summary>
         /// Gets the chatdata associated with the command

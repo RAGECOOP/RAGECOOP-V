@@ -9,26 +9,26 @@ namespace FirstGameMode
         [Command("hello")]
         public static void HelloCommand(CommandContext ctx)
         {
-            API.SendChatMessageToPlayer(ctx.Player.Username, "Hello " + ctx.Player.Username + " :)");
+            ctx.Client.SendChatMessage("Hello " + ctx.Client.Player.Username + " :)");
         }
 
         [Command("inrange")]
         public static void InRangeCommand(CommandContext ctx)
         {
-            if (ctx.Player.IsInRangeOf(new LVector3(0f, 0f, 75f), 7f))
+            if (ctx.Client.Player.IsInRangeOf(new LVector3(0f, 0f, 75f), 7f))
             {
-                API.SendChatMessageToPlayer(ctx.Player.Username, "You are in range! :)");
+                ctx.Client.SendChatMessage("You are in range! :)");
             }
             else
             {
-                API.SendChatMessageToPlayer(ctx.Player.Username, "You are not in range! :(");
+                ctx.Client.SendChatMessage("You are not in range! :(");
             }
         }
 
         [Command("online")]
         public static void OnlineCommand(CommandContext ctx)
         {
-            API.SendChatMessageToPlayer(ctx.Player.Username, API.GetAllPlayersCount() + " player online!");
+            ctx.Client.SendChatMessage(API.GetAllClientsCount() + " player online!");
         }
 
         [Command("kick")]
@@ -36,11 +36,11 @@ namespace FirstGameMode
         {
             if (ctx.Args.Length < 2)
             {
-                API.SendChatMessageToPlayer(ctx.Player.Username, "Please use \"/kick <USERNAME> <REASON>\"");
+                ctx.Client.SendChatMessage("Please use \"/kick <USERNAME> <REASON>\"");
                 return;
             }
 
-            API.KickPlayerByUsername(ctx.Args[0], ctx.Args.Skip(1).ToArray());
+            ctx.Client.Kick(ctx.Args.Skip(1).ToArray());
         }
 
         [Command("setweather")]
@@ -50,16 +50,16 @@ namespace FirstGameMode
 
             if (ctx.Args.Length < 3)
             {
-                API.SendChatMessageToPlayer(ctx.Player.Username, "Please use \"/setweather <HOURS> <MINUTES> <SECONDS>\"");
+                ctx.Client.SendChatMessage("Please use \"/setweather <HOURS> <MINUTES> <SECONDS>\"");
                 return;
             }
             else if (!int.TryParse(ctx.Args[0], out hours) || !int.TryParse(ctx.Args[1], out minutes) || !int.TryParse(ctx.Args[2], out seconds))
             {
-                API.SendChatMessageToPlayer(ctx.Player.Username, "Please use \"/setweather <NUMBER> <NUMBER> <NUMBER>\"");
+                ctx.Client.SendChatMessage("Please use \"/setweather <NUMBER> <NUMBER> <NUMBER>\"");
                 return;
             }
 
-            API.SendNativeCallToPlayer(ctx.Player.Username, 0x47C3B5848C3E45D8, hours, minutes, seconds);
+            ctx.Client.SendNativeCall(0x47C3B5848C3E45D8, hours, minutes, seconds);
         }
 
         [Command("upp")]

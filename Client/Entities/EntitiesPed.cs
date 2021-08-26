@@ -73,8 +73,6 @@ namespace CoopClient
         public bool VehIsEngineRunning { get; set; }
         public bool VehAreLightsOn { get; set; }
         public bool VehAreHighBeamsOn { get; set; }
-        private bool LastVehIsInBurnout = false;
-        public bool VehIsInBurnout { get; set; }
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         public VehicleDoors[] VehDoors { get; set; }
@@ -95,16 +93,31 @@ namespace CoopClient
             {
                 if (!LastSyncWasFull)
                 {
+                    if (Position != null)
+                    {
+                        if (PedBlip != null && PedBlip.Exists())
+                        {
+                            PedBlip.Position = Position;
+                        }
+                        else
+                        {
+                            PedBlip = World.CreateBlip(Position);
+                            PedBlip.Color = BlipColor.White;
+                            PedBlip.Scale = 0.8f;
+                            PedBlip.Name = username;
+                        }
+                    }
+
                     return;
                 }
 
                 AllDataAvailable = true;
             }
 
-            #region NOT_IN_RANGE
-            if (!Game.Player.Character.IsInRange(Position, 250f))
+            #region NOT_IN_RANGE OR !AllDataAvailable
+            if (!Game.Player.Character.IsInRange(Position, 500f))
             {
-                if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.PassengerCount <= 1)
+                if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.PassengerCount == 0)
                 {
                     MainVehicle.Delete();
                     MainVehicle = null;
@@ -118,16 +131,16 @@ namespace CoopClient
 
                 if (username != null)
                 {
-                    if (PedBlip == null || !PedBlip.Exists())
+                    if (PedBlip != null && PedBlip.Exists())
+                    {
+                        PedBlip.Position = Position;
+                    }
+                    else
                     {
                         PedBlip = World.CreateBlip(Position);
                         PedBlip.Color = BlipColor.White;
                         PedBlip.Scale = 0.8f;
                         PedBlip.Name = username;
-                    }
-                    else
-                    {
-                        PedBlip.Position = Position;
                     }
                 }
 
@@ -136,11 +149,6 @@ namespace CoopClient
             #endregion
 
             #region IS_IN_RANGE
-            if (PedBlip != null && PedBlip.Exists())
-            {
-                PedBlip.Delete();
-            }
-
             bool characterExist = Character != null && Character.Exists();
 
             if (!characterExist)
@@ -405,19 +413,6 @@ namespace CoopClient
 
                     LastVehDoors = VehDoors;
                 }
-
-                if (VehIsInBurnout && !LastVehIsInBurnout)
-                {
-                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, true);
-                    Function.Call(Hash.TASK_VEHICLE_TEMP_ACTION, Character, MainVehicle, 23, 120000); // 30 - burnout
-                }
-                else if (!VehIsInBurnout && LastVehIsInBurnout)
-                {
-                    Function.Call(Hash.SET_VEHICLE_BURNOUT, MainVehicle, false);
-                    Function.Call(Hash.CLEAR_PED_TASKS_IMMEDIATELY, Character); // Buggy but we need this to stop this burnout
-                }
-
-                LastVehIsInBurnout = VehIsInBurnout;
             }
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
@@ -426,7 +421,7 @@ namespace CoopClient
             }
 
             // Good enough for now, but we need to create a better sync
-            if ((CurrentVehicleSpeed > 0.2f || VehIsInBurnout) && MainVehicle.IsInRange(VehiclePosition, 7.0f))
+            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(VehiclePosition, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
@@ -597,6 +592,12 @@ namespace CoopClient
 
         private bool CreateCharacter(string username)
         {
+            if (PedBlip != null && PedBlip.Exists())
+            {
+                PedBlip.Delete();
+                PedBlip = null;
+            }
+
             LastModelHash = ModelHash;
             LastProps = Props;
 

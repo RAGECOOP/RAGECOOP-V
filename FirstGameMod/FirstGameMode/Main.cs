@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Timers;
 
 using CoopServer;
-using CoopServer.Entities;
 
 namespace FirstGameMode
 {
@@ -30,17 +29,17 @@ namespace FirstGameMode
 
         public static void RunningCommand(CommandContext ctx)
         {
-            API.SendChatMessageToPlayer(ctx.Player.Username, "Server has been running for: " + RunningSince + " seconds!");
+            ctx.Client.SendChatMessage("Server has been running for: " + RunningSince + " seconds!");
         }
 
-        public static void OnPlayerConnected(EntitiesPlayer player)
+        public static void OnPlayerConnected(Client client)
         {
-            API.SendChatMessageToAll("Player " + player.Username + " connected!");
+            API.SendChatMessageToAll("Player " + client.Player.Username + " connected!");
         }
 
-        public static void OnPlayerDisconnected(EntitiesPlayer player)
+        public static void OnPlayerDisconnected(Client client)
         {
-            API.SendChatMessageToAll("Player " + player.Username + " disconnected!");
+            API.SendChatMessageToAll("Player " + client.Player.Username + " disconnected!");
         }
 
         public static void OnChatMessage(string username, string message, CancelEventArgs e)
@@ -49,21 +48,25 @@ namespace FirstGameMode
 
             if (message.StartsWith("EASTEREGG"))
             {
-                API.SendChatMessageToPlayer(username, "You found the EASTEREGG! *-*");
+                Client client;
+                if ((client = API.GetClientByUsername(username)) != null)
+                {
+                    client.SendChatMessage("You found the EASTEREGG! *-*");
+                }
                 return;
             }
 
             API.SendChatMessageToAll(message, username);
         }
 
-        public static void OnPlayerPositionUpdate(EntitiesPlayer player)
+        public static void OnPlayerPositionUpdate(Client client)
         {
             if (ShowPlayerPosition)
             {
-                if (!SecretLocation.Contains(player.Username) && player.IsInRangeOf(new LVector3(0, 0, 75), 7f))
+                if (!SecretLocation.Contains(client.Player.Username) && client.Player.IsInRangeOf(new LVector3(0, 0, 75), 7f))
                 {
-                    API.SendChatMessageToPlayer(player.Username, "Hey! you find this secret location!");
-                    SecretLocation.Add(player.Username);
+                    client.SendChatMessage("Hey! you find this secret location!");
+                    SecretLocation.Add(client.Player.Username);
                     return;
                 }
             }
