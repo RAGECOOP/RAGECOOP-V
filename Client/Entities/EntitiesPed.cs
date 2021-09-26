@@ -117,17 +117,19 @@ namespace CoopClient
             #region NOT_IN_RANGE
             if (!Game.Player.Character.IsInRange(Position, 500f))
             {
+                if (Character != null && Character.Exists())
+                {
+                    Character.Kill();
+                    Character.MarkAsNoLongerNeeded();
+                    Character.Delete();
+                    Character = null;
+                }
+
                 if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.IsSeatFree(VehicleSeat.Driver) && MainVehicle.PassengerCount == 0)
                 {
                     MainVehicle.MarkAsNoLongerNeeded();
                     MainVehicle.Delete();
                     MainVehicle = null;
-                }
-
-                if (Character != null && Character.Exists())
-                {
-                    Character.Kill();
-                    Character.Delete();
                 }
 
                 if (username != null)

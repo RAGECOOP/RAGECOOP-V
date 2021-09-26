@@ -25,46 +25,34 @@ namespace CoopClient.Entities
             lock (Main.Npcs)
             {
                 localNpcs = new Dictionary<long, EntitiesNpc>(Main.Npcs);
-            }
 
-            int tickCount = Environment.TickCount;
-            for (int i = localNpcs.Count - 1; i >= 0; i--)
-            {
-                long key = localNpcs.ElementAt(i).Key;
-
-                if ((tickCount - localNpcs[key].LastUpdateReceived) > 3000)
+                int tickCount = Environment.TickCount;
+                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(localNpcs))
                 {
-                    if (localNpcs[key].Character != null && localNpcs[key].Character.Exists() && localNpcs[key].Health > 0)
+                    if ((tickCount - npc.Value.LastUpdateReceived) > 3000)
                     {
-                        localNpcs[key].Character.Kill();
-                        localNpcs[key].Character.MarkAsNoLongerNeeded();
-                        localNpcs[key].Character.Delete();
-                    }
+                        if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
+                        {
+                            npc.Value.Character.Kill();
+                            npc.Value.Character.MarkAsNoLongerNeeded();
+                            npc.Value.Character.Delete();
+                        }
 
-                    if (localNpcs[key].MainVehicle != null && localNpcs[key].MainVehicle.Exists() && localNpcs[key].MainVehicle.PassengerCount == 0)
-                    {
-                        localNpcs[key].MainVehicle.MarkAsNoLongerNeeded();
-                        localNpcs[key].MainVehicle.Delete();
-                    }
+                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
+                        {
+                            npc.Value.MainVehicle.MarkAsNoLongerNeeded();
+                            npc.Value.MainVehicle.Delete();
+                        }
 
-                    localNpcs.Remove(key);
-                }
-            }
-
-            lock (Main.Npcs)
-            {
-                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(Main.Npcs))
-                {
-                    if (!localNpcs.ContainsKey(npc.Key))
-                    {
+                        localNpcs.Remove(npc.Key);
                         Main.Npcs.Remove(npc.Key);
                     }
                 }
             }
 
-            for (int i = 0; i < localNpcs.Count; i++)
+            foreach (EntitiesNpc npc in localNpcs.Values)
             {
-                localNpcs.ElementAt(i).Value.DisplayLocally(null);
+                npc.DisplayLocally(null);
             }
 
             // Only if that player wants to share his NPCs with others
