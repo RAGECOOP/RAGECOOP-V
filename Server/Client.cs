@@ -9,6 +9,39 @@ namespace CoopServer
         public long ID = 0;
         public float Latency = 0.0f;
         public PlayerData Player;
+        private readonly Dictionary<string, object> CustomData = new();
+
+        #region CUSTOMDATA FUNCTIONS
+        public void SetData<T>(string name, T data)
+        {
+            if (HasData(name))
+            {
+                CustomData[name] = data;
+            }
+            else
+            {
+                CustomData.Add(name, data);
+            }
+        }
+
+        public bool HasData(string name)
+        {
+            return CustomData.ContainsKey(name);
+        }
+
+        public T GetData<T>(string name)
+        {
+            return HasData(name) ? (T)CustomData[name] : default;
+        }
+
+        public void RemoveData(string name)
+        {
+            if (HasData(name))
+            {
+                CustomData.Remove(name);
+            }
+        }
+        #endregion
 
         public void Kick(string[] reason)
         {

@@ -37,11 +37,13 @@ namespace CoopClient.Entities
                     if (localNpcs[key].Character != null && localNpcs[key].Character.Exists() && localNpcs[key].Health > 0)
                     {
                         localNpcs[key].Character.Kill();
+                        localNpcs[key].Character.MarkAsNoLongerNeeded();
                         localNpcs[key].Character.Delete();
                     }
 
                     if (localNpcs[key].MainVehicle != null && localNpcs[key].MainVehicle.Exists() && localNpcs[key].MainVehicle.PassengerCount == 0)
                     {
+                        localNpcs[key].MainVehicle.MarkAsNoLongerNeeded();
                         localNpcs[key].MainVehicle.Delete();
                     }
 

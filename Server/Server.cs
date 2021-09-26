@@ -455,7 +455,7 @@ namespace CoopServer
             }
 
             List<NetConnection> clients;
-            if ((clients = Util.FilterAllLocal(packet.ID)).Count == 0)
+            if ((clients = Util.FilterAllLocal(packet.ID)).Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);

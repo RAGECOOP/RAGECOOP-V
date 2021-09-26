@@ -114,11 +114,12 @@ namespace CoopClient
                 AllDataAvailable = true;
             }
 
-            #region NOT_IN_RANGE OR !AllDataAvailable
+            #region NOT_IN_RANGE
             if (!Game.Player.Character.IsInRange(Position, 500f))
             {
-                if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.PassengerCount == 0)
+                if (MainVehicle != null && MainVehicle.Exists() && MainVehicle.IsSeatFree(VehicleSeat.Driver) && MainVehicle.PassengerCount == 0)
                 {
+                    MainVehicle.MarkAsNoLongerNeeded();
                     MainVehicle.Delete();
                     MainVehicle = null;
                 }

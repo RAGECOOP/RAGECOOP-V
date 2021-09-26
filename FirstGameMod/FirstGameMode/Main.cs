@@ -10,8 +10,7 @@ namespace FirstGameMode
     {
         private static readonly Timer RunningSinceTimer = new() { Interval = 1000 };
         private static int RunningSince = 0;
-        public static bool ShowPlayerPosition = false;
-        private static List<string> SecretLocation = new List<string>();
+        private static readonly List<string> SecretLocation = new();
 
         public Main()
         {
@@ -61,7 +60,7 @@ namespace FirstGameMode
 
         public static void OnPlayerPositionUpdate(Client client)
         {
-            if (ShowPlayerPosition)
+            if (client.HasData("ShowPlayerPosition") && client.GetData<bool>("ShowPlayerPosition"))
             {
                 if (!SecretLocation.Contains(client.Player.Username) && client.Player.IsInRangeOf(new LVector3(0, 0, 75), 7f))
                 {

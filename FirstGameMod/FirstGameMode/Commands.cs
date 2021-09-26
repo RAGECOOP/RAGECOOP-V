@@ -65,7 +65,7 @@ namespace FirstGameMode
         [Command("upp")]
         public static void UpdatePlayerPositionCommand(CommandContext ctx)
         {
-            Main.ShowPlayerPosition = !Main.ShowPlayerPosition;
+            ctx.Client.SetData("ShowPlayerPosition", !ctx.Client.GetData<bool>("ShowPlayerPosition"));
         }
     }
 }
