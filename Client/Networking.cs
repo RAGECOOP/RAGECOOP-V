@@ -29,7 +29,6 @@ namespace CoopClient
                 Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
                 Client.FlushSendQueue();
                 Client.Disconnect("Bye!");
-                Interface.Disconnected("Bye!");
             }
             else
             {
@@ -59,7 +58,6 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
-                Interface.Connected();
             }
         }
 
@@ -130,15 +128,15 @@ namespace CoopClient
                                     Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
                                     Client.FlushSendQueue();
 
-                                    GTA.UI.Notification.Show("~g~Connected!");
 #if !NON_INTERACTIVE
                                     Main.MainMenu.ConnectedMenuSetting();
 #endif
+
+                                    Interface.Connected();
+                                    GTA.UI.Notification.Show("~g~Connected!");
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
-                                GTA.UI.Notification.Show("~r~Disconnected: " + reason);
-
                                 // Reset all values
                                 LastPlayerFullSync = 0;
 
@@ -153,6 +151,9 @@ namespace CoopClient
 #if !NON_INTERACTIVE
                                 Main.MainMenu.DisconnectedMenuSetting();
 #endif
+
+                                Interface.Disconnected(reason);
+                                GTA.UI.Notification.Show("~r~Disconnected: " + reason);
                                 break;
                         }
                         break;
@@ -215,7 +216,7 @@ namespace CoopClient
                                 ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
                                 if (!Interface.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
                                 {
-                                    Interface.SendChatMessage(chatMessagePacket.Username, chatMessagePacket.Message);
+                                    Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
                                 }
                                 break;
                             case (byte)PacketTypes.NativeCallPacket:
