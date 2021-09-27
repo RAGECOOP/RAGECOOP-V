@@ -33,7 +33,11 @@ namespace CoopClient
                 Update(Main.Players, Main.MainSettings.Username);
             }
 
-            if ((Environment.TickCount - Pressed) < 5000 && !Main.MainChat.Focused && !Main.MainMenu.MenuPool.AreAnyVisible)
+            if ((Environment.TickCount - Pressed) < 5000 && !Main.MainChat.Focused
+#if !NON_INTERACTIVE
+                && !Main.MainMenu.MenuPool.AreAnyVisible
+#endif
+                )
             {
                 Function.Call(Hash.DRAW_SCALEFORM_MOVIE, MainScaleform.Handle, 0.122f, 0.3f, 0.28f, 0.6f, 255, 255, 255, 255, 0);
             }

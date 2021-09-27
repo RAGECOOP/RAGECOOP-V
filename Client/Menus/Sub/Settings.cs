@@ -68,7 +68,9 @@ namespace CoopClient.Menus.Sub
 
         public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
         {
+#if !NON_INTERACTIVE
             Main.MainMenu.MainMenu.Alignment = FlipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
+#endif
             MainMenu.Alignment = FlipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
             Main.MainSettings.FlipMenu = FlipMenuItem.Checked;
