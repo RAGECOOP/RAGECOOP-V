@@ -4,11 +4,31 @@ namespace CoopClient
 {
     public static class Interface
     {
-        public delegate void ConnectEvent(bool connected, string bye_message);
-        public static event ConnectEvent OnConnect;
-        public static event ConnectEvent OnDisconnect;
+        #region DELEGATES
+        public delegate void ConnectEvent(bool connected, string bye_message = null);
         public delegate void MessageEvent(NetIncomingMessage message);
+        #endregion
+
+        #region EVENTS
+        public static event ConnectEvent OnConnected;
+        public static event ConnectEvent OnDisconnected;
         public static event MessageEvent OnMessage;
+
+        public static void Connected()
+        {
+            OnConnected?.Invoke(true);
+        }
+
+        public static void Disconnected(string bye_message)
+        {
+            OnDisconnected?.Invoke(false, bye_message);
+        }
+
+        public static void MessageReceived(NetIncomingMessage message)
+        {
+            OnMessage?.Invoke(message);
+        }
+        #endregion
 
         public static void Connect(string serverAddress)
         {
@@ -24,21 +44,5 @@ namespace CoopClient
             Main.UseDebug = debug;
 #endif
         }
-
-        public static void Disconnected( string bye_message)
-        {
-            OnDisconnect?.Invoke(false, bye_message);
-        }
-
-        public static void Connected()
-        {
-            OnConnect?.Invoke(true, "");
-        }
-
-        public static void MessageReceived(NetIncomingMessage message)
-        {
-            OnMessage?.Invoke(message);
-        }
-
     }
 }
