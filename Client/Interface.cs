@@ -1,4 +1,6 @@
-﻿using Lidgren.Network;
+﻿using System.ComponentModel;
+
+using Lidgren.Network;
 
 namespace CoopClient
 {
@@ -7,12 +9,14 @@ namespace CoopClient
         #region DELEGATES
         public delegate void ConnectEvent(bool connected, string bye_message = null);
         public delegate void MessageEvent(NetIncomingMessage message);
+        public delegate void ChatMessage(string from, string message, CancelEventArgs args);
         #endregion
 
         #region EVENTS
         public static event ConnectEvent OnConnected;
         public static event ConnectEvent OnDisconnected;
         public static event MessageEvent OnMessage;
+        public static event ChatMessage OnChatMessage;
 
         public static void Connected()
         {
@@ -28,7 +32,19 @@ namespace CoopClient
         {
             OnMessage?.Invoke(message);
         }
+
+        public static bool ChatMessageReceived(string from, string message)
+        {
+            CancelEventArgs args = new CancelEventArgs(false);
+            OnChatMessage?.Invoke(from, message, args);
+            return args.Cancel;
+        }
         #endregion
+
+        public static void SendChatMessage(string from, string message)
+        {
+            Main.MainChat.AddMessage(from, message);
+        }
 
         public static void Connect(string serverAddress)
         {

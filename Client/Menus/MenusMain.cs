@@ -9,21 +9,24 @@ namespace CoopClient.Menus
     {
         public ObjectPool MenuPool = new ObjectPool();
 
-        public NativeMenu MainMenu = new NativeMenu("GTACOOP:R", Main.CurrentModVersion.Replace("_", "."))
+        public NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "MAIN")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        #region ===== SUB =====
+        #region SUB
         public Sub.Settings SubSettings = new Sub.Settings();
         #endregion
 
-        #region ===== ITEMS =====
+        #region ITEMS
         private readonly NativeItem UsernameItem = new NativeItem("Username") { AltTitle = Main.MainSettings.Username };
         private readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
         private readonly NativeItem ServerConnectItem = new NativeItem("Connect");
-        private readonly NativeItem AboutItem = new NativeItem("About", "~g~GTACOOP~s~:~b~R ~s~by EntenKoeniq") { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
-        #endregion // !ITEMS
+        private readonly NativeItem AboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
+            "https://github.com/GTACOOP-R~n~" +
+            "~y~VERSION~s~~n~" +
+            Main.CurrentModVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
+        #endregion
 
         public MenusMain()
         {

@@ -43,7 +43,7 @@ namespace CoopServer
 
         internal bool InvokeChatMessage(string username, string message)
         {
-            var args = new CancelEventArgs(false);
+            CancelEventArgs args = new(false);
             OnChatMessage?.Invoke(username, message, args);
             return args.Cancel;
         }

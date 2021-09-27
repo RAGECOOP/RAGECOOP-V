@@ -213,7 +213,10 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
 
                                 ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
-                                Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
+                                if (!Interface.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
+                                {
+                                    Interface.SendChatMessage(chatMessagePacket.Username, chatMessagePacket.Message);
+                                }
                                 break;
                             case (byte)PacketTypes.NativeCallPacket:
                                 packet = new NativeCallPacket();
