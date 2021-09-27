@@ -26,11 +26,11 @@ namespace CoopClient
         private static bool IsGoingToCar = false;
 
         public static Settings MainSettings = Util.ReadSettings();
-
         public static Networking MainNetworking = new Networking();
 
+#if !NON_INTERACTIVE
         public static MenusMain MainMenu = new MenusMain();
-
+#endif
         public static Chat MainChat = new Chat();
 
         public static long LocalClientID = 0;
@@ -43,7 +43,9 @@ namespace CoopClient
             Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
 
             Tick += OnTick;
+#if !NON_INTERACTIVE
             KeyDown += OnKeyDown;
+#endif
             Aborted += (object sender, EventArgs e) => CleanUp();
 
             Util.NativeMemory();
@@ -62,7 +64,9 @@ namespace CoopClient
                 Game.Player.Character.RelationshipGroup = RelationshipGroup;
             }
 
+#if !NON_INTERACTIVE
             MainMenu.MenuPool.Process();
+#endif
 
             MainNetworking.ReceiveMessages();
 
@@ -110,6 +114,7 @@ namespace CoopClient
             LastDataSend = Environment.TickCount;
         }
 
+#if !NON_INTERACTIVE
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
@@ -169,6 +174,7 @@ namespace CoopClient
                     break;
             }
         }
+#endif
 
         public static void CleanUp()
         {

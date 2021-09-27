@@ -28,8 +28,8 @@ namespace CoopClient
                 new PlayerDisconnectPacket() { ID = Main.LocalClientID }.PacketToNetOutGoingMessage(outgoingMessage);
                 Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
                 Client.FlushSendQueue();
-
                 Client.Disconnect("Bye!");
+                Interface.Disconnected("Bye!");
             }
             else
             {
@@ -59,6 +59,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
+                Interface.Connected();
             }
         }
 
@@ -90,9 +91,9 @@ namespace CoopClient
                         switch (status)
                         {
                             case NetConnectionStatus.InitiatedConnect:
-                                Main.MainMenu.MainMenu.Items[0].Enabled = false;
-                                Main.MainMenu.MainMenu.Items[1].Enabled = false;
-                                Main.MainMenu.MainMenu.Items[2].Enabled = false;
+#if !NON_INTERACTIVE
+                                Main.MainMenu.InitiateConnectionMenuSetting();
+#endif
                                 GTA.UI.Notification.Show("~y~Trying to connect...");
                                 break;
                             case NetConnectionStatus.Connected:
@@ -130,13 +131,9 @@ namespace CoopClient
                                     Client.FlushSendQueue();
 
                                     GTA.UI.Notification.Show("~g~Connected!");
-
-                                    Main.MainMenu.MainMenu.Items[2].Enabled = true;
-                                    Main.MainMenu.MainMenu.Items[2].Title = "Disconnect";
-                                    Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
-
-                                    Main.MainMenu.MainMenu.Visible = false;
-                                    Main.MainMenu.MenuPool.RefreshAll();
+#if !NON_INTERACTIVE
+                                    Main.MainMenu.ConnectedMenuSetting();
+#endif
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -153,14 +150,9 @@ namespace CoopClient
                                 }
 
                                 Main.CleanUp();
-
-                                Main.MainMenu.MainMenu.Items[0].Enabled = true;
-                                Main.MainMenu.MainMenu.Items[1].Enabled = true;
-                                Main.MainMenu.MainMenu.Items[2].Enabled = true;
-                                Main.MainMenu.MainMenu.Items[2].Title = "Connect";
-                                Main.MainMenu.SubSettings.MainMenu.Items[1].Enabled = false;
-
-                                Main.MainMenu.MenuPool.RefreshAll();
+#if !NON_INTERACTIVE
+                                Main.MainMenu.DisconnectedMenuSetting();
+#endif
                                 break;
                         }
                         break;
@@ -242,12 +234,13 @@ namespace CoopClient
                         break;
                 }
 
+                Interface.MessageReceived(message);
                 Client.Recycle(message);
             }
         }
 
-        #region -- GET --
-        #region -- PLAYER --
+#region -- GET --
+#region -- PLAYER --
         private void PlayerConnect(PlayerConnectPacket packet)
         {
             EntitiesPlayer player = new EntitiesPlayer()
@@ -448,9 +441,9 @@ namespace CoopClient
 
             Function.Call((Hash)packet.Hash, arguments.ToArray());
         }
-        #endregion // -- PLAYER --
+#endregion // -- PLAYER --
 
-        #region -- NPC --
+#region -- NPC --
         private void FullSyncNpc(FullSyncNpcPacket packet)
         {
             lock (Main.Npcs)
@@ -570,10 +563,10 @@ namespace CoopClient
                 }
             }
         }
-        #endregion // -- NPC --
-        #endregion
+#endregion // -- NPC --
+#endregion
 
-        #region -- SEND --
+#region -- SEND --
         private int LastPlayerFullSync = 0;
         public void SendPlayerData()
         {
@@ -792,6 +785,6 @@ namespace CoopClient
             }
 #endif
         }
-        #endregion
+#endregion
     }
 }

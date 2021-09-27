@@ -68,5 +68,33 @@ namespace CoopClient.Menus
                 MenuPool.RefreshAll();
             }
         }
+
+        public void InitiateConnectionMenuSetting()
+        {
+            MainMenu.Items[0].Enabled = false;
+            MainMenu.Items[1].Enabled = false;
+            MainMenu.Items[2].Enabled = false;
+        }
+
+        public void ConnectedMenuSetting()
+        {
+            MainMenu.Items[2].Enabled = true;
+            MainMenu.Items[2].Title = "Disconnect";
+            SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
+
+            MainMenu.Visible = false;
+            MenuPool.RefreshAll();
+        }
+
+        public void DisconnectedMenuSetting()
+        {
+            MainMenu.Items[0].Enabled = true;
+            MainMenu.Items[1].Enabled = true;
+            MainMenu.Items[2].Enabled = true;
+            MainMenu.Items[2].Title = "Connect";
+            SubSettings.MainMenu.Items[1].Enabled = false;
+
+            MenuPool.RefreshAll();
+        }
     }
 }
