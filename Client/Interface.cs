@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 using Lidgren.Network;
 
@@ -53,6 +54,26 @@ namespace CoopClient
         public static bool IsOnServer()
         {
             return Main.MainNetworking.IsOnServer();
+        }
+
+        public static bool IsMenuVisible()
+        {
+            return Main.MainMenu.MenuPool.AreAnyVisible;
+        }
+
+        public static bool IsChatFocused()
+        {
+            return Main.MainChat.Focused;
+        }
+
+        public static bool IsPlayerListVisible()
+        {
+            return Environment.TickCount - PlayerList.Pressed < 5000;
+        }
+
+        public static string GetCurrentVersion()
+        {
+            return Main.CurrentVersion;
         }
 
         public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool debug = false)

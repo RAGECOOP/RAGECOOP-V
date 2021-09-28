@@ -53,7 +53,7 @@ namespace CoopClient
                     ID = 0,
                     SocialClubName = Game.Player.Name,
                     Username = Main.MainSettings.Username,
-                    ModVersion = Main.CurrentModVersion,
+                    ModVersion = Main.CurrentVersion,
                     NpcsAllowed = false
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 

@@ -25,7 +25,7 @@ namespace CoopClient.Menus
         private readonly NativeItem AboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/GTACOOP-R~n~" +
             "~y~VERSION~s~~n~" +
-            Main.CurrentModVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
+            Main.CurrentVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
         #endregion
 
         public MenusMain()

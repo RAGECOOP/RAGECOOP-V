@@ -11,7 +11,7 @@ namespace CoopServer
 {
     class Server
     {
-        public static readonly string CurrentModVersion = "V0_7_0";
+        private static readonly string CompatibleVersion = "V0_8";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -26,6 +26,11 @@ namespace CoopServer
 
         public Server()
         {
+            Logging.Info("================");
+            Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
+            Logging.Info($"Compatible GTACoOp:R versions: {CompatibleVersion.Replace('_', '.')}.x");
+            Logging.Info("================");
+
             // 6d4ec318f1c43bd62fe13d5a7ab28650 = GTACOOP:R
             NetPeerConfiguration config = new("6d4ec318f1c43bd62fe13d5a7ab28650")
             {
@@ -333,9 +338,9 @@ namespace CoopServer
                 }
             }
 
-            if (packet.ModVersion != CurrentModVersion)
+            if (!packet.ModVersion.StartsWith(CompatibleVersion))
             {
-                local.Deny("Please update GTACoop:R to " + CurrentModVersion.Replace("_", "."));
+                local.Deny($"GTACoOp:R version {CompatibleVersion.Replace('_', '.')}.x required!");
                 return;
             }
 
