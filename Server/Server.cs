@@ -646,7 +646,7 @@ namespace CoopServer
         private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
         {
             List<NetConnection> clients;
-            if ((clients = Util.GetAllInRange(packet.Position, 300f, local)).Count == 0)
+            if ((clients = Util.GetAllInRange(packet.Position, 550f, local)).Count == 0)
             {
                 return;
             }
@@ -659,7 +659,7 @@ namespace CoopServer
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
         {
             List<NetConnection> clients;
-            if ((clients = Util.GetAllInRange(packet.Position, 300f, local)).Count == 0)
+            if ((clients = Util.GetAllInRange(packet.Position, 550f, local)).Count == 0)
             {
                 return;
             }

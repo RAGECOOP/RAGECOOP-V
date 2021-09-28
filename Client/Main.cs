@@ -136,19 +136,6 @@ namespace CoopClient
                         MainMenu.MainMenu.Visible = true;
                     }
                     break;
-                case Keys.T:
-                    if (MainNetworking.IsOnServer())
-                    {
-                        MainChat.Focused = true;
-                    }
-                    break;
-                case Keys.Y:
-                    if (MainNetworking.IsOnServer())
-                    {
-                        int currentTimestamp = Environment.TickCount;
-                        PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
-                    }
-                    break;
                 case Keys.G:
                     if (IsGoingToCar)
                     {
@@ -170,6 +157,25 @@ namespace CoopClient
                                 }
                             }
                         }
+                    }
+                    break;
+                default:
+                    if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
+                    {
+                        if (MainNetworking.IsOnServer())
+                        {
+                            int currentTimestamp = Environment.TickCount;
+                            PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                        }
+                        return;
+                    }
+                    else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
+                    {
+                        if (MainNetworking.IsOnServer())
+                        {
+                            MainChat.Focused = true;
+                        }
+                        return;
                     }
                     break;
             }

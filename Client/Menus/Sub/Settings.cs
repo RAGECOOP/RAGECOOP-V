@@ -10,9 +10,9 @@ namespace CoopClient.Menus.Sub
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
-        private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic", Main.DisableTraffic);
-        private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share Npcs", Main.ShareNpcsWithPlayers) { Enabled = false };
-        private readonly NativeSliderItem StreamedNpcsItem = new NativeSliderItem(string.Format("Streamed Npcs ({0})", Main.MainSettings.StreamedNpc), 20, Main.MainSettings.StreamedNpc > 20 ? 20 : Main.MainSettings.StreamedNpc);
+        private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic (Npcs/Vehicles)", "Local traffic only", Main.DisableTraffic);
+        private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share Npcs", "20 Npcs = 1mb / 12 seconds (UPLOAD)", Main.ShareNpcsWithPlayers) { Enabled = false };
+        private readonly NativeSliderItem StreamedNpcsItem = new NativeSliderItem($"Streamed Npcs ({Main.MainSettings.StreamedNpc})", 20, Main.MainSettings.StreamedNpc > 20 ? 20 : Main.MainSettings.StreamedNpc);
         private readonly NativeCheckboxItem FlipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
 #if DEBUG
         private readonly NativeCheckboxItem UseDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
