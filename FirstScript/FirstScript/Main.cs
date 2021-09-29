@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 
 using GTA;
 
@@ -51,8 +49,8 @@ namespace FirstScript
                 return;
             }
 
-            CoopClient.Interface.SendDataToAll("FirstScript", 0, new TestPacketClass() { A = 5, B = 15 }.SerializeToByteArray());
-            CoopClient.Interface.SendDataToAll("FirstScript", 1, new SetPlayerTimePacket() { Hours = 0, Minutes = 0, Seconds = 0 }.SerializeToByteArray());
+            CoopClient.Interface.SendDataToAll("FirstScript", 0, CoopClient.CoopSerializer.CSerialize(new TestPacketClass() { A = 5, B = 15 }));
+            //CoopClient.Interface.SendDataToAll("FirstScript", 1, CoopClient.CoopSerializer.CSerialize(new SetPlayerTimePacket() { Hours = 0, Minutes = 0, Seconds = 0 }));
         }
 
         private void OnModPacketReceived(long from, string mod, byte customID, byte[] bytes)
@@ -65,51 +63,13 @@ namespace FirstScript
             switch (customID)
             {
                 case 0:
-                    TestPacketClass testPacketClass = bytes.Deserialize<TestPacketClass>();
+                    TestPacketClass testPacketClass = CoopClient.CoopSerializer.CDeserialize<TestPacketClass>(bytes);
 
                     GTA.UI.Notification.Show($"ModPacket(0)({from}): A[{testPacketClass.A}] B[{testPacketClass.B}]");
-                    break;
-                case 1:
-                    GTA.UI.Notification.Show($"ModPacket(0)({from}): Nice!");
                     break;
                 default:
                     GTA.UI.Notification.Show($"ModPacket({from}): ~r~Unknown customID!");
                     break;
-            }
-        }
-    }
-
-    public static class CustomSerializer
-    {
-        public static byte[] SerializeToByteArray(this object obj)
-        {
-            if (obj == null)
-            {
-                return null;
-            }
-
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
-        }
-
-        public static T Deserialize<T>(this byte[] byteArray) where T : class
-        {
-            if (byteArray == null)
-            {
-                return null;
-            }
-
-            using (MemoryStream memStream = new MemoryStream())
-            {
-                BinaryFormatter binForm = new BinaryFormatter();
-                memStream.Write(byteArray, 0, byteArray.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                T obj = (T)binForm.Deserialize(memStream);
-                return obj;
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
 
 using Lidgren.Network;
 using ProtoBuf;
@@ -148,7 +149,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.ModPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -158,7 +159,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            ModPacket data = CoopSerializer.Deserialize<ModPacket>(message.ReadBytes(len));
+            ModPacket data = message.ReadBytes(len).Deserialize<ModPacket>();
 
             ID = data.ID;
             Mod = data.Mod;
@@ -190,7 +191,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.HandshakePacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -200,7 +201,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            HandshakePacket data = CoopSerializer.Deserialize<HandshakePacket>(message.ReadBytes(len));
+            HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
 
             ID = data.ID;
             SocialClubName = data.SocialClubName;
@@ -226,7 +227,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.PlayerConnectPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -236,7 +237,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            PlayerConnectPacket data = CoopSerializer.Deserialize<PlayerConnectPacket>(message.ReadBytes(len));
+            PlayerConnectPacket data = message.ReadBytes(len).Deserialize<PlayerConnectPacket>();
 
             ID = data.ID;
             SocialClubName = data.SocialClubName;
@@ -254,7 +255,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.PlayerDisconnectPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -264,7 +265,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            PlayerDisconnectPacket data = CoopSerializer.Deserialize<PlayerDisconnectPacket>(message.ReadBytes(len));
+            PlayerDisconnectPacket data = message.ReadBytes(len).Deserialize<PlayerDisconnectPacket>();
 
             ID = data.ID;
         }
@@ -320,7 +321,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.FullSyncPlayerPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -330,7 +331,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            FullSyncPlayerPacket data = CoopSerializer.Deserialize<FullSyncPlayerPacket>(message.ReadBytes(len));
+            FullSyncPlayerPacket data = message.ReadBytes(len).Deserialize<FullSyncPlayerPacket>();
 
             Extra = data.Extra;
             ModelHash = data.ModelHash;
@@ -396,7 +397,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.FullSyncPlayerVehPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -406,7 +407,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            FullSyncPlayerVehPacket data = CoopSerializer.Deserialize<FullSyncPlayerVehPacket>(message.ReadBytes(len));
+            FullSyncPlayerVehPacket data = message.ReadBytes(len).Deserialize<FullSyncPlayerVehPacket>();
 
             Extra = data.Extra;
             ModelHash = data.ModelHash;
@@ -454,7 +455,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.LightSyncPlayerPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -464,7 +465,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            LightSyncPlayerPacket data = CoopSerializer.Deserialize<LightSyncPlayerPacket>(message.ReadBytes(len));
+            LightSyncPlayerPacket data = message.ReadBytes(len).Deserialize<LightSyncPlayerPacket>();
 
             Extra = data.Extra;
             Rotation = data.Rotation;
@@ -510,7 +511,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.LightSyncPlayerVehPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -520,7 +521,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            LightSyncPlayerVehPacket data = CoopSerializer.Deserialize<LightSyncPlayerVehPacket>(message.ReadBytes(len));
+            LightSyncPlayerVehPacket data = message.ReadBytes(len).Deserialize<LightSyncPlayerVehPacket>();
 
             Extra = data.Extra;
             VehModelHash = data.VehModelHash;
@@ -544,7 +545,7 @@ namespace CoopServer
         {
             message.Write((byte)PacketTypes.SuperLightSyncPlayerPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            byte[] result = this.Serialize();
 
             message.Write(result.Length);
             message.Write(result);
@@ -554,7 +555,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            SuperLightSyncPlayerPacket data = CoopSerializer.Deserialize<SuperLightSyncPlayerPacket>(message.ReadBytes(len));
+            SuperLightSyncPlayerPacket data = message.ReadBytes(len).Deserialize<SuperLightSyncPlayerPacket>();
 
             Extra = data.Extra;
         }
@@ -583,7 +584,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            ChatMessagePacket data = CoopSerializer.Deserialize<ChatMessagePacket>(message.ReadBytes(len));
+            ChatMessagePacket data = message.ReadBytes(len).Deserialize<ChatMessagePacket>();
 
             Username = data.Username;
             Message = data.Message;
@@ -614,7 +615,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            NativeCallPacket data = CoopSerializer.Deserialize<NativeCallPacket>(message.ReadBytes(len));
+            NativeCallPacket data = message.ReadBytes(len).Deserialize<NativeCallPacket>();
 
             Hash = data.Hash;
             Args = data.Args;
@@ -717,7 +718,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            FullSyncNpcPacket data = CoopSerializer.Deserialize<FullSyncNpcPacket>(message.ReadBytes(len));
+            FullSyncNpcPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcPacket>();
 
             ID = data.ID;
             ModelHash = data.ModelHash;
@@ -801,7 +802,7 @@ namespace CoopServer
         {
             int len = message.ReadInt32();
 
-            FullSyncNpcVehPacket data = CoopSerializer.Deserialize<FullSyncNpcVehPacket>(message.ReadBytes(len));
+            FullSyncNpcVehPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcVehPacket>();
 
             ID = data.ID;
             ModelHash = data.ModelHash;
@@ -824,16 +825,42 @@ namespace CoopServer
     }
     #endregion
 
-    class CoopSerializer
+    public static class CoopSerializer
     {
-        public static T Deserialize<T>(byte[] data) where T : new()
+        public static byte[] CSerialize(this object obj)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            BinaryFormatter bf = new BinaryFormatter();
+            using MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, obj);
+            return ms.ToArray();
+        }
+
+        public static T CDeserialize<T>(this byte[] bytes) where T : class
+        {
+            if (bytes == null)
+            {
+                return null;
+            }
+
+            using MemoryStream memStream = new MemoryStream();
+            BinaryFormatter binForm = new BinaryFormatter();
+            memStream.Write(bytes, 0, bytes.Length);
+            memStream.Seek(0, SeekOrigin.Begin);
+            T obj = (T)binForm.Deserialize(memStream);
+            return obj;
+        }
+
+        internal static T Deserialize<T>(this byte[] data) where T : new()
         {
             try
             {
-                using (MemoryStream stream = new MemoryStream(data))
-                {
-                    return Serializer.Deserialize<T>(stream);
-                }
+                using MemoryStream stream = new(data);
+                return Serializer.Deserialize<T>(stream);
             }
             catch
             {
@@ -841,13 +868,11 @@ namespace CoopServer
             }
         }
 
-        public static byte[] Serialize<T>(T packet)
+        internal static byte[] Serialize<T>(this T packet)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                Serializer.Serialize(stream, packet);
-                return stream.ToArray();
-            }
+            using MemoryStream stream = new();
+            Serializer.Serialize(stream, packet);
+            return stream.ToArray();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CoopServer;
+using System.Collections.Generic;
 
 namespace FirstGameMode
 {
@@ -37,6 +38,15 @@ namespace FirstGameMode
                     ctx.Client.SendNativeCall(0x47C3B5848C3E45D8, hours, minutes, seconds);
                     break;
             }
+        }
+
+        [Command("inrange")]
+        public static void InRangeCommand(CommandContext ctx)
+        {
+            List<string> list = new();
+            API.GetAllClients().FindAll(x => x.Player.IsInRangeOf(ctx.Client.Player.Position, 15f)).ForEach(x => list.Add(x.Player.Username));
+
+            ctx.Client.SendChatMessage(string.Join(", ", list.ToArray()));
         }
     }
 }
