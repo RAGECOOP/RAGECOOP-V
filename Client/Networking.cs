@@ -224,6 +224,12 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
                                 DecodeNativeCall((NativeCallPacket)packet);
                                 break;
+                            case (byte)PacketTypes.ModPacket:
+                                packet = new ModPacket();
+                                packet.NetIncomingMessageToPacket(message);
+                                ModPacket modPacket = (ModPacket)packet;
+                                Interface.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
+                                break;
                         }
                         break;
                     case NetIncomingMessageType.ConnectionLatencyUpdated:
@@ -238,13 +244,12 @@ namespace CoopClient
                         break;
                 }
 
-                Interface.MessageReceived(message);
                 Client.Recycle(message);
             }
         }
 
-#region -- GET --
-#region -- PLAYER --
+        #region -- GET --
+        #region -- PLAYER --
         private void PlayerConnect(PlayerConnectPacket packet)
         {
             EntitiesPlayer player = new EntitiesPlayer()
@@ -445,9 +450,9 @@ namespace CoopClient
 
             Function.Call((Hash)packet.Hash, arguments.ToArray());
         }
-#endregion // -- PLAYER --
+        #endregion // -- PLAYER --
 
-#region -- NPC --
+        #region -- NPC --
         private void FullSyncNpc(FullSyncNpcPacket packet)
         {
             lock (Main.Npcs)
@@ -567,10 +572,10 @@ namespace CoopClient
                 }
             }
         }
-#endregion // -- NPC --
-#endregion
+        #endregion // -- NPC --
+        #endregion
 
-#region -- SEND --
+        #region -- SEND --
         private int LastPlayerFullSync = 0;
         public void SendPlayerData()
         {
@@ -694,12 +699,12 @@ namespace CoopClient
             Client.SendMessage(outgoingMessage, messageType);
             Client.FlushSendQueue();
 
-#if DEBUG
+            #if DEBUG
             if (ShowNetworkInfo)
             {
                 BytesSend += outgoingMessage.LengthBytes;
             }
-#endif
+            #endif
         }
 
         public void SendNpcData(Ped npc)
@@ -763,12 +768,12 @@ namespace CoopClient
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
             Client.FlushSendQueue();
 
-#if DEBUG
+            #if DEBUG
             if (ShowNetworkInfo)
             {
                 BytesSend += outgoingMessage.LengthBytes;
             }
-#endif
+            #endif
         }
 
         public void SendChatMessage(string message)
@@ -782,13 +787,34 @@ namespace CoopClient
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
             Client.FlushSendQueue();
 
-#if DEBUG
+            #if DEBUG
             if (ShowNetworkInfo)
             {
                 BytesSend += outgoingMessage.LengthBytes;
             }
-#endif
+            #endif
         }
-#endregion
+
+        public void SendModData(string mod, byte customID, byte[] bytes)
+        {
+            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            new ModPacket()
+            {
+                ID = Main.LocalClientID,
+                Mod = mod,
+                CustomPacketID = customID,
+                Bytes = bytes
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.FlushSendQueue();
+
+            #if DEBUG
+            if (ShowNetworkInfo)
+            {
+                BytesSend += outgoingMessage.LengthBytes;
+            }
+            #endif
+        }
+        #endregion
     }
 }

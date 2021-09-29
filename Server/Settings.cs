@@ -9,6 +9,7 @@
         public string GameMode { get; set; } = "";
         public bool Allowlist { get; set; } = false;
         public bool NpcsAllowed { get; set; } = true;
+        public bool ModsAllowed {  get; set; } = false;
         public bool UPnP { get; set; } = true;
         public bool DebugMode { get; set; } = false;
     }

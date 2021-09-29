@@ -17,6 +17,7 @@ namespace CoopServer
         #region DELEGATES
         public delegate void ChatEvent(string username, string message, CancelEventArgs cancel);
         public delegate void PlayerEvent(Client client);
+        public delegate void ModEvent(long from, string mod, byte customID, byte[] bytes, CancelEventArgs args);
         #endregion
 
         #region EVENTS
@@ -25,6 +26,7 @@ namespace CoopServer
         public event PlayerEvent OnPlayerConnected;
         public event PlayerEvent OnPlayerDisconnected;
         public event PlayerEvent OnPlayerPositionUpdate;
+        public event ModEvent OnModPacketReceived;
 
         internal void InvokeStart()
         {
@@ -51,6 +53,13 @@ namespace CoopServer
         internal void InvokePlayerPositionUpdate(PlayerData playerData)
         {
             OnPlayerPositionUpdate?.Invoke(Server.Clients.First(x => x.Player.Username == playerData.Username));
+        }
+
+        internal bool InvokeModPacketReceived(long from, string mod, byte customID, byte[] bytes)
+        {
+            CancelEventArgs args = new(false);
+            OnModPacketReceived?.Invoke(from, mod, customID, bytes, args);
+            return args.Cancel;
         }
         #endregion
 

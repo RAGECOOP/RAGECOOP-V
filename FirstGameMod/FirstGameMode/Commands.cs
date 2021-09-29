@@ -1,71 +1,42 @@
-﻿using System.Linq;
-
-using CoopServer;
+﻿using CoopServer;
 
 namespace FirstGameMode
 {
     class Commands
     {
-        [Command("hello")]
-        public static void HelloCommand(CommandContext ctx)
+        [Command("set")]
+        public static void TimeCommand(CommandContext ctx)
         {
-            ctx.Client.SendChatMessage("Hello " + ctx.Client.Player.Username + " :)");
-        }
-
-        [Command("inrange")]
-        public static void InRangeCommand(CommandContext ctx)
-        {
-            if (ctx.Client.Player.IsInRangeOf(new LVector3(0f, 0f, 75f), 7f))
+            if (ctx.Args.Length < 1)
             {
-                ctx.Client.SendChatMessage("You are in range! :)");
+                ctx.Client.SendChatMessage("Please use \"/set <OPTION> ...\"");
+                return;
             }
-            else
+            else if (ctx.Args.Length < 2)
             {
-                ctx.Client.SendChatMessage("You are not in range! :(");
-            }
-        }
-
-        [Command("online")]
-        public static void OnlineCommand(CommandContext ctx)
-        {
-            ctx.Client.SendChatMessage(API.GetAllClientsCount() + " player online!");
-        }
-
-        [Command("kick")]
-        public static void KickCommand(CommandContext ctx)
-        {
-            if (ctx.Args.Length < 2)
-            {
-                ctx.Client.SendChatMessage("Please use \"/kick <USERNAME> <REASON>\"");
+                ctx.Client.SendChatMessage($"Please use \"/set {ctx.Args[0]} ...\"");
                 return;
             }
 
-            ctx.Client.Kick(ctx.Args.Skip(1).ToArray());
-        }
-
-        [Command("setweather")]
-        public static void SetWeatherCommand(CommandContext ctx)
-        {
-            int hours, minutes, seconds;
-
-            if (ctx.Args.Length < 3)
+            switch (ctx.Args[0])
             {
-                ctx.Client.SendChatMessage("Please use \"/setweather <HOURS> <MINUTES> <SECONDS>\"");
-                return;
-            }
-            else if (!int.TryParse(ctx.Args[0], out hours) || !int.TryParse(ctx.Args[1], out minutes) || !int.TryParse(ctx.Args[2], out seconds))
-            {
-                ctx.Client.SendChatMessage("Please use \"/setweather <NUMBER> <NUMBER> <NUMBER>\"");
-                return;
-            }
+                case "time":
+                    int hours, minutes, seconds;
 
-            ctx.Client.SendNativeCall(0x47C3B5848C3E45D8, hours, minutes, seconds);
-        }
+                    if (ctx.Args.Length < 4)
+                    {
+                        ctx.Client.SendChatMessage("Please use \"/set time <HOURS> <MINUTES> <SECONDS>\"");
+                        return;
+                    }
+                    else if (!int.TryParse(ctx.Args[1], out hours) || !int.TryParse(ctx.Args[2], out minutes) || !int.TryParse(ctx.Args[3], out seconds))
+                    {
+                        ctx.Client.SendChatMessage($"Please use \"/set time <NUMBER> <NUMBER> <NUMBER>\"");
+                        return;
+                    }
 
-        [Command("upp")]
-        public static void UpdatePlayerPositionCommand(CommandContext ctx)
-        {
-            ctx.Client.SetData("ShowPlayerPosition", !ctx.Client.GetData<bool>("ShowPlayerPosition"));
+                    ctx.Client.SendNativeCall(0x47C3B5848C3E45D8, hours, minutes, seconds);
+                    break;
+            }
         }
     }
 }

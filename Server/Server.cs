@@ -280,6 +280,38 @@ namespace CoopServer
                                         message.SenderConnection.Disconnect("Npcs are not allowed!");
                                     }
                                     break;
+                                case (byte)PacketTypes.ModPacket:
+                                    if (MainSettings.ModsAllowed)
+                                    {
+                                        try
+                                        {
+                                            packet = new ModPacket();
+                                            packet.NetIncomingMessageToPacket(message);
+
+                                            ModPacket modPacket = (ModPacket)packet;
+                                            if (GameMode != null)
+                                            {
+                                                if (GameMode.API.InvokeModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                {
+                                                    break;
+                                                }
+                                            }
+
+                                            // Send back to all players
+                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                            modPacket.PacketToNetOutGoingMessage(outgoingMessage);
+                                            MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        message.SenderConnection.Disconnect("Mods are not allowed!");
+                                    }
+                                    break;
                                 default:
                                     Logging.Error("Unhandled Data / Packet type");
                                     break;

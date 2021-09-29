@@ -1,22 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
 
-using Lidgren.Network;
-
 namespace CoopClient
 {
     public static class Interface
     {
         #region DELEGATES
         public delegate void ConnectEvent(bool connected, string reason = null);
-        public delegate void MessageEvent(NetIncomingMessage message);
         public delegate void ChatMessage(string from, string message, CancelEventArgs args);
+        public delegate void ModEvent(long from, string mod, byte customID, byte[] bytes);
         #endregion
 
         #region EVENTS
         public static event ConnectEvent OnConnection;
-        public static event MessageEvent OnMessage;
         public static event ChatMessage OnChatMessage;
+        public static event ModEvent OnModPacketReceived;
 
         internal static void Connected()
         {
@@ -28,9 +26,9 @@ namespace CoopClient
             OnConnection?.Invoke(false, reason);
         }
 
-        internal static void MessageReceived(NetIncomingMessage message)
+        internal static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
         {
-            OnMessage?.Invoke(message);
+            OnModPacketReceived?.Invoke(from, mod, customID, bytes);
         }
 
         internal static bool ChatMessageReceived(string from, string message)
@@ -51,14 +49,28 @@ namespace CoopClient
             Main.MainNetworking.DisConnectFromServer(serverAddress);
         }
 
+        public static void Disconnect()
+        {
+            Main.MainNetworking.DisConnectFromServer(null);
+        }
+
         public static bool IsOnServer()
         {
             return Main.MainNetworking.IsOnServer();
         }
 
+        public static long GetLocalID()
+        {
+            return Main.LocalClientID;
+        }
+
         public static bool IsMenuVisible()
         {
+#if NON_INTERACTIVE
+            return false;
+#else
             return Main.MainMenu.MenuPool.AreAnyVisible;
+#endif
         }
 
         public static bool IsChatFocused()
@@ -74,6 +86,12 @@ namespace CoopClient
         public static string GetCurrentVersion()
         {
             return Main.CurrentVersion;
+        }
+
+        // Send bytes to all players
+        public static void SendDataToAll(string mod, byte customID, byte[] bytes)
+        {
+            Main.MainNetworking.SendModData(mod, customID, bytes);
         }
 
         public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool debug = false)

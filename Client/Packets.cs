@@ -127,7 +127,8 @@ namespace CoopClient
         FullSyncNpcPacket,
         FullSyncNpcVehPacket,
         ChatMessagePacket,
-        NativeCallPacket
+        NativeCallPacket,
+        ModPacket
     }
 
     [Flags]
@@ -193,6 +194,44 @@ namespace CoopClient
     {
         public abstract void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
+    }
+
+    [ProtoContract]
+    class ModPacket : Packet
+    {
+        [ProtoMember(1)]
+        public long ID { get; set; }
+
+        [ProtoMember(2)]
+        public string Mod { get; set; }
+
+        [ProtoMember(3)]
+        public byte CustomPacketID { get; set; }
+
+        [ProtoMember(4)]
+        public byte[] Bytes { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.ModPacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            ModPacket data = CoopSerializer.Deserialize<ModPacket>(message.ReadBytes(len));
+
+            ID = data.ID;
+            Mod = data.Mod;
+            CustomPacketID = data.CustomPacketID;
+            Bytes = data.Bytes;
+        }
     }
 
     #region -- PLAYER --

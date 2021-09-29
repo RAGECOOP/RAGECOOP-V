@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.ComponentModel;
 using System.Timers;
 
@@ -6,11 +8,18 @@ using CoopServer;
 
 namespace FirstGameMode
 {
+    [Serializable]
+    public class SetPlayerTime
+    {
+        public int Hours {  get; set; }
+        public int Minutes {  get; set; }
+        public int Seconds {  get; set; }
+    }
+
     public class Main : ServerScript
     {
         private static readonly Timer RunningSinceTimer = new() { Interval = 1000 };
         private static int RunningSince = 0;
-        private static readonly List<string> SecretLocation = new();
 
         public Main()
         {
@@ -20,10 +29,24 @@ namespace FirstGameMode
             API.OnPlayerConnected += OnPlayerConnected;
             API.OnPlayerDisconnected += OnPlayerDisconnected;
             API.OnChatMessage += OnChatMessage;
-            API.OnPlayerPositionUpdate += OnPlayerPositionUpdate;
+            API.OnModPacketReceived += OnModPacketReceived;
 
             API.RegisterCommand("running", RunningCommand);
             API.RegisterCommands<Commands>();
+        }
+
+        private void OnModPacketReceived(long from, string mod, byte customID, byte[] bytes, CancelEventArgs args)
+        {
+            if (mod == "FirstScript" && customID == 1)
+            {
+                args.Cancel = true;
+
+                // Get data from bytes
+                SetPlayerTime setPlayerTime = bytes.Deserialize<SetPlayerTime>();
+
+                // Find the client by 'from' and send the time back as a nativecall
+                API.GetAllClients().Find(x => x.ID == from).SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
+            }
         }
 
         public static void RunningCommand(CommandContext ctx)
@@ -57,17 +80,39 @@ namespace FirstGameMode
 
             API.SendChatMessageToAll(message, username);
         }
+    }
 
-        public static void OnPlayerPositionUpdate(Client client)
+    public static class CustomSerializer
+    {
+        public static byte[] SerializeToByteArray(this object obj)
         {
-            if (client.HasData("ShowPlayerPosition") && client.GetData<bool>("ShowPlayerPosition"))
+            if (obj == null)
             {
-                if (!SecretLocation.Contains(client.Player.Username) && client.Player.IsInRangeOf(new LVector3(0, 0, 75), 7f))
-                {
-                    client.SendChatMessage("Hey! you find this secret location!");
-                    SecretLocation.Add(client.Player.Username);
-                    return;
-                }
+                return null;
+            }
+
+            BinaryFormatter bf = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                bf.Serialize(ms, obj);
+                return ms.ToArray();
+            }
+        }
+
+        public static T Deserialize<T>(this byte[] byteArray) where T : class
+        {
+            if (byteArray == null)
+            {
+                return null;
+            }
+
+            using (MemoryStream memStream = new MemoryStream())
+            {
+                BinaryFormatter binForm = new BinaryFormatter();
+                memStream.Write(byteArray, 0, byteArray.Length);
+                memStream.Seek(0, SeekOrigin.Begin);
+                T obj = (T)binForm.Deserialize(memStream);
+                return obj;
             }
         }
     }
