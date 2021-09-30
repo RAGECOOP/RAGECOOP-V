@@ -50,7 +50,7 @@ namespace FirstScript
             }
 
             CoopClient.Interface.SendDataToAll("FirstScript", 0, CoopClient.CoopSerializer.CSerialize(new TestPacketClass() { A = 5, B = 15 }));
-            //CoopClient.Interface.SendDataToAll("FirstScript", 1, CoopClient.CoopSerializer.CSerialize(new SetPlayerTimePacket() { Hours = 0, Minutes = 0, Seconds = 0 }));
+            CoopClient.Interface.SendDataToPlayer(CoopClient.Interface.GetLocalID(), "FirstScript", 1, CoopClient.CoopSerializer.CSerialize(new SetPlayerTimePacket() { Hours = 1, Minutes = 2, Seconds = 3 }));
         }
 
         private void OnModPacketReceived(long from, string mod, byte customID, byte[] bytes)

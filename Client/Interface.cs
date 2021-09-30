@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace CoopClient
 {
@@ -64,6 +66,19 @@ namespace CoopClient
             return Main.LocalClientID;
         }
 
+        public static Dictionary<long, int?> GetAllPlayers()
+        {
+            Dictionary<long, int?> result = new Dictionary<long, int?>();
+            lock (Main.Players)
+            {
+                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalClientID))
+                {
+                    result.Add(player.Key, player.Value.Character?.Handle);
+                }
+            }
+            return result;
+        }
+
         public static bool IsMenuVisible()
         {
 #if NON_INTERACTIVE
@@ -91,7 +106,13 @@ namespace CoopClient
         // Send bytes to all players
         public static void SendDataToAll(string mod, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(mod, customID, bytes);
+            Main.MainNetworking.SendModData(0, mod, customID, bytes);
+        }
+
+        // Send bytes to target
+        public static void SendDataToPlayer(long target, string mod, byte customID, byte[] bytes)
+        {
+            Main.MainNetworking.SendModData(target, mod, customID, bytes);
         }
 
         public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool debug = false)

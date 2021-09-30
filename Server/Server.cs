@@ -291,14 +291,32 @@ namespace CoopServer
                                             ModPacket modPacket = (ModPacket)packet;
                                             if (GameMode != null)
                                             {
-                                                if (GameMode.API.InvokeModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                if (GameMode.API.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                                 {
                                                     break;
                                                 }
                                             }
 
+                                            NetOutgoingMessage outgoingMessage;
+
+                                            NetConnection target;
+                                            if (modPacket.Target != 0)
+                                            {
+                                                target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
+                                                if (target == null)
+                                                {
+                                                    Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
+                                                    return;
+                                                }
+
+                                                // Send back to target
+                                                outgoingMessage = MainNetServer.CreateMessage();
+                                                modPacket.PacketToNetOutGoingMessage(outgoingMessage);
+                                                MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                            }
+
                                             // Send back to all players
-                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                            outgoingMessage = MainNetServer.CreateMessage();
                                             modPacket.PacketToNetOutGoingMessage(outgoingMessage);
                                             MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
                                         }

@@ -795,12 +795,13 @@ namespace CoopClient
             #endif
         }
 
-        public void SendModData(string mod, byte customID, byte[] bytes)
+        public void SendModData(long target, string mod, byte customID, byte[] bytes)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new ModPacket()
             {
                 ID = Main.LocalClientID,
+                Target = target,
                 Mod = mod,
                 CustomPacketID = customID,
                 Bytes = bytes

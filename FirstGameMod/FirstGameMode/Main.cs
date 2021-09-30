@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Timers;
+using System.Linq;
 
 using CoopServer;
 
@@ -33,7 +34,7 @@ namespace FirstGameMode
             API.RegisterCommands<Commands>();
         }
 
-        private void OnModPacketReceived(long from, string mod, byte customID, byte[] bytes, CancelEventArgs args)
+        private void OnModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes, CancelEventArgs args)
         {
             if (mod != "FirstScript" || customID != 1)
             {
@@ -46,7 +47,13 @@ namespace FirstGameMode
             SetPlayerTime setPlayerTime = bytes.CDeserialize<SetPlayerTime>();
 
             // Find the client by 'from' and send the time back as a nativecall
-            API.GetAllClients().Find(x => x.ID == from).SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
+            //API.GetAllClients().Find(x => x.ID == from).SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
+
+            // Find the client by 'target' and send the time back as a nativecall
+            Client targetClient = API.GetAllClients().FirstOrDefault(x => x.ID == target);
+
+            targetClient.SendChatMessage($"New modpacket nativecall from \"{API.GetAllClients().FirstOrDefault(x => x.ID == from)?.Player.Username}\"");
+            targetClient.SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
         }
 
         public static void RunningCommand(CommandContext ctx)

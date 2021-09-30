@@ -137,12 +137,15 @@ namespace CoopServer
         public long ID { get; set; }
 
         [ProtoMember(2)]
-        public string Mod { get; set; }
+        public long Target { get; set; }
 
         [ProtoMember(3)]
-        public byte CustomPacketID { get; set; }
+        public string Mod { get; set; }
 
         [ProtoMember(4)]
+        public byte CustomPacketID { get; set; }
+
+        [ProtoMember(5)]
         public byte[] Bytes { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -162,6 +165,7 @@ namespace CoopServer
             ModPacket data = message.ReadBytes(len).Deserialize<ModPacket>();
 
             ID = data.ID;
+            Target = data.Target;
             Mod = data.Mod;
             CustomPacketID = data.CustomPacketID;
             Bytes = data.Bytes;
