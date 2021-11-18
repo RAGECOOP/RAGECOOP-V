@@ -8,10 +8,12 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
+| ✅ New updates on 11/20/2021 |
+| --- |
+
 | ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
 | --- |
 
-WEB: https://gtacoopr.entenkoeniq.de/
 
 # 📋 Requirements
 - Visual Studio 2019
