@@ -16,14 +16,15 @@
 
 
 # 📋 Requirements
-- Visual Studio 2019
-- .NET 5.0
+- Visual Studio 2022
+- .NET 6.0
 - .NET Framework 4.8
 
 # 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/0322c0b7bd85c233e284616250be3deb3d1a0303)
-- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/c4e6db07bf2bc9d7cb1730b11137b2694fdb5c62)
-- [Lidgren Network](https://github.com/lidgren/lidgren-network-gen3/tree/f99b006d9af8a9a230ba7c5ce0320fc727ebae0c)
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/9edc0871bd857616a39055cbd31b33f6c2b8160e)
+- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/1342949cd19eaa4115990793311681ea1568054c)
+- Lidgren Network Custom (***PRIVATE***)
+- - No new features (only improvements)
 - [Protobuf-net](https://www.nuget.org/packages/protobuf-net/2.4.6)
 - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 
