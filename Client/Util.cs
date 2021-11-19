@@ -175,9 +175,6 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.LastSyncWasFull;
             }
 
-            // Ped is in vehicle
-            flags |= (byte)VehicleDataFlags.IsInVehicle;
-
             if (veh.IsEngineRunning)
             {
                 flags |= (byte)VehicleDataFlags.IsEngineRunning;
@@ -243,11 +240,6 @@ namespace CoopClient
             if (ped.IsOnFire)
             {
                 flags |= (byte)PedDataFlags.IsOnFire;
-            }
-
-            if (ped.IsInVehicle())
-            {
-                flags |= (byte)PedDataFlags.IsInVehicle;
             }
 
             return flags;

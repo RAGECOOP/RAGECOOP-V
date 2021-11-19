@@ -141,8 +141,7 @@ namespace CoopClient
         IsReloading = 1 << 3,
         IsJumping = 1 << 4,
         IsRagdoll = 1 << 5,
-        IsOnFire = 1 << 6,
-        IsInVehicle = 1 << 7
+        IsOnFire = 1 << 6
     }
 
     #region ===== VEHICLE DATA =====
@@ -150,12 +149,11 @@ namespace CoopClient
     enum VehicleDataFlags
     {
         LastSyncWasFull = 1 << 0,
-        IsInVehicle = 1 << 1,
-        IsEngineRunning = 1 << 2,
-        AreLightsOn = 1 << 3,
-        AreHighBeamsOn = 1 << 4,
-        IsSirenActive = 1 << 5,
-        IsDead = 1 << 6
+        IsEngineRunning = 1 << 1,
+        AreLightsOn = 1 << 2,
+        AreHighBeamsOn = 1 << 3,
+        IsSirenActive = 1 << 4,
+        IsDead = 1 << 5
     }
 
     [ProtoContract]

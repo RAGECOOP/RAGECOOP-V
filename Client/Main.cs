@@ -264,7 +264,7 @@ namespace CoopClient
                 DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
                 DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                DebugSyncPed.IsInVehicle = (flags.Value & (byte)PedDataFlags.IsInVehicle) > 0;
+                DebugSyncPed.IsInVehicle = false;
 
                 if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
                 {
@@ -300,7 +300,7 @@ namespace CoopClient
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
                 DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
-                DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
+                DebugSyncPed.IsInVehicle = true;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
