@@ -297,12 +297,12 @@ namespace CoopServer
                                                 }
                                             }
 
-                                            NetOutgoingMessage outgoingMessage;
+                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                            modPacket.PacketToNetOutGoingMessage(outgoingMessage);
 
-                                            NetConnection target;
                                             if (modPacket.Target != 0)
                                             {
-                                                target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
+                                                NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
                                                 if (target == null)
                                                 {
                                                     Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
@@ -310,15 +310,13 @@ namespace CoopServer
                                                 }
 
                                                 // Send back to target
-                                                outgoingMessage = MainNetServer.CreateMessage();
-                                                modPacket.PacketToNetOutGoingMessage(outgoingMessage);
                                                 MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
                                             }
-
-                                            // Send back to all players
-                                            outgoingMessage = MainNetServer.CreateMessage();
-                                            modPacket.PacketToNetOutGoingMessage(outgoingMessage);
-                                            MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                            else
+                                            {
+                                                // Send back to all players
+                                                MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                            }
                                         }
                                         catch (Exception e)
                                         {
