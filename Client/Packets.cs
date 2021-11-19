@@ -444,24 +444,30 @@ namespace CoopClient
         public float VehEngineHealth { get; set; }
 
         [ProtoMember(9)]
-        public LVector3 VehVelocity { get; set; }
+        public float VehRPM { get; set; }
 
         [ProtoMember(10)]
-        public float VehSpeed { get; set; }
+        public LVector3 VehVelocity { get; set; }
 
         [ProtoMember(11)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSpeed { get; set; }
 
         [ProtoMember(12)]
-        public int[] VehColors { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
-        public Dictionary<int, int> VehMods { get; set; }
+        public int[] VehColors { get; set; }
 
         [ProtoMember(14)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(15)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(16)]
+        public int VehTires { get; set; }
+
+        [ProtoMember(17)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -488,12 +494,14 @@ namespace CoopClient
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
             VehEngineHealth = data.VehEngineHealth;
+            VehRPM = data.VehRPM;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;
+            VehTires = data.VehTires;
             Flag = data.Flag;
         }
     }
@@ -839,24 +847,30 @@ namespace CoopClient
         public float VehEngineHealth { get; set; }
 
         [ProtoMember(11)]
-        public LVector3 VehVelocity { get; set; }
+        public float VehRPM { get; set; }
 
         [ProtoMember(12)]
-        public float VehSpeed { get; set; }
+        public LVector3 VehVelocity { get; set; }
 
         [ProtoMember(13)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSpeed { get; set; }
 
         [ProtoMember(14)]
-        public int[] VehColors { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(15)]
-        public Dictionary<int, int> VehMods { get; set; }
+        public int[] VehColors { get; set; }
 
         [ProtoMember(16)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(17)]
+        public VehicleDoors[] VehDoors { get; set; }
+
+        [ProtoMember(18)]
+        public int VehTires { get; set; }
+
+        [ProtoMember(19)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -885,12 +899,14 @@ namespace CoopClient
             VehPosition = data.VehPosition;
             VehRotation = data.VehRotation;
             VehEngineHealth = data.VehEngineHealth;
+            VehRPM = data.VehRPM;
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
             VehColors = data.VehColors;
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;
+            VehTires = data.VehTires;
             Flag = data.Flag;
         }
     }

@@ -67,7 +67,7 @@ namespace CoopClient
             }
         }
 
-        public static unsafe void CustomSteeringAngle(int handle, float value)
+        public static unsafe void CustomSteeringAngle(this int handle, float value)
         {
             IntPtr address = new IntPtr((long)GetEntityAddressFunc(handle));
             if (address == IntPtr.Zero || SteeringAngleOffset == 0)
@@ -79,7 +79,7 @@ namespace CoopClient
         }
         #endregion
 
-        public static Model ModelRequest(int hash)
+        public static Model ModelRequest(this int hash)
         {
             Model model = new Model(hash);
             short counter = 0;
@@ -119,7 +119,7 @@ namespace CoopClient
             return (end - start) * currentTime / duration + start;
         }
 
-        public static int GetResponsiblePedHandle(Vehicle veh)
+        public static int GetResponsiblePedHandle(this Vehicle veh)
         {
             if (veh == null || veh.Handle == 0 || !veh.Exists())
             {
@@ -142,7 +142,7 @@ namespace CoopClient
             return 0;
         }
 
-        public static byte GetPedSpeed(Ped ped)
+        public static byte GetPedSpeed(this Ped ped)
         {
             if (ped.IsSprinting)
             {
@@ -160,13 +160,13 @@ namespace CoopClient
             return 0;
         }
 
-        public static Vector3 GetPedAimCoords(Ped ped, bool isNpc)
+        public static Vector3 GetPedAimCoords(this Ped ped, bool isNpc)
         {
             bool aimOrShoot = ped.IsAiming || ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0;
             return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
         }
 
-        public static byte? GetVehicleFlags(Ped ped, Vehicle veh, bool fullSync)
+        public static byte? GetVehicleFlags(this Vehicle veh, bool fullSync)
         {
             byte? flags = 0;
 
@@ -175,10 +175,8 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.LastSyncWasFull;
             }
 
-            if (ped.IsInVehicle())
-            {
-                flags |= (byte)VehicleDataFlags.IsInVehicle;
-            }
+            // Ped is in vehicle
+            flags |= (byte)VehicleDataFlags.IsInVehicle;
 
             if (veh.IsEngineRunning)
             {
@@ -208,7 +206,7 @@ namespace CoopClient
             return flags;
         }
 
-        public static byte? GetPedFlags(Ped ped, bool fullSync, bool isPlayer = false)
+        public static byte? GetPedFlags(this Ped ped, bool fullSync, bool isPlayer = false)
         {
             byte? flags = 0;
 
@@ -255,7 +253,7 @@ namespace CoopClient
             return flags;
         }
 
-        public static Dictionary<int, int> GetPedProps(Ped ped)
+        public static Dictionary<int, int> GetPedProps(this Ped ped)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
             for (int i = 0; i < 11; i++)
@@ -266,17 +264,17 @@ namespace CoopClient
             return result;
         }
 
-        public static Dictionary<int, int> GetVehicleMods(Vehicle veh)
+        public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
-            foreach (VehicleMod mod in veh.Mods.ToArray())
+            foreach (VehicleMod mod in mods.ToArray())
             {
                 result.Add((int)mod.Type, mod.Index);
             }
             return result;
         }
 
-        public static VehicleDoors[] GetVehicleDoors(VehicleDoorCollection doors)
+        public static VehicleDoors[] GetVehicleDoors(this VehicleDoorCollection doors)
         {
             int doorLength = doors.ToArray().Length;
             if (doorLength == 0)
@@ -298,6 +296,21 @@ namespace CoopClient
             }
 
             return result;
+        }
+
+        public static int GetBrokenTires(this VehicleWheelCollection wheels)
+        {
+            int tyreFlag = 0;
+
+            foreach (var wheel in wheels.GetAllWheels())
+            {
+                if (wheel.IsBursted)
+                {
+                    tyreFlag |= (1 << (int)wheel.BoneId);
+                }
+            }
+
+            return tyreFlag;
         }
 
         public static Settings ReadSettings()

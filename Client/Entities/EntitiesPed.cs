@@ -77,8 +77,8 @@ namespace CoopClient
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         public VehicleDoors[] VehDoors { get; set; }
-        private byte LastVehTires;
-        public byte VehTires { get; set; }
+        private int LastVehTires;
+        public int VehTires { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -269,7 +269,7 @@ namespace CoopClient
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = Util.ModelRequest(VehicleModelHash);
+                    Model vehicleModel = VehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
                         GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
@@ -315,7 +315,7 @@ namespace CoopClient
             }
             else
             {
-                if (Util.GetResponsiblePedHandle(MainVehicle) != Character.Handle)
+                if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
                 {
                     return;
                 }
@@ -424,11 +424,12 @@ namespace CoopClient
 
                 if (VehTires != default && LastVehTires != VehTires)
                 {
-                    for (int i = 0; i < MainVehicle.Wheels.Count - 1; i++)
+                    foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
                     {
-                        if ((VehTires & 1 << i) != 0)
+                        if ((VehTires & 1 << (int)wheel.BoneId) != 0)
                         {
-                            Function.Call(Hash.SET_VEHICLE_TYRE_BURST, MainVehicle, i, true, 1000.0);
+                            wheel.Puncture();
+                            wheel.Burst();
                         }
                     }
 
@@ -438,7 +439,7 @@ namespace CoopClient
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
-                Util.CustomSteeringAngle(MainVehicle.Handle, (float)(Math.PI / 180) * VehicleSteeringAngle);
+                MainVehicle.Handle.CustomSteeringAngle((float)(Math.PI / 180) * VehicleSteeringAngle);
             }
 
             // Good enough for now, but we need to create a better sync
@@ -622,7 +623,7 @@ namespace CoopClient
             LastModelHash = ModelHash;
             LastProps = Props;
 
-            Model characterModel = Util.ModelRequest(ModelHash);
+            Model characterModel = ModelHash.ModelRequest();
 
             if (characterModel == null)
             {

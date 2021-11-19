@@ -241,7 +241,7 @@ namespace CoopClient
             if (fullSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
-                DebugSyncPed.Props = Util.GetPedProps(player);
+                DebugSyncPed.Props = player.GetPedProps();
             }
             DebugSyncPed.Health = player.Health;
             DebugSyncPed.Position = player.Position;
@@ -250,12 +250,12 @@ namespace CoopClient
 
             if (!player.IsInVehicle())
             {
-                flags = Util.GetPedFlags(player, fullSync, true);
+                flags = player.GetPedFlags(fullSync, true);
 
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
-                DebugSyncPed.Speed = Util.GetPedSpeed(player);
-                DebugSyncPed.AimCoords = Util.GetPedAimCoords(player, false);
+                DebugSyncPed.Speed = player.GetPedSpeed();
+                DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
                 DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
@@ -277,7 +277,7 @@ namespace CoopClient
                 Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = Util.GetVehicleFlags(player, veh, fullSync);
+                flags = veh.GetVehicleFlags(fullSync);
 
                 int secondaryColor;
                 int primaryColor;
@@ -286,27 +286,19 @@ namespace CoopClient
                     Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
-                byte tyreFlag = 0;
-                for (int i = 0; i < veh.Wheels.Count - 1; i++)
-                {
-                    if (Function.Call<bool>(Hash.IS_VEHICLE_TYRE_BURST, veh, i, false))
-                    {
-                        tyreFlag |= (byte)(1 << i);
-                    }
-                }
-
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
                 DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
+                DebugSyncPed.VehRPM = veh.CurrentRPM;
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
-                DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
-                DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
-                DebugSyncPed.VehTires = tyreFlag;
+                DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
+                DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
+                DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
