@@ -281,12 +281,12 @@ namespace CoopClient
                 }
             }
 
-            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle?.Model.Hash != VehicleModelHash)
+            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Handle != MainVehicle.Handle)
             {
                 if (VehicleSeatIndex == -1 &&
                     Game.Player.Character.IsInVehicle() &&
                     (int)Game.Player.Character.SeatIndex == -1 &&
-                    Game.Player.Character.CurrentVehicle == MainVehicle)
+                    Game.Player.Character.CurrentVehicle.Handle == MainVehicle.Handle)
                 {
                     Game.Player.Character.Task.WarpOutOfVehicle(MainVehicle);
                     GTA.UI.Notification.Show("~r~Car jacked!");
@@ -372,68 +372,71 @@ namespace CoopClient
 
                 Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
 
-                if (VehDoors != null && VehDoors != LastVehDoors)
+                if (LastSyncWasFull)
                 {
-                    int doorLength = VehDoors.Length;
-                    if (VehDoors.Length != 0)
+                    if (VehDoors != null && VehDoors != LastVehDoors)
                     {
-                        for (int i = 0; i < (doorLength - 1); i++)
+                        int doorLength = VehDoors.Length;
+                        if (VehDoors.Length != 0)
                         {
-                            VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
-                            VehicleDoors aDoor = VehDoors[i];
+                            for (int i = 0; i < (doorLength - 1); i++)
+                            {
+                                VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
+                                VehicleDoors aDoor = VehDoors[i];
 
-                            if (aDoor.Broken)
-                            {
-                                if (!door.IsBroken)
+                                if (aDoor.Broken)
                                 {
-                                    door.Break();
+                                    if (!door.IsBroken)
+                                    {
+                                        door.Break();
+                                    }
+                                    continue;
                                 }
-                                continue;
-                            }
-                            else if (!aDoor.Broken && door.IsBroken)
-                            {
-                                // Repair?
-                                //MainVehicle.Repair();
-                            }
-
-                            if (aDoor.FullyOpen)
-                            {
-                                if (!door.IsFullyOpen)
+                                else if (!aDoor.Broken && door.IsBroken)
                                 {
-                                    door.Open(false, true);
-                                }
-                                continue;
-                            }
-                            else if (aDoor.Open)
-                            {
-                                if (!door.IsOpen)
-                                {
-                                    door.Open();
+                                    // Repair?
+                                    //MainVehicle.Repair();
                                 }
 
-                                door.AngleRatio = aDoor.AngleRatio;
-                                continue;
-                            }
+                                if (aDoor.FullyOpen)
+                                {
+                                    if (!door.IsFullyOpen)
+                                    {
+                                        door.Open(false, true);
+                                    }
+                                    continue;
+                                }
+                                else if (aDoor.Open)
+                                {
+                                    if (!door.IsOpen)
+                                    {
+                                        door.Open();
+                                    }
 
-                            door.Close(true);
+                                    door.AngleRatio = aDoor.AngleRatio;
+                                    continue;
+                                }
+
+                                door.Close(true);
+                            }
                         }
+
+                        LastVehDoors = VehDoors;
                     }
 
-                    LastVehDoors = VehDoors;
-                }
-
-                if (VehTires != default && LastVehTires != VehTires)
-                {
-                    foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
+                    if (VehTires != default && LastVehTires != VehTires)
                     {
-                        if ((VehTires & 1 << (int)wheel.BoneId) != 0)
+                        foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
                         {
-                            wheel.Puncture();
-                            wheel.Burst();
+                            if ((VehTires & 1 << (int)wheel.BoneId) != 0)
+                            {
+                                wheel.Puncture();
+                                wheel.Burst();
+                            }
                         }
-                    }
 
-                    LastVehTires = VehTires;
+                        LastVehTires = VehTires;
+                    }
                 }
             }
             
