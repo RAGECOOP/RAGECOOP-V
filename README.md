@@ -11,6 +11,14 @@
 | ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
 | --- |
 
+Get the latest client to test out the new features before we release them:
+<br/>
+[**Download**](https://entenkoeniq.de/client.zip)
+<br/>
+<br/>
+Server:
+<br/>
+**168.119.29.103:4499**
 
 # 📋 Requirements
 - Visual Studio 2022
