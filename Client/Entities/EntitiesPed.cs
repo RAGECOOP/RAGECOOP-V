@@ -494,7 +494,7 @@ namespace CoopClient
 
         private void StartPedalingAnim(bool fast)
         {
-            Character.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1, AnimationFlags.Loop | AnimationFlags.AllowRotation, 5.0f);
+            Character.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1, AnimationFlags.Loop | AnimationFlags.AllowRotation, 1.0f);
         }
 
         private void StopPedalingAnim(bool fast)

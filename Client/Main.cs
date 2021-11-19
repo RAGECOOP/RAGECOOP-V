@@ -84,8 +84,8 @@ namespace CoopClient
             if (MainNetworking.ShowNetworkInfo)
             {
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {MainNetworking.BytesReceived} bytes", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {MainNetworking.BytesSend} bytes", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {MainNetworking.BytesReceived * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {MainNetworking.BytesSend * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 
