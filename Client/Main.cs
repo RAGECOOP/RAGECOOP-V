@@ -248,33 +248,11 @@ namespace CoopClient
 
             byte? flags;
 
-            if (!player.IsInVehicle())
-            {
-                flags = player.GetPedFlags(fullSync, true);
+            Vehicle vehicleTryingToEnter = null;
 
-                DebugSyncPed.Rotation = player.Rotation;
-                DebugSyncPed.Velocity = player.Velocity;
-                DebugSyncPed.Speed = player.GetPedSpeed();
-                DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
-                DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
-                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
-                DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
-                DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;
-                DebugSyncPed.IsReloading = (flags.Value & (byte)PedDataFlags.IsReloading) > 0;
-                DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
-                DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                DebugSyncPed.IsInVehicle = false;
-
-                if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
-                {
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
-                }
-            }
-            else
+            if (player.IsInVehicle() || (vehicleTryingToEnter = player.VehicleTryingToEnter) != null)
             {
-                Vehicle veh = player.CurrentVehicle;
+                Vehicle veh = player.CurrentVehicle ?? vehicleTryingToEnter;
                 veh.Opacity = 75;
 
                 flags = veh.GetVehicleFlags(fullSync);
@@ -309,8 +287,32 @@ namespace CoopClient
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, player.CurrentVehicle.Handle, false);
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.CurrentVehicle.Handle, DebugSyncPed.MainVehicle.Handle, false);
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, veh.Handle, false);
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, veh.Handle, DebugSyncPed.MainVehicle.Handle, false);
+                }
+            }
+            else
+            {
+                flags = player.GetPedFlags(fullSync, true);
+
+                DebugSyncPed.Rotation = player.Rotation;
+                DebugSyncPed.Velocity = player.Velocity;
+                DebugSyncPed.Speed = player.GetPedSpeed();
+                DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
+                DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
+                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
+                DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;
+                DebugSyncPed.IsReloading = (flags.Value & (byte)PedDataFlags.IsReloading) > 0;
+                DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
+                DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
+                DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
+                DebugSyncPed.IsInVehicle = false;
+
+                if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
+                {
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
+                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
                 }
             }
 
