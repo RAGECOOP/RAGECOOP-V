@@ -51,7 +51,7 @@ namespace CoopClient
             Util.NativeMemory();
         }
 
-        private int LastDataSend;
+        private ulong LastDataSend;
         private void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
@@ -104,14 +104,14 @@ namespace CoopClient
             }
 #endif
 
-            if ((Environment.TickCount - LastDataSend) < (1000 / 60))
+            if ((Util.GetTickCount64() - LastDataSend) < (1000 / 60))
             {
                 return;
             }
 
             MainNetworking.SendPlayerData();
 
-            LastDataSend = Environment.TickCount;
+            LastDataSend = Util.GetTickCount64();
         }
 
 #if !NON_INTERACTIVE
@@ -164,7 +164,7 @@ namespace CoopClient
                     {
                         if (MainNetworking.IsOnServer())
                         {
-                            int currentTimestamp = Environment.TickCount;
+                            ulong currentTimestamp = Util.GetTickCount64();
                             PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                         }
                         return;
@@ -217,9 +217,9 @@ namespace CoopClient
         }
 
 #if DEBUG
-        private int ArtificialLagCounter;
+        private ulong ArtificialLagCounter;
         public static EntitiesPlayer DebugSyncPed;
-        public static int LastFullDebugSync = 0;
+        public static ulong LastFullDebugSync = 0;
         public static bool UseDebug = false;
 
         private void Debug()
@@ -231,12 +231,12 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Environment.TickCount - ArtificialLagCounter) < 157)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 157)
             {
                 return;
             }
 
-            bool fullSync = (Environment.TickCount - LastFullDebugSync) > 1500;
+            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 1500;
 
             if (fullSync)
             {
@@ -316,7 +316,7 @@ namespace CoopClient
                 }
             }
 
-            int currentTimestamp = Environment.TickCount;
+            ulong currentTimestamp = Util.GetTickCount64();
 
             DebugSyncPed.LastUpdateReceived = currentTimestamp;
             DebugSyncPed.Latency = currentTimestamp - ArtificialLagCounter;

@@ -256,7 +256,7 @@ namespace CoopClient
             {
                 SocialClubName = packet.SocialClubName,
                 Username = packet.Username,
-                LastUpdateReceived = Environment.TickCount
+                LastUpdateReceived = Util.GetTickCount64()
             };
 
             Main.Players.Add(packet.ID, player);
@@ -304,7 +304,7 @@ namespace CoopClient
                 player.IsInVehicle = false;
 
                 player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Environment.TickCount;
+                player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
@@ -340,7 +340,7 @@ namespace CoopClient
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
 
                 player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Environment.TickCount;
+                player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
@@ -367,7 +367,7 @@ namespace CoopClient
                 player.IsInVehicle = false;
 
                 player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Environment.TickCount;
+                player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
@@ -395,7 +395,7 @@ namespace CoopClient
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
 
                 player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Environment.TickCount;
+                player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
@@ -409,7 +409,7 @@ namespace CoopClient
                 player.Position = packet.Extra.Position.ToVector();
 
                 player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Environment.TickCount;
+                player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
@@ -463,7 +463,7 @@ namespace CoopClient
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
 
-                    npc.LastUpdateReceived = Environment.TickCount;
+                    npc.LastUpdateReceived = Util.GetTickCount64();
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
@@ -487,7 +487,7 @@ namespace CoopClient
                 {
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
-                        LastUpdateReceived = Environment.TickCount,
+                        LastUpdateReceived = Util.GetTickCount64(),
 
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
@@ -519,7 +519,7 @@ namespace CoopClient
                 {
                     EntitiesNpc npc = Main.Npcs[packet.ID];
 
-                    npc.LastUpdateReceived = Environment.TickCount;
+                    npc.LastUpdateReceived = Util.GetTickCount64();
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
@@ -549,7 +549,7 @@ namespace CoopClient
                 {
                     Main.Npcs.Add(packet.ID, new EntitiesNpc()
                     {
-                        LastUpdateReceived = Environment.TickCount,
+                        LastUpdateReceived = Util.GetTickCount64(),
 
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
@@ -582,7 +582,7 @@ namespace CoopClient
         #endregion
 
         #region -- SEND --
-        private int LastPlayerFullSync = 0;
+        private ulong LastPlayerFullSync = 0;
         public void SendPlayerData()
         {
             Ped player = Game.Player.Character;
@@ -590,7 +590,7 @@ namespace CoopClient
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             NetDeliveryMethod messageType;
 
-            if ((Environment.TickCount - LastPlayerFullSync) > 500)
+            if ((Util.GetTickCount64() - LastPlayerFullSync) > 500)
             {
                 messageType = NetDeliveryMethod.UnreliableSequenced;
 
@@ -681,7 +681,7 @@ namespace CoopClient
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
-                LastPlayerFullSync = Environment.TickCount;
+                LastPlayerFullSync = Util.GetTickCount64();
             }
             else
             {

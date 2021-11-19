@@ -31,7 +31,7 @@ namespace CoopClient
             }
         }
 
-        private int LastMessageTime { get; set; }
+        private ulong LastMessageTime { get; set; }
 
         private bool CurrentHidden { get; set; }
         private bool Hidden
@@ -73,7 +73,7 @@ namespace CoopClient
 
         public void Tick()
         {
-            if ((Environment.TickCount - LastMessageTime) > 15000 && !Focused && !Hidden)
+            if ((Util.GetTickCount64() - LastMessageTime) > 15000 && !Focused && !Hidden)
             {
                 Hidden = true;
             }
@@ -94,7 +94,7 @@ namespace CoopClient
         public void AddMessage(string sender, string msg)
         {
             MainScaleForm.CallFunction("ADD_MESSAGE", sender + ":", msg);
-            LastMessageTime = Environment.TickCount;
+            LastMessageTime = Util.GetTickCount64();
             Hidden = false;
         }
 

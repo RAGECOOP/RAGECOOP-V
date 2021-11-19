@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
@@ -95,7 +94,7 @@ namespace CoopClient
 
         public static bool IsPlayerListVisible()
         {
-            return Environment.TickCount - PlayerList.Pressed < 5000;
+            return Util.GetTickCount64() - PlayerList.Pressed < 5000;
         }
 
         public static string GetCurrentVersion()

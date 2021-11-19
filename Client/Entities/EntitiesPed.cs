@@ -15,7 +15,7 @@ namespace CoopClient
     {
         private bool AllDataAvailable = false;
         public bool LastSyncWasFull { get; set; } = false;
-        public long LastUpdateReceived { get; set; }
+        public ulong LastUpdateReceived { get; set; }
         public float Latency { get; set; }
 
         public Ped Character { get; set; }
@@ -44,7 +44,7 @@ namespace CoopClient
         public Blip PedBlip;
 
         #region -- IN VEHICLE --
-        private int VehicleStopTime { get; set; }
+        private ulong VehicleStopTime { get; set; }
 
         public bool IsInVehicle { get; set; }
         public int VehicleModelHash { get; set; }
@@ -450,11 +450,11 @@ namespace CoopClient
                 MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
-                VehicleStopTime = Environment.TickCount;
+                VehicleStopTime = Util.GetTickCount64();
             }
-            else if ((Environment.TickCount - VehicleStopTime) <= 1000)
+            else if ((Util.GetTickCount64() - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Environment.TickCount - VehicleStopTime, 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Util.GetTickCount64() - VehicleStopTime, 1000);
 
                 MainVehicle.PositionNoOffset = posTarget;
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);

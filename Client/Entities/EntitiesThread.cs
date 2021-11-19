@@ -26,7 +26,7 @@ namespace CoopClient.Entities
             {
                 localNpcs = new Dictionary<long, EntitiesNpc>(Main.Npcs);
 
-                int tickCount = Environment.TickCount;
+                ulong tickCount = Util.GetTickCount64();
                 foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(localNpcs))
                 {
                     if ((tickCount - npc.Value.LastUpdateReceived) > 3000)

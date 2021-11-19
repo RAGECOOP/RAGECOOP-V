@@ -11,8 +11,8 @@ namespace CoopClient
     public class PlayerList : Script
     {
         private readonly Scaleform MainScaleform = new Scaleform("mp_mm_card_freemode");
-        private int LastUpdate = Environment.TickCount;
-        public static int Pressed { get; set; }
+        private ulong LastUpdate = Util.GetTickCount64();
+        public static ulong Pressed { get; set; }
 
         public PlayerList()
         {
@@ -28,12 +28,12 @@ namespace CoopClient
                 return;
             }
 
-            if ((Environment.TickCount - LastUpdate) >= 1000)
+            if ((Util.GetTickCount64() - LastUpdate) >= 1000)
             {
                 Update(Main.Players, Main.MainSettings.Username);
             }
 
-            if ((Environment.TickCount - Pressed) < 5000 && !Main.MainChat.Focused
+            if ((Util.GetTickCount64() - Pressed) < 5000 && !Main.MainChat.Focused
 #if !NON_INTERACTIVE
                 && !Main.MainMenu.MenuPool.AreAnyVisible
 #endif
@@ -53,7 +53,7 @@ namespace CoopClient
 
         private void Update(Dictionary<long, EntitiesPlayer> players, string localUsername)
         {
-            LastUpdate = Environment.TickCount;
+            LastUpdate = Util.GetTickCount64();
 
             MainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
             MainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Main.MainNetworking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');

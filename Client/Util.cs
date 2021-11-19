@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using static System.Runtime.InteropServices.Marshal;
 
 using GTA;
@@ -104,7 +105,7 @@ namespace CoopClient
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
         }
 
-        public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, int currentTime, int duration)
+        public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, ulong currentTime, int duration)
         {
             return new Vector3()
             {
@@ -114,7 +115,7 @@ namespace CoopClient
             };
         }
 
-        public static float LinearFloatLerp(float start, float end, int currentTime, int duration)
+        public static float LinearFloatLerp(float start, float end, ulong currentTime, int duration)
         {
             return (end - start) * currentTime / duration + start;
         }
@@ -468,5 +469,8 @@ namespace CoopClient
 
             return camPos + dir * raycastToDist;
         }
+
+        [DllImport("kernel32.dll")]
+        public static extern ulong GetTickCount64();
     }
 }
