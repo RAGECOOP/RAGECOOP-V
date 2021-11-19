@@ -18,7 +18,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentVersion = "V0_8_0";
+        public static readonly string CurrentVersion = "V0_8_0_1";
 
         public static bool ShareNpcsWithPlayers = false;
         public static bool DisableTraffic = false;
