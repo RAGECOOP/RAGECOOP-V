@@ -780,7 +780,7 @@ namespace CoopClient
                     VehColors = isDriver ? new int[] { primaryColor, secondaryColor } : new int[0],
                     VehMods = isDriver ? npc.CurrentVehicle.Mods.GetVehicleMods() : null,
                     VehDoors = isDriver ? npc.CurrentVehicle.Doors.GetVehicleDoors() : null,
-                    VehTires = npc.CurrentVehicle.Wheels.GetBrokenTires(),
+                    VehTires = isDriver ? npc.CurrentVehicle.Wheels.GetBrokenTires() : 0,
                     Flag = npc.CurrentVehicle.GetVehicleFlags(true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
