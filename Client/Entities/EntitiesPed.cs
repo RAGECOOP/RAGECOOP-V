@@ -71,11 +71,14 @@ namespace CoopClient
         }
         public float VehicleSteeringAngle { get; set; }
         public bool VehIsEngineRunning { get; set; }
+        public float VehRPM { get; set; }
         public bool VehAreLightsOn { get; set; }
         public bool VehAreHighBeamsOn { get; set; }
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         public VehicleDoors[] VehDoors { get; set; }
+        private byte LastVehTires;
+        public byte VehTires { get; set; }
         #endregion
 
         public void DisplayLocally(string username)
@@ -350,6 +353,8 @@ namespace CoopClient
                     MainVehicle.IsEngineRunning = VehIsEngineRunning;
                 }
 
+                MainVehicle.CurrentRPM = VehRPM;
+
                 if (VehAreLightsOn != MainVehicle.AreLightsOn)
                 {
                     MainVehicle.AreLightsOn = VehAreLightsOn;
@@ -415,6 +420,19 @@ namespace CoopClient
                     }
 
                     LastVehDoors = VehDoors;
+                }
+
+                if (VehTires != default && LastVehTires != VehTires)
+                {
+                    for (int i = 0; i < MainVehicle.Wheels.Count - 1; i++)
+                    {
+                        if ((VehTires & 1 << i) != 0)
+                        {
+                            Function.Call(Hash.SET_VEHICLE_TYRE_BURST, MainVehicle, i, true, 1000.0);
+                        }
+                    }
+
+                    LastVehTires = VehTires;
                 }
             }
             

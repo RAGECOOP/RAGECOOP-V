@@ -281,10 +281,18 @@ namespace CoopClient
 
                 int secondaryColor;
                 int primaryColor;
-
                 unsafe
                 {
                     Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                }
+
+                byte tyreFlag = 0;
+                for (int i = 0; i < veh.Wheels.Count - 1; i++)
+                {
+                    if (Function.Call<bool>(Hash.IS_VEHICLE_TYRE_BURST, veh, i, false))
+                    {
+                        tyreFlag |= (byte)(1 << i);
+                    }
                 }
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
@@ -298,6 +306,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = Util.GetVehicleMods(veh);
                 DebugSyncPed.VehDoors = Util.GetVehicleDoors(veh.Doors);
+                DebugSyncPed.VehTires = tyreFlag;
                 DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
                 DebugSyncPed.IsInVehicle = (flags.Value & (byte)VehicleDataFlags.IsInVehicle) > 0;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
