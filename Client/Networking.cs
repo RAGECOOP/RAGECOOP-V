@@ -45,6 +45,11 @@ namespace CoopClient
                 Client.Start();
 
                 string[] ip = address.Split(':');
+                
+                if(ip.Length != 2)
+                {
+                    throw new Exception("Malformed URL");
+                }
 
                 // Send HandshakePacket
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
@@ -260,6 +265,7 @@ namespace CoopClient
             };
 
             Main.Players.Add(packet.ID, player);
+            Interface.Connected(packet.ID);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
@@ -275,6 +281,7 @@ namespace CoopClient
 
                 player.PedBlip?.Delete();
 
+                Interface.Disconnected(packet.ID);
                 Main.Players.Remove(packet.ID);
             }
         }
