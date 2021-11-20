@@ -7,7 +7,7 @@ namespace CoopClient
     public static class Interface
     {
         #region DELEGATES
-        public delegate void ConnectEvent(bool connected, string reason = null);
+        public delegate void ConnectEvent(bool connected, long fromId, string reason = null);
         public delegate void ChatMessage(string from, string message, CancelEventArgs args);
         public delegate void ModEvent(long from, string mod, byte customID, byte[] bytes);
         #endregion
@@ -19,12 +19,22 @@ namespace CoopClient
 
         internal static void Connected()
         {
-            OnConnection?.Invoke(true);
+            OnConnection?.Invoke(true, GetLocalID());
         }
 
         internal static void Disconnected(string reason)
         {
-            OnConnection?.Invoke(false, reason);
+            OnConnection?.Invoke(false, GetLocalID(), reason);
+        }
+
+        internal static void Connected(long userId)
+        {
+            OnConnection?.Invoke(true, userId);
+        }
+
+        internal static void Disconnected(long userId)
+        {
+            OnConnection?.Invoke(false, userId);
         }
 
         internal static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
@@ -76,6 +86,14 @@ namespace CoopClient
                 }
             }
             return result;
+        }
+
+        public static Entities.EntitiesPlayer GetPlayer( long playerId )
+        {
+            if (Main.Players.ContainsKey(playerId))
+                return Main.Players[playerId];
+            else
+                return null;
         }
 
         public static bool IsMenuVisible()
