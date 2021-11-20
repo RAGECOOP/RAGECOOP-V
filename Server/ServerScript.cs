@@ -2,11 +2,96 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Lidgren.Network;
 
 namespace CoopServer
 {
+    internal class Resource
+    {
+        private static Thread _mainThread;
+        private static bool _hasToStop = false;
+        private static Queue<Action> _actionQueue;
+        private static TaskFactory _factory;
+        private static ServerScript _script;
+
+        public Resource(ServerScript script)
+        {
+            _factory = new();
+            _actionQueue = new();
+            _mainThread = new(ThreadLoop) { IsBackground = true };
+            _mainThread.Start();
+
+            lock (_actionQueue)
+            {
+                _actionQueue.Enqueue(() => _script = script);
+            }
+        }
+
+        private void ThreadLoop()
+        {
+            do
+            {
+                // 16 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(1000 / 60);
+
+                if (_actionQueue.Count == 0)
+                {
+                    continue;
+                }
+
+                lock (_actionQueue)
+                {
+                    _factory.StartNew(() => _actionQueue.Dequeue()?.Invoke());
+                }
+            } while (_hasToStop);
+        }
+
+        public bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)
+        {
+            Task<bool> shutdownTask = new(() => _script.API.InvokeModPacketReceived(from, target, mod, customID, bytes));
+            shutdownTask.Start();
+            shutdownTask.Wait(5000);
+
+            return shutdownTask.Result;
+        }
+
+        public void InvokePlayerConnected(Client client)
+        {
+            lock (_actionQueue)
+            {
+                _actionQueue.Enqueue(() => _script.API.InvokePlayerConnected(client));
+            }
+        }
+
+        public void InvokePlayerDisconnected(Client client)
+        {
+            lock (_actionQueue)
+            {
+                _actionQueue.Enqueue(() => _script.API.InvokePlayerDisconnected(client));
+            }
+        }
+
+        public bool InvokeChatMessage(string username, string message)
+        {
+            Task<bool> shutdownTask = new(() => _script.API.InvokeChatMessage(username, message));
+            shutdownTask.Start();
+            shutdownTask.Wait(5000);
+
+            return shutdownTask.Result;
+        }
+
+        public void InvokePlayerPositionUpdate(PlayerData playerData)
+        {
+            lock (_actionQueue)
+            {
+                _actionQueue.Enqueue(() => _script.API.InvokePlayerPositionUpdate(playerData));
+            }
+        }
+    }
+
     public abstract class ServerScript
     {
         public API API { get; } = new();

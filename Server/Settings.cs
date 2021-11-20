@@ -6,7 +6,7 @@
         public int MaxPlayers { get; set; } = 16;
         public string ServerName { get; set; } = "GTACoop:R server";
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
-        public string GameMode { get; set; } = "";
+        public string Resource { get; set; } = "";
         public bool Allowlist { get; set; } = false;
         public bool NpcsAllowed { get; set; } = true;
         public bool ModsAllowed {  get; set; } = false;

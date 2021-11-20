@@ -18,9 +18,9 @@
                 LastPosition = CurrentPosition;
                 CurrentPosition = value;
 
-                if (Server.GameMode != null && !LVector3.Equals(CurrentPosition, LastPosition))
+                if (Server.MainResource != null && !LVector3.Equals(CurrentPosition, LastPosition))
                 {
-                    Server.GameMode.API.InvokePlayerPositionUpdate(this);
+                    Server.MainResource.InvokePlayerPositionUpdate(this);
                 }
             }
         }
