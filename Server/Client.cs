@@ -83,5 +83,22 @@ namespace CoopServer
             packet.PacketToNetOutGoingMessage(outgoingMessage);
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
         }
+
+        public void SendModPacket(string mod, byte customID, byte[] bytes)
+        {
+            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            new ModPacket()
+            {
+                ID = -1,
+                Target = 0,
+                Mod = mod,
+                CustomPacketID = customID,
+                Bytes = bytes
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+            Server.MainNetServer.FlushSendQueue();
+        }
     }
 }

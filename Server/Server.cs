@@ -19,7 +19,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static ServerScript GameMode;
+        public static Resource MainResource;
         public static Dictionary<Command, Action<CommandContext>> Commands;
 
         public static readonly List<Client> Clients = new();
@@ -62,13 +62,13 @@ namespace CoopServer
                 }
             }
 
-            if (!string.IsNullOrEmpty(MainSettings.GameMode))
+            if (!string.IsNullOrEmpty(MainSettings.Resource))
             {
                 try
                 {
-                    Logging.Info("Loading gamemode...");
+                    Logging.Info("Loading resource...");
 
-                    Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "gamemodes" + Path.DirectorySeparatorChar + MainSettings.GameMode + ".dll");
+                    Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll");
                     Type[] types = asm.GetExportedTypes();
                     IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
                     Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
@@ -81,14 +81,13 @@ namespace CoopServer
                     {
                         Commands = new();
 
-                        GameMode = Activator.CreateInstance(enumerable.ToArray()[0]) as ServerScript;
-                        if (GameMode == null)
+                        if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
                         {
-                            Logging.Warning("Could not create gamemode: it is null.");
+                            MainResource = new(script);
                         }
                         else
                         {
-                            GameMode.API.InvokeStart();
+                            Logging.Warning("Could not create resource: it is null.");
                         }
                     }
                 }
@@ -107,9 +106,6 @@ namespace CoopServer
 
             while (true)
             {
-                // 16 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(1000 / 60);
-
                 NetIncomingMessage message;
 
                 while ((message = MainNetServer.ReadMessage()) != null)
@@ -289,9 +285,9 @@ namespace CoopServer
                                             packet.NetIncomingMessageToPacket(message);
 
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (GameMode != null)
+                                            if (MainResource != null)
                                             {
-                                                if (GameMode.API.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                if (MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                                 {
                                                     break;
                                                 }
@@ -357,6 +353,9 @@ namespace CoopServer
 
                     MainNetServer.Recycle(message);
                 }
+
+                // 16 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(1000 / 60);
             }
         }
 
@@ -458,9 +457,9 @@ namespace CoopServer
                 SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
             }
 
-            if (GameMode != null)
+            if (MainResource != null)
             {
-                GameMode.API.InvokePlayerConnected(Clients.Find(x => x.ID == packet.ID));
+                MainResource.InvokePlayerConnected(Clients.Find(x => x.ID == packet.ID));
             }
 
             List<NetConnection> clients;
@@ -502,9 +501,9 @@ namespace CoopServer
         // Send all players a message that someone has left the server
         private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet)
         {
-            if (GameMode != null)
+            if (MainResource != null)
             {
-                GameMode.API.InvokePlayerDisconnected(Clients.Find(x => x.ID == packet.ID));
+                MainResource.InvokePlayerDisconnected(Clients.Find(x => x.ID == packet.ID));
             }
 
             List<NetConnection> clients;
@@ -643,7 +642,7 @@ namespace CoopServer
         {
             NetOutgoingMessage outgoingMessage;
 
-            if (GameMode != null)
+            if (MainResource != null)
             {
                 if (packet.Message.StartsWith("/"))
                 {
@@ -679,7 +678,8 @@ namespace CoopServer
 
                     return;
                 }
-                else if (GameMode.API.InvokeChatMessage(packet.Username, packet.Message))
+                
+                if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
                 {
                     return;
                 }
