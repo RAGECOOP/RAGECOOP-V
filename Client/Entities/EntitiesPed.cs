@@ -297,6 +297,13 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            if (VehicleColors != null && VehicleColors != LastVehicleColors)
+            {
+                Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
+
+                LastVehicleColors = VehicleColors;
+            }
+
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
@@ -318,13 +325,6 @@ namespace CoopClient
                 if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
                 {
                     return;
-                }
-
-                if (VehicleColors != null && VehicleColors != LastVehicleColors)
-                {
-                    Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
-
-                    LastVehicleColors = VehicleColors;
                 }
 
                 if (VehicleMods != null && VehicleMods != LastVehicleMods)
