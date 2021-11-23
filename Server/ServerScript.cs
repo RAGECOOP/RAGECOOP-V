@@ -36,7 +36,7 @@ namespace CoopServer
 
         private void ThreadLoop()
         {
-            while (_hasToStop)
+            do
             {
                 if (_actionQueue.Count != 0)
                 {
@@ -48,7 +48,7 @@ namespace CoopServer
 
                 // 16 milliseconds to sleep to reduce CPU usage
                 Thread.Sleep(1000 / 60);
-            }
+            } while (_hasToStop);
         }
 
         public bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)

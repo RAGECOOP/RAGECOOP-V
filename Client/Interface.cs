@@ -88,12 +88,9 @@ namespace CoopClient
             return result;
         }
 
-        public static Entities.EntitiesPlayer GetPlayer( long playerId )
+        public static Entities.EntitiesPlayer GetPlayer(long playerId)
         {
-            if (Main.Players.ContainsKey(playerId))
-                return Main.Players[playerId];
-            else
-                return null;
+            return Main.Players.ContainsKey(playerId) ? Main.Players[playerId] : null;
         }
 
         public static bool IsMenuVisible()
