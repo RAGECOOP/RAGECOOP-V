@@ -26,27 +26,29 @@ namespace CoopServer
 
             lock (_actionQueue)
             {
-                _actionQueue.Enqueue(() => _script = script);
+                _actionQueue.Enqueue(() =>
+                {
+                    _script = script;
+                    _script.API.InvokeStart();
+                });
             }
         }
 
         private void ThreadLoop()
         {
-            do
+            while (_hasToStop)
             {
+                if (_actionQueue.Count != 0)
+                {
+                    lock (_actionQueue)
+                    {
+                        _factory.StartNew(() => _actionQueue.Dequeue()?.Invoke());
+                    }
+                }
+
                 // 16 milliseconds to sleep to reduce CPU usage
                 Thread.Sleep(1000 / 60);
-
-                if (_actionQueue.Count == 0)
-                {
-                    continue;
-                }
-
-                lock (_actionQueue)
-                {
-                    _factory.StartNew(() => _actionQueue.Dequeue()?.Invoke());
-                }
-            } while (_hasToStop);
+            }
         }
 
         public bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)

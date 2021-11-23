@@ -106,9 +106,6 @@ namespace CoopServer
 
             while (true)
             {
-                // 16 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(1000 / 60);
-
                 NetIncomingMessage message;
 
                 while ((message = MainNetServer.ReadMessage()) != null)
@@ -290,7 +287,6 @@ namespace CoopServer
                                             ModPacket modPacket = (ModPacket)packet;
                                             if (MainResource != null)
                                             {
-                                                // TODO: We need the true/false result
                                                 if (MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                                 {
                                                     break;
@@ -357,6 +353,9 @@ namespace CoopServer
 
                     MainNetServer.Recycle(message);
                 }
+
+                // 16 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(1000 / 60);
             }
         }
 
@@ -679,7 +678,8 @@ namespace CoopServer
 
                     return;
                 }
-                else if (MainResource.InvokeChatMessage(packet.Username, packet.Message)) // TODO: We need the true/false result
+                
+                if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
                 {
                     return;
                 }
