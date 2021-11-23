@@ -151,6 +151,21 @@ namespace CoopServer
         #endregion
 
         #region FUNCTIONS
+        public static void SendModPacketToAll(string mod, byte customID, byte[] bytes)
+        {
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            new ModPacket()
+            {
+                ID = -1,
+                Target = 0,
+                Mod = mod,
+                CustomPacketID = customID,
+                Bytes = bytes
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+            Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            Server.MainNetServer.FlushSendQueue();
+        }
+
         public static void SendNativeCallToAll(ulong hash, params object[] args)
         {
             if (Server.MainNetServer.ConnectionsCount == 0)
