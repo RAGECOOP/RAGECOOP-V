@@ -442,7 +442,7 @@ namespace CoopClient
             
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
-                MainVehicle.Handle.CustomSteeringAngle((float)(Math.PI / 180) * VehicleSteeringAngle);
+                MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * VehicleSteeringAngle);
             }
 
             // Good enough for now, but we need to create a better sync

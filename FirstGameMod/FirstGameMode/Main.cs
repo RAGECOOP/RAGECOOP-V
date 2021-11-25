@@ -25,8 +25,11 @@ namespace FirstGameMode
             RunningSinceTimer.Start();
             RunningSinceTimer.Elapsed += new ElapsedEventHandler((sender, e) => RunningSince += 1);
 
+            API.OnStart += OnResourceStarted;
             API.OnPlayerConnected += OnPlayerConnected;
             API.OnPlayerDisconnected += OnPlayerDisconnected;
+            API.OnPlayerHealthUpdate += OnPlayerHealthUpdate;
+            API.OnPlayerPositionUpdate += OnPlayerPositionUpdate;
             API.OnChatMessage += OnChatMessage;
             API.OnModPacketReceived += OnModPacketReceived;
 
@@ -34,7 +37,25 @@ namespace FirstGameMode
             API.RegisterCommands<Commands>();
         }
 
-        private void OnModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes, CancelEventArgs args)
+        public void OnResourceStarted()
+        {
+            Logging.Info("Resource started successfully!");
+        }
+
+        public void OnPlayerHealthUpdate(Client client)
+        {
+            if (client.Player.Health == 0)
+            {
+                Logging.Warning($"Player {client.Player.Username} has died!");
+            }
+        }
+
+        public void OnPlayerPositionUpdate(Client client)
+        {
+            // Code...
+        }
+
+        public void OnModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes, CancelEventArgs args)
         {
             if (mod != "FirstScript" || customID != 1)
             {
@@ -56,22 +77,22 @@ namespace FirstGameMode
             targetClient.SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
         }
 
-        public static void RunningCommand(CommandContext ctx)
+        public void RunningCommand(CommandContext ctx)
         {
-            ctx.Client.SendChatMessage("Server has been running for: " + RunningSince + " seconds!");
+            ctx.Client.SendChatMessage($"Server has been running for: {RunningSince} seconds!");
         }
 
-        public static void OnPlayerConnected(Client client)
+        public void OnPlayerConnected(Client client)
         {
-            API.SendChatMessageToAll("Player " + client.Player.Username + " connected!");
+            client.SendChatMessage($"Welcome {client.Player.Username}!");
         }
 
-        public static void OnPlayerDisconnected(Client client)
+        public void OnPlayerDisconnected(Client client)
         {
-            API.SendChatMessageToAll("Player " + client.Player.Username + " disconnected!");
+            API.SendChatMessageToAll($"Player {client.Player.Username} disconnected!");
         }
 
-        public static void OnChatMessage(string username, string message, CancelEventArgs e)
+        public void OnChatMessage(string username, string message, CancelEventArgs e)
         {
             e.Cancel = true;
 

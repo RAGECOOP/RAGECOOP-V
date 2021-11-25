@@ -8,11 +8,7 @@
         private LVector3 CurrentPosition { get; set; }
         public LVector3 Position
         {
-            get
-            {
-                return CurrentPosition;
-            }
-
+            get => CurrentPosition;
             set
             {
                 LastPosition = CurrentPosition;
@@ -22,6 +18,20 @@
                 {
                     Server.MainResource.InvokePlayerPositionUpdate(this);
                 }
+            }
+        }
+        private int CurrentHealth { get; set; }
+        public int Health
+        {
+            get => CurrentHealth;
+            set
+            {
+                if (CurrentHealth != value && Server.MainResource != null)
+                {
+                    Server.MainResource.InvokePlayerHealthUpdate(this);
+                }
+
+                CurrentHealth = value;
             }
         }
 

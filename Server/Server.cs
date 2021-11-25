@@ -299,14 +299,15 @@ namespace CoopServer
                                             if (modPacket.Target != 0)
                                             {
                                                 NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
-                                                if (target == null)
+                                                if (target.Equals(default(Client)))
                                                 {
                                                     Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
-                                                    return;
                                                 }
-
-                                                // Send back to target
-                                                MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                else
+                                                {
+                                                    // Send back to target
+                                                    MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                }
                                             }
                                             else
                                             {
@@ -331,7 +332,7 @@ namespace CoopServer
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
-                            if (client != default)
+                            if (!client.Equals(default(Client)))
                             {
                                 client.Latency = message.ReadFloat();
                             }
@@ -420,18 +421,23 @@ namespace CoopServer
 
             long localID = local.RemoteUniqueIdentifier;
 
+            Client tmpClient;
+
             // Add the player to Players
-            Clients.Add(
-                new Client()
-                {
-                    ID = localID,
-                    Player = new()
+            lock (Clients)
+            {
+                Clients.Add(
+                    tmpClient = new Client()
                     {
-                        SocialClubName = packet.SocialClubName,
-                        Username = packet.Username
+                        ID = localID,
+                        Player = new()
+                        {
+                            SocialClubName = packet.SocialClubName,
+                            Username = packet.Username
+                        }
                     }
-                }
-            );
+                );
+            }
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
@@ -447,65 +453,70 @@ namespace CoopServer
 
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerHandshake(tmpClient);
+            }
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
         {
+            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            if (localClient.Equals(default(Client)))
+            {
+                local.Disconnect("No data found!");
+                return;
+            }
+
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
                 SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
             }
 
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerConnected(Clients.Find(x => x.ID == packet.ID));
-            }
-
             List<NetConnection> clients;
-            if ((clients = Util.FilterAllLocal(local)).Count == 0)
+            if ((clients = Util.FilterAllLocal(local)).Count > 0)
             {
-                return;
-            }
+                // Send all players to local
+                clients.ForEach(targetPlayer =>
+                {
+                    long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
-            // Send all players to local
-            clients.ForEach(targetPlayer =>
-            {
-                long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
+                    Client targetClient = Clients.FirstOrDefault(x => x.ID == targetPlayerID);
+                    if (!targetClient.Equals(default(Client)))
+                    {
+                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                        new PlayerConnectPacket()
+                        {
+                            ID = targetPlayerID,
+                            SocialClubName = targetClient.Player.SocialClubName,
+                            Username = targetClient.Player.Username
+                        }.PacketToNetOutGoingMessage(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
+                    }
+                });
 
-                Client targetEntity = Clients.First(x => x.ID == targetPlayerID);
-
+                // Send local to all players
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerConnectPacket()
                 {
-                    ID = targetPlayerID,
-                    SocialClubName = targetEntity.Player.SocialClubName,
-                    Username = targetEntity.Player.Username
+                    ID = packet.ID,
+                    SocialClubName = localClient.Player.SocialClubName,
+                    Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
-            });
+                MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
+            }
 
-            // Send local to all players
-            Client localClient = Clients.First(x => x.ID == packet.ID);
-
-            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new PlayerConnectPacket()
+            if (MainResource != null)
             {
-                ID = packet.ID,
-                SocialClubName = localClient.Player.SocialClubName,
-                Username = localClient.Player.Username
-            }.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
+                MainResource.InvokePlayerConnected(localClient);
+            }
         }
 
         // Send all players a message that someone has left the server
         private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet)
         {
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerDisconnected(Clients.Find(x => x.ID == packet.ID));
-            }
-
             List<NetConnection> clients;
             if ((clients = Util.FilterAllLocal(packet.ID)).Count > 0)
             {
@@ -514,16 +525,40 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Clients.Remove(Clients.Find(x => x.ID == packet.ID));
+            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            if (localClient.Equals(default(Client)))
+            {
+                return;
+            }
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerDisconnected(localClient);
+            }
+
+            lock (Clients)
+            {
+                Clients.Remove(localClient);
+            }
         }
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -545,15 +580,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -575,15 +625,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -605,15 +670,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -635,6 +715,11 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         // Send a message to targets or all players
