@@ -104,7 +104,7 @@ namespace CoopClient
             }
 #endif
 
-            if ((Util.GetTickCount64() - LastDataSend) < (1000 / 60))
+            if ((Util.GetTickCount64() - LastDataSend) < ((ulong)(1f / (Game.FPS > 60f ? 60f : Game.FPS)  * 1000f)))
             {
                 return;
             }

@@ -297,6 +297,11 @@ namespace CoopClient
             }
 
             #region -- VEHICLE SYNC --
+            if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
+            {
+                return;
+            }
+
             if (VehicleColors != null && VehicleColors != LastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
@@ -322,11 +327,6 @@ namespace CoopClient
             }
             else
             {
-                if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
-                {
-                    return;
-                }
-
                 if (VehicleMods != null && VehicleMods != LastVehicleMods)
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
