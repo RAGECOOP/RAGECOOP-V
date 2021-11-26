@@ -50,7 +50,7 @@ namespace CoopClient
         }
         #endregion
 
-        public static void SendChatMessage(string from, string message)
+        public static void LocalChatMessage(string from, string message)
         {
             Main.MainChat.AddMessage(from, message);
         }
@@ -90,7 +90,10 @@ namespace CoopClient
 
         public static Entities.EntitiesPlayer GetPlayer(long playerId)
         {
-            return Main.Players.ContainsKey(playerId) ? Main.Players[playerId] : null;
+            lock (Main.Players)
+            {
+                return Main.Players.ContainsKey(playerId) ? Main.Players[playerId] : null;
+            }
         }
 
         public static bool IsMenuVisible()
