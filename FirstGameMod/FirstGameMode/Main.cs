@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Timers;
 using System.Linq;
 
@@ -7,14 +6,6 @@ using CoopServer;
 
 namespace FirstGameMode
 {
-    [Serializable]
-    public class SetPlayerTime
-    {
-        public int Hours {  get; set; }
-        public int Minutes {  get; set; }
-        public int Seconds {  get; set; }
-    }
-
     public class Main : ServerScript
     {
         private static readonly Timer RunningSinceTimer = new() { Interval = 1000 };
@@ -64,17 +55,17 @@ namespace FirstGameMode
 
             args.Cancel = true;
 
-            // Get data from bytes
-            SetPlayerTime setPlayerTime = bytes.CDeserialize<SetPlayerTime>();
-
             // Find the client by 'from' and send the time back as a nativecall
             //API.GetAllClients().Find(x => x.ID == from).SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
 
             // Find the client by 'target' and send the time back as a nativecall
-            Client targetClient = API.GetAllClients().FirstOrDefault(x => x.ID == target);
+            Client fromClient = API.GetAllClients().FirstOrDefault(x => x.ID == target);
+            Client targetClient = API.GetAllClients().Find(x => x.ID == target);
 
-            targetClient.SendChatMessage($"New modpacket nativecall from \"{API.GetAllClients().FirstOrDefault(x => x.ID == from)?.Player.Username}\"");
-            targetClient.SendNativeCall(0x47C3B5848C3E45D8, setPlayerTime.Hours, setPlayerTime.Minutes, setPlayerTime.Seconds);
+            fromClient.SendChatMessage($"New modpacket nativecall from \"{targetClient?.Player.Username}\"");
+
+            // Send packet to target
+            targetClient.SendModPacket("FirstScript", 1, bytes);
         }
 
         public void RunningCommand(CommandContext ctx)

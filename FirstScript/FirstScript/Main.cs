@@ -1,6 +1,7 @@
 ﻿using System;
 
 using GTA;
+using GTA.Native;
 
 namespace FirstScript
 {
@@ -30,11 +31,11 @@ namespace FirstScript
             CoopClient.Interface.OnConnection += OnConnection;
         }
 
-        private void OnConnection(bool connected, string reason = null)
+        private void OnConnection(bool connected, long id, string reason = null)
         {
             if (connected)
             {
-                CoopClient.Interface.SendChatMessage("Mod", "Welcome!");
+                CoopClient.Interface.LocalChatMessage("Mod", "Welcome!");
             }
             else
             {
@@ -60,12 +61,40 @@ namespace FirstScript
                 return;
             }
 
+            CoopClient.Entities.EntitiesPlayer fromClient;
+
             switch (customID)
             {
                 case 0:
                     TestPacketClass testPacketClass = CoopClient.CoopSerializer.CDeserialize<TestPacketClass>(bytes);
 
-                    GTA.UI.Notification.Show($"ModPacket(0)({from}): A[{testPacketClass.A}] B[{testPacketClass.B}]");
+                    fromClient = CoopClient.Interface.GetPlayer(from);
+                    if (fromClient == null)
+                    {
+                        if (from != CoopClient.Interface.GetLocalID())
+                        {
+                            GTA.UI.Notification.Show($"ClientID [{from}] not found!");
+                        }
+                        else
+                        {
+                            GTA.UI.Notification.Show($"ModPacket(0): A[{testPacketClass.A}] B[{testPacketClass.B}]");
+                        }
+                    }
+                    else
+                    {
+                        GTA.UI.Notification.Show($"ModPacket(0)({fromClient.Username}): A[{testPacketClass.A}] B[{testPacketClass.B}]");
+                    }
+                    break;
+                case 1:
+                    SetPlayerTimePacket setPlayerTimePacket = CoopClient.CoopSerializer.CDeserialize<SetPlayerTimePacket>(bytes);
+
+                    fromClient = CoopClient.Interface.GetPlayer(from);
+                    if (fromClient != null)
+                    {
+                        GTA.UI.Notification.Show($"Player {fromClient.Username} changed the time to: {setPlayerTimePacket.Hours}, {setPlayerTimePacket.Minutes}, {setPlayerTimePacket.Seconds}");
+                    }
+
+                    Function.Call(Hash.SET_CLOCK_TIME, setPlayerTimePacket.Hours, setPlayerTimePacket.Minutes, setPlayerTimePacket.Seconds);
                     break;
                 default:
                     GTA.UI.Notification.Show($"ModPacket({from}): ~r~Unknown customID!");
