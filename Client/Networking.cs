@@ -137,7 +137,7 @@ namespace CoopClient
                                     Main.MainMenu.ConnectedMenuSetting();
 #endif
 
-                                    Interface.Connected();
+                                    COOPAPI.Connected();
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 }
                                 break;
@@ -157,7 +157,7 @@ namespace CoopClient
                                 Main.MainMenu.DisconnectedMenuSetting();
 #endif
 
-                                Interface.Disconnected(reason);
+                                COOPAPI.Disconnected(reason);
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
                                 break;
                         }
@@ -219,7 +219,7 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
 
                                 ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
-                                if (!Interface.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
+                                if (!COOPAPI.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
                                 {
                                     Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
                                 }
@@ -233,7 +233,7 @@ namespace CoopClient
                                 packet = new ModPacket();
                                 packet.NetIncomingMessageToPacket(message);
                                 ModPacket modPacket = (ModPacket)packet;
-                                Interface.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
+                                COOPAPI.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
                                 break;
                         }
                         break;
@@ -265,7 +265,7 @@ namespace CoopClient
             };
 
             Main.Players.Add(packet.ID, player);
-            Interface.Connected(packet.ID);
+            COOPAPI.Connected(packet.ID);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
@@ -281,7 +281,7 @@ namespace CoopClient
 
                 player.PedBlip?.Delete();
 
-                Interface.Disconnected(packet.ID);
+                COOPAPI.Disconnected(packet.ID);
                 Main.Players.Remove(packet.ID);
             }
         }

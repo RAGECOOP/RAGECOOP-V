@@ -10,6 +10,11 @@ using Lidgren.Network;
 
 namespace CoopServer
 {
+    public abstract class ServerScript
+    {
+        public API API { get; } = new();
+    }
+
     internal class Resource
     {
         private static Thread _mainThread;
@@ -59,7 +64,7 @@ namespace CoopServer
             Task<bool> task = new(() => _script.API.InvokeModPacketReceived(from, target, mod, customID, bytes));
             task.Start();
             task.Wait(5000);
-            
+
             return task.Result;
         }
 
@@ -92,7 +97,7 @@ namespace CoopServer
             Task<bool> task = new(() => _script.API.InvokeChatMessage(username, message));
             task.Start();
             task.Wait(5000);
-            
+
             return task.Result;
         }
 
@@ -119,11 +124,6 @@ namespace CoopServer
                 _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHealthUpdate(playerData)));
             }
         }
-    }
-
-    public abstract class ServerScript
-    {
-        public API API { get; } = new();
     }
 
     public class API

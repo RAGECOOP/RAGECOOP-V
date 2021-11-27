@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace CoopClient
 {
-    public static class Interface
+    public static class COOPAPI
     {
         #region DELEGATES
         public delegate void ConnectEvent(bool connected, long fromId, string reason = null);
@@ -120,6 +120,12 @@ namespace CoopClient
             return Main.CurrentVersion;
         }
 
+        // Send bytes to server
+        public static void SendDataToServer(string mod, byte customID, byte[] bytes)
+        {
+            Main.MainNetworking.SendModData(-1, mod, customID, bytes);
+        }
+
         // Send bytes to all players
         public static void SendDataToAll(string mod, byte customID, byte[] bytes)
         {
@@ -130,6 +136,11 @@ namespace CoopClient
         public static void SendDataToPlayer(long target, string mod, byte customID, byte[] bytes)
         {
             Main.MainNetworking.SendModData(target, mod, customID, bytes);
+        }
+
+        public static string GetLocalUsername()
+        {
+            return Main.MainSettings.Username;
         }
 
         public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool debug = false)

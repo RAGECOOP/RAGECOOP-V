@@ -283,36 +283,35 @@ namespace CoopServer
                                         {
                                             packet = new ModPacket();
                                             packet.NetIncomingMessageToPacket(message);
-
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (MainResource != null)
+                                            if (MainResource != null &&
+                                                MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                             {
-                                                if (MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
-                                                {
-                                                    break;
-                                                }
+                                                // Was canceled
                                             }
-
-                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                                            modPacket.PacketToNetOutGoingMessage(outgoingMessage);
-
-                                            if (modPacket.Target != 0)
+                                            else if (modPacket.Target != -1)
                                             {
-                                                NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
-                                                if (target.Equals(default(Client)))
+                                                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                                modPacket.PacketToNetOutGoingMessage(outgoingMessage);
+
+                                                if (modPacket.Target != 0)
                                                 {
-                                                    Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
+                                                    NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
+                                                    if (target.Equals(default(Client)))
+                                                    {
+                                                        Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
+                                                    }
+                                                    else
+                                                    {
+                                                        // Send back to target
+                                                        MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    // Send back to target
-                                                    MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                    // Send back to all players
+                                                    MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
                                                 }
-                                            }
-                                            else
-                                            {
-                                                // Send back to all players
-                                                MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
                                             }
                                         }
                                         catch (Exception e)

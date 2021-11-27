@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 
 using Lidgren.Network;
 using ProtoBuf;
+using Newtonsoft.Json;
 
 using GTA.Math;
 
@@ -919,12 +919,8 @@ namespace CoopClient
                 return null;
             }
 
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
+            string jsonString = JsonConvert.SerializeObject(obj);
+            return System.Text.Encoding.ASCII.GetBytes(jsonString);
         }
 
         public static T CDeserialize<T>(this byte[] bytes) where T : class
@@ -934,14 +930,8 @@ namespace CoopClient
                 return null;
             }
 
-            using (MemoryStream memStream = new MemoryStream())
-            {
-                BinaryFormatter binForm = new BinaryFormatter();
-                memStream.Write(bytes, 0, bytes.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                T obj = (T)binForm.Deserialize(memStream);
-                return obj;
-            }
+            var jsonString = System.Text.Encoding.ASCII.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(jsonString);
         }
 
         internal static T Deserialize<T>(this byte[] data) where T : new()
