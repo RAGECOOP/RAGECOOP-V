@@ -13,7 +13,7 @@ namespace CoopClient
         public WorldThread()
         {
             Tick += OnTick;
-            Interval = (int)(1f / (Game.FPS > 60f ? 60f : Game.FPS) * 1000f);
+            Interval = Util.GetGameMs<int>();
             Aborted += (sender, e) =>
             {
                 if (LastDisableTraffic)

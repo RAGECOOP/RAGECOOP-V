@@ -11,7 +11,7 @@ namespace CoopClient.Entities
         public EntitiesThread()
         {
             Tick += OnTick;
-            Interval = (int)(1f / (Game.FPS > 60f ? 60f : Game.FPS)  * 1000f);
+            Interval = Util.GetGameMs<int>();
         }
 
         private void OnTick(object sender, EventArgs e)

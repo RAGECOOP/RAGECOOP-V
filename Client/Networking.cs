@@ -114,12 +114,6 @@ namespace CoopClient
                                     Main.LocalClientID = handshakePacket.ID;
                                     Main.NpcsAllowed = handshakePacket.NpcsAllowed;
 
-                                    Main.CleanUp();
-
-                                    Function.Call(Hash.SET_GARBAGE_TRUCKS, 0);
-                                    Function.Call(Hash.SET_RANDOM_BOATS, 0);
-                                    Function.Call(Hash.SET_RANDOM_TRAINS, 0);
-
                                     Main.MainChat.Init();
 
                                     // Send player connect packet
@@ -153,6 +147,7 @@ namespace CoopClient
                                 }
 
                                 Main.CleanUp();
+
 #if !NON_INTERACTIVE
                                 Main.MainMenu.DisconnectedMenuSetting();
 #endif
@@ -244,6 +239,9 @@ namespace CoopClient
                     case NetIncomingMessageType.ErrorMessage:
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.VerboseDebugMessage:
+#if DEBUG
+                        // TODO?
+#endif
                         break;
                     default:
                         break;

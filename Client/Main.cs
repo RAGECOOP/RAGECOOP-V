@@ -62,6 +62,8 @@ namespace CoopClient
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup = RelationshipGroup;
+
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "GTACOOP:R", "Welcome!", "Press ~g~F9~s~ to open the menu.");
             }
 
 #if !NON_INTERACTIVE
@@ -104,7 +106,7 @@ namespace CoopClient
             }
 #endif
 
-            if ((Util.GetTickCount64() - LastDataSend) < ((ulong)(1f / (Game.FPS > 60f ? 60f : Game.FPS)  * 1000f)))
+            if ((Util.GetTickCount64() - LastDataSend) < Util.GetGameMs<ulong>())
             {
                 return;
             }
@@ -203,17 +205,6 @@ namespace CoopClient
                 Npc.Value.Character?.Delete();
             }
             Npcs.Clear();
-
-            foreach (Ped entity in World.GetAllPeds().Where(p => p.Handle != Game.Player.Character.Handle))
-            {
-                entity.Kill();
-                entity.Delete();
-            }
-
-            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.CurrentVehicle?.Handle))
-            {
-                veh.Delete();
-            }
         }
 
 #if DEBUG
