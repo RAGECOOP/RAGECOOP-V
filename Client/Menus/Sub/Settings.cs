@@ -2,7 +2,7 @@
 
 namespace CoopClient.Menus.Sub
 {
-    public class Settings
+    internal class Settings
     {
         public NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
         {

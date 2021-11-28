@@ -1,6 +1,6 @@
 ﻿namespace CoopClient
 {
-    public class Settings
+    internal class Settings
     {
         public string Username { get; set; } = "Player";
         public string LastServerAddress { get; set; } = "127.0.0.1:4499";

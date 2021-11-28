@@ -12,7 +12,7 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    public class Main : Script
+    internal class Main : Script
     {
         public static RelationshipGroup RelationshipGroup;
 

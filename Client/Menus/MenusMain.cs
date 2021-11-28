@@ -5,7 +5,7 @@ using LemonUI.Menus;
 
 namespace CoopClient.Menus
 {
-    public class MenusMain
+    internal class MenusMain
     {
         public ObjectPool MenuPool = new ObjectPool();
 

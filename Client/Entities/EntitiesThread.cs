@@ -6,7 +6,7 @@ using GTA;
 
 namespace CoopClient.Entities
 {
-    public class EntitiesThread : Script
+    internal class EntitiesThread : Script
     {
         public EntitiesThread()
         {

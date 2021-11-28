@@ -8,7 +8,7 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    public class Chat
+    internal class Chat
     {
         private readonly Scaleform MainScaleForm;
 

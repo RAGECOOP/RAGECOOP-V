@@ -8,7 +8,7 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    public class PlayerList : Script
+    internal class PlayerList : Script
     {
         private readonly Scaleform MainScaleform = new Scaleform("mp_mm_card_freemode");
         private ulong LastUpdate = Util.GetTickCount64();

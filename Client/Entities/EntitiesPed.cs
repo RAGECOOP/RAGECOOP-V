@@ -9,58 +9,157 @@ using GTA.Math;
 
 using LemonUI.Elements;
 
-namespace CoopClient
+namespace CoopClient.Entities
 {
+    /// <summary>
+    /// ?
+    /// </summary>
     public class EntitiesPed
     {
         private bool AllDataAvailable = false;
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool LastSyncWasFull { get; set; } = false;
+        /// <summary>
+        /// ?
+        /// </summary>
         public ulong LastUpdateReceived { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public float Latency { get; set; }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         public Ped Character { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public int Health { get; set; }
         private int LastModelHash = 0;
+        /// <summary>
+        /// ?
+        /// </summary>
         public int ModelHash { get; set; }
         private Dictionary<int, int> LastProps = new Dictionary<int, int>();
+        /// <summary>
+        /// ?
+        /// </summary>
         public Dictionary<int, int> Props { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 Position { get; set; }
 
         #region -- ON FOOT --
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 Rotation { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 Velocity { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public byte Speed { get; set; }
         private bool LastIsJumping = false;
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsJumping { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsRagdoll { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsOnFire { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 AimCoords { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsAiming { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsShooting { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsReloading { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public int CurrentWeaponHash { get; set; }
         #endregion
 
+        /// <summary>
+        /// ?
+        /// </summary>
         public Blip PedBlip;
 
         #region -- IN VEHICLE --
         private ulong VehicleStopTime { get; set; }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool IsInVehicle { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public int VehicleModelHash { get; set; }
         private int[] LastVehicleColors = new int[] { 0, 0 };
+        /// <summary>
+        /// ?
+        /// </summary>
         public int[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
+        /// <summary>
+        /// ?
+        /// </summary>
         public Dictionary<int, int> VehicleMods { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehicleDead { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public float VehicleEngineHealth { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public int VehicleSeatIndex { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vehicle MainVehicle { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 VehiclePosition { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Quaternion VehicleRotation { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public Vector3 VehicleVelocity { get; set; }
         private float LastVehicleSpeed { get; set; }
         private float CurrentVehicleSpeed { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public float VehicleSpeed
         {
             set
@@ -69,19 +168,43 @@ namespace CoopClient
                 CurrentVehicleSpeed = value;
             }
         }
+        /// <summary>
+        /// ?
+        /// </summary>
         public float VehicleSteeringAngle { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehIsEngineRunning { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public float VehRPM { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehAreLightsOn { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehAreHighBeamsOn { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
+        /// <summary>
+        /// ?
+        /// </summary>
         public VehicleDoors[] VehDoors { get; set; }
         private int LastVehTires;
+        /// <summary>
+        /// ?
+        /// </summary>
         public int VehTires { get; set; }
         #endregion
 
-        public void DisplayLocally(string username)
+        internal void DisplayLocally(string username)
         {
             /*
              * username: string

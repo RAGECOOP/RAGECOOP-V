@@ -156,10 +156,16 @@ namespace CoopClient
         IsDead = 1 << 5
     }
 
+    /// <summary>
+    /// ?
+    /// </summary>
     [ProtoContract]
     public struct VehicleDoors
     {
         #region CLIENT-ONLY
+        /// <summary>
+        /// ?
+        /// </summary>
         public VehicleDoors(float angleRatio = 0f, bool broken = false, bool open = false, bool fullyOpen = false)
         {
             AngleRatio = angleRatio;
@@ -169,27 +175,39 @@ namespace CoopClient
         }
         #endregion
 
+        /// <summary>
+        /// ?
+        /// </summary>
         [ProtoMember(1)]
         public float AngleRatio { get; set; }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         [ProtoMember(2)]
         public bool Broken { get; set; }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         [ProtoMember(3)]
         public bool Open { get; set; }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         [ProtoMember(4)]
         public bool FullyOpen { get; set; }
     }
     #endregion
 
-    public interface IPacket
+    interface IPacket
     {
         void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         void NetIncomingMessageToPacket(NetIncomingMessage message);
     }
 
-    public abstract class Packet : IPacket
+    abstract class Packet : IPacket
     {
         public abstract void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
@@ -910,8 +928,14 @@ namespace CoopClient
     }
     #endregion
 
+    /// <summary>
+    /// ?
+    /// </summary>
     public static class CoopSerializer
     {
+        /// <summary>
+        /// ?
+        /// </summary>
         public static byte[] CSerialize(this object obj)
         {
             if (obj == null)
@@ -923,6 +947,9 @@ namespace CoopClient
             return System.Text.Encoding.ASCII.GetBytes(jsonString);
         }
 
+        /// <summary>
+        /// ?
+        /// </summary>
         public static T CDeserialize<T>(this byte[] bytes) where T : class
         {
             if (bytes == null)

@@ -10,7 +10,7 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    public class Networking
+    internal class Networking
     {
         public NetClient Client;
         public float Latency;

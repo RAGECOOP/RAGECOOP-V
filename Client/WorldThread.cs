@@ -6,7 +6,7 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    public class WorldThread : Script
+    internal class WorldThread : Script
     {
         private static bool LastDisableTraffic = false;
 
