@@ -728,19 +728,40 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                if (packet.Message.StartsWith("/"))
+                if (packet.Message.StartsWith('/'))
                 {
                     string[] cmdArgs = packet.Message.Split(" ");
                     string cmdName = cmdArgs[0].Remove(0, 1);
                     if (Commands.Any(x => x.Key.Name == cmdName))
                     {
+                        string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
+
                         CommandContext ctx = new()
                         {
-                            Client = Clients.First(x => x.Player.Username == packet.Username),
-                            Args = cmdArgs.Skip(1).ToArray()
+                            Client = Clients.FirstOrDefault(x => x.Player.Username == packet.Username),
+                            Args = argsWithoutCmd
                         };
 
                         KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
+
+                        if (command.Key.Usage != null && command.Key.ArgsLength != argsWithoutCmd.Length)
+                        {
+                            NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
+                            if (userConnection == default)
+                            {
+                                return;
+                            }
+
+                            outgoingMessage = MainNetServer.CreateMessage();
+                            new ChatMessagePacket()
+                            {
+                                Username = "Server",
+                                Message = command.Key.Usage
+                            }.PacketToNetOutGoingMessage(outgoingMessage);
+                            MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                            return;
+                        }
+
                         command.Value.Invoke(ctx);
                     }
                     else
@@ -807,9 +828,20 @@ namespace CoopServer
         }
         #endregion
 
+        public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        {
+            Command command = new(name) { Usage = usage, ArgsLength = argsLength };
+
+            if (Commands.ContainsKey(command))
+            {
+                throw new Exception("Command \"" + command.Name + "\" was already been registered!");
+            }
+
+            Commands.Add(command, callback);
+        }
         public static void RegisterCommand(string name, Action<CommandContext> callback)
         {
-            Command command = new() { Name = name };
+            Command command = new(name);
 
             if (Commands.ContainsKey(command))
             {
@@ -821,13 +853,13 @@ namespace CoopServer
 
         public static void RegisterCommands<T>()
         {
-            IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(CommandAttribute), false).Any());
+            IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(Command), false).Any());
 
             foreach (MethodInfo method in commands)
             {
-                CommandAttribute attribute = method.GetCustomAttribute<CommandAttribute>(true);
+                Command attribute = method.GetCustomAttribute<Command>(true);
 
-                RegisterCommand(attribute.Name, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
+                RegisterCommand(attribute.Name, attribute.Usage, attribute.ArgsLength, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
             }
         }
     }

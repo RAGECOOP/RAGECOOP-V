@@ -298,6 +298,10 @@ namespace CoopServer
             }
         }
 
+        public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        {
+            Server.RegisterCommand(name, usage, argsLength, callback);
+        }
         public static void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, callback);
@@ -310,20 +314,19 @@ namespace CoopServer
         #endregion
     }
 
-    public class Command
-    {
-        public string Name { get; set; }
-    }
-
     [AttributeUsage(AttributeTargets.Method)]
-    public class CommandAttribute : Attribute
+    public class Command : Attribute
     {
         /// <summary>
         /// Sets name of the command
         /// </summary>
         public string Name { get; set; }
 
-        public CommandAttribute(string name)
+        public string Usage { get; set; }
+
+        public short ArgsLength { get; set; }
+
+        public Command(string name)
         {
             Name = name;
         }
