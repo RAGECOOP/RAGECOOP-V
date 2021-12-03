@@ -8,7 +8,7 @@ using Lidgren.Network;
 
 namespace CoopServer
 {
-    class Util
+    internal class Util
     {
         public static List<NativeArgument> ParseNativeArguments(params object[] args)
         {

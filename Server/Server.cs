@@ -9,7 +9,7 @@ using Lidgren.Network;
 
 namespace CoopServer
 {
-    class Server
+    internal class Server
     {
         private static readonly string CompatibleVersion = "V0_8_0_1";
 
