@@ -12,31 +12,49 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    internal class Main : Script
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
+    public class Main : Script
     {
-        public static RelationshipGroup RelationshipGroup;
+        internal static RelationshipGroup RelationshipGroup;
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentVersion = "V0_8_0_1";
+        internal static readonly string CurrentVersion = "V0_8_0_1";
 
-        public static bool ShareNpcsWithPlayers = false;
-        public static bool DisableTraffic = false;
-        public static bool NpcsAllowed = false;
+        internal static bool ShareNpcsWithPlayers = false;
+        internal static bool DisableTraffic = false;
+        internal static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Settings MainSettings = Util.ReadSettings();
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Networking MainNetworking = new Networking();
 
 #if !NON_INTERACTIVE
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static MenusMain MainMenu = new MenusMain();
 #endif
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Chat MainChat = new Chat();
 
-        public static long LocalClientID = 0;
-        public static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
-        public static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
+        internal static long LocalClientID = 0;
+        internal static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
+        internal static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public Main()
         {
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
@@ -184,7 +202,7 @@ namespace CoopClient
         }
 #endif
 
-        public static void CleanUp()
+        internal static void CleanUp()
         {
             MainChat.Clear();
 
@@ -209,9 +227,9 @@ namespace CoopClient
 
 #if DEBUG
         private ulong ArtificialLagCounter;
-        public static EntitiesPlayer DebugSyncPed;
-        public static ulong LastFullDebugSync = 0;
-        public static bool UseDebug = false;
+        internal static EntitiesPlayer DebugSyncPed;
+        internal static ulong LastFullDebugSync = 0;
+        internal static bool UseDebug = false;
 
         private void Debug()
         {

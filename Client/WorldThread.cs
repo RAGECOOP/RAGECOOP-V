@@ -6,10 +6,16 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    internal class WorldThread : Script
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
+    public class WorldThread : Script
     {
         private static bool LastDisableTraffic = false;
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public WorldThread()
         {
             Tick += OnTick;
@@ -23,7 +29,7 @@ namespace CoopClient
             };
         }
 
-        public static void OnTick(object sender, EventArgs e)
+        internal static void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
             {

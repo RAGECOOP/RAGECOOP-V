@@ -6,8 +6,14 @@ using GTA;
 
 namespace CoopClient.Entities
 {
-    internal class EntitiesThread : Script
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
+    public class EntitiesThread : Script
     {
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public EntitiesThread()
         {
             Tick += OnTick;
