@@ -9,15 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="protobuf-net" Version="2.4.6" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Lidgren.Network">
-      <HintPath>..\Libs\Release\Lidgren.Network.dll</HintPath>
+      <HintPath>..\Libs\Release\scripts\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Libs\Release\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\Libs\Release\scripts\protobuf-net.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -39,19 +39,22 @@
     <DocumentationFile>bin\Release\CoopClient.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LemonUI.SHVDN3">
-      <HintPath>..\Libs\Release\LemonUI.SHVDN3.dll</HintPath>
+    <Reference Include="LemonUI.SHVDN3, Version=1.5.1.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\Release\scripts\LemonUI.SHVDN3.dll</HintPath>
     </Reference>
-    <Reference Include="Lidgren.Network">
-      <HintPath>..\Libs\Release\Lidgren.Network.dll</HintPath>
+    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\Release\scripts\Lidgren.Network.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Libs\Release\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net, Version=2.4.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\packages\protobuf-net.2.4.6\lib\net40\protobuf-net.dll</HintPath>
+    <Reference Include="protobuf-net">
+      <HintPath>..\Libs\Release\scripts\protobuf-net.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet3, Version=3.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="ScriptHookVDotNet3, Version=3.3.2.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Release\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
@@ -87,9 +90,6 @@
     <Compile Include="WorldThread.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

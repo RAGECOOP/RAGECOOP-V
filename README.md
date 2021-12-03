@@ -26,7 +26,7 @@ Server:
 - .NET Framework 4.8
 
 # 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/releases/tag/v3.3.2)
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/ca82751b7cc8bdf2203d361b27fe0d1aa895eb55)
 - [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/1342949cd19eaa4115990793311681ea1568054c)
 - Lidgren Network Custom (***PRIVATE***)
 - - No new features (only improvements)
