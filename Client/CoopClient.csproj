@@ -82,6 +82,7 @@
     <Compile Include="Entities\EntitiesThread.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\MenusMain.cs" />
+    <Compile Include="Menus\Sub\Servers.cs" />
     <Compile Include="Menus\Sub\Settings.cs" />
     <Compile Include="Networking.cs" />
     <Compile Include="Packets.cs" />

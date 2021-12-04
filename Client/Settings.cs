@@ -5,9 +5,21 @@
     /// </summary>
     public class Settings
     {
-        internal string Username { get; set; } = "Player";
-        internal string LastServerAddress { get; set; } = "127.0.0.1:4499";
-        internal bool FlipMenu { get; set; } = false;
-        internal int StreamedNpc { get; set; } = 10;
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public string Username { get; set; } = "Player";
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public string LastServerAddress { get; set; } = "127.0.0.1:4499";
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public bool FlipMenu { get; set; } = false;
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public int StreamedNpc { get; set; } = 10;
     }
 }

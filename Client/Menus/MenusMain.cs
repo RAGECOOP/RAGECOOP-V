@@ -22,6 +22,10 @@ namespace CoopClient.Menus
         /// Don't use it!
         /// </summary>
         public Sub.Settings SubSettings = new Sub.Settings();
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public Sub.Servers ServerList = new Sub.Servers();
         #endregion
 
         #region ITEMS
@@ -43,6 +47,8 @@ namespace CoopClient.Menus
             ServerIpItem.Activated += ServerIpActivated;
             ServerConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.MainSettings.LastServerAddress); };
 
+            MainMenu.AddSubMenu(ServerList.MainMenu);
+
             MainMenu.Add(UsernameItem);
             MainMenu.Add(ServerIpItem);
             MainMenu.Add(ServerConnectItem);
@@ -51,6 +57,7 @@ namespace CoopClient.Menus
 
             MainMenu.Add(AboutItem);
 
+            MenuPool.Add(ServerList.MainMenu);
             MenuPool.Add(MainMenu);
             MenuPool.Add(SubSettings.MainMenu);
         }
@@ -86,12 +93,13 @@ namespace CoopClient.Menus
             MainMenu.Items[0].Enabled = false;
             MainMenu.Items[1].Enabled = false;
             MainMenu.Items[2].Enabled = false;
+            MainMenu.Items[3].Enabled = false;
         }
 
         internal void ConnectedMenuSetting()
         {
-            MainMenu.Items[2].Enabled = true;
-            MainMenu.Items[2].Title = "Disconnect";
+            MainMenu.Items[3].Enabled = true;
+            MainMenu.Items[3].Title = "Disconnect";
             SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
 
             MainMenu.Visible = false;
@@ -103,7 +111,8 @@ namespace CoopClient.Menus
             MainMenu.Items[0].Enabled = true;
             MainMenu.Items[1].Enabled = true;
             MainMenu.Items[2].Enabled = true;
-            MainMenu.Items[2].Title = "Connect";
+            MainMenu.Items[3].Enabled = true;
+            MainMenu.Items[3].Title = "Connect";
             SubSettings.MainMenu.Items[1].Enabled = false;
 
             MenuPool.RefreshAll();
