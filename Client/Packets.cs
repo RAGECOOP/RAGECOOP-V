@@ -472,18 +472,21 @@ namespace CoopClient
         public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
-        public int[] VehColors { get; set; }
+        public LVector3 VehAimCoords { get; set; }
 
         [ProtoMember(14)]
-        public Dictionary<int, int> VehMods { get; set; }
+        public int[] VehColors { get; set; }
 
         [ProtoMember(15)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(16)]
-        public int VehTires { get; set; }
+        public VehicleDoors[] VehDoors { get; set; }
 
         [ProtoMember(17)]
+        public int VehTires { get; set; }
+
+        [ProtoMember(18)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -514,6 +517,7 @@ namespace CoopClient
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehAimCoords = data.VehAimCoords;
             VehColors = data.VehColors;
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;

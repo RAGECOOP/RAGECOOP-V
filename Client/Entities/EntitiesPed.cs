@@ -172,6 +172,7 @@ namespace CoopClient.Entities
         /// ?
         /// </summary>
         public float VehicleSteeringAngle { get; set; }
+        private int LastVehicleAim;
         /// <summary>
         /// ?
         /// </summary>
@@ -560,9 +561,19 @@ namespace CoopClient.Entities
 
                         LastVehTires = VehTires;
                     }
+
+                    if (AimCoords != default)
+                    {
+                        int gameTime = Game.GameTime;
+                        if (gameTime - LastVehicleAim > 30)
+                        {
+                            Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                            LastVehicleAim = gameTime;
+                        }
+                    }
                 }
             }
-            
+
             if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
             {
                 MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * VehicleSteeringAngle);

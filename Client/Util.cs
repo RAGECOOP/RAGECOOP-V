@@ -139,6 +139,15 @@ namespace CoopClient
             return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
         }
 
+        /// <summary>
+        /// Only works for players NOT NPCs
+        /// </summary>
+        /// <returns>Vector3</returns>
+        public static Vector3 GetVehicleAimCoords()
+        {
+            return RaycastEverything(new Vector2(0, 0));
+        }
+
         public static byte? GetVehicleFlags(this Vehicle veh, bool fullSync)
         {
             byte? flags = 0;
@@ -335,6 +344,38 @@ namespace CoopClient
             }
 
             return coord.GetResult<Vector3>();
+        }
+
+        public static bool IsTurretSeat(this Vehicle veh, int seat)
+        {
+            if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
+            {
+                return false;
+            }
+
+            switch (seat)
+            {
+                case -1:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Rhino
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Khanjari
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.FireTruck;
+                case 1:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical3
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.HalfTrack; // Not sure
+                case 2:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2;
+                case 3:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Limo2;
+                case 7:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Insurgent;
+            }
+
+            return false;
         }
 
         public static double DegToRad(double deg)

@@ -240,12 +240,12 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 157)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 56)
             {
                 return;
             }
 
-            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 1500;
+            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 500;
 
             if (fullSync)
             {
@@ -282,6 +282,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();

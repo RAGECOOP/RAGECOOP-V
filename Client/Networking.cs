@@ -335,6 +335,7 @@ namespace CoopClient
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.AimCoords = packet.VehAimCoords.ToVector();
                 player.VehicleColors = packet.VehColors;
                 player.VehicleMods = packet.VehMods;
                 player.VehDoors = packet.VehDoors;
@@ -661,6 +662,7 @@ namespace CoopClient
                         VehVelocity = vehVelocity,
                         VehSpeed = vehSpeed,
                         VehSteeringAngle = vehSteeringAngle,
+                        VehAimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords().ToLVector() : new LVector3(),
                         VehColors = new int[] { primaryColor, secondaryColor },
                         VehMods = vehMods,
                         VehDoors = vehDoors,
