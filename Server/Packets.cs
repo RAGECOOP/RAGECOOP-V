@@ -857,7 +857,7 @@ namespace CoopServer
             }
 
             string jsonString = JsonConvert.SerializeObject(obj);
-            return System.Text.Encoding.ASCII.GetBytes(jsonString);
+            return System.Text.Encoding.UTF8.GetBytes(jsonString);
         }
 
         public static T CDeserialize<T>(this byte[] bytes) where T : class
@@ -867,7 +867,7 @@ namespace CoopServer
                 return null;
             }
 
-            var jsonString = System.Text.Encoding.ASCII.GetString(bytes);
+            var jsonString = System.Text.Encoding.UTF8.GetString(bytes);
             return JsonConvert.DeserializeObject<T>(jsonString);
         }
 

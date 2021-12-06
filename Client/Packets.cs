@@ -948,7 +948,7 @@ namespace CoopClient
             }
 
             string jsonString = JsonConvert.SerializeObject(obj);
-            return System.Text.Encoding.ASCII.GetBytes(jsonString);
+            return System.Text.Encoding.UTF8.GetBytes(jsonString);
         }
 
         /// <summary>
@@ -961,7 +961,7 @@ namespace CoopClient
                 return null;
             }
 
-            var jsonString = System.Text.Encoding.ASCII.GetString(bytes);
+            var jsonString = System.Text.Encoding.UTF8.GetString(bytes);
             return JsonConvert.DeserializeObject<T>(jsonString);
         }
 
