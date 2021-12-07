@@ -47,9 +47,16 @@ namespace CoopClient
 
                 Client.Start();
 
-                string[] ip = address.Split(':');
-                
-                if(ip.Length != 2)
+                string[] ip = new string[2];
+
+                int idx = address.LastIndexOf(':');
+                if (idx != -1)
+                {
+                    ip[0] = address.Substring(0, idx);
+                    ip[1] = address.Substring(idx + 1);
+                }
+
+                if (ip.Length != 2)
                 {
                     throw new Exception("Malformed URL");
                 }

@@ -103,6 +103,7 @@ namespace CoopClient.Menus
             SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
 
             MainMenu.Visible = false;
+            ServerList.MainMenu.Visible = false;
             MenuPool.RefreshAll();
         }
 

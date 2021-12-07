@@ -4,11 +4,20 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Reflection;
 using System.IO;
+using System.Net.Http;
+
+using Newtonsoft.Json;
 
 using Lidgren.Network;
+using System.Text;
 
 namespace CoopServer
 {
+    internal class IpInfo
+    {
+        public string Country { get; set; }
+    }
+
     internal class Server
     {
         private static readonly string CompatibleVersion = "V0_8_0_1";
@@ -60,6 +69,78 @@ namespace CoopServer
                     Logging.Error("Port forwarding failed!");
                     Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to \"false\"!");
                 }
+            }
+
+            if (1 == 1) // TODO
+            {
+                #region -- MASTERSERVER --
+                new Thread(async () =>
+                {
+                    try
+                    {
+                        HttpClient httpClient = new();
+
+                        IpInfo info;
+
+                        try
+                        {
+                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+
+                            info = JsonConvert.DeserializeObject<IpInfo>(data);
+                        }
+                        catch
+                        {
+                            info = new() { Country = "?" };
+                        }
+
+                        bool responseError = false;
+
+                        while (!responseError)
+                        {
+                            string msg =
+                                "{ " +
+                                "\"port\": \"" + MainSettings.ServerPort + "\", " +
+                                "\"name\": \"" + MainSettings.ServerName + "\", " +
+                                "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
+                                "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
+                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
+                                "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
+                                "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
+                                "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
+                                "\"country\": \"" + info.Country + "\"" +
+                                " }";
+
+                            string responseContent = "";
+                            try
+                            {
+                                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:8083/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
+
+                                responseContent = await response.Content.ReadAsStringAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logging.Error(ex.Message);
+                                continue;
+                            }
+
+                            if (responseContent != "{\"success\":true}")
+                            {
+                                Logging.Error(responseContent);
+                                responseError = true;
+                            }
+                            else
+                            {
+                                // Sleep for 12.5s
+                                Thread.Sleep(12500);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Error(ex.Message);
+                    }
+                }).Start();
+                #endregion
             }
 
             if (!string.IsNullOrEmpty(MainSettings.Resource))
@@ -783,7 +864,7 @@ namespace CoopServer
 
                     return;
                 }
-                
+
                 if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
                 {
                     return;
