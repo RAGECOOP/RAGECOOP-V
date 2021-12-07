@@ -113,7 +113,7 @@ namespace CoopServer
                             string responseContent = "";
                             try
                             {
-                                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:8083/servers", new StringContent(msg, Encoding.UTF8, "application/json"));
+                                HttpResponseMessage response = await httpClient.PostAsync("http://gtacoopr.000webhostapp.com/", new StringContent(msg, Encoding.UTF8, "application/json"));
 
                                 responseContent = await response.Content.ReadAsStringAsync();
                             }
@@ -123,7 +123,7 @@ namespace CoopServer
                                 continue;
                             }
 
-                            if (responseContent != "{\"success\":true}")
+                            if (responseContent != "OK")
                             {
                                 Logging.Error(responseContent);
                                 responseError = true;

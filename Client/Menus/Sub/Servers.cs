@@ -12,8 +12,6 @@ namespace CoopClient.Menus.Sub
     {
         [JsonProperty("ip")]
         public string IP { get; set; }
-        [JsonProperty("port")]
-        public string Port { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("players")]
@@ -66,7 +64,7 @@ namespace CoopClient.Menus.Sub
             try
             {
                 WebClient client = new WebClient();
-                string data = client.DownloadString("http://localhost:8083/servers");
+                string data = client.DownloadString("http://gtacoopr.000webhostapp.com/");
                 serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
             }
             catch (Exception ex)
@@ -88,16 +86,18 @@ namespace CoopClient.Menus.Sub
 
             foreach (ServerListClass server in serverList)
             {
-                string serverIp = $"{server.IP}:{server.Port}";
                 NativeItem tmpItem = null;
-                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{serverIp}~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "X" : "O")}]"});
+                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{server.IP}~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
                 tmpItem.Activated += (object sender, EventArgs e) =>
                 {
                     try
                     {
-                        Main.MainNetworking.DisConnectFromServer(serverIp);
+                        MainMenu.Visible = false;
+                        Main.MainMenu.MainMenu.Visible = true;
 
-                        Main.MainSettings.LastServerAddress = serverIp;
+                        Main.MainNetworking.DisConnectFromServer(server.IP);
+
+                        Main.MainSettings.LastServerAddress = server.IP;
                         Util.SaveSettings();
                     }
                     catch (Exception ex)
