@@ -27,10 +27,6 @@ namespace CoopClient
         {
             if (IsOnServer())
             {
-                NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-                new PlayerDisconnectPacket() { ID = Main.LocalClientID }.PacketToNetOutGoingMessage(outgoingMessage);
-                Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
-                Client.FlushSendQueue();
                 Client.Disconnect("Bye!");
             }
             else
