@@ -64,7 +64,7 @@ namespace CoopClient.Menus.Sub
             try
             {
                 WebClient client = new WebClient();
-                string data = client.DownloadString("http://gtacoopr.000webhostapp.com/");
+                string data = client.DownloadString(Main.MainSettings.MasterServer);
                 serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
             }
             catch (Exception ex)

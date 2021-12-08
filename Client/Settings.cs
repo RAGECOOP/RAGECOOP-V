@@ -16,6 +16,10 @@
         /// <summary>
         /// Don't use it!
         /// </summary>
+        public string MasterServer { get; set; } = "http://gtacoopr.000webhostapp.com/servers.php";
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public bool FlipMenu { get; set; } = false;
         /// <summary>
         /// Don't use it!

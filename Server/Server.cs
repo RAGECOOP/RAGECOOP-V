@@ -20,7 +20,7 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V0_8_0_1";
+        private static readonly string CompatibleVersion = "V0_9_0";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -71,8 +71,10 @@ namespace CoopServer
                 }
             }
 
-            if (1 == 1) // TODO
+            if (MainSettings.AnnounceSelf)
             {
+                Logging.Info("Announcing to master server...");
+
                 #region -- MASTERSERVER --
                 new Thread(async () =>
                 {
@@ -110,10 +112,16 @@ namespace CoopServer
                                 "\"country\": \"" + info.Country + "\"" +
                                 " }";
 
+                            HttpResponseMessage response = null;
                             string responseContent = "";
                             try
                             {
-                                HttpResponseMessage response = await httpClient.PostAsync("http://gtacoopr.000webhostapp.com/", new StringContent(msg, Encoding.UTF8, "application/json"));
+                                response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+                                if (response == null)
+                                {
+                                    Logging.Error("MasterServer: Something went wrong!");
+                                    continue;
+                                }
 
                                 responseContent = await response.Content.ReadAsStringAsync();
                             }
@@ -123,9 +131,9 @@ namespace CoopServer
                                 continue;
                             }
 
-                            if (responseContent != "OK")
+                            if (response.StatusCode != System.Net.HttpStatusCode.OK)
                             {
-                                Logging.Error(responseContent);
+                                Logging.Error($"MasterServer: {response.StatusCode}");
                                 responseError = true;
                             }
                             else
@@ -137,7 +145,7 @@ namespace CoopServer
                     }
                     catch (Exception ex)
                     {
-                        Logging.Error(ex.Message);
+                        Logging.Error($"MasterServer: {ex.Message}");
                     }
                 }).Start();
                 #endregion

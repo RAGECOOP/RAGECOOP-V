@@ -11,6 +11,8 @@
         public bool NpcsAllowed { get; set; } = true;
         public bool ModsAllowed {  get; set; } = false;
         public bool UPnP { get; set; } = true;
+        public bool AnnounceSelf { get; set; } = true;
+        public string MasterServer { get; set; } = "http://gtacoopr.000webhostapp.com/servers.php";
         public bool DebugMode { get; set; } = false;
     }
 }
