@@ -443,6 +443,14 @@ namespace CoopServer
                     Thread.Sleep(1000 / 60);
                 }
             }
+
+            if (MainNetServer.Connections.Count > 0)
+            {
+                MainNetServer.Connections.ForEach(x => x.Disconnect("Server is shutting down!"));
+                // We have to wait some time for all Disconnect() messages to be sent successfully
+                // Sleep for 1 second
+                Thread.Sleep(1000);
+            }
         }
 
         #region -- PLAYER --
