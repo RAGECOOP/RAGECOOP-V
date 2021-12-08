@@ -97,7 +97,7 @@ namespace CoopServer
 
                         bool responseError = false;
 
-                        while (!responseError)
+                        while (!Program.ReadyToStop && !responseError)
                         {
                             string msg =
                                 "{ " +
@@ -193,7 +193,7 @@ namespace CoopServer
         {
             Logging.Info("Listening for clients");
 
-            while (true)
+            while (!Program.ReadyToStop)
             {
                 NetIncomingMessage message;
 
@@ -429,6 +429,14 @@ namespace CoopServer
                     MainNetServer.Recycle(message);
                 }
 
+                // 16 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(1000 / 60);
+            }
+
+            Logging.Warning("Server is shutting down!");
+            // Waiting for resource...
+            while (MainResource != null && !MainResource.ReadyToStop)
+            {
                 // 16 milliseconds to sleep to reduce CPU usage
                 Thread.Sleep(1000 / 60);
             }

@@ -5,6 +5,7 @@ namespace CoopServer
 {
     class Program
     {
+        public static bool ReadyToStop = false;
         static void Main(string[] args)
         {
             try
@@ -15,6 +16,15 @@ namespace CoopServer
                 {
                     File.WriteAllText("log.txt", string.Empty);
                 }
+
+                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
+                {
+                    if (e.SpecialKey == ConsoleSpecialKey.ControlC)
+                    {
+                        e.Cancel = true;
+                        ReadyToStop = true;
+                    }
+                };
 
                 _ = new Server();
             }
