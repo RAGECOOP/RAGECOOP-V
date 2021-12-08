@@ -74,6 +74,7 @@ namespace CoopServer
             if (MainSettings.AnnounceSelf)
             {
                 Logging.Info("Announcing to master server...");
+                Logging.Warning("Please make sure that port forwarding is active, otherwise nobody can join!");
 
                 #region -- MASTERSERVER --
                 new Thread(async () =>
