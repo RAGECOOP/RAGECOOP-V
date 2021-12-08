@@ -80,8 +80,9 @@ namespace CoopClient
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup = RelationshipGroup;
-
+#if !NON_INTERACTIVE
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "GTACOOP:R", "Welcome!", "Press ~g~F9~s~ to open the menu.");
+#endif
             }
 
 #if !NON_INTERACTIVE
