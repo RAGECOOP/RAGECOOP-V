@@ -202,10 +202,10 @@ namespace CoopServer
                     switch (message.MessageType)
                     {
                         case NetIncomingMessageType.ConnectionApproval:
-                            Logging.Info("New incoming connection from: " + message.SenderConnection.RemoteEndPoint.ToString());
+                            Logging.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
                             if (message.ReadByte() != (byte)PacketTypes.HandshakePacket)
                             {
-                                Logging.Info(string.Format("Player with IP {0} blocked, reason: Wrong packet!", message.SenderConnection.RemoteEndPoint.Address.ToString()));
+                                Logging.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
                                 message.SenderConnection.Deny("Wrong packet!");
                             }
                             else
@@ -219,7 +219,7 @@ namespace CoopServer
                                 }
                                 catch (Exception e)
                                 {
-                                    Logging.Info(string.Format("Player with IP {0} blocked, reason: {1}", message.SenderConnection.RemoteEndPoint.Address.ToString(), e.Message));
+                                    Logging.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
                                     message.SenderConnection.Deny(e.Message);
                                 }
                             }
@@ -227,11 +227,9 @@ namespace CoopServer
                         case NetIncomingMessageType.StatusChanged:
                             NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
 
-                            long clientID = message.SenderConnection.RemoteUniqueIdentifier;
-
-                            if (status == NetConnectionStatus.Disconnected && Clients.Any(x => x.ID == clientID))
+                            if (status == NetConnectionStatus.Disconnected)
                             {
-                                SendPlayerDisconnectPacket(new PlayerDisconnectPacket() { ID = clientID });
+                                SendPlayerDisconnectPacket(message.SenderConnection.RemoteUniqueIdentifier);
                             }
                             break;
                         case NetIncomingMessageType.Data:
@@ -249,18 +247,6 @@ namespace CoopServer
                                         packet = new PlayerConnectPacket();
                                         packet.NetIncomingMessageToPacket(message);
                                         SendPlayerConnectPacket(message.SenderConnection, (PlayerConnectPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
-                                    }
-                                    break;
-                                case (byte)PacketTypes.PlayerDisconnectPacket:
-                                    try
-                                    {
-                                        packet = new PlayerDisconnectPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        SendPlayerDisconnectPacket((PlayerDisconnectPacket)packet);
                                     }
                                     catch (Exception e)
                                     {
@@ -558,11 +544,6 @@ namespace CoopServer
                 return;
             }
 
-            if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
-            {
-                SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
-            }
-
             List<NetConnection> clients;
             if ((clients = Util.FilterAllLocal(local)).Count > 0)
             {
@@ -600,33 +581,46 @@ namespace CoopServer
             {
                 MainResource.InvokePlayerConnected(localClient);
             }
+            else
+            {
+                Logging.Info($"Player {localClient.Player.Username} connected!");
+            }
+
+            if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
+            {
+                SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
+            }
         }
 
         // Send all players a message that someone has left the server
-        private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet)
+        private static void SendPlayerDisconnectPacket(long clientID)
         {
-            List<NetConnection> clients;
-            if ((clients = Util.FilterAllLocal(packet.ID)).Count > 0)
+            List<NetConnection> clients = MainNetServer.Connections;
+            if (clients.Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                new PlayerDisconnectPacket()
+                {
+                    ID = clientID
+                }.PacketToNetOutGoingMessage(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            Client localClient = Clients.FirstOrDefault(x => x.ID == clientID);
             if (localClient.Equals(default(Client)))
             {
                 return;
             }
 
+            Clients.Remove(localClient);
+
             if (MainResource != null)
             {
                 MainResource.InvokePlayerDisconnected(localClient);
             }
-
-            lock (Clients)
+            else
             {
-                Clients.Remove(localClient);
+                Logging.Info($"Player {localClient.Player.Username} disconnected!");
             }
         }
 

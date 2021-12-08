@@ -93,9 +93,12 @@ namespace CoopClient.Menus.Sub
                     try
                     {
                         MainMenu.Visible = false;
-                        Main.MainMenu.MainMenu.Visible = true;
 
                         Main.MainNetworking.DisConnectFromServer(server.IP);
+
+                        Main.MainMenu.ServerIpItem.AltTitle = server.IP;
+
+                        Main.MainMenu.MainMenu.Visible = true;
 
                         Main.MainSettings.LastServerAddress = server.IP;
                         Util.SaveSettings();

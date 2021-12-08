@@ -30,7 +30,7 @@ namespace CoopClient.Menus
 
         #region ITEMS
         private readonly NativeItem UsernameItem = new NativeItem("Username") { AltTitle = Main.MainSettings.Username };
-        private readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
+        internal readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
         private readonly NativeItem ServerConnectItem = new NativeItem("Connect");
         private readonly NativeItem AboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/GTACOOP-R~n~" +
@@ -104,7 +104,6 @@ namespace CoopClient.Menus
 
             MainMenu.Visible = false;
             ServerList.MainMenu.Visible = false;
-            MenuPool.RefreshAll();
         }
 
         internal void DisconnectedMenuSetting()
