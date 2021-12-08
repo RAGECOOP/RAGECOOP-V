@@ -228,11 +228,12 @@ namespace CoopClient
         /// <summary>
         /// ?
         /// </summary>
-        public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool debug = false)
+        public static void Configure(string playerName, bool shareNpcsWithPlayers, int streamedNpcs, bool disableTrafficSharing, bool debug = false)
         {
             Main.MainSettings.Username = playerName;
             Main.ShareNpcsWithPlayers = shareNpcsWithPlayers;
             Main.MainSettings.StreamedNpc = streamedNpcs;
+            Main.DisableTraffic = disableTrafficSharing;
 #if DEBUG
             Main.UseDebug = debug;
 #endif
