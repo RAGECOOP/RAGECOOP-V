@@ -434,11 +434,14 @@ namespace CoopServer
             }
 
             Logging.Warning("Server is shutting down!");
-            // Waiting for resource...
-            while (MainResource != null && !MainResource.ReadyToStop)
+            if (MainResource != null)
             {
-                // 16 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(1000 / 60);
+                // Waiting for resource...
+                while (!MainResource.ReadyToStop)
+                {
+                    // 16 milliseconds to sleep to reduce CPU usage
+                    Thread.Sleep(1000 / 60);
+                }
             }
         }
 
