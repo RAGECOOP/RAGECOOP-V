@@ -10,17 +10,20 @@ using GTA.Native;
 
 namespace CoopClient
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class Networking
     {
-        public NetClient Client;
-        public float Latency;
+        internal NetClient Client;
+        internal float Latency;
 
-        public bool ShowNetworkInfo = false;
+        internal bool ShowNetworkInfo = false;
 
-        public int BytesReceived = 0;
-        public int BytesSend = 0;
+        internal int BytesReceived = 0;
+        internal int BytesSend = 0;
 
-        public void DisConnectFromServer(string address)
+        internal void DisConnectFromServer(string address)
         {
             if (IsOnServer())
             {
@@ -44,9 +47,16 @@ namespace CoopClient
 
                 Client.Start();
 
-                string[] ip = address.Split(':');
-                
-                if(ip.Length != 2)
+                string[] ip = new string[2];
+
+                int idx = address.LastIndexOf(':');
+                if (idx != -1)
+                {
+                    ip[0] = address.Substring(0, idx);
+                    ip[1] = address.Substring(idx + 1);
+                }
+
+                if (ip.Length != 2)
                 {
                     throw new Exception("Malformed URL");
                 }
@@ -66,12 +76,12 @@ namespace CoopClient
             }
         }
 
-        public bool IsOnServer()
+        internal bool IsOnServer()
         {
             return Client?.ConnectionStatus == NetConnectionStatus.Connected;
         }
 
-        public void ReceiveMessages()
+        internal void ReceiveMessages()
         {
             if (Client == null)
             {
@@ -114,12 +124,6 @@ namespace CoopClient
                                     Main.LocalClientID = handshakePacket.ID;
                                     Main.NpcsAllowed = handshakePacket.NpcsAllowed;
 
-                                    Main.CleanUp();
-
-                                    Function.Call(Hash.SET_GARBAGE_TRUCKS, 0);
-                                    Function.Call(Hash.SET_RANDOM_BOATS, 0);
-                                    Function.Call(Hash.SET_RANDOM_TRAINS, 0);
-
                                     Main.MainChat.Init();
 
                                     // Send player connect packet
@@ -137,7 +141,7 @@ namespace CoopClient
                                     Main.MainMenu.ConnectedMenuSetting();
 #endif
 
-                                    Interface.Connected();
+                                    COOPAPI.Connected();
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 }
                                 break;
@@ -153,11 +157,12 @@ namespace CoopClient
                                 }
 
                                 Main.CleanUp();
+
 #if !NON_INTERACTIVE
                                 Main.MainMenu.DisconnectedMenuSetting();
 #endif
 
-                                Interface.Disconnected(reason);
+                                COOPAPI.Disconnected(reason);
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
                                 break;
                         }
@@ -219,7 +224,7 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
 
                                 ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
-                                if (!Interface.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
+                                if (!COOPAPI.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
                                 {
                                     Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
                                 }
@@ -233,7 +238,7 @@ namespace CoopClient
                                 packet = new ModPacket();
                                 packet.NetIncomingMessageToPacket(message);
                                 ModPacket modPacket = (ModPacket)packet;
-                                Interface.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
+                                COOPAPI.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
                                 break;
                         }
                         break;
@@ -244,6 +249,9 @@ namespace CoopClient
                     case NetIncomingMessageType.ErrorMessage:
                     case NetIncomingMessageType.WarningMessage:
                     case NetIncomingMessageType.VerboseDebugMessage:
+#if DEBUG
+                        // TODO?
+#endif
                         break;
                     default:
                         break;
@@ -265,7 +273,7 @@ namespace CoopClient
             };
 
             Main.Players.Add(packet.ID, player);
-            Interface.Connected(packet.ID);
+            COOPAPI.Connected(packet.ID);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
@@ -281,7 +289,7 @@ namespace CoopClient
 
                 player.PedBlip?.Delete();
 
-                Interface.Disconnected(packet.ID);
+                COOPAPI.Disconnected(packet.ID);
                 Main.Players.Remove(packet.ID);
             }
         }
@@ -334,6 +342,7 @@ namespace CoopClient
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
+                player.AimCoords = packet.VehAimCoords.ToVector();
                 player.VehicleColors = packet.VehColors;
                 player.VehicleMods = packet.VehMods;
                 player.VehDoors = packet.VehDoors;
@@ -590,7 +599,7 @@ namespace CoopClient
 
         #region -- SEND --
         private ulong LastPlayerFullSync = 0;
-        public void SendPlayerData()
+        internal void SendPlayerData()
         {
             Ped player = Game.Player.Character;
 
@@ -660,6 +669,7 @@ namespace CoopClient
                         VehVelocity = vehVelocity,
                         VehSpeed = vehSpeed,
                         VehSteeringAngle = vehSteeringAngle,
+                        VehAimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords().ToLVector() : new LVector3(),
                         VehColors = new int[] { primaryColor, secondaryColor },
                         VehMods = vehMods,
                         VehDoors = vehDoors,
@@ -762,7 +772,7 @@ namespace CoopClient
             #endif
         }
 
-        public void SendNpcData(Ped npc)
+        internal void SendNpcData(Ped npc)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
@@ -859,7 +869,7 @@ namespace CoopClient
             #endif
         }
 
-        public void SendChatMessage(string message)
+        internal void SendChatMessage(string message)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new ChatMessagePacket()
@@ -878,7 +888,7 @@ namespace CoopClient
             #endif
         }
 
-        public void SendModData(long target, string mod, byte customID, byte[] bytes)
+        internal void SendModData(long target, string mod, byte customID, byte[] bytes)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new ModPacket()

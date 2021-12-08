@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Lidgren.Network;
 
@@ -43,62 +44,97 @@ namespace CoopServer
         }
         #endregion
 
+        #region FUNCTIONS
         public void Kick(string[] reason)
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID).Disconnect(string.Join(" ", reason));
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(string.Join(" ", reason));
         }
 
         public void SendChatMessage(string message, string from = "Server")
         {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
-
-            ChatMessagePacket packet = new()
+            try
             {
-                Username = from,
-                Message = message
-            };
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                if (userConnection == null)
+                {
+                    return;
+                }
 
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            packet.PacketToNetOutGoingMessage(outgoingMessage);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                ChatMessagePacket packet = new()
+                {
+                    Username = from,
+                    Message = message
+                };
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+            catch (Exception e)
+            {
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
         }
 
         public void SendNativeCall(ulong hash, params object[] args)
         {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
-
-            List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-            if (arguments == null)
+            try
             {
-                return;
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                if (userConnection == null)
+                {
+                    return;
+                }
+
+                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+                if (arguments == null)
+                {
+                    return;
+                }
+
+                NativeCallPacket packet = new()
+                {
+                    Hash = hash,
+                    Args = arguments
+                };
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
             }
-
-            NativeCallPacket packet = new()
+            catch (Exception e)
             {
-                Hash = hash,
-                Args = arguments
-            };
-
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            packet.PacketToNetOutGoingMessage(outgoingMessage);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
         }
 
         public void SendModPacket(string mod, byte customID, byte[] bytes)
         {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
-
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            new ModPacket()
+            try
             {
-                ID = -1,
-                Target = 0,
-                Mod = mod,
-                CustomPacketID = customID,
-                Bytes = bytes
-            }.PacketToNetOutGoingMessage(outgoingMessage);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
-            Server.MainNetServer.FlushSendQueue();
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                if (userConnection == null)
+                {
+                    return;
+                }
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                new ModPacket()
+                {
+                    ID = 0,
+                    Target = 0,
+                    Mod = mod,
+                    CustomPacketID = customID,
+                    Bytes = bytes
+                }.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.FlushSendQueue();
+            }
+            catch (Exception e)
+            {
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
         }
+        #endregion
     }
 }

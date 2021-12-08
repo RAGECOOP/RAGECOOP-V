@@ -2,9 +2,12 @@
 
 namespace CoopClient.Menus.Sub
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class Settings
     {
-        public NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
+        internal NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
@@ -19,6 +22,9 @@ namespace CoopClient.Menus.Sub
         private readonly NativeCheckboxItem ShowNetworkInfo = new NativeCheckboxItem("Show Network Info", Main.MainNetworking.ShowNetworkInfo);
 #endif
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public Settings()
         {
             DisableTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
@@ -40,7 +46,7 @@ namespace CoopClient.Menus.Sub
 #endif
         }
 
-        public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
+        internal void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             Main.DisableTraffic = DisableTraffic.Checked;
 
@@ -59,14 +65,14 @@ namespace CoopClient.Menus.Sub
             }
         }
 
-        public void StreamedNpcsValueChanged(object a, System.EventArgs b)
+        internal void StreamedNpcsValueChanged(object a, System.EventArgs b)
         {
             Main.MainSettings.StreamedNpc = StreamedNpcsItem.Value;
             Util.SaveSettings();
             StreamedNpcsItem.Title = string.Format("Streamed Npcs ({0})", Main.MainSettings.StreamedNpc);
         }
 
-        public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
+        internal void FlipMenuCheckboxChanged(object a, System.EventArgs b)
         {
 #if !NON_INTERACTIVE
             Main.MainMenu.MainMenu.Alignment = FlipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
@@ -78,7 +84,7 @@ namespace CoopClient.Menus.Sub
         }
 
 #if DEBUG
-        public void UseDebugCheckboxChanged(object a, System.EventArgs b)
+        internal void UseDebugCheckboxChanged(object a, System.EventArgs b)
         {
             Main.UseDebug = UseDebugItem.Checked;
 
@@ -96,7 +102,7 @@ namespace CoopClient.Menus.Sub
             }
         }
 
-        public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
+        internal void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
         {
             Main.MainNetworking.ShowNetworkInfo = ShowNetworkInfo.Checked;
 

@@ -11,14 +11,7 @@
 | ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
 | --- |
 
-Get the latest client to test out the new features before we release them:
-<br/>
-[**Download**](https://entenkoeniq.de/client.zip)
-<br/>
-<br/>
-Server:
-<br/>
-**168.119.29.103:4499**
+http://gtacoopr.000webhostapp.com/
 
 # 📋 Requirements
 - Visual Studio 2022
@@ -26,7 +19,7 @@ Server:
 - .NET Framework 4.8
 
 # 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/releases/tag/v3.3.2)
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/ca82751b7cc8bdf2203d361b27fe0d1aa895eb55)
 - [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/1342949cd19eaa4115990793311681ea1568054c)
 - Lidgren Network Custom (***PRIVATE***)
 - - No new features (only improvements)

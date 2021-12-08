@@ -2,9 +2,7 @@
 using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using static System.Runtime.InteropServices.Marshal;
 
 using GTA;
 using GTA.Native;
@@ -17,60 +15,29 @@ namespace CoopClient
         #region -- POINTER --
         private static int SteeringAngleOffset { get; set; }
 
-        delegate ulong GetHandleAddressFuncDelegate(int handle);
-        static GetHandleAddressFuncDelegate GetEntityAddressFunc;
-
-        static unsafe byte* FindPattern(string pattern, string mask)
-        {
-            ProcessModule module = Process.GetCurrentProcess().MainModule;
-
-            ulong address = (ulong)module.BaseAddress.ToInt64();
-            ulong endAddress = address + (ulong)module.ModuleMemorySize;
-
-            for (; address < endAddress; address++)
-            {
-                for (int i = 0; i < pattern.Length; i++)
-                {
-                    if (mask[i] != '?' && ((byte*)address)[i] != pattern[i])
-                    {
-                        break;
-                    }
-                    else if (i + 1 == pattern.Length)
-                    {
-                        return (byte*)address;
-                    }
-                }
-            }
-
-            return null;
-        }
-
         public static unsafe void NativeMemory()
         {
-            byte* address;
+            IntPtr address;
 
-            address = FindPattern("\xE8\x00\x00\x00\x00\x48\x8B\xD8\x48\x85\xC0\x74\x2E\x48\x83\x3D", "x????xxxxxxxxxxx");
-            GetEntityAddressFunc = GetDelegateForFunctionPointer<GetHandleAddressFuncDelegate>(new IntPtr(*(int*)(address + 1) + address + 5));
-
-            address = FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
-            if (address != null)
+            address = Game.FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
+            if (address != IntPtr.Zero)
             {
                 SteeringAngleOffset = *(int*)(address + 6) + 8;
             }
 
-            address = FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
-            if (address != null)
+            address = Game.FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
+            if (address != IntPtr.Zero)
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    *(byte*)((IntPtr)address + i).ToPointer() = 0x90;
+                    *(byte*)(address + i).ToPointer() = 0x90;
                 }
             }
         }
 
-        public static unsafe void CustomSteeringAngle(this int handle, float value)
+        public static unsafe void CustomSteeringAngle(this Vehicle veh, float value)
         {
-            IntPtr address = new IntPtr((long)GetEntityAddressFunc(handle));
+            IntPtr address = new IntPtr((long)veh.MemoryAddress);
             if (address == IntPtr.Zero || SteeringAngleOffset == 0)
             {
                 return;
@@ -79,6 +46,11 @@ namespace CoopClient
             *(float*)(address + SteeringAngleOffset).ToPointer() = value;
         }
         #endregion
+
+        public static T GetGameMs<T>() where T : IConvertible
+        {
+            return (T)Convert.ChangeType(1f / (Game.FPS > 60f ? 60f : Game.FPS) * 1000f, typeof(T));
+        }
 
         public static Model ModelRequest(this int hash)
         {
@@ -165,6 +137,15 @@ namespace CoopClient
         {
             bool aimOrShoot = ped.IsAiming || ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0;
             return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
+        }
+
+        /// <summary>
+        /// Only works for players NOT NPCs
+        /// </summary>
+        /// <returns>Vector3</returns>
+        public static Vector3 GetVehicleAimCoords()
+        {
+            return RaycastEverything(new Vector2(0, 0));
         }
 
         public static byte? GetVehicleFlags(this Vehicle veh, bool fullSync)
@@ -363,6 +344,38 @@ namespace CoopClient
             }
 
             return coord.GetResult<Vector3>();
+        }
+
+        public static bool IsTurretSeat(this Vehicle veh, int seat)
+        {
+            if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
+            {
+                return false;
+            }
+
+            switch (seat)
+            {
+                case -1:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Rhino
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Khanjari
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.FireTruck;
+                case 1:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Technical3
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.HalfTrack; // Not sure
+                case 2:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2;
+                case 3:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Limo2;
+                case 7:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Insurgent;
+            }
+
+            return false;
         }
 
         public static double DegToRad(double deg)

@@ -8,7 +8,7 @@ using Lidgren.Network;
 
 namespace CoopServer
 {
-    class Util
+    internal class Util
     {
         public static List<NativeArgument> ParseNativeArguments(params object[] args)
         {
@@ -50,13 +50,13 @@ namespace CoopServer
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            long clientID;
-            if ((clientID = Server.Clients.FirstOrDefault(x => x.Player.Username == username).ID) == default)
+            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username == username);
+            if (client.Equals(default(Client)))
             {
                 return null;
             }
 
-            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == clientID);
+            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == client.ID);
         }
 
         // Return a list of all connections but not the local connection
@@ -72,12 +72,20 @@ namespace CoopServer
         // Return a list of players within range of ...
         public static List<NetConnection> GetAllInRange(LVector3 position, float range)
         {
-            return new(Server.MainNetServer.Connections.FindAll(e => Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier).Player.IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.FindAll(e =>
+            {
+                Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
+                return !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+            }));
         }
         // Return a list of players within range of ... but not the local one
         public static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
         {
-            return new(Server.MainNetServer.Connections.Where(e => e != local && Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier).Player.IsInRangeOf(position, range)));
+            return new(Server.MainNetServer.Connections.Where(e =>
+            {
+                Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
+                return e != local && !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+            }));
         }
 
         public static T Read<T>(string file) where T : new()

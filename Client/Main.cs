@@ -12,31 +12,49 @@ using GTA.Native;
 
 namespace CoopClient
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class Main : Script
     {
-        public static RelationshipGroup RelationshipGroup;
+        internal static RelationshipGroup RelationshipGroup;
 
         private bool GameLoaded = false;
 
-        public static readonly string CurrentVersion = "V0_8_0_1";
+        internal static readonly string CurrentVersion = "V0_9_0";
 
-        public static bool ShareNpcsWithPlayers = false;
-        public static bool DisableTraffic = false;
-        public static bool NpcsAllowed = false;
+        internal static bool ShareNpcsWithPlayers = false;
+        internal static bool DisableTraffic = false;
+        internal static bool NpcsAllowed = false;
         private static bool IsGoingToCar = false;
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Settings MainSettings = Util.ReadSettings();
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Networking MainNetworking = new Networking();
 
 #if !NON_INTERACTIVE
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static MenusMain MainMenu = new MenusMain();
 #endif
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public static Chat MainChat = new Chat();
 
-        public static long LocalClientID = 0;
-        public static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
-        public static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
+        internal static long LocalClientID = 0;
+        internal static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
+        internal static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public Main()
         {
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
@@ -62,6 +80,8 @@ namespace CoopClient
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup = RelationshipGroup;
+
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "GTACOOP:R", "Welcome!", "Press ~g~F9~s~ to open the menu.");
             }
 
 #if !NON_INTERACTIVE
@@ -104,7 +124,7 @@ namespace CoopClient
             }
 #endif
 
-            if ((Util.GetTickCount64() - LastDataSend) < (1000 / 60))
+            if ((Util.GetTickCount64() - LastDataSend) < Util.GetGameMs<ulong>())
             {
                 return;
             }
@@ -182,7 +202,7 @@ namespace CoopClient
         }
 #endif
 
-        public static void CleanUp()
+        internal static void CleanUp()
         {
             MainChat.Clear();
 
@@ -203,24 +223,13 @@ namespace CoopClient
                 Npc.Value.Character?.Delete();
             }
             Npcs.Clear();
-
-            foreach (Ped entity in World.GetAllPeds().Where(p => p.Handle != Game.Player.Character.Handle))
-            {
-                entity.Kill();
-                entity.Delete();
-            }
-
-            foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.Handle != Game.Player.Character.CurrentVehicle?.Handle))
-            {
-                veh.Delete();
-            }
         }
 
 #if DEBUG
         private ulong ArtificialLagCounter;
-        public static EntitiesPlayer DebugSyncPed;
-        public static ulong LastFullDebugSync = 0;
-        public static bool UseDebug = false;
+        internal static EntitiesPlayer DebugSyncPed;
+        internal static ulong LastFullDebugSync = 0;
+        internal static bool UseDebug = false;
 
         private void Debug()
         {
@@ -231,12 +240,12 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 157)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 56)
             {
                 return;
             }
 
-            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 1500;
+            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 500;
 
             if (fullSync)
             {
@@ -273,6 +282,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleVelocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
+                DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
                 DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();

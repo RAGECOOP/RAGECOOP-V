@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
 
 using Lidgren.Network;
 using ProtoBuf;
+using Newtonsoft.Json;
 
 namespace CoopServer
 {
@@ -387,18 +387,21 @@ namespace CoopServer
         public float VehSteeringAngle { get; set; }
 
         [ProtoMember(13)]
-        public int[] VehColors { get; set; }
+        public LVector3 VehAimCoords { get; set; }
 
         [ProtoMember(14)]
-        public Dictionary<int, int> VehMods { get; set; }
+        public int[] VehColors { get; set; }
 
         [ProtoMember(15)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(16)]
-        public int VehTires { get; set; }
+        public VehicleDoors[] VehDoors { get; set; }
 
         [ProtoMember(17)]
+        public int VehTires { get; set; }
+
+        [ProtoMember(18)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -429,6 +432,7 @@ namespace CoopServer
             VehVelocity = data.VehVelocity;
             VehSpeed = data.VehSpeed;
             VehSteeringAngle = data.VehSteeringAngle;
+            VehAimCoords = data.VehAimCoords;
             VehColors = data.VehColors;
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;
@@ -852,10 +856,8 @@ namespace CoopServer
                 return null;
             }
 
-            BinaryFormatter bf = new BinaryFormatter();
-            using MemoryStream ms = new MemoryStream();
-            bf.Serialize(ms, obj);
-            return ms.ToArray();
+            string jsonString = JsonConvert.SerializeObject(obj);
+            return System.Text.Encoding.UTF8.GetBytes(jsonString);
         }
 
         public static T CDeserialize<T>(this byte[] bytes) where T : class
@@ -865,12 +867,8 @@ namespace CoopServer
                 return null;
             }
 
-            using MemoryStream memStream = new MemoryStream();
-            BinaryFormatter binForm = new BinaryFormatter();
-            memStream.Write(bytes, 0, bytes.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            T obj = (T)binForm.Deserialize(memStream);
-            return obj;
+            var jsonString = System.Text.Encoding.UTF8.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(jsonString);
         }
 
         internal static T Deserialize<T>(this byte[] data) where T : new()

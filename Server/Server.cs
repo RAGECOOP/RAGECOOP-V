@@ -4,14 +4,23 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Reflection;
 using System.IO;
+using System.Net.Http;
+
+using Newtonsoft.Json;
 
 using Lidgren.Network;
+using System.Text;
 
 namespace CoopServer
 {
-    class Server
+    internal class IpInfo
     {
-        private static readonly string CompatibleVersion = "V0_8_0_1";
+        public string Country { get; set; }
+    }
+
+    internal class Server
+    {
+        private static readonly string CompatibleVersion = "V0_9_0";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -60,6 +69,86 @@ namespace CoopServer
                     Logging.Error("Port forwarding failed!");
                     Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to \"false\"!");
                 }
+            }
+
+            if (MainSettings.AnnounceSelf)
+            {
+                Logging.Info("Announcing to master server...");
+
+                #region -- MASTERSERVER --
+                new Thread(async () =>
+                {
+                    try
+                    {
+                        HttpClient httpClient = new();
+
+                        IpInfo info;
+
+                        try
+                        {
+                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+
+                            info = JsonConvert.DeserializeObject<IpInfo>(data);
+                        }
+                        catch
+                        {
+                            info = new() { Country = "?" };
+                        }
+
+                        bool responseError = false;
+
+                        while (!responseError)
+                        {
+                            string msg =
+                                "{ " +
+                                "\"port\": \"" + MainSettings.ServerPort + "\", " +
+                                "\"name\": \"" + MainSettings.ServerName + "\", " +
+                                "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
+                                "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
+                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
+                                "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
+                                "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
+                                "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
+                                "\"country\": \"" + info.Country + "\"" +
+                                " }";
+
+                            HttpResponseMessage response = null;
+                            string responseContent = "";
+                            try
+                            {
+                                response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+                                if (response == null)
+                                {
+                                    Logging.Error("MasterServer: Something went wrong!");
+                                    continue;
+                                }
+
+                                responseContent = await response.Content.ReadAsStringAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                Logging.Error(ex.Message);
+                                continue;
+                            }
+
+                            if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                            {
+                                Logging.Error($"MasterServer: {response.StatusCode}");
+                                responseError = true;
+                            }
+                            else
+                            {
+                                // Sleep for 12.5s
+                                Thread.Sleep(12500);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Error($"MasterServer: {ex.Message}");
+                    }
+                }).Start();
+                #endregion
             }
 
             if (!string.IsNullOrEmpty(MainSettings.Resource))
@@ -283,35 +372,35 @@ namespace CoopServer
                                         {
                                             packet = new ModPacket();
                                             packet.NetIncomingMessageToPacket(message);
-
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (MainResource != null)
+                                            if (MainResource != null &&
+                                                MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                             {
-                                                if (MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
-                                                {
-                                                    break;
-                                                }
+                                                // Was canceled
                                             }
-
-                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                                            modPacket.PacketToNetOutGoingMessage(outgoingMessage);
-
-                                            if (modPacket.Target != 0)
+                                            else if (modPacket.Target != -1)
                                             {
-                                                NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
-                                                if (target == null)
+                                                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                                modPacket.PacketToNetOutGoingMessage(outgoingMessage);
+
+                                                if (modPacket.Target != 0)
                                                 {
-                                                    Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
-                                                    return;
+                                                    NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
+                                                    if (target.Equals(default(Client)))
+                                                    {
+                                                        Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
+                                                    }
+                                                    else
+                                                    {
+                                                        // Send back to target
+                                                        MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                    }
                                                 }
-
-                                                // Send back to target
-                                                MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
-                                            }
-                                            else
-                                            {
-                                                // Send back to all players
-                                                MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                                else
+                                                {
+                                                    // Send back to all players
+                                                    MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                                }
                                             }
                                         }
                                         catch (Exception e)
@@ -331,7 +420,7 @@ namespace CoopServer
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
-                            if (client != default)
+                            if (!client.Equals(default(Client)))
                             {
                                 client.Latency = message.ReadFloat();
                             }
@@ -420,18 +509,23 @@ namespace CoopServer
 
             long localID = local.RemoteUniqueIdentifier;
 
+            Client tmpClient;
+
             // Add the player to Players
-            Clients.Add(
-                new Client()
-                {
-                    ID = localID,
-                    Player = new()
+            lock (Clients)
+            {
+                Clients.Add(
+                    tmpClient = new Client()
                     {
-                        SocialClubName = packet.SocialClubName,
-                        Username = packet.Username
+                        ID = localID,
+                        Player = new()
+                        {
+                            SocialClubName = packet.SocialClubName,
+                            Username = packet.Username
+                        }
                     }
-                }
-            );
+                );
+            }
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
@@ -447,65 +541,70 @@ namespace CoopServer
 
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerHandshake(tmpClient);
+            }
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
         {
+            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            if (localClient.Equals(default(Client)))
+            {
+                local.Disconnect("No data found!");
+                return;
+            }
+
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
                 SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
             }
 
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerConnected(Clients.Find(x => x.ID == packet.ID));
-            }
-
             List<NetConnection> clients;
-            if ((clients = Util.FilterAllLocal(local)).Count == 0)
+            if ((clients = Util.FilterAllLocal(local)).Count > 0)
             {
-                return;
-            }
+                // Send all players to local
+                clients.ForEach(targetPlayer =>
+                {
+                    long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
-            // Send all players to local
-            clients.ForEach(targetPlayer =>
-            {
-                long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
+                    Client targetClient = Clients.FirstOrDefault(x => x.ID == targetPlayerID);
+                    if (!targetClient.Equals(default(Client)))
+                    {
+                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                        new PlayerConnectPacket()
+                        {
+                            ID = targetPlayerID,
+                            SocialClubName = targetClient.Player.SocialClubName,
+                            Username = targetClient.Player.Username
+                        }.PacketToNetOutGoingMessage(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
+                    }
+                });
 
-                Client targetEntity = Clients.First(x => x.ID == targetPlayerID);
-
+                // Send local to all players
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerConnectPacket()
                 {
-                    ID = targetPlayerID,
-                    SocialClubName = targetEntity.Player.SocialClubName,
-                    Username = targetEntity.Player.Username
+                    ID = packet.ID,
+                    SocialClubName = localClient.Player.SocialClubName,
+                    Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
-            });
+                MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
+            }
 
-            // Send local to all players
-            Client localClient = Clients.First(x => x.ID == packet.ID);
-
-            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-            new PlayerConnectPacket()
+            if (MainResource != null)
             {
-                ID = packet.ID,
-                SocialClubName = localClient.Player.SocialClubName,
-                Username = localClient.Player.Username
-            }.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
+                MainResource.InvokePlayerConnected(localClient);
+            }
         }
 
         // Send all players a message that someone has left the server
         private static void SendPlayerDisconnectPacket(PlayerDisconnectPacket packet)
         {
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerDisconnected(Clients.Find(x => x.ID == packet.ID));
-            }
-
             List<NetConnection> clients;
             if ((clients = Util.FilterAllLocal(packet.ID)).Count > 0)
             {
@@ -514,16 +613,40 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Clients.Remove(Clients.Find(x => x.ID == packet.ID));
+            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            if (localClient.Equals(default(Client)))
+            {
+                return;
+            }
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerDisconnected(localClient);
+            }
+
+            lock (Clients)
+            {
+                Clients.Remove(localClient);
+            }
         }
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -545,15 +668,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -575,15 +713,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -605,15 +758,30 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Client client = Clients.First(x => x.ID == packet.Extra.ID);
-            client.Player.Position = packet.Extra.Position;
+            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
+            if (tmpClient.Equals(default(Client)))
+            {
+                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return;
+            }
+            tmpClient.Player.Position = packet.Extra.Position;
+            tmpClient.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            playerPacket.Latency = tmpClient.Latency;
 
             packet.Extra = playerPacket;
 
@@ -635,6 +803,11 @@ namespace CoopServer
 
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
             });
+
+            if (MainResource != null)
+            {
+                MainResource.InvokePlayerUpdate(tmpClient);
+            }
         }
 
         // Send a message to targets or all players
@@ -644,19 +817,40 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                if (packet.Message.StartsWith("/"))
+                if (packet.Message.StartsWith('/'))
                 {
                     string[] cmdArgs = packet.Message.Split(" ");
                     string cmdName = cmdArgs[0].Remove(0, 1);
                     if (Commands.Any(x => x.Key.Name == cmdName))
                     {
+                        string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
+
                         CommandContext ctx = new()
                         {
-                            Client = Clients.First(x => x.Player.Username == packet.Username),
-                            Args = cmdArgs.Skip(1).ToArray()
+                            Client = Clients.FirstOrDefault(x => x.Player.Username == packet.Username),
+                            Args = argsWithoutCmd
                         };
 
                         KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
+
+                        if (command.Key.Usage != null && command.Key.ArgsLength != argsWithoutCmd.Length)
+                        {
+                            NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
+                            if (userConnection == default)
+                            {
+                                return;
+                            }
+
+                            outgoingMessage = MainNetServer.CreateMessage();
+                            new ChatMessagePacket()
+                            {
+                                Username = "Server",
+                                Message = command.Key.Usage
+                            }.PacketToNetOutGoingMessage(outgoingMessage);
+                            MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                            return;
+                        }
+
                         command.Value.Invoke(ctx);
                     }
                     else
@@ -678,7 +872,7 @@ namespace CoopServer
 
                     return;
                 }
-                
+
                 if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
                 {
                     return;
@@ -723,9 +917,20 @@ namespace CoopServer
         }
         #endregion
 
+        public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        {
+            Command command = new(name) { Usage = usage, ArgsLength = argsLength };
+
+            if (Commands.ContainsKey(command))
+            {
+                throw new Exception("Command \"" + command.Name + "\" was already been registered!");
+            }
+
+            Commands.Add(command, callback);
+        }
         public static void RegisterCommand(string name, Action<CommandContext> callback)
         {
-            Command command = new() { Name = name };
+            Command command = new(name);
 
             if (Commands.ContainsKey(command))
             {
@@ -737,13 +942,13 @@ namespace CoopServer
 
         public static void RegisterCommands<T>()
         {
-            IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(CommandAttribute), false).Any());
+            IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(Command), false).Any());
 
             foreach (MethodInfo method in commands)
             {
-                CommandAttribute attribute = method.GetCustomAttribute<CommandAttribute>(true);
+                Command attribute = method.GetCustomAttribute<Command>(true);
 
-                RegisterCommand(attribute.Name, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
+                RegisterCommand(attribute.Name, attribute.Usage, attribute.ArgsLength, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
             }
         }
     }

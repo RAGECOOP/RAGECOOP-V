@@ -8,14 +8,17 @@ using GTA.Native;
 
 namespace CoopClient
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class Chat
     {
         private readonly Scaleform MainScaleForm;
 
-        public string CurrentInput { get; set; }
+        internal string CurrentInput { get; set; }
 
         private bool CurrentFocused { get; set; }
-        public bool Focused
+        internal bool Focused
         {
             get { return CurrentFocused; }
             set
@@ -55,23 +58,26 @@ namespace CoopClient
             }
         }
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public Chat()
         {
             MainScaleForm = new Scaleform("multiplayer_chat");
         }
 
-        public void Init()
+        internal void Init()
         {
             MainScaleForm.CallFunction("SET_FOCUS", 2, 2, "ALL");
             MainScaleForm.CallFunction("SET_FOCUS", 1, 2, "ALL");
         }
 
-        public void Clear()
+        internal void Clear()
         {
             MainScaleForm.CallFunction("RESET");
         }
 
-        public void Tick()
+        internal void Tick()
         {
             if ((Util.GetTickCount64() - LastMessageTime) > 15000 && !Focused && !Hidden)
             {
@@ -91,14 +97,14 @@ namespace CoopClient
             Function.Call(Hash.DISABLE_ALL_CONTROL_ACTIONS, 0);
         }
 
-        public void AddMessage(string sender, string msg)
+        internal void AddMessage(string sender, string msg)
         {
             MainScaleForm.CallFunction("ADD_MESSAGE", sender + ":", msg);
             LastMessageTime = Util.GetTickCount64();
             Hidden = false;
         }
 
-        public void OnKeyDown(Keys key)
+        internal void OnKeyDown(Keys key)
         {
             if (key == Keys.Escape)
             {
@@ -151,12 +157,12 @@ namespace CoopClient
         }
 
         [DllImport("user32.dll")]
-        public static extern int ToUnicodeEx(uint virtualKeyCode, uint scanCode, byte[] keyboardState,
+        internal static extern int ToUnicodeEx(uint virtualKeyCode, uint scanCode, byte[] keyboardState,
             [Out, MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
             StringBuilder receivingBuffer,
             int bufferSize, uint flags, IntPtr kblayout);
 
-        public static string GetCharFromKey(Keys key, bool shift, bool altGr)
+        internal static string GetCharFromKey(Keys key, bool shift, bool altGr)
         {
             StringBuilder buf = new StringBuilder(256);
             byte[] keyboardState = new byte[256];

@@ -6,14 +6,20 @@ using GTA.Native;
 
 namespace CoopClient
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class WorldThread : Script
     {
         private static bool LastDisableTraffic = false;
 
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public WorldThread()
         {
             Tick += OnTick;
-            Interval = 1000 / 60;
+            Interval = Util.GetGameMs<int>();
             Aborted += (sender, e) =>
             {
                 if (LastDisableTraffic)
@@ -23,7 +29,7 @@ namespace CoopClient
             };
         }
 
-        public static void OnTick(object sender, EventArgs e)
+        internal static void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
             {

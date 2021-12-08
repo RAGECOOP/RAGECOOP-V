@@ -6,12 +6,18 @@ using GTA;
 
 namespace CoopClient.Entities
 {
+    /// <summary>
+    /// Don't use it!
+    /// </summary>
     public class EntitiesThread : Script
     {
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
         public EntitiesThread()
         {
             Tick += OnTick;
-            Interval = 1000 / 60;
+            Interval = Util.GetGameMs<int>();
         }
 
         private void OnTick(object sender, EventArgs e)
