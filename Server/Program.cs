@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CoopServer
 {
@@ -10,7 +13,19 @@ namespace CoopServer
         {
             try
             {
-                Console.Title = "GTACOOP:R Server";
+#if DEBUG
+                new Thread(async () =>
+                {
+                    do
+                    {
+                        Console.Title = string.Format("GTAC:R [{0,5:P2}] [{1:F}MB]", await GetCpuUsageForProcess(), Process.GetCurrentProcess().PrivateMemorySize64 * 0.000001);
+
+                        Thread.Sleep(500);
+                    } while (true);
+                }).Start();
+#else
+                Console.Title = "GTACOOP:R";
+#endif
 
                 if (File.Exists("log.txt"))
                 {
@@ -34,5 +49,22 @@ namespace CoopServer
                 Console.ReadLine();
             }
         }
+
+#if DEBUG
+        private static async Task<double> GetCpuUsageForProcess()
+        {
+            DateTime startTime = DateTime.UtcNow;
+
+            TimeSpan startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+            await Task.Delay(500);
+
+            DateTime endTime = DateTime.UtcNow;
+            TimeSpan endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
+            double cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
+            double totalMsPassed = (endTime - startTime).TotalMilliseconds;
+            double cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+            return cpuUsageTotal * 100;
+        }
+#endif
     }
 }

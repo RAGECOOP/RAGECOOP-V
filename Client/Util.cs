@@ -301,7 +301,7 @@ namespace CoopClient
                     settings = (Settings)ser.Deserialize(stream);
                 }
 
-                using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
+                using (FileStream stream = new FileStream(path, FileMode.Truncate, FileAccess.ReadWrite))
                 {
                     ser.Serialize(stream, settings);
                 }

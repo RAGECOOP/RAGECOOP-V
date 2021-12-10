@@ -102,15 +102,17 @@ namespace CoopServer
                     data = (T)ser.Deserialize(stream);
                 }
 
-                using (FileStream stream = new(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
+                using (FileStream stream = new(path, FileMode.Truncate, FileAccess.ReadWrite))
                 {
                     ser.Serialize(stream, data);
                 }
             }
             else
             {
-                using FileStream stream = File.OpenWrite(path);
-                ser.Serialize(stream, data = new T());
+                using (FileStream stream = File.OpenWrite(path))
+                {
+                    ser.Serialize(stream, data = new T());
+                }
             }
 
             return data;
