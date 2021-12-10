@@ -193,6 +193,7 @@ namespace CoopServer
         private void Listen()
         {
             Logging.Info("Listening for clients");
+            Logging.Info("Please use CTRL + C if you want to stop the server!");
 
             while (!Program.ReadyToStop)
             {

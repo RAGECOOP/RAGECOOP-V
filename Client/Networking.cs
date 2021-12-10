@@ -539,7 +539,7 @@ namespace CoopClient
             }
             else
             {
-                GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of argument not found!");
                 return;
             }
 

@@ -84,12 +84,14 @@ namespace CoopServer
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
                 if (userConnection == null)
                 {
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{ID}\" not found!");
                     return;
                 }
 
                 List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-                if (arguments == null)
+                if (arguments == null || args.Length == 0)
                 {
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Missing arguments!");
                     return;
                 }
 
@@ -116,6 +118,7 @@ namespace CoopServer
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
                 if (userConnection == null)
                 {
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{ID}\" not found!");
                     return;
                 }
 
@@ -143,12 +146,14 @@ namespace CoopServer
                 }
                 else
                 {
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Argument does not exist!");
                     return;
                 }
 
                 List<NativeArgument> arguments = Util.ParseNativeArguments(args);
                 if (arguments == null)
                 {
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: One or more arguments do not exist!");
                     return;
                 }
 

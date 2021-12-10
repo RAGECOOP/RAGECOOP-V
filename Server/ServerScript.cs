@@ -238,9 +238,10 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments;
-                if ((arguments = Util.ParseNativeArguments(args)) == null)
+                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+                if (arguments == null)
                 {
+                    Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: One or more arguments do not exist!");
                     return;
                 }
 

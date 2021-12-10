@@ -12,36 +12,40 @@ namespace CoopServer
     {
         public static List<NativeArgument> ParseNativeArguments(params object[] args)
         {
-            List<NativeArgument> result = new();
+            List<NativeArgument> result = null;
 
-            foreach (object arg in args)
+            if (args != null && args.Length > 0)
             {
-                Type typeOf = arg.GetType();
+                result = new();
 
-                if (typeOf == typeof(int))
+                foreach (object arg in args)
                 {
-                    result.Add(new IntArgument() { Data = (int)arg });
-                }
-                else if (typeOf == typeof(bool))
-                {
-                    result.Add(new BoolArgument() { Data = (bool)arg });
-                }
-                else if (typeOf == typeof(float))
-                {
-                    result.Add(new FloatArgument() { Data = (float)arg });
-                }
-                else if (typeOf == typeof(string))
-                {
-                    result.Add(new StringArgument() { Data = (string)arg });
-                }
-                else if (typeOf == typeof(LVector3))
-                {
-                    result.Add(new LVector3Argument() { Data = (LVector3)arg });
-                }
-                else
-                {
-                    Logging.Error("[Util->ParseNativeArguments(params object[] args)]: Type of argument not found!");
-                    return null;
+                    Type typeOf = arg.GetType();
+
+                    if (typeOf == typeof(int))
+                    {
+                        result.Add(new IntArgument() { Data = (int)arg });
+                    }
+                    else if (typeOf == typeof(bool))
+                    {
+                        result.Add(new BoolArgument() { Data = (bool)arg });
+                    }
+                    else if (typeOf == typeof(float))
+                    {
+                        result.Add(new FloatArgument() { Data = (float)arg });
+                    }
+                    else if (typeOf == typeof(string))
+                    {
+                        result.Add(new StringArgument() { Data = (string)arg });
+                    }
+                    else if (typeOf == typeof(LVector3))
+                    {
+                        result.Add(new LVector3Argument() { Data = (LVector3)arg });
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
 
