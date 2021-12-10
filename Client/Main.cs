@@ -166,7 +166,7 @@ namespace CoopClient
                     else if (!Game.Player.Character.IsInVehicle())
                     {
                         Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).FirstOrDefault();
-                        if (veh != default)
+                        if (veh != null)
                         {
                             for (int i = 0; i < veh.PassengerCapacity; i++)
                             {

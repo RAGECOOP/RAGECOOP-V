@@ -121,7 +121,7 @@ namespace CoopServer
                                 if (response == null)
                                 {
                                     Logging.Error("MasterServer: Something went wrong!");
-                                    continue;
+                                    break;
                                 }
 
                                 responseContent = await response.Content.ReadAsStringAsync();
@@ -129,7 +129,7 @@ namespace CoopServer
                             catch (Exception ex)
                             {
                                 Logging.Error(ex.Message);
-                                continue;
+                                break;
                             }
 
                             if (response.StatusCode != System.Net.HttpStatusCode.OK)
@@ -361,7 +361,7 @@ namespace CoopServer
                                             NativeResponsePacket responsePacket = (NativeResponsePacket)packet;
 
                                             Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
-                                            if (client != default(Client))
+                                            if (client != null)
                                             {
                                                 if (client.Callbacks.ContainsKey(responsePacket.ID))
                                                 {
@@ -419,7 +419,7 @@ namespace CoopServer
                                                 if (modPacket.Target != 0)
                                                 {
                                                     NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
-                                                    if (target.Equals(default(Client)))
+                                                    if (target == null)
                                                     {
                                                         Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
                                                     }
@@ -454,7 +454,7 @@ namespace CoopServer
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             {
                                 Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
-                                if (!client.Equals(default(Client)))
+                                if (client != null)
                                 {
                                     client.Latency = message.ReadFloat();
                                 }
@@ -550,12 +550,12 @@ namespace CoopServer
                 return;
             }
 
-            if (Clients.Any(x => x.Player.SocialClubName == packet.SocialClubName))
+            if (Clients.Any(x => x.Player.SocialClubName.ToLower() == packet.SocialClubName.ToLower()))
             {
                 local.Deny("The name of the Social Club is already taken!");
                 return;
             }
-            else if (Clients.Any(x => x.Player.Username == packet.Username))
+            else if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 local.Deny("Username is already taken!");
                 return;
@@ -606,7 +606,7 @@ namespace CoopServer
         private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
         {
             Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
-            if (localClient.Equals(default(Client)))
+            if (localClient == null)
             {
                 local.Disconnect("No data found!");
                 return;
@@ -621,7 +621,7 @@ namespace CoopServer
                     long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
                     Client targetClient = Clients.FirstOrDefault(x => x.ID == targetPlayerID);
-                    if (!targetClient.Equals(default(Client)))
+                    if (targetClient == null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                         new PlayerConnectPacket()
@@ -675,7 +675,7 @@ namespace CoopServer
             }
 
             Client localClient = Clients.FirstOrDefault(x => x.ID == clientID);
-            if (localClient.Equals(default(Client)))
+            if (localClient == null)
             {
                 return;
             }
@@ -695,7 +695,7 @@ namespace CoopServer
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
             Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient.Equals(default(Client)))
+            if (tmpClient == null)
             {
                 NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
                 if (localConn != null)
@@ -740,7 +740,7 @@ namespace CoopServer
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
             Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient.Equals(default(Client)))
+            if (tmpClient == null)
             {
                 NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
                 if (localConn != null)
@@ -785,7 +785,7 @@ namespace CoopServer
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
             Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient.Equals(default(Client)))
+            if (tmpClient == null)
             {
                 NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
                 if (localConn != null)
@@ -830,7 +830,7 @@ namespace CoopServer
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
             Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient.Equals(default(Client)))
+            if (tmpClient == null)
             {
                 NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
                 if (localConn != null)

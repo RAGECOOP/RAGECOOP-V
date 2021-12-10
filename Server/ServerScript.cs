@@ -281,8 +281,7 @@ namespace CoopServer
 
         public static Client GetClientByUsername(string username)
         {
-            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username == username);
-            return client.Equals(default(Client)) ? null : client;
+            return Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
         public static void SendChatMessageToAll(string message, string username = "Server")

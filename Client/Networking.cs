@@ -434,38 +434,41 @@ namespace CoopClient
         {
             List<InputArgument> arguments = new List<InputArgument>();
 
-            packet.Args.ForEach(arg =>
+            if (packet.Args != null && packet.Args.Count > 0)
             {
-                Type typeOf = arg.GetType();
+                packet.Args.ForEach(arg =>
+                {
+                    Type typeOf = arg.GetType();
 
-                if (typeOf == typeof(IntArgument))
-                {
-                    arguments.Add(((IntArgument)arg).Data);
-                }
-                else if (typeOf == typeof(BoolArgument))
-                {
-                    arguments.Add(((BoolArgument)arg).Data);
-                }
-                else if (typeOf == typeof(FloatArgument))
-                {
-                    arguments.Add(((FloatArgument)arg).Data);
-                }
-                else if (typeOf == typeof(StringArgument))
-                {
-                    arguments.Add(((StringArgument)arg).Data);
-                }
-                else if (typeOf == typeof(LVector3Argument))
-                {
-                    arguments.Add(((LVector3Argument)arg).Data.X);
-                    arguments.Add(((LVector3Argument)arg).Data.Y);
-                    arguments.Add(((LVector3Argument)arg).Data.Z);
-                }
-                else
-                {
-                    GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
-                    return;
-                }
-            });
+                    if (typeOf == typeof(IntArgument))
+                    {
+                        arguments.Add(((IntArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(BoolArgument))
+                    {
+                        arguments.Add(((BoolArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(FloatArgument))
+                    {
+                        arguments.Add(((FloatArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(StringArgument))
+                    {
+                        arguments.Add(((StringArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(LVector3Argument))
+                    {
+                        arguments.Add(((LVector3Argument)arg).Data.X);
+                        arguments.Add(((LVector3Argument)arg).Data.Y);
+                        arguments.Add(((LVector3Argument)arg).Data.Z);
+                    }
+                    else
+                    {
+                        GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                        return;
+                    }
+                });
+            }
 
             Function.Call((Hash)packet.Hash, arguments.ToArray());
         }
@@ -475,37 +478,41 @@ namespace CoopClient
             List<InputArgument> arguments = new List<InputArgument>();
             Type typeOf = null;
 
-            packet.Args.ForEach(arg =>
+            if (packet.Args != null && packet.Args.Count > 0)
             {
-                typeOf = arg.GetType();
-                if (typeOf == typeof(IntArgument))
+                packet.Args.ForEach(arg =>
                 {
-                    arguments.Add(((IntArgument)arg).Data);
-                }
-                else if (typeOf == typeof(BoolArgument))
-                {
-                    arguments.Add(((BoolArgument)arg).Data);
-                }
-                else if (typeOf == typeof(FloatArgument))
-                {
-                    arguments.Add(((FloatArgument)arg).Data);
-                }
-                else if (typeOf == typeof(StringArgument))
-                {
-                    arguments.Add(((StringArgument)arg).Data);
-                }
-                else if (typeOf == typeof(LVector3Argument))
-                {
-                    arguments.Add(((LVector3Argument)arg).Data.X);
-                    arguments.Add(((LVector3Argument)arg).Data.Y);
-                    arguments.Add(((LVector3Argument)arg).Data.Z);
-                }
-                else
-                {
-                    GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
-                    return;
-                }
-            });
+                    typeOf = arg.GetType();
+
+                    if (typeOf == typeof(IntArgument))
+                    {
+                        arguments.Add(((IntArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(BoolArgument))
+                    {
+                        arguments.Add(((BoolArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(FloatArgument))
+                    {
+                        arguments.Add(((FloatArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(StringArgument))
+                    {
+                        arguments.Add(((StringArgument)arg).Data);
+                    }
+                    else if (typeOf == typeof(LVector3Argument))
+                    {
+                        arguments.Add(((LVector3Argument)arg).Data.X);
+                        arguments.Add(((LVector3Argument)arg).Data.Y);
+                        arguments.Add(((LVector3Argument)arg).Data.Z);
+                    }
+                    else
+                    {
+                        GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                        return;
+                    }
+                });
+            }
 
             NativeArgument result = null;
 

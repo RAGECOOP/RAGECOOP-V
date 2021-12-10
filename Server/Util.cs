@@ -50,7 +50,7 @@ namespace CoopServer
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username == username);
+            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
             if (client.Equals(default(Client)))
             {
                 return null;
