@@ -622,7 +622,7 @@ namespace CoopServer
                     long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
                     Client targetClient = Clients.FirstOrDefault(x => x.ID == targetPlayerID);
-                    if (targetClient == null)
+                    if (targetClient != null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                         new PlayerConnectPacket()
