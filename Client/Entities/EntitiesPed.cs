@@ -421,6 +421,16 @@ namespace CoopClient.Entities
             }
 
             #region -- VEHICLE SYNC --
+            if (AimCoords != default)
+            {
+                int gameTime = Game.GameTime;
+                if (gameTime - LastVehicleAim > 30)
+                {
+                    Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                    LastVehicleAim = gameTime;
+                }
+            }
+
             if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
             {
                 return;
@@ -560,16 +570,6 @@ namespace CoopClient.Entities
                         }
 
                         LastVehTires = VehTires;
-                    }
-
-                    if (AimCoords != default)
-                    {
-                        int gameTime = Game.GameTime;
-                        if (gameTime - LastVehicleAim > 30)
-                        {
-                            Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-                            LastVehicleAim = gameTime;
-                        }
                     }
                 }
             }

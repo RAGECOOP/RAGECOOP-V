@@ -358,19 +358,28 @@ namespace CoopClient
                 case -1:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Rhino
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Khanjari
-                        || (VehicleHash)veh.Model.Hash == VehicleHash.FireTruck;
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.FireTruck
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Riot2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus3;
+                case 0:
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Apc;
                 case 1:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Technical
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Technical2
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Technical3
-                        || (VehicleHash)veh.Model.Hash == VehicleHash.HalfTrack; // Not sure
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.HalfTrack
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Barrage;
                 case 2:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
-                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2;
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Barrage;
                 case 3:
-                    return (VehicleHash)veh.Model.Hash == VehicleHash.Limo2;
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Limo2
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Dinghy5;
                 case 7:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Insurgent;
             }
