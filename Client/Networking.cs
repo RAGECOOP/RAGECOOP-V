@@ -230,6 +230,11 @@ namespace CoopClient
                                 packet.NetIncomingMessageToPacket(message);
                                 DecodeNativeCall((NativeCallPacket)packet);
                                 break;
+                            case (byte)PacketTypes.NativeResponsePacket:
+                                packet = new NativeResponsePacket();
+                                packet.NetIncomingMessageToPacket(message);
+                                DecodeNativeResponse((NativeResponsePacket)packet);
+                                break;
                             case (byte)PacketTypes.ModPacket:
                                 packet = new ModPacket();
                                 packet.NetIncomingMessageToPacket(message);
@@ -463,6 +468,84 @@ namespace CoopClient
             });
 
             Function.Call((Hash)packet.Hash, arguments.ToArray());
+        }
+
+        private void DecodeNativeResponse(NativeResponsePacket packet)
+        {
+            List<InputArgument> arguments = new List<InputArgument>();
+            Type typeOf = null;
+
+            packet.Args.ForEach(arg =>
+            {
+                typeOf = arg.GetType();
+                if (typeOf == typeof(IntArgument))
+                {
+                    arguments.Add(((IntArgument)arg).Data);
+                }
+                else if (typeOf == typeof(BoolArgument))
+                {
+                    arguments.Add(((BoolArgument)arg).Data);
+                }
+                else if (typeOf == typeof(FloatArgument))
+                {
+                    arguments.Add(((FloatArgument)arg).Data);
+                }
+                else if (typeOf == typeof(StringArgument))
+                {
+                    arguments.Add(((StringArgument)arg).Data);
+                }
+                else if (typeOf == typeof(LVector3Argument))
+                {
+                    arguments.Add(((LVector3Argument)arg).Data.X);
+                    arguments.Add(((LVector3Argument)arg).Data.Y);
+                    arguments.Add(((LVector3Argument)arg).Data.Z);
+                }
+                else
+                {
+                    GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                    return;
+                }
+            });
+
+            NativeArgument result = null;
+
+            typeOf = packet.Type.GetType();
+            if (typeOf == typeof(IntArgument))
+            {
+                result = new IntArgument() { Data = Function.Call<int>((Hash)packet.Hash, arguments.ToArray()) };
+            }
+            else if (typeOf == typeof(BoolArgument))
+            {
+                result = new BoolArgument() { Data = Function.Call<bool>((Hash)packet.Hash, arguments.ToArray()) };
+            }
+            else if (typeOf == typeof(FloatArgument))
+            {
+                result = new FloatArgument() { Data = Function.Call<float>((Hash)packet.Hash, arguments.ToArray()) };
+            }
+            else if (typeOf == typeof(StringArgument))
+            {
+                result = new StringArgument() { Data = Function.Call<string>((Hash)packet.Hash, arguments.ToArray()) };
+            }
+            else if (typeOf == typeof(LVector3Argument))
+            {
+                result = new LVector3Argument() { Data = Function.Call<GTA.Math.Vector3>((Hash)packet.Hash, arguments.ToArray()).ToLVector() };
+            }
+            else
+            {
+                GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            new NativeResponsePacket()
+            {
+                Hash = 0,
+                Args = null,
+                Type = result,
+                ID = packet.ID
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.FlushSendQueue();
         }
         #endregion // -- PLAYER --
 

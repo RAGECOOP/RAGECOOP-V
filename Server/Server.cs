@@ -352,6 +352,52 @@ namespace CoopServer
                                         message.SenderConnection.Disconnect("Npcs are not allowed!");
                                     }
                                     break;
+                                case (byte)PacketTypes.NativeResponsePacket:
+                                    {
+                                        try
+                                        {
+                                            packet = new NativeResponsePacket();
+                                            packet.NetIncomingMessageToPacket(message);
+                                            NativeResponsePacket responsePacket = (NativeResponsePacket)packet;
+
+                                            Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                            if (client != default(Client))
+                                            {
+                                                if (client.Callbacks.ContainsKey(responsePacket.ID))
+                                                {
+                                                    object resp = null;
+                                                    if (responsePacket.Type is IntArgument argument)
+                                                    {
+                                                        resp = argument.Data;
+                                                    }
+                                                    else if (responsePacket.Type is StringArgument argument1)
+                                                    {
+                                                        resp = argument1.Data;
+                                                    }
+                                                    else if (responsePacket.Type is FloatArgument argument2)
+                                                    {
+                                                        resp = argument2.Data;
+                                                    }
+                                                    else if (responsePacket.Type is BoolArgument argument3)
+                                                    {
+                                                        resp = argument3.Data;
+                                                    }
+                                                    else if (responsePacket.Type is LVector3Argument argument4)
+                                                    {
+                                                        resp = argument4.Data;
+                                                    }
+
+                                                    client.Callbacks[responsePacket.ID].Invoke(resp);
+                                                    client.Callbacks.Remove(responsePacket.ID);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
+                                    }
+                                    break;
                                 case (byte)PacketTypes.ModPacket:
                                     if (MainSettings.ModsAllowed)
                                     {
@@ -406,10 +452,12 @@ namespace CoopServer
                             }
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
-                            Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
-                            if (!client.Equals(default(Client)))
                             {
-                                client.Latency = message.ReadFloat();
+                                Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                if (!client.Equals(default(Client)))
+                                {
+                                    client.Latency = message.ReadFloat();
+                                }
                             }
                             break;
                         case NetIncomingMessageType.ErrorMessage:

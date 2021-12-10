@@ -11,6 +11,7 @@ namespace CoopServer
         public float Latency = 0.0f;
         public PlayerData Player;
         private readonly Dictionary<string, object> CustomData = new();
+        internal readonly Dictionary<long, Action<object>> Callbacks = new();
 
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)
@@ -96,6 +97,70 @@ namespace CoopServer
                 {
                     Hash = hash,
                     Args = arguments
+                };
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+            catch (Exception e)
+            {
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
+        }
+
+        public void SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)
+        {
+            try
+            {
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                if (userConnection == null)
+                {
+                    return;
+                }
+
+                NativeArgument returnType = null;
+                Type typeOf = type;
+                if (typeOf == typeof(int))
+                {
+                    returnType = new IntArgument();
+                }
+                else if (typeOf == typeof(bool))
+                {
+                    returnType = new BoolArgument();
+                }
+                else if (typeOf == typeof(float))
+                {
+                    returnType = new FloatArgument();
+                }
+                else if (typeOf == typeof(string))
+                {
+                    returnType = new StringArgument();
+                }
+                else if (typeOf == typeof(LVector3))
+                {
+                    returnType = new LVector3Argument();
+                }
+                else
+                {
+                    return;
+                }
+
+                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+                if (arguments == null)
+                {
+                    return;
+                }
+
+                long id = 0;
+                Callbacks.Add(id = Environment.TickCount64, callback);
+
+                NativeResponsePacket packet = new()
+                {
+                    Hash = hash,
+                    Args = arguments,
+                    Type = returnType,
+                    ID = id
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
