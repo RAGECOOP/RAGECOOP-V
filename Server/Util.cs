@@ -52,15 +52,31 @@ namespace CoopServer
             return result;
         }
 
+        public static Client GetClientByID(long id)
+        {
+            Client result = Server.Clients.Find(x => x.ID == id);
+            if (result == null)
+            {
+                NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
+                if (localConn != null)
+                {
+                    localConn.Disconnect("No data found!");
+                }
+                return null;
+            }
+
+            return result;
+        }
+
         public static NetConnection GetConnectionByUsername(string username)
         {
-            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
-            if (client.Equals(default(Client)))
+            Client client = Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
+            if (client == null)
             {
                 return null;
             }
 
-            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == client.ID);
+            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.ID);
         }
 
         // Return a list of all connections but not the local connection
@@ -79,7 +95,7 @@ namespace CoopServer
             return new(Server.MainNetServer.Connections.FindAll(e =>
             {
                 Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
-                return !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+                return client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
         // Return a list of players within range of ... but not the local one
@@ -88,7 +104,7 @@ namespace CoopServer
             return new(Server.MainNetServer.Connections.Where(e =>
             {
                 Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
-                return e != local && !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+                return e != local && client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
 

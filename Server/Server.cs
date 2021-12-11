@@ -96,9 +96,7 @@ namespace CoopServer
                             info = new() { Country = "?" };
                         }
 
-                        bool responseError = false;
-
-                        while (!Program.ReadyToStop && !responseError)
+                        while (!Program.ReadyToStop)
                         {
                             string msg =
                                 "{ " +
@@ -114,7 +112,6 @@ namespace CoopServer
                                 " }";
 
                             HttpResponseMessage response = null;
-                            string responseContent = "";
                             try
                             {
                                 response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
@@ -123,8 +120,6 @@ namespace CoopServer
                                     Logging.Error("MasterServer: Something went wrong!");
                                     break;
                                 }
-
-                                responseContent = await response.Content.ReadAsStringAsync();
                             }
                             catch (Exception ex)
                             {
@@ -135,7 +130,7 @@ namespace CoopServer
                             if (response.StatusCode != System.Net.HttpStatusCode.OK)
                             {
                                 Logging.Error($"MasterServer: {response.StatusCode}");
-                                responseError = true;
+                                break;
                             }
                             else
                             {
@@ -361,7 +356,7 @@ namespace CoopServer
                                             packet.NetIncomingMessageToPacket(message);
                                             NativeResponsePacket responsePacket = (NativeResponsePacket)packet;
 
-                                            Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                            Client client = Clients.Find(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
                                             if (client != null)
                                             {
                                                 if (client.Callbacks.ContainsKey(responsePacket.ID))
@@ -419,7 +414,7 @@ namespace CoopServer
 
                                                 if (modPacket.Target != 0)
                                                 {
-                                                    NetConnection target = MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == modPacket.Target);
+                                                    NetConnection target = MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == modPacket.Target);
                                                     if (target == null)
                                                     {
                                                         Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
@@ -454,7 +449,7 @@ namespace CoopServer
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             {
-                                Client client = Clients.FirstOrDefault(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                Client client = Clients.Find(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
                                 if (client != null)
                                 {
                                     client.Latency = message.ReadFloat();
@@ -606,7 +601,7 @@ namespace CoopServer
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
         {
-            Client localClient = Clients.FirstOrDefault(x => x.ID == packet.ID);
+            Client localClient = Clients.Find(x => x.ID == packet.ID);
             if (localClient == null)
             {
                 local.Disconnect("No data found!");
@@ -621,7 +616,7 @@ namespace CoopServer
                 {
                     long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
 
-                    Client targetClient = Clients.FirstOrDefault(x => x.ID == targetPlayerID);
+                    Client targetClient = Clients.Find(x => x.ID == targetPlayerID);
                     if (targetClient != null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -675,7 +670,7 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Client localClient = Clients.FirstOrDefault(x => x.ID == clientID);
+            Client localClient = Clients.Find(x => x.ID == clientID);
             if (localClient == null)
             {
                 return;
@@ -695,21 +690,16 @@ namespace CoopServer
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient == null)
+            Client client = Util.GetClientByID(packet.Extra.ID);
+            if (client == null)
             {
-                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
-                if (localConn != null)
-                {
-                    localConn.Disconnect("No data found!");
-                }
                 return;
             }
-            tmpClient.Player.Position = packet.Extra.Position;
-            tmpClient.Player.Health = packet.Extra.Health;
+            client.Player.Position = packet.Extra.Position;
+            client.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = tmpClient.Latency;
+            playerPacket.Latency = client.Latency;
 
             packet.Extra = playerPacket;
 
@@ -734,27 +724,22 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                MainResource.InvokePlayerUpdate(tmpClient);
+                MainResource.InvokePlayerUpdate(client);
             }
         }
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient == null)
+            Client client = Util.GetClientByID(packet.Extra.ID);
+            if (client == null)
             {
-                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
-                if (localConn != null)
-                {
-                    localConn.Disconnect("No data found!");
-                }
                 return;
             }
-            tmpClient.Player.Position = packet.Extra.Position;
-            tmpClient.Player.Health = packet.Extra.Health;
+            client.Player.Position = packet.Extra.Position;
+            client.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = tmpClient.Latency;
+            playerPacket.Latency = client.Latency;
 
             packet.Extra = playerPacket;
 
@@ -779,27 +764,22 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                MainResource.InvokePlayerUpdate(tmpClient);
+                MainResource.InvokePlayerUpdate(client);
             }
         }
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient == null)
+            Client client = Util.GetClientByID(packet.Extra.ID);
+            if (client == null)
             {
-                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
-                if (localConn != null)
-                {
-                    localConn.Disconnect("No data found!");
-                }
                 return;
             }
-            tmpClient.Player.Position = packet.Extra.Position;
-            tmpClient.Player.Health = packet.Extra.Health;
+            client.Player.Position = packet.Extra.Position;
+            client.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = tmpClient.Latency;
+            playerPacket.Latency = client.Latency;
 
             packet.Extra = playerPacket;
 
@@ -824,27 +804,22 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                MainResource.InvokePlayerUpdate(tmpClient);
+                MainResource.InvokePlayerUpdate(client);
             }
         }
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Client tmpClient = Clients.FirstOrDefault(x => x.ID == packet.Extra.ID);
-            if (tmpClient == null)
+            Client client = Util.GetClientByID(packet.Extra.ID);
+            if (client == null)
             {
-                NetConnection localConn = MainNetServer.Connections.Find(x => packet.Extra.ID == x.RemoteUniqueIdentifier);
-                if (localConn != null)
-                {
-                    localConn.Disconnect("No data found!");
-                }
                 return;
             }
-            tmpClient.Player.Position = packet.Extra.Position;
-            tmpClient.Player.Health = packet.Extra.Health;
+            client.Player.Position = packet.Extra.Position;
+            client.Player.Health = packet.Extra.Health;
 
             PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = tmpClient.Latency;
+            playerPacket.Latency = client.Latency;
 
             packet.Extra = playerPacket;
 
@@ -869,7 +844,7 @@ namespace CoopServer
 
             if (MainResource != null)
             {
-                MainResource.InvokePlayerUpdate(tmpClient);
+                MainResource.InvokePlayerUpdate(client);
             }
         }
 
@@ -890,7 +865,7 @@ namespace CoopServer
 
                         CommandContext ctx = new()
                         {
-                            Client = Clients.FirstOrDefault(x => x.Player.Username == packet.Username),
+                            Client = Clients.Find(x => x.Player.Username == packet.Username),
                             Args = argsWithoutCmd
                         };
 
