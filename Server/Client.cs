@@ -92,12 +92,17 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-                if (arguments == null || args.Length == 0)
+                List<NativeArgument> arguments = null;
+                if (args != null && args.Length > 0)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Missing arguments!");
-                    return;
+                    arguments = Util.ParseNativeArguments(args);
+                    if (arguments == null)
+                    {
+                        Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Missing arguments!");
+                        return;
+                    }
                 }
+                
 
                 NativeCallPacket packet = new()
                 {
@@ -154,11 +159,15 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-                if (arguments == null)
+                List<NativeArgument> arguments = null;
+                if (args != null && args.Length > 0)
                 {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: One or more arguments do not exist!");
-                    return;
+                    arguments = Util.ParseNativeArguments(args);
+                    if (arguments == null)
+                    {
+                        Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: One or more arguments do not exist!");
+                        return;
+                    }
                 }
 
                 long id = 0;
