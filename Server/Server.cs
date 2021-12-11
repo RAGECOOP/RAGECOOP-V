@@ -5,6 +5,7 @@ using System.Threading;
 using System.Reflection;
 using System.IO;
 using System.Net.Http;
+using System.Net;
 
 using Newtonsoft.Json;
 
@@ -40,12 +41,36 @@ namespace CoopServer
             Logging.Info($"Compatible GTACoOp:R versions: {CompatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
 
+            IPAddress address = null;
+
+            try
+            {
+                if (!IPAddress.TryParse(MainSettings.Address, out address))
+                {
+                    Logging.Error("Please use a valid IPv4 address!");
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.Error(e.Message);
+                return;
+            }
+
+            if (address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                // This address is not an IPv4 address
+                Logging.Error("Please use an IPv4 address!");
+                return;
+            }
+
             // 6d4ec318f1c43bd62fe13d5a7ab28650 = GTACOOP:R
             NetPeerConfiguration config = new("6d4ec318f1c43bd62fe13d5a7ab28650")
             {
                 MaximumConnections = MainSettings.MaxPlayers,
-                Port = MainSettings.ServerPort,
-                EnableUPnP = MainSettings.UPnP
+                Port = MainSettings.Port,
+                EnableUPnP = MainSettings.UPnP,
+                LocalAddress = address
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -58,9 +83,9 @@ namespace CoopServer
 
             if (MainSettings.UPnP)
             {
-                Logging.Info(string.Format("Attempting to forward port {0}", MainSettings.ServerPort));
+                Logging.Info(string.Format("Attempting to forward port {0}", MainSettings.Port));
 
-                if (MainNetServer.UPnP.ForwardPort(MainSettings.ServerPort, "GTACOOP:R server"))
+                if (MainNetServer.UPnP.ForwardPort(MainSettings.Port, "GTACOOP:R server"))
                 {
                     Logging.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
                 }
@@ -100,8 +125,9 @@ namespace CoopServer
                         {
                             string msg =
                                 "{ " +
-                                "\"port\": \"" + MainSettings.ServerPort + "\", " +
-                                "\"name\": \"" + MainSettings.ServerName + "\", " +
+                                "\"address\": \"" + MainSettings.Address + "\", " +
+                                "\"port\": \"" + MainSettings.Port + "\", " +
+                                "\"name\": \"" + MainSettings.Name + "\", " +
                                 "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
                                 "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
