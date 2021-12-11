@@ -50,6 +50,10 @@ namespace CoopServer
         {
             Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(string.Join(" ", reason));
         }
+        public void Kick(string reason)
+        {
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(reason);
+        }
 
         public void SendChatMessage(string message, string from = "Server")
         {
