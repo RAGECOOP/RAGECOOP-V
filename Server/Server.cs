@@ -5,7 +5,6 @@ using System.Threading;
 using System.Reflection;
 using System.IO;
 using System.Net.Http;
-using System.Net;
 
 using Newtonsoft.Json;
 
@@ -16,7 +15,8 @@ namespace CoopServer
 {
     internal class IpInfo
     {
-        public string Country { get; set; }
+        public string ip { get; set; }
+        public string country { get; set; }
     }
 
     internal class Server
@@ -41,36 +41,12 @@ namespace CoopServer
             Logging.Info($"Compatible GTACoOp:R versions: {CompatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
 
-            IPAddress address = null;
-
-            try
-            {
-                if (!IPAddress.TryParse(MainSettings.Address, out address))
-                {
-                    Logging.Error("Please use a valid IPv4 address!");
-                    return;
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.Error(e.Message);
-                return;
-            }
-
-            if (address.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
-            {
-                // This address is not an IPv4 address
-                Logging.Error("Please use an IPv4 address!");
-                return;
-            }
-
             // 6d4ec318f1c43bd62fe13d5a7ab28650 = GTACOOP:R
             NetPeerConfiguration config = new("6d4ec318f1c43bd62fe13d5a7ab28650")
             {
                 MaximumConnections = MainSettings.MaxPlayers,
                 Port = MainSettings.Port,
-                EnableUPnP = MainSettings.UPnP,
-                LocalAddress = address
+                EnableUPnP = MainSettings.UPnP
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -92,7 +68,7 @@ namespace CoopServer
                 else
                 {
                     Logging.Error("Port forwarding failed!");
-                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to \"false\"!");
+                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to false!");
                 }
             }
 
@@ -118,14 +94,14 @@ namespace CoopServer
                         }
                         catch
                         {
-                            info = new() { Country = "?" };
+                            info = new() { ip = MainNetServer.Configuration.LocalAddress.ToString(), country = "?" };
                         }
 
                         while (!Program.ReadyToStop)
                         {
                             string msg =
                                 "{ " +
-                                "\"address\": \"" + MainSettings.Address + "\", " +
+                                "\"address\": \"" + info.ip + "\", " +
                                 "\"port\": \"" + MainSettings.Port + "\", " +
                                 "\"name\": \"" + MainSettings.Name + "\", " +
                                 "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
@@ -134,7 +110,7 @@ namespace CoopServer
                                 "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
                                 "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
                                 "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
-                                "\"country\": \"" + info.Country + "\"" +
+                                "\"country\": \"" + info.country + "\"" +
                                 " }";
 
                             HttpResponseMessage response = null;
