@@ -21,7 +21,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V0_9_0";
+        internal static readonly string CurrentVersion = "V1_0_0";
 
         internal static bool ShareNpcsWithPlayers = false;
         internal static bool DisableTraffic = false;
@@ -166,7 +166,7 @@ namespace CoopClient
                     else if (!Game.Player.Character.IsInVehicle())
                     {
                         Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).FirstOrDefault();
-                        if (veh != default)
+                        if (veh != null)
                         {
                             for (int i = 0; i < veh.PassengerCapacity; i++)
                             {

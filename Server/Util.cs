@@ -12,37 +12,57 @@ namespace CoopServer
     {
         public static List<NativeArgument> ParseNativeArguments(params object[] args)
         {
-            List<NativeArgument> result = new();
+            List<NativeArgument> result = null;
 
-            foreach (object arg in args)
+            if (args != null && args.Length > 0)
             {
-                Type typeOf = arg.GetType();
+                result = new();
 
-                if (typeOf == typeof(int))
+                foreach (object arg in args)
                 {
-                    result.Add(new IntArgument() { Data = (int)arg });
+                    Type typeOf = arg.GetType();
+
+                    if (typeOf == typeof(int))
+                    {
+                        result.Add(new IntArgument() { Data = (int)arg });
+                    }
+                    else if (typeOf == typeof(bool))
+                    {
+                        result.Add(new BoolArgument() { Data = (bool)arg });
+                    }
+                    else if (typeOf == typeof(float))
+                    {
+                        result.Add(new FloatArgument() { Data = (float)arg });
+                    }
+                    else if (typeOf == typeof(string))
+                    {
+                        result.Add(new StringArgument() { Data = (string)arg });
+                    }
+                    else if (typeOf == typeof(LVector3))
+                    {
+                        result.Add(new LVector3Argument() { Data = (LVector3)arg });
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
-                else if (typeOf == typeof(bool))
+            }
+
+            return result;
+        }
+
+        public static Client GetClientByID(long id)
+        {
+            Client result = Server.Clients.Find(x => x.ID == id);
+            if (result == null)
+            {
+                NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
+                if (localConn != null)
                 {
-                    result.Add(new BoolArgument() { Data = (bool)arg });
+                    localConn.Disconnect("No data found!");
                 }
-                else if (typeOf == typeof(float))
-                {
-                    result.Add(new FloatArgument() { Data = (float)arg });
-                }
-                else if (typeOf == typeof(string))
-                {
-                    result.Add(new StringArgument() { Data = (string)arg });
-                }
-                else if (typeOf == typeof(LVector3))
-                {
-                    result.Add(new LVector3Argument() { Data = (LVector3)arg });
-                }
-                else
-                {
-                    Logging.Error("[Util->ParseNativeArguments(params object[] args)]: Type of argument not found!");
-                    return null;
-                }
+                return null;
             }
 
             return result;
@@ -50,13 +70,13 @@ namespace CoopServer
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username == username);
-            if (client.Equals(default(Client)))
+            Client client = Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
+            if (client == null)
             {
                 return null;
             }
 
-            return Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == client.ID);
+            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.ID);
         }
 
         // Return a list of all connections but not the local connection
@@ -75,7 +95,7 @@ namespace CoopServer
             return new(Server.MainNetServer.Connections.FindAll(e =>
             {
                 Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
-                return !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+                return client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
         // Return a list of players within range of ... but not the local one
@@ -84,7 +104,7 @@ namespace CoopServer
             return new(Server.MainNetServer.Connections.Where(e =>
             {
                 Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
-                return e != local && !client.Equals(default(Client)) && client.Player.IsInRangeOf(position, range);
+                return e != local && client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
 
@@ -102,15 +122,17 @@ namespace CoopServer
                     data = (T)ser.Deserialize(stream);
                 }
 
-                using (FileStream stream = new(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
+                using (FileStream stream = new(path, FileMode.Truncate, FileAccess.ReadWrite))
                 {
                     ser.Serialize(stream, data);
                 }
             }
             else
             {
-                using FileStream stream = File.OpenWrite(path);
-                ser.Serialize(stream, data = new T());
+                using (FileStream stream = File.OpenWrite(path))
+                {
+                    ser.Serialize(stream, data = new T());
+                }
             }
 
             return data;

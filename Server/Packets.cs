@@ -72,6 +72,7 @@ namespace CoopServer
         FullSyncNpcVehPacket,
         ChatMessagePacket,
         NativeCallPacket,
+        NativeResponsePacket,
         ModPacket
     }
 
@@ -633,6 +634,44 @@ namespace CoopServer
 
             Hash = data.Hash;
             Args = data.Args;
+        }
+    }
+
+    [ProtoContract]
+    class NativeResponsePacket : Packet
+    {
+        [ProtoMember(1)]
+        public ulong Hash { get; set; }
+
+        [ProtoMember(2)]
+        public List<NativeArgument> Args { get; set; }
+
+        [ProtoMember(3)]
+        public NativeArgument Type { get; set; }
+
+        [ProtoMember(4)]
+        public long ID { get; set; }
+
+        public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+        {
+            message.Write((byte)PacketTypes.NativeResponsePacket);
+
+            byte[] result = CoopSerializer.Serialize(this);
+
+            message.Write(result.Length);
+            message.Write(result);
+        }
+
+        public override void NetIncomingMessageToPacket(NetIncomingMessage message)
+        {
+            int len = message.ReadInt32();
+
+            NativeResponsePacket data = message.ReadBytes(len).Deserialize<NativeResponsePacket>();
+
+            Hash = data.Hash;
+            Args = data.Args;
+            Type = data.Type;
+            ID = data.ID;
         }
     }
 

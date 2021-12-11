@@ -14,6 +14,8 @@ namespace CoopClient.Menus.Sub
         public string IP { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
+        [JsonProperty("version")]
+        public string Version { get; set; }
         [JsonProperty("players")]
         public int Players { get; set; }
         [JsonProperty("maxPlayers")]
@@ -87,7 +89,7 @@ namespace CoopClient.Menus.Sub
             foreach (ServerListClass server in serverList)
             {
                 NativeItem tmpItem = null;
-                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{server.IP}~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
+                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{server.IP}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
                 tmpItem.Activated += (object sender, EventArgs e) =>
                 {
                     try

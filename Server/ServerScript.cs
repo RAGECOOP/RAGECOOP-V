@@ -17,8 +17,9 @@ namespace CoopServer
 
     internal class Resource
     {
+        public bool ReadyToStop = false;
+
         private static Thread _mainThread;
-        private static bool _hasToStop = false;
         private static Queue _actionQueue;
         private static ServerScript _script;
 
@@ -40,7 +41,7 @@ namespace CoopServer
 
         private void ThreadLoop()
         {
-            while (!_hasToStop)
+            while (!Program.ReadyToStop)
             {
                 Queue localQueue;
                 lock (_actionQueue.SyncRoot)
@@ -57,6 +58,9 @@ namespace CoopServer
                 // 16 milliseconds to sleep to reduce CPU usage
                 Thread.Sleep(1000 / 60);
             }
+
+            _script.API.InvokeStop();
+            ReadyToStop = true;
         }
 
         public bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)
@@ -137,6 +141,7 @@ namespace CoopServer
 
         #region EVENTS
         public event EmptyEvent OnStart;
+        public event EmptyEvent OnStop;
         public event ChatEvent OnChatMessage;
         public event PlayerEvent OnPlayerHandshake;
         public event PlayerEvent OnPlayerConnected;
@@ -149,6 +154,11 @@ namespace CoopServer
         internal void InvokeStart()
         {
             OnStart?.Invoke();
+        }
+
+        internal void InvokeStop()
+        {
+            OnStop?.Invoke();
         }
 
         internal void InvokePlayerHandshake(Client client)
@@ -228,9 +238,10 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments;
-                if ((arguments = Util.ParseNativeArguments(args)) == null)
+                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
+                if (arguments == null)
                 {
+                    Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: One or more arguments do not exist!");
                     return;
                 }
 
@@ -271,8 +282,7 @@ namespace CoopServer
 
         public static Client GetClientByUsername(string username)
         {
-            Client client = Server.Clients.FirstOrDefault(x => x.Player.Username == username);
-            return client.Equals(default(Client)) ? null : client;
+            return Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
         public static void SendChatMessageToAll(string message, string username = "Server")

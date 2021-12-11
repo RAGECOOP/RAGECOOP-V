@@ -11,6 +11,7 @@ namespace CoopServer
         public float Latency = 0.0f;
         public PlayerData Player;
         private readonly Dictionary<string, object> CustomData = new();
+        internal readonly Dictionary<long, Action<object>> Callbacks = new();
 
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)
@@ -49,6 +50,10 @@ namespace CoopServer
         {
             Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(string.Join(" ", reason));
         }
+        public void Kick(string reason)
+        {
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(reason);
+        }
 
         public void SendChatMessage(string message, string from = "Server")
         {
@@ -83,19 +88,97 @@ namespace CoopServer
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
                 if (userConnection == null)
                 {
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{ID}\" not found!");
                     return;
                 }
 
-                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-                if (arguments == null)
+                List<NativeArgument> arguments = null;
+                if (args != null && args.Length > 0)
                 {
-                    return;
+                    arguments = Util.ParseNativeArguments(args);
+                    if (arguments == null)
+                    {
+                        Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Missing arguments!");
+                        return;
+                    }
                 }
+                
 
                 NativeCallPacket packet = new()
                 {
                     Hash = hash,
                     Args = arguments
+                };
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+            }
+            catch (Exception e)
+            {
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
+        }
+
+        public void SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)
+        {
+            try
+            {
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                if (userConnection == null)
+                {
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{ID}\" not found!");
+                    return;
+                }
+
+                NativeArgument returnType = null;
+                Type typeOf = type;
+                if (typeOf == typeof(int))
+                {
+                    returnType = new IntArgument();
+                }
+                else if (typeOf == typeof(bool))
+                {
+                    returnType = new BoolArgument();
+                }
+                else if (typeOf == typeof(float))
+                {
+                    returnType = new FloatArgument();
+                }
+                else if (typeOf == typeof(string))
+                {
+                    returnType = new StringArgument();
+                }
+                else if (typeOf == typeof(LVector3))
+                {
+                    returnType = new LVector3Argument();
+                }
+                else
+                {
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Argument does not exist!");
+                    return;
+                }
+
+                List<NativeArgument> arguments = null;
+                if (args != null && args.Length > 0)
+                {
+                    arguments = Util.ParseNativeArguments(args);
+                    if (arguments == null)
+                    {
+                        Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: One or more arguments do not exist!");
+                        return;
+                    }
+                }
+
+                long id = 0;
+                Callbacks.Add(id = Environment.TickCount64, callback);
+
+                NativeResponsePacket packet = new()
+                {
+                    Hash = hash,
+                    Args = arguments,
+                    Type = returnType,
+                    ID = id
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
