@@ -13,9 +13,9 @@ namespace CoopClient.Menus.Sub
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
-        private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic (Npcs/Vehicles)", "Local traffic only", Main.DisableTraffic);
-        private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share NPCs", "20 NPCs = 1mb / 12 seconds (UPLOAD)", Main.ShareNpcsWithPlayers) { Enabled = false };
-        private readonly NativeSliderItem StreamedNpcsItem = new NativeSliderItem($"Streamed NPCs ({Main.MainSettings.StreamedNpc})", 20, Main.MainSettings.StreamedNpc > 20 ? 20 : Main.MainSettings.StreamedNpc);
+        private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
+        private readonly NativeCheckboxItem ShareNpcsItem = new NativeCheckboxItem("Share NPCs", "30 NPCs = 1mb / 9 seconds (UPLOAD)", Main.ShareNpcsWithPlayers) { Enabled = false };
+        private readonly NativeSliderItem StreamedNPCsItem = new NativeSliderItem($"Streamed NPCs ({Main.MainSettings.StreamedNPCs})", 30, Main.MainSettings.StreamedNPCs > 30 ? 30 : Main.MainSettings.StreamedNPCs);
         private readonly NativeCheckboxItem FlipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
 #if DEBUG
         private readonly NativeCheckboxItem UseDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
@@ -29,7 +29,7 @@ namespace CoopClient.Menus.Sub
         {
             DisableTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
             ShareNpcsItem.CheckboxChanged += (item, check) => { Main.ShareNpcsWithPlayers = ShareNpcsItem.Checked; };
-            StreamedNpcsItem.ValueChanged += StreamedNpcsValueChanged;
+            StreamedNPCsItem.ValueChanged += StreamedNpcsValueChanged;
             FlipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
 #if DEBUG
             UseDebugItem.CheckboxChanged += UseDebugCheckboxChanged;
@@ -38,7 +38,7 @@ namespace CoopClient.Menus.Sub
 
             MainMenu.Add(DisableTraffic);
             MainMenu.Add(ShareNpcsItem);
-            MainMenu.Add(StreamedNpcsItem);
+            MainMenu.Add(StreamedNPCsItem);
             MainMenu.Add(FlipMenuItem);
 #if DEBUG
             MainMenu.Add(UseDebugItem);
@@ -67,9 +67,9 @@ namespace CoopClient.Menus.Sub
 
         internal void StreamedNpcsValueChanged(object a, System.EventArgs b)
         {
-            Main.MainSettings.StreamedNpc = StreamedNpcsItem.Value;
+            Main.MainSettings.StreamedNPCs = StreamedNPCsItem.Value;
             Util.SaveSettings();
-            StreamedNpcsItem.Title = string.Format("Streamed Npcs ({0})", Main.MainSettings.StreamedNpc);
+            StreamedNPCsItem.Title = string.Format("Streamed NPCs ({0})", Main.MainSettings.StreamedNPCs);
         }
 
         internal void FlipMenuCheckboxChanged(object a, System.EventArgs b)

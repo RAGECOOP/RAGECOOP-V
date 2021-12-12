@@ -232,7 +232,7 @@ namespace CoopClient
         {
             Main.MainSettings.Username = playerName;
             Main.ShareNpcsWithPlayers = shareNpcsWithPlayers;
-            Main.MainSettings.StreamedNpc = streamedNpcs;
+            Main.MainSettings.StreamedNPCs = streamedNpcs;
             Main.DisableTraffic = disableTrafficSharing;
 #if DEBUG
             Main.UseDebug = debug;

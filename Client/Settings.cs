@@ -24,6 +24,6 @@
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public int StreamedNpc { get; set; } = 10;
+        public int StreamedNPCs { get; set; } = 15;
     }
 }

@@ -68,7 +68,7 @@ namespace CoopClient.Entities
                 foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 150f)
                     .Where(p => p.Handle != Game.Player.Character.Handle && !p.IsDead && p.RelationshipGroup != Main.RelationshipGroup)
                     .OrderBy(p => (p.Position - Game.Player.Character.Position).Length())
-                    .Take((Main.MainSettings.StreamedNpc > 20 || Main.MainSettings.StreamedNpc < 0) ? 0 : Main.MainSettings.StreamedNpc))
+                    .Take((Main.MainSettings.StreamedNPCs > 30 || Main.MainSettings.StreamedNPCs < 0) ? 0 : Main.MainSettings.StreamedNPCs))
                 {
                     Main.MainNetworking.SendNpcData(ped);
                 }
