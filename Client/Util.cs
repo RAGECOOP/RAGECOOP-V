@@ -58,6 +58,7 @@ namespace CoopClient
 
             if (!model.IsValid)
             {
+                //GTA.UI.Notification.Show("~y~Not valid!");
                 return null;
             }
 

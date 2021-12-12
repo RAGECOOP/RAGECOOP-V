@@ -436,8 +436,8 @@ namespace CoopClient.Entities
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
-                    MainVehicle.Quaternion = VehicleRotation;
+                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition, VehicleRotation.Z);
+                    vehicleModel.MarkAsNoLongerNeeded();
                 }
             }
 
@@ -822,6 +822,7 @@ namespace CoopClient.Entities
             }
 
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
+            characterModel.MarkAsNoLongerNeeded();
             Character.RelationshipGroup = Main.RelationshipGroup;
             if (IsInVehicle)
             {
