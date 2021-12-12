@@ -431,7 +431,7 @@ namespace CoopClient.Entities
                     Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
-                        GTA.UI.Notification.Show($"~r~Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                        GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
                         ModelNotFound = 2;
                         return;
                     }
@@ -459,11 +459,14 @@ namespace CoopClient.Entities
             #region -- VEHICLE SYNC --
             if (AimCoords != default)
             {
-                int gameTime = Game.GameTime;
-                if (gameTime - LastVehicleAim > 30)
+                if (MainVehicle.IsTurretSeat(VehicleSeatIndex))
                 {
-                    Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-                    LastVehicleAim = gameTime;
+                    int gameTime = Game.GameTime;
+                    if (gameTime - LastVehicleAim > 30)
+                    {
+                        Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                        LastVehicleAim = gameTime;
+                    }
                 }
             }
 
@@ -813,7 +816,7 @@ namespace CoopClient.Entities
 
             if (characterModel == null)
             {
-                GTA.UI.Notification.Show($"~r~Model ({CurrentModelHash}) cannot be loaded!");
+                GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
                 ModelNotFound = 1;
                 return false;
             }
