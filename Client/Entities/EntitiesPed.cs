@@ -16,6 +16,12 @@ namespace CoopClient.Entities
     /// </summary>
     public class EntitiesPed
     {
+        /// <summary>
+        /// 0 = Nothing
+        /// 1 = Character
+        /// 2 = Vehicle
+        /// </summary>
+        private short ModelNotFound = 0;
         private bool AllDataAvailable = false;
         /// <summary>
         /// ?
@@ -39,10 +45,18 @@ namespace CoopClient.Entities
         /// </summary>
         public int Health { get; set; }
         private int LastModelHash = 0;
+        private int CurrentModelHash = 0;
         /// <summary>
         /// ?
         /// </summary>
-        public int ModelHash { get; set; }
+        public int ModelHash
+        {
+            set
+            {
+                LastModelHash = LastModelHash == 0 ? value : CurrentModelHash;
+                CurrentModelHash = value;
+            }
+        }
         private Dictionary<int, int> LastProps = new Dictionary<int, int>();
         /// <summary>
         /// ?
@@ -113,10 +127,19 @@ namespace CoopClient.Entities
         /// ?
         /// </summary>
         public bool IsInVehicle { get; set; }
+        private int LastVehicleModelHash = 0;
+        private int CurrentVehicleModelHash = 0;
         /// <summary>
         /// ?
         /// </summary>
-        public int VehicleModelHash { get; set; }
+        public int VehicleModelHash
+        {
+            set
+            {
+                LastVehicleModelHash = CurrentVehicleModelHash == 0 ? value : CurrentVehicleModelHash;
+                CurrentVehicleModelHash = value;
+            }
+        }
         private int[] LastVehicleColors = new int[] { 0, 0 };
         /// <summary>
         /// ?
@@ -290,7 +313,7 @@ namespace CoopClient.Entities
             }
             else if (LastSyncWasFull)
             {
-                if (ModelHash != LastModelHash)
+                if (CurrentModelHash != LastModelHash)
                 {
                     Character.Kill();
                     Character.Delete();
@@ -375,11 +398,23 @@ namespace CoopClient.Entities
 
         private void DisplayInVehicle()
         {
-            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
+            if (ModelNotFound == 2)
+            {
+                if (CurrentVehicleModelHash == LastVehicleModelHash)
+                {
+                    return;
+                }
+                else
+                {
+                    ModelNotFound = 0;
+                }
+            }
+
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
             {
                 bool vehFound = false;
 
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
+                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { CurrentVehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
 
                 foreach (Vehicle veh in vehs)
                 {
@@ -393,10 +428,11 @@ namespace CoopClient.Entities
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = VehicleModelHash.ModelRequest();
+                    Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
-                        GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
+                        GTA.UI.Notification.Show($"~r~Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                        ModelNotFound = 2;
                         return;
                     }
 
@@ -469,6 +505,8 @@ namespace CoopClient.Entities
                     {
                         MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
                     }
+
+                    LastVehicleMods = VehicleMods;
                 }
 
                 MainVehicle.EngineHealth = VehicleEngineHealth;
@@ -611,7 +649,7 @@ namespace CoopClient.Entities
 
         private string PedalingAnimDict()
         {
-            switch ((VehicleHash)VehicleModelHash)
+            switch ((VehicleHash)CurrentVehicleModelHash)
             {
                 case VehicleHash.Bmx:
                     return "veh@bicycle@bmx@front@base";
@@ -751,20 +789,32 @@ namespace CoopClient.Entities
 
         private bool CreateCharacter(string username)
         {
+            if (ModelNotFound == 1)
+            {
+                if (CurrentModelHash == LastModelHash)
+                {
+                    return false;
+                }
+                else
+                {
+                    ModelNotFound = 0;
+                }
+            }
+
             if (PedBlip != null && PedBlip.Exists())
             {
                 PedBlip.Delete();
                 PedBlip = null;
             }
 
-            LastModelHash = ModelHash;
             LastProps = Props;
 
-            Model characterModel = ModelHash.ModelRequest();
+            Model characterModel = CurrentModelHash.ModelRequest();
 
             if (characterModel == null)
             {
-                GTA.UI.Notification.Show($"~r~Model ({ModelHash}) cannot be loaded!");
+                GTA.UI.Notification.Show($"~r~Model ({CurrentModelHash}) cannot be loaded!");
+                ModelNotFound = 1;
                 return false;
             }
 

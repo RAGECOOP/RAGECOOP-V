@@ -57,7 +57,7 @@ namespace CoopClient
             Model model = new Model(hash);
             short counter = 0;
 
-            while (counter++ < 1000)
+            while (counter++ < 5)
             {
                 model.Request();
 
