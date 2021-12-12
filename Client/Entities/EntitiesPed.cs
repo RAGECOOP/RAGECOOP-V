@@ -21,7 +21,7 @@ namespace CoopClient.Entities
         /// 1 = Character
         /// 2 = Vehicle
         /// </summary>
-        private short ModelNotFound = 0;
+        private byte ModelNotFound = 0;
         private bool AllDataAvailable = false;
         /// <summary>
         /// ?
@@ -431,7 +431,7 @@ namespace CoopClient.Entities
                     Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
-                        GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                        //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
                         ModelNotFound = 2;
                         return;
                     }
@@ -816,7 +816,7 @@ namespace CoopClient.Entities
 
             if (characterModel == null)
             {
-                GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
+                //GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
                 ModelNotFound = 1;
                 return false;
             }
