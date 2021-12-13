@@ -138,16 +138,20 @@ namespace CoopServer
                                 if (errorCounter != 0)
                                 {
                                     Logging.Error($"MasterServer: Remaining attempts {errorCounter--} ...");
+
+                                    // Wait 5 seconds before trying again
+                                    Thread.Sleep(5000);
                                     continue;
                                 }
                                 
                                 break;
                             }
-                            else
-                            {
-                                // Sleep for 12.5s
-                                Thread.Sleep(12500);
-                            }
+
+                            // Reset errorCounter
+                            errorCounter = 3;
+
+                            // Sleep for 12.5s
+                            Thread.Sleep(12500);
                         }
                     }
                     catch (Exception ex)
