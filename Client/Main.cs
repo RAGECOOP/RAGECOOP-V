@@ -21,7 +21,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_0_1";
+        internal static readonly string CurrentVersion = "V1_1_0";
 
         internal static bool ShareNpcsWithPlayers = false;
         internal static bool DisableTraffic = false;
@@ -258,11 +258,9 @@ namespace CoopClient
 
             byte? flags;
 
-            Vehicle vehicleTryingToEnter = null;
-
-            if (player.IsInVehicle() || (vehicleTryingToEnter = player.VehicleTryingToEnter) != null)
+            if (player.IsInVehicle())
             {
-                Vehicle veh = player.CurrentVehicle ?? vehicleTryingToEnter;
+                Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
                 flags = veh.GetVehicleFlags(fullSync);

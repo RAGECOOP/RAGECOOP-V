@@ -21,7 +21,7 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V1_0";
+        private static readonly string CompatibleVersion = "V1_1";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
