@@ -220,7 +220,7 @@ namespace CoopServer
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
                 Server.MainNetServer.FlushSendQueue();
             }
             catch (Exception e)
@@ -253,7 +253,7 @@ namespace CoopServer
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -300,7 +300,7 @@ namespace CoopServer
                     Username = username,
                     Message = message
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
             }
             catch (Exception e)
             {

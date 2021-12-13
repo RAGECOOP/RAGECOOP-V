@@ -133,6 +133,16 @@ namespace CoopClient
         ModPacket
     }
 
+    enum ConnectionChannel
+    {
+        Default = 0,
+        Player = 1,
+        NPC = 2,
+        Chat = 3,
+        Native = 4,
+        Mod = 5
+    }
+
     [Flags]
     enum PedDataFlags
     {

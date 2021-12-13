@@ -551,7 +551,7 @@ namespace CoopClient
                 Type = result,
                 ID = packet.ID
             }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
             Client.FlushSendQueue();
         }
         #endregion // -- PLAYER --
@@ -804,7 +804,7 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, messageType);
+            Client.SendMessage(outgoingMessage, messageType, (int)ConnectionChannel.Player);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -872,7 +872,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable, (int)ConnectionChannel.NPC);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -891,7 +891,7 @@ namespace CoopClient
                 Username = Main.MainSettings.Username,
                 Message = message
             }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -913,7 +913,7 @@ namespace CoopClient
                 CustomPacketID = customID,
                 Bytes = bytes
             }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
             Client.FlushSendQueue();
 
             #if DEBUG

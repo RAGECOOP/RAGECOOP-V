@@ -437,13 +437,13 @@ namespace CoopServer
                                                     else
                                                     {
                                                         // Send back to target
-                                                        MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, 0);
+                                                        MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
                                                     }
                                                 }
                                                 else
                                                 {
                                                     // Send back to all players
-                                                    MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+                                                    MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
                                                 }
                                             }
                                         }
@@ -734,7 +734,7 @@ namespace CoopServer
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (MainResource != null)
@@ -774,7 +774,7 @@ namespace CoopServer
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (MainResource != null)
@@ -814,7 +814,7 @@ namespace CoopServer
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (MainResource != null)
@@ -854,7 +854,7 @@ namespace CoopServer
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, 0);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (MainResource != null)
@@ -900,7 +900,7 @@ namespace CoopServer
                                 Username = "Server",
                                 Message = command.Key.Usage
                             }.PacketToNetOutGoingMessage(outgoingMessage);
-                            MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                            MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
                             return;
                         }
 
@@ -920,7 +920,7 @@ namespace CoopServer
                             Username = "Server",
                             Message = "Command not found!"
                         }.PacketToNetOutGoingMessage(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                        MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
                     }
 
                     return;
@@ -936,7 +936,7 @@ namespace CoopServer
 
             outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, 0);
+            MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
 
             Logging.Info(packet.Username + ": " + packet.Message);
         }
@@ -953,7 +953,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.NPC);
         }
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
@@ -966,7 +966,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, 0);
+            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.NPC);
         }
         #endregion
 
