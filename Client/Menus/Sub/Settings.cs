@@ -14,7 +14,7 @@ namespace CoopClient.Menus.Sub
         };
 
         private readonly NativeCheckboxItem DisableTraffic = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
-        private readonly NativeCheckboxItem ShareNPCsItem = new NativeCheckboxItem("Share NPCs", "~y~WARNING:~s~ High network traffic! (Every 5 seconds = 1mb or more)", Main.ShareNpcsWithPlayers) { Enabled = false };
+        private readonly NativeCheckboxItem ShareNPCsItem = new NativeCheckboxItem("Share NPCs", "~y~WARNING:~s~ High network traffic!", Main.ShareNpcsWithPlayers) { Enabled = false };
         private readonly NativeCheckboxItem FlipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
 #if DEBUG
         private readonly NativeCheckboxItem UseDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
