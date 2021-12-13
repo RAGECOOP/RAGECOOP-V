@@ -310,7 +310,6 @@ namespace CoopClient
                 player.Speed = packet.Speed;
                 player.CurrentWeaponHash = packet.CurrentWeaponHash;
                 player.AimCoords = packet.AimCoords.ToVector();
-                player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
                 player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
                 player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
@@ -318,6 +317,7 @@ namespace CoopClient
                 player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
                 player.IsInVehicle = false;
+                player.LastSyncWasFull = false;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -348,13 +348,14 @@ namespace CoopClient
                 player.VehicleMods = packet.VehMods;
                 player.VehDoors = packet.VehDoors;
                 player.VehTires = packet.VehTires;
-                player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
-                player.IsInVehicle = true;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
+                player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                player.IsInVehicle = true;
+                player.LastSyncWasFull = false;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -374,7 +375,6 @@ namespace CoopClient
                 player.Speed = packet.Speed;
                 player.CurrentWeaponHash = packet.CurrentWeaponHash;
                 player.AimCoords = packet.AimCoords.ToVector();
-                player.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                 player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
                 player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
                 player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
@@ -382,6 +382,7 @@ namespace CoopClient
                 player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
                 player.IsInVehicle = false;
+                player.LastSyncWasFull = false;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -403,13 +404,14 @@ namespace CoopClient
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
-                player.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
-                player.IsInVehicle = true;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
+                player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                player.IsInVehicle = true;
+                player.LastSyncWasFull = false;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -576,7 +578,6 @@ namespace CoopClient
                     npc.Speed = packet.Speed;
                     npc.CurrentWeaponHash = packet.CurrentWeaponHash;
                     npc.AimCoords = packet.AimCoords.ToVector();
-                    npc.LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
                     npc.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
                     npc.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
                     npc.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
@@ -584,6 +585,7 @@ namespace CoopClient
                     npc.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                     npc.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
                     npc.IsInVehicle = false;
+                    npc.LastSyncWasFull = true;
                 }
                 else
                 {
@@ -600,14 +602,14 @@ namespace CoopClient
                         Speed = packet.Speed,
                         CurrentWeaponHash = packet.CurrentWeaponHash,
                         AimCoords = packet.AimCoords.ToVector(),
-                        LastSyncWasFull = (packet.Flag.Value & (byte)PedDataFlags.LastSyncWasFull) > 0,
                         IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0,
                         IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0,
                         IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0,
                         IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0,
                         IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0,
                         IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0,
-                        IsInVehicle = false
+                        IsInVehicle = false,
+                        LastSyncWasFull = true
                     });
                 }
             }
@@ -639,13 +641,14 @@ namespace CoopClient
                     npc.VehicleColors = packet.VehColors;
                     npc.VehDoors = packet.VehDoors;
                     npc.VehTires = packet.VehTires;
-                    npc.LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
-                    npc.IsInVehicle = true;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                     npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                     npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                     npc.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                     npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
+                    npc.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                    npc.IsInVehicle = true;
+                    npc.LastSyncWasFull = true;
                 }
                 else
                 {
@@ -669,13 +672,14 @@ namespace CoopClient
                         VehicleColors = packet.VehColors,
                         VehDoors = packet.VehDoors,
                         VehTires = packet.VehTires,
-                        LastSyncWasFull = (packet.Flag.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0,
-                        IsInVehicle = true,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
                         VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
                         VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0,
                         VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0,
-                        VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0
+                        VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0,
+                        IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0,
+                        IsInVehicle = true,
+                        LastSyncWasFull = true
                     });
                 }
             }
@@ -732,7 +736,7 @@ namespace CoopClient
                         VehMods = veh.Mods.GetVehicleMods(),
                         VehDoors = veh.Doors.GetVehicleDoors(),
                         VehTires = veh.Wheels.GetBrokenTires(),
-                        Flag = veh.GetVehicleFlags(true)
+                        Flag = veh.GetVehicleFlags()
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
                 else
@@ -752,7 +756,7 @@ namespace CoopClient
                         Speed = player.GetPedSpeed(),
                         AimCoords = player.GetPedAimCoords(false).ToLVector(),
                         CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                        Flag = player.GetPedFlags(true, true)
+                        Flag = player.GetPedFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
 
@@ -781,7 +785,7 @@ namespace CoopClient
                         VehVelocity = veh.Velocity.ToLVector(),
                         VehSpeed = veh.Speed,
                         VehSteeringAngle = veh.SteeringAngle,
-                        Flag = veh.GetVehicleFlags(false)
+                        Flag = veh.GetVehicleFlags()
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
                 else
@@ -799,7 +803,7 @@ namespace CoopClient
                         Speed = player.GetPedSpeed(),
                         AimCoords = player.GetPedAimCoords(false).ToLVector(),
                         CurrentWeaponHash = (int)player.Weapons.Current.Hash,
-                        Flag = player.GetPedFlags(false, true)
+                        Flag = player.GetPedFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
             }
@@ -851,7 +855,7 @@ namespace CoopClient
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDoors = veh.Doors.GetVehicleDoors(),
                     VehTires = veh.Wheels.GetBrokenTires(),
-                    Flag = veh.GetVehicleFlags(true)
+                    Flag = veh.GetVehicleFlags()
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else

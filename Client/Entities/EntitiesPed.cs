@@ -204,6 +204,11 @@ namespace CoopClient.Entities
         /// ?
         /// </summary>
         public float VehRPM { get; set; }
+        private bool LastHornActive = false;
+        /// <summary>
+        /// ?
+        /// </summary>
+        public bool IsHornActive { get; set; }
         /// <summary>
         /// ?
         /// </summary>
@@ -548,6 +553,17 @@ namespace CoopClient.Entities
                 if (VehIsSireneActive != MainVehicle.IsSirenActive)
                 {
                     MainVehicle.IsSirenActive = VehIsSireneActive;
+                }
+
+                if (IsHornActive && !LastHornActive)
+                {
+                    LastHornActive = true;
+                    MainVehicle.SoundHorn(99999);
+                }
+                else if (!IsHornActive && LastHornActive)
+                {
+                    LastHornActive = false;
+                    MainVehicle.SoundHorn(1);
                 }
 
                 Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);

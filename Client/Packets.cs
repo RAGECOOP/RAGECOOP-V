@@ -146,25 +146,24 @@ namespace CoopClient
     [Flags]
     enum PedDataFlags
     {
-        LastSyncWasFull = 1 << 0,
-        IsAiming = 1 << 1,
-        IsShooting = 1 << 2,
-        IsReloading = 1 << 3,
-        IsJumping = 1 << 4,
-        IsRagdoll = 1 << 5,
-        IsOnFire = 1 << 6
+        IsAiming = 1 << 0,
+        IsShooting = 1 << 1,
+        IsReloading = 1 << 2,
+        IsJumping = 1 << 3,
+        IsRagdoll = 1 << 4,
+        IsOnFire = 1 << 5
     }
 
     #region ===== VEHICLE DATA =====
     [Flags]
     enum VehicleDataFlags
     {
-        LastSyncWasFull = 1 << 0,
-        IsEngineRunning = 1 << 1,
-        AreLightsOn = 1 << 2,
-        AreHighBeamsOn = 1 << 3,
-        IsSirenActive = 1 << 4,
-        IsDead = 1 << 5
+        IsEngineRunning = 1 << 0,
+        AreLightsOn = 1 << 1,
+        AreHighBeamsOn = 1 << 2,
+        IsSirenActive = 1 << 3,
+        IsDead = 1 << 4,
+        IsHornActive = 1 << 5,
     }
 
     /// <summary>

@@ -263,7 +263,7 @@ namespace CoopClient
                 Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = veh.GetVehicleFlags(fullSync);
+                flags = veh.GetVehicleFlags();
 
                 int secondaryColor;
                 int primaryColor;
@@ -286,13 +286,14 @@ namespace CoopClient
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
                 DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
-                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsInVehicle = true;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
+                DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {
@@ -302,14 +303,14 @@ namespace CoopClient
             }
             else
             {
-                flags = player.GetPedFlags(fullSync, true);
+                flags = player.GetPedFlags(true);
 
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
                 DebugSyncPed.Speed = player.GetPedSpeed();
                 DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
                 DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
-                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
                 DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;
                 DebugSyncPed.IsReloading = (flags.Value & (byte)PedDataFlags.IsReloading) > 0;

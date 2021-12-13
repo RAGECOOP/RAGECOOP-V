@@ -146,14 +146,9 @@ namespace CoopClient
             return RaycastEverything(new Vector2(0, 0));
         }
 
-        public static byte? GetVehicleFlags(this Vehicle veh, bool fullSync)
+        public static byte? GetVehicleFlags(this Vehicle veh)
         {
             byte? flags = 0;
-
-            if (fullSync)
-            {
-                flags |= (byte)VehicleDataFlags.LastSyncWasFull;
-            }
 
             if (veh.IsEngineRunning)
             {
@@ -180,17 +175,17 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsDead;
             }
 
+            if (Function.Call<bool>(Hash.IS_HORN_ACTIVE, veh.Handle))
+            {
+                flags |= (byte)VehicleDataFlags.IsHornActive;
+            }
+
             return flags;
         }
 
-        public static byte? GetPedFlags(this Ped ped, bool fullSync, bool isPlayer = false)
+        public static byte? GetPedFlags(this Ped ped, bool isPlayer = false)
         {
             byte? flags = 0;
-
-            if (fullSync)
-            {
-                flags |= (byte)PedDataFlags.LastSyncWasFull;
-            }
 
             if (ped.IsAiming)
             {
