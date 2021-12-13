@@ -264,8 +264,26 @@ namespace CoopClient.Entities
                 AllDataAvailable = true;
             }
 
+            if (ModelNotFound != 0)
+            {
+                if (ModelNotFound == 1)
+                {
+                    if (CurrentModelHash != LastModelHash)
+                    {
+                        ModelNotFound = 0;
+                    }
+                }
+                else
+                {
+                    if (CurrentVehicleModelHash != LastVehicleModelHash)
+                    {
+                        ModelNotFound = 0;
+                    }
+                }
+            }
+
             #region NOT_IN_RANGE
-            if (!Game.Player.Character.IsInRange(Position, 500f))
+            if (ModelNotFound != 0 || !Game.Player.Character.IsInRange(Position, 500f))
             {
                 if (Character != null && Character.Exists())
                 {
@@ -398,18 +416,6 @@ namespace CoopClient.Entities
 
         private void DisplayInVehicle()
         {
-            if (ModelNotFound == 2)
-            {
-                if (CurrentVehicleModelHash == LastVehicleModelHash)
-                {
-                    return;
-                }
-                else
-                {
-                    ModelNotFound = 0;
-                }
-            }
-
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
             {
                 bool vehFound = false;
@@ -792,18 +798,6 @@ namespace CoopClient.Entities
 
         private bool CreateCharacter(string username)
         {
-            if (ModelNotFound == 1)
-            {
-                if (CurrentModelHash == LastModelHash)
-                {
-                    return false;
-                }
-                else
-                {
-                    ModelNotFound = 0;
-                }
-            }
-
             if (PedBlip != null && PedBlip.Exists())
             {
                 PedBlip.Delete();
