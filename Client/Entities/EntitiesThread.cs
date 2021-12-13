@@ -37,14 +37,14 @@ namespace CoopClient.Entities
                 {
                     if ((tickCount - npc.Value.LastUpdateReceived) > 3000)
                     {
-                        if (npc.Value.Character != null && npc.Value.Character.Exists() && npc.Value.Health > 0)
+                        if (npc.Value.Character != null && npc.Value.Character.Exists() && !npc.Value.Character.IsDead)
                         {
                             npc.Value.Character.Kill();
                             npc.Value.Character.MarkAsNoLongerNeeded();
                             npc.Value.Character.Delete();
                         }
 
-                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
+                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && !npc.Value.MainVehicle.IsDead && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
                         {
                             npc.Value.MainVehicle.MarkAsNoLongerNeeded();
                             npc.Value.MainVehicle.Delete();
@@ -66,9 +66,8 @@ namespace CoopClient.Entities
             {
                 // Send all npcs from the current player
                 foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 150f)
-                    .Where(p => p.Handle != Game.Player.Character.Handle && !p.IsDead && p.RelationshipGroup != Main.RelationshipGroup)
-                    .OrderBy(p => (p.Position - Game.Player.Character.Position).Length())
-                    .Take((Main.MainSettings.StreamedNPCs > 30 || Main.MainSettings.StreamedNPCs < 0) ? 0 : Main.MainSettings.StreamedNPCs))
+                    .Where(p => p.Handle != Game.Player.Character.Handle && p.RelationshipGroup != Main.RelationshipGroup)
+                    .OrderBy(p => (p.Position - Game.Player.Character.Position).Length()))
                 {
                     Main.MainNetworking.SendNpcData(ped);
                 }

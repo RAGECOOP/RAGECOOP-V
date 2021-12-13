@@ -21,9 +21,5 @@
         /// Don't use it!
         /// </summary>
         public bool FlipMenu { get; set; } = false;
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public int StreamedNPCs { get; set; } = 15;
     }
 }

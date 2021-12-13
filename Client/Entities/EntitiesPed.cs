@@ -418,17 +418,16 @@ namespace CoopClient.Entities
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
             {
+                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
+
                 bool vehFound = false;
 
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { CurrentVehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
-
-                foreach (Vehicle veh in vehs)
+                if (targetVehicle != null)
                 {
-                    if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                    if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
                     {
-                        MainVehicle = veh;
+                        MainVehicle = targetVehicle;
                         vehFound = true;
-                        break;
                     }
                 }
 
@@ -442,7 +441,7 @@ namespace CoopClient.Entities
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition, VehicleRotation.Z);
+                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition, VehicleRotation.W);
                     vehicleModel.MarkAsNoLongerNeeded();
                 }
             }

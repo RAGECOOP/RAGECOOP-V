@@ -88,7 +88,7 @@ namespace CoopServer
 
                         try
                         {
-                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+                            string data = await httpClient.GetStringAsync("https://wimip.info/json");
 
                             info = JsonConvert.DeserializeObject<IpInfo>(data);
                         }
