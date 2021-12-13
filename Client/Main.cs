@@ -294,6 +294,7 @@ namespace CoopClient
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                DebugSyncPed.Transformed = (flags.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {

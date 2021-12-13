@@ -180,6 +180,11 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsHornActive;
             }
 
+            if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh))
+            {
+                flags |= (byte)VehicleDataFlags.IsTransformed;
+            }
+
             return flags;
         }
 

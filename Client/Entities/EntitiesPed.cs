@@ -204,6 +204,11 @@ namespace CoopClient.Entities
         /// ?
         /// </summary>
         public float VehRPM { get; set; }
+        private bool LastTransformed = false;
+        /// <summary>
+        /// ?
+        /// </summary>
+        public bool Transformed { get; set; }
         private bool LastHornActive = false;
         /// <summary>
         /// ?
@@ -548,6 +553,20 @@ namespace CoopClient.Entities
                 if (VehAreHighBeamsOn != MainVehicle.AreHighBeamsOn)
                 {
                     MainVehicle.AreHighBeamsOn = VehAreHighBeamsOn;
+                }
+
+                if (MainVehicle.IsSubmarineCar)
+                {
+                    if (Transformed && !LastTransformed)
+                    {
+                        LastTransformed = true;
+                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle, false);
+                    }
+                    else if (!Transformed && LastTransformed)
+                    {
+                        LastTransformed = false;
+                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle, false);
+                    }
                 }
 
                 if (VehIsSireneActive != MainVehicle.IsSirenActive)

@@ -354,6 +354,7 @@ namespace CoopClient
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = false;
 
@@ -410,6 +411,7 @@ namespace CoopClient
                 player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = false;
 
@@ -647,6 +649,7 @@ namespace CoopClient
                     npc.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                     npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                     npc.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                    npc.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
                 }
@@ -678,6 +681,7 @@ namespace CoopClient
                         VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0,
                         VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0,
                         IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0,
+                        Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0,
                         IsInVehicle = true,
                         LastSyncWasFull = true
                     });
