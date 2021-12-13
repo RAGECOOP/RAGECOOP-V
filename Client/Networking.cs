@@ -696,44 +696,16 @@ namespace CoopClient
             {
                 messageType = NetDeliveryMethod.UnreliableSequenced;
 
-                Vehicle vehicleIsTryingToEnter = null;
-
-                if (player.IsInVehicle() || (vehicleIsTryingToEnter = player.VehicleTryingToEnter) != null)
+                if (player.IsInVehicle())
                 {
-                    Vehicle veh = player.CurrentVehicle ?? vehicleIsTryingToEnter;
-
-                    LVector3 vehPosition = new LVector3();
-                    LQuaternion vehRotation = new LQuaternion();
-                    float vehEngineHealth = 0f;
-                    float vehRPM = 0f;
-                    LVector3 vehVelocity = new LVector3();
-                    float vehSpeed = 0f;
-                    float vehSteeringAngle = 0f;
-                    Dictionary<int, int> vehMods = null;
-                    VehicleDoors[] vehDoors = null;
-                    int vehTires = 0;
+                    Vehicle veh = player.CurrentVehicle;
 
                     int primaryColor = 0;
                     int secondaryColor = 0;
 
-                    if (veh.GetResponsiblePedHandle() == player.Handle)
+                    unsafe
                     {
-                        vehPosition = veh.Position.ToLVector();
-                        vehRotation = veh.Quaternion.ToLQuaternion();
-                        vehEngineHealth = veh.EngineHealth;
-                        vehRPM = veh.CurrentRPM;
-                        vehVelocity = veh.Velocity.ToLVector();
-                        vehSpeed = veh.Speed;
-                        vehSteeringAngle = veh.SteeringAngle;
-
-                        vehMods = veh.Mods.GetVehicleMods();
-                        vehDoors = veh.Doors.GetVehicleDoors();
-                        vehTires = veh.Wheels.GetBrokenTires();
-
-                        unsafe
-                        {
-                            Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
-                        }
+                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                     }
 
                     new FullSyncPlayerVehPacket()
@@ -748,18 +720,18 @@ namespace CoopClient
                         Props = player.GetPedProps(),
                         VehModelHash = veh.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
-                        VehPosition = vehPosition,
-                        VehRotation = vehRotation,
-                        VehEngineHealth = vehEngineHealth,
-                        VehRPM = vehRPM,
-                        VehVelocity = vehVelocity,
-                        VehSpeed = vehSpeed,
-                        VehSteeringAngle = vehSteeringAngle,
+                        VehPosition = veh.Position.ToLVector(),
+                        VehRotation = veh.Quaternion.ToLQuaternion(),
+                        VehEngineHealth = veh.EngineHealth,
+                        VehRPM = veh.CurrentRPM,
+                        VehVelocity = veh.Velocity.ToLVector(),
+                        VehSpeed = veh.Speed,
+                        VehSteeringAngle = veh.SteeringAngle,
                         VehAimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords().ToLVector() : new LVector3(),
                         VehColors = new int[] { primaryColor, secondaryColor },
-                        VehMods = vehMods,
-                        VehDoors = vehDoors,
-                        VehTires = vehTires,
+                        VehMods = veh.Mods.GetVehicleMods(),
+                        VehDoors = veh.Doors.GetVehicleDoors(),
+                        VehTires = veh.Wheels.GetBrokenTires(),
                         Flag = veh.GetVehicleFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -794,21 +766,6 @@ namespace CoopClient
                 {
                     Vehicle veh = player.CurrentVehicle;
 
-                    LVector3 vehPosition = new LVector3();
-                    LQuaternion vehRotation = new LQuaternion();
-                    LVector3 vehVelocity = new LVector3();
-                    float vehSpeed = 0f;
-                    float vehSteeringAngle = 0f;
-
-                    if (veh.GetResponsiblePedHandle() == player.Handle)
-                    {
-                        vehPosition = veh.Position.ToLVector();
-                        vehRotation = veh.Quaternion.ToLQuaternion();
-                        vehVelocity = veh.Velocity.ToLVector();
-                        vehSpeed = veh.Speed;
-                        vehSteeringAngle = veh.SteeringAngle;
-                    }
-
                     new LightSyncPlayerVehPacket()
                     {
                         Extra = new PlayerPacket()
@@ -819,11 +776,11 @@ namespace CoopClient
                         },
                         VehModelHash = veh.Model.Hash,
                         VehSeatIndex = (int)player.SeatIndex,
-                        VehPosition = vehPosition,
-                        VehRotation = vehRotation,
-                        VehVelocity = vehVelocity,
-                        VehSpeed = vehSpeed,
-                        VehSteeringAngle = vehSteeringAngle,
+                        VehPosition = veh.Position.ToLVector(),
+                        VehRotation = veh.Quaternion.ToLQuaternion(),
+                        VehVelocity = veh.Velocity.ToLVector(),
+                        VehSpeed = veh.Speed,
+                        VehSteeringAngle = veh.SteeringAngle,
                         Flag = veh.GetVehicleFlags(false)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -862,45 +819,16 @@ namespace CoopClient
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
-            Vehicle vehicleTryingToEnter = null;
-
-            if (npc.IsInVehicle() || (vehicleTryingToEnter = npc.VehicleTryingToEnter) != null)
+            if (npc.IsInVehicle())
             {
-                Vehicle veh = npc.CurrentVehicle ?? vehicleTryingToEnter;
-
-                LVector3 vehPosition = new LVector3();
-                LQuaternion vehRotation = new LQuaternion();
-                float vehEngineHealth = 0f;
-                float vehRPM = 0f;
-                LVector3 vehVelocity = new LVector3();
-                float vehSpeed = 0f;
-                float vehSteeringAngle = 0f;
-                Dictionary<int, int> vehMods = null;
-                VehicleDoors[] vehDoors = null;
-                int vehTires = 0;
-
+                Vehicle veh = npc.CurrentVehicle;
 
                 int primaryColor = 0;
                 int secondaryColor = 0;
 
-                if (veh.GetResponsiblePedHandle() == npc.Handle)
+                unsafe
                 {
-                    vehPosition = veh.Position.ToLVector();
-                    vehRotation = veh.Quaternion.ToLQuaternion();
-                    vehEngineHealth = veh.EngineHealth;
-                    vehRPM = veh.CurrentRPM;
-                    vehVelocity = veh.Velocity.ToLVector();
-                    vehSpeed = veh.Speed;
-                    vehSteeringAngle = veh.SteeringAngle;
-
-                    vehMods = veh.Mods.GetVehicleMods();
-                    vehDoors = veh.Doors.GetVehicleDoors();
-                    vehTires = veh.Wheels.GetBrokenTires();
-
-                    unsafe
-                    {
-                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
-                    }
+                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
                 }
 
                 new FullSyncNpcVehPacket()
@@ -912,17 +840,17 @@ namespace CoopClient
                     Position = npc.Position.ToLVector(),
                     VehModelHash = veh.Model.Hash,
                     VehSeatIndex = (int)npc.SeatIndex,
-                    VehPosition = vehPosition,
-                    VehRotation = vehRotation,
-                    VehEngineHealth = vehEngineHealth,
-                    VehRPM = vehRPM,
-                    VehVelocity = vehVelocity,
-                    VehSpeed = vehSpeed,
-                    VehSteeringAngle = vehSteeringAngle,
+                    VehPosition = veh.Position.ToLVector(),
+                    VehRotation = veh.Quaternion.ToLQuaternion(),
+                    VehEngineHealth = veh.EngineHealth,
+                    VehRPM = veh.CurrentRPM,
+                    VehVelocity = veh.Velocity.ToLVector(),
+                    VehSpeed = veh.Speed,
+                    VehSteeringAngle = veh.SteeringAngle,
                     VehColors = new int[] { primaryColor, secondaryColor },
-                    VehMods = vehMods,
-                    VehDoors = vehDoors,
-                    VehTires = vehTires,
+                    VehMods = veh.Mods.GetVehicleMods(),
+                    VehDoors = veh.Doors.GetVehicleDoors(),
+                    VehTires = veh.Wheels.GetBrokenTires(),
                     Flag = veh.GetVehicleFlags(true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
