@@ -55,21 +55,19 @@ namespace CoopClient
         public static Model ModelRequest(this int hash)
         {
             Model model = new Model(hash);
-            short counter = 0;
 
-            while (counter++ < 1000)
+            if (!model.IsValid)
             {
-                model.Request();
-
-                Script.Yield();
-
-                if (model.IsLoaded)
-                {
-                    return model;
-                }
+                //GTA.UI.Notification.Show("~y~Not valid!");
+                return null;
             }
 
-            return null;
+            if (!model.IsLoaded)
+            {
+                return model.Request(1000) ? model : null;
+            }
+
+            return model;
         }
 
         public static bool IsBetween<T>(this T item, T start, T end)

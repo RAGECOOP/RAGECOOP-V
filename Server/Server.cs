@@ -29,7 +29,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static Resource MainResource;
+        public static Resource MainResource = null;
         public static Dictionary<Command, Action<CommandContext>> Commands;
 
         public static readonly List<Client> Clients = new();
@@ -88,7 +88,7 @@ namespace CoopServer
 
                         try
                         {
-                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
+                            string data = await httpClient.GetStringAsync("https://wimip.info/json");
 
                             info = JsonConvert.DeserializeObject<IpInfo>(data);
                         }
@@ -96,6 +96,8 @@ namespace CoopServer
                         {
                             info = new() { ip = MainNetServer.Configuration.LocalAddress.ToString(), country = "?" };
                         }
+
+                        byte errorCounter = 3;
 
                         while (!Program.ReadyToStop)
                         {
@@ -131,14 +133,25 @@ namespace CoopServer
 
                             if (response.StatusCode != System.Net.HttpStatusCode.OK)
                             {
-                                Logging.Error($"MasterServer: {response.StatusCode}");
+                                Logging.Error($"MasterServer: [{(int)response.StatusCode}]{response.StatusCode}");
+
+                                if (errorCounter != 0)
+                                {
+                                    Logging.Error($"MasterServer: Remaining attempts {errorCounter--} ...");
+
+                                    // Wait 5 seconds before trying again
+                                    Thread.Sleep(5000);
+                                    continue;
+                                }
+                                
                                 break;
                             }
-                            else
-                            {
-                                // Sleep for 12.5s
-                                Thread.Sleep(12500);
-                            }
+
+                            // Reset errorCounter
+                            errorCounter = 3;
+
+                            // Sleep for 12.5s
+                            Thread.Sleep(12500);
                         }
                     }
                     catch (Exception ex)

@@ -96,7 +96,7 @@ namespace CoopClient
                 Function.Call((Hash)0xF796359A959DF65D, false); //Display distant vehicles
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
 
-                foreach (Ped ped in World.GetAllPeds().Where(p => p.RelationshipGroup != "SYNCPED"))
+                foreach (Ped ped in World.GetAllPeds().Where(p => p.RelationshipGroup != "SYNCPED" && !p.IsPlayer))
                 {
                     ped.CurrentVehicle?.Delete();
                     ped.Kill();

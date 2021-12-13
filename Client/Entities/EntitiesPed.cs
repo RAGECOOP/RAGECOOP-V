@@ -16,6 +16,12 @@ namespace CoopClient.Entities
     /// </summary>
     public class EntitiesPed
     {
+        /// <summary>
+        /// 0 = Nothing
+        /// 1 = Character
+        /// 2 = Vehicle
+        /// </summary>
+        private byte ModelNotFound = 0;
         private bool AllDataAvailable = false;
         /// <summary>
         /// ?
@@ -39,10 +45,18 @@ namespace CoopClient.Entities
         /// </summary>
         public int Health { get; set; }
         private int LastModelHash = 0;
+        private int CurrentModelHash = 0;
         /// <summary>
         /// ?
         /// </summary>
-        public int ModelHash { get; set; }
+        public int ModelHash
+        {
+            set
+            {
+                LastModelHash = LastModelHash == 0 ? value : CurrentModelHash;
+                CurrentModelHash = value;
+            }
+        }
         private Dictionary<int, int> LastProps = new Dictionary<int, int>();
         /// <summary>
         /// ?
@@ -113,10 +127,19 @@ namespace CoopClient.Entities
         /// ?
         /// </summary>
         public bool IsInVehicle { get; set; }
+        private int LastVehicleModelHash = 0;
+        private int CurrentVehicleModelHash = 0;
         /// <summary>
         /// ?
         /// </summary>
-        public int VehicleModelHash { get; set; }
+        public int VehicleModelHash
+        {
+            set
+            {
+                LastVehicleModelHash = CurrentVehicleModelHash == 0 ? value : CurrentVehicleModelHash;
+                CurrentVehicleModelHash = value;
+            }
+        }
         private int[] LastVehicleColors = new int[] { 0, 0 };
         /// <summary>
         /// ?
@@ -241,8 +264,26 @@ namespace CoopClient.Entities
                 AllDataAvailable = true;
             }
 
+            if (ModelNotFound != 0)
+            {
+                if (ModelNotFound == 1)
+                {
+                    if (CurrentModelHash != LastModelHash)
+                    {
+                        ModelNotFound = 0;
+                    }
+                }
+                else
+                {
+                    if (CurrentVehicleModelHash != LastVehicleModelHash)
+                    {
+                        ModelNotFound = 0;
+                    }
+                }
+            }
+
             #region NOT_IN_RANGE
-            if (!Game.Player.Character.IsInRange(Position, 500f))
+            if (ModelNotFound != 0 || !Game.Player.Character.IsInRange(Position, 500f))
             {
                 if (Character != null && Character.Exists())
                 {
@@ -290,7 +331,7 @@ namespace CoopClient.Entities
             }
             else if (LastSyncWasFull)
             {
-                if (ModelHash != LastModelHash)
+                if (CurrentModelHash != LastModelHash)
                 {
                     Character.Kill();
                     Character.Delete();
@@ -375,33 +416,33 @@ namespace CoopClient.Entities
 
         private void DisplayInVehicle()
         {
-            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
             {
+                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
+
                 bool vehFound = false;
 
-                List<Vehicle> vehs = World.GetNearbyVehicles(Character, 7f, new Model[] { VehicleModelHash }).OrderBy(v => (v.Position - Character.Position).Length()).Take(3).ToList();
-
-                foreach (Vehicle veh in vehs)
+                if (targetVehicle != null)
                 {
-                    if (veh.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                    if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
                     {
-                        MainVehicle = veh;
+                        MainVehicle = targetVehicle;
                         vehFound = true;
-                        break;
                     }
                 }
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = VehicleModelHash.ModelRequest();
+                    Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
-                        GTA.UI.Notification.Show($"~r~Model ({VehicleModelHash}) cannot be loaded!");
+                        //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                        ModelNotFound = 2;
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
-                    MainVehicle.Quaternion = VehicleRotation;
+                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition, VehicleRotation.W);
+                    vehicleModel.MarkAsNoLongerNeeded();
                 }
             }
 
@@ -423,11 +464,14 @@ namespace CoopClient.Entities
             #region -- VEHICLE SYNC --
             if (AimCoords != default)
             {
-                int gameTime = Game.GameTime;
-                if (gameTime - LastVehicleAim > 30)
+                if (MainVehicle.IsTurretSeat(VehicleSeatIndex))
                 {
-                    Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-                    LastVehicleAim = gameTime;
+                    int gameTime = Game.GameTime;
+                    if (gameTime - LastVehicleAim > 30)
+                    {
+                        Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                        LastVehicleAim = gameTime;
+                    }
                 }
             }
 
@@ -469,6 +513,8 @@ namespace CoopClient.Entities
                     {
                         MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
                     }
+
+                    LastVehicleMods = VehicleMods;
                 }
 
                 MainVehicle.EngineHealth = VehicleEngineHealth;
@@ -611,7 +657,7 @@ namespace CoopClient.Entities
 
         private string PedalingAnimDict()
         {
-            switch ((VehicleHash)VehicleModelHash)
+            switch ((VehicleHash)CurrentVehicleModelHash)
             {
                 case VehicleHash.Bmx:
                     return "veh@bicycle@bmx@front@base";
@@ -757,18 +803,19 @@ namespace CoopClient.Entities
                 PedBlip = null;
             }
 
-            LastModelHash = ModelHash;
             LastProps = Props;
 
-            Model characterModel = ModelHash.ModelRequest();
+            Model characterModel = CurrentModelHash.ModelRequest();
 
             if (characterModel == null)
             {
-                GTA.UI.Notification.Show($"~r~Model ({ModelHash}) cannot be loaded!");
+                //GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
+                ModelNotFound = 1;
                 return false;
             }
 
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
+            characterModel.MarkAsNoLongerNeeded();
             Character.RelationshipGroup = Main.RelationshipGroup;
             if (IsInVehicle)
             {
