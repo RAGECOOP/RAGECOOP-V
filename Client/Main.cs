@@ -31,32 +31,58 @@ namespace CoopClient
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public static Settings MainSettings = Util.ReadSettings();
+        public static Settings MainSettings = null;
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public static Networking MainNetworking = new Networking();
+        public static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public static MenusMain MainMenu = new MenusMain();
+        public static MenusMain MainMenu = null;
 #endif
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public static Chat MainChat = new Chat();
+        public static Chat MainChat = null;
 
         internal static long LocalClientID = 0;
-        internal static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
-        internal static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
+        internal static Dictionary<long, EntitiesPlayer> Players = null;
+        internal static Dictionary<long, EntitiesNpc> NPCs = null;
 
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
+            // Required for some synchronization!
+            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            {
+                Tick += (object sender, EventArgs e) =>
+                {
+                    if (Game.IsLoading)
+                    {
+                        return;
+                    }
+
+                    if (!GameLoaded)
+                    {
+                        GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
+                        GameLoaded = true;
+                    }
+                };
+                return;
+            }
+
+            MainSettings = Util.ReadSettings();
+            MainNetworking = new Networking();
+            MainMenu = new MenusMain();
+            MainChat = new Chat();
+            Players = new Dictionary<long, EntitiesPlayer>();
+            NPCs = new Dictionary<long, EntitiesNpc>();
+
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
             Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
 
@@ -217,13 +243,13 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in NPCs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
                 Npc.Value.Character?.Delete();
             }
-            Npcs.Clear();
+            NPCs.Clear();
         }
 
 #if DEBUG

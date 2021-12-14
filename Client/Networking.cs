@@ -563,11 +563,11 @@ namespace CoopClient
         #region -- NPC --
         private void FullSyncNpc(FullSyncNpcPacket packet)
         {
-            lock (Main.Npcs)
+            lock (Main.NPCs)
             {
-                if (Main.Npcs.ContainsKey(packet.ID))
+                if (Main.NPCs.ContainsKey(packet.ID))
                 {
-                    EntitiesNpc npc = Main.Npcs[packet.ID];
+                    EntitiesNpc npc = Main.NPCs[packet.ID];
 
                     npc.LastUpdateReceived = Util.GetTickCount64();
 
@@ -591,7 +591,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                    Main.NPCs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Util.GetTickCount64(),
 
@@ -619,11 +619,11 @@ namespace CoopClient
 
         private void FullSyncNpcVeh(FullSyncNpcVehPacket packet)
         {
-            lock (Main.Npcs)
+            lock (Main.NPCs)
             {
-                if (Main.Npcs.ContainsKey(packet.ID))
+                if (Main.NPCs.ContainsKey(packet.ID))
                 {
-                    EntitiesNpc npc = Main.Npcs[packet.ID];
+                    EntitiesNpc npc = Main.NPCs[packet.ID];
 
                     npc.LastUpdateReceived = Util.GetTickCount64();
 
@@ -655,7 +655,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.Npcs.Add(packet.ID, new EntitiesNpc()
+                    Main.NPCs.Add(packet.ID, new EntitiesNpc()
                     {
                         LastUpdateReceived = Util.GetTickCount64(),
 

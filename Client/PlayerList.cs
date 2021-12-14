@@ -22,6 +22,12 @@ namespace CoopClient
         /// </summary>
         public PlayerList()
         {
+            // Required for some synchronization!
+            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            {
+                return;
+            }
+
             Init();
 
             Tick += OnTick;

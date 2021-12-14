@@ -16,6 +16,12 @@ namespace CoopClient.Entities
         /// </summary>
         public EntitiesThread()
         {
+            // Required for some synchronization!
+            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            {
+                return;
+            }
+
             Tick += OnTick;
             Interval = Util.GetGameMs<int>();
         }
@@ -27,13 +33,13 @@ namespace CoopClient.Entities
                 return;
             }
 
-            Dictionary<long, EntitiesNpc> localNpcs = null;
-            lock (Main.Npcs)
+            Dictionary<long, EntitiesNpc> localNPCs = null;
+            lock (Main.NPCs)
             {
-                localNpcs = new Dictionary<long, EntitiesNpc>(Main.Npcs);
+                localNPCs = new Dictionary<long, EntitiesNpc>(Main.NPCs);
 
                 ulong tickCount = Util.GetTickCount64();
-                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(localNpcs))
+                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(localNPCs))
                 {
                     if ((tickCount - npc.Value.LastUpdateReceived) > 3000)
                     {
@@ -50,13 +56,13 @@ namespace CoopClient.Entities
                             npc.Value.MainVehicle.Delete();
                         }
 
-                        localNpcs.Remove(npc.Key);
-                        Main.Npcs.Remove(npc.Key);
+                        localNPCs.Remove(npc.Key);
+                        Main.NPCs.Remove(npc.Key);
                     }
                 }
             }
 
-            foreach (EntitiesNpc npc in localNpcs.Values)
+            foreach (EntitiesNpc npc in localNPCs.Values)
             {
                 npc.DisplayLocally(null);
             }
