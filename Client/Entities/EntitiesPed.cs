@@ -12,14 +12,11 @@ using LemonUI.Elements;
 namespace CoopClient.Entities
 {
     /// <summary>
-    /// Please DO NOT CHANGE any val
+    /// ?
     /// </summary>
     public class EntitiesPed
     {
-        /// <summary>
-        /// ?
-        /// </summary>
-        public long NPCVehHandle { get; internal set; } = 0;
+        internal long NPCVehHandle { get; set; } = 0;
         /// <summary>
         /// 0 = Nothing
         /// 1 = Character
@@ -27,16 +24,13 @@ namespace CoopClient.Entities
         /// </summary>
         private byte ModelNotFound = 0;
         private bool AllDataAvailable = false;
+        internal bool LastSyncWasFull { get; set; } = false;
         /// <summary>
-        /// ?
-        /// </summary>
-        public bool LastSyncWasFull { get; internal set; } = false;
-        /// <summary>
-        /// ?
+        /// Get the last update = TickCount64()
         /// </summary>
         public ulong LastUpdateReceived { get; internal set; }
         /// <summary>
-        /// ?
+        /// Get the player latency
         /// </summary>
         public float Latency { get; internal set; }
 
@@ -45,13 +39,13 @@ namespace CoopClient.Entities
         /// </summary>
         public Ped Character { get; internal set; }
         /// <summary>
-        /// ?
+        /// The latest character health (may not have been applied yet)
         /// </summary>
         public int Health { get; internal set; }
         private int LastModelHash = 0;
         private int CurrentModelHash = 0;
         /// <summary>
-        /// ?
+        /// The latest character model hash (may not have been applied yet)
         /// </summary>
         public int ModelHash
         {
@@ -63,79 +57,43 @@ namespace CoopClient.Entities
             }
         }
         private Dictionary<int, int> LastProps = new Dictionary<int, int>();
+        internal Dictionary<int, int> Props { get; set; }
         /// <summary>
-        /// ?
-        /// </summary>
-        public Dictionary<int, int> Props { get; internal set; }
-        /// <summary>
-        /// ?
+        /// The latest character position (may not have been applied yet)
         /// </summary>
         public Vector3 Position { get; internal set; }
 
         #region -- ON FOOT --
         /// <summary>
-        /// ?
+        /// The latest character rotation (may not have been applied yet)
         /// </summary>
         public Vector3 Rotation { get; internal set; }
         /// <summary>
-        /// ?
+        /// The latest character velocity (may not have been applied yet)
         /// </summary>
         public Vector3 Velocity { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public byte Speed { get; internal set; }
+        internal byte Speed { get; set; }
         private bool LastIsJumping = false;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsJumping { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsRagdoll { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsOnFire { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public Vector3 AimCoords { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsAiming { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsShooting { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsReloading { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public int CurrentWeaponHash { get; internal set; }
+        internal bool IsJumping { get; set; }
+        internal bool IsRagdoll { get; set; }
+        internal bool IsOnFire { get; set; }
+        internal Vector3 AimCoords { get; set; }
+        internal bool IsAiming { get; set; }
+        internal bool IsShooting { get; set; }
+        internal bool IsReloading { get; set; }
+        internal int CurrentWeaponHash { get; set; }
         #endregion
 
-        /// <summary>
-        /// ?
-        /// </summary>
-        public Blip PedBlip;
+        internal Blip PedBlip = null;
 
         #region -- IN VEHICLE --
         private ulong VehicleStopTime { get; set; }
 
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsInVehicle { get; internal set; }
+        internal bool IsInVehicle { get; set; }
         private int LastVehicleModelHash = 0;
         private int CurrentVehicleModelHash = 0;
         /// <summary>
-        /// ?
+        /// The latest vehicle model hash (may not have been applied yet)
         /// </summary>
         public int VehicleModelHash
         {
@@ -147,106 +105,53 @@ namespace CoopClient.Entities
             }
         }
         private int[] LastVehicleColors = new int[] { 0, 0 };
-        /// <summary>
-        /// ?
-        /// </summary>
-        public int[] VehicleColors { get; internal set; }
+        internal int[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
-        /// <summary>
-        /// ?
-        /// </summary>
-        public Dictionary<int, int> VehicleMods { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool VehicleDead { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public float VehicleEngineHealth { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public int VehicleSeatIndex { get; internal set; }
+        internal Dictionary<int, int> VehicleMods { get; set; }
+        internal bool VehicleDead { get; set; }
+        internal float VehicleEngineHealth { get; set; }
+        internal int VehicleSeatIndex { get; set; }
         /// <summary>
         /// ?
         /// </summary>
         public Vehicle MainVehicle { get; internal set; }
         /// <summary>
-        /// ?
+        /// The latest vehicle position (may not have been applied yet)
         /// </summary>
         public Vector3 VehiclePosition { get; internal set; }
         /// <summary>
-        /// ?
+        /// The latest vehicle rotation (may not have been applied yet)
         /// </summary>
         public Quaternion VehicleRotation { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public Vector3 VehicleVelocity { get; internal set; }
+        internal Vector3 VehicleVelocity { get; set; }
         private float LastVehicleSpeed { get; set; }
         private float CurrentVehicleSpeed { get; set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public float VehicleSpeed
+        internal float VehicleSpeed
         {
             get => CurrentVehicleSpeed;
-            internal set
+            set
             {
                 LastVehicleSpeed = CurrentVehicleSpeed;
                 CurrentVehicleSpeed = value;
             }
         }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public float VehicleSteeringAngle { get; internal set; }
+        internal float VehicleSteeringAngle { get; set; }
         private int LastVehicleAim;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool VehIsEngineRunning { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public float VehRPM { get; internal set; }
+        internal bool VehIsEngineRunning { get; set; }
+        internal float VehRPM { get; set; }
         private bool LastTransformed = false;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool Transformed { get; internal set; }
+        internal bool Transformed { get; set; }
         private bool LastHornActive = false;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool IsHornActive { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool VehAreLightsOn { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool VehAreHighBeamsOn { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public byte VehLandingGear { get; internal set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public bool VehIsSireneActive { get; internal set; }
+        internal bool IsHornActive { get; set; }
+        internal bool VehAreLightsOn { get; set; }
+        internal bool VehAreHighBeamsOn { get; set; }
+        internal byte VehLandingGear { get; set; }
+
+        internal bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public VehicleDoors[] VehDoors { get; internal set; }
+        internal VehicleDoors[] VehDoors { get; set; }
         private int LastVehTires;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public int VehTires { get; internal set; }
+        internal int VehTires { get; set; }
         #endregion
 
         internal void DisplayLocally(string username)

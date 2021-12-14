@@ -28,25 +28,13 @@ namespace CoopClient
         internal static bool NPCsAllowed = false;
         private static bool IsGoingToCar = false;
 
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Settings MainSettings = null;
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Networking MainNetworking = null;
+        internal static Settings MainSettings = null;
+        internal static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static MenusMain MainMenu = null;
+        internal static MenusMain MainMenu = null;
 #endif
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Chat MainChat = null;
+        internal static Chat MainChat = null;
 
         internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
