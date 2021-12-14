@@ -52,6 +52,16 @@ namespace CoopClient.Entities
 
                         if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && !npc.Value.MainVehicle.IsDead && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
                         {
+                            if (npc.Value.NPCVehHandle != 0)
+                            {
+                                lock (Main.NPCsVehicles)
+                                {
+                                    if (Main.NPCsVehicles.ContainsKey(npc.Value.NPCVehHandle))
+                                    {
+                                        Main.NPCsVehicles.Remove(npc.Value.NPCVehHandle);
+                                    }
+                                }
+                            }
                             npc.Value.MainVehicle.MarkAsNoLongerNeeded();
                             npc.Value.MainVehicle.Delete();
                         }

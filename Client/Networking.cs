@@ -317,7 +317,7 @@ namespace CoopClient
                 player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
                 player.IsInVehicle = false;
-                player.LastSyncWasFull = false;
+                player.LastSyncWasFull = true;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -357,7 +357,7 @@ namespace CoopClient
                 player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                 player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
                 player.IsInVehicle = true;
-                player.LastSyncWasFull = false;
+                player.LastSyncWasFull = true;
 
                 player.Latency = packet.Extra.Latency;
                 player.LastUpdateReceived = Util.GetTickCount64();
@@ -570,7 +570,8 @@ namespace CoopClient
                 {
                     EntitiesNpc npc = Main.NPCs[packet.ID];
 
-                    npc.LastUpdateReceived = Util.GetTickCount64();
+                    // "if" this NPC has left a vehicle
+                    npc.NPCVehHandle = 0;
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
@@ -589,13 +590,13 @@ namespace CoopClient
                     npc.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
                     npc.IsInVehicle = false;
                     npc.LastSyncWasFull = true;
+
+                    npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
                 {
                     Main.NPCs.Add(packet.ID, new EntitiesNpc()
                     {
-                        LastUpdateReceived = Util.GetTickCount64(),
-
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
                         Health = packet.Health,
@@ -612,7 +613,9 @@ namespace CoopClient
                         IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0,
                         IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0,
                         IsInVehicle = false,
-                        LastSyncWasFull = true
+                        LastSyncWasFull = true,
+
+                        LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
             }
@@ -626,7 +629,7 @@ namespace CoopClient
                 {
                     EntitiesNpc npc = Main.NPCs[packet.ID];
 
-                    npc.LastUpdateReceived = Util.GetTickCount64();
+                    npc.NPCVehHandle = packet.VehHandle;
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Props = packet.Props;
@@ -654,12 +657,14 @@ namespace CoopClient
                     npc.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
+
+                    npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
                 {
                     Main.NPCs.Add(packet.ID, new EntitiesNpc()
                     {
-                        LastUpdateReceived = Util.GetTickCount64(),
+                        NPCVehHandle = packet.VehHandle,
 
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
@@ -686,7 +691,9 @@ namespace CoopClient
                         IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0,
                         Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0,
                         IsInVehicle = true,
-                        LastSyncWasFull = true
+                        LastSyncWasFull = true,
+
+                        LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
             }
@@ -846,6 +853,7 @@ namespace CoopClient
                 new FullSyncNpcVehPacket()
                 {
                     ID = Main.LocalClientID + npc.Handle,
+                    VehHandle = Main.LocalClientID + veh.Handle,
                     ModelHash = npc.Model.Hash,
                     Props = npc.GetPedProps(),
                     Health = npc.Health,

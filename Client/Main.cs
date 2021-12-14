@@ -51,6 +51,7 @@ namespace CoopClient
         internal static long LocalClientID = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
         internal static Dictionary<long, EntitiesNpc> NPCs = null;
+        internal static Dictionary<long, int> NPCsVehicles = null;
 
         /// <summary>
         /// Don't use it!
@@ -82,6 +83,7 @@ namespace CoopClient
             MainChat = new Chat();
             Players = new Dictionary<long, EntitiesPlayer>();
             NPCs = new Dictionary<long, EntitiesNpc>();
+            NPCsVehicles = new Dictionary<long, int>();
 
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
             Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS

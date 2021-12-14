@@ -808,60 +808,63 @@ namespace CoopServer
         public long ID { get; set; }
 
         [ProtoMember(2)]
-        public int ModelHash { get; set; }
+        public long VehHandle { get; set; }
 
         [ProtoMember(3)]
-        public Dictionary<int, int> Props { get; set; }
+        public int ModelHash { get; set; }
 
         [ProtoMember(4)]
-        public int Health { get; set; }
+        public Dictionary<int, int> Props { get; set; }
 
         [ProtoMember(5)]
-        public LVector3 Position { get; set; }
+        public int Health { get; set; }
 
         [ProtoMember(6)]
-        public int VehModelHash { get; set; }
+        public LVector3 Position { get; set; }
 
         [ProtoMember(7)]
-        public int VehSeatIndex { get; set; }
+        public int VehModelHash { get; set; }
 
         [ProtoMember(8)]
-        public LVector3 VehPosition { get; set; }
+        public int VehSeatIndex { get; set; }
 
         [ProtoMember(9)]
-        public LQuaternion VehRotation { get; set; }
+        public LVector3 VehPosition { get; set; }
 
         [ProtoMember(10)]
-        public float VehEngineHealth { get; set; }
+        public LQuaternion VehRotation { get; set; }
 
         [ProtoMember(11)]
-        public float VehRPM { get; set; }
+        public float VehEngineHealth { get; set; }
 
         [ProtoMember(12)]
-        public LVector3 VehVelocity { get; set; }
+        public float VehRPM { get; set; }
 
         [ProtoMember(13)]
-        public float VehSpeed { get; set; }
+        public LVector3 VehVelocity { get; set; }
 
         [ProtoMember(14)]
-        public float VehSteeringAngle { get; set; }
+        public float VehSpeed { get; set; }
 
         [ProtoMember(15)]
-        public int[] VehColors { get; set; }
+        public float VehSteeringAngle { get; set; }
 
         [ProtoMember(16)]
-        public Dictionary<int, int> VehMods { get; set; }
+        public int[] VehColors { get; set; }
 
         [ProtoMember(17)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public Dictionary<int, int> VehMods { get; set; }
 
         [ProtoMember(18)]
-        public int VehTires { get; set; }
+        public VehicleDoors[] VehDoors { get; set; }
 
         [ProtoMember(19)]
-        public byte VehLandingGear { get; set; }
+        public int VehTires { get; set; }
 
         [ProtoMember(20)]
+        public byte VehLandingGear { get; set; }
+
+        [ProtoMember(21)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -881,6 +884,7 @@ namespace CoopServer
             FullSyncNpcVehPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcVehPacket>();
 
             ID = data.ID;
+            VehHandle = data.VehHandle;
             ModelHash = data.ModelHash;
             Props = data.Props;
             Health = data.Health;

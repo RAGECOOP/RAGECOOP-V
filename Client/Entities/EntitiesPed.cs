@@ -12,10 +12,14 @@ using LemonUI.Elements;
 namespace CoopClient.Entities
 {
     /// <summary>
-    /// ?
+    /// Please DO NOT CHANGE any val
     /// </summary>
     public class EntitiesPed
     {
+        /// <summary>
+        /// ?
+        /// </summary>
+        public long NPCVehHandle { get; internal set; } = 0;
         /// <summary>
         /// 0 = Nothing
         /// 1 = Character
@@ -26,24 +30,24 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
-        public bool LastSyncWasFull { get; set; } = false;
+        public bool LastSyncWasFull { get; internal set; } = false;
         /// <summary>
         /// ?
         /// </summary>
-        public ulong LastUpdateReceived { get; set; }
+        public ulong LastUpdateReceived { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public float Latency { get; set; }
+        public float Latency { get; internal set; }
 
         /// <summary>
         /// ?
         /// </summary>
-        public Ped Character { get; set; }
+        public Ped Character { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public int Health { get; set; }
+        public int Health { get; internal set; }
         private int LastModelHash = 0;
         private int CurrentModelHash = 0;
         /// <summary>
@@ -51,7 +55,8 @@ namespace CoopClient.Entities
         /// </summary>
         public int ModelHash
         {
-            set
+            get => CurrentModelHash;
+            internal set
             {
                 LastModelHash = LastModelHash == 0 ? value : CurrentModelHash;
                 CurrentModelHash = value;
@@ -61,58 +66,58 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
-        public Dictionary<int, int> Props { get; set; }
+        public Dictionary<int, int> Props { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 Position { get; set; }
+        public Vector3 Position { get; internal set; }
 
         #region -- ON FOOT --
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 Rotation { get; set; }
+        public Vector3 Rotation { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 Velocity { get; set; }
+        public Vector3 Velocity { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public byte Speed { get; set; }
+        public byte Speed { get; internal set; }
         private bool LastIsJumping = false;
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsJumping { get; set; }
+        public bool IsJumping { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsRagdoll { get; set; }
+        public bool IsRagdoll { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsOnFire { get; set; }
+        public bool IsOnFire { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 AimCoords { get; set; }
+        public Vector3 AimCoords { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsAiming { get; set; }
+        public bool IsAiming { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsShooting { get; set; }
+        public bool IsShooting { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsReloading { get; set; }
+        public bool IsReloading { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public int CurrentWeaponHash { get; set; }
+        public int CurrentWeaponHash { get; internal set; }
         #endregion
 
         /// <summary>
@@ -126,7 +131,7 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsInVehicle { get; set; }
+        public bool IsInVehicle { get; internal set; }
         private int LastVehicleModelHash = 0;
         private int CurrentVehicleModelHash = 0;
         /// <summary>
@@ -134,7 +139,8 @@ namespace CoopClient.Entities
         /// </summary>
         public int VehicleModelHash
         {
-            set
+            get => CurrentVehicleModelHash;
+            internal set
             {
                 LastVehicleModelHash = CurrentVehicleModelHash == 0 ? value : CurrentVehicleModelHash;
                 CurrentVehicleModelHash = value;
@@ -144,40 +150,40 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
-        public int[] VehicleColors { get; set; }
+        public int[] VehicleColors { get; internal set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
         /// <summary>
         /// ?
         /// </summary>
-        public Dictionary<int, int> VehicleMods { get; set; }
+        public Dictionary<int, int> VehicleMods { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool VehicleDead { get; set; }
+        public bool VehicleDead { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public float VehicleEngineHealth { get; set; }
+        public float VehicleEngineHealth { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public int VehicleSeatIndex { get; set; }
+        public int VehicleSeatIndex { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vehicle MainVehicle { get; set; }
+        public Vehicle MainVehicle { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 VehiclePosition { get; set; }
+        public Vector3 VehiclePosition { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Quaternion VehicleRotation { get; set; }
+        public Quaternion VehicleRotation { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public Vector3 VehicleVelocity { get; set; }
+        public Vector3 VehicleVelocity { get; internal set; }
         private float LastVehicleSpeed { get; set; }
         private float CurrentVehicleSpeed { get; set; }
         /// <summary>
@@ -185,7 +191,8 @@ namespace CoopClient.Entities
         /// </summary>
         public float VehicleSpeed
         {
-            set
+            get => CurrentVehicleSpeed;
+            internal set
             {
                 LastVehicleSpeed = CurrentVehicleSpeed;
                 CurrentVehicleSpeed = value;
@@ -194,52 +201,52 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
-        public float VehicleSteeringAngle { get; set; }
+        public float VehicleSteeringAngle { get; internal set; }
         private int LastVehicleAim;
         /// <summary>
         /// ?
         /// </summary>
-        public bool VehIsEngineRunning { get; set; }
+        public bool VehIsEngineRunning { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public float VehRPM { get; set; }
+        public float VehRPM { get; internal set; }
         private bool LastTransformed = false;
         /// <summary>
         /// ?
         /// </summary>
-        public bool Transformed { get; set; }
+        public bool Transformed { get; internal set; }
         private bool LastHornActive = false;
         /// <summary>
         /// ?
         /// </summary>
-        public bool IsHornActive { get; set; }
+        public bool IsHornActive { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool VehAreLightsOn { get; set; }
+        public bool VehAreLightsOn { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool VehAreHighBeamsOn { get; set; }
+        public bool VehAreHighBeamsOn { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public byte VehLandingGear { get; set; }
+        public byte VehLandingGear { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>
-        public bool VehIsSireneActive { get; set; }
+        public bool VehIsSireneActive { get; internal set; }
         private VehicleDoors[] LastVehDoors;
         /// <summary>
         /// ?
         /// </summary>
-        public VehicleDoors[] VehDoors { get; set; }
+        public VehicleDoors[] VehDoors { get; internal set; }
         private int LastVehTires;
         /// <summary>
         /// ?
         /// </summary>
-        public int VehTires { get; set; }
+        public int VehTires { get; internal set; }
         #endregion
 
         internal void DisplayLocally(string username)
@@ -432,16 +439,36 @@ namespace CoopClient.Entities
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
             {
-                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
-
                 bool vehFound = false;
 
-                if (targetVehicle != null)
+                if (NPCVehHandle != 0)
                 {
-                    if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                    lock (Main.NPCsVehicles)
                     {
-                        MainVehicle = targetVehicle;
-                        vehFound = true;
+                        if (Main.NPCsVehicles.ContainsKey(NPCVehHandle))
+                        {
+                            Vehicle targetVehicle = World.GetAllVehicles().First(x => x.Handle == Main.NPCsVehicles[NPCVehHandle]);
+                            if (targetVehicle == null)
+                            {
+                                return;
+                            }
+
+                            MainVehicle = targetVehicle;
+                            vehFound = true;
+                        }
+                    }
+                }
+                else
+                {
+                    Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
+
+                    if (targetVehicle != null)
+                    {
+                        if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
+                        {
+                            MainVehicle = targetVehicle;
+                            vehFound = true;
+                        }
                     }
                 }
 
@@ -455,8 +482,13 @@ namespace CoopClient.Entities
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition, VehicleRotation.W);
+                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
                     vehicleModel.MarkAsNoLongerNeeded();
+                    if (NPCVehHandle != 0)
+                    {
+                        Main.NPCsVehicles.Add(NPCVehHandle, MainVehicle.Handle);
+                    }
+                    MainVehicle.Quaternion = VehicleRotation;
                 }
             }
 
