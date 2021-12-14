@@ -67,6 +67,11 @@ namespace CoopClient.Menus.Sub
             List<ServerListClass> serverList = null;
             try
             {
+                // SSL/TLS
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
                 WebClient client = new WebClient();
                 string data = client.DownloadString(Main.MainSettings.MasterServer);
                 serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
