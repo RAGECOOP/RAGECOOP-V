@@ -498,6 +498,9 @@ namespace CoopClient
         public int VehTires { get; set; }
 
         [ProtoMember(18)]
+        public byte VehLandingGear { get; set; }
+
+        [ProtoMember(19)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -533,6 +536,7 @@ namespace CoopClient
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             VehTires = data.VehTires;
+            VehLandingGear = data.VehLandingGear;
             Flag = data.Flag;
         }
     }
@@ -940,6 +944,9 @@ namespace CoopClient
         public int VehTires { get; set; }
 
         [ProtoMember(19)]
+        public byte VehLandingGear { get; set; }
+
+        [ProtoMember(20)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -976,6 +983,7 @@ namespace CoopClient
             VehMods = data.VehMods;
             VehDoors = data.VehDoors;
             VehTires = data.VehTires;
+            VehLandingGear = data.VehLandingGear;
             Flag = data.Flag;
         }
     }

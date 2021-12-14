@@ -225,6 +225,10 @@ namespace CoopClient.Entities
         /// <summary>
         /// ?
         /// </summary>
+        public byte VehLandingGear { get; set; }
+        /// <summary>
+        /// ?
+        /// </summary>
         public bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         /// <summary>
@@ -569,88 +573,98 @@ namespace CoopClient.Entities
                     }
                 }
 
-                if (VehIsSireneActive != MainVehicle.IsSirenActive)
+                if (MainVehicle.IsPlane)
                 {
-                    MainVehicle.IsSirenActive = VehIsSireneActive;
-                }
-
-                if (IsHornActive && !LastHornActive)
-                {
-                    LastHornActive = true;
-                    MainVehicle.SoundHorn(99999);
-                }
-                else if (!IsHornActive && LastHornActive)
-                {
-                    LastHornActive = false;
-                    MainVehicle.SoundHorn(1);
-                }
-
-                Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
-
-                if (LastSyncWasFull)
-                {
-                    if (VehDoors != null && VehDoors != LastVehDoors)
+                    if (VehLandingGear != (byte)MainVehicle.LandingGearState)
                     {
-                        int doorLength = VehDoors.Length;
-                        if (VehDoors.Length != 0)
-                        {
-                            for (int i = 0; i < (doorLength - 1); i++)
-                            {
-                                VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
-                                VehicleDoors aDoor = VehDoors[i];
-
-                                if (aDoor.Broken)
-                                {
-                                    if (!door.IsBroken)
-                                    {
-                                        door.Break();
-                                    }
-                                    continue;
-                                }
-                                else if (!aDoor.Broken && door.IsBroken)
-                                {
-                                    // Repair?
-                                    //MainVehicle.Repair();
-                                }
-
-                                if (aDoor.FullyOpen)
-                                {
-                                    if (!door.IsFullyOpen)
-                                    {
-                                        door.Open(false, true);
-                                    }
-                                    continue;
-                                }
-                                else if (aDoor.Open)
-                                {
-                                    if (!door.IsOpen)
-                                    {
-                                        door.Open();
-                                    }
-
-                                    door.AngleRatio = aDoor.AngleRatio;
-                                    continue;
-                                }
-
-                                door.Close(true);
-                            }
-                        }
-
-                        LastVehDoors = VehDoors;
+                        MainVehicle.LandingGearState = (VehicleLandingGearState)VehLandingGear;
+                    }
+                }
+                else
+                {
+                    if (MainVehicle.HasSiren && VehIsSireneActive != MainVehicle.IsSirenActive)
+                    {
+                        MainVehicle.IsSirenActive = VehIsSireneActive;
                     }
 
-                    if (VehTires != default && LastVehTires != VehTires)
+                    if (IsHornActive && !LastHornActive)
                     {
-                        foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
+                        LastHornActive = true;
+                        MainVehicle.SoundHorn(99999);
+                    }
+                    else if (!IsHornActive && LastHornActive)
+                    {
+                        LastHornActive = false;
+                        MainVehicle.SoundHorn(1);
+                    }
+
+                    Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
+
+                    if (LastSyncWasFull)
+                    {
+                        if (VehDoors != null && VehDoors != LastVehDoors)
                         {
-                            if ((VehTires & 1 << (int)wheel.BoneId) != 0)
+                            int doorLength = VehDoors.Length;
+                            if (VehDoors.Length != 0)
                             {
-                                wheel.Puncture();
-                                wheel.Burst();
+                                for (int i = 0; i < (doorLength - 1); i++)
+                                {
+                                    VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
+                                    VehicleDoors aDoor = VehDoors[i];
+
+                                    if (aDoor.Broken)
+                                    {
+                                        if (!door.IsBroken)
+                                        {
+                                            door.Break();
+                                        }
+                                        continue;
+                                    }
+                                    else if (!aDoor.Broken && door.IsBroken)
+                                    {
+                                        // Repair?
+                                        //MainVehicle.Repair();
+                                    }
+
+                                    if (aDoor.FullyOpen)
+                                    {
+                                        if (!door.IsFullyOpen)
+                                        {
+                                            door.Open(false, true);
+                                        }
+                                        continue;
+                                    }
+                                    else if (aDoor.Open)
+                                    {
+                                        if (!door.IsOpen)
+                                        {
+                                            door.Open();
+                                        }
+
+                                        door.AngleRatio = aDoor.AngleRatio;
+                                        continue;
+                                    }
+
+                                    door.Close(true);
+                                }
                             }
+
+                            LastVehDoors = VehDoors;
                         }
 
-                        LastVehTires = VehTires;
+                        if (VehTires != default && LastVehTires != VehTires)
+                        {
+                            foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
+                            {
+                                if ((VehTires & 1 << (int)wheel.BoneId) != 0)
+                                {
+                                    wheel.Puncture();
+                                    wheel.Burst();
+                                }
+                            }
+
+                            LastVehTires = VehTires;
+                        }
                     }
                 }
             }

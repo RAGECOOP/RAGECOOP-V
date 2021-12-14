@@ -348,6 +348,7 @@ namespace CoopClient
                 player.VehicleMods = packet.VehMods;
                 player.VehDoors = packet.VehDoors;
                 player.VehTires = packet.VehTires;
+                player.VehLandingGear = packet.VehLandingGear;
                 player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
@@ -643,6 +644,7 @@ namespace CoopClient
                     npc.VehicleColors = packet.VehColors;
                     npc.VehDoors = packet.VehDoors;
                     npc.VehTires = packet.VehTires;
+                    npc.VehLandingGear = packet.VehLandingGear;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                     npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                     npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
@@ -675,6 +677,7 @@ namespace CoopClient
                         VehicleColors = packet.VehColors,
                         VehDoors = packet.VehDoors,
                         VehTires = packet.VehTires,
+                        VehLandingGear = packet.VehLandingGear,
                         VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
                         VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
                         VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0,
@@ -740,6 +743,7 @@ namespace CoopClient
                         VehMods = veh.Mods.GetVehicleMods(),
                         VehDoors = veh.Doors.GetVehicleDoors(),
                         VehTires = veh.Wheels.GetBrokenTires(),
+                        VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
                         Flag = veh.GetVehicleFlags()
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -859,6 +863,7 @@ namespace CoopClient
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDoors = veh.Doors.GetVehicleDoors(),
                     VehTires = veh.Wheels.GetBrokenTires(),
+                    VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
                     Flag = veh.GetVehicleFlags()
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
