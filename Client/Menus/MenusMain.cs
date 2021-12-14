@@ -100,7 +100,7 @@ namespace CoopClient.Menus
         {
             MainMenu.Items[3].Enabled = true;
             MainMenu.Items[3].Title = "Disconnect";
-            SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
+            SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NPCsAllowed;
 
             MainMenu.Visible = false;
             ServerList.MainMenu.Visible = false;

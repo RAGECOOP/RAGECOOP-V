@@ -214,7 +214,7 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ModPacket()
                 {
-                    ID = 0,
+                    NetHandle = 0,
                     Target = 0,
                     Mod = mod,
                     CustomPacketID = customID,

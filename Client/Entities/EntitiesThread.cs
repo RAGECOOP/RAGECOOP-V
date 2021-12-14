@@ -28,7 +28,7 @@ namespace CoopClient.Entities
 
         private void OnTick(object sender, EventArgs e)
         {
-            if (Game.IsLoading || !Main.MainNetworking.IsOnServer() || !Main.NpcsAllowed)
+            if (Game.IsLoading || !Main.MainNetworking.IsOnServer() || !Main.NPCsAllowed)
             {
                 return;
             }
@@ -78,7 +78,7 @@ namespace CoopClient.Entities
             }
 
             // Only if that player wants to share his NPCs with others
-            if (Main.ShareNpcsWithPlayers)
+            if (Main.ShareNPCsWithPlayers)
             {
                 // Send all npcs from the current player
                 foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 150f)

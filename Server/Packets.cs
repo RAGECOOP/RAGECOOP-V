@@ -143,7 +143,7 @@ namespace CoopServer
     class ModPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public long Target { get; set; }
@@ -173,7 +173,7 @@ namespace CoopServer
 
             ModPacket data = message.ReadBytes(len).Deserialize<ModPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             Target = data.Target;
             Mod = data.Mod;
             CustomPacketID = data.CustomPacketID;
@@ -186,7 +186,7 @@ namespace CoopServer
     class HandshakePacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -216,7 +216,7 @@ namespace CoopServer
 
             HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             SocialClubName = data.SocialClubName;
             Username = data.Username;
             ModVersion = data.ModVersion;
@@ -228,7 +228,7 @@ namespace CoopServer
     class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -252,7 +252,7 @@ namespace CoopServer
 
             PlayerConnectPacket data = message.ReadBytes(len).Deserialize<PlayerConnectPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             SocialClubName = data.SocialClubName;
             Username = data.Username;
         }
@@ -262,7 +262,7 @@ namespace CoopServer
     class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -280,7 +280,7 @@ namespace CoopServer
 
             PlayerDisconnectPacket data = message.ReadBytes(len).Deserialize<PlayerDisconnectPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
         }
     }
 
@@ -288,7 +288,7 @@ namespace CoopServer
     struct PlayerPacket
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public int Health { get; set; }
@@ -664,7 +664,7 @@ namespace CoopServer
         public NativeArgument Type { get; set; }
 
         [ProtoMember(4)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -685,7 +685,7 @@ namespace CoopServer
             Hash = data.Hash;
             Args = data.Args;
             Type = data.Type;
-            ID = data.ID;
+            NetHandle = data.NetHandle;
         }
     }
 
@@ -739,7 +739,7 @@ namespace CoopServer
     class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -787,7 +787,7 @@ namespace CoopServer
 
             FullSyncNpcPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             ModelHash = data.ModelHash;
             Props = data.Props;
             Health = data.Health;
@@ -805,7 +805,7 @@ namespace CoopServer
     class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public long VehHandle { get; set; }
@@ -883,7 +883,7 @@ namespace CoopServer
 
             FullSyncNpcVehPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcVehPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             VehHandle = data.VehHandle;
             ModelHash = data.ModelHash;
             Props = data.Props;

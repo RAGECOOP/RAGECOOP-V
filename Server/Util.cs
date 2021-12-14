@@ -52,12 +52,12 @@ namespace CoopServer
             return result;
         }
 
-        public static Client GetClientByID(long id)
+        public static Client GetClientByNetHandle(long netHandle)
         {
-            Client result = Server.Clients.Find(x => x.ID == id);
+            Client result = Server.Clients.Find(x => x.NetHandle == netHandle);
             if (result == null)
             {
-                NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
+                NetConnection localConn = Server.MainNetServer.Connections.Find(x => netHandle == x.RemoteUniqueIdentifier);
                 if (localConn != null)
                 {
                     localConn.Disconnect("No data found!");
@@ -76,7 +76,7 @@ namespace CoopServer
                 return null;
             }
 
-            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.ID);
+            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.NetHandle);
         }
 
         // Return a list of all connections but not the local connection
@@ -94,7 +94,7 @@ namespace CoopServer
         {
             return new(Server.MainNetServer.Connections.FindAll(e =>
             {
-                Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.First(x => x.NetHandle == e.RemoteUniqueIdentifier);
                 return client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
@@ -103,7 +103,7 @@ namespace CoopServer
         {
             return new(Server.MainNetServer.Connections.Where(e =>
             {
-                Client client = Server.Clients.First(x => x.ID == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.First(x => x.NetHandle == e.RemoteUniqueIdentifier);
                 return e != local && client != null && client.Player.IsInRangeOf(position, range);
             }));
         }

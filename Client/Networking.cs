@@ -61,7 +61,7 @@ namespace CoopClient
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                 new HandshakePacket()
                 {
-                    ID = 0,
+                    NetHandle =  0,
                     SocialClubName = Game.Player.Name,
                     Username = Main.MainSettings.Username,
                     ModVersion = Main.CurrentVersion,
@@ -117,8 +117,8 @@ namespace CoopClient
                                     remoteHailMessagePacket.NetIncomingMessageToPacket(message.SenderConnection.RemoteHailMessage);
 
                                     HandshakePacket handshakePacket = (HandshakePacket)remoteHailMessagePacket;
-                                    Main.LocalClientID = handshakePacket.ID;
-                                    Main.NpcsAllowed = handshakePacket.NpcsAllowed;
+                                    Main.LocalNetHandle = handshakePacket.NetHandle;
+                                    Main.NPCsAllowed = handshakePacket.NpcsAllowed;
 
                                     Main.MainChat.Init();
 
@@ -126,7 +126,7 @@ namespace CoopClient
                                     NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                                     new PlayerConnectPacket()
                                     {
-                                        ID = Main.LocalClientID,
+                                        NetHandle =  Main.LocalNetHandle,
                                         SocialClubName = string.Empty,
                                         Username = string.Empty
                                     }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -145,7 +145,7 @@ namespace CoopClient
                                 // Reset all values
                                 LastPlayerFullSync = 0;
 
-                                Main.NpcsAllowed = false;
+                                Main.NPCsAllowed = false;
 
                                 if (Main.MainChat.Focused)
                                 {
@@ -239,7 +239,7 @@ namespace CoopClient
                                 packet = new ModPacket();
                                 packet.NetIncomingMessageToPacket(message);
                                 ModPacket modPacket = (ModPacket)packet;
-                                COOPAPI.ModPacketReceived(modPacket.ID, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
+                                COOPAPI.ModPacketReceived(modPacket.NetHandle, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
                                 break;
                         }
                         break;
@@ -273,15 +273,15 @@ namespace CoopClient
                 LastUpdateReceived = Util.GetTickCount64()
             };
 
-            Main.Players.Add(packet.ID, player);
-            COOPAPI.Connected(packet.ID);
+            Main.Players.Add(packet.NetHandle, player);
+            COOPAPI.Connected(packet.NetHandle);
         }
 
         private void PlayerDisconnect(PlayerDisconnectPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.ID))
+            if (Main.Players.ContainsKey(packet.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.ID];
+                EntitiesPlayer player = Main.Players[packet.NetHandle];
                 if (player.Character != null && player.Character.Exists())
                 {
                     player.Character.Kill();
@@ -290,16 +290,16 @@ namespace CoopClient
 
                 player.PedBlip?.Delete();
 
-                COOPAPI.Disconnected(packet.ID);
-                Main.Players.Remove(packet.ID);
+                COOPAPI.Disconnected(packet.NetHandle);
+                Main.Players.Remove(packet.NetHandle);
             }
         }
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.ID))
+            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.ID];
+                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
@@ -326,9 +326,9 @@ namespace CoopClient
 
         private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.ID))
+            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.ID];
+                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
                 player.Props = packet.Props;
@@ -366,9 +366,9 @@ namespace CoopClient
 
         private void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.ID))
+            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.ID];
+                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.Health = packet.Extra.Health;
                 player.Position = packet.Extra.Position.ToVector();
@@ -393,9 +393,9 @@ namespace CoopClient
 
         private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.ID))
+            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.ID];
+                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.Health = packet.Extra.Health;
                 player.Position = packet.Extra.Position.ToVector();
@@ -423,9 +423,9 @@ namespace CoopClient
 
         private void SuperLightSyncPlayer(SuperLightSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.ID))
+            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.ID];
+                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.Health = packet.Extra.Health;
                 player.Position = packet.Extra.Position.ToVector();
@@ -554,7 +554,7 @@ namespace CoopClient
                 Hash = 0,
                 Args = null,
                 Type = result,
-                ID = packet.ID
+                NetHandle =  packet.NetHandle
             }.PacketToNetOutGoingMessage(outgoingMessage);
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
             Client.FlushSendQueue();
@@ -566,9 +566,9 @@ namespace CoopClient
         {
             lock (Main.NPCs)
             {
-                if (Main.NPCs.ContainsKey(packet.ID))
+                if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesNpc npc = Main.NPCs[packet.ID];
+                    EntitiesNpc npc = Main.NPCs[packet.NetHandle];
 
                     // "if" this NPC has left a vehicle
                     npc.NPCVehHandle = 0;
@@ -595,7 +595,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.ID, new EntitiesNpc()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesNpc()
                     {
                         ModelHash = packet.ModelHash,
                         Props = packet.Props,
@@ -625,9 +625,9 @@ namespace CoopClient
         {
             lock (Main.NPCs)
             {
-                if (Main.NPCs.ContainsKey(packet.ID))
+                if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesNpc npc = Main.NPCs[packet.ID];
+                    EntitiesNpc npc = Main.NPCs[packet.NetHandle];
 
                     npc.NPCVehHandle = packet.VehHandle;
 
@@ -662,7 +662,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.ID, new EntitiesNpc()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesNpc()
                     {
                         NPCVehHandle = packet.VehHandle,
 
@@ -730,7 +730,7 @@ namespace CoopClient
                     {
                         Extra = new PlayerPacket()
                         {
-                            ID = Main.LocalClientID,
+                            NetHandle =  Main.LocalNetHandle,
                             Health = player.Health,
                             Position = player.Position.ToLVector()
                         },
@@ -760,7 +760,7 @@ namespace CoopClient
                     {
                         Extra = new PlayerPacket()
                         {
-                            ID = Main.LocalClientID,
+                            NetHandle =  Main.LocalNetHandle,
                             Health = player.Health,
                             Position = player.Position.ToLVector()
                         },
@@ -789,7 +789,7 @@ namespace CoopClient
                     {
                         Extra = new PlayerPacket()
                         {
-                            ID = Main.LocalClientID,
+                            NetHandle =  Main.LocalNetHandle,
                             Health = player.Health,
                             Position = player.Position.ToLVector()
                         },
@@ -809,7 +809,7 @@ namespace CoopClient
                     {
                         Extra = new PlayerPacket()
                         {
-                            ID = Main.LocalClientID,
+                            NetHandle =  Main.LocalNetHandle,
                             Health = player.Health,
                             Position = player.Position.ToLVector()
                         },
@@ -852,8 +852,8 @@ namespace CoopClient
 
                 new FullSyncNpcVehPacket()
                 {
-                    ID = Main.LocalClientID + npc.Handle,
-                    VehHandle = Main.LocalClientID + veh.Handle,
+                    NetHandle =  Main.LocalNetHandle + npc.Handle,
+                    VehHandle = Main.LocalNetHandle + veh.Handle,
                     ModelHash = npc.Model.Hash,
                     Props = npc.GetPedProps(),
                     Health = npc.Health,
@@ -879,7 +879,7 @@ namespace CoopClient
             {
                 new FullSyncNpcPacket()
                 {
-                    ID = Main.LocalClientID + npc.Handle,
+                    NetHandle =  Main.LocalNetHandle + npc.Handle,
                     ModelHash = npc.Model.Hash,
                     Props = npc.GetPedProps(),
                     Health = npc.Health,
@@ -928,10 +928,10 @@ namespace CoopClient
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new ModPacket()
             {
-                ID = Main.LocalClientID,
+                NetHandle =  Main.LocalNetHandle,
                 Target = target,
                 Mod = mod,
-                CustomPacketID = customID,
+                CustomPacketID =  customID,
                 Bytes = bytes
             }.PacketToNetOutGoingMessage(outgoingMessage);
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);

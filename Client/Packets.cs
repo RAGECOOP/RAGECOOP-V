@@ -228,7 +228,7 @@ namespace CoopClient
     class ModPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public long Target { get; set; }
@@ -258,10 +258,10 @@ namespace CoopClient
 
             ModPacket data = message.ReadBytes(len).Deserialize<ModPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             Target = data.Target;
             Mod = data.Mod;
-            CustomPacketID = data.CustomPacketID;
+            CustomPacketID =  data.CustomPacketID;
             Bytes = data.Bytes;
         }
     }
@@ -271,7 +271,7 @@ namespace CoopClient
     class HandshakePacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -301,7 +301,7 @@ namespace CoopClient
 
             HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             SocialClubName = data.SocialClubName;
             Username = data.Username;
             ModVersion = data.ModVersion;
@@ -313,7 +313,7 @@ namespace CoopClient
     class PlayerConnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public string SocialClubName { get; set; }
@@ -337,7 +337,7 @@ namespace CoopClient
 
             PlayerConnectPacket data = message.ReadBytes(len).Deserialize<PlayerConnectPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             SocialClubName = data.SocialClubName;
             Username = data.Username;
         }
@@ -347,7 +347,7 @@ namespace CoopClient
     class PlayerDisconnectPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -365,7 +365,7 @@ namespace CoopClient
 
             PlayerDisconnectPacket data = message.ReadBytes(len).Deserialize<PlayerDisconnectPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
         }
     }
 
@@ -373,7 +373,7 @@ namespace CoopClient
     struct PlayerPacket
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public int Health { get; set; }
@@ -749,7 +749,7 @@ namespace CoopClient
         public NativeArgument Type { get; set; }
 
         [ProtoMember(4)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -770,7 +770,7 @@ namespace CoopClient
             Hash = data.Hash;
             Args = data.Args;
             Type = data.Type;
-            ID = data.ID;
+            NetHandle = data.NetHandle;
         }
     }
 
@@ -824,7 +824,7 @@ namespace CoopClient
     class FullSyncNpcPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public int ModelHash { get; set; }
@@ -872,7 +872,7 @@ namespace CoopClient
 
             FullSyncNpcPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             ModelHash = data.ModelHash;
             Props = data.Props;
             Health = data.Health;
@@ -890,7 +890,7 @@ namespace CoopClient
     class FullSyncNpcVehPacket : Packet
     {
         [ProtoMember(1)]
-        public long ID { get; set; }
+        public long NetHandle { get; set; }
 
         [ProtoMember(2)]
         public long VehHandle { get; set; }
@@ -968,7 +968,7 @@ namespace CoopClient
 
             FullSyncNpcVehPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcVehPacket>();
 
-            ID = data.ID;
+            NetHandle = data.NetHandle;
             VehHandle = data.VehHandle;
             ModelHash = data.ModelHash;
             Props = data.Props;

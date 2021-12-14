@@ -371,10 +371,10 @@ namespace CoopServer
                                             packet.NetIncomingMessageToPacket(message);
                                             NativeResponsePacket responsePacket = (NativeResponsePacket)packet;
 
-                                            Client client = Clients.Find(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                            Client client = Clients.Find(x => x.NetHandle == message.SenderConnection.RemoteUniqueIdentifier);
                                             if (client != null)
                                             {
-                                                if (client.Callbacks.ContainsKey(responsePacket.ID))
+                                                if (client.Callbacks.ContainsKey(responsePacket.NetHandle))
                                                 {
                                                     object resp = null;
                                                     if (responsePacket.Type is IntArgument argument)
@@ -398,8 +398,8 @@ namespace CoopServer
                                                         resp = argument4.Data;
                                                     }
 
-                                                    client.Callbacks[responsePacket.ID].Invoke(resp);
-                                                    client.Callbacks.Remove(responsePacket.ID);
+                                                    client.Callbacks[responsePacket.NetHandle].Invoke(resp);
+                                                    client.Callbacks.Remove(responsePacket.NetHandle);
                                                 }
                                             }
                                         }
@@ -418,7 +418,7 @@ namespace CoopServer
                                             packet.NetIncomingMessageToPacket(message);
                                             ModPacket modPacket = (ModPacket)packet;
                                             if (MainResource != null &&
-                                                MainResource.InvokeModPacketReceived(modPacket.ID, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                MainResource.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
                                             {
                                                 // Was canceled
                                             }
@@ -464,7 +464,7 @@ namespace CoopServer
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             {
-                                Client client = Clients.Find(x => x.ID == message.SenderConnection.RemoteUniqueIdentifier);
+                                Client client = Clients.Find(x => x.NetHandle == message.SenderConnection.RemoteUniqueIdentifier);
                                 if (client != null)
                                 {
                                     client.Latency = message.ReadFloat();
@@ -572,7 +572,7 @@ namespace CoopServer
                 return;
             }
 
-            long localID = local.RemoteUniqueIdentifier;
+            long localNetHandle = local.RemoteUniqueIdentifier;
 
             Client tmpClient;
 
@@ -582,7 +582,7 @@ namespace CoopServer
                 Clients.Add(
                     tmpClient = new Client()
                     {
-                        ID = localID,
+                        NetHandle = localNetHandle,
                         Player = new()
                         {
                             SocialClubName = packet.SocialClubName,
@@ -597,7 +597,7 @@ namespace CoopServer
             // Create a new handshake packet
             new HandshakePacket()
             {
-                ID = localID,
+                NetHandle = localNetHandle,
                 SocialClubName = string.Empty,
                 Username = string.Empty,
                 ModVersion = string.Empty,
@@ -616,7 +616,7 @@ namespace CoopServer
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
         {
-            Client localClient = Clients.Find(x => x.ID == packet.ID);
+            Client localClient = Clients.Find(x => x.NetHandle == packet.NetHandle);
             if (localClient == null)
             {
                 local.Disconnect("No data found!");
@@ -629,15 +629,15 @@ namespace CoopServer
                 // Send all players to local
                 clients.ForEach(targetPlayer =>
                 {
-                    long targetPlayerID = targetPlayer.RemoteUniqueIdentifier;
+                    long targetNetHandle = targetPlayer.RemoteUniqueIdentifier;
 
-                    Client targetClient = Clients.Find(x => x.ID == targetPlayerID);
+                    Client targetClient = Clients.Find(x => x.NetHandle == targetNetHandle);
                     if (targetClient != null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                         new PlayerConnectPacket()
                         {
-                            ID = targetPlayerID,
+                            NetHandle = targetNetHandle,
                             SocialClubName = targetClient.Player.SocialClubName,
                             Username = targetClient.Player.Username
                         }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -649,7 +649,7 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerConnectPacket()
                 {
-                    ID = packet.ID,
+                    NetHandle = packet.NetHandle,
                     SocialClubName = localClient.Player.SocialClubName,
                     Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -680,12 +680,12 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerDisconnectPacket()
                 {
-                    ID = clientID
+                    NetHandle = clientID
                 }.PacketToNetOutGoingMessage(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Client localClient = Clients.Find(x => x.ID == clientID);
+            Client localClient = Clients.Find(x => x.NetHandle == clientID);
             if (localClient == null)
             {
                 return;
@@ -705,7 +705,7 @@ namespace CoopServer
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Client client = Util.GetClientByID(packet.Extra.ID);
+            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
             if (client == null)
             {
                 return;
@@ -718,11 +718,11 @@ namespace CoopServer
 
             packet.Extra = playerPacket;
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.ID).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.ID == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -745,7 +745,7 @@ namespace CoopServer
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Client client = Util.GetClientByID(packet.Extra.ID);
+            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
             if (client == null)
             {
                 return;
@@ -758,11 +758,11 @@ namespace CoopServer
 
             packet.Extra = playerPacket;
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.ID).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.ID == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -785,7 +785,7 @@ namespace CoopServer
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Client client = Util.GetClientByID(packet.Extra.ID);
+            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
             if (client == null)
             {
                 return;
@@ -798,11 +798,11 @@ namespace CoopServer
 
             packet.Extra = playerPacket;
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.ID).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.ID == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -825,7 +825,7 @@ namespace CoopServer
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Client client = Util.GetClientByID(packet.Extra.ID);
+            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
             if (client == null)
             {
                 return;
@@ -838,11 +838,11 @@ namespace CoopServer
 
             packet.Extra = playerPacket;
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.ID).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.ID == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
                 }

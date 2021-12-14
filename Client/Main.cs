@@ -23,9 +23,9 @@ namespace CoopClient
 
         internal static readonly string CurrentVersion = "V1_1_0";
 
-        internal static bool ShareNpcsWithPlayers = false;
+        internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
-        internal static bool NpcsAllowed = false;
+        internal static bool NPCsAllowed = false;
         private static bool IsGoingToCar = false;
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace CoopClient
         /// </summary>
         public static Chat MainChat = null;
 
-        internal static long LocalClientID = 0;
+        internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
         internal static Dictionary<long, EntitiesNpc> NPCs = null;
         internal static Dictionary<long, int> NPCsVehicles = null;

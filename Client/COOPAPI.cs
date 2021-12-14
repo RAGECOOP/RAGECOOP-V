@@ -106,17 +106,17 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get the local ID from this Lidgren network client when connected to a server
+        /// Get the local net handle from this Lidgren network client when connected to a server
         /// </summary>
         /// <returns>long</returns>
         public static long GetLocalID()
         {
-            return Main.LocalClientID;
+            return Main.LocalNetHandle;
         }
 
         /// <summary>
         /// Get all connected player's as a Dictionary.
-        /// Key = Lidgren-Network client ID
+        /// Key = Lidgren-Network net handle
         /// Value = Character handle or null
         /// </summary>
         /// <returns>Dictionary(long, int)</returns>
@@ -125,7 +125,7 @@ namespace CoopClient
             Dictionary<long, int?> result = new Dictionary<long, int?>();
             lock (Main.Players)
             {
-                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalClientID))
+                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalNetHandle))
                 {
                     result.Add(player.Key, player.Value.Character?.Handle);
                 }
@@ -134,15 +134,15 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get a player using their Lidgren Network Client ID
+        /// Get a player using their Lidgren Network net handle
         /// </summary>
-        /// <param name="lnID">Lidgren-Network client ID</param>
+        /// <param name="handle">Lidgren-Network net handle</param>
         /// <returns>Entities.EntitiesPlayer</returns>
-        public static Entities.EntitiesPlayer GetPlayer(long lnID)
+        public static Entities.EntitiesPlayer GetPlayer(long handle)
         {
             lock (Main.Players)
             {
-                return Main.Players.ContainsKey(lnID) ? Main.Players[lnID] : null;
+                return Main.Players.ContainsKey(handle) ? Main.Players[handle] : null;
             }
         }
 
@@ -159,7 +159,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// ?
+        /// Check the chat is visible
         /// </summary>
         public static bool IsChatFocused()
         {
@@ -167,16 +167,18 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// ?
+        /// Check the list of players is visible
         /// </summary>
+        /// <returns>bool</returns>
         public static bool IsPlayerListVisible()
         {
             return Util.GetTickCount64() - PlayerList.Pressed < 5000;
         }
 
         /// <summary>
-        /// ?
+        /// Get the version of GTACOOP:R
         /// </summary>
+        /// <returns>string</returns>
         public static string GetCurrentVersion()
         {
             return Main.CurrentVersion;
@@ -217,25 +219,58 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get that player's local username that has been set
+        /// Get that player's local username
         /// </summary>
         /// <returns>string</returns>
-        public static string GetLocalUsername()
+        public static string GetUsername()
         {
             return Main.MainSettings.Username;
         }
 
         /// <summary>
+        /// Set a new username for this player
+        /// </summary>
+        /// <param name="username">The new username</param>
+        /// <returns>false if the player already joined a server or the username is null or empty otherwise true</returns>
+        public static bool SetUsername(string username)
+        {
+            if (IsOnServer() || string.IsNullOrEmpty(username))
+            {
+                return false;
+            }
+
+            Main.MainSettings.Username = username;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Enable or disable sharing of NPCs with other players
+        /// </summary>
+        /// <param name="share"></param>
+        public static void SetShareNPCs(bool share)
+        {
+            Main.ShareNPCsWithPlayers = share;
+        }
+
+        /// <summary>
+        /// Enable or disable the local traffic for this player
+        /// </summary>
+        /// <param name="stop"></param>
+        public static void SetLocalTraffic(bool stop)
+        {
+            Main.DisableTraffic = stop;
+        }
+
+#if DEBUG
+        /// <summary>
         /// ?
         /// </summary>
-        public static void Configure(string playerName, bool shareNpcsWithPlayers, bool disableTrafficSharing, bool debug = false)
+        /// <param name="value"></param>
+        public static void SetDebug(bool value)
         {
-            Main.MainSettings.Username = playerName;
-            Main.ShareNpcsWithPlayers = shareNpcsWithPlayers;
-            Main.DisableTraffic = disableTrafficSharing;
-#if DEBUG
-            Main.UseDebug = debug;
-#endif
+            Main.UseDebug = value;
         }
+#endif
     }
 }
