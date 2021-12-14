@@ -13,14 +13,24 @@ namespace CoopClient
         /// <summary>
         /// ?
         /// </summary>
-        public delegate void ConnectEvent(bool connected, long fromId, string reason = null);
+        /// <param name="connected"></param>
+        /// <param name="from">The Lidgren-Network net handle</param>
+        /// <param name="reason"></param>
+        public delegate void ConnectEvent(bool connected, long from, string reason = null);
         /// <summary>
         /// ?
         /// </summary>
+        /// <param name="from"></param>
+        /// <param name="message">The Lidgren-Network net handle</param>
+        /// <param name="args"></param>
         public delegate void ChatMessage(string from, string message, CancelEventArgs args);
         /// <summary>
         /// ?
         /// </summary>
+        /// <param name="from">The Lidgren-Network net handle</param>
+        /// <param name="mod"></param>
+        /// <param name="customID"></param>
+        /// <param name="bytes"></param>
         public delegate void ModEvent(long from, string mod, byte customID, byte[] bytes);
         #endregion
 
@@ -40,22 +50,22 @@ namespace CoopClient
 
         internal static void Connected()
         {
-            OnConnection?.Invoke(true, GetLocalID());
+            OnConnection?.Invoke(true, GetLocalNetHandle());
         }
 
         internal static void Disconnected(string reason)
         {
-            OnConnection?.Invoke(false, GetLocalID(), reason);
+            OnConnection?.Invoke(false, GetLocalNetHandle(), reason);
         }
 
-        internal static void Connected(long userId)
+        internal static void Connected(long netHandle)
         {
-            OnConnection?.Invoke(true, userId);
+            OnConnection?.Invoke(true, netHandle);
         }
 
-        internal static void Disconnected(long userId)
+        internal static void Disconnected(long netHandle)
         {
-            OnConnection?.Invoke(false, userId);
+            OnConnection?.Invoke(false, netHandle);
         }
 
         internal static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
@@ -109,7 +119,7 @@ namespace CoopClient
         /// Get the local net handle from this Lidgren network client when connected to a server
         /// </summary>
         /// <returns>long</returns>
-        public static long GetLocalID()
+        public static long GetLocalNetHandle()
         {
             return Main.LocalNetHandle;
         }
@@ -209,13 +219,13 @@ namespace CoopClient
         /// <summary>
         /// Send any data (bytes) to a player
         /// </summary>
-        /// <param name="lnID">The Lidgren Network Client ID that receives the data</param>
+        /// <param name="netHandle">The Lidgren Network net handle that receives the data</param>
         /// <param name="mod">The name of this modification (script)</param>
         /// <param name="customID">The ID to know what the data is</param>
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToPlayer(long lnID, string mod, byte customID, byte[] bytes)
+        public static void SendDataToPlayer(long netHandle, string mod, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(lnID, mod, customID, bytes);
+            Main.MainNetworking.SendModData(netHandle, mod, customID, bytes);
         }
 
         /// <summary>
