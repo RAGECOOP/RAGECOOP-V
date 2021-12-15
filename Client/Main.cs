@@ -240,6 +240,8 @@ namespace CoopClient
                 Npc.Value.Character?.Delete();
             }
             NPCs.Clear();
+
+            NPCsVehicles.Clear();
         }
 
 #if DEBUG
