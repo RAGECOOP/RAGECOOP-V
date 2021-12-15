@@ -55,7 +55,7 @@ namespace CoopClient.Entities
                 CurrentModelHash = value;
             }
         }
-        private Dictionary<int, int> LastProps = new Dictionary<int, int>();
+        private Dictionary<int, int> LastProps = null;
         internal Dictionary<int, int> Props { get; set; }
         /// <summary>
         /// The latest character position (may not have been applied yet)
@@ -79,7 +79,7 @@ namespace CoopClient.Entities
             {
                 if (!LastSyncWasFull)
                 {
-                    if (Position != null)
+                    if (Position != default)
                     {
                         if (PedBlip != null && PedBlip.Exists())
                         {
@@ -257,8 +257,6 @@ namespace CoopClient.Entities
                 PedBlip.Delete();
                 PedBlip = null;
             }
-
-            LastProps = Props;
 
             Model characterModel = CurrentModelHash.ModelRequest();
 
