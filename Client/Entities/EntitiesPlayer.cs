@@ -8,7 +8,7 @@
         /// <summary>
         /// ?
         /// </summary>
-        public string SocialClubName { get; set; }
+        public string SocialClubName { get; internal set; }
         /// <summary>
         /// ?
         /// </summary>

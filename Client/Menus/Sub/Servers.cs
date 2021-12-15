@@ -10,8 +10,10 @@ namespace CoopClient.Menus.Sub
 {
     internal class ServerListClass
     {
-        [JsonProperty("ip")]
-        public string IP { get; set; }
+        [JsonProperty("address")]
+        public string Address { get; set; }
+        [JsonProperty("port")]
+        public string Port { get; set; }
         [JsonProperty("name")]
         public string Name { get; set; }
         [JsonProperty("version")]
@@ -65,6 +67,11 @@ namespace CoopClient.Menus.Sub
             List<ServerListClass> serverList = null;
             try
             {
+                // SSL/TLS
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
                 WebClient client = new WebClient();
                 string data = client.DownloadString(Main.MainSettings.MasterServer);
                 serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
@@ -88,21 +95,22 @@ namespace CoopClient.Menus.Sub
 
             foreach (ServerListClass server in serverList)
             {
+                string address = $"{server.Address}:{server.Port}";
                 NativeItem tmpItem = null;
-                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{server.IP}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
+                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
                 tmpItem.Activated += (object sender, EventArgs e) =>
                 {
                     try
                     {
                         MainMenu.Visible = false;
 
-                        Main.MainNetworking.DisConnectFromServer(server.IP);
+                        Main.MainNetworking.DisConnectFromServer(address);
 
-                        Main.MainMenu.ServerIpItem.AltTitle = server.IP;
+                        Main.MainMenu.ServerIpItem.AltTitle = address;
 
                         Main.MainMenu.MainMenu.Visible = true;
 
-                        Main.MainSettings.LastServerAddress = server.IP;
+                        Main.MainSettings.LastServerAddress = address;
                         Util.SaveSettings();
                     }
                     catch (Exception ex)

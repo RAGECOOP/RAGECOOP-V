@@ -7,7 +7,7 @@ namespace CoopServer
 {
     public class Client
     {
-        public long ID = 0;
+        public long NetHandle = 0;
         public float Latency = 0.0f;
         public PlayerData Player;
         private readonly Dictionary<string, object> CustomData = new();
@@ -48,18 +48,18 @@ namespace CoopServer
         #region FUNCTIONS
         public void Kick(string[] reason)
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(string.Join(" ", reason));
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect(string.Join(" ", reason));
         }
         public void Kick(string reason)
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID)?.Disconnect(reason);
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect(reason);
         }
 
         public void SendChatMessage(string message, string from = "Server")
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
                 if (userConnection == null)
                 {
                     return;
@@ -73,7 +73,7 @@ namespace CoopServer
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
             }
             catch (Exception e)
             {
@@ -85,10 +85,10 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{ID}\" not found!");
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetHandle}\" not found!");
                     return;
                 }
 
@@ -112,7 +112,7 @@ namespace CoopServer
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -124,10 +124,10 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{ID}\" not found!");
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetHandle}\" not found!");
                     return;
                 }
 
@@ -178,12 +178,12 @@ namespace CoopServer
                     Hash = hash,
                     Args = arguments,
                     Type = returnType,
-                    ID = id
+                    NetHandle = id
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -195,7 +195,7 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
                 if (userConnection == null)
                 {
                     return;
@@ -204,13 +204,13 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ModPacket()
                 {
-                    ID = 0,
+                    NetHandle = 0,
                     Target = 0,
                     Mod = mod,
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, 0);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
                 Server.MainNetServer.FlushSendQueue();
             }
             catch (Exception e)

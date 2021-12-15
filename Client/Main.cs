@@ -21,42 +21,58 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_0_1";
+        internal static readonly string CurrentVersion = "V1_1_0";
 
-        internal static bool ShareNpcsWithPlayers = false;
+        internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
-        internal static bool NpcsAllowed = false;
+        internal static bool NPCsAllowed = false;
         private static bool IsGoingToCar = false;
 
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Settings MainSettings = Util.ReadSettings();
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Networking MainNetworking = new Networking();
+        internal static Settings MainSettings = null;
+        internal static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static MenusMain MainMenu = new MenusMain();
+        internal static MenusMain MainMenu = null;
 #endif
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public static Chat MainChat = new Chat();
+        internal static Chat MainChat = null;
 
-        internal static long LocalClientID = 0;
-        internal static readonly Dictionary<long, EntitiesPlayer> Players = new Dictionary<long, EntitiesPlayer>();
-        internal static readonly Dictionary<long, EntitiesNpc> Npcs = new Dictionary<long, EntitiesNpc>();
+        internal static long LocalNetHandle = 0;
+        internal static Dictionary<long, EntitiesPlayer> Players = null;
+        internal static Dictionary<long, EntitiesNpc> NPCs = null;
+        internal static Dictionary<long, int> NPCsVehicles = null;
 
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
+            // Required for some synchronization!
+            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            {
+                Tick += (object sender, EventArgs e) =>
+                {
+                    if (Game.IsLoading)
+                    {
+                        return;
+                    }
+
+                    if (!GameLoaded)
+                    {
+                        GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
+                        GameLoaded = true;
+                    }
+                };
+                return;
+            }
+
+            MainSettings = Util.ReadSettings();
+            MainNetworking = new Networking();
+            MainMenu = new MenusMain();
+            MainChat = new Chat();
+            Players = new Dictionary<long, EntitiesPlayer>();
+            NPCs = new Dictionary<long, EntitiesNpc>();
+            NPCsVehicles = new Dictionary<long, int>();
+
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
             Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
 
@@ -217,13 +233,15 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesNpc> Npc in Npcs)
+            foreach (KeyValuePair<long, EntitiesNpc> Npc in NPCs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();
                 Npc.Value.Character?.Delete();
             }
-            Npcs.Clear();
+            NPCs.Clear();
+
+            NPCsVehicles.Clear();
         }
 
 #if DEBUG
@@ -235,6 +253,7 @@ namespace CoopClient
         private void Debug()
         {
             Ped player = Game.Player.Character;
+
             if (!Players.ContainsKey(0))
             {
                 Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
@@ -258,14 +277,12 @@ namespace CoopClient
 
             byte? flags;
 
-            Vehicle vehicleTryingToEnter = null;
-
-            if (player.IsInVehicle() || (vehicleTryingToEnter = player.VehicleTryingToEnter) != null)
+            if (player.IsInVehicle())
             {
-                Vehicle veh = player.CurrentVehicle ?? vehicleTryingToEnter;
+                Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = veh.GetVehicleFlags(fullSync);
+                flags = veh.GetVehicleFlags();
 
                 int secondaryColor;
                 int primaryColor;
@@ -288,13 +305,16 @@ namespace CoopClient
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
                 DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
-                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)VehicleDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsInVehicle = true;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
                 DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
                 DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
                 DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
                 DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
+                DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
+                DebugSyncPed.Transformed = (flags.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                DebugSyncPed.VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
                 {
@@ -304,14 +324,15 @@ namespace CoopClient
             }
             else
             {
-                flags = player.GetPedFlags(fullSync, true);
+                flags = player.GetPedFlags(true);
 
                 DebugSyncPed.Rotation = player.Rotation;
                 DebugSyncPed.Velocity = player.Velocity;
                 DebugSyncPed.Speed = player.GetPedSpeed();
                 DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
-                DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
-                DebugSyncPed.LastSyncWasFull = (flags.Value & (byte)PedDataFlags.LastSyncWasFull) > 0;
+                DebugSyncPed.CurrentWeaponHash = (uint)player.Weapons.Current.Hash;
+                DebugSyncPed.WeaponComponents = player.Weapons.Current.GetWeaponComponents();
+                DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
                 DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;
                 DebugSyncPed.IsReloading = (flags.Value & (byte)PedDataFlags.IsReloading) > 0;

@@ -146,14 +146,9 @@ namespace CoopClient
             return RaycastEverything(new Vector2(0, 0));
         }
 
-        public static byte? GetVehicleFlags(this Vehicle veh, bool fullSync)
+        public static byte? GetVehicleFlags(this Vehicle veh)
         {
             byte? flags = 0;
-
-            if (fullSync)
-            {
-                flags |= (byte)VehicleDataFlags.LastSyncWasFull;
-            }
 
             if (veh.IsEngineRunning)
             {
@@ -180,17 +175,22 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsDead;
             }
 
+            if (Function.Call<bool>(Hash.IS_HORN_ACTIVE, veh.Handle))
+            {
+                flags |= (byte)VehicleDataFlags.IsHornActive;
+            }
+
+            if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh))
+            {
+                flags |= (byte)VehicleDataFlags.IsTransformed;
+            }
+
             return flags;
         }
 
-        public static byte? GetPedFlags(this Ped ped, bool fullSync, bool isPlayer = false)
+        public static byte? GetPedFlags(this Ped ped, bool isPlayer = false)
         {
             byte? flags = 0;
-
-            if (fullSync)
-            {
-                flags |= (byte)PedDataFlags.LastSyncWasFull;
-            }
 
             if (ped.IsAiming)
             {
@@ -233,6 +233,23 @@ namespace CoopClient
                 int mod = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
                 result.Add(i, mod);
             }
+            return result;
+        }
+
+        public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)
+        {
+            Dictionary<uint, bool> result = null;
+
+            if (weapon.Components.Count > 0)
+            {
+                result = new Dictionary<uint, bool>();
+
+                foreach (var comp in weapon.Components)
+                {
+                    result.Add((uint)comp.ComponentHash, comp.Active);
+                }
+            }
+
             return result;
         }
 

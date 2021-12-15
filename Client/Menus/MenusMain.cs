@@ -18,14 +18,8 @@ namespace CoopClient.Menus
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         #region SUB
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public Sub.Settings SubSettings = new Sub.Settings();
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public Sub.Servers ServerList = new Sub.Servers();
+        internal Sub.Settings SubSettings = new Sub.Settings();
+        internal Sub.Servers ServerList = new Sub.Servers();
         #endregion
 
         #region ITEMS
@@ -100,7 +94,7 @@ namespace CoopClient.Menus
         {
             MainMenu.Items[3].Enabled = true;
             MainMenu.Items[3].Title = "Disconnect";
-            SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NpcsAllowed;
+            SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NPCsAllowed;
 
             MainMenu.Visible = false;
             ServerList.MainMenu.Visible = false;
