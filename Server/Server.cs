@@ -166,9 +166,10 @@ namespace CoopServer
             {
                 try
                 {
-                    Logging.Info("Loading resource...");
+                    string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll";
+                    Logging.Info($"Loading resource {resourcepath}...");
 
-                    Assembly asm = Assembly.LoadFrom(AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll");
+                    Assembly asm = Assembly.LoadFrom(resourcepath);
                     Type[] types = asm.GetExportedTypes();
                     IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
                     Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();

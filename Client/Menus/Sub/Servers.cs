@@ -105,11 +105,11 @@ namespace CoopClient.Menus.Sub
                         MainMenu.Visible = false;
 
                         Main.MainNetworking.DisConnectFromServer(address);
-
+#if !NON_INTERACTIVE
                         Main.MainMenu.ServerIpItem.AltTitle = address;
 
                         Main.MainMenu.MainMenu.Visible = true;
-
+#endif
                         Main.MainSettings.LastServerAddress = address;
                         Util.SaveSettings();
                     }
