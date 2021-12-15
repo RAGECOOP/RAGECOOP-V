@@ -11,7 +11,7 @@
 | ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
 | --- |
 
-http://gtacoopr.000webhostapp.com/
+MasterServer: https://coop.entenkoeniq.de/
 
 # 📋 Requirements
 - Visual Studio 2022
