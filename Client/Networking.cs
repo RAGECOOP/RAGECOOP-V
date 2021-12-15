@@ -771,7 +771,7 @@ namespace CoopClient
                         Velocity = player.Velocity.ToLVector(),
                         Speed = player.GetPedSpeed(),
                         AimCoords = player.GetPedAimCoords(false).ToLVector(),
-                        CurrentWeaponHash = (int)player.Weapons.Current.Hash,
+                        CurrentWeaponHash = (uint)player.Weapons.Current.Hash,
                         WeaponComponents = player.Weapons.Current.GetWeaponComponents(),
                         Flag = player.GetPedFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -819,7 +819,7 @@ namespace CoopClient
                         Velocity = player.Velocity.ToLVector(),
                         Speed = player.GetPedSpeed(),
                         AimCoords = player.GetPedAimCoords(false).ToLVector(),
-                        CurrentWeaponHash = (int)player.Weapons.Current.Hash,
+                        CurrentWeaponHash = (uint)player.Weapons.Current.Hash,
                         Flag = player.GetPedFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
@@ -890,7 +890,7 @@ namespace CoopClient
                     Velocity = npc.Velocity.ToLVector(),
                     Speed = npc.GetPedSpeed(),
                     AimCoords = npc.GetPedAimCoords(true).ToLVector(),
-                    CurrentWeaponHash = (int)npc.Weapons.Current.Hash,
+                    CurrentWeaponHash = (uint)npc.Weapons.Current.Hash,
                     Flag = npc.GetPedFlags(true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }

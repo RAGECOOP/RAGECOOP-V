@@ -251,6 +251,7 @@ namespace CoopClient
         private void Debug()
         {
             Ped player = Game.Player.Character;
+
             if (!Players.ContainsKey(0))
             {
                 Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
@@ -327,7 +328,7 @@ namespace CoopClient
                 DebugSyncPed.Velocity = player.Velocity;
                 DebugSyncPed.Speed = player.GetPedSpeed();
                 DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
-                DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
+                DebugSyncPed.CurrentWeaponHash = (uint)player.Weapons.Current.Hash;
                 DebugSyncPed.WeaponComponents = player.Weapons.Current.GetWeaponComponents();
                 DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;

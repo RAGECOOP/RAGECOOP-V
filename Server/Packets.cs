@@ -325,10 +325,10 @@ namespace CoopServer
         public LVector3 AimCoords { get; set; }
 
         [ProtoMember(8)]
-        public int CurrentWeaponHash { get; set; }
+        public uint CurrentWeaponHash { get; set; }
 
         [ProtoMember(9)]
-        public List<uint> WeaponComponents { get; set; }
+        public Dictionary<uint, bool> WeaponComponents { get; set; }
 
         [ProtoMember(10)]
         public byte? Flag { get; set; } = 0;
@@ -479,7 +479,7 @@ namespace CoopServer
         public LVector3 AimCoords { get; set; }
 
         [ProtoMember(6)]
-        public int CurrentWeaponHash { get; set; }
+        public uint CurrentWeaponHash { get; set; }
 
         [ProtoMember(7)]
         public byte? Flag { get; set; } = 0;
@@ -770,7 +770,7 @@ namespace CoopServer
         public LVector3 AimCoords { get; set; }
 
         [ProtoMember(10)]
-        public int CurrentWeaponHash { get; set; }
+        public uint CurrentWeaponHash { get; set; }
 
         [ProtoMember(11)]
         public byte? Flag { get; set; } = 0;

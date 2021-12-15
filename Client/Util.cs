@@ -236,17 +236,17 @@ namespace CoopClient
             return result;
         }
 
-        public static List<uint> GetWeaponComponents(this Weapon weapon)
+        public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)
         {
-            List<uint> result = null;
+            Dictionary<uint, bool> result = null;
 
             if (weapon.Components.Count > 0)
             {
-                result = new List<uint>();
+                result = new Dictionary<uint, bool>();
 
                 foreach (var comp in weapon.Components)
                 {
-                    result.Add((uint)comp.ComponentHash);
+                    result.Add((uint)comp.ComponentHash, comp.Active);
                 }
             }
 
