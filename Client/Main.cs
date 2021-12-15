@@ -67,7 +67,9 @@ namespace CoopClient
 
             MainSettings = Util.ReadSettings();
             MainNetworking = new Networking();
+#if !NON_INTERACTIVE
             MainMenu = new MenusMain();
+#endif
             MainChat = new Chat();
             Players = new Dictionary<long, EntitiesPlayer>();
             NPCs = new Dictionary<long, EntitiesNpc>();

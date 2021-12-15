@@ -266,10 +266,10 @@ namespace CoopClient
         /// <summary>
         /// Enable or disable the local traffic for this player
         /// </summary>
-        /// <param name="stop"></param>
-        public static void SetLocalTraffic(bool stop)
+        /// <param name="enable"></param>
+        public static void SetLocalTraffic(bool enable)
         {
-            Main.DisableTraffic = stop;
+            Main.DisableTraffic = !enable;
         }
 
 #if DEBUG
