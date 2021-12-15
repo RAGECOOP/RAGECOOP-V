@@ -328,6 +328,7 @@ namespace CoopClient
                 DebugSyncPed.Speed = player.GetPedSpeed();
                 DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
                 DebugSyncPed.CurrentWeaponHash = (int)player.Weapons.Current.Hash;
+                DebugSyncPed.WeaponComponents = player.Weapons.Current.GetWeaponComponents();
                 DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
                 DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;

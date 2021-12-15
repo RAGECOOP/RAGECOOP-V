@@ -309,6 +309,7 @@ namespace CoopClient
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
                 player.CurrentWeaponHash = packet.CurrentWeaponHash;
+                player.WeaponComponents = packet.WeaponComponents;
                 player.AimCoords = packet.AimCoords.ToVector();
                 player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
                 player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
@@ -771,6 +772,7 @@ namespace CoopClient
                         Speed = player.GetPedSpeed(),
                         AimCoords = player.GetPedAimCoords(false).ToLVector(),
                         CurrentWeaponHash = (int)player.Weapons.Current.Hash,
+                        WeaponComponents = player.Weapons.Current.GetWeaponComponents(),
                         Flag = player.GetPedFlags(true)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }

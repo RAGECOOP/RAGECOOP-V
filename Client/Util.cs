@@ -236,6 +236,23 @@ namespace CoopClient
             return result;
         }
 
+        public static List<uint> GetWeaponComponents(this Weapon weapon)
+        {
+            List<uint> result = null;
+
+            if (weapon.Components.Count > 0)
+            {
+                result = new List<uint>();
+
+                foreach (var comp in weapon.Components)
+                {
+                    result.Add((uint)comp.ComponentHash);
+                }
+            }
+
+            return result;
+        }
+
         public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();

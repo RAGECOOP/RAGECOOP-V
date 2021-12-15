@@ -82,6 +82,7 @@ namespace CoopClient.Entities
         internal bool IsShooting { get; set; }
         internal bool IsReloading { get; set; }
         internal int CurrentWeaponHash { get; set; }
+        internal List<uint> WeaponComponents { get; set; }
         #endregion
 
         internal Blip PedBlip = null;
@@ -745,8 +746,19 @@ namespace CoopClient.Entities
 
             if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash)
             {
-                Character.Weapons.RemoveAll();
-                Character.Weapons.Give((WeaponHash)CurrentWeaponHash, -1, true, true);
+                if (WeaponComponents == null)
+                {
+                    Character.Weapons.RemoveAll();
+                    Character.Weapons.Give((WeaponHash)CurrentWeaponHash, -1, true, true);
+                }
+                else
+                {
+                    int wObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
+
+                    WeaponComponents.ForEach(mod => Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, wObj, mod));
+
+                    Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, wObj, Character);
+                }
             }
 
             if (IsShooting)
@@ -802,7 +814,10 @@ namespace CoopClient.Entities
 
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
             characterModel.MarkAsNoLongerNeeded();
+            
+            // ?
             Character.RelationshipGroup = Main.RelationshipGroup;
+
             if (IsInVehicle)
             {
                 Character.IsVisible = false;
@@ -811,6 +826,9 @@ namespace CoopClient.Entities
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
             Character.Health = Health;
+
+            Character.CanBeTargetted = true;
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character.Handle, Game.Player, true);
 
             if (username != null)
             {
@@ -828,8 +846,6 @@ namespace CoopClient.Entities
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
             }
-
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Character, Game.Player, true);
 
             return true;
         }

@@ -413,6 +413,9 @@ namespace CoopClient
         public int CurrentWeaponHash { get; set; }
 
         [ProtoMember(9)]
+        public List<uint> WeaponComponents { get; set; }
+
+        [ProtoMember(10)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -439,6 +442,7 @@ namespace CoopClient
             Speed = data.Speed;
             AimCoords = data.AimCoords;
             CurrentWeaponHash = data.CurrentWeaponHash;
+            WeaponComponents = data.WeaponComponents;
             Flag = data.Flag;
         }
     }
