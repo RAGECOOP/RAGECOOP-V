@@ -207,18 +207,18 @@ namespace CoopServer
         #endregion
 
         #region FUNCTIONS
-        public static void SendModPacketToAll(string mod, byte customID, byte[] bytes, List<long> playerIdList = null)
+        public static void SendModPacketToAll(string mod, byte customID, byte[] bytes, List<long> netHandleList = null)
         {
             try
             {
                 List<NetConnection> connections;
-                if (playerIdList == null)
+                if (netHandleList == null)
                 {
                     connections = Server.MainNetServer.Connections;
                 }
                 else
                 {
-                    connections = Server.MainNetServer.Connections.FindAll(c => playerIdList.Contains(c.RemoteUniqueIdentifier));
+                    connections = Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
                 }
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ModPacket()
@@ -294,7 +294,7 @@ namespace CoopServer
             return Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
-        public static void SendChatMessageToAll(string message, string username = "Server", List<long> playerIdList = null)
+        public static void SendChatMessageToAll(string message, string username = "Server", List<long> netHandleList = null)
         {
             try
             {
@@ -304,13 +304,13 @@ namespace CoopServer
                 }
 
                 List<NetConnection> connections;
-                if (playerIdList == null)
+                if (netHandleList == null)
                 {
                     connections = Server.MainNetServer.Connections;
                 }
                 else
                 {
-                    connections = Server.MainNetServer.Connections.FindAll(c => playerIdList.Contains(c.RemoteUniqueIdentifier));
+                    connections = Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
                 }
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ChatMessagePacket()
