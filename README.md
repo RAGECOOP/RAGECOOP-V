@@ -19,8 +19,8 @@ MasterServer: https://coop.entenkoeniq.de/
 - .NET Framework 4.8
 
 # 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/ca82751b7cc8bdf2203d361b27fe0d1aa895eb55)
-- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/tree/1342949cd19eaa4115990793311681ea1568054c)
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/commit/ca82751b7cc8bdf2203d361b27fe0d1aa895eb55)
+- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/commit/b570dc70e9241b45ae4c53ec7bb69efa3636f79d)
 - Lidgren Network Custom (***PRIVATE***)
 - - No new features (only improvements)
 - [Protobuf-net](https://www.nuget.org/packages/protobuf-net/2.4.6)

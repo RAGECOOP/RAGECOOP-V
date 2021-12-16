@@ -1,0 +1,3624 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>LemonUI.SHVDN3</name>
+    </assembly>
+    <members>
+        <member name="T:LemonUI.Controls">
+            <summary>
+            Tools for dealing with controls.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Controls.IsUsingController">
+            <summary>
+            Gets if the player used a controller for the last input.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Controls.IsJustPressed(GTA.Control)">
+            <summary>
+            Checks if a control was pressed during the last frame.
+            </summary>
+            <param name="control">The control to check.</param>
+            <returns>true if the control was pressed, false otherwise.</returns>
+        </member>
+        <member name="M:LemonUI.Controls.IsPressed(GTA.Control)">
+            <summary>
+            Checks if a control is currently pressed.
+            </summary>
+            <param name="control">The control to check.</param>
+            <returns>true if the control is pressed, false otherwise.</returns>
+        </member>
+        <member name="M:LemonUI.Controls.DisableAll(System.Int32)">
+            <summary>
+            Disables all of the controls during the next frame.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Controls.EnableThisFrame(GTA.Control)">
+            <summary>
+            Enables a control during the next frame.
+            </summary>
+            <param name="control">The control to enable.</param>
+        </member>
+        <member name="M:LemonUI.Controls.EnableThisFrame(System.Collections.Generic.IEnumerable{GTA.Control})">
+            <summary>
+            Enables a specific set of controls during the next frame.
+            </summary>
+            <param name="controls">The controls to enable.</param>
+        </member>
+        <member name="M:LemonUI.Controls.DisableThisFrame(GTA.Control)">
+            <summary>
+            Disables a control during the next frame.
+            </summary>
+            <param name="control">The control to disable.</param>
+        </member>
+        <member name="T:LemonUI.Elements.BaseElement">
+            <summary>
+            Base class for all of the 2D elements.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.BaseElement.literalPosition">
+            <summary>
+            The 1080 scaled position.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.BaseElement.relativePosition">
+            <summary>
+            The relative position between 0 and 1.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.BaseElement.literalSize">
+            <summary>
+            The 1080 scaled size.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.BaseElement.relativeSize">
+            <summary>
+            The relative size between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.BaseElement.Position">
+            <summary>
+            The Position of the drawable.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.BaseElement.Size">
+            <summary>
+            The Size of the drawable.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.BaseElement.Color">
+            <summary>
+            The Color of the drawable.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.BaseElement.Heading">
+            <summary>
+            The rotation of the drawable.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.BaseElement.#ctor(System.Drawing.PointF,System.Drawing.SizeF)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Elements.BaseElement"/> with the specified Position and Size.
+            </summary>
+            <param name="pos">The position of the Element.</param>
+            <param name="size">The size of the Element.</param>
+        </member>
+        <member name="M:LemonUI.Elements.BaseElement.Recalculate">
+            <summary>
+            Recalculates the size and position of this item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.BaseElement.Draw">
+            <summary>
+            Draws the item on the screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Elements.I2Dimensional">
+            <summary>
+            A 2D item that can be drawn on the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.I2Dimensional.Position">
+            <summary>
+            The Position of the drawable.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.I2Dimensional.Size">
+            <summary>
+            The Size of the drawable.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.I2Dimensional.Color">
+            <summary>
+            The Color of the drawable.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Elements.IText">
+            <summary>
+            A Drawable screen text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Position">
+            <summary>
+            The position of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Text">
+            <summary>
+            The text to draw.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Color">
+            <summary>
+            The color of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Font">
+            <summary>
+            The game font to use.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Scale">
+            <summary>
+            The scale of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Shadow">
+            <summary>
+            If the text should have a drop down shadow.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Outline">
+            <summary>
+            If the text should have an outline.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Alignment">
+            <summary>
+            The alignment of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.WordWrap">
+            <summary>
+            The maximum distance from X where the text would wrap into a new line.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.Width">
+            <summary>
+            The width that the text takes from the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.LineCount">
+            <summary>
+            The number of lines used by this text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.IText.LineHeight">
+            <summary>
+            The height of each line of text.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Elements.ScaledRectangle">
+            <summary>
+            A 2D rectangle.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledRectangle.#ctor(System.Drawing.PointF,System.Drawing.SizeF)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Elements.ScaledRectangle"/> with the specified Position and Size.
+            </summary>
+            <param name="pos">The position of the Rectangle.</param>
+            <param name="size">The size of the Rectangle.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledRectangle.Draw">
+            <summary>
+            Draws the rectangle on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledRectangle.Recalculate">
+            <summary>
+            Recalculates the position based on the size.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Elements.ScaledText">
+            <summary>
+            A text string.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.chunkSize">
+            <summary>
+            The size of every chunk of text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.absolutePosition">
+            <summary>
+            The absolute 1080p based screen position.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.relativePosition">
+            <summary>
+            The relative 0-1 relative position.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.text">
+            <summary>
+            The raw string of text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.chunks">
+            <summary>
+            The raw string split into equally sized strings.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.alignment">
+            <summary>
+            The alignment of the item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.internalWrap">
+            <summary>
+            The word wrap value passed by the user.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Elements.ScaledText.realWrap">
+            <summary>
+            The real word wrap value based on the position of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Position">
+            <summary>
+            The position of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Text">
+            <summary>
+            The text to draw.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Color">
+            <summary>
+            The color of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Font">
+            <summary>
+            The game font to use.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Scale">
+            <summary>
+            The scale of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Shadow">
+            <summary>
+            If the text should have a drop down shadow.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Outline">
+            <summary>
+            If the test should have an outline.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Alignment">
+            <summary>
+            The alignment of the text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.WordWrap">
+            <summary>
+            The distance from the start position where the text will be wrapped into new lines.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.Width">
+            <summary>
+            The width that the text takes from the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.LineCount">
+            <summary>
+            The number of lines used by this text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledText.LineHeight">
+            <summary>
+            The relative height of each line in the text.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.#ctor(System.Drawing.PointF,System.String)">
+            <summary>
+            Creates a text with the specified options.
+            </summary>
+            <param name="pos">The position where the text should be located.</param>
+            <param name="text">The text to show.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.#ctor(System.Drawing.PointF,System.String,System.Single)">
+            <summary>
+            Creates a text with the specified options.
+            </summary>
+            <param name="pos">The position where the text should be located.</param>
+            <param name="text">The text to show.</param>
+            <param name="scale">The scale of the text.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.#ctor(System.Drawing.PointF,System.String,System.Single,GTA.UI.Font)">
+            <summary>
+            Creates a text with the specified options
+            </summary>
+            <param name="pos">The position where the text should be located.</param>
+            <param name="text">The text to show.</param>
+            <param name="scale">The scale of the text.</param>
+            <param name="font">The font to use.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.Add">
+            <summary>
+            Adds the text information for measurement.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.Slice">
+            <summary>
+            Slices the string of text into appropiately saved chunks.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.Recalculate">
+            <summary>
+            Recalculates the size, position and word wrap of this item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledText.Draw">
+            <summary>
+            Draws the text on the screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Elements.ScaledTexture">
+            <summary>
+            A 2D game texture.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledTexture.Dictionary">
+            <summary>
+            The dictionary where the texture is loaded.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Elements.ScaledTexture.Texture">
+            <summary>
+            The texture to draw from the dictionary.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Elements.ScaledTexture"/> with a Position and Size of Zero.
+            </summary>
+            <param name="dictionary">The dictionary where the texture is located.</param>
+            <param name="texture">The texture to draw.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.#ctor(System.Drawing.PointF,System.Drawing.SizeF,System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Elements.ScaledTexture"/> with a Position and Size of zero.
+            </summary>
+            <param name="pos">The position of the Texture.</param>
+            <param name="size">The size of the Texture.</param>
+            <param name="dictionary">The dictionary where the texture is located.</param>
+            <param name="texture">The texture to draw.</param>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.Request">
+            <summary>
+            Requests the texture dictionary for this class.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.Draw">
+            <summary>
+            Draws the texture on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.DrawSpecific(System.Drawing.PointF,System.Drawing.PointF)">
+            <summary>
+            Draws a specific part of the texture on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Elements.ScaledTexture.Recalculate">
+            <summary>
+            Recalculates the position based on the size.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Extensions.FloatExtensions">
+            <summary>
+            Extensions for the float class.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Extensions.FloatExtensions.ToXRelative(System.Single)">
+            <summary>
+            Converts an absolute X or Width float to a relative one.
+            </summary>
+            <param name="fin">The float to convert.</param>
+            <returns>A relative float between 0 and 1.</returns>
+        </member>
+        <member name="M:LemonUI.Extensions.FloatExtensions.ToYRelative(System.Single)">
+            <summary>
+            Converts an absolute Y or Height float to a relative one.
+            </summary>
+            <param name="fin">The float to convert.</param>
+            <returns>A relative float between 0 and 1.</returns>
+        </member>
+        <member name="M:LemonUI.Extensions.FloatExtensions.ToXAbsolute(System.Single)">
+            <summary>
+            Converts an relative X or Width float to an absolute one.
+            </summary>
+            <param name="fin">The float to convert.</param>
+            <returns>An absolute float.</returns>
+        </member>
+        <member name="M:LemonUI.Extensions.FloatExtensions.ToYAbsolute(System.Single)">
+            <summary>
+            Converts an relative Y or Height float to an absolute one.
+            </summary>
+            <param name="fin">The float to convert.</param>
+            <returns>An absolute float.</returns>
+        </member>
+        <member name="T:LemonUI.Extensions.PointExtensions">
+            <summary>
+            Extensions for the Point and PointF classes.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Extensions.PointExtensions.ToRelative(System.Drawing.PointF)">
+            <summary>
+            Converts an absolute 1080-based position into a relative one.
+            </summary>
+            <param name="point">The absolute PointF.</param>
+            <returns>A new PointF with relative values.</returns>
+        </member>
+        <member name="M:LemonUI.Extensions.PointExtensions.ToAbsolute(System.Drawing.PointF)">
+            <summary>
+            Converts a normalized 0-1 position into an absolute one.
+            </summary>
+            <param name="point">The relative PointF.</param>
+            <returns>A new PointF with absolute values.</returns>
+        </member>
+        <member name="T:LemonUI.Extensions.SizeExtensions">
+            <summary>
+            Extensions for the Size and SizeF classes.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Extensions.SizeExtensions.ToRelative(System.Drawing.SizeF)">
+            <summary>
+            Converts an absolute 1080-based size into a relative one.
+            </summary>
+            <param name="size">The absolute SizeF.</param>
+            <returns>A new SizeF with relative values.</returns>
+        </member>
+        <member name="M:LemonUI.Extensions.SizeExtensions.ToAbsolute(System.Drawing.SizeF)">
+            <summary>
+            Converts a normalized 0-1 size into an absolute one.
+            </summary>
+            <param name="size">The relative SizeF.</param>
+            <returns>A new SizeF with absolute values.</returns>
+        </member>
+        <member name="T:LemonUI.IContainer`1">
+            <summary>
+            Represents a container that can hold other UI Elements.
+            </summary>
+        </member>
+        <member name="M:LemonUI.IContainer`1.Add(`0)">
+            <summary>
+            Adds the specified item into the Container.
+            </summary>
+            <param name="item">The item to add.</param>
+        </member>
+        <member name="M:LemonUI.IContainer`1.Remove(`0)">
+            <summary>
+            Removes the item from the container.
+            </summary>
+            <param name="item">The item to remove.</param>
+        </member>
+        <member name="M:LemonUI.IContainer`1.Remove(System.Func{`0,System.Boolean})">
+            <summary>
+            Removes all of the items that match the function.
+            </summary>
+            <param name="func">The function to check items.</param>
+        </member>
+        <member name="M:LemonUI.IContainer`1.Clear">
+            <summary>
+            Clears all of the items in the container.
+            </summary>
+        </member>
+        <member name="M:LemonUI.IContainer`1.Contains(`0)">
+            <summary>
+            Checks if the item is part of the container.
+            </summary>
+            <param name="item">The item to check.</param>
+            <returns><see langword="true"/> if the item is in this container, <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="T:LemonUI.IDrawable">
+            <summary>
+            Represents an item that can be drawn.
+            </summary>
+        </member>
+        <member name="M:LemonUI.IDrawable.Draw">
+            <summary>
+            Draws the item on the screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.IProcessable">
+            <summary>
+            Interface for items that can be processed in an Object Pool.
+            </summary>
+        </member>
+        <member name="P:LemonUI.IProcessable.Visible">
+            <summary>
+            If this processable item is visible on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.IProcessable.Process">
+            <summary>
+            Processes the object.
+            </summary>
+        </member>
+        <member name="T:LemonUI.IRecalculable">
+            <summary>
+            Interface for classes that have values that need to be recalculated on resolution changes.
+            </summary>
+        </member>
+        <member name="M:LemonUI.IRecalculable.Recalculate">
+            <summary>
+            Recalculates the values.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.BadgeSet">
+            <summary>
+            Represents a badge that can be applied to a <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.BadgeSet.NormalDictionary">
+            <summary>
+            The texture dictionary where the normal texture is located.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.BadgeSet.NormalTexture">
+            <summary>
+            The texture to use when the item is not hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.BadgeSet.HoveredDictionary">
+            <summary>
+            The texture dictionary where the normal texture is located.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.BadgeSet.HoveredTexture">
+            <summary>
+            The texture to use when the item is hovered.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.BadgeSet.#ctor">
+            <summary>
+            Creates a new empty <see cref="T:LemonUI.Menus.BadgeSet"/>.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.BadgeSet.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.BadgeSet"/> where both textures are in the same dictionary.
+            </summary>
+            <param name="dict">The dictionary where the textures are located.</param>
+            <param name="normal">The normal texture name.</param>
+            <param name="hovered">The hovered texture name.</param>
+        </member>
+        <member name="M:LemonUI.Menus.BadgeSet.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.BadgeSet"/> where both textures are in different dictionaries.
+            </summary>
+            <param name="normalDict">The dictionary where the normal texture is located.</param>
+            <param name="normalTexture">The normal texture name.</param>
+            <param name="hoveredDict">The dictionary where the hovered texture is located.</param>
+            <param name="hoveredTexture">The hovered texture name.</param>
+        </member>
+        <member name="T:LemonUI.Menus.ColorSet">
+            <summary>
+            Stores the different colors required to make the colors of a <see cref="T:LemonUI.Menus.NativeItem"/> dynamic.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.TitleNormal">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.Title"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is not hovered and enabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.TitleHovered">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.Title"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.TitleDisabled">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.Title"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is disabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.AltTitleNormal">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.AltTitle"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is not hovered and enabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.AltTitleHovered">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.AltTitle"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.AltTitleDisabled">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.AltTitle"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is disabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.ArrowsNormal">
+            <summary>
+            The color of the <see cref="T:LemonUI.Menus.NativeSlidableItem"/> arrows when the item is not hovered and enabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.ArrowsHovered">
+            <summary>
+            The color of the <see cref="T:LemonUI.Menus.NativeSlidableItem"/> arrows when the item is hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.ArrowsDisabled">
+            <summary>
+            The color of the <see cref="T:LemonUI.Menus.NativeSlidableItem"/> arrows when the item is disabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeLeftNormal">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.LeftBadge"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is not hovered and enabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeLeftHovered">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.LeftBadge"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeLeftDisabled">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.LeftBadge"/> when the <see cref="T:LemonUI.Menus.NativeItem"/> is disabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeRightNormal">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.RightBadge"/> or <see cref="T:LemonUI.Menus.NativeCheckboxItem"/> checkbox when the <see cref="T:LemonUI.Menus.NativeItem"/> is not hovered and enabled.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeRightHovered">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.RightBadge"/> or <see cref="T:LemonUI.Menus.NativeCheckboxItem"/> checkbox when the <see cref="T:LemonUI.Menus.NativeItem"/> is hovered.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BadgeRightDisabled">
+            <summary>
+            The color of the <see cref="P:LemonUI.Menus.NativeItem.RightBadge"/> or <see cref="T:LemonUI.Menus.NativeCheckboxItem"/> checkbox when the <see cref="T:LemonUI.Menus.NativeItem"/> is disabled.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeCheckboxItem">
+            <summary>
+            Rockstar-like checkbox item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeCheckboxItem.check">
+            <summary>
+            The image shown on the checkbox.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeCheckboxItem.checked_">
+            <summary>
+            If this item is checked or not.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeCheckboxItem.Checked">
+            <summary>
+            If this item is checked or not.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeCheckboxItem.CheckboxChanged">
+            <summary>
+            Event triggered when the checkbox changes.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.#ctor(System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeCheckboxItem"/>.
+            </summary>
+            <param name="title">The title used for the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.#ctor(System.String,System.Boolean)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeCheckboxItem"/>.
+            </summary>
+            <param name="title">The title used for the Item.</param>
+            <param name="check">If the checkbox should be enabled or not.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeCheckboxItem"/>.
+            </summary>
+            <param name="title">The title used for the Item.</param>
+            <param name="description">The description of the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.#ctor(System.String,System.String,System.Boolean)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeCheckboxItem"/>.
+            </summary>
+            <param name="title">The title used for the Item.</param>
+            <param name="description">The description of the Item.</param>
+            <param name="check">If the checkbox should be enabled or not.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.Toggle(System.Object,System.EventArgs)">
+            <summary>
+            Inverts the checkbox activation.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.UpdateTexture(System.Boolean)">
+            <summary>
+            Updates the texture of the sprite.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the item positions and sizes with the specified values.
+            </summary>
+            <param name="pos">The position of the item.</param>
+            <param name="size">The size of the item.</param>
+            <param name="selected">If this item has been selected.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.Draw">
+            <summary>
+            Draws the Checkbox on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeCheckboxItem.UpdateColors">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.Menus.ColorTitleStyle">
+            <summary>
+            The Style of title for the Color Panel.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.ColorTitleStyle.None">
+            <summary>
+            Does not shows any Title.
+            The count will still be shown if <see cref="P:LemonUI.Menus.NativeColorPanel.ShowCount"/> is set to <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.ColorTitleStyle.Simple">
+            <summary>
+            Shows a Simple Title for all of the Colors.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.ColorTitleStyle.ColorName">
+            <summary>
+            Shows the Color Name as the Title.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeColorData">
+            <summary>
+            Represents the Color Information shown on the Panel.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorData.Name">
+            <summary>
+            The name of the color.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorData.Color">
+            <summary>
+            The RGBA values of the color.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorData.#ctor(System.String,System.Drawing.Color)">
+            <summary>
+            Creates a new Color Panel information.
+            </summary>
+            <param name="name">The name of the color.</param>
+            <param name="color">The RGBA values of the color.</param>
+        </member>
+        <member name="T:LemonUI.Menus.NativeColorPanel">
+            <summary>
+            A Panel that allows you to select a Color.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.leftDifference">
+            <summary>
+            The space difference for the colors and opacity bar on the left.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.rightDifference">
+            <summary>
+            The space difference for the colors and opacity bar on the left.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.lastPosition">
+            <summary>
+            The position reported after the last Recalculation.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.lastWidth">
+            <summary>
+            The Width reported after the last Recalculation.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.title">
+            <summary>
+            The title of the Color Panel.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.selectionRectangle">
+            <summary>
+            The rectangle used for marking the item selection on the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.opacityText">
+            <summary>
+            The "Opacity" text when the opacity bar is enabled
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.percentMin">
+            <summary>
+            The zero percent text when the opacity bar is enabled.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.percentMax">
+            <summary>
+            The 100 percent text when the opacity bar is enabled.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.opacityForeground">
+            <summary>
+            The top section of the opacity bar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.opacityBackground">
+            <summary>
+            The background of the opacity bar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.showOpacity">
+            <summary>
+            If the opacity bar is available to the user.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.opacity">
+            <summary>
+            The current value of the opacity slider.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.index">
+            <summary>
+            The current index of the Colors.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.firstItem">
+            <summary>
+            The position of the first item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.maxItems">
+            <summary>
+            The maximum number of items shown at once.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.simpleTitle">
+            <summary>
+            The generic title for this color.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.titleStyle">
+            <summary>
+            The style of the title.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.showCount">
+            <summary>
+            If the number of colors should be shown.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.visibleItems">
+            <summary>
+            The items that are currently visible on the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeColorPanel.DefaultSound">
+            <summary>
+            The default sound used for the Color Navigation.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.Clickable">
+            <inheritdoc/>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.ShowOpacity">
+            <summary>
+            If the Opacity selector should be shown.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.Opacity">
+            <summary>
+            The opacity value from 0 to 100.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.SelectedColor">
+            <summary>
+            Returns the currently selected color with the opacity taken into account.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.SelectedItem">
+            <summary>
+            Returns the currently selected <see cref="T:LemonUI.Menus.NativeColorData"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.SelectedIndex">
+            <summary>
+            The index of the currently selected Color.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.Title">
+            <summary>
+            The Title used for the Panel when <see cref="P:LemonUI.Menus.NativeColorPanel.TitleStyle"/> is set to <see cref="F:LemonUI.Menus.ColorTitleStyle.Simple"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.TitleStyle">
+            <summary>
+            The style of the Panel Title.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.ShowCount">
+            <summary>
+            If the count of items should be shown as part of the title.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.MaxItems">
+            <summary>
+            THe maximum number of items shown on the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.Colors">
+            <summary>
+            The colors shown on this Panel.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeColorPanel.Sound">
+            <summary>
+            The sound played when the item is changed.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.#ctor">
+            <summary>
+            Creates a color panel with no Items or Title.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.#ctor(System.String,LemonUI.Menus.NativeColorData[])">
+            <summary>
+            Creates a Panel with a specific Title and set of Colors.
+            </summary>
+            <param name="title">The title of the panel.</param>
+            <param name="colors">The colors of the panel.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.UpdateTitle">
+            <summary>
+            Updates the Text of the Title.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.UpdateItems">
+            <summary>
+            Updates the position of the Items.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.UpdateOpacityBar">
+            <summary>
+            Updates the size of the opacity bar.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Recalculate">
+            <summary>
+            Recalculates the Color panel with the last known Position and Width.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Previous">
+            <summary>
+            Moves to the Previous Color.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Next">
+            <summary>
+            Moves to the Next Color.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Add(LemonUI.Menus.NativeColorData)">
+            <summary>
+            Adds a color to the Panel.
+            </summary>
+            <param name="color">The color to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Remove(LemonUI.Menus.NativeColorData)">
+            <summary>
+            Removes a color from the panel.
+            </summary>
+            <param name="color">The color to remove.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Remove(System.Func{LemonUI.Menus.NativeColorData,System.Boolean})">
+            <summary>
+            Removes all of the 
+            </summary>
+            <param name="func"></param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Clear">
+            <summary>
+            Removes all of the colors from the Panel.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Contains(LemonUI.Menus.NativeColorData)">
+            <summary>
+            Checks if the Color Data is present on this Panel.
+            </summary>
+            <param name="color">The Color Data to check.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Recalculate(System.Drawing.PointF,System.Single)">
+            <summary>
+            Recalculates the position of the Color Panel.
+            </summary>
+            <param name="position">The position of the panel.</param>
+            <param name="width">The width of the menu.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeColorPanel.Process">
+            <summary>
+            Draws the Color Panel.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeDynamicItem`1">
+            <summary>
+            Dynamic Items allow you to dynamically change the item shown to the user.
+            </summary>
+            <typeparam name="T">The type of item.</typeparam>
+        </member>
+        <member name="P:LemonUI.Menus.NativeDynamicItem`1.SelectedItem">
+            <summary>
+            The currently selected item.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeDynamicItem`1.ItemChanged">
+            <summary>
+            Event triggered when the user has changed the item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.#ctor(System.String)">
+            <summary>
+            Creates a new Dynamic List Item.
+            </summary>
+            <param name="title">The Title of the item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.#ctor(System.String,`0)">
+            <summary>
+            Creates a new Dynamic List Item.
+            </summary>
+            <param name="title">The Title of the item.</param>
+            <param name="item">The Item to set.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new Dynamic List Item.
+            </summary>
+            <param name="title">The Title of the item.</param>
+            <param name="description">The Description of the item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.#ctor(System.String,System.String,`0)">
+            <summary>
+            Creates a new Dynamic List Item.
+            </summary>
+            <param name="title">The Title of the item.</param>
+            <param name="description">The Description of the item.</param>
+            <param name="item">The Item to set.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.UpdateItemName">
+            <summary>
+            Updates the currently selected item based on the index.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.GoLeft">
+            <summary>
+            Gets the previous item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.GoRight">
+            <summary>
+            Gets the next item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the position of the current List Item.
+            </summary>
+            <param name="pos">The new position of the item.</param>
+            <param name="size">The Size of the item.</param>
+            <param name="selected">If the item is selected or not.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.Draw">
+            <summary>
+            Draws the List on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeDynamicItem`1.UpdateColors">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.Menus.GridStyle">
+            <summary>
+            The style of the Grid Panel.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.GridStyle.Full">
+            <summary>
+            The full grid with X and Y values.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.GridStyle.Row">
+            <summary>
+            A single row on the center with the X value only.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.GridStyle.Column">
+            <summary>
+            A single column on the center with the Y value only.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.GridValueChangedEventHandler">
+            <summary>
+            Represents the method that is called when the value on a grid is changed.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">An <see cref="T:LemonUI.Menus.ItemActivatedArgs"/> with the item information.</param>
+        </member>
+        <member name="T:LemonUI.Menus.GridValueChangedArgs">
+            <summary>
+            Represents the Previous and Current X and Y values when changing the position on a grid.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.GridValueChangedArgs.Before">
+            <summary>
+            The values present before they were changed.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.GridValueChangedArgs.After">
+            <summary>
+            The values present after they were changed.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeGridPanel">
+            <summary>
+            Represents a grid where you can select X and Y values.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.Clickable">
+            <inheritdoc/>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.X">
+            <summary>
+            The X value between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.Y">
+            <summary>
+            The X value between 0 and 1.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.LabelTop">
+            <summary>
+            The text label shown on the top.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.LabelBottom">
+            <summary>
+            The text label shown on the bottom.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.LabelLeft">
+            <summary>
+            The text label shown on the left.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.LabelRight">
+            <summary>
+            The text label shown on the right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeGridPanel.Style">
+            <summary>
+            The style of this grid.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeGridPanel.ValuesChanged">
+            <summary>
+            Event triggered when X and/or Y values are changed.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeGridPanel.#ctor">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeGridPanel"/>.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeGridPanel.Recalculate(System.Drawing.PointF,System.Single)">
+            <inheritdoc/>
+        </member>
+        <member name="M:LemonUI.Menus.NativeGridPanel.Process">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.Menus.NativeItem">
+            <summary>
+            Basic Rockstar-like item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.title">
+            <summary>
+            The title of the object.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.lastPosition">
+            <summary>
+            The last known Item Position.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.lastSize">
+            <summary>
+            The last known Item Size.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.lastSelected">
+            <summary>
+            The last known Item Selection.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.badgeLeft">
+            <summary>
+            The left badge of the Item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.badgeRight">
+            <summary>
+            The left badge of the Item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeItem.altTitle">
+            <summary>
+            The alternate title of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Enabled">
+            <summary>
+            If this item can be used or not.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Tag">
+            <summary>
+            Object that contains data about this Item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Title">
+            <summary>
+            The title of the item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.AltTitle">
+            <summary>
+            The alternative title of the item shown on the right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.TitleFont">
+            <summary>
+            The font of title item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.AltTitleFont">
+            <summary>
+            The font of alternative title item shown on the right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Description">
+            <summary>
+            The description of the item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.LeftBadge">
+            <summary>
+            The Left badge of the Item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.LeftBadgeSet">
+            <summary>
+            The Left badge set of the Item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.RightBadge">
+            <summary>
+            The Right badge of the Item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.RightBadgeSet">
+            <summary>
+            The Right badge set of the Item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Colors">
+            <summary>
+            The different colors that change dynamically when the item is used.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.Panel">
+            <summary>
+            The Panel asociated to this <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeItem.Selected">
+            <summary>
+            Event triggered when the item is selected.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeItem.Activated">
+            <summary>
+            Event triggered when the item is activated.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeItem.EnabledChanged">
+            <summary>
+            Event triggered when the <see cref="P:LemonUI.Menus.NativeItem.Enabled"/> property is changed.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.#ctor(System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+            <param name="title">The title of the item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+            <param name="title">The title of the item.</param>
+            <param name="description">The description of the item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+            <param name="title">The title of the item.</param>
+            <param name="description">The description of the item.</param>
+            <param name="altTitle">The alternative title of the item, shown on the right.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.OnSelected(System.Object,LemonUI.Menus.SelectedEventArgs)">
+            <summary>
+            Triggers the Selected event.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.OnActivated(System.Object)">
+            <summary>
+            Triggers the Activated event.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.Recalculate">
+            <summary>
+            Recalculates the item with the last known values.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the item positions and sizes with the specified values.
+            </summary>
+            <param name="pos">The position of the item.</param>
+            <param name="size">The size of the item.</param>
+            <param name="selected">If this item has been selected.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.Draw">
+            <summary>
+            Draws the item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeItem.UpdateColors">
+            <summary>
+            Updates the colors of the <see cref="N:LemonUI.Elements"/> from the <see cref="P:LemonUI.Menus.NativeItem.Colors"/> <see cref="T:LemonUI.Menus.ColorSet"/>.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.ItemChangedEventHandler`1">
+            <summary>
+            Represents the method that is called when the selected item is changed on a List Item.
+            </summary>
+            <typeparam name="T">The type of item that was changed.</typeparam>
+            <param name="sender">The source of the event.</param>
+            <param name="e">A <see cref="T:LemonUI.Menus.ItemChangedEventArgs`1"/> with the information of the selected item.</param>
+        </member>
+        <member name="T:LemonUI.Menus.Direction">
+            <summary>
+            The movement direction of the item change.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.Direction.Unknown">
+            <summary>
+            The Direction is Unknown.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.Direction.Left">
+            <summary>
+            The item was moved to the Left.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.Direction.Right">
+            <summary>
+            The item was moved to the Right.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.ItemChangedEventArgs`1">
+            <summary>
+            Represents the change of the selection of an item.
+            </summary>
+            <typeparam name="T">The type of object that got changed.</typeparam>
+        </member>
+        <member name="P:LemonUI.Menus.ItemChangedEventArgs`1.Object">
+            <summary>
+            The new object.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ItemChangedEventArgs`1.Index">
+            <summary>
+            The index of the object.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ItemChangedEventArgs`1.Direction">
+            <summary>
+            The direction of the Item Changed event.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeListItem">
+            <summary>
+            Base class for list items.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeListItem.text">
+            <summary>
+            The text of the current item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new list item with a title and subtitle.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="subtitle">The subtitle of the Item.</param>
+        </member>
+        <member name="T:LemonUI.Menus.NativeListItem`1">
+            <summary>
+            An item that allows you to scroll between a set of objects.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeListItem`1.SelectedIndex">
+            <summary>
+            The index of the currently selected index.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeListItem`1.SelectedItem">
+            <summary>
+            The currently selected item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeListItem`1.Items">
+            <summary>
+            The objects used by this item.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeListItem`1.ItemChanged">
+            <summary>
+            Event triggered when the selected item is changed.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.#ctor(System.String,`0[])">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeListItem"/>.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="objs">The objects that are available on the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.#ctor(System.String,System.String,`0[])">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.NativeListItem"/>.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="subtitle">The subtitle of the Item.</param>
+            <param name="objs">The objects that are available on the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.TriggerEvent(System.Int32,LemonUI.Menus.Direction)">
+            <summary>
+            Triggers the <seealso cref="T:LemonUI.Menus.ItemChangedEventHandler`1"/> event.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.UpdateIndex">
+            <summary>
+            Updates the currently selected item based on the index.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Add(`0)">
+            <summary>
+            Adds a <typeparamref name="T" /> into this item.
+            </summary>
+            <param name="item">The <typeparamref name="T" /> to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Add(System.Int32,`0)">
+            <summary>
+            Adds a <typeparamref name="T" /> in a specific location.
+            </summary>
+            <param name="position">The position where the item should be added.</param>
+            <param name="item">The <typeparamref name="T" /> to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Remove(`0)">
+            <summary>
+            Removes a specific <typeparamref name="T" />.
+            </summary>
+            <param name="item">The <typeparamref name="T" /> to remove.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.RemoveAt(System.Int32)">
+            <summary>
+            Removes a <typeparamref name="T" /> at a specific location.
+            </summary>
+            <param name="position">The position of the <typeparamref name="T" />.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Remove(System.Func{`0,System.Boolean})">
+            <summary>
+            Removes all of the items that match the <paramref name="pred"/>.
+            </summary>
+            <param name="pred">The function to use as a check.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Clear">
+            <summary>
+            Removes all of the <typeparamref name="T" /> from this item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the item positions and sizes with the specified values.
+            </summary>
+            <param name="pos">The position of the item.</param>
+            <param name="size">The size of the item.</param>
+            <param name="selected">If this item has been selected.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.GoLeft">
+            <summary>
+            Moves to the previous item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.GoRight">
+            <summary>
+            Moves to the next item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.Draw">
+            <summary>
+            Draws the List on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeListItem`1.UpdateColors">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.Menus.SelectedEventHandler">
+            <summary>
+            Represents the method that is called when a new item is selected in the Menu.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">A <see cref="T:LemonUI.Menus.SelectedEventArgs"/> with the index information.</param>
+        </member>
+        <member name="T:LemonUI.Menus.ItemActivatedEventHandler">
+            <summary>
+            Represents the method that is called when an item is activated on a menu.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">An <see cref="T:LemonUI.Menus.ItemActivatedArgs"/> with the item information.</param>
+        </member>
+        <member name="T:LemonUI.Menus.SelectedEventArgs">
+            <summary>
+            Represents the selection of an item in the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.SelectedEventArgs.Index">
+            <summary>
+            The index of the item in the full list of items.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.SelectedEventArgs.OnScreen">
+            <summary>
+            The index of the item in the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.SelectedEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Menus.SelectedEventArgs"/>.
+            </summary>
+            <param name="index">The index of the item in the menu.</param>
+            <param name="screen">The index of the item based on the number of items shown on screen,</param>
+        </member>
+        <member name="T:LemonUI.Menus.ItemActivatedArgs">
+            <summary>
+            Represents the arguments of an item activation.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ItemActivatedArgs.Item">
+            <summary>
+            The item that was just activated.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.CountVisibility">
+            <summary>
+            The visibility setting for the Item Count of the Menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.CountVisibility.Never">
+            <summary>
+            The Item Count is never shown.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.CountVisibility.Auto">
+            <summary>
+            The Item Count is shown when is not possible to show all of the items in the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.CountVisibility.Always">
+            <summary>
+            The Item Count is always shown.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeMenu">
+            <summary>
+            Menu that looks like the ones used by Rockstar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.DefaultActivatedSound">
+            <summary>
+            The default <see cref="T:LemonUI.Sound"/> played when the current <see cref="T:LemonUI.Menus.NativeItem"/> is changed or activated.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.DefaultCloseSound">
+            <summary>
+            The default <see cref="T:LemonUI.Sound"/> played when the menu is closed.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.DefaultUpDownSound">
+            <summary>
+            The default <see cref="T:LemonUI.Sound"/> played when the user navigates Up and Down.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.DefaultLeftRightSound">
+            <summary>
+            The default <see cref="T:LemonUI.Sound"/> played when the user navigates Left and Right on a <see cref="T:LemonUI.Menus.NativeSlidableItem"/>.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.DefaultDisabledSound">
+            <summary>
+            The default <see cref="T:LemonUI.Sound"/> played when the user activates a <see cref="T:LemonUI.Menus.NativeItem"/> that is disabled.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.searchAreaSize">
+            <summary>
+            The search area size for the cursor rotation.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.controlsRequired">
+            <summary>
+            The controls required by the menu with both a gamepad and mouse + keyboard.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.controlsCamera">
+            <summary>
+            Controls required for the camera to work.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.controlsGamepad">
+            <summary>
+            The controls required in a gamepad.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.subtitleHeight">
+            <summary>
+            The height of the menu subtitle background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.itemHeight">
+            <summary>
+            The height of one of the items in the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.heightDiffDescImg">
+            <summary>
+            The height difference between the description and the end of the items.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.heightDiffDescTxt">
+            <summary>
+            The height difference between the background and text of the description.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.posXDescTxt">
+            <summary>
+            The X position of the description text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.itemOffsetX">
+            <summary>
+            The offset to the X value of the item title.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.itemOffsetY">
+            <summary>
+            The offset to the Y value of the item title.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.controls">
+            <summary>
+            A list of GTA V Controls.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.justOpenedControlChecks">
+            <summary>
+            If the menu has just been opened and we should check the controls.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.visibleItems">
+            <summary>
+            The list of visible items on the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.subtitle">
+            <summary>
+            The subtitle of the menu, without any changes.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.visible">
+            <summary>
+            If the menu is visible or not.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.safeZoneAware">
+            <summary>
+            If this menu should be aware of the Safe Zone when doing calculations.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.index">
+            <summary>
+            The index of the selected item in the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.width">
+            <summary>
+            The width of the menu itself.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.alignment">
+            <summary>
+            The alignment of the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.offset">
+            <summary>
+            The offset of the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.bannerImage">
+            <summary>
+            The banner of the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.subtitleImage">
+            <summary>
+            The background of the drawable text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.subtitleText">
+            <summary>
+            The text of the subtitle.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.countText">
+            <summary>
+            The text that shows the current total and index of items.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.backgroundImage">
+            <summary>
+            The image on the background of the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.selectedRect">
+            <summary>
+            The rectangle that shows the currently selected item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.descriptionRect">
+            <summary>
+            The rectangle with the description text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.descriptionText">
+            <summary>
+            The text with the description text.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.maxItems">
+            <summary>
+            The maximum allowed number of items in the menu at once.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.firstItem">
+            <summary>
+            The first item in the menu.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.searchAreaRight">
+            <summary>
+            The search area on the right side of the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.upSince">
+            <summary>
+            The time sice the player has been pressing the Up button.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeMenu.downSince">
+            <summary>
+            The time sice the player has been pressing the Down button.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Visible">
+            <summary>
+            If the menu is visible on the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Title">
+            <summary>
+            The title of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.TitleFont">
+            <summary>
+            The font of title menu text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SubtitleFont">
+            <summary>
+            The font of subtitle text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.DescriptionFont">
+            <summary>
+            The font of description text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.ItemCountFont">
+            <summary>
+            The font of item count text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Banner">
+            <summary>
+            The banner shown at the top of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Offset">
+            <summary>
+            The offset of the menu position.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SelectedItem">
+            <summary>
+            Returns the currently selected item.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SelectedIndex">
+            <summary>
+            The current index of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Width">
+            <summary>
+            The width of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Alignment">
+            <summary>
+            The alignment of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Subtitle">
+            <summary>
+            The subtitle of the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Description">
+            <summary>
+            The description used when this menu is used as a submenu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.UseMouse">
+            <summary>
+            If the mouse should be used for navigating the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.CloseOnInvalidClick">
+            <summary>
+            If the menu should be closed when the user clicks out of bounds (aka anywhere else other than the items).
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.RotateCamera">
+            <summary>
+            If the camera should be rotated when the cursor is on the left and right corners of the screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Items">
+            <summary>
+            The items that this menu contain.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.NoItemsText">
+            <summary>
+            Text shown when there are no items in the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.ResetCursorWhenOpened">
+            <summary>
+            If the cursor should be reset when the menu is opened.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.MaxItems">
+            <summary>
+            The maximum allowed number of items in the menu at once.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SafeZoneAware">
+            <summary>
+            If this menu should be aware of the Safe Zone when doing calculations.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.ItemCount">
+            <summary>
+            If the count of items should be shown on the right of the subtitle.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Buttons">
+            <summary>
+            The instructional buttons shown in the bottom right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.Parent">
+            <summary>
+            The parent menu of this menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.AcceptsInput">
+            <summary>
+            If the menu accepts user input for navigation.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.DisableControls">
+            <summary>
+            If the conflictive controls should be disabled while the menu is open.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.HeldTime">
+            <summary>
+            The time between item changes when holding left, right, up or down.
+            </summary>
+            <remarks>
+            This property can be set to zero to completely disable it.
+            </remarks>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.RequiredControls">
+            <summary>
+            The controls that are required for some menu operations.
+            </summary>
+            <remarks>
+            Add controls to this list when you want to detect them as pressed while the menu is open.
+            </remarks>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundOpened">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when the menu is opened.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundActivated">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when a <see cref="T:LemonUI.Menus.NativeItem"/> is activated.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundClose">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when the menu is closed.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundUpDown">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when the user navigates Up or Down the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundLeftRight">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when the user navigates Left and Right on a <see cref="T:LemonUI.Menus.NativeSlidableItem"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeMenu.SoundDisabled">
+            <summary>
+            The <see cref="T:LemonUI.Sound"/> played when the user activates a <see cref="T:LemonUI.Menus.NativeItem"/> that is disabled.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.Opening">
+            <summary>
+            Event triggered when the menu is being opened.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.Shown">
+            <summary>
+            Event triggered when the menu is opened and shown to the user.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.Closing">
+            <summary>
+            Event triggered when the menu starts closing.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.Closed">
+            <summary>
+            Event triggered when the menu finishes closing.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.SelectedIndexChanged">
+            <summary>
+            Event triggered when the index has been changed.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeMenu.ItemActivated">
+            <summary>
+            Event triggered when an item in the menu is activated.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.#ctor(System.String)">
+            <summary>
+            Creates a new menu with the specified title.
+            </summary>
+            <param name="title">The title of the menu.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new menu with the specified title and subtitle.
+            </summary>
+            <param name="title">The title of the menu.</param>
+            <param name="subtitle">The subtitle of this menu.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new menu with the specified title, subtitle and description.
+            </summary>
+            <param name="title">The title of the menu.</param>
+            <param name="subtitle">The subtitle of this menu.</param>
+            <param name="description">The description used for submenus.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.#ctor(System.String,System.String,System.String,LemonUI.Elements.I2Dimensional)">
+            <summary>
+            Creates a new menu with the specified title, subtitle, description and banner.
+            </summary>
+            <param name="title">The title of the menu.</param>
+            <param name="subtitle">The subtitle of this menu.</param>
+            <param name="description">The description used for submenus.</param>
+            <param name="banner">The drawable to use as the banner.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.UpdateItemList">
+            <summary>
+            Updates the list of visible items on the screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.TriggerSelectedItem">
+            <summary>
+            Triggers the Selected event for the current item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.RecalculatePanel">
+            <summary>
+            Recalculates the Position and Size of the Panel of the Selected Item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.ResetCursor">
+            <summary>
+            Resets the current position of the cursor.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.UpdateItems">
+            <summary>
+            Updates the positions of the items.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.UpdateDescription">
+            <summary>
+            Updates the size and text of the description.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.ProcessControls">
+            <summary>
+            Processes the button presses.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Draw">
+            <summary>
+            Draws the UI Elements.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Add(LemonUI.Menus.NativeItem)">
+            <summary>
+            Adds an item at the end of the menu.
+            </summary>
+            <param name="item">The item to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Add(System.Int32,LemonUI.Menus.NativeItem)">
+            <summary>
+            Adds an item at the specified position.
+            </summary>
+            <param name="position">The position of the item.</param>
+            <param name="item">The item to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.AddSubMenu(LemonUI.Menus.NativeMenu)">
+            <summary>
+            Adds a specific menu as a submenu with an item.
+            </summary>
+            <param name="menu">The menu to add.</param>
+            <returns>The item that points to the submenu.</returns>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.AddSubMenu(LemonUI.Menus.NativeMenu,System.String)">
+            <summary>
+            Adds a specific menu as a submenu with an item and endlabel string.
+            </summary>
+            <param name="menu">The menu to add.</param>
+            <param name="endlabel">The alternative title of the item, shown on the right.</param>
+            <returns>The item that points to the submenu.</returns>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Remove(LemonUI.Menus.NativeItem)">
+            <summary>
+            Removes an item from the menu.
+            </summary>
+            <param name="item">The item to remove.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Remove(System.Func{LemonUI.Menus.NativeItem,System.Boolean})">
+            <summary>
+            Removes the items that match the predicate.
+            </summary>
+            <param name="pred">The function to use as a check.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Clear">
+            <summary>
+            Removes all of the items from this menu.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Contains(LemonUI.Menus.NativeItem)">
+            <summary>
+            Checks if an item is part of the menu.
+            </summary>
+            <param name="item">The item to check.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Process">
+            <summary>
+            Draws the menu and handles the controls.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Recalculate">
+            <summary>
+            Calculates the positions and sizes of the elements.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Back">
+            <summary>
+            Returns to the previous menu or closes the existing one.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Open">
+            <summary>
+            Opens the menu.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Close">
+            <summary>
+            Closes the menu.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Previous">
+            <summary>
+            Moves to the previous item.
+            Does nothing if the menu has no items.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeMenu.Next">
+            <summary>
+            Moves to the next item.
+            Does nothing if the menu has no items.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativePanel">
+            <summary>
+            Represents a panel shown under the description of the item description.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativePanel.Visible">
+            <summary>
+            If this panel is visible to the user.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativePanel.Clickable">
+            <summary>
+            If the item has controls that can be clicked.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativePanel.Background">
+            <summary>
+            The Background of the panel itself.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativePanel.Recalculate(System.Drawing.PointF,System.Single)">
+            <summary>
+            Recalculates the menu contents.
+            </summary>
+            <param name="position">The position of the panel.</param>
+            <param name="width">The width of the menu.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativePanel.Process">
+            <summary>
+            Processes and Draws the panel.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeSeparatorItem">
+            <summary>
+            A Blank Separator Item for creating empty spaces between menu items.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSeparatorItem.#ctor">
+            <summary>
+            Creates a new Menu Separator.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSeparatorItem.Draw">
+            <summary>
+            Draws nothing.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeSlidableItem">
+            <summary>
+            Basic elements for a slidable item.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSlidableItem.arrowLeft">
+            <summary>
+            The arrow pointing to the Left.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSlidableItem.arrowRight">
+            <summary>
+            The arrow pointing to the Right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSlidableItem.LeftArrow">
+            <summary>
+            The arrow pointing to the Left.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSlidableItem.RightArrow">
+            <summary>
+            The arrow pointing to the Right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSlidableItem.ArrowsAlwaysVisible">
+            <summary>
+            Whether the arrows should always be shown regardless of the visibility of the Item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new item that can be sliden.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="description">The description of the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the item positions and sizes with the specified values.
+            </summary>
+            <param name="pos">The position of the item.</param>
+            <param name="size">The size of the item.</param>
+            <param name="selected">If this item has been selected.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.GoLeft">
+            <summary>
+            Moves to the previous item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.GoRight">
+            <summary>
+            Moves to the next item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.Draw">
+            <summary>
+            Draws the left and right arrow.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSlidableItem.UpdateColors">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.Menus.NativeSliderItem">
+            <summary>
+            A slider item for changing integer values.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSliderItem.background">
+            <summary>
+            The background of the slider.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSliderItem.slider">
+            <summary>
+            THe front of the slider.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSliderItem.maximum">
+            <summary>
+            The maximum value of the slider.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Menus.NativeSliderItem._value">
+            <summary>
+            The current value of the slider.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSliderItem.Maximum">
+            <summary>
+            The maximum value of the slider.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSliderItem.Value">
+            <summary>
+            The current value of the slider.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSliderItem.Multiplier">
+            <summary>
+            The multiplier for increasing and decreasing the value.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Menus.NativeSliderItem.ValueChanged">
+            <summary>
+            Event triggered when the value of the menu changes.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.#ctor(System.String)">
+            <summary>
+            Creates a <see cref="T:LemonUI.Menus.NativeSliderItem"/> with a maximum of 100.
+            </summary>
+            <param name="title">The title of the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.#ctor(System.String,System.String)">
+            <summary>
+            Creates a <see cref="T:LemonUI.Menus.NativeSliderItem"/> with a maximum of 100.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="description">The description of the Item.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.#ctor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a <see cref="T:LemonUI.Menus.NativeSliderItem"/> with a specific current and maximum value.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="max">The maximum value of the Slider.</param>
+            <param name="value">The current value of the Slider.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.#ctor(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a <see cref="T:LemonUI.Menus.NativeSliderItem"/> with a specific maximum.
+            </summary>
+            <param name="title">The title of the Item.</param>
+            <param name="description">The description of the Item.</param>
+            <param name="max">The maximum value of the Slider.</param>
+            <param name="value">The current value of the Slider.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.UpdatePosition">
+            <summary>
+            Updates the position of the bar based on the value.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.Recalculate(System.Drawing.PointF,System.Drawing.SizeF,System.Boolean)">
+            <summary>
+            Recalculates the item positions and sizes with the specified values.
+            </summary>
+            <param name="pos">The position of the item.</param>
+            <param name="size">The size of the item.</param>
+            <param name="selected">If this item has been selected.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.GoLeft">
+            <summary>
+            Reduces the value of the slider.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.GoRight">
+            <summary>
+            Increases the value of the slider.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSliderItem.Draw">
+            <summary>
+            Draws the slider.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeStatsInfo">
+            <summary>
+            Represents the Information of a specific field in a <see cref="T:LemonUI.Menus.NativeStatsPanel"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeStatsInfo.Name">
+            <summary>
+            The name of the Stats Field.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeStatsInfo.Value">
+            <summary>
+            The value of the Stats bar.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsInfo.#ctor(System.String)">
+            <summary>
+            Creates a new Stat Info with the specified name and value set to zero.
+            </summary>
+            <param name="name">The name of the Stat.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsInfo.#ctor(System.String,System.Int32)">
+            <summary>
+            Creates a new Stat Info with the specified name and value.
+            </summary>
+            <param name="name">The name of the Stat.</param>
+            <param name="value"></param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsInfo.UpdateBars">
+            <summary>
+            Updates the values of the bars.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsInfo.Recalculate(System.Drawing.PointF,System.Single)">
+            <summary>
+            Recalculates the position of the stat Text and Bar.
+            </summary>
+            <param name="position">The new position fot the Stat.</param>
+            <param name="width">The Width of the parent Stats Panel.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsInfo.Draw">
+            <summary>
+            Draws the stat information.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeStatsPanel">
+            <summary>
+            Represents a Statistics panel.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.#ctor(LemonUI.Menus.NativeStatsInfo[])">
+            <summary>
+            Creates a new Stats Panel.
+            </summary>
+            <param name="stats">The Statistics to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Add(LemonUI.Menus.NativeStatsInfo)">
+            <summary>
+            Adds a stat to the player field.
+            </summary>
+            <param name="field">The Field to add.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Remove(LemonUI.Menus.NativeStatsInfo)">
+            <summary>
+            Removes a field from the 
+            </summary>
+            <param name="field"></param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Remove(System.Func{LemonUI.Menus.NativeStatsInfo,System.Boolean})">
+            <summary>
+            Removes the items that match the function.
+            </summary>
+            <param name="func">The function used to match items.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Clear">
+            <summary>
+            Removes all of the Stats fields.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Contains(LemonUI.Menus.NativeStatsInfo)">
+            <summary>
+            Checks if the field is part of the Stats Panel.
+            </summary>
+            <param name="field">The field to check.</param>
+            <returns><see langword="true"/> if the item is part of the Panel, <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Recalculate">
+            <summary>
+            Recalculates the Stats panel with the last known Position and Width.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Recalculate(System.Drawing.PointF,System.Single)">
+            <summary>
+            Recalculates the position of the Stats panel.
+            </summary>
+            <param name="position">The new position of the Stats Panel.</param>
+            <param name="width">The width of the menu.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeStatsPanel.Process">
+            <summary>
+            Processes the Stats Panel.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Menus.NativeSubmenuItem">
+            <summary>
+            Item used for opening submenus.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeSubmenuItem.Menu">
+            <summary>
+            The menu opened by this item.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSubmenuItem.#ctor(LemonUI.Menus.NativeMenu,LemonUI.Menus.NativeMenu)">
+            <summary>
+            Creates a new Item that opens a Submenu.
+            </summary>
+            <param name="menu">The menu that this item will open.</param>
+            <param name="parent">The parent menu where this item will be located.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSubmenuItem.#ctor(LemonUI.Menus.NativeMenu,LemonUI.Menus.NativeMenu,System.String)">
+            <summary>
+            Creates a new Item that opens a Submenu.
+            </summary>
+            <param name="menu">The menu that this item will open.</param>
+            <param name="parent">The parent menu where this item will be located.</param>
+            <param name="endlabel">The alternative title of the item, shown on the right.</param>
+        </member>
+        <member name="M:LemonUI.Menus.NativeSubmenuItem.Draw">
+            <inheritdoc/>
+        </member>
+        <member name="T:LemonUI.ResolutionChangedEventHandler">
+            <summary>
+            Represents the method that reports a Resolution change in the Game Settings.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">A <see cref="T:LemonUI.ResolutionChangedEventArgs"/> containing the Previous and Current resolution.</param>
+        </member>
+        <member name="T:LemonUI.SafeZoneChangedEventHandler">
+            <summary>
+            Represents the method that reports a Safe Zone change in the Game Settings.
+            </summary>
+            <param name="sender">The source of the event event.</param>
+            <param name="e">A <see cref="T:LemonUI.ResolutionChangedEventArgs"/> containing the Previous and Current Safe Zone.</param>
+        </member>
+        <member name="T:LemonUI.ResolutionChangedEventArgs">
+            <summary>
+            Represents the information after a Resolution Change in the game.
+            </summary>
+        </member>
+        <member name="P:LemonUI.ResolutionChangedEventArgs.Before">
+            <summary>
+            The Game Resolution before it was changed.
+            </summary>
+        </member>
+        <member name="P:LemonUI.ResolutionChangedEventArgs.After">
+            <summary>
+            The Game Resolution after it was changed.
+            </summary>
+        </member>
+        <member name="T:LemonUI.SafeZoneChangedEventArgs">
+            <summary>
+            Represents the information after a Safe Zone Change in the game.
+            </summary>
+        </member>
+        <member name="P:LemonUI.SafeZoneChangedEventArgs.Before">
+            <summary>
+            The raw Safezone size before the change.
+            </summary>
+        </member>
+        <member name="P:LemonUI.SafeZoneChangedEventArgs.After">
+            <summary>
+            The Safezone size after the change.
+            </summary>
+        </member>
+        <member name="T:LemonUI.ObjectPool">
+            <summary>
+            Manager for Menus and Items.
+            </summary>
+        </member>
+        <member name="F:LemonUI.ObjectPool.lastKnownResolution">
+            <summary>
+            The last known resolution by the object pool.
+            </summary>
+        </member>
+        <member name="F:LemonUI.ObjectPool.lastKnownSafezone">
+            <summary>
+            The last know Safezone size.
+            </summary>
+        </member>
+        <member name="F:LemonUI.ObjectPool.objects">
+            <summary>
+            The list of processable objects.
+            </summary>
+        </member>
+        <member name="P:LemonUI.ObjectPool.AreAnyVisible">
+            <summary>
+            Checks if there are objects visible on the screen.
+            </summary>
+        </member>
+        <member name="E:LemonUI.ObjectPool.ResolutionChanged">
+            <summary>
+            Event triggered when the game resolution is changed.
+            </summary>
+        </member>
+        <member name="E:LemonUI.ObjectPool.SafezoneChanged">
+            <summary>
+            Event triggered when the Safezone size option in the Display settings is changed.
+            </summary>
+        </member>
+        <member name="M:LemonUI.ObjectPool.DetectResolutionChanges">
+            <summary>
+            Detects resolution changes by comparing the last known resolution and the current one.
+            </summary>
+        </member>
+        <member name="M:LemonUI.ObjectPool.DetectSafezoneChanges">
+            <summary>
+            Detects Safezone changes by comparing the last known value to the current one.
+            </summary>
+        </member>
+        <member name="M:LemonUI.ObjectPool.Add(LemonUI.IProcessable)">
+            <summary>
+            Adds the object into the pool.
+            </summary>
+            <param name="obj">The object to add.</param>
+        </member>
+        <member name="M:LemonUI.ObjectPool.Remove(LemonUI.IProcessable)">
+            <summary>
+            Removes the object from the pool.
+            </summary>
+            <param name="obj">The object to remove.</param>
+        </member>
+        <member name="M:LemonUI.ObjectPool.ForEach``1(System.Action{``0})">
+            <summary>
+            Performs the specified action on each element that matches T.
+            </summary>
+            <typeparam name="T">The type to match.</typeparam>
+            <param name="action">The action delegate to perform on each T.</param>
+        </member>
+        <member name="M:LemonUI.ObjectPool.RefreshAll">
+            <summary>
+            Refreshes all of the items.
+            </summary>
+        </member>
+        <member name="M:LemonUI.ObjectPool.HideAll">
+            <summary>
+            Hides all of the objects.
+            </summary>
+        </member>
+        <member name="M:LemonUI.ObjectPool.Process">
+            <summary>
+            Processes the objects and features in this pool.
+            This needs to be called every tick.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BaseScaleform">
+            <summary>
+            Represents a generic Scaleform object.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BaseScaleform.scaleform">
+            <summary>
+            The ID of the scaleform.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BaseScaleform.Handle">
+            <summary>
+            The ID or Handle of the Scaleform.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BaseScaleform.Name">
+            <summary>
+            The Name of the Scaleform.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BaseScaleform.Visible">
+            <summary>
+            If the Scaleform should be visible or not.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BaseScaleform.IsLoaded">
+            <summary>
+            If the Scaleform is loaded or not.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.#ctor(System.String)">
+            <summary>
+            Creates a new Scaleform class with the specified Scaleform object name.
+            </summary>
+            <param name="sc">The Scalform object.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.IsValueReady(System.Int32)">
+            <summary>
+            Checks if the specified Scaleform Return Value is ready to be fetched.
+            </summary>
+            <param name="id">The Identifier of the Value.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.GetValue``1(System.Int32)">
+            <summary>
+            Gets a specific value.
+            </summary>
+            <typeparam name="T">The type of value.</typeparam>
+            <param name="id">The Identifier of the value.</param>
+            <returns>The value returned by the native.</returns>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.CallFunction(System.String,System.Object[])">
+            <summary>
+            Calls a Scaleform function.
+            </summary>
+            <param name="function">The name of the function to call.</param>
+            <param name="parameters">The parameters to pass.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.CallFunctionReturn(System.String,System.Object[])">
+            <summary>
+            Calls a Scaleform function with a return value.
+            </summary>
+            <param name="function">The name of the function to call.</param>
+            <param name="parameters">The parameters to pass.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.Update">
+            <summary>
+            Updates the parameters of the Scaleform.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.DrawFullScreen">
+            <summary>
+            Draws the scaleform full screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.Draw">
+            <summary>
+            Draws the scaleform full screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.Process">
+            <summary>
+            Draws the scaleform full screen.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BaseScaleform.Dispose">
+            <summary>
+            Marks the scaleform as no longer needed.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.MessageType">
+            <summary>
+            The type for a big message.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.Customizable">
+            <summary>
+            A centered message with customizable text an d background colors.
+            Internally called SHOW_SHARD_CENTERED_MP_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.RankUp">
+            <summary>
+            Used when you rank up on GTA Online.
+            Internally called SHOW_SHARD_CREW_RANKUP_MP_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.MissionPassedOldGen">
+            <summary>
+            The Mission Passed screen on PS3 and Xbox 360.
+            Internally called SHOW_MISSION_PASSED_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.Wasted">
+            <summary>
+            The Message Type shown on the Wasted screen.
+            Internally called SHOW_SHARD_WASTED_MP_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.Plane">
+            <summary>
+            Used on the GTA Online Freemode event announcements.
+            Internally called SHOW_PLANE_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.CopsAndCrooks">
+            <summary>
+            Development leftover from when GTA Online was Cops and Crooks.
+            Internally called SHOW_BIG_MP_MESSAGE.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.Weapon">
+            <summary>
+            Message shown when the player purchases a weapon.
+            Internally called SHOW_WEAPON_PURCHASED.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.MessageType.CenteredLarge">
+            <summary>
+            Unknown where this one is used.
+            Internally called SHOW_CENTERED_MP_MESSAGE_LARGE.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BigMessage">
+            <summary>
+            A customizable big message.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.Title">
+            <summary>
+            The title of the message.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.Message">
+            <summary>
+            The subtitle or description of the message.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.TextColor">
+            <summary>
+            The color of the text.
+            Only used on the Customizable message type.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.BackgroundColor">
+            <summary>
+            The color of the background.
+            Only used on the Customizable message type.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.Rank">
+            <summary>
+            The Rank on Cops and Crooks.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.Weapon">
+            <summary>
+            The hash of the Weapon as an enum.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.WeaponHash">
+            <summary>
+            The hash of the Weapon as it's native value.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BigMessage.Type">
+            <summary>
+            The type of message to show.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String)">
+            <summary>
+            Creates a standard customizable message with just a title.
+            </summary>
+            <param name="title">The title to use.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,LemonUI.Scaleform.MessageType)">
+            <summary>
+            Creates a custom message with the specified title.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="type">The type of message.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String)">
+            <summary>
+            Creates a standard customizable message with a title and message.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a Cops and Crooks message type.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+            <param name="rank">Text to show in the Rank space.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,LemonUI.Scaleform.MessageType)">
+            <summary>
+            Creates a message with the specified type, title and message.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+            <param name="type">The type of message.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.Int32)">
+            <summary>
+            Creates a standard customizable message with a title and a custom text color.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="colorText">The color of the text.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Creates a standard customizable message with a specific title and custom colors.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="colorText">The color of the text.</param>
+            <param name="colorBackground">The color of the background.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,GTA.WeaponHash)">
+            <summary>
+            Creates a Weapon Purchase message with a custom text and weapons.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="weapon">The name of the Weapon.</param>
+            <param name="hash">The hash of the Weapon image.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,System.String,GTA.WeaponHash)">
+            <summary>
+            Creates a Weapon Purchase message with a custom text and weapons.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+            <param name="weapon">The name of the Weapon.</param>
+            <param name="hash">The hash of the Weapon image.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,System.String,GTA.WeaponHash,System.Int32,System.Int32,LemonUI.Scaleform.MessageType)">
+            <summary>
+            Creates a message with all of the selected information.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+            <param name="rank">The Rank on Cops and Crooks.</param>
+            <param name="weapon">The hash of the Weapon image.</param>
+            <param name="colorText">The color of the text.</param>
+            <param name="colorBackground">The color of the background.</param>
+            <param name="type">The type of message.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.#ctor(System.String,System.String,System.String,System.UInt32,System.Int32,System.Int32,LemonUI.Scaleform.MessageType)">
+            <summary>
+            Creates a message with all of the selected information.
+            </summary>
+            <param name="title">The title to use.</param>
+            <param name="message">The message to show.</param>
+            <param name="rank">The Rank on Cops and Crooks.</param>
+            <param name="weapon">The hash of the Weapon image.</param>
+            <param name="colorText">The color of the text.</param>
+            <param name="colorBackground">The color of the background.</param>
+            <param name="type">The type of message.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.Update">
+            <summary>
+            Updates the Message information in the Scaleform.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BruteForceBackground">
+            <summary>
+            The Background of the BruteForce Hack Minigame.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.Black">
+            <summary>
+            A simple Black background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.Purple">
+            <summary>
+            A simple Purple background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.Gray">
+            <summary>
+            A simple Gray background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.LightBlue">
+            <summary>
+            A simple Light Blue background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.Wallpaper1">
+            <summary>
+            A Light Blue Wallpaper.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceBackground.DarkFade">
+            <summary>
+            A Fade from Gray in the center to Black in the corners.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BruteForceStatus">
+            <summary>
+            The status of the BruteForce Hack after finishing.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceStatus.Completed">
+            <summary>
+            The user completed the hack successfully.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceStatus.OutOfTime">
+            <summary>
+            The user ran out of time.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.BruteForceStatus.OutOfLives">
+            <summary>
+            The player ran out of lives.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BruteForceFinishedEventArgs">
+            <summary>
+            Event information after an the BruteForce hack has finished.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForceFinishedEventArgs.Status">
+            <summary>
+            The final status of the Hack.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.BruteForceFinishedEventHandler">
+            <summary>
+            Represents the method that is called when the end user finishes the BruteForce hack.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">An <see cref="T:LemonUI.Scaleform.BruteForceFinishedEventArgs"/> with the hack status.</param>
+        </member>
+        <member name="T:LemonUI.Scaleform.BruteForce">
+            <summary>
+            The BruteForce Hacking Minigame shown in multiple missions.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.Word">
+            <summary>
+            The Word shown to select in the menu.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.Background">
+            <summary>
+            The background of the Hacking minigame.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.TotalLives">
+            <summary>
+            The number of Lives of the minigame.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.CurrentLives">
+            <summary>
+            The current number of lives that the player has.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.SuccessMessages">
+            <summary>
+            The messages that might appear on success.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.FailMessages">
+            <summary>
+            The messages that will appear when the player fails.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.CloseAfter">
+            <summary>
+            After how many miliseconds should the Hack close automatically.
+            Set to -1 to keep the Hack window open.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.CanRetry">
+            <summary>
+            If the player can retry the hack after failing.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.Countdown">
+            <summary>
+            The countdown of the Hack minigame.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.ShowLives">
+            <summary>
+            If the lives of the player should be shown on the top right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.BruteForce.ResetOnRowFail">
+            <summary>
+            If all of the rows should be restarted after the player fails one.
+            </summary>
+        </member>
+        <member name="E:LemonUI.Scaleform.BruteForce.HackFinished">
+            <summary>
+            Event triggered when the player finishes a hack.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BruteForce.#ctor">
+            <summary>
+            Creates a new Hacking Scaleform.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BruteForce.Reset">
+            <summary>
+            Resets the entire Hacking minigame.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.BruteForce.SetColumnSpeed(System.Int32,System.Single)">
+            <summary>
+            Sets the speed of one of the 8 columns.
+            </summary>
+            <param name="index">The index of the column.</param>
+            <param name="speed">The speed of the column.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BruteForce.RunProgram(System.Int32)">
+            <summary>
+            Runs the specified Hacking program.
+            </summary>
+            <param name="program">The program to open.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BruteForce.Update">
+            <summary>
+            Updates the information of the Hacking window.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.InstructionalButton">
+            <summary>
+            An individual instructional button.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.InstructionalButton.Description">
+            <summary>
+            The description of this button.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.InstructionalButton.Control">
+            <summary>
+            The Control used by this button.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.InstructionalButton.Raw">
+            <summary>
+            The Raw Control sent to the Scaleform.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButton.#ctor(System.String,GTA.Control)">
+            <summary>
+            Creates an instructional button for a Control.
+            </summary>
+            <param name="description">The text for the description.</param>
+            <param name="control">The control to use.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButton.#ctor(System.String,System.String)">
+            <summary>
+            Creates an instructional button for a raw control.
+            </summary>
+            <param name="description">The text for the description.</param>
+            <param name="raw">The raw value of the control.</param>
+        </member>
+        <member name="T:LemonUI.Scaleform.InstructionalButtons">
+            <summary>
+            Buttons shown on the bottom right of the screen.
+            </summary>
+        </member>
+        <member name="F:LemonUI.Scaleform.InstructionalButtons.buttons">
+            <summary>
+            The buttons used in this Scaleform.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButtons.#ctor(LemonUI.Scaleform.InstructionalButton[])">
+            <summary>
+            Creates a new set of Instructional Buttons.
+            </summary>
+            <param name="buttons">The buttons to add into this menu.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButtons.Add(LemonUI.Scaleform.InstructionalButton)">
+            <summary>
+            Adds an Instructional Button.
+            </summary>
+            <param name="button">The button to add.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButtons.Remove(LemonUI.Scaleform.InstructionalButton)">
+            <summary>
+            Removes an Instructional Button.
+            </summary>
+            <param name="button">The button to remove.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButtons.Clear">
+            <summary>
+            Removes all of the instructional buttons.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.InstructionalButtons.Update">
+            <summary>
+            Refreshes the items shown in the Instructional buttons.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.IScaleform">
+            <summary>
+            Scaleforms are 2D Adobe Flash-like objects.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.IScaleform.DrawFullScreen">
+            <summary>
+            Draws the Scaleform in full screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.LoadingScreen">
+            <summary>
+            Loading screen like the transition between story mode and online.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.LoadingScreen.Title">
+            <summary>
+            The title of the loading screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.LoadingScreen.Subtitle">
+            <summary>
+            The subtitle of the loading screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.LoadingScreen.Description">
+            <summary>
+            The description of the loading screen.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.LoadingScreen.Dictionary">
+            <summary>
+            The Texture Dictionary (TXD) where the texture is loaded.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.LoadingScreen.Texture">
+            <summary>
+            The texture in the dictionary.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.LoadingScreen.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new GTA Online like loading screen with no image.
+            </summary>
+            <param name="title">The title of the screen.</param>
+            <param name="subtitle">The subtitle of the screen.</param>
+            <param name="description">The description of the screen.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.LoadingScreen.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates a new GTA Online like loading screen with a custom texture.
+            </summary>
+            <param name="title">The title of the screen.</param>
+            <param name="subtitle">The subtitle of the screen.</param>
+            <param name="description">The description of the screen.</param>
+            <param name="dictionary">The dictionary where the texture is located.</param>
+            <param name="texture">The texture to use on the right.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.LoadingScreen.ChangeTexture(System.String,System.String)">
+            <summary>
+            Changes the texture shown on the loading screen.
+            </summary>
+            <param name="dictionary">The Texture Dictionary or TXD.</param>
+            <param name="texture">The Texture name.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.LoadingScreen.Update">
+            <summary>
+            Updates the Title, Description and Image of the loading screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.GFXAlignment">
+            <summary>
+            Represents the internal alignment of screen elements.
+            </summary>
+        </member>
+        <member name="F:LemonUI.GFXAlignment.Bottom">
+            <summary>
+            Vertical Alignment to the Bottom.
+            </summary>
+        </member>
+        <member name="F:LemonUI.GFXAlignment.Top">
+            <summary>
+            Vertical Alignment to the Top.
+            </summary>
+        </member>
+        <member name="F:LemonUI.GFXAlignment.Center">
+            <summary>
+            Centered Vertically or Horizontally.
+            </summary>
+        </member>
+        <member name="F:LemonUI.GFXAlignment.Left">
+            <summary>
+            Horizontal Alignment to the Left.
+            </summary>
+        </member>
+        <member name="F:LemonUI.GFXAlignment.Right">
+            <summary>
+            Horizontal Alignment to the Right.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Screen">
+            <summary>
+            Contains a set of tools to work with the screen information.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Screen.AspectRatio">
+            <summary>
+            The Aspect Ratio of the screen resolution.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Screen.CursorPositionRelative">
+            <summary>
+            The location of the cursor on screen between 0 and 1.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Screen.ToAbsolute(System.Single,System.Single,System.Single@,System.Single@)">
+            <summary>
+            Converts a relative resolution into one scaled to 1080p.
+            </summary>
+            <param name="relativeX">The relative value of X.</param>
+            <param name="relativeY">The relative value of Y.</param>
+            <param name="absoluteX">The value of X scaled to 1080p.</param>
+            <param name="absoluteY">The value of Y scaled to 1080p.</param>
+        </member>
+        <member name="M:LemonUI.Screen.ToRelative(System.Single,System.Single,System.Single@,System.Single@)">
+            <summary>
+            Converts a 1080p-based resolution into relative values.
+            </summary>
+            <param name="absoluteX">The 1080p based X coord.</param>
+            <param name="absoluteY">The 1080p based Y coord.</param>
+            <param name="relativeX">The value of X converted to relative.</param>
+            <param name="relativeY">The value of Y converted to relative.</param>
+        </member>
+        <member name="M:LemonUI.Screen.IsCursorInArea(System.Drawing.PointF,System.Drawing.SizeF)">
+            <summary>
+            Checks if the cursor is inside of the specified area.
+            </summary>
+            <remarks>
+            This function takes values scaled to 1080p and is aware of the alignment set via SET_SCRIPT_GFX_ALIGN.
+            </remarks>
+            <param name="pos">The start of the area.</param>
+            <param name="size">The size of the area to check.</param>
+            <returns><see langword="true"/> if the cursor is in the specified bounds, <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:LemonUI.Screen.IsCursorInArea(System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Checks if the cursor is inside of the specified area.
+            </summary>
+            <remarks>
+            This function takes values scaled to 1080p and is aware of the alignment set via SET_SCRIPT_GFX_ALIGN.
+            </remarks>
+            <param name="x">The start X position.</param>
+            <param name="y">The start Y position.</param>
+            <param name="width">The height of the search area from X.</param>
+            <param name="height">The height of the search area from Y.</param>
+            <returns><see langword="true"/> if the cursor is in the specified bounds, <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:LemonUI.Screen.GetRealPosition(System.Drawing.PointF)">
+            <summary>
+            Converts the specified position into one that is aware of <see cref="M:LemonUI.Screen.SetElementAlignment(LemonUI.GFXAlignment,LemonUI.GFXAlignment)"/>.
+            </summary>
+            <param name="og">The original 1080p based position.</param>
+            <returns>A new 1080p based position that is aware of the the Alignment.</returns>
+        </member>
+        <member name="M:LemonUI.Screen.GetRealPosition(System.Single,System.Single)">
+            <summary>
+            Converts the specified position into one that is aware of <see cref="M:LemonUI.Screen.SetElementAlignment(LemonUI.GFXAlignment,LemonUI.GFXAlignment)"/>.
+            </summary>
+            <param name="x">The 1080p based X position.</param>
+            <param name="y">The 1080p based Y position.</param>
+            <returns>A new 1080p based position that is aware of the the Alignment.</returns>
+        </member>
+        <member name="M:LemonUI.Screen.ShowCursorThisFrame">
+            <summary>
+            Shows the cursor during the current game frame.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Screen.SetElementAlignment(GTA.UI.Alignment,LemonUI.GFXAlignment)">
+            <summary>
+            Sets the alignment of game elements like <see cref="T:LemonUI.Elements.ScaledRectangle"/>, <see cref="T:LemonUI.Elements.ScaledText"/> and <see cref="T:LemonUI.Elements.ScaledTexture"/>.
+            </summary>
+            <param name="horizontal">The Horizontal alignment of the items.</param>
+            <param name="vertical">The vertical alignment of the items.</param>
+        </member>
+        <member name="M:LemonUI.Screen.SetElementAlignment(LemonUI.GFXAlignment,LemonUI.GFXAlignment)">
+            <summary>
+            Sets the alignment of game elements like <see cref="T:LemonUI.Elements.ScaledRectangle"/>, <see cref="T:LemonUI.Elements.ScaledText"/> and <see cref="T:LemonUI.Elements.ScaledTexture"/>.
+            </summary>
+            <param name="horizontal">The Horizontal alignment of the items.</param>
+            <param name="vertical">The vertical alignment of the items.</param>
+        </member>
+        <member name="M:LemonUI.Screen.ResetElementAlignment">
+            <summary>
+            Resets the alignment of the game elements.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Sound">
+            <summary>
+            Contains information for a Game Sound that is played at specific times.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Sound.Set">
+            <summary>
+            The Set where the sound is located.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Sound.File">
+            <summary>
+            The name of the sound file.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Sound.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.Sound"/> class with the specified Sound Set and File.
+            </summary>
+            <param name="set">The Set where the sound is located.</param>
+            <param name="file">The name of the sound file.</param>
+        </member>
+        <member name="M:LemonUI.Sound.PlayFrontend">
+            <summary>
+            Plays the sound for the local <see cref="T:GTA.Player"/>.
+            </summary>
+        </member>
+        <member name="T:LemonUI.TimerBars.TimerBar">
+            <summary>
+            Represents a Bar with text information shown in the bottom right.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.separation">
+            <summary>
+            The separation between the different timer bars.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.backgroundWidth">
+            <summary>
+            The width of the background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.backgroundHeight">
+            <summary>
+            The height of the background.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.background">
+            <summary>
+            The background of the timer bar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.title">
+            <summary>
+            The title of the timer bar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBar.info">
+            <summary>
+            The information of the Timer Bar.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBar.Title">
+            <summary>
+            The title of the bar, shown on the left.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBar.Info">
+            <summary>
+            The information shown on the right.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBar.InfoWidth">
+            <summary>
+            The Width of the information text.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBar.Color">
+            <summary>
+            The color of the information text.
+            </summary>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBar.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.TimerBars.TimerBar"/> with the specified Title and Value.
+            </summary>
+            <param name="title">The title of the bar.</param>
+            <param name="info">The information shown on the bar.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBar.Recalculate(System.Drawing.PointF)">
+            <summary>
+            Recalculates the position of the timer bar elements based on the location of it on the screen.
+            </summary>
+            <param name="pos">The Top Left position of the Timer Bar.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBar.Draw">
+            <summary>
+            Draws the timer bar information.
+            </summary>
+        </member>
+        <member name="T:LemonUI.TimerBars.TimerBarCollection">
+            <summary>
+            A collection or Set of <see cref="T:LemonUI.TimerBars.TimerBar"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBarCollection.Visible">
+            <summary>
+            If this collection of Timer Bars is visible to the user.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBarCollection.TimerBars">
+            <summary>
+            The <see cref="T:LemonUI.TimerBars.TimerBar"/>s that are part of this collection.
+            </summary>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.#ctor(LemonUI.TimerBars.TimerBar[])">
+            <summary>
+            Creates a new collection of Timer Bars.
+            </summary>
+            <param name="bars"></param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Add(LemonUI.TimerBars.TimerBar)">
+            <summary>
+            Adds a <see cref="T:LemonUI.TimerBars.TimerBar"/> onto this collection.
+            </summary>
+            <param name="bar">The <see cref="T:LemonUI.TimerBars.TimerBar"/> to add.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Remove(LemonUI.TimerBars.TimerBar)">
+            <summary>
+            Removes a <see cref="T:LemonUI.TimerBars.TimerBar"/> from the Collection.
+            </summary>
+            <param name="bar">The <see cref="T:LemonUI.TimerBars.TimerBar"/> to remove.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Remove(System.Func{LemonUI.TimerBars.TimerBar,System.Boolean})">
+            <summary>
+            Removes all of the <see cref="T:LemonUI.TimerBars.TimerBar"/> that match the function.
+            </summary>
+            <param name="func">The function to check the <see cref="T:LemonUI.TimerBars.TimerBar"/>.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Clear">
+            <summary>
+            Removes all of the <see cref="T:LemonUI.TimerBars.TimerBar"/> in this collection.
+            </summary>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Contains(LemonUI.TimerBars.TimerBar)">
+            <summary>
+            Checks if the <see cref="T:LemonUI.TimerBars.TimerBar"/> is part of this collection.
+            </summary>
+            <param name="bar">The <see cref="T:LemonUI.TimerBars.TimerBar"/> to check.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Recalculate">
+            <summary>
+            Recalculates the positions and sizes of the <see cref="T:LemonUI.TimerBars.TimerBar"/>.
+            </summary>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarCollection.Process">
+            <summary>
+            Draws the known timer bars.
+            </summary>
+        </member>
+        <member name="T:LemonUI.TimerBars.TimerBarProgress">
+            <summary>
+            Represents a Timer Bar that shows the progress of something.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBarProgress.barBackground">
+            <summary>
+            The background of the Progress Bar.
+            </summary>
+        </member>
+        <member name="F:LemonUI.TimerBars.TimerBarProgress.barForeground">
+            <summary>
+            The foreground of the Progress Bar.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBarProgress.Progress">
+            <summary>
+            The progress of the bar.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBarProgress.ForegroundColor">
+            <summary>
+            The Foreground color of the Progress bar.
+            </summary>
+        </member>
+        <member name="P:LemonUI.TimerBars.TimerBarProgress.BackgroundColor">
+            <summary>
+            The Background color of the Progress bar.
+            </summary>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarProgress.#ctor(System.String)">
+            <summary>
+            Creates a new <see cref="T:LemonUI.TimerBars.TimerBarProgress"/> with the specified title.
+            </summary>
+            <param name="title">The title of the bar.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarProgress.Recalculate(System.Drawing.PointF)">
+            <summary>
+            Recalculates the position of the timer bar elements based on the location of it on the screen.
+            </summary>
+            <param name="pos">The Top Left position of the Timer Bar.</param>
+        </member>
+        <member name="M:LemonUI.TimerBars.TimerBarProgress.Draw">
+            <summary>
+            Draws the TimerBar.
+            </summary>
+        </member>
+    </members>
+</doc>
