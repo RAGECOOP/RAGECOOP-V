@@ -102,7 +102,7 @@ namespace CoopClient.Entities
                 }
             }
 
-            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || WeaponComponents != LastWeaponComponents)
+            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(LastWeaponComponents))
             {
                 Character.Weapons.RemoveAll();
 

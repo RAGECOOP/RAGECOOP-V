@@ -177,7 +177,7 @@ namespace CoopClient.Entities
                         return;
                     }
                 }
-                else if (Clothes != LastClothes)
+                else if (!Clothes.Compare(LastClothes))
                 {
                     foreach (KeyValuePair<byte, short> cloth in Clothes)
                     {

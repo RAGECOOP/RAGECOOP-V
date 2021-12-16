@@ -75,6 +75,32 @@ namespace CoopClient
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
         }
 
+        public static bool Compare<T, Y>(this Dictionary<T, Y> item, Dictionary<T, Y> item2)
+        {
+            if (item == null || item2 == null || item.Count != item2.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<T, Y> pair in item)
+            {
+                if (item2.TryGetValue(pair.Key, out Y value))
+                {
+                    if (!Equals(value, pair.Value))
+                    {
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                break;
+            }
+
+
+            return true;
+        }
+
         public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, ulong currentTime, int duration)
         {
             return new Vector3()

@@ -194,7 +194,7 @@ namespace CoopClient.Entities
             }
             else
             {
-                if (VehicleMods != null && VehicleMods != LastVehicleMods)
+                if (VehicleMods != null && !VehicleMods.Compare(LastVehicleMods))
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
