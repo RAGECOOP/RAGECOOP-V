@@ -140,15 +140,45 @@ namespace CoopServer
         #endregion
 
         #region EVENTS
+        /// <summary>
+        /// Called when the server has started
+        /// </summary>
         public event EmptyEvent OnStart;
+        /// <summary>
+        /// Called when the server has stopped
+        /// </summary>
         public event EmptyEvent OnStop;
+        /// <summary>
+        /// Called when the server receives a new chat message for players
+        /// </summary>
         public event ChatEvent OnChatMessage;
+        /// <summary>
+        /// Called when the server receives a new incoming connection
+        /// </summary>
         public event PlayerEvent OnPlayerHandshake;
+        /// <summary>
+        /// Called when a new player has successfully connected
+        /// </summary>
         public event PlayerEvent OnPlayerConnected;
+        /// <summary>
+        /// Called when a new player has successfully disconnected
+        /// </summary>
         public event PlayerEvent OnPlayerDisconnected;
+        /// <summary>
+        /// Called when a new player sends data like health
+        /// </summary>
         public event PlayerEvent OnPlayerUpdate;
+        /// <summary>
+        /// Called when a player has a new health value
+        /// </summary>
         public event PlayerEvent OnPlayerHealthUpdate;
+        /// <summary>
+        /// Called when a player has a new position
+        /// </summary>
         public event PlayerEvent OnPlayerPositionUpdate;
+        /// <summary>
+        /// Called when a player sends a packet from another modification
+        /// </summary>
         public event ModEvent OnModPacketReceived;
 
         internal void InvokeStart()
@@ -207,19 +237,21 @@ namespace CoopServer
         #endregion
 
         #region FUNCTIONS
+        /// <summary>
+        /// Send a mod packet to all players
+        /// </summary>
+        /// <param name="mod">The name of the modification that will receive the data</param>
+        /// <param name="customID">The ID to check what this data is</param>
+        /// <param name="bytes">The serialized data</param>
+        /// <param name="netHandleList">The list of connections (players) that will receive the data</param>
         public static void SendModPacketToAll(string mod, byte customID, byte[] bytes, List<long> netHandleList = null)
         {
             try
             {
-                List<NetConnection> connections;
-                if (netHandleList == null)
-                {
-                    connections = Server.MainNetServer.Connections;
-                }
-                else
-                {
-                    connections = Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
-                }
+                List<NetConnection> connections = netHandleList == null
+                    ? Server.MainNetServer.Connections
+                    : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
+
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ModPacket()
                 {
@@ -238,6 +270,11 @@ namespace CoopServer
             }
         }
 
+        /// <summary>
+        /// Send a native call (Function.Call) to all players
+        /// </summary>
+        /// <param name="hash">The hash (Example: 0x25223CA6B4D20B7F = GET_CLOCK_HOURS)</param>
+        /// <param name="args">The arguments (Example: "Function.Call(Hash.SET_TIME_SCALE, args);")</param>
         public static void SendNativeCallToAll(ulong hash, params object[] args)
         {
             try
@@ -270,6 +307,10 @@ namespace CoopServer
             }
         }
 
+        /// <summary>
+        /// Get all connections as a list of NetHandle(long)
+        /// </summary>
+        /// <returns></returns>
         public static List<long> GetAllConnections()
         {
             List<long> result = new();
@@ -294,6 +335,12 @@ namespace CoopServer
             return Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
+        /// <summary>
+        /// Send a chat message to all players
+        /// </summary>
+        /// <param name="message">The chat message</param>
+        /// <param name="username">The username which send this message (default = "Server")</param>
+        /// <param name="netHandleList">The list of connections (players) who received this chat message</param>
         public static void SendChatMessageToAll(string message, string username = "Server", List<long> netHandleList = null)
         {
             try
@@ -303,15 +350,10 @@ namespace CoopServer
                     return;
                 }
 
-                List<NetConnection> connections;
-                if (netHandleList == null)
-                {
-                    connections = Server.MainNetServer.Connections;
-                }
-                else
-                {
-                    connections = Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
-                }
+                List<NetConnection> connections = netHandleList == null
+                    ? Server.MainNetServer.Connections
+                    : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
+
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new ChatMessagePacket()
                 {
@@ -326,15 +368,31 @@ namespace CoopServer
             }
         }
 
+        /// <summary>
+        /// Register a new command chat command (Example: "/test")
+        /// </summary>
+        /// <param name="name">The name of the command (Example: "test" for "/test")</param>
+        /// <param name="usage">How to use this message (argsLength required!)</param>
+        /// <param name="argsLength">The length of args (Example: "/message USERNAME MESSAGE" = 2) (usage required!)</param>
+        /// <param name="callback">Create a new function!</param>
         public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, usage, argsLength, callback);
         }
+        /// <summary>
+        /// Register a new command chat command (Example: "/test")
+        /// </summary>
+        /// <param name="name">The name of the command (Example: "test" for "/test")</param>
+        /// <param name="callback">Create a new function!</param>
         public static void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, callback);
         }
 
+        /// <summary>
+        /// Register a class of commands
+        /// </summary>
+        /// <typeparam name="T">The name of your class with functions</typeparam>
         public static void RegisterCommands<T>()
         {
             Server.RegisterCommands<T>();
@@ -350,8 +408,14 @@ namespace CoopServer
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// Set the Usage (Example: "Please use "/help"". ArgsLength required!)
+        /// </summary>
         public string Usage { get; set; }
 
+        /// <summary>
+        /// Set the length of arguments (Example: 2 for "/message USERNAME MESSAGE". Usage required!)
+        /// </summary>
         public short ArgsLength { get; set; }
 
         public Command(string name)
@@ -368,7 +432,7 @@ namespace CoopServer
         public Client Client { get; internal set; }
 
         /// <summary>
-        /// Gets the chatdata associated with the command
+        /// Gets the arguments (Example: "/message USERNAME MESSAGE", Args[0] for USERNAME)
         /// </summary>
         public string[] Args { get; internal set; }
     }
