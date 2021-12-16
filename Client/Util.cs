@@ -225,12 +225,12 @@ namespace CoopClient
             return flags;
         }
 
-        public static Dictionary<int, int> GetPedProps(this Ped ped)
+        public static Dictionary<byte, short> GetPedClothes(this Ped ped)
         {
-            Dictionary<int, int> result = new Dictionary<int, int>();
-            for (int i = 0; i < 11; i++)
+            Dictionary<byte, short> result = new Dictionary<byte, short>();
+            for (byte i = 0; i < 11; i++)
             {
-                int mod = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                short mod = Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
                 result.Add(i, mod);
             }
             return result;

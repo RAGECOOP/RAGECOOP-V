@@ -28,13 +28,13 @@ namespace CoopClient.Entities
                 CurrentVehicleModelHash = value;
             }
         }
-        private int[] LastVehicleColors = new int[] { 0, 0 };
-        internal int[] VehicleColors { get; set; }
+        private byte[] LastVehicleColors = new byte[] { 0, 0 };
+        internal byte[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
         internal Dictionary<int, int> VehicleMods { get; set; }
         internal bool VehicleDead { get; set; }
         internal float VehicleEngineHealth { get; set; }
-        internal int VehicleSeatIndex { get; set; }
+        internal short VehicleSeatIndex { get; set; }
         /// <summary>
         /// ?
         /// </summary>

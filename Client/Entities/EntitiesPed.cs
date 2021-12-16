@@ -55,8 +55,8 @@ namespace CoopClient.Entities
                 CurrentModelHash = value;
             }
         }
-        private Dictionary<int, int> LastProps = null;
-        internal Dictionary<int, int> Props { get; set; }
+        private Dictionary<byte, short> LastClothes = null;
+        internal Dictionary<byte, short> Clothes { get; set; }
         /// <summary>
         /// The latest character position (may not have been applied yet)
         /// </summary>
@@ -177,14 +177,14 @@ namespace CoopClient.Entities
                         return;
                     }
                 }
-                else if (Props != LastProps)
+                else if (Clothes != LastClothes)
                 {
-                    foreach (KeyValuePair<int, int> prop in Props)
+                    foreach (KeyValuePair<byte, short> cloth in Clothes)
                     {
-                        Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
+                        Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
                     }
 
-                    LastProps = Props;
+                    LastClothes = Clothes;
                 }
             }
 
@@ -297,9 +297,9 @@ namespace CoopClient.Entities
                 Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character.Handle, false);
             }
 
-            foreach (KeyValuePair<int, int> prop in Props)
+            foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
-                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, prop.Key, prop.Value, 0, 0);
+                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
             }
 
             return true;

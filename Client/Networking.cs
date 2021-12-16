@@ -302,7 +302,7 @@ namespace CoopClient
                 EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
-                player.Props = packet.Props;
+                player.Clothes = packet.Clothes;
                 player.Health = packet.Extra.Health;
                 player.Position = packet.Extra.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
@@ -332,7 +332,7 @@ namespace CoopClient
                 EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
-                player.Props = packet.Props;
+                player.Clothes = packet.Clothes;
                 player.Health = packet.Extra.Health;
                 player.Position = packet.Extra.Position.ToVector();
                 player.VehicleModelHash = packet.VehModelHash;
@@ -575,7 +575,7 @@ namespace CoopClient
                     npc.NPCVehHandle = 0;
 
                     npc.ModelHash = packet.ModelHash;
-                    npc.Props = packet.Props;
+                    npc.Clothes = packet.Clothes;
                     npc.Health = packet.Health;
                     npc.Position = packet.Position.ToVector();
                     npc.Rotation = packet.Rotation.ToVector();
@@ -599,7 +599,7 @@ namespace CoopClient
                     Main.NPCs.Add(packet.NetHandle, new EntitiesNpc()
                     {
                         ModelHash = packet.ModelHash,
-                        Props = packet.Props,
+                        Clothes = packet.Clothes,
                         Health = packet.Health,
                         Position = packet.Position.ToVector(),
                         Rotation = packet.Rotation.ToVector(),
@@ -633,7 +633,7 @@ namespace CoopClient
                     npc.NPCVehHandle = packet.VehHandle;
 
                     npc.ModelHash = packet.ModelHash;
-                    npc.Props = packet.Props;
+                    npc.Clothes = packet.Clothes;
                     npc.Health = packet.Health;
                     npc.Position = packet.Position.ToVector();
                     npc.VehicleModelHash = packet.VehModelHash;
@@ -668,7 +668,7 @@ namespace CoopClient
                         NPCVehHandle = packet.VehHandle,
 
                         ModelHash = packet.ModelHash,
-                        Props = packet.Props,
+                        Clothes = packet.Clothes,
                         Health = packet.Health,
                         Position = packet.Position.ToVector(),
                         VehicleModelHash = packet.VehModelHash,
@@ -719,12 +719,11 @@ namespace CoopClient
                 {
                     Vehicle veh = player.CurrentVehicle;
 
-                    int primaryColor = 0;
-                    int secondaryColor = 0;
-
+                    byte primaryColor = 0;
+                    byte secondaryColor = 0;
                     unsafe
                     {
-                        Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                        Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                     }
 
                     new FullSyncPlayerVehPacket()
@@ -736,9 +735,9 @@ namespace CoopClient
                             Position = player.Position.ToLVector()
                         },
                         ModelHash = player.Model.Hash,
-                        Props = player.GetPedProps(),
+                        Clothes = player.GetPedClothes(),
                         VehModelHash = veh.Model.Hash,
-                        VehSeatIndex = (int)player.SeatIndex,
+                        VehSeatIndex = (short)player.SeatIndex,
                         VehPosition = veh.Position.ToLVector(),
                         VehRotation = veh.Quaternion.ToLQuaternion(),
                         VehEngineHealth = veh.EngineHealth,
@@ -747,7 +746,7 @@ namespace CoopClient
                         VehSpeed = veh.Speed,
                         VehSteeringAngle = veh.SteeringAngle,
                         VehAimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords().ToLVector() : new LVector3(),
-                        VehColors = new int[] { primaryColor, secondaryColor },
+                        VehColors = new byte[] { primaryColor, secondaryColor },
                         VehMods = veh.Mods.GetVehicleMods(),
                         VehDoors = veh.Doors.GetVehicleDoors(),
                         VehTires = veh.Wheels.GetBrokenTires(),
@@ -766,7 +765,7 @@ namespace CoopClient
                             Position = player.Position.ToLVector()
                         },
                         ModelHash = player.Model.Hash,
-                        Props = player.GetPedProps(),
+                        Clothes = player.GetPedClothes(),
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = player.GetPedSpeed(),
@@ -796,7 +795,7 @@ namespace CoopClient
                             Position = player.Position.ToLVector()
                         },
                         VehModelHash = veh.Model.Hash,
-                        VehSeatIndex = (int)player.SeatIndex,
+                        VehSeatIndex = (short)player.SeatIndex,
                         VehPosition = veh.Position.ToLVector(),
                         VehRotation = veh.Quaternion.ToLQuaternion(),
                         VehVelocity = veh.Velocity.ToLVector(),
@@ -844,12 +843,11 @@ namespace CoopClient
             {
                 Vehicle veh = npc.CurrentVehicle;
 
-                int primaryColor = 0;
-                int secondaryColor = 0;
-
+                byte primaryColor = 0;
+                byte secondaryColor = 0;
                 unsafe
                 {
-                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
+                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
                 }
 
                 new FullSyncNpcVehPacket()
@@ -857,11 +855,11 @@ namespace CoopClient
                     NetHandle =  Main.LocalNetHandle + npc.Handle,
                     VehHandle = Main.LocalNetHandle + veh.Handle,
                     ModelHash = npc.Model.Hash,
-                    Props = npc.GetPedProps(),
+                    Clothes = npc.GetPedClothes(),
                     Health = npc.Health,
                     Position = npc.Position.ToLVector(),
                     VehModelHash = veh.Model.Hash,
-                    VehSeatIndex = (int)npc.SeatIndex,
+                    VehSeatIndex = (short)npc.SeatIndex,
                     VehPosition = veh.Position.ToLVector(),
                     VehRotation = veh.Quaternion.ToLQuaternion(),
                     VehEngineHealth = veh.EngineHealth,
@@ -869,7 +867,7 @@ namespace CoopClient
                     VehVelocity = veh.Velocity.ToLVector(),
                     VehSpeed = veh.Speed,
                     VehSteeringAngle = veh.SteeringAngle,
-                    VehColors = new int[] { primaryColor, secondaryColor },
+                    VehColors = new byte[] { primaryColor, secondaryColor },
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDoors = veh.Doors.GetVehicleDoors(),
                     VehTires = veh.Wheels.GetBrokenTires(),
@@ -883,7 +881,7 @@ namespace CoopClient
                 {
                     NetHandle =  Main.LocalNetHandle + npc.Handle,
                     ModelHash = npc.Model.Hash,
-                    Props = npc.GetPedProps(),
+                    Clothes = npc.GetPedClothes(),
                     Health = npc.Health,
                     Position = npc.Position.ToLVector(),
                     Rotation = npc.Rotation.ToLVector(),

@@ -272,7 +272,7 @@ namespace CoopClient
             if (fullSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
-                DebugSyncPed.Props = player.GetPedProps();
+                DebugSyncPed.Clothes = player.GetPedClothes();
             }
             DebugSyncPed.Health = player.Health;
             DebugSyncPed.Position = player.Position;
@@ -286,15 +286,15 @@ namespace CoopClient
 
                 flags = veh.GetVehicleFlags();
 
-                int secondaryColor;
-                int primaryColor;
+                byte secondaryColor;
+                byte primaryColor;
                 unsafe
                 {
-                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
-                DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
+                DebugSyncPed.VehicleSeatIndex = (short)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
@@ -303,7 +303,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
-                DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehicleColors = new byte[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
                 DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
