@@ -108,7 +108,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// ?
+        /// Check if the player is already on a server
         /// </summary>
         public static bool IsOnServer()
         {
@@ -116,7 +116,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get the local net handle from this Lidgren network client when connected to a server
+        /// Get the local net handle from this Lidgren-Network client when connected to a server
         /// </summary>
         /// <returns>long</returns>
         public static long GetLocalNetHandle()
@@ -129,7 +129,6 @@ namespace CoopClient
         /// Key = Lidgren-Network net handle
         /// Value = Character handle or null
         /// </summary>
-        /// <returns>Dictionary(long, int)</returns>
         public static Dictionary<long, int?> GetAllPlayers()
         {
             Dictionary<long, int?> result = new Dictionary<long, int?>();
@@ -147,7 +146,6 @@ namespace CoopClient
         /// Get a player using their Lidgren Network net handle
         /// </summary>
         /// <param name="handle">Lidgren-Network net handle</param>
-        /// <returns>Entities.EntitiesPlayer</returns>
         public static Entities.EntitiesPlayer GetPlayer(long handle)
         {
             lock (Main.Players)
@@ -157,7 +155,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// ?
+        /// Check if a GTACOOP:R menu is visible
         /// </summary>
         public static bool IsMenuVisible()
         {
@@ -169,7 +167,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Check the chat is visible
+        /// Check if the GTACOOP:R chat is visible
         /// </summary>
         public static bool IsChatFocused()
         {
@@ -177,9 +175,8 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Check the list of players is visible
+        /// Check if the GTACOOP:R list of players is visible
         /// </summary>
-        /// <returns>bool</returns>
         public static bool IsPlayerListVisible()
         {
             return Util.GetTickCount64() - PlayerList.Pressed < 5000;
@@ -188,7 +185,6 @@ namespace CoopClient
         /// <summary>
         /// Get the version of GTACOOP:R
         /// </summary>
-        /// <returns>string</returns>
         public static string GetCurrentVersion()
         {
             return Main.CurrentVersion;
@@ -231,7 +227,6 @@ namespace CoopClient
         /// <summary>
         /// Get that player's local username
         /// </summary>
-        /// <returns>string</returns>
         public static string GetUsername()
         {
             return Main.MainSettings.Username;
