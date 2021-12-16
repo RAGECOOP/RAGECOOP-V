@@ -84,19 +84,16 @@ namespace CoopClient
 
             foreach (KeyValuePair<T, Y> pair in item)
             {
-                if (item2.TryGetValue(pair.Key, out Y value))
+                if (item2.TryGetValue(pair.Key, out Y value) && Equals(value, pair.Value))
                 {
-                    if (!Equals(value, pair.Value))
-                    {
-                        return false;
-                    }
-
                     continue;
                 }
 
-                break;
+                // TryGetValue() or Equals failed
+                return false;
             }
 
+            // No difference between item and item2
             return true;
         }
 
