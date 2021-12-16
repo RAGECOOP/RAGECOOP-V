@@ -97,7 +97,6 @@ namespace CoopClient
                 break;
             }
 
-
             return true;
         }
 
