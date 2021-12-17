@@ -76,7 +76,7 @@ namespace CoopServer
         {
             lock (_actionQueue.SyncRoot)
             {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerConnected(client)));
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHandshake(client)));
             }
         }
 

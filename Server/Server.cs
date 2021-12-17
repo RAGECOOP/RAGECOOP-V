@@ -256,6 +256,10 @@ namespace CoopServer
                             {
                                 SendPlayerDisconnectPacket(message.SenderConnection.RemoteUniqueIdentifier);
                             }
+                            else if (status == NetConnectionStatus.Connected)
+                            {
+                                SendPlayerConnectPacket(message.SenderConnection);
+                            }
                             break;
                         case NetIncomingMessageType.Data:
                             // Get packet type
@@ -266,18 +270,6 @@ namespace CoopServer
 
                             switch (type)
                             {
-                                case (byte)PacketTypes.PlayerConnectPacket:
-                                    try
-                                    {
-                                        packet = new PlayerConnectPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        SendPlayerConnectPacket(message.SenderConnection, (PlayerConnectPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
-                                    }
-                                    break;
                                 case (byte)PacketTypes.FullSyncPlayerPacket:
                                     try
                                     {
@@ -635,9 +627,9 @@ namespace CoopServer
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
-        private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
+        private static void SendPlayerConnectPacket(NetConnection local)
         {
-            Client localClient = Clients.Find(x => x.NetHandle == packet.NetHandle);
+            Client localClient = Clients.Find(x => x.NetHandle == local.RemoteUniqueIdentifier);
             if (localClient == null)
             {
                 local.Disconnect("No data found!");
@@ -670,7 +662,7 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerConnectPacket()
                 {
-                    NetHandle = packet.NetHandle,
+                    NetHandle = local.RemoteUniqueIdentifier,
                     SocialClubName = localClient.Player.SocialClubName,
                     Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);

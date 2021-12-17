@@ -122,17 +122,6 @@ namespace CoopClient
 
                                     Main.MainChat.Init();
 
-                                    // Send player connect packet
-                                    NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-                                    new PlayerConnectPacket()
-                                    {
-                                        NetHandle =  Main.LocalNetHandle,
-                                        SocialClubName = string.Empty,
-                                        Username = string.Empty
-                                    }.PacketToNetOutGoingMessage(outgoingMessage);
-                                    Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered);
-                                    Client.FlushSendQueue();
-
 #if !NON_INTERACTIVE
                                     Main.MainMenu.ConnectedMenuSetting();
 #endif
