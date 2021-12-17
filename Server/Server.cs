@@ -30,7 +30,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static Resource MainResource = null;
+        public static List<Resource> Resources = new();
         public static Dictionary<Command, Action<CommandContext>> Commands;
 
         public static readonly List<Client> Clients = new();
@@ -171,40 +171,43 @@ namespace CoopServer
                 #endregion
             }
 
-            if (!string.IsNullOrEmpty(MainSettings.Resource))
+            if (MainSettings.Resources.Any())
             {
-                try
+                Commands = new();
+
+                MainSettings.Resources.ForEach(x =>
                 {
-                    string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll";
-                    Logging.Info($"Loading resource {resourcepath}...");
-
-                    Assembly asm = Assembly.LoadFrom(resourcepath);
-                    Type[] types = asm.GetExportedTypes();
-                    IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
-                    Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
-
-                    if (!enumerable.Any())
+                    try
                     {
-                        Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
-                    }
-                    else
-                    {
-                        Commands = new();
+                        string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + x + ".dll";
+                        Logging.Info($"Loading resource \"{x}.dll\"...");
 
-                        if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
+                        Assembly asm = Assembly.LoadFrom(resourcepath);
+                        Type[] types = asm.GetExportedTypes();
+                        IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
+                        Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
+
+                        if (!enumerable.Any())
                         {
-                            MainResource = new(script);
+                            Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
                         }
                         else
                         {
-                            Logging.Warning("Could not create resource: it is null.");
+                            if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
+                            {
+                                Resources.Add(new(script));
+                            }
+                            else
+                            {
+                                Logging.Warning("Could not create resource: it is null.");
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Logging.Error(e.Message);
-                }
+                    catch (Exception e)
+                    {
+                        Logging.Error(e.InnerException.Message);
+                    }
+                });
             }
 
             Listen();
@@ -427,8 +430,7 @@ namespace CoopServer
                                             packet = new ModPacket();
                                             packet.NetIncomingMessageToPacket(message);
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (MainResource != null &&
-                                                MainResource.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                            if (Resources.Any(x => x.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes)))
                                             {
                                                 // Was canceled
                                             }
@@ -504,14 +506,17 @@ namespace CoopServer
             }
 
             Logging.Warning("Server is shutting down!");
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                // Waiting for resource...
-                while (!MainResource.ReadyToStop)
+                Resources.ForEach(x =>
                 {
-                    // 16 milliseconds to sleep to reduce CPU usage
-                    Thread.Sleep(1000 / 60);
-                }
+                    // Waiting for resource...
+                    while (!x.ReadyToStop)
+                    {
+                        // 16 milliseconds to sleep to reduce CPU usage
+                        Thread.Sleep(1000 / 60);
+                    }
+                });
             }
 
             if (MainNetServer.Connections.Count > 0)
@@ -617,10 +622,7 @@ namespace CoopServer
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
 
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerHandshake(tmpClient);
-            }
+            Resources.ForEach(x => x.InvokePlayerHandshake(tmpClient));
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
@@ -666,9 +668,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerConnected(localClient);
+                Resources.ForEach(x => x.InvokePlayerConnected(localClient));
             }
             else
             {
@@ -703,9 +705,9 @@ namespace CoopServer
 
             Clients.Remove(localClient);
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerDisconnected(localClient);
+                Resources.ForEach(x => x.InvokePlayerDisconnected(localClient));
             }
             else
             {
@@ -747,9 +749,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -787,9 +789,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -827,9 +829,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -867,9 +869,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -878,7 +880,7 @@ namespace CoopServer
         {
             NetOutgoingMessage outgoingMessage;
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
                 if (packet.Message.StartsWith('/'))
                 {
@@ -936,7 +938,7 @@ namespace CoopServer
                     return;
                 }
 
-                if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
+                if (Resources.Any(x => x.InvokeChatMessage(packet.Username, packet.Message)))
                 {
                     return;
                 }

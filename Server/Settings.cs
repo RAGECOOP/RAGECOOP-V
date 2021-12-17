@@ -1,4 +1,6 @@
-﻿namespace CoopServer
+﻿using System.Collections.Generic;
+
+namespace CoopServer
 {
     public class Settings
     {
@@ -6,7 +8,7 @@
         public int MaxPlayers { get; set; } = 16;
         public string Name { get; set; } = "GTACoop:R server";
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
-        public string Resource { get; set; } = "";
+        public List<string> Resources { get; set; } = new List<string>();
         public bool Allowlist { get; set; } = false;
         public bool NpcsAllowed { get; set; } = true;
         public bool ModsAllowed {  get; set; } = false;
