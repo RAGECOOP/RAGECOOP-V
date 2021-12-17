@@ -67,9 +67,9 @@ namespace CoopClient.Menus.Sub
             List<ServerListClass> serverList = null;
             try
             {
-                // SSL/TLS
+                // TLS only
                 ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                 WebClient client = new WebClient();

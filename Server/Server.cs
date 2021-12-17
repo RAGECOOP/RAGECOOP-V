@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,7 +11,6 @@ using System.Net.Http;
 using Newtonsoft.Json;
 
 using Lidgren.Network;
-using System.Text;
 
 namespace CoopServer
 {
@@ -67,7 +68,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    Logging.Error("Port forwarding failed!");
+                    Logging.Error("Port forwarding failed! Your router may not support UPnP.");
                     Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to false!");
                 }
             }
@@ -75,13 +76,17 @@ namespace CoopServer
             if (MainSettings.AnnounceSelf)
             {
                 Logging.Info("Announcing to master server...");
-                Logging.Warning("Please make sure that port forwarding is active, otherwise nobody can join!");
 
                 #region -- MASTERSERVER --
                 new Thread(async () =>
                 {
                     try
                     {
+                        // TLS only
+                        ServicePointManager.Expect100Continue = true;
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
                         HttpClient httpClient = new();
 
                         IpInfo info;
@@ -153,6 +158,10 @@ namespace CoopServer
                             // Sleep for 12.5s
                             Thread.Sleep(12500);
                         }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Logging.Error($"MasterServer: {ex.InnerException.Message}");
                     }
                     catch (Exception ex)
                     {

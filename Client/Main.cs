@@ -88,6 +88,11 @@ namespace CoopClient
         }
 
         private ulong LastDataSend;
+#if DEBUG
+        private ulong LastDebugData;
+        private int DebugBytesSend;
+        private int DebugBytesReceived;
+#endif
         private void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
@@ -122,9 +127,20 @@ namespace CoopClient
 #if DEBUG
             if (MainNetworking.ShowNetworkInfo)
             {
+                ulong time = Util.GetTickCount64();
+                if (time - LastDebugData > 1000)
+                {
+                    LastDebugData = time;
+
+                    DebugBytesReceived = MainNetworking.BytesReceived;
+                    MainNetworking.BytesReceived = 0;
+                    DebugBytesSend = MainNetworking.BytesSend;
+                    MainNetworking.BytesSend = 0;
+                }
+
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {MainNetworking.BytesReceived * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {MainNetworking.BytesSend * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 
