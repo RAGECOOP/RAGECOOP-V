@@ -430,11 +430,20 @@ namespace CoopServer
                                             packet = new ModPacket();
                                             packet.NetIncomingMessageToPacket(message);
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (Resources.Any(x => x.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes)))
+
+                                            bool resourceResult = false;
+                                            if (Resources.Any())
                                             {
-                                                // Was canceled
+                                                Resources.ForEach(x =>
+                                                {
+                                                    if (x.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                    {
+                                                        resourceResult = true;
+                                                    }
+                                                });
                                             }
-                                            else if (modPacket.Target != -1)
+
+                                            if (!resourceResult && modPacket.Target != -1)
                                             {
                                                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                                                 modPacket.PacketToNetOutGoingMessage(outgoingMessage);
@@ -938,9 +947,21 @@ namespace CoopServer
                     return;
                 }
 
-                if (Resources.Any(x => x.InvokeChatMessage(packet.Username, packet.Message)))
+                if (Resources.Any())
                 {
-                    return;
+                    bool resourceResult = false;
+                    Resources.ForEach(x =>
+                    {
+                        if (x.InvokeChatMessage(packet.Username, packet.Message))
+                        {
+                            resourceResult = true;
+                        }
+                    });
+
+                    if (resourceResult)
+                    {
+                        return;
+                    }
                 }
             }
 
