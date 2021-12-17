@@ -535,30 +535,27 @@ namespace CoopServer
         {
             Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
-            if (string.IsNullOrWhiteSpace(packet.Username))
-            {
-                local.Deny("Username is empty or contains spaces!");
-                return;
-            }
-            else if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
-            {
-                local.Deny("Username contains special chars!");
-                return;
-            }
-
-            if (MainAllowlist.Username.Any() && !MainAllowlist.Username.Contains(packet.Username))
-            {
-                local.Deny("This Username is not on the allow list!");
-                return;
-            }
-
             if (!packet.ModVersion.StartsWith(CompatibleVersion))
             {
                 local.Deny($"GTACoOp:R version {CompatibleVersion.Replace('_', '.')}.x required!");
                 return;
             }
-
-            if (MainBlocklist.Username.Contains(packet.Username))
+            if (string.IsNullOrWhiteSpace(packet.Username))
+            {
+                local.Deny("Username is empty or contains spaces!");
+                return;
+            }
+            if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
+            {
+                local.Deny("Username contains special chars!");
+                return;
+            }
+            if (MainAllowlist.Username.Any() && !MainAllowlist.Username.Contains(packet.Username.ToLower()))
+            {
+                local.Deny("This Username is not on the allow list!");
+                return;
+            }
+            if (MainBlocklist.Username.Contains(packet.Username.ToLower()))
             {
                 local.Deny("This Username has been blocked by this server!");
                 return;
@@ -568,7 +565,6 @@ namespace CoopServer
                 local.Deny("This IP was blocked by this server!");
                 return;
             }
-
             if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 local.Deny("Username is already taken!");
