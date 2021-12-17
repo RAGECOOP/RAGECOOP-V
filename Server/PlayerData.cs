@@ -4,7 +4,6 @@ namespace CoopServer
 {
     public struct PlayerData
     {
-        public string SocialClubName { get; set; }
         public string Username { get; set; }
         private LVector3 LastPosition { get; set; }
         private LVector3 CurrentPosition { get; set; }

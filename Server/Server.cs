@@ -114,7 +114,7 @@ namespace CoopServer
                                 "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
                                 "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
-                                "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
+                                "\"allowlist\": \"" + MainAllowlist.Username.Any() + "\", " +
                                 "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
                                 "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
                                 "\"country\": \"" + info.country + "\"" +
@@ -533,7 +533,7 @@ namespace CoopServer
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, HandshakePacket packet)
         {
-            Logging.Debug("New handshake from: [SC: " + packet.SocialClubName + " | Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
+            Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
             if (string.IsNullOrWhiteSpace(packet.Username))
             {
@@ -546,13 +546,10 @@ namespace CoopServer
                 return;
             }
 
-            if (MainSettings.Allowlist)
+            if (MainAllowlist.Username.Any() && !MainAllowlist.Username.Contains(packet.Username))
             {
-                if (!MainAllowlist.SocialClubName.Contains(packet.SocialClubName))
-                {
-                    local.Deny("This Social Club name is not on the allow list!");
-                    return;
-                }
+                local.Deny("This Username is not on the allow list!");
+                return;
             }
 
             if (!packet.ModVersion.StartsWith(CompatibleVersion))
@@ -561,28 +558,18 @@ namespace CoopServer
                 return;
             }
 
-            if (MainBlocklist.SocialClubName.Contains(packet.SocialClubName))
-            {
-                local.Deny("This Social Club name has been blocked by this server!");
-                return;
-            }
-            else if (MainBlocklist.Username.Contains(packet.Username))
+            if (MainBlocklist.Username.Contains(packet.Username))
             {
                 local.Deny("This Username has been blocked by this server!");
                 return;
             }
-            else if (MainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
+            if (MainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
             {
                 local.Deny("This IP was blocked by this server!");
                 return;
             }
 
-            if (Clients.Any(x => x.Player.SocialClubName.ToLower() == packet.SocialClubName.ToLower()))
-            {
-                local.Deny("The name of the Social Club is already taken!");
-                return;
-            }
-            else if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
+            if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 local.Deny("Username is already taken!");
                 return;
@@ -601,7 +588,6 @@ namespace CoopServer
                         NetHandle = localNetHandle,
                         Player = new()
                         {
-                            SocialClubName = packet.SocialClubName,
                             Username = packet.Username
                         }
                     }
@@ -614,7 +600,6 @@ namespace CoopServer
             new HandshakePacket()
             {
                 NetHandle = localNetHandle,
-                SocialClubName = string.Empty,
                 Username = string.Empty,
                 ModVersion = string.Empty,
                 NpcsAllowed = MainSettings.NpcsAllowed
@@ -651,7 +636,6 @@ namespace CoopServer
                         new PlayerConnectPacket()
                         {
                             NetHandle = targetNetHandle,
-                            SocialClubName = targetClient.Player.SocialClubName,
                             Username = targetClient.Player.Username
                         }.PacketToNetOutGoingMessage(outgoingMessage);
                         MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
@@ -663,7 +647,6 @@ namespace CoopServer
                 new PlayerConnectPacket()
                 {
                     NetHandle = local.RemoteUniqueIdentifier,
-                    SocialClubName = localClient.Player.SocialClubName,
                     Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);

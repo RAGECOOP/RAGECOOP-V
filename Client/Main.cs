@@ -274,7 +274,7 @@ namespace CoopClient
 
             if (!Players.ContainsKey(0))
             {
-                Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
+                Players.Add(0, new EntitiesPlayer() { Username = "DebugPlayer" });
                 DebugSyncPed = Players[0];
             }
 

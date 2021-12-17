@@ -62,7 +62,6 @@ namespace CoopClient
                 new HandshakePacket()
                 {
                     NetHandle =  0,
-                    SocialClubName = Game.Player.Name,
                     Username = Main.MainSettings.Username,
                     ModVersion = Main.CurrentVersion,
                     NpcsAllowed = false
@@ -255,12 +254,7 @@ namespace CoopClient
         #region -- PLAYER --
         private void PlayerConnect(PlayerConnectPacket packet)
         {
-            EntitiesPlayer player = new EntitiesPlayer()
-            {
-                SocialClubName = packet.SocialClubName,
-                Username = packet.Username,
-                LastUpdateReceived = Util.GetTickCount64()
-            };
+            EntitiesPlayer player = new EntitiesPlayer() { Username = packet.Username };
 
             Main.Players.Add(packet.NetHandle, player);
             COOPAPI.Connected(packet.NetHandle);

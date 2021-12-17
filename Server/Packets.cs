@@ -189,15 +189,12 @@ namespace CoopServer
         public long NetHandle { get; set; }
 
         [ProtoMember(2)]
-        public string SocialClubName { get; set; }
-
-        [ProtoMember(3)]
         public string Username { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public string ModVersion { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public bool NpcsAllowed { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -217,7 +214,6 @@ namespace CoopServer
             HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
 
             NetHandle = data.NetHandle;
-            SocialClubName = data.SocialClubName;
             Username = data.Username;
             ModVersion = data.ModVersion;
             NpcsAllowed = data.NpcsAllowed;
