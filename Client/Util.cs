@@ -141,11 +141,11 @@ namespace CoopClient
             {
                 return 3;
             }
-            else if (ped.IsRunning)
+            if (ped.IsRunning)
             {
                 return 2;
             }
-            else if (ped.IsWalking)
+            if (ped.IsWalking)
             {
                 return 1;
             }
@@ -309,19 +309,19 @@ namespace CoopClient
             return result;
         }
 
-        public static int GetBrokenTires(this VehicleWheelCollection wheels)
+        public static int GetBurstedTires(this VehicleWheelCollection wheels)
         {
-            int tyreFlag = 0;
+            int tireFlag = 0;
 
             foreach (var wheel in wheels.GetAllWheels())
             {
                 if (wheel.IsBursted)
                 {
-                    tyreFlag |= (1 << (int)wheel.BoneId);
+                    tireFlag |= (1 << (int)wheel.BoneId);
                 }
             }
 
-            return tyreFlag;
+            return tireFlag;
         }
 
         public static Settings ReadSettings()

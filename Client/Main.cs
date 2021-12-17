@@ -306,7 +306,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleColors = new byte[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
-                DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
+                DebugSyncPed.VehTires = veh.Wheels.GetBurstedTires();
                 DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsInVehicle = true;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;

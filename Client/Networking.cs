@@ -749,7 +749,7 @@ namespace CoopClient
                         VehColors = new byte[] { primaryColor, secondaryColor },
                         VehMods = veh.Mods.GetVehicleMods(),
                         VehDoors = veh.Doors.GetVehicleDoors(),
-                        VehTires = veh.Wheels.GetBrokenTires(),
+                        VehTires = veh.Wheels.GetBurstedTires(),
                         VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
                         Flag = veh.GetVehicleFlags()
                     }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -870,7 +870,7 @@ namespace CoopClient
                     VehColors = new byte[] { primaryColor, secondaryColor },
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDoors = veh.Doors.GetVehicleDoors(),
-                    VehTires = veh.Wheels.GetBrokenTires(),
+                    VehTires = veh.Wheels.GetBurstedTires(),
                     VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
                     Flag = veh.GetVehicleFlags()
                 }.PacketToNetOutGoingMessage(outgoingMessage);
