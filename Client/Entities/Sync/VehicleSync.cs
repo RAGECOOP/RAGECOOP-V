@@ -132,6 +132,15 @@ namespace CoopClient.Entities
                         Main.NPCsVehicles.Add(NPCVehHandle, MainVehicle.Handle);
                     }
                     MainVehicle.Quaternion = VehicleRotation;
+
+                    if (MainVehicle.HasRoof)
+                    {
+                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                        if (roofOpened != VehRoofOpened)
+                        {
+                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opened : VehicleRoofState.Closed;
+                        }
+                    }
                 }
             }
 
@@ -239,12 +248,12 @@ namespace CoopClient.Entities
                     if (Transformed && !LastTransformed)
                     {
                         LastTransformed = true;
-                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle, false);
+                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
                     }
                     else if (!Transformed && LastTransformed)
                     {
                         LastTransformed = false;
-                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle, false);
+                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
                     }
                 }
 
