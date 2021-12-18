@@ -75,9 +75,6 @@ namespace CoopClient
             NPCs = new Dictionary<long, EntitiesPed>();
             NPCsVehicles = new Dictionary<long, int>();
 
-            Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
-            Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
-
             Tick += OnTick;
 #if !NON_INTERACTIVE
             KeyDown += OnKeyDown;
