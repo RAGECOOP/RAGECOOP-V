@@ -35,9 +35,9 @@ GTACOOP:R is NOT intended to replace the GTACOOP modification! GTACOOP:R is an a
 - [Makinolo](https://github.com/Makinolo)
 - - For testing, ideas, contributions and the first modification with the COOPAPI
 - [crosire](https://github.com/crosire)
-- - Because he's working on ScriptHookVDotNet
+- - For the extensive work in ScriptHookVDotNet
 - [justalemon](https://github.com/justalemon)
-- - Because she? works on LemonUI
+- - For the extensive work in LemonUI
 
 # 📝 License
 This project is licensed under [MIT license](https://github.com/GTACoop-R/GTACoop-R/blob/main/LICENSE)
