@@ -70,7 +70,7 @@ namespace CoopClient.Entities
         internal bool VehAreLightsOn { get; set; }
         internal bool VehAreHighBeamsOn { get; set; }
         internal byte VehLandingGear { get; set; }
-
+        internal bool VehRoofOpened { get; set; }
         internal bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         internal VehicleDoors[] VehDoors { get; set; }
@@ -271,6 +271,15 @@ namespace CoopClient.Entities
                     {
                         LastHornActive = false;
                         MainVehicle.SoundHorn(1);
+                    }
+
+                    if (MainVehicle.HasRoof)
+                    {
+                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                        if (roofOpened != VehRoofOpened)
+                        {
+                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
+                        }
                     }
 
                     Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);

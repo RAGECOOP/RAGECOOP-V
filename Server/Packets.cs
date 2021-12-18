@@ -107,7 +107,8 @@ namespace CoopServer
         IsSirenActive = 1 << 3,
         IsDead = 1 << 4,
         IsHornActive = 1 << 5,
-        IsTransformed = 1 << 6
+        IsTransformed = 1 << 6,
+        RoofOpened = 1 << 7
     }
 
     [ProtoContract]

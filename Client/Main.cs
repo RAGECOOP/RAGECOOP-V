@@ -251,11 +251,11 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesPed> Npc in NPCs)
+            foreach (KeyValuePair<long, EntitiesPed> npc in NPCs)
             {
-                Npc.Value.Character?.CurrentVehicle?.Delete();
-                Npc.Value.Character?.Kill();
-                Npc.Value.Character?.Delete();
+                npc.Value.Character?.CurrentVehicle?.Delete();
+                npc.Value.Character?.Kill();
+                npc.Value.Character?.Delete();
             }
             NPCs.Clear();
 
@@ -332,6 +332,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                 DebugSyncPed.Transformed = (flags.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                DebugSyncPed.VehRoofOpened = (flags.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
                 DebugSyncPed.VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())

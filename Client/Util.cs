@@ -207,6 +207,11 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsTransformed;
             }
 
+            if (veh.HasRoof && (veh.RoofState == VehicleRoofState.Opened || veh.RoofState == VehicleRoofState.Opening))
+            {
+                flags |= (byte)VehicleDataFlags.RoofOpened;
+            }
+
             return flags;
         }
 

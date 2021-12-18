@@ -340,6 +340,7 @@ namespace CoopClient
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                 player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                player.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = true;
 
@@ -397,6 +398,7 @@ namespace CoopClient
                 player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                 player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                player.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = false;
 
@@ -639,6 +641,7 @@ namespace CoopClient
                     npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
                     npc.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                     npc.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                    npc.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
 
@@ -674,6 +677,7 @@ namespace CoopClient
                         VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0,
                         IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0,
                         Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0,
+                        VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0,
                         IsInVehicle = true,
                         LastSyncWasFull = true,
 
