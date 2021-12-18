@@ -38,7 +38,7 @@ namespace CoopClient
 
         internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
-        internal static Dictionary<long, EntitiesNpc> NPCs = null;
+        internal static Dictionary<long, EntitiesPed> NPCs = null;
         internal static Dictionary<long, int> NPCsVehicles = null;
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace CoopClient
 #endif
             MainChat = new Chat();
             Players = new Dictionary<long, EntitiesPlayer>();
-            NPCs = new Dictionary<long, EntitiesNpc>();
+            NPCs = new Dictionary<long, EntitiesPed>();
             NPCsVehicles = new Dictionary<long, int>();
 
             Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
@@ -251,7 +251,7 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesNpc> Npc in NPCs)
+            foreach (KeyValuePair<long, EntitiesPed> Npc in NPCs)
             {
                 Npc.Value.Character?.CurrentVehicle?.Delete();
                 Npc.Value.Character?.Kill();

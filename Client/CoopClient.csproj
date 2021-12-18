@@ -76,7 +76,6 @@
   <ItemGroup>
     <Compile Include="Chat.cs" />
     <Compile Include="COOPAPI.cs" />
-    <Compile Include="Entities\EntitiesNpc.cs" />
     <Compile Include="Entities\EntitiesPed.cs" />
     <Compile Include="Entities\EntitiesPlayer.cs" />
     <Compile Include="Entities\EntitiesThread.cs" />

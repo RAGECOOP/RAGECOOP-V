@@ -15,6 +15,7 @@ namespace CoopClient.Entities
     /// </summary>
     public partial class EntitiesPed
     {
+        // If this NPC is in a vehicle, we can find the handle of this vehicle in Main.NPCsVehicles[NPCVehHandle] and prevent multiple vehicles from being created
         internal long NPCVehHandle { get; set; } = 0;
         /// <summary>
         /// 0 = Nothing

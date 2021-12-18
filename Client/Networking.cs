@@ -552,7 +552,7 @@ namespace CoopClient
             {
                 if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesNpc npc = Main.NPCs[packet.NetHandle];
+                    EntitiesPed npc = Main.NPCs[packet.NetHandle];
 
                     // "if" this NPC has left a vehicle
                     npc.NPCVehHandle = 0;
@@ -579,7 +579,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.NetHandle, new EntitiesNpc()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesPed()
                     {
                         ModelHash = packet.ModelHash,
                         Clothes = packet.Clothes,
@@ -611,7 +611,7 @@ namespace CoopClient
             {
                 if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesNpc npc = Main.NPCs[packet.NetHandle];
+                    EntitiesPed npc = Main.NPCs[packet.NetHandle];
 
                     npc.NPCVehHandle = packet.VehHandle;
 
@@ -646,7 +646,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.NetHandle, new EntitiesNpc()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesPed()
                     {
                         NPCVehHandle = packet.VehHandle,
 
