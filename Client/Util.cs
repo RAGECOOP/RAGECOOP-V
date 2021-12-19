@@ -75,6 +75,28 @@ namespace CoopClient
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
         }
 
+        public static bool Compare<T, Y>(this Dictionary<T, Y> item, Dictionary<T, Y> item2)
+        {
+            if (item == null || item2 == null || item.Count != item2.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<T, Y> pair in item)
+            {
+                if (item2.TryGetValue(pair.Key, out Y value) && Equals(value, pair.Value))
+                {
+                    continue;
+                }
+
+                // TryGetValue() or Equals failed
+                return false;
+            }
+
+            // No difference between item and item2
+            return true;
+        }
+
         public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, ulong currentTime, int duration)
         {
             return new Vector3()
@@ -119,11 +141,11 @@ namespace CoopClient
             {
                 return 3;
             }
-            else if (ped.IsRunning)
+            if (ped.IsRunning)
             {
                 return 2;
             }
-            else if (ped.IsWalking)
+            if (ped.IsWalking)
             {
                 return 1;
             }
@@ -180,9 +202,14 @@ namespace CoopClient
                 flags |= (byte)VehicleDataFlags.IsHornActive;
             }
 
-            if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh))
+            if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
             {
                 flags |= (byte)VehicleDataFlags.IsTransformed;
+            }
+
+            if (veh.HasRoof && (veh.RoofState == VehicleRoofState.Opened || veh.RoofState == VehicleRoofState.Opening))
+            {
+                flags |= (byte)VehicleDataFlags.RoofOpened;
             }
 
             return flags;
@@ -225,12 +252,12 @@ namespace CoopClient
             return flags;
         }
 
-        public static Dictionary<int, int> GetPedProps(this Ped ped)
+        public static Dictionary<byte, short> GetPedClothes(this Ped ped)
         {
-            Dictionary<int, int> result = new Dictionary<int, int>();
-            for (int i = 0; i < 11; i++)
+            Dictionary<byte, short> result = new Dictionary<byte, short>();
+            for (byte i = 0; i < 11; i++)
             {
-                int mod = Function.Call<int>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                short mod = Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
                 result.Add(i, mod);
             }
             return result;
@@ -287,19 +314,19 @@ namespace CoopClient
             return result;
         }
 
-        public static int GetBrokenTires(this VehicleWheelCollection wheels)
+        public static int GetBurstedTires(this VehicleWheelCollection wheels)
         {
-            int tyreFlag = 0;
+            int tireFlag = 0;
 
             foreach (var wheel in wheels.GetAllWheels())
             {
                 if (wheel.IsBursted)
                 {
-                    tyreFlag |= (1 << (int)wheel.BoneId);
+                    tireFlag |= (1 << (int)wheel.BoneId);
                 }
             }
 
-            return tyreFlag;
+            return tireFlag;
         }
 
         public static Settings ReadSettings()

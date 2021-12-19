@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Net;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,7 +11,6 @@ using System.Net.Http;
 using Newtonsoft.Json;
 
 using Lidgren.Network;
-using System.Text;
 
 namespace CoopServer
 {
@@ -21,7 +22,7 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V1_1";
+        private static readonly string CompatibleVersion = "V1_2";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -29,7 +30,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static Resource MainResource = null;
+        public static List<Resource> Resources = new();
         public static Dictionary<Command, Action<CommandContext>> Commands;
 
         public static readonly List<Client> Clients = new();
@@ -67,7 +68,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    Logging.Error("Port forwarding failed!");
+                    Logging.Error("Port forwarding failed! Your router may not support UPnP.");
                     Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to false!");
                 }
             }
@@ -75,13 +76,17 @@ namespace CoopServer
             if (MainSettings.AnnounceSelf)
             {
                 Logging.Info("Announcing to master server...");
-                Logging.Warning("Please make sure that port forwarding is active, otherwise nobody can join!");
 
                 #region -- MASTERSERVER --
                 new Thread(async () =>
                 {
                     try
                     {
+                        // TLS only
+                        ServicePointManager.Expect100Continue = true;
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
                         HttpClient httpClient = new();
 
                         IpInfo info;
@@ -109,7 +114,7 @@ namespace CoopServer
                                 "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
                                 "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
-                                "\"allowlist\": \"" + MainSettings.Allowlist + "\", " +
+                                "\"allowlist\": \"" + MainAllowlist.Username.Any() + "\", " +
                                 "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
                                 "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
                                 "\"country\": \"" + info.country + "\"" +
@@ -154,6 +159,10 @@ namespace CoopServer
                             Thread.Sleep(12500);
                         }
                     }
+                    catch (HttpRequestException ex)
+                    {
+                        Logging.Error($"MasterServer: {ex.InnerException.Message}");
+                    }
                     catch (Exception ex)
                     {
                         Logging.Error($"MasterServer: {ex.Message}");
@@ -162,40 +171,43 @@ namespace CoopServer
                 #endregion
             }
 
-            if (!string.IsNullOrEmpty(MainSettings.Resource))
+            if (MainSettings.Resources.Any())
             {
-                try
+                Commands = new();
+
+                MainSettings.Resources.ForEach(x =>
                 {
-                    string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll";
-                    Logging.Info($"Loading resource {resourcepath}...");
-
-                    Assembly asm = Assembly.LoadFrom(resourcepath);
-                    Type[] types = asm.GetExportedTypes();
-                    IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
-                    Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
-
-                    if (!enumerable.Any())
+                    try
                     {
-                        Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
-                    }
-                    else
-                    {
-                        Commands = new();
+                        string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + x + ".dll";
+                        Logging.Info($"Loading resource \"{x}.dll\"...");
 
-                        if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
+                        Assembly asm = Assembly.LoadFrom(resourcepath);
+                        Type[] types = asm.GetExportedTypes();
+                        IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
+                        Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
+
+                        if (!enumerable.Any())
                         {
-                            MainResource = new(script);
+                            Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
                         }
                         else
                         {
-                            Logging.Warning("Could not create resource: it is null.");
+                            if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
+                            {
+                                Resources.Add(new(script));
+                            }
+                            else
+                            {
+                                Logging.Warning("Could not create resource: it is null.");
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Logging.Error(e.Message);
-                }
+                    catch (Exception e)
+                    {
+                        Logging.Error(e.InnerException.Message);
+                    }
+                });
             }
 
             Listen();
@@ -244,6 +256,10 @@ namespace CoopServer
                             {
                                 SendPlayerDisconnectPacket(message.SenderConnection.RemoteUniqueIdentifier);
                             }
+                            else if (status == NetConnectionStatus.Connected)
+                            {
+                                SendPlayerConnectPacket(message.SenderConnection);
+                            }
                             break;
                         case NetIncomingMessageType.Data:
                             // Get packet type
@@ -254,18 +270,6 @@ namespace CoopServer
 
                             switch (type)
                             {
-                                case (byte)PacketTypes.PlayerConnectPacket:
-                                    try
-                                    {
-                                        packet = new PlayerConnectPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        SendPlayerConnectPacket(message.SenderConnection, (PlayerConnectPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
-                                    }
-                                    break;
                                 case (byte)PacketTypes.FullSyncPlayerPacket:
                                     try
                                     {
@@ -418,12 +422,20 @@ namespace CoopServer
                                             packet = new ModPacket();
                                             packet.NetIncomingMessageToPacket(message);
                                             ModPacket modPacket = (ModPacket)packet;
-                                            if (MainResource != null &&
-                                                MainResource.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+
+                                            bool resourceResult = false;
+                                            if (Resources.Any())
                                             {
-                                                // Was canceled
+                                                Resources.ForEach(x =>
+                                                {
+                                                    if (x.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
+                                                    {
+                                                        resourceResult = true;
+                                                    }
+                                                });
                                             }
-                                            else if (modPacket.Target != -1)
+
+                                            if (!resourceResult && modPacket.Target != -1)
                                             {
                                                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                                                 modPacket.PacketToNetOutGoingMessage(outgoingMessage);
@@ -495,14 +507,17 @@ namespace CoopServer
             }
 
             Logging.Warning("Server is shutting down!");
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                // Waiting for resource...
-                while (!MainResource.ReadyToStop)
+                Resources.ForEach(x =>
                 {
-                    // 16 milliseconds to sleep to reduce CPU usage
-                    Thread.Sleep(1000 / 60);
-                }
+                    // Waiting for resource...
+                    while (!x.ReadyToStop)
+                    {
+                        // 16 milliseconds to sleep to reduce CPU usage
+                        Thread.Sleep(1000 / 60);
+                    }
+                });
             }
 
             if (MainNetServer.Connections.Count > 0)
@@ -518,56 +533,39 @@ namespace CoopServer
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, HandshakePacket packet)
         {
-            Logging.Debug("New handshake from: [SC: " + packet.SocialClubName + " | Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
-
-            if (string.IsNullOrWhiteSpace(packet.Username))
-            {
-                local.Deny("Username is empty or contains spaces!");
-                return;
-            }
-            else if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
-            {
-                local.Deny("Username contains special chars!");
-                return;
-            }
-
-            if (MainSettings.Allowlist)
-            {
-                if (!MainAllowlist.SocialClubName.Contains(packet.SocialClubName))
-                {
-                    local.Deny("This Social Club name is not on the allow list!");
-                    return;
-                }
-            }
+            Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
             if (!packet.ModVersion.StartsWith(CompatibleVersion))
             {
                 local.Deny($"GTACoOp:R version {CompatibleVersion.Replace('_', '.')}.x required!");
                 return;
             }
-
-            if (MainBlocklist.SocialClubName.Contains(packet.SocialClubName))
+            if (string.IsNullOrWhiteSpace(packet.Username))
             {
-                local.Deny("This Social Club name has been blocked by this server!");
+                local.Deny("Username is empty or contains spaces!");
                 return;
             }
-            else if (MainBlocklist.Username.Contains(packet.Username))
+            if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
+            {
+                local.Deny("Username contains special chars!");
+                return;
+            }
+            if (MainAllowlist.Username.Any() && !MainAllowlist.Username.Contains(packet.Username.ToLower()))
+            {
+                local.Deny("This Username is not on the allow list!");
+                return;
+            }
+            if (MainBlocklist.Username.Contains(packet.Username.ToLower()))
             {
                 local.Deny("This Username has been blocked by this server!");
                 return;
             }
-            else if (MainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
+            if (MainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
             {
                 local.Deny("This IP was blocked by this server!");
                 return;
             }
-
-            if (Clients.Any(x => x.Player.SocialClubName.ToLower() == packet.SocialClubName.ToLower()))
-            {
-                local.Deny("The name of the Social Club is already taken!");
-                return;
-            }
-            else if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
+            if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 local.Deny("Username is already taken!");
                 return;
@@ -586,7 +584,6 @@ namespace CoopServer
                         NetHandle = localNetHandle,
                         Player = new()
                         {
-                            SocialClubName = packet.SocialClubName,
                             Username = packet.Username
                         }
                     }
@@ -599,7 +596,6 @@ namespace CoopServer
             new HandshakePacket()
             {
                 NetHandle = localNetHandle,
-                SocialClubName = string.Empty,
                 Username = string.Empty,
                 ModVersion = string.Empty,
                 NpcsAllowed = MainSettings.NpcsAllowed
@@ -608,16 +604,13 @@ namespace CoopServer
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
 
-            if (MainResource != null)
-            {
-                MainResource.InvokePlayerHandshake(tmpClient);
-            }
+            Resources.ForEach(x => x.InvokePlayerHandshake(tmpClient));
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
-        private static void SendPlayerConnectPacket(NetConnection local, PlayerConnectPacket packet)
+        private static void SendPlayerConnectPacket(NetConnection local)
         {
-            Client localClient = Clients.Find(x => x.NetHandle == packet.NetHandle);
+            Client localClient = Clients.Find(x => x.NetHandle == local.RemoteUniqueIdentifier);
             if (localClient == null)
             {
                 local.Disconnect("No data found!");
@@ -639,7 +632,6 @@ namespace CoopServer
                         new PlayerConnectPacket()
                         {
                             NetHandle = targetNetHandle,
-                            SocialClubName = targetClient.Player.SocialClubName,
                             Username = targetClient.Player.Username
                         }.PacketToNetOutGoingMessage(outgoingMessage);
                         MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
@@ -650,16 +642,15 @@ namespace CoopServer
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new PlayerConnectPacket()
                 {
-                    NetHandle = packet.NetHandle,
-                    SocialClubName = localClient.Player.SocialClubName,
+                    NetHandle = local.RemoteUniqueIdentifier,
                     Username = localClient.Player.Username
                 }.PacketToNetOutGoingMessage(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerConnected(localClient);
+                Resources.ForEach(x => x.InvokePlayerConnected(localClient));
             }
             else
             {
@@ -694,9 +685,9 @@ namespace CoopServer
 
             Clients.Remove(localClient);
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerDisconnected(localClient);
+                Resources.ForEach(x => x.InvokePlayerDisconnected(localClient));
             }
             else
             {
@@ -738,9 +729,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -778,9 +769,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -818,9 +809,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -858,9 +849,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
-                MainResource.InvokePlayerUpdate(client);
+                Resources.ForEach(x => x.InvokePlayerUpdate(client));
             }
         }
 
@@ -869,7 +860,7 @@ namespace CoopServer
         {
             NetOutgoingMessage outgoingMessage;
 
-            if (MainResource != null)
+            if (Resources.Any())
             {
                 if (packet.Message.StartsWith('/'))
                 {
@@ -927,9 +918,21 @@ namespace CoopServer
                     return;
                 }
 
-                if (MainResource.InvokeChatMessage(packet.Username, packet.Message))
+                if (Resources.Any())
                 {
-                    return;
+                    bool resourceResult = false;
+                    Resources.ForEach(x =>
+                    {
+                        if (x.InvokeChatMessage(packet.Username, packet.Message))
+                        {
+                            resourceResult = true;
+                        }
+                    });
+
+                    if (resourceResult)
+                    {
+                        return;
+                    }
                 }
             }
 

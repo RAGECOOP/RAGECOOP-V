@@ -4,6 +4,6 @@ namespace CoopServer
 {
     public class Allowlist
     {
-        public List<string> SocialClubName { get; set; } = new();
+        public List<string> Username { get; set; } = new();
     }
 }

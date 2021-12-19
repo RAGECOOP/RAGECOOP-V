@@ -21,7 +21,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_1_0";
+        internal static readonly string CurrentVersion = "V1_2_0";
 
         internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
@@ -38,7 +38,7 @@ namespace CoopClient
 
         internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
-        internal static Dictionary<long, EntitiesNpc> NPCs = null;
+        internal static Dictionary<long, EntitiesPed> NPCs = null;
         internal static Dictionary<long, int> NPCsVehicles = null;
 
         /// <summary>
@@ -72,11 +72,8 @@ namespace CoopClient
 #endif
             MainChat = new Chat();
             Players = new Dictionary<long, EntitiesPlayer>();
-            NPCs = new Dictionary<long, EntitiesNpc>();
+            NPCs = new Dictionary<long, EntitiesPed>();
             NPCsVehicles = new Dictionary<long, int>();
-
-            Function.Call((Hash)0x0888C3502DBBEEF5); // _LOAD_MP_DLC_MAPS
-            Function.Call((Hash)0x9BAE5AD2508DF078, true); // _ENABLE_MP_DLC_MAPS
 
             Tick += OnTick;
 #if !NON_INTERACTIVE
@@ -88,6 +85,11 @@ namespace CoopClient
         }
 
         private ulong LastDataSend;
+#if DEBUG
+        private ulong LastDebugData;
+        private int DebugBytesSend;
+        private int DebugBytesReceived;
+#endif
         private void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
@@ -97,7 +99,7 @@ namespace CoopClient
             else if (!GameLoaded && (GameLoaded = true))
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
-                Game.Player.Character.RelationshipGroup = RelationshipGroup;
+                Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(RelationshipGroup, Relationship.Neutral, true);
 #if !NON_INTERACTIVE
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "GTACOOP:R", "Welcome!", "Press ~g~F9~s~ to open the menu.");
 #endif
@@ -122,9 +124,20 @@ namespace CoopClient
 #if DEBUG
             if (MainNetworking.ShowNetworkInfo)
             {
+                ulong time = Util.GetTickCount64();
+                if (time - LastDebugData > 1000)
+                {
+                    LastDebugData = time;
+
+                    DebugBytesReceived = MainNetworking.BytesReceived;
+                    MainNetworking.BytesReceived = 0;
+                    DebugBytesSend = MainNetworking.BytesSend;
+                    MainNetworking.BytesSend = 0;
+                }
+
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {MainNetworking.BytesReceived * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {MainNetworking.BytesSend * 0.000001} mb", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 
@@ -235,11 +248,11 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesNpc> Npc in NPCs)
+            foreach (KeyValuePair<long, EntitiesPed> npc in NPCs)
             {
-                Npc.Value.Character?.CurrentVehicle?.Delete();
-                Npc.Value.Character?.Kill();
-                Npc.Value.Character?.Delete();
+                npc.Value.Character?.CurrentVehicle?.Delete();
+                npc.Value.Character?.Kill();
+                npc.Value.Character?.Delete();
             }
             NPCs.Clear();
 
@@ -258,7 +271,7 @@ namespace CoopClient
 
             if (!Players.ContainsKey(0))
             {
-                Players.Add(0, new EntitiesPlayer() { SocialClubName = "DEBUG", Username = "DebugPlayer" });
+                Players.Add(0, new EntitiesPlayer() { Username = "DebugPlayer" });
                 DebugSyncPed = Players[0];
             }
 
@@ -272,7 +285,7 @@ namespace CoopClient
             if (fullSync)
             {
                 DebugSyncPed.ModelHash = player.Model.Hash;
-                DebugSyncPed.Props = player.GetPedProps();
+                DebugSyncPed.Clothes = player.GetPedClothes();
             }
             DebugSyncPed.Health = player.Health;
             DebugSyncPed.Position = player.Position;
@@ -286,15 +299,15 @@ namespace CoopClient
 
                 flags = veh.GetVehicleFlags();
 
-                int secondaryColor;
-                int primaryColor;
+                byte secondaryColor;
+                byte primaryColor;
                 unsafe
                 {
-                    Function.Call<int>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
-                DebugSyncPed.VehicleSeatIndex = (int)player.SeatIndex;
+                DebugSyncPed.VehicleSeatIndex = (short)player.SeatIndex;
                 DebugSyncPed.VehiclePosition = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
@@ -303,10 +316,10 @@ namespace CoopClient
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
-                DebugSyncPed.VehicleColors = new int[] { primaryColor, secondaryColor };
+                DebugSyncPed.VehicleColors = new byte[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
                 DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
-                DebugSyncPed.VehTires = veh.Wheels.GetBrokenTires();
+                DebugSyncPed.VehTires = veh.Wheels.GetBurstedTires();
                 DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsInVehicle = true;
                 DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
@@ -316,6 +329,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
                 DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
                 DebugSyncPed.Transformed = (flags.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
+                DebugSyncPed.VehRoofOpened = (flags.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
                 DebugSyncPed.VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())

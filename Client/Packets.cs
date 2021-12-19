@@ -164,7 +164,8 @@ namespace CoopClient
         IsSirenActive = 1 << 3,
         IsDead = 1 << 4,
         IsHornActive = 1 << 5,
-        IsTransformed = 1 << 6
+        IsTransformed = 1 << 6,
+        RoofOpened = 1 << 7
     }
 
     /// <summary>
@@ -274,15 +275,12 @@ namespace CoopClient
         public long NetHandle { get; set; }
 
         [ProtoMember(2)]
-        public string SocialClubName { get; set; }
-
-        [ProtoMember(3)]
         public string Username { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public string ModVersion { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public bool NpcsAllowed { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
@@ -302,7 +300,6 @@ namespace CoopClient
             HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
 
             NetHandle = data.NetHandle;
-            SocialClubName = data.SocialClubName;
             Username = data.Username;
             ModVersion = data.ModVersion;
             NpcsAllowed = data.NpcsAllowed;
@@ -395,7 +392,7 @@ namespace CoopClient
         public int ModelHash { get; set; }
 
         [ProtoMember(3)]
-        public Dictionary<int, int> Props { get; set; }
+        public Dictionary<byte, short> Clothes { get; set; }
 
         [ProtoMember(4)]
         public LVector3 Rotation { get; set; }
@@ -436,7 +433,7 @@ namespace CoopClient
 
             Extra = data.Extra;
             ModelHash = data.ModelHash;
-            Props = data.Props;
+            Clothes = data.Clothes;
             Rotation = data.Rotation;
             Velocity = data.Velocity;
             Speed = data.Speed;
@@ -457,13 +454,13 @@ namespace CoopClient
         public int ModelHash { get; set; }
 
         [ProtoMember(3)]
-        public Dictionary<int, int> Props { get; set; }
+        public Dictionary<byte, short> Clothes { get; set; }
 
         [ProtoMember(4)]
         public int VehModelHash { get; set; }
 
         [ProtoMember(5)]
-        public int VehSeatIndex { get; set; }
+        public short VehSeatIndex { get; set; }
 
         [ProtoMember(6)]
         public LVector3 VehPosition { get; set; }
@@ -490,7 +487,7 @@ namespace CoopClient
         public LVector3 VehAimCoords { get; set; }
 
         [ProtoMember(14)]
-        public int[] VehColors { get; set; }
+        public byte[] VehColors { get; set; }
 
         [ProtoMember(15)]
         public Dictionary<int, int> VehMods { get; set; }
@@ -525,7 +522,7 @@ namespace CoopClient
 
             Extra = data.Extra;
             ModelHash = data.ModelHash;
-            Props = data.Props;
+            Clothes = data.Clothes;
             VehModelHash = data.VehModelHash;
             VehSeatIndex = data.VehSeatIndex;
             VehPosition = data.VehPosition;
@@ -605,7 +602,7 @@ namespace CoopClient
         public int VehModelHash { get; set; }
 
         [ProtoMember(5)]
-        public int VehSeatIndex { get; set; }
+        public short VehSeatIndex { get; set; }
 
         [ProtoMember(6)]
         public LVector3 VehPosition { get; set; }
@@ -834,7 +831,7 @@ namespace CoopClient
         public int ModelHash { get; set; }
 
         [ProtoMember(3)]
-        public Dictionary<int, int> Props { get; set; }
+        public Dictionary<byte, short> Clothes { get; set; }
 
         [ProtoMember(4)]
         public int Health { get; set; }
@@ -878,7 +875,7 @@ namespace CoopClient
 
             NetHandle = data.NetHandle;
             ModelHash = data.ModelHash;
-            Props = data.Props;
+            Clothes = data.Clothes;
             Health = data.Health;
             Position = data.Position;
             Rotation = data.Rotation;
@@ -903,7 +900,7 @@ namespace CoopClient
         public int ModelHash { get; set; }
 
         [ProtoMember(4)]
-        public Dictionary<int, int> Props { get; set; }
+        public Dictionary<byte, short> Clothes { get; set; }
 
         [ProtoMember(5)]
         public int Health { get; set; }
@@ -915,7 +912,7 @@ namespace CoopClient
         public int VehModelHash { get; set; }
 
         [ProtoMember(8)]
-        public int VehSeatIndex { get; set; }
+        public short VehSeatIndex { get; set; }
 
         [ProtoMember(9)]
         public LVector3 VehPosition { get; set; }
@@ -939,7 +936,7 @@ namespace CoopClient
         public float VehSteeringAngle { get; set; }
 
         [ProtoMember(16)]
-        public int[] VehColors { get; set; }
+        public byte[] VehColors { get; set; }
 
         [ProtoMember(17)]
         public Dictionary<int, int> VehMods { get; set; }
@@ -975,7 +972,7 @@ namespace CoopClient
             NetHandle = data.NetHandle;
             VehHandle = data.VehHandle;
             ModelHash = data.ModelHash;
-            Props = data.Props;
+            Clothes = data.Clothes;
             Health = data.Health;
             Position = data.Position;
             VehModelHash = data.VehModelHash;

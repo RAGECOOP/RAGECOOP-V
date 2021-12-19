@@ -33,13 +33,13 @@ namespace CoopClient.Entities
                 return;
             }
 
-            Dictionary<long, EntitiesNpc> localNPCs = null;
+            Dictionary<long, EntitiesPed> localNPCs = null;
             lock (Main.NPCs)
             {
-                localNPCs = new Dictionary<long, EntitiesNpc>(Main.NPCs);
+                localNPCs = new Dictionary<long, EntitiesPed>(Main.NPCs);
 
                 ulong tickCount = Util.GetTickCount64();
-                foreach (KeyValuePair<long, EntitiesNpc> npc in new Dictionary<long, EntitiesNpc>(localNPCs))
+                foreach (KeyValuePair<long, EntitiesPed> npc in new Dictionary<long, EntitiesPed>(localNPCs))
                 {
                     if ((tickCount - npc.Value.LastUpdateReceived) > 3000)
                     {
@@ -72,7 +72,7 @@ namespace CoopClient.Entities
                 }
             }
 
-            foreach (EntitiesNpc npc in localNPCs.Values)
+            foreach (EntitiesPed npc in localNPCs.Values)
             {
                 npc.DisplayLocally(null);
             }

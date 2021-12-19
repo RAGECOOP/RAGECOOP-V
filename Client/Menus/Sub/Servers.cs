@@ -56,9 +56,12 @@ namespace CoopClient.Menus.Sub
             };
             MainMenu.Closed += (object sender, EventArgs e) =>
             {
-                for (int i = 0; i < MainMenu.Items.Count; i++)
+                if (MainMenu.Items.Count > 0)
                 {
-                    MainMenu.Remove(MainMenu.Items[i]);
+                    for (int i = 0; i < MainMenu.Items.Count; i++)
+                    {
+                        MainMenu.Remove(MainMenu.Items[i]);
+                    }
                 }
             };
         }
@@ -67,9 +70,9 @@ namespace CoopClient.Menus.Sub
             List<ServerListClass> serverList = null;
             try
             {
-                // SSL/TLS
+                // TLS only
                 ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                 WebClient client = new WebClient();
@@ -79,11 +82,18 @@ namespace CoopClient.Menus.Sub
             catch (Exception ex)
             {
                 ResultItem.Title = "Download failed!";
-                ResultItem.Description = ex.Message; // You have to use any key to see this message
+                ResultItem.Description = ex.Message;
+                return;
             }
-
+            
             if (serverList == null)
             {
+                MainMenu.Items[0].Title = "Something went wrong!";
+                return;
+            }
+            if (serverList.Count == 0)
+            {
+                MainMenu.Items[0].Title = "No server was found!";
                 return;
             }
 

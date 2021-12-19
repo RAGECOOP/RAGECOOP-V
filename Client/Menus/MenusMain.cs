@@ -65,7 +65,6 @@ namespace CoopClient.Menus
                 Util.SaveSettings();
 
                 UsernameItem.AltTitle = newUsername;
-                MenuPool.RefreshAll();
             }
         }
 
@@ -78,7 +77,6 @@ namespace CoopClient.Menus
                 Util.SaveSettings();
 
                 ServerIpItem.AltTitle = newServerIp;
-                MenuPool.RefreshAll();
             }
         }
 
@@ -108,8 +106,6 @@ namespace CoopClient.Menus
             MainMenu.Items[3].Enabled = true;
             MainMenu.Items[3].Title = "Connect";
             SubSettings.MainMenu.Items[1].Enabled = false;
-
-            MenuPool.RefreshAll();
         }
     }
 }

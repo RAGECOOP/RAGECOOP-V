@@ -28,13 +28,13 @@ namespace CoopClient.Entities
                 CurrentVehicleModelHash = value;
             }
         }
-        private int[] LastVehicleColors = new int[] { 0, 0 };
-        internal int[] VehicleColors { get; set; }
+        private byte[] LastVehicleColors = new byte[] { 0, 0 };
+        internal byte[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
         internal Dictionary<int, int> VehicleMods { get; set; }
         internal bool VehicleDead { get; set; }
         internal float VehicleEngineHealth { get; set; }
-        internal int VehicleSeatIndex { get; set; }
+        internal short VehicleSeatIndex { get; set; }
         /// <summary>
         /// ?
         /// </summary>
@@ -70,7 +70,7 @@ namespace CoopClient.Entities
         internal bool VehAreLightsOn { get; set; }
         internal bool VehAreHighBeamsOn { get; set; }
         internal byte VehLandingGear { get; set; }
-
+        internal bool VehRoofOpened { get; set; }
         internal bool VehIsSireneActive { get; set; }
         private VehicleDoors[] LastVehDoors;
         internal VehicleDoors[] VehDoors { get; set; }
@@ -132,6 +132,15 @@ namespace CoopClient.Entities
                         Main.NPCsVehicles.Add(NPCVehHandle, MainVehicle.Handle);
                     }
                     MainVehicle.Quaternion = VehicleRotation;
+
+                    if (MainVehicle.HasRoof)
+                    {
+                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                        if (roofOpened != VehRoofOpened)
+                        {
+                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opened : VehicleRoofState.Closed;
+                        }
+                    }
                 }
             }
 
@@ -194,7 +203,7 @@ namespace CoopClient.Entities
             }
             else
             {
-                if (VehicleMods != null && VehicleMods != LastVehicleMods)
+                if (VehicleMods != null && !VehicleMods.Compare(LastVehicleMods))
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
@@ -239,12 +248,12 @@ namespace CoopClient.Entities
                     if (Transformed && !LastTransformed)
                     {
                         LastTransformed = true;
-                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle, false);
+                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
                     }
                     else if (!Transformed && LastTransformed)
                     {
                         LastTransformed = false;
-                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle, false);
+                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
                     }
                 }
 
@@ -271,6 +280,15 @@ namespace CoopClient.Entities
                     {
                         LastHornActive = false;
                         MainVehicle.SoundHorn(1);
+                    }
+
+                    if (MainVehicle.HasRoof)
+                    {
+                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                        if (roofOpened != VehRoofOpened)
+                        {
+                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
+                        }
                     }
 
                     Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);

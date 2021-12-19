@@ -1,8 +1,9 @@
-﻿namespace CoopServer
+﻿using System.Linq;
+
+namespace CoopServer
 {
     public struct PlayerData
     {
-        public string SocialClubName { get; set; }
         public string Username { get; set; }
         private LVector3 LastPosition { get; set; }
         private LVector3 CurrentPosition { get; set; }
@@ -14,9 +15,12 @@
                 LastPosition = CurrentPosition;
                 CurrentPosition = value;
 
-                if (Server.MainResource != null && !LVector3.Equals(CurrentPosition, LastPosition))
+                if (Server.Resources.Any() && !LVector3.Equals(CurrentPosition, LastPosition))
                 {
-                    Server.MainResource.InvokePlayerPositionUpdate(this);
+                    foreach (Resource resource in Server.Resources)
+                    {
+                        resource.InvokePlayerPositionUpdate(this);
+                    }
                 }
             }
         }
@@ -26,9 +30,12 @@
             get => CurrentHealth;
             set
             {
-                if (CurrentHealth != value && Server.MainResource != null)
+                if (Server.Resources.Any() && CurrentHealth != value)
                 {
-                    Server.MainResource.InvokePlayerHealthUpdate(this);
+                    foreach (Resource resource in Server.Resources)
+                    {
+                        resource.InvokePlayerHealthUpdate(this);
+                    }
                 }
 
                 CurrentHealth = value;
