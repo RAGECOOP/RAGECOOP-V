@@ -459,6 +459,9 @@ namespace CoopClient
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
 
+            // Write player health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
             // Write player flags
             byteArray.Add(Flag.Value);
 
@@ -549,6 +552,9 @@ namespace CoopClient
 
             // Read player netHandle
             NetHandle = reader.ReadLong();
+
+            // Read player health
+            Health = reader.ReadInt();
 
             // Read player flag
             Flag = reader.ReadByte();
