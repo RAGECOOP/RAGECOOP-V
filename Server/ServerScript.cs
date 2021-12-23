@@ -261,7 +261,7 @@ namespace CoopServer
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
+                Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                 Server.MainNetServer.FlushSendQueue();
             }
             catch (Exception e)
@@ -271,11 +271,12 @@ namespace CoopServer
         }
 
         /// <summary>
-        /// Send a native call (Function.Call) to all players
+        /// Send a native call (Function.Call) to all players.
+        /// Keys = int, float, bool, string and lvector3
         /// </summary>
         /// <param name="hash">The hash (Example: 0x25223CA6B4D20B7F = GET_CLOCK_HOURS)</param>
-        /// <param name="args">The arguments (Example: "Function.Call(Hash.SET_TIME_SCALE, args);")</param>
-        public static void SendNativeCallToAll(ulong hash, params object[] args)
+        /// <param name="args">The arguments (Example: string = int, object = 5)</param>
+        public static void SendNativeCallToAll(ulong hash, List<object> args = null)
         {
             try
             {
@@ -284,22 +285,21 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments = Util.ParseNativeArguments(args);
-                if (arguments == null)
+                if (args != null && args.Count == 0)
                 {
-                    Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: One or more arguments do not exist!");
+                    Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
                     return;
                 }
 
                 NativeCallPacket packet = new()
                 {
                     Hash = hash,
-                    Args = arguments
+                    Args = args ?? new List<object>()
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
+                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -354,13 +354,7 @@ namespace CoopServer
                     ? Server.MainNetServer.Connections
                     : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
 
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new ChatMessagePacket()
-                {
-                    Username = username,
-                    Message = message
-                }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                Server.SendChatMessage(username, message, connections);
             }
             catch (Exception e)
             {

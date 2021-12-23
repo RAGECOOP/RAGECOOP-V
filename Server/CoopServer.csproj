@@ -15,9 +15,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\Libs\Release\scripts\protobuf-net.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

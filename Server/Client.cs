@@ -65,15 +65,7 @@ namespace CoopServer
                     return;
                 }
 
-                ChatMessagePacket packet = new()
-                {
-                    Username = from,
-                    Message = message
-                };
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                Server.SendChatMessage(from, message, userConnection);
             }
             catch (Exception e)
             {
@@ -81,7 +73,7 @@ namespace CoopServer
             }
         }
 
-        public void SendNativeCall(ulong hash, params object[] args)
+        public void SendNativeCall(ulong hash, List<object> args = null)
         {
             try
             {
@@ -92,27 +84,21 @@ namespace CoopServer
                     return;
                 }
 
-                List<NativeArgument> arguments = null;
-                if (args != null && args.Length > 0)
+                if (args != null && args.Count == 0)
                 {
-                    arguments = Util.ParseNativeArguments(args);
-                    if (arguments == null)
-                    {
-                        Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Missing arguments!");
-                        return;
-                    }
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
+                    return;
                 }
-                
 
                 NativeCallPacket packet = new()
                 {
                     Hash = hash,
-                    Args = arguments
+                    Args = args ?? new List<object>(),
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -120,7 +106,7 @@ namespace CoopServer
             }
         }
 
-        public void SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)
+        public void SendNativeResponse(Action<object> callback, ulong hash, Type returnType, List<object> args = null)
         {
             try
             {
@@ -131,59 +117,51 @@ namespace CoopServer
                     return;
                 }
 
-                NativeArgument returnType = null;
-                Type typeOf = type;
-                if (typeOf == typeof(int))
+                if (args != null && args.Count == 0)
                 {
-                    returnType = new IntArgument();
-                }
-                else if (typeOf == typeof(bool))
-                {
-                    returnType = new BoolArgument();
-                }
-                else if (typeOf == typeof(float))
-                {
-                    returnType = new FloatArgument();
-                }
-                else if (typeOf == typeof(string))
-                {
-                    returnType = new StringArgument();
-                }
-                else if (typeOf == typeof(LVector3))
-                {
-                    returnType = new LVector3Argument();
-                }
-                else
-                {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Argument does not exist!");
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
                     return;
-                }
-
-                List<NativeArgument> arguments = null;
-                if (args != null && args.Length > 0)
-                {
-                    arguments = Util.ParseNativeArguments(args);
-                    if (arguments == null)
-                    {
-                        Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: One or more arguments do not exist!");
-                        return;
-                    }
                 }
 
                 long id = 0;
                 Callbacks.Add(id = Environment.TickCount64, callback);
 
-                NativeResponsePacket packet = new()
+                byte returnTypeValue = 0x00;
+                if (returnType == typeof(int))
                 {
-                    Hash = hash,
-                    Args = arguments,
-                    Type = returnType,
-                    NetHandle = id
-                };
+                    // NOTHING BECAUSE VALUE IS 0x00
+                }
+                else if (returnType == typeof(bool))
+                {
+                    returnTypeValue = 0x01;
+                }
+                else if (returnType == typeof(float))
+                {
+                    returnTypeValue = 0x02;
+                }
+                else if (returnType == typeof(string))
+                {
+                    returnTypeValue = 0x03;
+                }
+                else if (returnType == typeof(LVector3))
+                {
+                    returnTypeValue = 0x04;
+                }
+                else
+                {
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing return type!");
+                    return;
+                }
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
+                new NativeResponsePacket()
+                {
+                    Hash = hash,
+                    Args = args ?? new List<object>(),
+                    ResultType = returnTypeValue,
+                    ID = id
+                }.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)
             {
@@ -210,7 +188,7 @@ namespace CoopServer
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                 Server.MainNetServer.FlushSendQueue();
             }
             catch (Exception e)

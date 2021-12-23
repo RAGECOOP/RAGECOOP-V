@@ -64,7 +64,7 @@ namespace CoopClient
                     NetHandle =  0,
                     Username = Main.MainSettings.Username,
                     ModVersion = Main.CurrentVersion,
-                    NpcsAllowed = false
+                    NPCsAllowed = false
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
@@ -111,13 +111,14 @@ namespace CoopClient
                                 }
                                 else
                                 {
-                                    Packet remoteHailMessagePacket;
-                                    remoteHailMessagePacket = new HandshakePacket();
-                                    remoteHailMessagePacket.NetIncomingMessageToPacket(message.SenderConnection.RemoteHailMessage);
+                                    int len = message.SenderConnection.RemoteHailMessage.ReadInt32();
+                                    byte[] data = message.SenderConnection.RemoteHailMessage.ReadBytes(len);
 
-                                    HandshakePacket handshakePacket = (HandshakePacket)remoteHailMessagePacket;
+                                    HandshakePacket handshakePacket = new HandshakePacket();
+                                    handshakePacket.NetIncomingMessageToPacket(data);
+
                                     Main.LocalNetHandle = handshakePacket.NetHandle;
-                                    Main.NPCsAllowed = handshakePacket.NpcsAllowed;
+                                    Main.NPCsAllowed = handshakePacket.NPCsAllowed;
 
                                     Main.MainChat.Init();
 
@@ -154,80 +155,166 @@ namespace CoopClient
                     case NetIncomingMessageType.Data:
                         byte packetType = message.ReadByte();
 
-                        Packet packet;
-
                         switch (packetType)
                         {
                             case (byte)PacketTypes.PlayerConnectPacket:
-                                packet = new PlayerConnectPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                PlayerConnect((PlayerConnectPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    PlayerConnectPacket packet = new PlayerConnectPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    PlayerConnect(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.PlayerDisconnectPacket:
-                                packet = new PlayerDisconnectPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                PlayerDisconnect((PlayerDisconnectPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    PlayerDisconnectPacket packet = new PlayerDisconnectPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    PlayerDisconnect(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.FullSyncPlayerPacket:
-                                packet = new FullSyncPlayerPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                FullSyncPlayer((FullSyncPlayerPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    FullSyncPlayer(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.FullSyncPlayerVehPacket:
-                                packet = new FullSyncPlayerVehPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                FullSyncPlayerVeh((FullSyncPlayerVehPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    FullSyncPlayerVeh(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.LightSyncPlayerPacket:
-                                packet = new LightSyncPlayerPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                LightSyncPlayer((LightSyncPlayerPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    LightSyncPlayer(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.LightSyncPlayerVehPacket:
-                                packet = new LightSyncPlayerVehPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                LightSyncPlayerVeh((LightSyncPlayerVehPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    LightSyncPlayerVeh(packet);
+                                }
+                                break;
+                            case (byte)PacketTypes.SuperLightSyncPacket:
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    SuperLightSyncPacket packet = new SuperLightSyncPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    if (Main.Players.ContainsKey(packet.NetHandle))
+                                    {
+                                        EntitiesPlayer player = Main.Players[packet.NetHandle];
+
+                                        player.Position = packet.Position.ToVector();
+                                        player.Latency = packet.Latency.HasValue ? packet.Latency.Value : 0;
+                                    }
+                                }
                                 break;
                             case (byte)PacketTypes.FullSyncNpcPacket:
-                                packet = new FullSyncNpcPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                FullSyncNpc((FullSyncNpcPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    FullSyncNpcPacket packet = new FullSyncNpcPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    FullSyncNpc(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.FullSyncNpcVehPacket:
-                                packet = new FullSyncNpcVehPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                FullSyncNpcVeh((FullSyncNpcVehPacket)packet);
-                                break;
-                            case (byte)PacketTypes.SuperLightSyncPlayerPacket:
-                                packet = new SuperLightSyncPlayerPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                SuperLightSyncPlayer((SuperLightSyncPlayerPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    FullSyncNpcVeh(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.ChatMessagePacket:
-                                packet = new ChatMessagePacket();
-                                packet.NetIncomingMessageToPacket(message);
-
-                                ChatMessagePacket chatMessagePacket = (ChatMessagePacket)packet;
-                                if (!COOPAPI.ChatMessageReceived(chatMessagePacket.Username, chatMessagePacket.Message))
                                 {
-                                    Main.MainChat.AddMessage(chatMessagePacket.Username, chatMessagePacket.Message);
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    ChatMessagePacket packet = new ChatMessagePacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    if (!COOPAPI.ChatMessageReceived(packet.Username, packet.Message))
+                                    {
+                                        Main.MainChat.AddMessage(packet.Username, packet.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.NativeCallPacket:
-                                packet = new NativeCallPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                DecodeNativeCall((NativeCallPacket)packet);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    NativeCallPacket packet = new NativeCallPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    DecodeNativeCall(packet);
+                                }
                                 break;
                             case (byte)PacketTypes.NativeResponsePacket:
-                                packet = new NativeResponsePacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                DecodeNativeResponse((NativeResponsePacket)packet);
+                                {
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+
+                                        NativeResponsePacket packet = new NativeResponsePacket();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        DecodeNativeResponse(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show($"{ex.Message}");
+                                    }
+                                }
                                 break;
                             case (byte)PacketTypes.ModPacket:
-                                packet = new ModPacket();
-                                packet.NetIncomingMessageToPacket(message);
-                                ModPacket modPacket = (ModPacket)packet;
-                                COOPAPI.ModPacketReceived(modPacket.NetHandle, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes);
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    ModPacket packet = new ModPacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    COOPAPI.ModPacketReceived(packet.NetHandle, packet.Mod, packet.CustomPacketID, packet.Bytes);
+                                }
                                 break;
                         }
                         break;
@@ -280,14 +367,14 @@ namespace CoopClient
 
         private void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
+            if (Main.Players.ContainsKey(packet.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
+                EntitiesPlayer player = Main.Players[packet.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
                 player.Clothes = packet.Clothes;
-                player.Health = packet.Extra.Health;
-                player.Position = packet.Extra.Position.ToVector();
+                player.Health = packet.Health;
+                player.Position = packet.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -303,24 +390,23 @@ namespace CoopClient
                 player.IsInVehicle = false;
                 player.LastSyncWasFull = true;
 
-                player.Latency = packet.Extra.Latency;
+                player.Latency = packet.Latency.Value;
                 player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
         private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
+            if (Main.Players.ContainsKey(packet.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
+                EntitiesPlayer player = Main.Players[packet.NetHandle];
 
                 player.ModelHash = packet.ModelHash;
                 player.Clothes = packet.Clothes;
-                player.Health = packet.Extra.Health;
-                player.Position = packet.Extra.Position.ToVector();
+                player.Health = packet.Health;
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
-                player.VehiclePosition = packet.VehPosition.ToVector();
+                player.Position = packet.Position.ToVector();
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
                 player.VehicleEngineHealth = packet.VehEngineHealth;
                 player.VehRPM = packet.VehRPM;
@@ -330,33 +416,32 @@ namespace CoopClient
                 player.AimCoords = packet.VehAimCoords.ToVector();
                 player.VehicleColors = packet.VehColors;
                 player.VehicleMods = packet.VehMods;
-                player.VehDoors = packet.VehDoors;
-                player.VehTires = packet.VehTires;
+                player.VehDamageModel = packet.VehDamageModel;
                 player.VehLandingGear = packet.VehLandingGear;
-                player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
-                player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
-                player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
-                player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
-                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
-                player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
-                player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
-                player.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
+                player.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
+                player.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
+                player.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
+                player.IsHornActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsHornActive) > 0;
+                player.Transformed = (packet.Flag.Value & (ushort)VehicleDataFlags.IsTransformed) > 0;
+                player.VehRoofOpened = (packet.Flag.Value & (ushort)VehicleDataFlags.RoofOpened) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = true;
 
-                player.Latency = packet.Extra.Latency;
+                player.Latency = packet.Latency.Value;
                 player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
         private void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
+            if (Main.Players.ContainsKey(packet.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
+                EntitiesPlayer player = Main.Players[packet.NetHandle];
 
-                player.Health = packet.Extra.Health;
-                player.Position = packet.Extra.Position.ToVector();
+                player.Health = packet.Health;
+                player.Position = packet.Position.ToVector();
                 player.Rotation = packet.Rotation.ToVector();
                 player.Velocity = packet.Velocity.ToVector();
                 player.Speed = packet.Speed;
@@ -371,52 +456,40 @@ namespace CoopClient
                 player.IsInVehicle = false;
                 player.LastSyncWasFull = false;
 
-                player.Latency = packet.Extra.Latency;
+                if (packet.Flag.HasValue)
+                {
+                    player.Latency = packet.Latency.Value;
+                }
                 player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
 
         private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
+            if (Main.Players.ContainsKey(packet.NetHandle))
             {
-                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
+                EntitiesPlayer player = Main.Players[packet.NetHandle];
 
-                player.Health = packet.Extra.Health;
-                player.Position = packet.Extra.Position.ToVector();
+                player.Health = packet.Health;
                 player.VehicleModelHash = packet.VehModelHash;
                 player.VehicleSeatIndex = packet.VehSeatIndex;
-                player.VehiclePosition = packet.VehPosition.ToVector();
+                player.Position = packet.Position.ToVector();
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
                 player.VehicleVelocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
-                player.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
-                player.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
-                player.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
-                player.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
-                player.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
-                player.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
-                player.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
-                player.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
+                player.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
+                player.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
+                player.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
+                player.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
+                player.IsHornActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsHornActive) > 0;
+                player.Transformed = (packet.Flag.Value & (ushort)VehicleDataFlags.IsTransformed) > 0;
+                player.VehRoofOpened = (packet.Flag.Value & (ushort)VehicleDataFlags.RoofOpened) > 0;
                 player.IsInVehicle = true;
                 player.LastSyncWasFull = false;
 
-                player.Latency = packet.Extra.Latency;
-                player.LastUpdateReceived = Util.GetTickCount64();
-            }
-        }
-
-        private void SuperLightSyncPlayer(SuperLightSyncPlayerPacket packet)
-        {
-            if (Main.Players.ContainsKey(packet.Extra.NetHandle))
-            {
-                EntitiesPlayer player = Main.Players[packet.Extra.NetHandle];
-
-                player.Health = packet.Extra.Health;
-                player.Position = packet.Extra.Position.ToVector();
-
-                player.Latency = packet.Extra.Latency;
+                player.Latency = packet.Latency.Value;
                 player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
@@ -427,31 +500,32 @@ namespace CoopClient
 
             if (packet.Args != null && packet.Args.Count > 0)
             {
-                packet.Args.ForEach(arg =>
+                packet.Args.ForEach(x =>
                 {
-                    Type typeOf = arg.GetType();
+                    Type type = x.GetType();
 
-                    if (typeOf == typeof(IntArgument))
+                    if (type == typeof(int))
                     {
-                        arguments.Add(((IntArgument)arg).Data);
+                        arguments.Add((int)x);
                     }
-                    else if (typeOf == typeof(BoolArgument))
+                    else if (type == typeof(bool))
                     {
-                        arguments.Add(((BoolArgument)arg).Data);
+                        arguments.Add((bool)x);
                     }
-                    else if (typeOf == typeof(FloatArgument))
+                    else if (type == typeof(float))
                     {
-                        arguments.Add(((FloatArgument)arg).Data);
+                        arguments.Add((float)x);
                     }
-                    else if (typeOf == typeof(StringArgument))
+                    else if (type == typeof(string))
                     {
-                        arguments.Add(((StringArgument)arg).Data);
+                        arguments.Add((string)x);
                     }
-                    else if (typeOf == typeof(LVector3Argument))
+                    else if (type == typeof(LVector3))
                     {
-                        arguments.Add(((LVector3Argument)arg).Data.X);
-                        arguments.Add(((LVector3Argument)arg).Data.Y);
-                        arguments.Add(((LVector3Argument)arg).Data.Z);
+                        LVector3 vector = (LVector3)x;
+                        arguments.Add((float)vector.X);
+                        arguments.Add((float)vector.Y);
+                        arguments.Add((float)vector.Z);
                     }
                     else
                     {
@@ -471,78 +545,72 @@ namespace CoopClient
 
             if (packet.Args != null && packet.Args.Count > 0)
             {
-                packet.Args.ForEach(arg =>
+                packet.Args.ForEach(x =>
                 {
-                    typeOf = arg.GetType();
+                    typeOf = x.GetType();
 
-                    if (typeOf == typeof(IntArgument))
+                    if (typeOf == typeof(int))
                     {
-                        arguments.Add(((IntArgument)arg).Data);
+                        arguments.Add((int)x);
                     }
-                    else if (typeOf == typeof(BoolArgument))
+                    else if (typeOf == typeof(bool))
                     {
-                        arguments.Add(((BoolArgument)arg).Data);
+                        arguments.Add((bool)x);
                     }
-                    else if (typeOf == typeof(FloatArgument))
+                    else if (typeOf == typeof(float))
                     {
-                        arguments.Add(((FloatArgument)arg).Data);
+                        arguments.Add((float)x);
                     }
-                    else if (typeOf == typeof(StringArgument))
+                    else if (typeOf == typeof(string))
                     {
-                        arguments.Add(((StringArgument)arg).Data);
+                        arguments.Add((string)x);
                     }
-                    else if (typeOf == typeof(LVector3Argument))
+                    else if (typeOf == typeof(LVector3))
                     {
-                        arguments.Add(((LVector3Argument)arg).Data.X);
-                        arguments.Add(((LVector3Argument)arg).Data.Y);
-                        arguments.Add(((LVector3Argument)arg).Data.Z);
+                        LVector3 vector = (LVector3)x;
+                        arguments.Add((float)vector.X);
+                        arguments.Add((float)vector.Y);
+                        arguments.Add((float)vector.Z);
                     }
                     else
                     {
-                        GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
+                        GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of argument not found!");
                         return;
                     }
                 });
             }
 
-            NativeArgument result = null;
-
-            typeOf = packet.Type.GetType();
-            if (typeOf == typeof(IntArgument))
+            object result;
+            switch (packet.ResultType.Value)
             {
-                result = new IntArgument() { Data = Function.Call<int>((Hash)packet.Hash, arguments.ToArray()) };
-            }
-            else if (typeOf == typeof(BoolArgument))
-            {
-                result = new BoolArgument() { Data = Function.Call<bool>((Hash)packet.Hash, arguments.ToArray()) };
-            }
-            else if (typeOf == typeof(FloatArgument))
-            {
-                result = new FloatArgument() { Data = Function.Call<float>((Hash)packet.Hash, arguments.ToArray()) };
-            }
-            else if (typeOf == typeof(StringArgument))
-            {
-                result = new StringArgument() { Data = Function.Call<string>((Hash)packet.Hash, arguments.ToArray()) };
-            }
-            else if (typeOf == typeof(LVector3Argument))
-            {
-                result = new LVector3Argument() { Data = Function.Call<GTA.Math.Vector3>((Hash)packet.Hash, arguments.ToArray()).ToLVector() };
-            }
-            else
-            {
-                GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of argument not found!");
-                return;
+                case 0x00: // int
+                    result = Function.Call<int>((Hash)packet.Hash, arguments.ToArray());
+                    break;
+                case 0x01: // bool
+                    result = Function.Call<bool>((Hash)packet.Hash, arguments.ToArray());
+                    break;
+                case 0x02: // float
+                    result = Function.Call<float>((Hash)packet.Hash, arguments.ToArray());
+                    break;
+                case 0x03: // string
+                    result = Function.Call<string>((Hash)packet.Hash, arguments.ToArray());
+                    break;
+                case 0x04: // vector3
+                    result = Function.Call<GTA.Math.Vector3>((Hash)packet.Hash, arguments.ToArray()).ToLVector();
+                    break;
+                default:
+                    GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of return not found!");
+                    return;
             }
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new NativeResponsePacket()
             {
                 Hash = 0,
-                Args = null,
-                Type = result,
-                NetHandle =  packet.NetHandle
+                Args = new List<object>() { result },
+                ID =  packet.ID
             }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Native);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             Client.FlushSendQueue();
         }
         #endregion // -- PLAYER --
@@ -620,10 +688,9 @@ namespace CoopClient
                     npc.ModelHash = packet.ModelHash;
                     npc.Clothes = packet.Clothes;
                     npc.Health = packet.Health;
-                    npc.Position = packet.Position.ToVector();
                     npc.VehicleModelHash = packet.VehModelHash;
                     npc.VehicleSeatIndex = packet.VehSeatIndex;
-                    npc.VehiclePosition = packet.VehPosition.ToVector();
+                    npc.Position = packet.Position.ToVector();
                     npc.VehicleRotation = packet.VehRotation.ToQuaternion();
                     npc.VehicleEngineHealth = packet.VehEngineHealth;
                     npc.VehRPM = packet.VehRPM;
@@ -631,17 +698,16 @@ namespace CoopClient
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
                     npc.VehicleColors = packet.VehColors;
-                    npc.VehDoors = packet.VehDoors;
-                    npc.VehTires = packet.VehTires;
+                    npc.VehDamageModel = packet.VehDamageModel;
                     npc.VehLandingGear = packet.VehLandingGear;
-                    npc.VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
-                    npc.VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
-                    npc.VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
-                    npc.VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
-                    npc.VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0;
-                    npc.IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
-                    npc.Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
-                    npc.VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
+                    npc.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
+                    npc.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                    npc.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
+                    npc.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
+                    npc.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
+                    npc.IsHornActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsHornActive) > 0;
+                    npc.Transformed = (packet.Flag.Value & (ushort)VehicleDataFlags.IsTransformed) > 0;
+                    npc.VehRoofOpened = (packet.Flag.Value & (ushort)VehicleDataFlags.RoofOpened) > 0;
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
 
@@ -656,10 +722,9 @@ namespace CoopClient
                         ModelHash = packet.ModelHash,
                         Clothes = packet.Clothes,
                         Health = packet.Health,
-                        Position = packet.Position.ToVector(),
                         VehicleModelHash = packet.VehModelHash,
                         VehicleSeatIndex = packet.VehSeatIndex,
-                        VehiclePosition = packet.VehPosition.ToVector(),
+                        Position = packet.Position.ToVector(),
                         VehicleRotation = packet.VehRotation.ToQuaternion(),
                         VehicleEngineHealth = packet.VehEngineHealth,
                         VehRPM = packet.VehRPM,
@@ -667,17 +732,16 @@ namespace CoopClient
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
                         VehicleColors = packet.VehColors,
-                        VehDoors = packet.VehDoors,
-                        VehTires = packet.VehTires,
+                        VehDamageModel = packet.VehDamageModel,
                         VehLandingGear = packet.VehLandingGear,
-                        VehIsEngineRunning = (packet.Flag.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0,
-                        VehAreLightsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreLightsOn) > 0,
-                        VehAreHighBeamsOn = (packet.Flag.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0,
-                        VehIsSireneActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsSirenActive) > 0,
-                        VehicleDead = (packet.Flag.Value & (byte)VehicleDataFlags.IsDead) > 0,
-                        IsHornActive = (packet.Flag.Value & (byte)VehicleDataFlags.IsHornActive) > 0,
-                        Transformed = (packet.Flag.Value & (byte)VehicleDataFlags.IsTransformed) > 0,
-                        VehRoofOpened = (packet.Flag.Value & (byte)VehicleDataFlags.RoofOpened) > 0,
+                        VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0,
+                        VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0,
+                        VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0,
+                        VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0,
+                        VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0,
+                        IsHornActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsHornActive) > 0,
+                        Transformed = (packet.Flag.Value & (ushort)VehicleDataFlags.IsTransformed) > 0,
+                        VehRoofOpened = (packet.Flag.Value & (ushort)VehicleDataFlags.RoofOpened) > 0,
                         IsInVehicle = true,
                         LastSyncWasFull = true,
 
@@ -697,10 +761,12 @@ namespace CoopClient
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             NetDeliveryMethod messageType;
+            int connectionChannel = 0;
 
             if ((Util.GetTickCount64() - LastPlayerFullSync) > 500)
             {
                 messageType = NetDeliveryMethod.UnreliableSequenced;
+                connectionChannel = (byte)ConnectionChannel.PlayerFull;
 
                 if (player.IsInVehicle())
                 {
@@ -715,17 +781,13 @@ namespace CoopClient
 
                     new FullSyncPlayerVehPacket()
                     {
-                        Extra = new PlayerPacket()
-                        {
-                            NetHandle =  Main.LocalNetHandle,
-                            Health = player.Health,
-                            Position = player.Position.ToLVector()
-                        },
+                        NetHandle = Main.LocalNetHandle,
+                        Health = player.Health,
                         ModelHash = player.Model.Hash,
                         Clothes = player.GetPedClothes(),
                         VehModelHash = veh.Model.Hash,
                         VehSeatIndex = (short)player.SeatIndex,
-                        VehPosition = veh.Position.ToLVector(),
+                        Position = veh.Position.ToLVector(),
                         VehRotation = veh.Quaternion.ToLQuaternion(),
                         VehEngineHealth = veh.EngineHealth,
                         VehRPM = veh.CurrentRPM,
@@ -735,24 +797,20 @@ namespace CoopClient
                         VehAimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords().ToLVector() : new LVector3(),
                         VehColors = new byte[] { primaryColor, secondaryColor },
                         VehMods = veh.Mods.GetVehicleMods(),
-                        VehDoors = veh.Doors.GetVehicleDoors(),
-                        VehTires = veh.Wheels.GetBurstedTires(),
+                        VehDamageModel = veh.GetVehicleDamageModel(),
                         VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
-                        Flag = veh.GetVehicleFlags()
+                        Flag = player.GetVehicleFlags(veh)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
                 else
                 {
                     new FullSyncPlayerPacket()
                     {
-                        Extra = new PlayerPacket()
-                        {
-                            NetHandle =  Main.LocalNetHandle,
-                            Health = player.Health,
-                            Position = player.Position.ToLVector()
-                        },
+                        NetHandle = Main.LocalNetHandle,
+                        Health = player.Health,
                         ModelHash = player.Model.Hash,
                         Clothes = player.GetPedClothes(),
+                        Position = player.Position.ToLVector(),
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = player.GetPedSpeed(),
@@ -768,6 +826,7 @@ namespace CoopClient
             else
             {
                 messageType = NetDeliveryMethod.ReliableSequenced;
+                connectionChannel = (byte)ConnectionChannel.PlayerLight;
 
                 if (player.IsInVehicle())
                 {
@@ -775,32 +834,25 @@ namespace CoopClient
 
                     new LightSyncPlayerVehPacket()
                     {
-                        Extra = new PlayerPacket()
-                        {
-                            NetHandle =  Main.LocalNetHandle,
-                            Health = player.Health,
-                            Position = player.Position.ToLVector()
-                        },
+                        NetHandle = Main.LocalNetHandle,
+                        Health = player.Health,
                         VehModelHash = veh.Model.Hash,
                         VehSeatIndex = (short)player.SeatIndex,
-                        VehPosition = veh.Position.ToLVector(),
+                        Position = veh.Position.ToLVector(),
                         VehRotation = veh.Quaternion.ToLQuaternion(),
                         VehVelocity = veh.Velocity.ToLVector(),
                         VehSpeed = veh.Speed,
                         VehSteeringAngle = veh.SteeringAngle,
-                        Flag = veh.GetVehicleFlags()
+                        Flag = player.GetVehicleFlags(veh)
                     }.PacketToNetOutGoingMessage(outgoingMessage);
                 }
                 else
                 {
                     new LightSyncPlayerPacket()
                     {
-                        Extra = new PlayerPacket()
-                        {
-                            NetHandle =  Main.LocalNetHandle,
-                            Health = player.Health,
-                            Position = player.Position.ToLVector()
-                        },
+                        NetHandle = Main.LocalNetHandle,
+                        Health = player.Health,
+                        Position = player.Position.ToLVector(),
                         Rotation = player.Rotation.ToLVector(),
                         Velocity = player.Velocity.ToLVector(),
                         Speed = player.GetPedSpeed(),
@@ -811,7 +863,7 @@ namespace CoopClient
                 }
             }
 
-            Client.SendMessage(outgoingMessage, messageType, (int)ConnectionChannel.Player);
+            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -844,10 +896,9 @@ namespace CoopClient
                     ModelHash = npc.Model.Hash,
                     Clothes = npc.GetPedClothes(),
                     Health = npc.Health,
-                    Position = npc.Position.ToLVector(),
                     VehModelHash = veh.Model.Hash,
                     VehSeatIndex = (short)npc.SeatIndex,
-                    VehPosition = veh.Position.ToLVector(),
+                    Position = veh.Position.ToLVector(),
                     VehRotation = veh.Quaternion.ToLQuaternion(),
                     VehEngineHealth = veh.EngineHealth,
                     VehRPM = veh.CurrentRPM,
@@ -856,10 +907,9 @@ namespace CoopClient
                     VehSteeringAngle = veh.SteeringAngle,
                     VehColors = new byte[] { primaryColor, secondaryColor },
                     VehMods = veh.Mods.GetVehicleMods(),
-                    VehDoors = veh.Doors.GetVehicleDoors(),
-                    VehTires = veh.Wheels.GetBurstedTires(),
+                    VehDamageModel = veh.GetVehicleDamageModel(),
                     VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
-                    Flag = veh.GetVehicleFlags()
+                    Flag = npc.GetVehicleFlags(veh)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else
@@ -880,7 +930,7 @@ namespace CoopClient
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable, (int)ConnectionChannel.NPC);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.Unreliable, (byte)ConnectionChannel.NPCFull);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -894,12 +944,10 @@ namespace CoopClient
         internal void SendChatMessage(string message)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            new ChatMessagePacket()
-            {
-                Username = Main.MainSettings.Username,
-                Message = message
-            }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+
+            new ChatMessagePacket() { Username = Main.MainSettings.Username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
+
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
             Client.FlushSendQueue();
 
             #if DEBUG
@@ -921,7 +969,7 @@ namespace CoopClient
                 CustomPacketID =  customID,
                 Bytes = bytes
             }.PacketToNetOutGoingMessage(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
             Client.FlushSendQueue();
 
             #if DEBUG

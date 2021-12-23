@@ -168,48 +168,58 @@ namespace CoopClient
             return RaycastEverything(new Vector2(0, 0));
         }
 
-        public static byte? GetVehicleFlags(this Vehicle veh)
+        public static ushort? GetVehicleFlags(this Ped ped, Vehicle veh)
         {
-            byte? flags = 0;
+            ushort? flags = 0;
 
             if (veh.IsEngineRunning)
             {
-                flags |= (byte)VehicleDataFlags.IsEngineRunning;
+                flags |= (ushort)VehicleDataFlags.IsEngineRunning;
             }
 
             if (veh.AreLightsOn)
             {
-                flags |= (byte)VehicleDataFlags.AreLightsOn;
+                flags |= (ushort)VehicleDataFlags.AreLightsOn;
             }
 
             if (veh.AreHighBeamsOn)
             {
-                flags |= (byte)VehicleDataFlags.AreHighBeamsOn;
+                flags |= (ushort)VehicleDataFlags.AreHighBeamsOn;
             }
 
             if (veh.IsSirenActive)
             {
-                flags |= (byte)VehicleDataFlags.IsSirenActive;
+                flags |= (ushort)VehicleDataFlags.IsSirenActive;
             }
 
             if (veh.IsDead)
             {
-                flags |= (byte)VehicleDataFlags.IsDead;
+                flags |= (ushort)VehicleDataFlags.IsDead;
             }
 
             if (Function.Call<bool>(Hash.IS_HORN_ACTIVE, veh.Handle))
             {
-                flags |= (byte)VehicleDataFlags.IsHornActive;
+                flags |= (ushort)VehicleDataFlags.IsHornActive;
             }
 
             if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
             {
-                flags |= (byte)VehicleDataFlags.IsTransformed;
+                flags |= (ushort)VehicleDataFlags.IsTransformed;
             }
 
             if (veh.HasRoof && (veh.RoofState == VehicleRoofState.Opened || veh.RoofState == VehicleRoofState.Opening))
             {
-                flags |= (byte)VehicleDataFlags.RoofOpened;
+                flags |= (ushort)VehicleDataFlags.RoofOpened;
+            }
+
+            if (veh.IsTurretSeat((int)ped.SeatIndex))
+            {
+                flags |= (ushort)VehicleDataFlags.OnTurretSeat;
+            }
+
+            if (veh.IsPlane)
+            {
+                flags |= (ushort)VehicleDataFlags.IsPlane;
             }
 
             return flags;
@@ -290,43 +300,103 @@ namespace CoopClient
             return result;
         }
 
-        public static VehicleDoors[] GetVehicleDoors(this VehicleDoorCollection doors)
+        public static VehicleDamageModel GetVehicleDamageModel(this Vehicle veh)
         {
-            int doorLength = doors.ToArray().Length;
-            if (doorLength == 0)
+            VehicleDamageModel result = new VehicleDamageModel()
             {
-                return null;
+                BrokenDoors = 0,
+                BrokenWindows = 0,
+                BurstedTires = 0,
+                PuncturedTires = 0
+            };
+
+            // Broken windows
+            for (int i = 0; i < 8; i++)
+            {
+                if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
+                {
+                    result.BrokenWindows |= (byte)(1 << i);
+                }
             }
 
-            VehicleDoors[] result = new VehicleDoors[doorLength];
-            for (int i = 0; i < (doorLength - 1); i++)
+            // Broken doors
+            foreach (VehicleDoor door in veh.Doors)
             {
-                VehicleDoors currentDoor = new VehicleDoors()
+                if (door.IsBroken)
                 {
-                    AngleRatio = doors[(VehicleDoorIndex)i].AngleRatio,
-                    Broken = doors[(VehicleDoorIndex)i].IsBroken,
-                    Open = doors[(VehicleDoorIndex)i].IsOpen,
-                    FullyOpen = doors[(VehicleDoorIndex)i].IsFullyOpen
-                };
-                result[i] = currentDoor;
+                    result.BrokenDoors |= (byte)(1 << (byte)door.Index);
+                }
+            }
+
+            // Bursted and Punctured tires
+            foreach (VehicleWheel wheel in veh.Wheels.GetAllWheels())
+            {
+                if (wheel.IsBursted)
+                {
+                    result.BurstedTires |= (ushort)(1 << (int)wheel.BoneId);
+                }
+                
+                if (wheel.IsPunctured)
+                {
+                    result.PuncturedTires |= (ushort)(1 << (int)wheel.BoneId);
+                }
             }
 
             return result;
         }
 
-        public static int GetBurstedTires(this VehicleWheelCollection wheels)
+        public static void SetVehicleDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
-            int tireFlag = 0;
-
-            foreach (var wheel in wheels.GetAllWheels())
+            // Set doors
+            for (int i = 0; i < 8; i++)
             {
-                if (wheel.IsBursted)
+                if ((model.BrokenDoors & (byte)(1 << i)) != 0)
                 {
-                    tireFlag |= (1 << (int)wheel.BoneId);
+                    veh.Doors[(VehicleDoorIndex)i].Break(leavedoors);
+                }
+                else if (veh.Doors[(VehicleDoorIndex)i].IsBroken)
+                {
+                    // The vehicle can only fix a door if the vehicle was completely fixed
+                    veh.Repair();
+                    return;
+                }
+
+                if ((model.BrokenWindows & (byte)(1 << i)) != 0)
+                {
+                    veh.Windows[(VehicleWindowIndex)i].Smash();
+                }
+                else if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
+                {
+                    veh.Windows[(VehicleWindowIndex)i].Repair();
                 }
             }
 
-            return tireFlag;
+            foreach (VehicleWheel wheel in veh.Wheels)
+            {
+                if ((model.PuncturedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
+                {
+                    if (!wheel.IsPunctured)
+                    {
+                        wheel.Puncture();
+                    }
+                }
+                else if (wheel.IsPunctured)
+                {
+                    wheel.Fix();
+                }
+
+                if ((model.BurstedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
+                {
+                    if (!wheel.IsBursted)
+                    {
+                        wheel.Burst();
+                    }
+                }
+                else if (wheel.IsBursted)
+                {
+                    wheel.Fix();
+                }
+            }
         }
 
         public static Settings ReadSettings()

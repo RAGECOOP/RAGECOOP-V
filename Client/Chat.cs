@@ -132,7 +132,7 @@ namespace CoopClient
             switch (keyChar[0])
             {
                 case (char)8:
-                    if (CurrentInput.Length > 0)
+                    if (CurrentInput?.Length > 0)
                     {
                         CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1);
                         MainScaleForm.CallFunction("DELETE_TEXT");

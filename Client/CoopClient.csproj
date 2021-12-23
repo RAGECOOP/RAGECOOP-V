@@ -51,9 +51,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\Libs\Release\scripts\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="ScriptHookVDotNet3, Version=3.3.2.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Release\ScriptHookVDotNet3.dll</HintPath>
@@ -74,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitReader.cs" />
     <Compile Include="Chat.cs" />
     <Compile Include="COOPAPI.cs" />
     <Compile Include="Entities\EntitiesPed.cs" />

@@ -21,7 +21,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_2_0";
+        internal static readonly string CurrentVersion = "V1_3_0";
 
         internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
@@ -290,14 +290,14 @@ namespace CoopClient
             DebugSyncPed.Health = player.Health;
             DebugSyncPed.Position = player.Position;
 
-            byte? flags;
+            ushort? flags;
 
             if (player.IsInVehicle())
             {
                 Vehicle veh = player.CurrentVehicle;
                 veh.Opacity = 75;
 
-                flags = veh.GetVehicleFlags();
+                flags = player.GetVehicleFlags(veh);
 
                 byte secondaryColor;
                 byte primaryColor;
@@ -308,7 +308,7 @@ namespace CoopClient
 
                 DebugSyncPed.VehicleModelHash = veh.Model.Hash;
                 DebugSyncPed.VehicleSeatIndex = (short)player.SeatIndex;
-                DebugSyncPed.VehiclePosition = veh.Position;
+                DebugSyncPed.Position = veh.Position;
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
                 DebugSyncPed.VehRPM = veh.CurrentRPM;
@@ -318,18 +318,17 @@ namespace CoopClient
                 DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
                 DebugSyncPed.VehicleColors = new byte[] { primaryColor, secondaryColor };
                 DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
-                DebugSyncPed.VehDoors = veh.Doors.GetVehicleDoors();
-                DebugSyncPed.VehTires = veh.Wheels.GetBurstedTires();
+                DebugSyncPed.VehDamageModel = veh.GetVehicleDamageModel();
                 DebugSyncPed.LastSyncWasFull = true;
                 DebugSyncPed.IsInVehicle = true;
-                DebugSyncPed.VehIsEngineRunning = (flags.Value & (byte)VehicleDataFlags.IsEngineRunning) > 0;
-                DebugSyncPed.VehAreLightsOn = (flags.Value & (byte)VehicleDataFlags.AreLightsOn) > 0;
-                DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (byte)VehicleDataFlags.AreHighBeamsOn) > 0;
-                DebugSyncPed.VehIsSireneActive = (flags.Value & (byte)VehicleDataFlags.IsSirenActive) > 0;
-                DebugSyncPed.VehicleDead = (flags.Value & (byte)VehicleDataFlags.IsDead) > 0;
-                DebugSyncPed.IsHornActive = (flags.Value & (byte)VehicleDataFlags.IsHornActive) > 0;
-                DebugSyncPed.Transformed = (flags.Value & (byte)VehicleDataFlags.IsTransformed) > 0;
-                DebugSyncPed.VehRoofOpened = (flags.Value & (byte)VehicleDataFlags.RoofOpened) > 0;
+                DebugSyncPed.VehIsEngineRunning = (flags.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
+                DebugSyncPed.VehAreLightsOn = (flags.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
+                DebugSyncPed.VehIsSireneActive = (flags.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
+                DebugSyncPed.VehicleDead = (flags.Value & (ushort)VehicleDataFlags.IsDead) > 0;
+                DebugSyncPed.IsHornActive = (flags.Value & (ushort)VehicleDataFlags.IsHornActive) > 0;
+                DebugSyncPed.Transformed = (flags.Value & (ushort)VehicleDataFlags.IsTransformed) > 0;
+                DebugSyncPed.VehRoofOpened = (flags.Value & (ushort)VehicleDataFlags.RoofOpened) > 0;
                 DebugSyncPed.VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0;
 
                 if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())

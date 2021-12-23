@@ -40,10 +40,6 @@ namespace CoopClient.Entities
         /// </summary>
         public Vehicle MainVehicle { get; internal set; }
         /// <summary>
-        /// The latest vehicle position (may not have been applied yet)
-        /// </summary>
-        public Vector3 VehiclePosition { get; internal set; }
-        /// <summary>
         /// The latest vehicle rotation (may not have been applied yet)
         /// </summary>
         public Quaternion VehicleRotation { get; internal set; }
@@ -72,10 +68,7 @@ namespace CoopClient.Entities
         internal byte VehLandingGear { get; set; }
         internal bool VehRoofOpened { get; set; }
         internal bool VehIsSireneActive { get; set; }
-        private VehicleDoors[] LastVehDoors;
-        internal VehicleDoors[] VehDoors { get; set; }
-        private int LastVehTires;
-        internal int VehTires { get; set; }
+        internal VehicleDamageModel VehDamageModel { get; set; }
         #endregion
 
         private void DisplayInVehicle()
@@ -125,7 +118,7 @@ namespace CoopClient.Entities
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, VehiclePosition);
+                    MainVehicle = World.CreateVehicle(vehicleModel, Position);
                     vehicleModel.MarkAsNoLongerNeeded();
                     if (NPCVehHandle != 0)
                     {
@@ -295,69 +288,7 @@ namespace CoopClient.Entities
 
                     if (LastSyncWasFull)
                     {
-                        if (VehDoors != null && VehDoors != LastVehDoors)
-                        {
-                            int doorLength = VehDoors.Length;
-                            if (VehDoors.Length != 0)
-                            {
-                                for (int i = 0; i < (doorLength - 1); i++)
-                                {
-                                    VehicleDoor door = MainVehicle.Doors[(VehicleDoorIndex)i];
-                                    VehicleDoors aDoor = VehDoors[i];
-
-                                    if (aDoor.Broken)
-                                    {
-                                        if (!door.IsBroken)
-                                        {
-                                            door.Break();
-                                        }
-                                        continue;
-                                    }
-                                    else if (!aDoor.Broken && door.IsBroken)
-                                    {
-                                        // Repair?
-                                        //MainVehicle.Repair();
-                                    }
-
-                                    if (aDoor.FullyOpen)
-                                    {
-                                        if (!door.IsFullyOpen)
-                                        {
-                                            door.Open(false, true);
-                                        }
-                                        continue;
-                                    }
-                                    else if (aDoor.Open)
-                                    {
-                                        if (!door.IsOpen)
-                                        {
-                                            door.Open();
-                                        }
-
-                                        door.AngleRatio = aDoor.AngleRatio;
-                                        continue;
-                                    }
-
-                                    door.Close(true);
-                                }
-                            }
-
-                            LastVehDoors = VehDoors;
-                        }
-
-                        if (VehTires != default && LastVehTires != VehTires)
-                        {
-                            foreach (var wheel in MainVehicle.Wheels.GetAllWheels())
-                            {
-                                if ((VehTires & 1 << (int)wheel.BoneId) != 0)
-                                {
-                                    wheel.Puncture();
-                                    wheel.Burst();
-                                }
-                            }
-
-                            LastVehTires = VehTires;
-                        }
+                        MainVehicle.SetVehicleDamageModel(VehDamageModel);
                     }
                 }
             }
@@ -368,25 +299,25 @@ namespace CoopClient.Entities
             }
 
             // Good enough for now, but we need to create a better sync
-            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(VehiclePosition, 7.0f))
+            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
-                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (VehiclePosition - MainVehicle.Position);
+                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (Position - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Util.GetTickCount64();
             }
             else if ((Util.GetTickCount64() - VehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, VehiclePosition + (VehiclePosition - MainVehicle.Position), Util.GetTickCount64() - VehicleStopTime, 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - VehicleStopTime, 1000);
 
                 MainVehicle.PositionNoOffset = posTarget;
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }
             else
             {
-                MainVehicle.PositionNoOffset = VehiclePosition;
+                MainVehicle.PositionNoOffset = Position;
                 MainVehicle.Quaternion = VehicleRotation;
             }
             #endregion

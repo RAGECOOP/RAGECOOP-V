@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 using Lidgren.Network;
-using ProtoBuf;
 using Newtonsoft.Json;
 
 namespace CoopServer
 {
-    [ProtoContract]
     public struct LVector3
     {
         public LVector3(float X, float Y, float Z)
@@ -18,13 +17,10 @@ namespace CoopServer
             this.Z = Z;
         }
 
-        [ProtoMember(1)]
         public float X { get; set; }
 
-        [ProtoMember(2)]
         public float Y { get; set; }
 
-        [ProtoMember(3)]
         public float Z { get; set; }
 
         #region SERVER-ONLY
@@ -34,7 +30,6 @@ namespace CoopServer
         #endregion
     }
 
-    [ProtoContract]
     public struct LQuaternion
     {
         public LQuaternion(float X, float Y, float Z, float W)
@@ -45,16 +40,12 @@ namespace CoopServer
             this.W = W;
         }
 
-        [ProtoMember(1)]
         public float X { get; set; }
 
-        [ProtoMember(2)]
         public float Y { get; set; }
 
-        [ProtoMember(3)]
         public float Z { get; set; }
 
-        [ProtoMember(4)]
         public float W { get; set; }
     }
 
@@ -67,7 +58,7 @@ namespace CoopServer
         FullSyncPlayerVehPacket,
         LightSyncPlayerPacket,
         LightSyncPlayerVehPacket,
-        SuperLightSyncPlayerPacket,
+        SuperLightSyncPacket,
         FullSyncNpcPacket,
         FullSyncNpcVehPacket,
         ChatMessagePacket,
@@ -79,11 +70,13 @@ namespace CoopServer
     enum ConnectionChannel
     {
         Default = 0,
-        Player = 1,
-        NPC = 2,
-        Chat = 3,
-        Native = 4,
-        Mod = 5
+        PlayerLight = 1,
+        PlayerFull = 2,
+        PlayerSuperLight = 3,
+        NPCFull = 4,
+        Chat = 5,
+        Native = 6,
+        Mod = 7
     }
 
     [Flags]
@@ -108,23 +101,20 @@ namespace CoopServer
         IsDead = 1 << 4,
         IsHornActive = 1 << 5,
         IsTransformed = 1 << 6,
-        RoofOpened = 1 << 7
+        RoofOpened = 1 << 7,
+        OnTurretSeat = 1 << 8,
+        IsPlane = 1 << 9
     }
 
-    [ProtoContract]
-    struct VehicleDoors
+    struct VehicleDamageModel
     {
-        [ProtoMember(1)]
-        public float AngleRatio { get; set; }
+        public byte BrokenWindows { get; set; }
 
-        [ProtoMember(2)]
-        public bool Broken { get; set; }
+        public byte BrokenDoors { get; set; }
 
-        [ProtoMember(3)]
-        public bool Open { get; set; }
+        public ushort BurstedTires { get; set; }
 
-        [ProtoMember(4)]
-        public bool FullyOpen { get; set; }
+        public ushort PuncturedTires { get; set; }
     }
     #endregion
 
@@ -132,786 +122,1886 @@ namespace CoopServer
     {
         void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         void NetIncomingMessageToPacket(NetIncomingMessage message);
+        void NetIncomingMessageToPacket(byte[] array);
     }
 
     abstract class Packet : IPacket
     {
         public abstract void PacketToNetOutGoingMessage(NetOutgoingMessage message);
         public abstract void NetIncomingMessageToPacket(NetIncomingMessage message);
+        public abstract void NetIncomingMessageToPacket(byte[] array);
     }
 
-    [ProtoContract]
     class ModPacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
         public long Target { get; set; }
 
-        [ProtoMember(3)]
         public string Mod { get; set; }
 
-        [ProtoMember(4)]
         public byte CustomPacketID { get; set; }
 
-        [ProtoMember(5)]
         public byte[] Bytes { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.ModPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write NetHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write Target
+            byteArray.AddRange(BitConverter.GetBytes(Target));
+
+            // Write Mod
+            byte[] modBytes = Encoding.UTF8.GetBytes(Mod);
+            byteArray.AddRange(BitConverter.GetBytes(modBytes.Length));
+            byteArray.AddRange(modBytes);
+
+            // Write CustomPacketID
+            byteArray.Add(CustomPacketID);
+
+            // Write Bytes
+            byteArray.AddRange(BitConverter.GetBytes(Bytes.Length));
+            byteArray.AddRange(Bytes);
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            ModPacket data = message.ReadBytes(len).Deserialize<ModPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
-            Target = data.Target;
-            Mod = data.Mod;
-            CustomPacketID = data.CustomPacketID;
-            Bytes = data.Bytes;
+            // Read NetHandle
+            NetHandle = reader.ReadLong();
+
+            // Read Target
+            NetHandle = reader.ReadLong();
+
+            // Read Mod
+            int modLength = reader.ReadInt();
+            Mod = reader.ReadString(modLength);
+
+            // Read CustomPacketID
+            CustomPacketID = reader.ReadByte();
+
+            // Read Bytes
+            int bytesLength = reader.ReadInt();
+            Bytes = reader.ReadByteArray(bytesLength);
+            #endregion
         }
     }
 
     #region -- PLAYER --
-    [ProtoContract]
     class HandshakePacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
         public string Username { get; set; }
 
-        [ProtoMember(3)]
         public string ModVersion { get; set; }
 
-        [ProtoMember(4)]
-        public bool NpcsAllowed { get; set; }
+        public bool NPCsAllowed { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.HandshakePacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write NetHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write Username
+            byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
+            byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
+            byteArray.AddRange(usernameBytes);
+
+            // Write ModVersion
+            byte[] modVersionBytes = Encoding.UTF8.GetBytes(ModVersion);
+            byteArray.AddRange(BitConverter.GetBytes(modVersionBytes.Length));
+            byteArray.AddRange(modVersionBytes);
+
+            // Write NpcsAllowed
+            byteArray.Add(NPCsAllowed ? (byte)0x01 : (byte)0x00);
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            HandshakePacket data = message.ReadBytes(len).Deserialize<HandshakePacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
-            Username = data.Username;
-            ModVersion = data.ModVersion;
-            NpcsAllowed = data.NpcsAllowed;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read Username
+            int usernameLength = reader.ReadInt();
+            Username = reader.ReadString(usernameLength);
+
+            // Read ModVersion
+            int modVersionLength = reader.ReadInt();
+            ModVersion = reader.ReadString(modVersionLength);
+
+            // Read NPCsAllowed
+            NPCsAllowed = reader.ReadBool();
+            #endregion
         }
     }
 
-    [ProtoContract]
     class PlayerConnectPacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
-        public string SocialClubName { get; set; }
-
-        [ProtoMember(3)]
         public string Username { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.PlayerConnectPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write NetHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Get Username bytes
+            byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
+
+            // Write UsernameLength
+            byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
+
+            // Write Username
+            byteArray.AddRange(usernameBytes);
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            PlayerConnectPacket data = message.ReadBytes(len).Deserialize<PlayerConnectPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
-            SocialClubName = data.SocialClubName;
-            Username = data.Username;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read Username
+            int usernameLength = reader.ReadInt();
+            Username = reader.ReadString(usernameLength);
+            #endregion
         }
     }
 
-    [ProtoContract]
     class PlayerDisconnectPacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.PlayerDisconnectPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            PlayerDisconnectPacket data = message.ReadBytes(len).Deserialize<PlayerDisconnectPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
+            NetHandle = reader.ReadLong();
+            #endregion
         }
     }
 
-    [ProtoContract]
-    struct PlayerPacket
-    {
-        [ProtoMember(1)]
-        public long NetHandle { get; set; }
-
-        [ProtoMember(2)]
-        public int Health { get; set; }
-
-        [ProtoMember(3)]
-        public LVector3 Position { get; set; }
-
-        [ProtoMember(4)]
-        public float Latency { get; set; }
-    }
-
-    [ProtoContract]
     class FullSyncPlayerPacket : Packet
     {
-        [ProtoMember(1)]
-        public PlayerPacket Extra { get; set; }
+        public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
+        public int Health { get; set; }
+
         public int ModelHash { get; set; }
 
-        [ProtoMember(3)]
-        public Dictionary<byte, short> Clothes { get; set; }
+        public LVector3 Position { get; set; }
 
-        [ProtoMember(4)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(5)]
+        public Dictionary<byte, short> Clothes { get; set; }
+
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(6)]
         public byte Speed { get; set; }
 
-        [ProtoMember(7)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(8)]
         public uint CurrentWeaponHash { get; set; }
 
-        [ProtoMember(9)]
         public Dictionary<uint, bool> WeaponComponents { get; set; }
 
-        [ProtoMember(10)]
-        public byte? Flag { get; set; } = 0;
+        public byte? Flag { get; set; }
+
+        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.FullSyncPlayerPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write player netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player flags
+            byteArray.Add(Flag.Value);
+
+            // Write player model hash
+            byteArray.AddRange(BitConverter.GetBytes(ModelHash));
+
+            // Write player position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write player rotation
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+
+            // Write player clothes
+            // Write the count of clothes
+            byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
+            // Loop the dictionary and add the values
+            for (int i = 0; i < Clothes.Count; i++)
+            {
+                // Write the cloth value
+                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+            }
+
+            // Write player velocity
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Z));
+
+            // Write player speed
+            byteArray.Add(Speed);
+
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (byte)PedDataFlags.IsAiming) != 0 || (Flag.Value & (byte)PedDataFlags.IsShooting) != 0)
+                {
+                    // Write player aim coords
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+                }
+            }
+
+            // Write player weapon hash
+            byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
+
+            // Write player weapon components
+            if (WeaponComponents != null)
+            {
+                byteArray.Add(0x01);
+                byteArray.AddRange(BitConverter.GetBytes((ushort)WeaponComponents.Count));
+                foreach (KeyValuePair<uint, bool> component in WeaponComponents)
+                {
+                    byteArray.AddRange(BitConverter.GetBytes(component.Value));
+                }
+            }
+            else
+            {
+                // Player weapon doesn't have any components
+                byteArray.Add(0x00);
+            }
+
+            // Check if player latency has value
+            if (Latency.HasValue)
+            {
+                // Write player latency
+                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            FullSyncPlayerPacket data = message.ReadBytes(len).Deserialize<FullSyncPlayerPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Extra = data.Extra;
-            ModelHash = data.ModelHash;
-            Clothes = data.Clothes;
-            Rotation = data.Rotation;
-            Velocity = data.Velocity;
-            Speed = data.Speed;
-            AimCoords = data.AimCoords;
-            CurrentWeaponHash = data.CurrentWeaponHash;
-            WeaponComponents = data.WeaponComponents;
-            Flag = data.Flag;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read player flag
+            Flag = reader.ReadByte();
+
+            // Read player model hash
+            ModelHash = reader.ReadInt();
+
+            // Read player position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player rotation
+            Rotation = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player clothes
+            // Create new Dictionary
+            Clothes = new Dictionary<byte, short>();
+            // Read the count of clothes
+            ushort clothCount = reader.ReadUShort();
+            // For clothCount
+            for (ushort i = 0; i < clothCount; i++)
+            {
+                // Read cloth value
+                short clothValue = reader.ReadShort();
+                Clothes.Add((byte)i, clothValue);
+            }
+
+            // Read player velocity
+            Velocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player speed
+            Speed = reader.ReadByte();
+
+            // Read player flag values
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (byte)PedDataFlags.IsAiming) != 0 || (Flag.Value & (byte)PedDataFlags.IsShooting) != 0)
+                {
+                    AimCoords = new LVector3()
+                    {
+                        X = reader.ReadFloat(),
+                        Y = reader.ReadFloat(),
+                        Z = reader.ReadFloat()
+                    };
+                }
+            }
+
+            // Read player weapon hash
+            CurrentWeaponHash = reader.ReadUInt();
+
+            // Read player weapon components
+            if (reader.ReadBool())
+            {
+                WeaponComponents = new Dictionary<uint, bool>();
+                ushort comCount = reader.ReadUShort();
+
+                for (ushort i = 0; i < comCount; i++)
+                {
+                    WeaponComponents.Add(i, reader.ReadBool());
+                }
+            }
+
+            // Try to read latency
+            if (reader.CanRead(4))
+            {
+                // Read player latency
+                Latency = reader.ReadFloat();
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
     class FullSyncPlayerVehPacket : Packet
     {
-        [ProtoMember(1)]
-        public PlayerPacket Extra { get; set; }
+        public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
+        public int Health { get; set; }
+
         public int ModelHash { get; set; }
 
-        [ProtoMember(3)]
         public Dictionary<byte, short> Clothes { get; set; }
 
-        [ProtoMember(4)]
         public int VehModelHash { get; set; }
 
-        [ProtoMember(5)]
         public short VehSeatIndex { get; set; }
 
-        [ProtoMember(6)]
-        public LVector3 VehPosition { get; set; }
+        public LVector3 Position { get; set; }
 
-        [ProtoMember(7)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(8)]
         public float VehEngineHealth { get; set; }
 
-        [ProtoMember(9)]
         public float VehRPM { get; set; }
 
-        [ProtoMember(10)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(11)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(12)]
         public float VehSteeringAngle { get; set; }
 
-        [ProtoMember(13)]
         public LVector3 VehAimCoords { get; set; }
 
-        [ProtoMember(14)]
         public byte[] VehColors { get; set; }
 
-        [ProtoMember(15)]
         public Dictionary<int, int> VehMods { get; set; }
 
-        [ProtoMember(16)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public VehicleDamageModel VehDamageModel { get; set; }
 
-        [ProtoMember(17)]
-        public int VehTires { get; set; }
-
-        [ProtoMember(18)]
         public byte VehLandingGear { get; set; }
 
-        [ProtoMember(19)]
-        public byte? Flag { get; set; } = 0;
+        public ushort? Flag { get; set; }
+
+        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.FullSyncPlayerVehPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write player netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write vehicles flags
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
+
+            // Write player health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write player model hash
+            byteArray.AddRange(BitConverter.GetBytes(ModelHash));
+
+            // Write player clothes
+            // Write the count of clothes
+            byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
+            // Loop the dictionary and add the values
+            for (int i = 0; i < Clothes.Count; i++)
+            {
+                // Write the cloth value
+                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+            }
+
+            // Write vehicle model hash
+            byteArray.AddRange(BitConverter.GetBytes(VehModelHash));
+
+            // Write player seat index
+            byteArray.AddRange(BitConverter.GetBytes(VehSeatIndex));
+
+            // Write vehicle position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write vehicle rotation
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Z));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.W));
+
+            // Write vehicle engine health
+            byteArray.AddRange(BitConverter.GetBytes(VehEngineHealth));
+
+            // Write vehicle rpm
+            byteArray.AddRange(BitConverter.GetBytes(VehRPM));
+
+            // Write vehicle velocity
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Z));
+
+            // Write vehicle speed
+            byteArray.AddRange(BitConverter.GetBytes(VehSpeed));
+
+            // Write vehicle steering angle
+            byteArray.AddRange(BitConverter.GetBytes(VehSteeringAngle));
+
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (ushort)VehicleDataFlags.OnTurretSeat) != 0)
+                {
+                    // Write player aim coords
+                    byteArray.AddRange(BitConverter.GetBytes(VehAimCoords.X));
+                    byteArray.AddRange(BitConverter.GetBytes(VehAimCoords.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(VehAimCoords.Z));
+                }
+
+                if ((Flag.Value & (ushort)VehicleDataFlags.IsPlane) != 0)
+                {
+                    // Write the vehicle landing gear
+                    byteArray.AddRange(BitConverter.GetBytes(VehLandingGear));
+                }
+            }
+
+            // Write vehicle colors
+            byteArray.Add(VehColors[0]);
+            byteArray.Add(VehColors[1]);
+
+            // Write vehicle mods
+            // Write the count of mods
+            byteArray.AddRange(BitConverter.GetBytes((short)VehMods.Count));
+            // Loop the dictionary and add the values
+            foreach (KeyValuePair<int, int> mod in VehMods)
+            {
+                // Write the mod value
+                byteArray.AddRange(BitConverter.GetBytes((short)mod.Value));
+            }
+
+            if (!VehDamageModel.Equals(default(VehicleDamageModel)))
+            {
+                // Write boolean = true
+                byteArray.Add(0x01);
+                // Write vehicle damage model
+                byteArray.Add(VehDamageModel.BrokenDoors);
+                byteArray.Add(VehDamageModel.BrokenWindows);
+                byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.BurstedTires));
+                byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.PuncturedTires));
+            }
+            else
+            {
+                // Write boolean = false
+                byteArray.Add(0x00);
+            }
+
+            // Check if player latency has value
+            if (Latency.HasValue)
+            {
+                // Write player latency
+                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            FullSyncPlayerVehPacket data = message.ReadBytes(len).Deserialize<FullSyncPlayerVehPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Extra = data.Extra;
-            ModelHash = data.ModelHash;
-            Clothes = data.Clothes;
-            VehModelHash = data.VehModelHash;
-            VehSeatIndex = data.VehSeatIndex;
-            VehPosition = data.VehPosition;
-            VehRotation = data.VehRotation;
-            VehEngineHealth = data.VehEngineHealth;
-            VehRPM = data.VehRPM;
-            VehVelocity = data.VehVelocity;
-            VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
-            VehAimCoords = data.VehAimCoords;
-            VehColors = data.VehColors;
-            VehMods = data.VehMods;
-            VehDoors = data.VehDoors;
-            VehTires = data.VehTires;
-            VehLandingGear = data.VehLandingGear;
-            Flag = data.Flag;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read vehicle flags
+            Flag = reader.ReadUShort();
+
+            // Read player health
+            Health = reader.ReadInt();
+
+            // Read player model hash
+            ModelHash = reader.ReadInt();
+
+            // Read player clothes
+            // Create new Dictionary
+            Clothes = new Dictionary<byte, short>();
+            // Read the count of clothes
+            ushort clothCount = reader.ReadUShort();
+            // For clothCount
+            for (int i = 0; i < clothCount; i++)
+            {
+                // Read cloth value
+                short clothValue = reader.ReadShort();
+                Clothes.Add((byte)i, clothValue);
+            }
+
+            // Read vehicle model hash
+            VehModelHash = reader.ReadInt();
+
+            // Read player seat index
+            VehSeatIndex = reader.ReadShort();
+
+            // Read vehicle position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle rotation
+            VehRotation = new LQuaternion()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat(),
+                W = reader.ReadFloat()
+            };
+
+            // Read vehicle engine health
+            VehEngineHealth = reader.ReadFloat();
+
+            // Read vehicle rpm
+            VehRPM = reader.ReadFloat();
+
+            // Read vehicle velocity
+            VehVelocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle speed
+            VehSpeed = reader.ReadFloat();
+
+            // Read vehicle steering angle
+            VehSteeringAngle = reader.ReadFloat();
+
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (int)VehicleDataFlags.OnTurretSeat) != 0)
+                {
+                    // Read vehicle aim coords
+                    VehAimCoords = new LVector3()
+                    {
+                        X = reader.ReadFloat(),
+                        Y = reader.ReadFloat(),
+                        Z = reader.ReadFloat()
+                    };
+                }
+
+                if ((Flag.Value & (int)VehicleDataFlags.IsPlane) != 0)
+                {
+                    // Read vehicle landing gear
+                    VehLandingGear = (byte)reader.ReadShort();
+                }
+            }
+
+            // Read vehicle colors
+            byte vehColor1 = reader.ReadByte();
+            byte vehColor2 = reader.ReadByte();
+            VehColors = new byte[] { vehColor1, vehColor2 };
+
+            // Read vehicle mods
+            // Create new Dictionary
+            VehMods = new Dictionary<int, int>();
+            // Read count of mods
+            short vehModCount = reader.ReadShort();
+            // Loop
+            for (int i = 0; i < vehModCount; i++)
+            {
+                // Read the mod value
+                short mod = reader.ReadShort();
+                VehMods.Add(i, mod);
+            }
+
+            if (reader.ReadBool())
+            {
+                // Read vehicle damage model
+                VehDamageModel = new VehicleDamageModel()
+                {
+                    BrokenDoors = reader.ReadByte(),
+                    BrokenWindows = reader.ReadByte(),
+                    BurstedTires = reader.ReadUShort(),
+                    PuncturedTires = reader.ReadUShort()
+                };
+            }
+
+            // Try to read latency
+            if (reader.CanRead(4))
+            {
+                // Read player latency
+                Latency = reader.ReadFloat();
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
     class LightSyncPlayerPacket : Packet
     {
-        [ProtoMember(1)]
-        public PlayerPacket Extra { get; set; }
+        public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
+        public int Health { get; set; }
+
+        public LVector3 Position { get; set; }
+
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(3)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(4)]
         public byte Speed { get; set; }
 
-        [ProtoMember(5)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(6)]
         public uint CurrentWeaponHash { get; set; }
 
-        [ProtoMember(7)]
-        public byte? Flag { get; set; } = 0;
+        public byte? Flag { get; set; }
+
+        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.LightSyncPlayerPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write player netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player flags
+            byteArray.Add(Flag.Value);
+
+            // Write player health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write player position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write player rotation
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+
+            // Write player velocity
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Z));
+
+            // Write player speed
+            byteArray.Add(Speed);
+
+            // Write player weapon hash
+            byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
+
+            if (Flag.HasValue && ((Flag.Value & (int)PedDataFlags.IsAiming) != 0 || (Flag.Value & (int)PedDataFlags.IsShooting) != 0))
+            {
+                // Write player aim coords
+                byteArray.AddRange(BitConverter.GetBytes(AimCoords.X));
+                byteArray.AddRange(BitConverter.GetBytes(AimCoords.Y));
+                byteArray.AddRange(BitConverter.GetBytes(AimCoords.Z));
+            }
+
+            // Check if player latency has value
+            if (Latency.HasValue)
+            {
+                // Write player latency
+                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            LightSyncPlayerPacket data = message.ReadBytes(len).Deserialize<LightSyncPlayerPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Extra = data.Extra;
-            Rotation = data.Rotation;
-            Velocity = data.Velocity;
-            Speed = data.Speed;
-            AimCoords = data.AimCoords;
-            CurrentWeaponHash = data.CurrentWeaponHash;
-            Flag = data.Flag;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read player flags
+            Flag = reader.ReadByte();
+
+            // Read player health
+            Health = reader.ReadInt();
+
+            // Read player position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player rotation
+            Rotation = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player velocity
+            Velocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player speed
+            Speed = reader.ReadByte();
+
+            // Read player weapon hash
+            CurrentWeaponHash = reader.ReadUInt();
+
+            // Try to read aim coords
+            if (Flag.HasValue && ((Flag.Value & (int)PedDataFlags.IsAiming) != 0 || (Flag.Value & (int)PedDataFlags.IsShooting) != 0))
+            {
+                // Read player aim coords
+                AimCoords = new LVector3()
+                {
+                    X = reader.ReadFloat(),
+                    Y = reader.ReadFloat(),
+                    Z = reader.ReadFloat()
+                };
+            }
+
+            // Try to read latency
+            if (reader.CanRead(4))
+            {
+                // Read player latency
+                Latency = reader.ReadFloat();
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
     class LightSyncPlayerVehPacket : Packet
     {
-        [ProtoMember(1)]
-        public PlayerPacket Extra { get; set; }
+        public long NetHandle { get; set; }
 
-        [ProtoMember(4)]
+        public int Health { get; set; }
+
         public int VehModelHash { get; set; }
 
-        [ProtoMember(5)]
         public short VehSeatIndex { get; set; }
 
-        [ProtoMember(6)]
-        public LVector3 VehPosition { get; set; }
+        public LVector3 Position { get; set; }
 
-        [ProtoMember(7)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(8)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(9)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(10)]
         public float VehSteeringAngle { get; set; }
 
-        [ProtoMember(11)]
-        public byte? Flag { get; set; } = 0;
+        public ushort? Flag { get; set; }
+
+        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.LightSyncPlayerVehPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write player netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write vehicle model hash
+            byteArray.AddRange(BitConverter.GetBytes(VehModelHash));
+
+            // Write player seat index
+            byteArray.AddRange(BitConverter.GetBytes(VehSeatIndex));
+
+            // Write vehicle position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write vehicle rotation
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Z));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.W));
+
+            // Write vehicle velocity
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Z));
+
+            // Write vehicle speed
+            byteArray.AddRange(BitConverter.GetBytes(VehSpeed));
+
+            // Write vehicle steering angle
+            byteArray.AddRange(BitConverter.GetBytes(VehSteeringAngle));
+
+            // Write vehicle flags
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
+
+            // Check if player latency has value
+            if (Latency.HasValue)
+            {
+                // Write player latency
+                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            LightSyncPlayerVehPacket data = message.ReadBytes(len).Deserialize<LightSyncPlayerVehPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Extra = data.Extra;
-            VehModelHash = data.VehModelHash;
-            VehSeatIndex = data.VehSeatIndex;
-            VehPosition = data.VehPosition;
-            VehRotation = data.VehRotation;
-            VehVelocity = data.VehVelocity;
-            VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
-            Flag = data.Flag;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read player health
+            Health = reader.ReadInt();
+
+            // Read vehicle model hash
+            VehModelHash = reader.ReadInt();
+
+            // Read player seat index
+            VehSeatIndex = reader.ReadShort();
+
+            // Read player position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle rotation
+            VehRotation = new LQuaternion()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat(),
+                W = reader.ReadFloat()
+            };
+
+            // Read vehicle velocity
+            VehVelocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle speed
+            VehSpeed = reader.ReadFloat();
+
+            // Read vehicle steering angle
+            VehSteeringAngle = reader.ReadFloat();
+
+            // Read player flags
+            Flag = reader.ReadUShort();
+
+            // Try to read latency
+            if (reader.CanRead(4))
+            {
+                // Read player latency
+                Latency = reader.ReadFloat();
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
-    class SuperLightSyncPlayerPacket : Packet
+    class SuperLightSyncPacket : Packet
     {
-        [ProtoMember(1)]
-        public PlayerPacket Extra { get; set; }
+        public long NetHandle { get; set; }
+
+        public LVector3 Position { get; set; }
+
+        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
-            message.Write((byte)PacketTypes.SuperLightSyncPlayerPacket);
+            #region PacketToNetOutGoingMessage
+            message.Write((byte)PacketTypes.SuperLightSyncPacket);
 
-            byte[] result = this.Serialize();
+            List<byte> byteArray = new List<byte>();
+
+            // Write player netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write player latency
+            if (Latency.HasValue)
+            {
+                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            SuperLightSyncPlayerPacket data = message.ReadBytes(len).Deserialize<SuperLightSyncPlayerPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Extra = data.Extra;
+            // Read player netHandle
+            NetHandle = reader.ReadLong();
+
+            // Read player position
+            Position = new LVector3
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read player latency
+            if (reader.CanRead(4))
+            {
+                Latency = reader.ReadFloat();
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
     class ChatMessagePacket : Packet
     {
-        [ProtoMember(1)]
         public string Username { get; set; }
 
-        [ProtoMember(2)]
         public string Message { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.ChatMessagePacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            List<byte> byteArray = new List<byte>();
+
+            byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
+            byte[] messageBytes = Encoding.UTF8.GetBytes(Message);
+
+            // Write UsernameLength
+            byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
+
+            // Write Username
+            byteArray.AddRange(usernameBytes);
+
+            // Write MessageLength
+            byteArray.AddRange(BitConverter.GetBytes(messageBytes.Length));
+
+            // Write Message
+            byteArray.AddRange(messageBytes);
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            ChatMessagePacket data = message.ReadBytes(len).Deserialize<ChatMessagePacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Username = data.Username;
-            Message = data.Message;
+            // Read username
+            int usernameLength = reader.ReadInt();
+            Username = reader.ReadString(usernameLength);
+
+            // Read message
+            int messageLength = reader.ReadInt();
+            Message = reader.ReadString(messageLength);
+            #endregion
         }
     }
 
     #region ===== NATIVECALL =====
-    [ProtoContract]
     class NativeCallPacket : Packet
     {
-        [ProtoMember(1)]
         public ulong Hash { get; set; }
 
-        [ProtoMember(2)]
-        public List<NativeArgument> Args { get; set; }
+        public List<object> Args { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.NativeCallPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            List<byte> byteArray = new List<byte>();
+
+            // Write Hash
+            byteArray.AddRange(BitConverter.GetBytes(Hash));
+
+            // Write Args
+            byteArray.AddRange(BitConverter.GetBytes(Args.Count));
+            Args.ForEach(x =>
+            {
+                Type type = x.GetType();
+
+                if (type == typeof(int))
+                {
+                    byteArray.Add(0x00);
+                    byteArray.AddRange(BitConverter.GetBytes((int)x));
+                }
+                else if (type == typeof(bool))
+                {
+                    byteArray.Add(0x01);
+                    byteArray.AddRange(BitConverter.GetBytes((bool)x));
+                }
+                else if (type == typeof(float))
+                {
+                    byteArray.Add(0x02);
+                    byteArray.AddRange(BitConverter.GetBytes((float)x));
+                }
+                else if (type == typeof(string))
+                {
+                    byteArray.Add(0x03);
+                    byte[] stringBytes = Encoding.UTF8.GetBytes((string)x);
+                    byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
+                    byteArray.AddRange(stringBytes);
+                }
+                else if (type == typeof(LVector3))
+                {
+                    byteArray.Add(0x04);
+                    LVector3 vector = (LVector3)x;
+                    byteArray.AddRange(BitConverter.GetBytes(vector.X));
+                    byteArray.AddRange(BitConverter.GetBytes(vector.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(vector.Z));
+                }
+            });
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            NativeCallPacket data = message.ReadBytes(len).Deserialize<NativeCallPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            Hash = data.Hash;
-            Args = data.Args;
+            // Read Hash
+            Hash = reader.ReadULong();
+
+            // Read Args
+            Args = new List<object>();
+            int argsLength = reader.ReadInt();
+            for (int i = 0; i < argsLength; i++)
+            {
+                byte argType = reader.ReadByte();
+                switch (argType)
+                {
+                    case 0x00:
+                        Args.Add(reader.ReadInt());
+                        break;
+                    case 0x01:
+                        Args.Add(reader.ReadBool());
+                        break;
+                    case 0x02:
+                        Args.Add(reader.ReadFloat());
+                        break;
+                    case 0x03:
+                        int stringLength = reader.ReadInt();
+                        Args.Add(reader.ReadString(stringLength));
+                        break;
+                    case 0x04:
+                        Args.Add(new LVector3()
+                        {
+                            X = reader.ReadFloat(),
+                            Y = reader.ReadFloat(),
+                            Z = reader.ReadFloat()
+                        });
+                        break;
+                }
+            }
+            #endregion
         }
     }
 
-    [ProtoContract]
     class NativeResponsePacket : Packet
     {
-        [ProtoMember(1)]
         public ulong Hash { get; set; }
 
-        [ProtoMember(2)]
-        public List<NativeArgument> Args { get; set; }
+        public List<object> Args { get; set; }
 
-        [ProtoMember(3)]
-        public NativeArgument Type { get; set; }
+        public byte? ResultType { get; set; }
 
-        [ProtoMember(4)]
-        public long NetHandle { get; set; }
+        public long ID { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.NativeResponsePacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            List<byte> byteArray = new List<byte>();
+
+            // Write Hash
+            byteArray.AddRange(BitConverter.GetBytes(Hash));
+
+            Type type;
+
+            // Write Args
+            byteArray.AddRange(BitConverter.GetBytes(Args.Count));
+            Args.ForEach(x =>
+            {
+                type = x.GetType();
+
+                if (type == typeof(int))
+                {
+                    byteArray.Add(0x00);
+                    byteArray.AddRange(BitConverter.GetBytes((int)x));
+                }
+                else if (type == typeof(bool))
+                {
+                    byteArray.Add(0x01);
+                    byteArray.AddRange(BitConverter.GetBytes((bool)x));
+                }
+                else if (type == typeof(float))
+                {
+                    byteArray.Add(0x02);
+                    byteArray.AddRange(BitConverter.GetBytes((float)x));
+                }
+                else if (type == typeof(string))
+                {
+                    byteArray.Add(0x03);
+                    byte[] stringBytes = Encoding.UTF8.GetBytes((string)x);
+                    byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
+                    byteArray.AddRange(stringBytes);
+                }
+                else if (type == typeof(LVector3))
+                {
+                    byteArray.Add(0x04);
+                    LVector3 vector = (LVector3)x;
+                    byteArray.AddRange(BitConverter.GetBytes(vector.X));
+                    byteArray.AddRange(BitConverter.GetBytes(vector.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(vector.Z));
+                }
+            });
+
+            byteArray.AddRange(BitConverter.GetBytes(ID));
+
+            // Write type of result
+            if (ResultType.HasValue)
+            {
+                byteArray.Add(ResultType.Value);
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
-
-            NativeResponsePacket data = message.ReadBytes(len).Deserialize<NativeResponsePacket>();
-
-            Hash = data.Hash;
-            Args = data.Args;
-            Type = data.Type;
-            NetHandle = data.NetHandle;
+            throw new NotImplementedException();
         }
-    }
 
-    [ProtoContract]
-    [ProtoInclude(1, typeof(IntArgument))]
-    [ProtoInclude(2, typeof(BoolArgument))]
-    [ProtoInclude(3, typeof(FloatArgument))]
-    [ProtoInclude(4, typeof(StringArgument))]
-    [ProtoInclude(5, typeof(LVector3Argument))]
-    class NativeArgument { }
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-    [ProtoContract]
-    class IntArgument : NativeArgument
-    {
-        [ProtoMember(1)]
-        public int Data { get; set; }
-    }
+            // Read Hash
+            Hash = reader.ReadULong();
 
-    [ProtoContract]
-    class BoolArgument : NativeArgument
-    {
-        [ProtoMember(1)]
-        public bool Data { get; set; }
-    }
+            // Read Args
+            Args = new List<object>();
+            int argsLength = reader.ReadInt();
+            for (int i = 0; i < argsLength; i++)
+            {
+                byte argType = reader.ReadByte();
+                switch (argType)
+                {
+                    case 0x00:
+                        Args.Add(reader.ReadInt());
+                        break;
+                    case 0x01:
+                        Args.Add(reader.ReadBool());
+                        break;
+                    case 0x02:
+                        Args.Add(reader.ReadFloat());
+                        break;
+                    case 0x03:
+                        int stringLength = reader.ReadInt();
+                        Args.Add(reader.ReadString(stringLength));
+                        break;
+                    case 0x04:
+                        Args.Add(new LVector3()
+                        {
+                            X = reader.ReadFloat(),
+                            Y = reader.ReadFloat(),
+                            Z = reader.ReadFloat()
+                        });
+                        break;
+                }
+            }
 
-    [ProtoContract]
-    class FloatArgument : NativeArgument
-    {
-        [ProtoMember(1)]
-        public float Data { get; set; }
-    }
+            ID = reader.ReadLong();
 
-    [ProtoContract]
-    class StringArgument : NativeArgument
-    {
-        [ProtoMember(1)]
-        public string Data { get; set; }
-    }
-
-    [ProtoContract]
-    class LVector3Argument : NativeArgument
-    {
-        [ProtoMember(1)]
-        public LVector3 Data { get; set; }
+            // Read type of result
+            if (reader.CanRead(1))
+            {
+                ResultType = reader.ReadByte();
+            }
+            #endregion
+        }
     }
     #endregion // ===== NATIVECALL =====
     #endregion
 
     #region -- NPC --
-    [ProtoContract]
     class FullSyncNpcPacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
         public int ModelHash { get; set; }
 
-        [ProtoMember(3)]
         public Dictionary<byte, short> Clothes { get; set; }
 
-        [ProtoMember(4)]
         public int Health { get; set; }
 
-        [ProtoMember(5)]
         public LVector3 Position { get; set; }
 
-        [ProtoMember(6)]
         public LVector3 Rotation { get; set; }
 
-        [ProtoMember(7)]
         public LVector3 Velocity { get; set; }
 
-        [ProtoMember(8)]
         public byte Speed { get; set; }
 
-        [ProtoMember(9)]
         public LVector3 AimCoords { get; set; }
 
-        [ProtoMember(10)]
         public uint CurrentWeaponHash { get; set; }
 
-        [ProtoMember(11)]
         public byte? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.FullSyncNpcPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            List<byte> byteArray = new List<byte>();
+
+            // Write player + ped handle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write npc flags
+            byteArray.Add(Flag.Value);
+
+            // Write npc model hash
+            byteArray.AddRange(BitConverter.GetBytes(ModelHash));
+
+            // Write npc position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write npc rotation
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+
+            // Write npc clothes
+            // Write the count of clothes
+            byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
+            // Loop the dictionary and add the values
+            for (int i = 0; i < Clothes.Count; i++)
+            {
+                // Write the cloth value
+                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+            }
+
+            // Write npc health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write npc velocity
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Velocity.Z));
+
+            // Write npc speed
+            byteArray.Add(Speed);
+
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (byte)PedDataFlags.IsAiming) != 0 || (Flag.Value & (byte)PedDataFlags.IsShooting) != 0)
+                {
+                    // Write player aim coords
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+                }
+            }
+
+            // Write npc weapon hash
+            byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            FullSyncNpcPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
-            ModelHash = data.ModelHash;
-            Clothes = data.Clothes;
-            Health = data.Health;
-            Position = data.Position;
-            Rotation = data.Rotation;
-            Velocity = data.Velocity;
-            Speed = data.Speed;
-            AimCoords = data.AimCoords;
-            CurrentWeaponHash = data.CurrentWeaponHash;
-            Flag = data.Flag;
+            // Read player + ped handle
+            NetHandle = reader.ReadLong();
+
+            // Read npc flag
+            Flag = reader.ReadByte();
+
+            // Read npc model hash
+            ModelHash = reader.ReadInt();
+
+            // Read npc position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read npc rotation
+            Rotation = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read npc clothes
+            // Create new Dictionary
+            Clothes = new Dictionary<byte, short>();
+            // Read the count of clothes
+            ushort clothCount = reader.ReadUShort();
+            // For clothCount
+            for (ushort i = 0; i < clothCount; i++)
+            {
+                // Read cloth value
+                short clothValue = reader.ReadShort();
+                Clothes.Add((byte)i, clothValue);
+            }
+
+            // Read npc health
+            Health = reader.ReadByte();
+
+            // Read npc velocity
+            Velocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read npc speed
+            Speed = reader.ReadByte();
+
+            // Read npc flag values
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (byte)PedDataFlags.IsAiming) != 0 || (Flag.Value & (byte)PedDataFlags.IsShooting) != 0)
+                {
+                    AimCoords = new LVector3()
+                    {
+                        X = reader.ReadFloat(),
+                        Y = reader.ReadFloat(),
+                        Z = reader.ReadFloat()
+                    };
+                }
+            }
+
+            // Read npc weapon hash
+            CurrentWeaponHash = reader.ReadUInt();
+            #endregion
         }
     }
 
-    [ProtoContract]
     class FullSyncNpcVehPacket : Packet
     {
-        [ProtoMember(1)]
         public long NetHandle { get; set; }
 
-        [ProtoMember(2)]
         public long VehHandle { get; set; }
 
-        [ProtoMember(3)]
         public int ModelHash { get; set; }
 
-        [ProtoMember(4)]
         public Dictionary<byte, short> Clothes { get; set; }
 
-        [ProtoMember(5)]
         public int Health { get; set; }
 
-        [ProtoMember(6)]
         public LVector3 Position { get; set; }
 
-        [ProtoMember(7)]
         public int VehModelHash { get; set; }
 
-        [ProtoMember(8)]
         public short VehSeatIndex { get; set; }
 
-        [ProtoMember(9)]
-        public LVector3 VehPosition { get; set; }
-
-        [ProtoMember(10)]
         public LQuaternion VehRotation { get; set; }
 
-        [ProtoMember(11)]
         public float VehEngineHealth { get; set; }
 
-        [ProtoMember(12)]
         public float VehRPM { get; set; }
 
-        [ProtoMember(13)]
         public LVector3 VehVelocity { get; set; }
 
-        [ProtoMember(14)]
         public float VehSpeed { get; set; }
 
-        [ProtoMember(15)]
         public float VehSteeringAngle { get; set; }
 
-        [ProtoMember(16)]
         public byte[] VehColors { get; set; }
 
-        [ProtoMember(17)]
         public Dictionary<int, int> VehMods { get; set; }
 
-        [ProtoMember(18)]
-        public VehicleDoors[] VehDoors { get; set; }
+        public VehicleDamageModel VehDamageModel { get; set; }
 
-        [ProtoMember(19)]
-        public int VehTires { get; set; }
-
-        [ProtoMember(20)]
         public byte VehLandingGear { get; set; }
 
-        [ProtoMember(21)]
-        public byte? Flag { get; set; } = 0;
+        public ushort? Flag { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
+            #region PacketToNetOutGoingMessage
             message.Write((byte)PacketTypes.FullSyncNpcVehPacket);
 
-            byte[] result = CoopSerializer.Serialize(this);
+            List<byte> byteArray = new List<byte>();
+
+            // Write player + npc netHandle
+            byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player + vehicle handle
+            byteArray.AddRange(BitConverter.GetBytes(VehHandle));
+
+            // Write vehicles flags
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
+
+            // Write npc health
+            byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write npc model hash
+            byteArray.AddRange(BitConverter.GetBytes(ModelHash));
+
+            // Write npc clothes
+            // Write the count of clothes
+            byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
+            // Loop the dictionary and add the values
+            for (int i = 0; i < Clothes.Count; i++)
+            {
+                // Write the cloth value
+                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+            }
+
+            // Write vehicle model hash
+            byteArray.AddRange(BitConverter.GetBytes(VehModelHash));
+
+            // Write player seat index
+            byteArray.AddRange(BitConverter.GetBytes(VehSeatIndex));
+
+            // Write vehicle position
+            byteArray.AddRange(BitConverter.GetBytes(Position.X));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Y));
+            byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+
+            // Write vehicle rotation
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.Z));
+            byteArray.AddRange(BitConverter.GetBytes(VehRotation.W));
+
+            // Write vehicle engine health
+            byteArray.AddRange(BitConverter.GetBytes(VehEngineHealth));
+
+            // Write vehicle rpm
+            byteArray.AddRange(BitConverter.GetBytes(VehRPM));
+
+            // Write vehicle velocity
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.X));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Y));
+            byteArray.AddRange(BitConverter.GetBytes(VehVelocity.Z));
+
+            // Write vehicle speed
+            byteArray.AddRange(BitConverter.GetBytes(VehSpeed));
+
+            // Write vehicle steering angle
+            byteArray.AddRange(BitConverter.GetBytes(VehSteeringAngle));
+
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (ushort)VehicleDataFlags.IsPlane) != 0)
+                {
+                    // Write the vehicle landing gear
+                    byteArray.AddRange(BitConverter.GetBytes(VehLandingGear));
+                }
+            }
+
+            // Write vehicle colors
+            byteArray.Add(VehColors[0]);
+            byteArray.Add(VehColors[1]);
+
+            // Write vehicle mods
+            // Write the count of mods
+            byteArray.AddRange(BitConverter.GetBytes((short)VehMods.Count));
+            // Loop the dictionary and add the values
+            foreach (KeyValuePair<int, int> mod in VehMods)
+            {
+                // Write the mod value
+                byteArray.AddRange(BitConverter.GetBytes((short)mod.Value));
+            }
+
+            if (!VehDamageModel.Equals(default(VehicleDamageModel)))
+            {
+                // Write boolean = true
+                byteArray.Add(0x01);
+                // Write vehicle damage model
+                byteArray.Add(VehDamageModel.BrokenDoors);
+                byteArray.Add(VehDamageModel.BrokenWindows);
+                byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.BurstedTires));
+                byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.PuncturedTires));
+            }
+            else
+            {
+                // Write boolean = false
+                byteArray.Add(0x00);
+            }
+
+            byte[] result = byteArray.ToArray();
 
             message.Write(result.Length);
             message.Write(result);
+            #endregion
         }
 
         public override void NetIncomingMessageToPacket(NetIncomingMessage message)
         {
-            int len = message.ReadInt32();
+            throw new NotImplementedException();
+        }
 
-            FullSyncNpcVehPacket data = message.ReadBytes(len).Deserialize<FullSyncNpcVehPacket>();
+        public override void NetIncomingMessageToPacket(byte[] array)
+        {
+            #region NetIncomingMessageToPacket
+            BitReader reader = new BitReader(array);
 
-            NetHandle = data.NetHandle;
-            VehHandle = data.VehHandle;
-            ModelHash = data.ModelHash;
-            Clothes = data.Clothes;
-            Health = data.Health;
-            Position = data.Position;
-            VehModelHash = data.VehModelHash;
-            VehSeatIndex = data.VehSeatIndex;
-            VehPosition = data.VehPosition;
-            VehRotation = data.VehRotation;
-            VehEngineHealth = data.VehEngineHealth;
-            VehRPM = data.VehRPM;
-            VehVelocity = data.VehVelocity;
-            VehSpeed = data.VehSpeed;
-            VehSteeringAngle = data.VehSteeringAngle;
-            VehColors = data.VehColors;
-            VehMods = data.VehMods;
-            VehDoors = data.VehDoors;
-            VehTires = data.VehTires;
-            VehLandingGear = data.VehLandingGear;
-            Flag = data.Flag;
+            // Read player + npc netHandle
+            NetHandle = reader.ReadLong();
+
+            // Reader player + vehicle handle
+            VehHandle = reader.ReadLong();
+
+            // Read vehicle flags
+            Flag = reader.ReadUShort();
+
+            // Read npc health
+            Health = reader.ReadInt();
+
+            // Read npc model hash
+            ModelHash = reader.ReadInt();
+
+            // Read npc clothes
+            // Create new Dictionary
+            Clothes = new Dictionary<byte, short>();
+            // Read the count of clothes
+            ushort clothCount = reader.ReadUShort();
+            // For clothCount
+            for (int i = 0; i < clothCount; i++)
+            {
+                // Read cloth value
+                short clothValue = reader.ReadShort();
+                Clothes.Add((byte)i, clothValue);
+            }
+
+            // Read vehicle model hash
+            VehModelHash = reader.ReadInt();
+
+            // Read npc seat index
+            VehSeatIndex = reader.ReadShort();
+
+            // Read vehicle position
+            Position = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle rotation
+            VehRotation = new LQuaternion()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat(),
+                W = reader.ReadFloat()
+            };
+
+            // Read vehicle engine health
+            VehEngineHealth = reader.ReadFloat();
+
+            // Read vehicle rpm
+            VehRPM = reader.ReadFloat();
+
+            // Read vehicle velocity
+            VehVelocity = new LVector3()
+            {
+                X = reader.ReadFloat(),
+                Y = reader.ReadFloat(),
+                Z = reader.ReadFloat()
+            };
+
+            // Read vehicle speed
+            VehSpeed = reader.ReadFloat();
+
+            // Read vehicle steering angle
+            VehSteeringAngle = reader.ReadFloat();
+
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (int)VehicleDataFlags.IsPlane) != 0)
+                {
+                    // Read vehicle landing gear
+                    VehLandingGear = (byte)reader.ReadShort();
+                }
+            }
+
+            // Read vehicle colors
+            byte vehColor1 = reader.ReadByte();
+            byte vehColor2 = reader.ReadByte();
+            VehColors = new byte[] { vehColor1, vehColor2 };
+
+            // Read vehicle mods
+            // Create new Dictionary
+            VehMods = new Dictionary<int, int>();
+            // Read count of mods
+            short vehModCount = reader.ReadShort();
+            // Loop
+            for (int i = 0; i < vehModCount; i++)
+            {
+                // Read the mod value
+                short mod = reader.ReadShort();
+                VehMods.Add(i, mod);
+            }
+
+            if (reader.ReadBool())
+            {
+                // Read vehicle damage model
+                VehDamageModel = new VehicleDamageModel()
+                {
+                    BrokenDoors = reader.ReadByte(),
+                    BrokenWindows = reader.ReadByte(),
+                    BurstedTires = reader.ReadUShort(),
+                    PuncturedTires = reader.ReadUShort()
+                };
+            }
+            #endregion
         }
     }
     #endregion
 
     public static class CoopSerializer
     {
-        public static byte[] CSerialize(this object obj)
+        public static byte[] Serialize(this object obj)
         {
             if (obj == null)
             {
@@ -922,7 +2012,7 @@ namespace CoopServer
             return System.Text.Encoding.UTF8.GetBytes(jsonString);
         }
 
-        public static T CDeserialize<T>(this byte[] bytes) where T : class
+        public static T Deserialize<T>(this byte[] bytes) where T : class
         {
             if (bytes == null)
             {
@@ -931,26 +2021,6 @@ namespace CoopServer
 
             var jsonString = System.Text.Encoding.UTF8.GetString(bytes);
             return JsonConvert.DeserializeObject<T>(jsonString);
-        }
-
-        internal static T Deserialize<T>(this byte[] data) where T : new()
-        {
-            try
-            {
-                using MemoryStream stream = new(data);
-                return Serializer.Deserialize<T>(stream);
-            }
-            catch
-            {
-                throw new Exception(string.Format("The deserialization of the packet {0} failed!", typeof(T).Name));
-            }
-        }
-
-        internal static byte[] Serialize<T>(this T packet)
-        {
-            using MemoryStream stream = new();
-            Serializer.Serialize(stream, packet);
-            return stream.ToArray();
         }
     }
 }

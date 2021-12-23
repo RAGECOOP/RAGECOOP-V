@@ -10,48 +10,6 @@ namespace CoopServer
 {
     internal class Util
     {
-        public static List<NativeArgument> ParseNativeArguments(params object[] args)
-        {
-            List<NativeArgument> result = null;
-
-            if (args != null && args.Length > 0)
-            {
-                result = new();
-
-                foreach (object arg in args)
-                {
-                    Type typeOf = arg.GetType();
-
-                    if (typeOf == typeof(int))
-                    {
-                        result.Add(new IntArgument() { Data = (int)arg });
-                    }
-                    else if (typeOf == typeof(bool))
-                    {
-                        result.Add(new BoolArgument() { Data = (bool)arg });
-                    }
-                    else if (typeOf == typeof(float))
-                    {
-                        result.Add(new FloatArgument() { Data = (float)arg });
-                    }
-                    else if (typeOf == typeof(string))
-                    {
-                        result.Add(new StringArgument() { Data = (string)arg });
-                    }
-                    else if (typeOf == typeof(LVector3))
-                    {
-                        result.Add(new LVector3Argument() { Data = (LVector3)arg });
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            return result;
-        }
-
         public static Client GetClientByNetHandle(long netHandle)
         {
             Client result = Server.Clients.Find(x => x.NetHandle == netHandle);

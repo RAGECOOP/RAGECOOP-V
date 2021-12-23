@@ -22,7 +22,7 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V1_2";
+        private static readonly string CompatibleVersion = "V1_3";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -237,10 +237,13 @@ namespace CoopServer
                             {
                                 try
                                 {
-                                    Packet approvalPacket;
-                                    approvalPacket = new HandshakePacket();
-                                    approvalPacket.NetIncomingMessageToPacket(message);
-                                    GetHandshake(message.SenderConnection, (HandshakePacket)approvalPacket);
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    HandshakePacket packet = new HandshakePacket();
+                                    packet.NetIncomingMessageToPacket(data);
+
+                                    GetHandshake(message.SenderConnection, packet);
                                 }
                                 catch (Exception e)
                                 {
@@ -265,146 +268,165 @@ namespace CoopServer
                             // Get packet type
                             byte type = message.ReadByte();
 
-                            // Create packet
-                            Packet packet;
-
                             switch (type)
                             {
                                 case (byte)PacketTypes.FullSyncPlayerPacket:
-                                    try
                                     {
-                                        packet = new FullSyncPlayerPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        FullSyncPlayer((FullSyncPlayerPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            FullSyncPlayer(packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     break;
                                 case (byte)PacketTypes.FullSyncPlayerVehPacket:
-                                    try
                                     {
-                                        packet = new FullSyncPlayerVehPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        FullSyncPlayerVeh((FullSyncPlayerVehPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            FullSyncPlayerVeh(packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     break;
                                 case (byte)PacketTypes.LightSyncPlayerPacket:
-                                    try
                                     {
-                                        packet = new LightSyncPlayerPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        LightSyncPlayer((LightSyncPlayerPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            LightSyncPlayer(packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     break;
                                 case (byte)PacketTypes.LightSyncPlayerVehPacket:
-                                    try
                                     {
-                                        packet = new LightSyncPlayerVehPacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        LightSyncPlayerVeh((LightSyncPlayerVehPacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            LightSyncPlayerVeh(packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     break;
                                 case (byte)PacketTypes.ChatMessagePacket:
-                                    try
                                     {
-                                        packet = new ChatMessagePacket();
-                                        packet.NetIncomingMessageToPacket(message);
-                                        SendChatMessage((ChatMessagePacket)packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        message.SenderConnection.Disconnect(e.Message);
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            ChatMessagePacket packet = new ChatMessagePacket();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            SendChatMessage(packet);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            message.SenderConnection.Disconnect(e.Message);
+                                        }
                                     }
                                     break;
                                 case (byte)PacketTypes.FullSyncNpcPacket:
-                                    if (MainSettings.NpcsAllowed)
                                     {
-                                        try
+                                        if (MainSettings.NpcsAllowed)
                                         {
-                                            packet = new FullSyncNpcPacket();
-                                            packet.NetIncomingMessageToPacket(message);
-                                            FullSyncNpc(message.SenderConnection, (FullSyncNpcPacket)packet);
+                                            try
+                                            {
+                                                int len = message.ReadInt32();
+                                                byte[] data = message.ReadBytes(len);
+
+                                                FullSyncNpcPacket packet = new FullSyncNpcPacket();
+                                                packet.NetIncomingMessageToPacket(data);
+
+                                                FullSyncNpc(message.SenderConnection, packet);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                message.SenderConnection.Disconnect(e.Message);
+                                            }
                                         }
-                                        catch (Exception e)
+                                        else
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            message.SenderConnection.Disconnect("Npcs are not allowed!");
                                         }
-                                    }
-                                    else
-                                    {
-                                        message.SenderConnection.Disconnect("Npcs are not allowed!");
                                     }
                                     break;
                                 case (byte)PacketTypes.FullSyncNpcVehPacket:
-                                    if (MainSettings.NpcsAllowed)
                                     {
-                                        try
+                                        if (MainSettings.NpcsAllowed)
                                         {
-                                            packet = new FullSyncNpcVehPacket();
-                                            packet.NetIncomingMessageToPacket(message);
-                                            FullSyncNpcVeh(message.SenderConnection, (FullSyncNpcVehPacket)packet);
+                                            try
+                                            {
+                                                int len = message.ReadInt32();
+                                                byte[] data = message.ReadBytes(len);
+
+                                                FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
+                                                packet.NetIncomingMessageToPacket(data);
+
+                                                FullSyncNpcVeh(message.SenderConnection, packet);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                message.SenderConnection.Disconnect(e.Message);
+                                            }
                                         }
-                                        catch (Exception e)
+                                        else
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            message.SenderConnection.Disconnect("Npcs are not allowed!");
                                         }
-                                    }
-                                    else
-                                    {
-                                        message.SenderConnection.Disconnect("Npcs are not allowed!");
                                     }
                                     break;
                                 case (byte)PacketTypes.NativeResponsePacket:
                                     {
                                         try
                                         {
-                                            packet = new NativeResponsePacket();
-                                            packet.NetIncomingMessageToPacket(message);
-                                            NativeResponsePacket responsePacket = (NativeResponsePacket)packet;
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            NativeResponsePacket packet = new NativeResponsePacket();
+                                            packet.NetIncomingMessageToPacket(data);
 
                                             Client client = Clients.Find(x => x.NetHandle == message.SenderConnection.RemoteUniqueIdentifier);
                                             if (client != null)
                                             {
-                                                if (client.Callbacks.ContainsKey(responsePacket.NetHandle))
+                                                if (client.Callbacks.ContainsKey(packet.ID))
                                                 {
-                                                    object resp = null;
-                                                    if (responsePacket.Type is IntArgument argument)
-                                                    {
-                                                        resp = argument.Data;
-                                                    }
-                                                    else if (responsePacket.Type is StringArgument argument1)
-                                                    {
-                                                        resp = argument1.Data;
-                                                    }
-                                                    else if (responsePacket.Type is FloatArgument argument2)
-                                                    {
-                                                        resp = argument2.Data;
-                                                    }
-                                                    else if (responsePacket.Type is BoolArgument argument3)
-                                                    {
-                                                        resp = argument3.Data;
-                                                    }
-                                                    else if (responsePacket.Type is LVector3Argument argument4)
-                                                    {
-                                                        resp = argument4.Data;
-                                                    }
-
-                                                    client.Callbacks[responsePacket.NetHandle].Invoke(resp);
-                                                    client.Callbacks.Remove(responsePacket.NetHandle);
+                                                    client.Callbacks[packet.ID].Invoke(packet.Args[0]);
+                                                    client.Callbacks.Remove(packet.ID);
                                                 }
                                             }
                                         }
@@ -415,59 +437,63 @@ namespace CoopServer
                                     }
                                     break;
                                 case (byte)PacketTypes.ModPacket:
-                                    if (MainSettings.ModsAllowed)
                                     {
-                                        try
+                                        if (MainSettings.ModsAllowed)
                                         {
-                                            packet = new ModPacket();
-                                            packet.NetIncomingMessageToPacket(message);
-                                            ModPacket modPacket = (ModPacket)packet;
-
-                                            bool resourceResult = false;
-                                            if (Resources.Any())
+                                            try
                                             {
-                                                Resources.ForEach(x =>
-                                                {
-                                                    if (x.InvokeModPacketReceived(modPacket.NetHandle, modPacket.Target, modPacket.Mod, modPacket.CustomPacketID, modPacket.Bytes))
-                                                    {
-                                                        resourceResult = true;
-                                                    }
-                                                });
-                                            }
+                                                int len = message.ReadInt32();
+                                                byte[] data = message.ReadBytes(len);
 
-                                            if (!resourceResult && modPacket.Target != -1)
-                                            {
-                                                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                                                modPacket.PacketToNetOutGoingMessage(outgoingMessage);
+                                                ModPacket packet = new ModPacket();
+                                                packet.NetIncomingMessageToPacket(data);
 
-                                                if (modPacket.Target != 0)
+                                                bool resourceResult = false;
+                                                if (Resources.Any())
                                                 {
-                                                    NetConnection target = MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == modPacket.Target);
-                                                    if (target == null)
+                                                    Resources.ForEach(x =>
                                                     {
-                                                        Logging.Error($"[ModPacket] target \"{modPacket.Target}\" not found!");
+                                                        if (x.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Mod, packet.CustomPacketID, packet.Bytes))
+                                                        {
+                                                            resourceResult = true;
+                                                        }
+                                                    });
+                                                }
+
+                                                if (!resourceResult && packet.Target != -1)
+                                                {
+                                                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                                    packet.PacketToNetOutGoingMessage(outgoingMessage);
+
+                                                    if (packet.Target != 0)
+                                                    {
+                                                        NetConnection target = MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == packet.Target);
+                                                        if (target == null)
+                                                        {
+                                                            Logging.Error($"[ModPacket] target \"{packet.Target}\" not found!");
+                                                        }
+                                                        else
+                                                        {
+                                                            // Send back to target
+                                                            MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        // Send back to target
-                                                        MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
+                                                        // Send back to all players
+                                                        MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                                                     }
                                                 }
-                                                else
-                                                {
-                                                    // Send back to all players
-                                                    MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Mod);
-                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                message.SenderConnection.Disconnect(e.Message);
                                             }
                                         }
-                                        catch (Exception e)
+                                        else
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            message.SenderConnection.Disconnect("Mods are not allowed!");
                                         }
-                                    }
-                                    else
-                                    {
-                                        message.SenderConnection.Disconnect("Mods are not allowed!");
                                     }
                                     break;
                                 default:
@@ -598,7 +624,7 @@ namespace CoopServer
                 NetHandle = localNetHandle,
                 Username = string.Empty,
                 ModVersion = string.Empty,
-                NpcsAllowed = MainSettings.NpcsAllowed
+                NPCsAllowed = MainSettings.NpcsAllowed
             }.PacketToNetOutGoingMessage(outgoingMessage);
 
             // Accept the connection and send back a new handshake packet with the connection ID
@@ -697,36 +723,36 @@ namespace CoopServer
 
         private static void FullSyncPlayer(FullSyncPlayerPacket packet)
         {
-            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
+            Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
             {
                 return;
             }
-            client.Player.Position = packet.Extra.Position;
-            client.Player.Health = packet.Extra.Health;
+            // Save the new data
+            client.Player.Position = packet.Position;
+            client.Player.Health = packet.Health;
 
-            PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            // Override the latency
+            packet.Latency = client.Latency;
 
-            packet.Extra = playerPacket;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerFull);
                 }
                 else
                 {
-                    new SuperLightSyncPlayerPacket()
+                    new SuperLightSyncPacket()
                     {
-                        Extra = packet.Extra
+                        NetHandle = packet.NetHandle,
+                        Position = packet.Position,
+                        Latency = packet.Latency
                     }.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
                 }
-
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (Resources.Any())
@@ -737,36 +763,37 @@ namespace CoopServer
 
         private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
         {
-            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
+            Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
             {
                 return;
             }
-            client.Player.Position = packet.Extra.Position;
-            client.Player.Health = packet.Extra.Health;
+            // Save the new data
+            client.Player.Position = packet.Position;
+            client.Player.Health = packet.Health;
 
-            PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            // Override the latency
+            packet.Latency = client.Latency;
 
-            packet.Extra = playerPacket;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerFull);
                 }
                 else
                 {
-                    new SuperLightSyncPlayerPacket()
+                    new SuperLightSyncPacket()
                     {
-                        Extra = packet.Extra
+                        NetHandle = packet.NetHandle,
+                        Position = packet.Position,
+                        Latency = packet.Latency
                     }.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
                 }
-
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (Resources.Any())
@@ -777,36 +804,37 @@ namespace CoopServer
 
         private static void LightSyncPlayer(LightSyncPlayerPacket packet)
         {
-            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
+            Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
             {
                 return;
             }
-            client.Player.Position = packet.Extra.Position;
-            client.Player.Health = packet.Extra.Health;
+            // Save the new data
+            client.Player.Position = packet.Position;
+            client.Player.Health = packet.Health;
 
-            PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            // Override the latency
+            packet.Latency = client.Latency;
 
-            packet.Extra = playerPacket;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerLight);
                 }
                 else
                 {
-                    new SuperLightSyncPlayerPacket()
+                    new SuperLightSyncPacket()
                     {
-                        Extra = packet.Extra
+                        NetHandle = packet.NetHandle,
+                        Position = packet.Position,
+                        Latency = packet.Latency
                     }.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
                 }
-
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (Resources.Any())
@@ -817,36 +845,37 @@ namespace CoopServer
 
         private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
         {
-            Client client = Util.GetClientByNetHandle(packet.Extra.NetHandle);
+            Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
             {
                 return;
             }
-            client.Player.Position = packet.Extra.Position;
-            client.Player.Health = packet.Extra.Health;
+            // Save the new data
+            client.Player.Position = packet.Position;
+            client.Player.Health = packet.Health;
 
-            PlayerPacket playerPacket = packet.Extra;
-            playerPacket.Latency = client.Latency;
+            // Override the latency
+            packet.Latency = client.Latency;
 
-            packet.Extra = playerPacket;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.Extra.NetHandle).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Extra.Position, 550f))
+                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
                 {
                     packet.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerLight);
                 }
                 else
                 {
-                    new SuperLightSyncPlayerPacket()
+                    new SuperLightSyncPacket()
                     {
-                        Extra = packet.Extra
+                        NetHandle = packet.NetHandle,
+                        Position = packet.Position,
+                        Latency = packet.Latency
                     }.PacketToNetOutGoingMessage(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
                 }
-
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.Player);
             });
 
             if (Resources.Any())
@@ -858,8 +887,6 @@ namespace CoopServer
         // Send a message to targets or all players
         private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
         {
-            NetOutgoingMessage outgoingMessage;
-
             if (Resources.Any())
             {
                 if (packet.Message.StartsWith('/'))
@@ -886,13 +913,7 @@ namespace CoopServer
                                 return;
                             }
 
-                            outgoingMessage = MainNetServer.CreateMessage();
-                            new ChatMessagePacket()
-                            {
-                                Username = "Server",
-                                Message = command.Key.Usage
-                            }.PacketToNetOutGoingMessage(outgoingMessage);
-                            MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                            SendChatMessage("Server", command.Key.Usage, userConnection);
                             return;
                         }
 
@@ -906,13 +927,7 @@ namespace CoopServer
                             return;
                         }
 
-                        outgoingMessage = MainNetServer.CreateMessage();
-                        new ChatMessagePacket()
-                        {
-                            Username = "Server",
-                            Message = "Command not found!"
-                        }.PacketToNetOutGoingMessage(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                        SendChatMessage("Server", "Command not found!", userConnection);
                     }
 
                     return;
@@ -938,11 +953,22 @@ namespace CoopServer
 
             packet.Message = packet.Message.Replace("~", "");
 
-            outgoingMessage = MainNetServer.CreateMessage();
-            packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+            SendChatMessage(packet.Username, packet.Message, targets);
 
             Logging.Info(packet.Username + ": " + packet.Message);
+        }
+
+        internal static void SendChatMessage(string username, string message, List<NetConnection> targets = null)
+        {
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+
+            new ChatMessagePacket() { Username = username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
+
+            MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
+        }
+        internal static void SendChatMessage(string username, string message, NetConnection target)
+        {
+            SendChatMessage(username, message, new List<NetConnection>() { target });
         }
         #endregion
 
@@ -957,7 +983,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.NPC);
+            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.NPCFull);
         }
 
         private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
@@ -970,7 +996,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             packet.PacketToNetOutGoingMessage(outgoingMessage);
-            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.NPC);
+            MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.NPCFull);
         }
         #endregion
 
