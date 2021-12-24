@@ -84,7 +84,6 @@ namespace CoopClient
             Util.NativeMemory();
         }
 
-        private ulong LastDataSend;
 #if DEBUG
         private ulong LastDebugData;
         private int DebugBytesSend;
@@ -156,14 +155,7 @@ namespace CoopClient
             }
 #endif
 
-            if ((Util.GetTickCount64() - LastDataSend) < Util.GetGameMs<ulong>())
-            {
-                return;
-            }
-
             MainNetworking.SendPlayerData();
-
-            LastDataSend = Util.GetTickCount64();
         }
 
 #if !NON_INTERACTIVE
@@ -275,7 +267,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 30)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 20)
             {
                 return;
             }

@@ -47,11 +47,6 @@ namespace CoopClient
         }
         #endregion
 
-        public static T GetGameMs<T>() where T : IConvertible
-        {
-            return (T)Convert.ChangeType(1f / (Game.FPS > 60f ? 60f : Game.FPS) * 1000f, typeof(T));
-        }
-
         public static Model ModelRequest(this int hash)
         {
             Model model = new Model(hash);

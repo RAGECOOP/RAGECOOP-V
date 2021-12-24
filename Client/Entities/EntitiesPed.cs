@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 
 using GTA;
 using GTA.Native;
@@ -26,9 +27,34 @@ namespace CoopClient.Entities
         private bool AllDataAvailable = false;
         internal bool LastSyncWasFull { get; set; } = false;
         /// <summary>
+        /// PLEASE USE LastUpdateReceived
+        /// </summary>
+        private ulong LastUpdate;
+        /// <summary>
         /// Get the last update = TickCount64()
         /// </summary>
-        public ulong LastUpdateReceived { get; internal set; }
+        public ulong LastUpdateReceived
+        {
+            get => LastUpdate;
+            internal set
+            {
+                if (LastUpdate != 0)
+                {
+                    LatencyAverager.Enqueue(value - LastUpdate);
+                    if (LatencyAverager.Count >= 10)
+                    {
+                        LatencyAverager.Dequeue();
+                    }
+                }
+
+                LastUpdate = value;
+            }
+        }
+        private Queue<double> LatencyAverager = new Queue<double>();
+        private double AverageLatency
+        {
+            get => LatencyAverager.Count == 0 ? 0 : LatencyAverager.Average();
+        }
         /// <summary>
         /// Get the player latency
         /// </summary>

@@ -16,7 +16,7 @@ namespace CoopClient
     public class Networking
     {
         internal NetClient Client;
-        internal float Latency;
+        internal float Latency = 0;
 
         internal bool ShowNetworkInfo = false;
 
@@ -132,6 +132,7 @@ namespace CoopClient
                                 break;
                             case NetConnectionStatus.Disconnected:
                                 // Reset all values
+                                Latency = 0;
                                 LastPlayerFullSync = 0;
 
                                 Main.NPCsAllowed = false;
@@ -456,10 +457,7 @@ namespace CoopClient
                 player.IsInVehicle = false;
                 player.LastSyncWasFull = false;
 
-                if (packet.Flag.HasValue)
-                {
-                    player.Latency = packet.Latency.Value;
-                }
+                player.Latency = packet.Latency.Value;
                 player.LastUpdateReceived = Util.GetTickCount64();
             }
         }
@@ -646,6 +644,7 @@ namespace CoopClient
                     npc.IsInVehicle = false;
                     npc.LastSyncWasFull = true;
 
+                    npc.Latency = packet.Latency.Value;
                     npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
@@ -670,6 +669,7 @@ namespace CoopClient
                         IsInVehicle = false,
                         LastSyncWasFull = true,
 
+                        Latency = packet.Latency.Value,
                         LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
@@ -712,6 +712,7 @@ namespace CoopClient
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
 
+                    npc.Latency = packet.Latency.Value;
                     npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
@@ -746,6 +747,7 @@ namespace CoopClient
                         IsInVehicle = true,
                         LastSyncWasFull = true,
 
+                        Latency = packet.Latency.Value,
                         LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
@@ -910,7 +912,8 @@ namespace CoopClient
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDamageModel = veh.GetVehicleDamageModel(),
                     VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
-                    Flag = npc.GetVehicleFlags(veh)
+                    Flag = npc.GetVehicleFlags(veh),
+                    Latency = Latency
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else
@@ -927,7 +930,8 @@ namespace CoopClient
                     Speed = npc.GetPedSpeed(),
                     AimCoords = npc.GetPedAimCoords(true).ToLVector(),
                     CurrentWeaponHash = (uint)npc.Weapons.Current.Hash,
-                    Flag = npc.GetPedFlags(true)
+                    Flag = npc.GetPedFlags(true),
+                    Latency = Latency
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 

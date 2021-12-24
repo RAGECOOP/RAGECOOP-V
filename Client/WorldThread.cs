@@ -19,7 +19,6 @@ namespace CoopClient
         public WorldThread()
         {
             Tick += OnTick;
-            Interval = Util.GetGameMs<int>();
             Aborted += (sender, e) =>
             {
                 if (LastDisableTraffic)

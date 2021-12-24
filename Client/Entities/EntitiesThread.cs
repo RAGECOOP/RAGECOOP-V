@@ -23,7 +23,6 @@ namespace CoopClient.Entities
             }
 
             Tick += OnTick;
-            Interval = Util.GetGameMs<int>();
         }
 
         private void OnTick(object sender, EventArgs e)
@@ -41,7 +40,7 @@ namespace CoopClient.Entities
                 ulong tickCount = Util.GetTickCount64();
                 foreach (KeyValuePair<long, EntitiesPed> npc in new Dictionary<long, EntitiesPed>(localNPCs))
                 {
-                    if ((tickCount - npc.Value.LastUpdateReceived) > 3000)
+                    if ((tickCount - npc.Value.LastUpdateReceived) > 2500)
                     {
                         if (npc.Value.Character != null && npc.Value.Character.Exists() && !npc.Value.Character.IsDead)
                         {
@@ -50,7 +49,7 @@ namespace CoopClient.Entities
                             npc.Value.Character.Delete();
                         }
 
-                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && !npc.Value.MainVehicle.IsDead && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
+                        if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
                         {
                             if (npc.Value.NPCVehHandle != 0)
                             {
@@ -62,8 +61,12 @@ namespace CoopClient.Entities
                                     }
                                 }
                             }
-                            npc.Value.MainVehicle.MarkAsNoLongerNeeded();
-                            npc.Value.MainVehicle.Delete();
+
+                            if (!npc.Value.MainVehicle.IsDead)
+                            {
+                                npc.Value.MainVehicle.MarkAsNoLongerNeeded();
+                                npc.Value.MainVehicle.Delete();
+                            }
                         }
 
                         localNPCs.Remove(npc.Key);
@@ -81,9 +84,10 @@ namespace CoopClient.Entities
             if (Main.ShareNPCsWithPlayers)
             {
                 // Send all npcs from the current player
-                foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 150f)
-                    .Where(p => p.Handle != Game.Player.Character.Handle && p.RelationshipGroup != Main.RelationshipGroup)
-                    .OrderBy(p => (p.Position - Game.Player.Character.Position).Length()))
+                foreach (Ped ped in World.GetNearbyPeds(Game.Player.Character.Position, 200f) // Get all NPCs around 200f
+                    .Where(p => !p.IsDead && p.Handle != Game.Player.Character.Handle && p.RelationshipGroup != Main.RelationshipGroup)
+                    .OrderBy(p => (p.Position - Game.Player.Character.Position).Length()) // Get the nearest NPCs
+                    .Take(35)) // We shouldn't sync more peds than 35 as the network traffic can be too high for many players
                 {
                     Main.MainNetworking.SendNpcData(ped);
                 }
