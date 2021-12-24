@@ -11,8 +11,11 @@ using GTA.Math;
 namespace CoopClient
 {
     #region CLIENT-ONLY
-    static class VectorExtensions
+    public static class VectorExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public static Vector3 ToVector(this Quaternion vec)
         {
             return new Vector3()
@@ -23,6 +26,9 @@ namespace CoopClient
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static Quaternion ToQuaternion(this Vector3 vec, float vW = 0.0f)
         {
             return new Quaternion()
@@ -34,6 +40,9 @@ namespace CoopClient
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static LVector3 ToLVector(this Vector3 vec)
         {
             return new LVector3()
@@ -44,6 +53,9 @@ namespace CoopClient
             };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static LQuaternion ToLQuaternion(this Quaternion vec)
         {
             return new LQuaternion()
@@ -57,15 +69,24 @@ namespace CoopClient
     }
     #endregion
 
-    struct LVector3
+    /// <summary>
+    /// 
+    /// </summary>
+    public struct LVector3
     {
         #region CLIENT-ONLY
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3 ToVector()
         {
             return new Vector3(X, Y, Z);
         }
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
         public LVector3(float X, float Y, float Z)
         {
             this.X = X;
@@ -73,22 +94,37 @@ namespace CoopClient
             this.Z = Z;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float X { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float Y { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float Z { get; set; }
     }
 
-    struct LQuaternion
+    public struct LQuaternion
     {
         #region CLIENT-ONLY
+        /// <summary>
+        /// 
+        /// </summary>
         public Quaternion ToQuaternion()
         {
             return new Quaternion(X, Y, Z, W);
         }
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
         public LQuaternion(float X, float Y, float Z, float W)
         {
             this.X = X;
@@ -97,12 +133,24 @@ namespace CoopClient
             this.W = W;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float X { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float Y { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float Z { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public float W { get; set; }
     }
 

@@ -47,10 +47,9 @@ namespace CoopClient
         }
         #endregion
 
-        // Dirty & dangerous
         public static dynamic Lerp(dynamic from, dynamic to, float fAlpha)
         {
-            return ((to - from) * fAlpha + from);
+            return (to - from) * fAlpha + from;
         }
 
         public static T GetGameMs<T>() where T : IConvertible
