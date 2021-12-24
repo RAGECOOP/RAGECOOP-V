@@ -1165,6 +1165,8 @@ namespace CoopClient
 
         public float VehSteeringAngle { get; set; }
 
+        public LVector3 AimCoords { get; set; }
+
         public ushort? Flag { get; set; }
 
         public float? Latency { get; set; }
@@ -1178,6 +1180,9 @@ namespace CoopClient
 
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write vehicle flags
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
@@ -1210,8 +1215,17 @@ namespace CoopClient
             // Write vehicle steering angle
             byteArray.AddRange(BitConverter.GetBytes(VehSteeringAngle));
 
-            // Write vehicle flags
-            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (ushort)VehicleDataFlags.OnTurretSeat) != 0)
+                {
+                    // Write player aim coords
+                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.X));
+                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.Y));
+                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.Z));
+                }
+            }
 
             // Check if player latency has value
             if (Latency.HasValue)
@@ -1239,6 +1253,9 @@ namespace CoopClient
 
             // Read player netHandle
             NetHandle = reader.ReadLong();
+
+            // Read player flags
+            Flag = reader.ReadUShort();
 
             // Read player health
             Health = reader.ReadInt();
@@ -1280,8 +1297,19 @@ namespace CoopClient
             // Read vehicle steering angle
             VehSteeringAngle = reader.ReadFloat();
 
-            // Read player flags
-            Flag = reader.ReadUShort();
+            // Check
+            if (Flag.HasValue)
+            {
+                if ((Flag.Value & (ushort)VehicleDataFlags.OnTurretSeat) != 0)
+                {
+                    AimCoords = new LVector3()
+                    {
+                        X = reader.ReadFloat(),
+                        Y = reader.ReadFloat(),
+                        Z= reader.ReadFloat()
+                    };
+                }
+            }
 
             // Try to read latency
             if (reader.CanRead(4))

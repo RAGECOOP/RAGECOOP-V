@@ -47,11 +47,6 @@ namespace CoopClient
         }
         #endregion
 
-        public static dynamic Lerp(dynamic from, dynamic to, float fAlpha)
-        {
-            return (to - from) * fAlpha + from;
-        }
-
         public static T GetGameMs<T>() where T : IConvertible
         {
             return (T)Convert.ChangeType(1f / (Game.FPS > 60f ? 60f : Game.FPS) * 1000f, typeof(T));
@@ -115,6 +110,11 @@ namespace CoopClient
         public static float LinearFloatLerp(float start, float end, ulong currentTime, int duration)
         {
             return (end - start) * currentTime / duration + start;
+        }
+
+        public static dynamic Lerp(dynamic from, dynamic to, float fAlpha)
+        {
+            return (to - from) * fAlpha + from;
         }
 
         public static int GetResponsiblePedHandle(this Vehicle veh)
@@ -352,7 +352,6 @@ namespace CoopClient
 
         public static void SetVehicleDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
-            // Set doors
             for (int i = 0; i < 8; i++)
             {
                 if ((model.BrokenDoors & (byte)(1 << i)) != 0)
