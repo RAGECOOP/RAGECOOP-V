@@ -482,10 +482,10 @@ namespace CoopClient
             // Write the count of clothes
             byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
             // Loop the dictionary and add the values
-            for (int i = 0; i < Clothes.Count; i++)
+            foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
-                // Write the cloth value
-                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+                byteArray.Add(cloth.Key);
+                byteArray.AddRange(BitConverter.GetBytes(cloth.Value));
             }
 
             // Write player velocity
@@ -517,6 +517,7 @@ namespace CoopClient
                 byteArray.AddRange(BitConverter.GetBytes((ushort)WeaponComponents.Count));
                 foreach (KeyValuePair<uint, bool> component in WeaponComponents)
                 {
+                    byteArray.AddRange(BitConverter.GetBytes(component.Key));
                     byteArray.AddRange(BitConverter.GetBytes(component.Value));
                 }
             }
@@ -587,8 +588,7 @@ namespace CoopClient
             for (ushort i = 0; i < clothCount; i++)
             {
                 // Read cloth value
-                short clothValue = reader.ReadShort();
-                Clothes.Add((byte)i, clothValue);
+                Clothes.Add(reader.ReadByte(), reader.ReadShort());
             }
 
             // Read player velocity
@@ -624,10 +624,9 @@ namespace CoopClient
             {
                 WeaponComponents = new Dictionary<uint, bool>();
                 ushort comCount = reader.ReadUShort();
-                
                 for (ushort i = 0; i < comCount; i++)
                 {
-                    WeaponComponents.Add(i, reader.ReadBool());
+                    WeaponComponents.Add(reader.ReadUInt(), reader.ReadBool());
                 }
             }
 
@@ -706,10 +705,10 @@ namespace CoopClient
             // Write the count of clothes
             byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
             // Loop the dictionary and add the values
-            for (int i = 0; i < Clothes.Count; i++)
+            foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
-                // Write the cloth value
-                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+                byteArray.Add(cloth.Key);
+                byteArray.AddRange(BitConverter.GetBytes(cloth.Value));
             }
 
             // Write vehicle model hash
@@ -775,7 +774,8 @@ namespace CoopClient
             foreach (KeyValuePair<int, int> mod in VehMods)
             {
                 // Write the mod value
-                byteArray.AddRange(BitConverter.GetBytes((short)mod.Value));
+                byteArray.AddRange(BitConverter.GetBytes(mod.Key));
+                byteArray.AddRange(BitConverter.GetBytes(mod.Value));
             }
 
             if (!VehDamageModel.Equals(default(VehicleDamageModel)))
@@ -836,11 +836,10 @@ namespace CoopClient
             // Read the count of clothes
             ushort clothCount = reader.ReadUShort();
             // For clothCount
-            for (int i = 0; i < clothCount; i++)
+            for (ushort i = 0; i < clothCount; i++)
             {
                 // Read cloth value
-                short clothValue = reader.ReadShort();
-                Clothes.Add((byte)i, clothValue);
+                Clothes.Add(reader.ReadByte(), reader.ReadShort());
             }
 
             // Read vehicle model hash
@@ -921,8 +920,7 @@ namespace CoopClient
             for (int i = 0; i < vehModCount; i++)
             {
                 // Read the mod value
-                short mod = reader.ReadShort();
-                VehMods.Add(i, mod);
+                VehMods.Add(reader.ReadInt(), reader.ReadInt());
             }
 
             if (reader.ReadBool())
@@ -1667,10 +1665,10 @@ namespace CoopClient
             // Write the count of clothes
             byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
             // Loop the dictionary and add the values
-            for (int i = 0; i < Clothes.Count; i++)
+            foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
-                // Write the cloth value
-                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+                byteArray.Add(cloth.Key);
+                byteArray.AddRange(BitConverter.GetBytes(cloth.Value));
             }
 
             // Write npc health
@@ -1749,8 +1747,7 @@ namespace CoopClient
             for (ushort i = 0; i < clothCount; i++)
             {
                 // Read cloth value
-                short clothValue = reader.ReadShort();
-                Clothes.Add((byte)i, clothValue);
+                Clothes.Add(reader.ReadByte(), reader.ReadShort());
             }
 
             // Read npc health
@@ -1853,10 +1850,10 @@ namespace CoopClient
             // Write the count of clothes
             byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
             // Loop the dictionary and add the values
-            for (int i = 0; i < Clothes.Count; i++)
+            foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
-                // Write the cloth value
-                byteArray.AddRange(BitConverter.GetBytes(Clothes[(byte)i]));
+                byteArray.Add(cloth.Key);
+                byteArray.AddRange(BitConverter.GetBytes(cloth.Value));
             }
 
             // Write vehicle model hash
@@ -1914,7 +1911,8 @@ namespace CoopClient
             foreach (KeyValuePair<int, int> mod in VehMods)
             {
                 // Write the mod value
-                byteArray.AddRange(BitConverter.GetBytes((short)mod.Value));
+                byteArray.AddRange(BitConverter.GetBytes(mod.Key));
+                byteArray.AddRange(BitConverter.GetBytes(mod.Value));
             }
 
             if (!VehDamageModel.Equals(default(VehicleDamageModel)))
@@ -1974,8 +1972,7 @@ namespace CoopClient
             for (int i = 0; i < clothCount; i++)
             {
                 // Read cloth value
-                short clothValue = reader.ReadShort();
-                Clothes.Add((byte)i, clothValue);
+                Clothes.Add(reader.ReadByte(), reader.ReadShort());
             }
 
             // Read vehicle model hash
@@ -2045,8 +2042,7 @@ namespace CoopClient
             for (int i = 0; i < vehModCount; i++)
             {
                 // Read the mod value
-                short mod = reader.ReadShort();
-                VehMods.Add(i, mod);
+                VehMods.Add(reader.ReadInt(), reader.ReadInt());
             }
 
             if (reader.ReadBool())

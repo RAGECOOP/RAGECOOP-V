@@ -48,8 +48,6 @@ namespace CoopClient.Entities
                 Character.IsInvincible = false;
 
                 Function.Call(Hash.START_ENTITY_FIRE, Character.Handle);
-
-                return;
             }
             else if (!IsOnFire && Character.IsOnFire)
             {
@@ -74,8 +72,6 @@ namespace CoopClient.Entities
             {
                 Character.CanRagdoll = true;
                 Character.Ragdoll();
-
-                return;
             }
             else if (!IsRagdoll && Character.IsRagdoll)
             {
@@ -83,8 +79,9 @@ namespace CoopClient.Entities
                 Character.CanRagdoll = false;
             }
 
-            if (IsJumping || IsOnFire)
+            if (IsJumping || IsOnFire || IsRagdoll)
             {
+                UpdateOnFootPosition(true, true, false);
                 return;
             }
 
@@ -96,10 +93,8 @@ namespace CoopClient.Entities
                     Character.Task.ReloadWeapon();
                 }
 
-                if (Character.IsInRange(Position, 0.5f))
-                {
-                    return;
-                }
+                UpdateOnFootPosition();
+                return;
             }
 
             if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(LastWeaponComponents))
@@ -166,57 +161,72 @@ namespace CoopClient.Entities
         private bool LastMoving;
         private void WalkTo()
         {
-            if (!Character.IsInRange(Position, 6.0f) && (LastMoving = true))
+            Vector3 predictPosition = Position + (Position - Character.Position) + Velocity;
+            float range = predictPosition.DistanceToSquared(Character.Position);
+
+            switch (Speed)
             {
-                Character.Position = Position;
-                Character.Rotation = Rotation;
+                case 1:
+                    if (!Character.IsWalking || range > 0.25f)
+                    {
+                        float nrange = range * 2;
+                        if (nrange > 1.0f)
+                        {
+                            nrange = 1.0f;
+                        }
+
+                        Character.Task.GoStraightTo(predictPosition);
+                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, nrange);
+                    }
+                    LastMoving = true;
+                    break;
+                case 2:
+                    if (!Character.IsRunning || range > 0.50f)
+                    {
+                        Character.Task.RunTo(predictPosition, true);
+                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
+                    }
+                    LastMoving = true;
+                    break;
+                case 3:
+                    if (!Character.IsSprinting || range > 0.75f)
+                    {
+                        Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character.Handle, predictPosition.X, predictPosition.Y, predictPosition.Z, 3.0f, -1, 0.0f, 0.0f);
+                        Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, Character.Handle, 1.49f);
+                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
+                    }
+                    LastMoving = true;
+                    break;
+                default:
+                    if (LastMoving)
+                    {
+                        Character.Task.StandStill(2000);
+                        LastMoving = false;
+                    }
+                    break;
             }
-            else
+            UpdateOnFootPosition();
+        }
+
+        private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
+        {
+            if (updatePosition)
             {
-                Vector3 predictPosition = Position + (Position - Character.Position) + Velocity;
-                float range = predictPosition.DistanceToSquared(Character.Position);
+                float lerpValue = ((int)((Latency * 1000 / 2) + Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f;
 
-                switch (Speed)
-                {
-                    case 1:
-                        if ((!Character.IsWalking || range > 0.25f) && (LastMoving = true))
-                        {
-                            float nrange = range * 2;
-                            if (nrange > 1.0f)
-                            {
-                                nrange = 1.0f;
-                            }
-
-                            Character.Task.GoStraightTo(predictPosition);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, nrange);
-                        }
-                        break;
-                    case 2:
-                        if ((!Character.IsRunning || range > 0.50f) && (LastMoving = true))
-                        {
-                            Character.Task.RunTo(predictPosition, true);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
-                        }
-                        break;
-                    case 3:
-                        if ((!Character.IsSprinting || range > 0.75f) && (LastMoving = true))
-                        {
-                            Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, Character.Handle, predictPosition.X, predictPosition.Y, predictPosition.Z, 3.0f, -1, 0.0f, 0.0f);
-                            Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, Character.Handle, 1.49f);
-                            Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, Character.Handle, 1.0f);
-                        }
-                        break;
-                    default:
-                        if (!Character.IsInRange(Position, 0.5f))
-                        {
-                            Character.Task.RunTo(Position, true, 500);
-                        }
-                        else if (LastMoving && (LastMoving = false))
-                        {
-                            Character.Task.StandStill(1000);
-                        }
-                        break;
-                }
+                Vector2 biDimensionalPos = Vector2.Lerp(new Vector2(Character.Position.X, Character.Position.Y), new Vector2(Position.X + (Velocity.X / 5), Position.Y + (Velocity.Y / 5)), lerpValue);
+                float zPos = Util.Lerp(Character.Position.Z, Position.Z, 0.1f);
+                Character.PositionNoOffset = new Vector3(biDimensionalPos.X, biDimensionalPos.Y, zPos);
+            }
+            
+            if (updateRotation)
+            {
+                Character.Rotation = Vector3.Lerp(Character.Rotation, Rotation, 0.10f);
+            }
+            
+            if (updateVelocity)
+            {
+                Character.Velocity = Velocity;
             }
         }
     }

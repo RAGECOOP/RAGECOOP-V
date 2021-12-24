@@ -47,6 +47,12 @@ namespace CoopClient
         }
         #endregion
 
+        // Dirty & dangerous
+        public static dynamic Lerp(dynamic from, dynamic to, float fAlpha)
+        {
+            return ((to - from) * fAlpha + from);
+        }
+
         public static T GetGameMs<T>() where T : IConvertible
         {
             return (T)Convert.ChangeType(1f / (Game.FPS > 60f ? 60f : Game.FPS) * 1000f, typeof(T));
