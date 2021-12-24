@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,68 +9,6 @@ using GTA.Math;
 
 namespace CoopClient
 {
-    #region CLIENT-ONLY
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class VectorExtensions
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public static Vector3 ToVector(this Quaternion vec)
-        {
-            return new Vector3()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z
-            };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static Quaternion ToQuaternion(this Vector3 vec, float vW = 0.0f)
-        {
-            return new Quaternion()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z,
-                W = vW
-            };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static LVector3 ToLVector(this Vector3 vec)
-        {
-            return new LVector3()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z
-            };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static LQuaternion ToLQuaternion(this Quaternion vec)
-        {
-            return new LQuaternion()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z,
-                W = vec.W
-            };
-        }
-    }
-    #endregion
-
     /// <summary>
     /// 
     /// </summary>

@@ -611,4 +611,114 @@ namespace CoopClient
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class VectorExtensions
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public static Vector3 ToVector(this Quaternion vec)
+        {
+            return new Vector3()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static Quaternion ToQuaternion(this Vector3 vec, float vW = 0.0f)
+        {
+            return new Quaternion()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z,
+                W = vW
+            };
+        }
+
+        internal static float Denormalize(this float h)
+        {
+            return h < 0f ? h + 360f : h;
+        }
+
+        internal static float ToRadians(this float val)
+        {
+            return (float)(Math.PI / 180) * val;
+        }
+
+        internal static Vector3 ToRadians(this Vector3 i)
+        {
+            return new Vector3()
+            {
+                X = ToRadians(i.X),
+                Y = ToRadians(i.Y),
+                Z = ToRadians(i.Z),
+            };
+        }
+
+        internal static Quaternion ToQuaternion(this Vector3 vect)
+        {
+            vect = new Vector3()
+            {
+                X = vect.X.Denormalize() * -1,
+                Y = vect.Y.Denormalize() - 180f,
+                Z = vect.Z.Denormalize() - 180f,
+            };
+
+            vect = vect.ToRadians();
+
+            float rollOver2 = vect.Z * 0.5f;
+            float sinRollOver2 = (float)Math.Sin((double)rollOver2);
+            float cosRollOver2 = (float)Math.Cos((double)rollOver2);
+            float pitchOver2 = vect.Y * 0.5f;
+            float sinPitchOver2 = (float)Math.Sin((double)pitchOver2);
+            float cosPitchOver2 = (float)Math.Cos((double)pitchOver2);
+            float yawOver2 = vect.X * 0.5f; // pitch
+            float sinYawOver2 = (float)Math.Sin((double)yawOver2);
+            float cosYawOver2 = (float)Math.Cos((double)yawOver2);
+            Quaternion result = new Quaternion()
+            {
+                X = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2,
+                Y = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2,
+                Z = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2,
+                W = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2
+            };
+            return result;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static LVector3 ToLVector(this Vector3 vec)
+        {
+            return new LVector3()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static LQuaternion ToLQuaternion(this Quaternion vec)
+        {
+            return new LQuaternion()
+            {
+                X = vec.X,
+                Y = vec.Y,
+                Z = vec.Z,
+                W = vec.W
+            };
+        }
+    }
 }

@@ -68,18 +68,26 @@ namespace CoopClient.Entities
 
             LastIsJumping = IsJumping;
 
-            if (IsRagdoll && !Character.IsRagdoll)
+            if (IsRagdoll)
             {
-                Character.CanRagdoll = true;
-                Character.Ragdoll();
+                if (!Character.IsRagdoll)
+                {
+                    // CanRagdoll = true, inside this function
+                    Character.Ragdoll();
+                }
+
+                UpdateOnFootPosition(false, false, true);
+                return;
             }
             else if (!IsRagdoll && Character.IsRagdoll)
             {
-                Character.CancelRagdoll();
                 Character.CanRagdoll = false;
+                Character.Task.ClearAllImmediately();
+
+                return;
             }
 
-            if (IsJumping || IsOnFire || IsRagdoll)
+            if (IsJumping || IsOnFire)
             {
                 UpdateOnFootPosition(true, true, false);
                 return;
@@ -133,6 +141,7 @@ namespace CoopClient.Entities
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, true, 0x3F000000, 0x40800000, false, 0, false,
                                     unchecked((int)FiringPattern.FullAuto));
+                    UpdateOnFootPosition();
                 }
                 else
                 {
@@ -146,6 +155,7 @@ namespace CoopClient.Entities
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, false, 0x3F000000, 0x40800000, false, 512, false,
                                     unchecked((int)FiringPattern.FullAuto));
+                    UpdateOnFootPosition();
                 }
                 else
                 {
@@ -221,7 +231,8 @@ namespace CoopClient.Entities
             
             if (updateRotation)
             {
-                Character.Rotation = Vector3.Lerp(Character.Rotation, Rotation, 0.10f);
+                // You can find the ToQuaternion() for Rotation inside the VectorExtensions
+                Character.Quaternion = Quaternion.Lerp(Character.Quaternion, Rotation.ToQuaternion(), 0.10f);
             }
             
             if (updateVelocity)
