@@ -11,6 +11,9 @@ using GTA.Math;
 namespace CoopClient
 {
     #region CLIENT-ONLY
+    /// <summary>
+    /// 
+    /// </summary>
     public static class VectorExtensions
     {
         /// <summary>
@@ -110,6 +113,9 @@ namespace CoopClient
         public float Z { get; set; }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public struct LQuaternion
     {
         #region CLIENT-ONLY
