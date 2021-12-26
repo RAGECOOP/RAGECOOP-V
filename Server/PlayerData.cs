@@ -5,8 +5,8 @@ namespace CoopServer
     public struct PlayerData
     {
         public string Username { get; set; }
-        private int LastPedHandle = 0;
-        private int CurrentPedHandle = 0;
+        private int LastPedHandle { get; set; }
+        private int CurrentPedHandle { get; set; }
         public int PedHandle
         {
             get => CurrentPedHandle;
