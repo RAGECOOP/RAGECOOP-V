@@ -8,6 +8,27 @@ using Newtonsoft.Json;
 
 namespace CoopServer
 {
+    public static class VectorExtensions
+    {
+        public static LVector3 Normalize(this LVector3 value)
+        {
+            float value2 = value.Length();
+            return value / value2;
+        }
+
+        public static float Distance(this LVector3 value1, LVector3 value2)
+        {
+            LVector3 vector = value1 - value2;
+            float num = Dot(vector, vector);
+            return (float)Math.Sqrt(num);
+        }
+
+        public static float Dot(this LVector3 vector1, LVector3 vector2)
+        {
+            return vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z;
+        }
+    }
+
     public struct LVector3
     {
         public LVector3(float X, float Y, float Z)
@@ -27,6 +48,19 @@ namespace CoopServer
         public float Length() => (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
         public static LVector3 Subtract(LVector3 pos1, LVector3 pos2) => new(pos1.X - pos2.X, pos1.Y - pos2.Y, pos1.Z - pos2.Z);
         public static bool Equals(LVector3 value1, LVector3 value2) => value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z;
+        public static LVector3 operator /(LVector3 value1, float value2)
+        {
+            float num = 1f / value2;
+            return new LVector3(value1.X * num, value1.Y * num, value1.Z * num);
+        }
+        public static LVector3 operator -(LVector3 left, LVector3 right)
+        {
+            return new LVector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+        }
+        public static LVector3 operator -(LVector3 value)
+        {
+            return default(LVector3) - value;
+        }
         #endregion
     }
 
@@ -64,7 +98,8 @@ namespace CoopServer
         ChatMessagePacket,
         NativeCallPacket,
         NativeResponsePacket,
-        ModPacket
+        ModPacket,
+        CleanUpWorldPacket
     }
 
     enum ConnectionChannel
@@ -365,6 +400,8 @@ namespace CoopServer
     {
         public long NetHandle { get; set; }
 
+        public int PedHandle { get; set; }
+
         public int Health { get; set; }
 
         public int ModelHash { get; set; }
@@ -398,6 +435,9 @@ namespace CoopServer
 
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(PedHandle));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
@@ -494,6 +534,9 @@ namespace CoopServer
             // Read player netHandle
             NetHandle = reader.ReadLong();
 
+            // Read player pedHandle
+            PedHandle = reader.ReadInt();
+
             // Read player health
             Health = reader.ReadInt();
 
@@ -584,7 +627,11 @@ namespace CoopServer
     {
         public long NetHandle { get; set; }
 
+        public int PedHandle { get; set; }
+
         public int Health { get; set; }
+
+        public int VehicleHandle { get; set; }
 
         public int ModelHash { get; set; }
 
@@ -632,11 +679,17 @@ namespace CoopServer
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
 
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(PedHandle));
+
             // Write vehicles flags
             byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(VehicleHandle));
 
             // Write player model hash
             byteArray.AddRange(BitConverter.GetBytes(ModelHash));
@@ -761,11 +814,17 @@ namespace CoopServer
             // Read player netHandle
             NetHandle = reader.ReadLong();
 
+            // Read player ped handle
+            PedHandle = reader.ReadInt();
+
             // Read vehicle flags
             Flag = reader.ReadUShort();
 
             // Read player health
             Health = reader.ReadInt();
+
+            // Read player vehicle handle
+            VehicleHandle = reader.ReadInt();
 
             // Read player model hash
             ModelHash = reader.ReadInt();

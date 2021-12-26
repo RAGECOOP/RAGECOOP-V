@@ -112,7 +112,8 @@ namespace CoopClient
         ChatMessagePacket,
         NativeCallPacket,
         NativeResponsePacket,
-        ModPacket
+        ModPacket,
+        CleanUpWorldPacket
     }
 
     enum ConnectionChannel
@@ -416,6 +417,8 @@ namespace CoopClient
     {
         public long NetHandle { get; set; }
 
+        public int PedHandle { get; set; }
+
         public int Health { get; set; }
 
         public int ModelHash { get; set; }
@@ -449,6 +452,9 @@ namespace CoopClient
 
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
+
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(PedHandle));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
@@ -544,6 +550,9 @@ namespace CoopClient
 
             // Read player netHandle
             NetHandle = reader.ReadLong();
+            
+            // Read player pedHandle
+            PedHandle = reader.ReadInt();
 
             // Read player health
             Health = reader.ReadInt();
@@ -635,7 +644,11 @@ namespace CoopClient
     {
         public long NetHandle { get; set; }
 
+        public int PedHandle { get; set; }
+
         public int Health { get; set; }
+
+        public int VehicleHandle { get; set; }
 
         public int ModelHash { get; set; }
 
@@ -683,11 +696,17 @@ namespace CoopClient
             // Write player netHandle
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
 
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(PedHandle));
+
             // Write vehicles flags
             byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
+
+            // Write player ped handle
+            byteArray.AddRange(BitConverter.GetBytes(VehicleHandle));
 
             // Write player model hash
             byteArray.AddRange(BitConverter.GetBytes(ModelHash));
@@ -812,11 +831,17 @@ namespace CoopClient
             // Read player netHandle
             NetHandle = reader.ReadLong();
 
+            // Read player ped handle
+            PedHandle = reader.ReadInt();
+
             // Read vehicle flags
             Flag = reader.ReadUShort();
 
             // Read player health
             Health = reader.ReadInt();
+
+            // Read player vehicle handle
+            VehicleHandle = reader.ReadInt();
 
             // Read player model hash
             ModelHash = reader.ReadInt();

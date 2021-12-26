@@ -5,6 +5,37 @@ namespace CoopServer
     public struct PlayerData
     {
         public string Username { get; set; }
+        private int LastPedHandle = 0;
+        private int CurrentPedHandle = 0;
+        public int PedHandle
+        {
+            get => CurrentPedHandle;
+            set
+            {
+                LastPedHandle = CurrentPedHandle;
+                CurrentPedHandle = value;
+                if (CurrentPedHandle != LastPedHandle)
+                {
+                    // TODO
+                }
+            }
+        }
+        private int LastVehicleHandle { get; set; }
+        private int CurrentVehicleHandle { get; set; }
+        public int VehicleHandle
+        {
+            get => CurrentPedHandle;
+            set
+            {
+                LastVehicleHandle = CurrentVehicleHandle;
+                CurrentVehicleHandle = value;
+                if (CurrentVehicleHandle != LastVehicleHandle)
+                {
+                    // TODO
+                }
+            }
+        }
+        public bool IsInVehicle { get; set; }
         private LVector3 LastPosition { get; set; }
         private LVector3 CurrentPosition { get; set; }
         public LVector3 Position

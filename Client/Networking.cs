@@ -135,6 +135,8 @@ namespace CoopClient
                                 Latency = 0;
                                 LastPlayerFullSync = 0;
 
+                                Main.CleanUpWorld();
+
                                 Main.NPCsAllowed = false;
 
                                 if (Main.MainChat.Focused)
@@ -158,6 +160,11 @@ namespace CoopClient
 
                         switch (packetType)
                         {
+                            case (byte)PacketTypes.CleanUpWorldPacket:
+                                {
+                                    Main.CleanUpWorld();
+                                }
+                                break;
                             case (byte)PacketTypes.PlayerConnectPacket:
                                 {
                                     int len = message.ReadInt32();
@@ -602,6 +609,18 @@ namespace CoopClient
                     return;
             }
 
+            if (Main.CheckNativeHash.ContainsKey(packet.Hash))
+            {
+                foreach (KeyValuePair<ulong, byte> hash in Main.CheckNativeHash)
+                {
+                    if (hash.Key == packet.Hash)
+                    {
+                        Main.ServerItems.Add((int)result, hash.Value);
+                        break;
+                    }
+                }
+            }
+
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new NativeResponsePacket()
             {
@@ -785,7 +804,9 @@ namespace CoopClient
                     new FullSyncPlayerVehPacket()
                     {
                         NetHandle = Main.LocalNetHandle,
+                        PedHandle = player.Handle,
                         Health = player.Health,
+                        VehicleHandle = veh.Handle,
                         ModelHash = player.Model.Hash,
                         Clothes = player.GetPedClothes(),
                         VehModelHash = veh.Model.Hash,
@@ -810,6 +831,7 @@ namespace CoopClient
                     new FullSyncPlayerPacket()
                     {
                         NetHandle = Main.LocalNetHandle,
+                        PedHandle = player.Handle,
                         Health = player.Health,
                         ModelHash = player.Model.Hash,
                         Clothes = player.GetPedClothes(),

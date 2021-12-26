@@ -11,6 +11,7 @@ namespace CoopServer
         public float Latency = 0.0f;
         public PlayerData Player;
         private readonly Dictionary<string, object> CustomData = new();
+        private long CallbacksCount = 0;
         internal readonly Dictionary<long, Action<object>> Callbacks = new();
 
         #region CUSTOMDATA FUNCTIONS
@@ -73,7 +74,7 @@ namespace CoopServer
             }
         }
 
-        public void SendNativeCall(ulong hash, List<object> args = null)
+        public void SendNativeCall(ulong hash, params object[] args)
         {
             try
             {
@@ -84,7 +85,7 @@ namespace CoopServer
                     return;
                 }
 
-                if (args != null && args.Count == 0)
+                if (args != null && args.Length == 0)
                 {
                     Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
                     return;
@@ -93,7 +94,7 @@ namespace CoopServer
                 NativeCallPacket packet = new()
                 {
                     Hash = hash,
-                    Args = args ?? new List<object>(),
+                    Args = new List<object>(args) ?? new List<object>(),
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
@@ -106,7 +107,7 @@ namespace CoopServer
             }
         }
 
-        public void SendNativeResponse(Action<object> callback, ulong hash, Type returnType, List<object> args = null)
+        public void SendNativeResponse(Action<object> callback, ulong hash, Type returnType, params object[] args)
         {
             try
             {
@@ -117,14 +118,14 @@ namespace CoopServer
                     return;
                 }
 
-                if (args != null && args.Count == 0)
+                if (args != null && args.Length == 0)
                 {
                     Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
                     return;
                 }
 
-                long id = 0;
-                Callbacks.Add(id = Environment.TickCount64, callback);
+                long id = ++CallbacksCount;
+                Callbacks.Add(id, callback);
 
                 byte returnTypeValue = 0x00;
                 if (returnType == typeof(int))
@@ -157,7 +158,7 @@ namespace CoopServer
                 new NativeResponsePacket()
                 {
                     Hash = hash,
-                    Args = args ?? new List<object>(),
+                    Args = new List<object>(args) ?? new List<object>(),
                     ResultType = returnTypeValue,
                     ID = id
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -167,6 +168,20 @@ namespace CoopServer
             {
                 Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
+        }
+
+        public void SendCleanUpWorld()
+        {
+            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+            if (userConnection == null)
+            {
+                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetHandle}\" not found!");
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            outgoingMessage.Write((byte)PacketTypes.CleanUpWorldPacket);
+            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
         public void SendModPacket(string mod, byte customID, byte[] bytes)

@@ -128,18 +128,31 @@ namespace CoopServer
                 _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHealthUpdate(playerData)));
             }
         }
+
+        public void InvokeTick(long tick)
+        {
+            lock (_actionQueue.SyncRoot)
+            {
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokeTick(tick)));
+            }
+        }
     }
 
     public class API
     {
         #region DELEGATES
         public delegate void EmptyEvent();
+        public delegate void OnTickEvent(long tick);
         public delegate void ChatEvent(string username, string message, CancelEventArgs cancel);
         public delegate void PlayerEvent(Client client);
         public delegate void ModEvent(long from, long target, string mod, byte customID, byte[] bytes, CancelEventArgs args);
         #endregion
 
         #region EVENTS
+        /// <summary>
+        /// Called every tick
+        /// </summary>
+        public event OnTickEvent OnTick;
         /// <summary>
         /// Called when the server has started
         /// </summary>
@@ -180,6 +193,11 @@ namespace CoopServer
         /// Called when a player sends a packet from another modification
         /// </summary>
         public event ModEvent OnModPacketReceived;
+
+        internal void InvokeTick(long tick)
+        {
+            OnTick?.Invoke(tick);
+        }
 
         internal void InvokeStart()
         {
@@ -276,7 +294,7 @@ namespace CoopServer
         /// </summary>
         /// <param name="hash">The hash (Example: 0x25223CA6B4D20B7F = GET_CLOCK_HOURS)</param>
         /// <param name="args">The arguments (Example: string = int, object = 5)</param>
-        public static void SendNativeCallToAll(ulong hash, List<object> args = null)
+        public static void SendNativeCallToAll(ulong hash, params object[] args)
         {
             try
             {
@@ -285,7 +303,7 @@ namespace CoopServer
                     return;
                 }
 
-                if (args != null && args.Count == 0)
+                if (args != null && args.Length == 0)
                 {
                     Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
                     return;
@@ -294,7 +312,7 @@ namespace CoopServer
                 NativeCallPacket packet = new()
                 {
                     Hash = hash,
-                    Args = args ?? new List<object>()
+                    Args = new List<object>(args) ?? new List<object>()
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
@@ -360,6 +378,25 @@ namespace CoopServer
             {
                 Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void SendCleanUpWorldToAll(List<long> netHandleList = null)
+        {
+            if (Server.MainNetServer.ConnectionsCount == 0)
+            {
+                return;
+            }
+
+            List<NetConnection> connections = netHandleList == null
+                    ? Server.MainNetServer.Connections
+                    : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            outgoingMessage.Write((byte)PacketTypes.CleanUpWorldPacket);
+            Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
         /// <summary>

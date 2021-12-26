@@ -23,6 +23,7 @@ namespace CoopServer
     internal class Server
     {
         private static readonly string CompatibleVersion = "V1_3";
+        private static long CurrentTick = 0;
 
         public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
@@ -220,6 +221,14 @@ namespace CoopServer
 
             while (!Program.ReadyToStop)
             {
+                if (Resources.Count != 0)
+                {
+                    Resources.ForEach(x =>
+                    {
+                        x.InvokeTick(++CurrentTick);
+                    });
+                }
+
                 NetIncomingMessage message;
 
                 while ((message = MainNetServer.ReadMessage()) != null)
@@ -729,6 +738,8 @@ namespace CoopServer
                 return;
             }
             // Save the new data
+            client.Player.PedHandle = packet.PedHandle;
+            client.Player.IsInVehicle = false;
             client.Player.Position = packet.Position;
             client.Player.Health = packet.Health;
 
@@ -769,6 +780,9 @@ namespace CoopServer
                 return;
             }
             // Save the new data
+            client.Player.PedHandle = packet.PedHandle;
+            client.Player.VehicleHandle = packet.VehicleHandle;
+            client.Player.IsInVehicle = true;
             client.Player.Position = packet.Position;
             client.Player.Health = packet.Health;
 
