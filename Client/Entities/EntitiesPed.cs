@@ -58,7 +58,7 @@ namespace CoopClient.Entities
         /// <summary>
         /// Get the player latency
         /// </summary>
-        public float Latency { get; internal set; }
+        public float Latency { get; internal set; } = 1.5f;
 
         /// <summary>
         /// ?

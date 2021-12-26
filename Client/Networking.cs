@@ -615,7 +615,10 @@ namespace CoopClient
                 {
                     if (hash.Key == packet.Hash)
                     {
-                        Main.ServerItems.Add((int)result, hash.Value);
+                        lock (Main.ServerItems)
+                        {
+                            Main.ServerItems.Add((int)result, hash.Value);
+                        }
                         break;
                     }
                 }

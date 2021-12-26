@@ -299,24 +299,21 @@ namespace CoopClient.Entities
             }
 
             // Good enough for now, but we need to create a better sync
-            float latency = (((int)((Latency * 1000 / 2) + Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f) + (Util.GetTickCount64() - LastUpdateReceived) / (float)AverageLatency;
-
-            Vector3 dir = Position - MainVehicle.Position;
-            
-            if (CurrentVehicleSpeed > 0.02f && MainVehicle.IsInRange(Position, 7.0f))
+            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
             {
-                Vector3 posTarget = Vector3.Lerp(Position, Position + dir, Math.Min(1.5f, latency));
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
-                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (posTarget - MainVehicle.Position);
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, latency));
+                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (Position - MainVehicle.Position);
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Util.GetTickCount64();
             }
             else if ((Util.GetTickCount64() - VehicleStopTime) <= 1000)
             {
-                MainVehicle.PositionNoOffset = Util.LinearVectorLerp(MainVehicle.Position, Position + dir, Util.GetTickCount64() - VehicleStopTime, 1000);
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, Math.Min(1.5f, latency));
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - VehicleStopTime, 1000);
+
+                MainVehicle.PositionNoOffset = posTarget;
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
             }
             else
             {
@@ -327,9 +324,9 @@ namespace CoopClient.Entities
         }
 
         #region -- PEDALING --
-        /*
-         * Thanks to @oldnapalm.
-         */
+            /*
+             * Thanks to @oldnapalm.
+             */
 
         private string PedalingAnimDict()
         {

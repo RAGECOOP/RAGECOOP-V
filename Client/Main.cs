@@ -142,18 +142,18 @@ namespace CoopClient
 
             MainChat.Tick();
 
-            // Display all players
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
-            {
-                player.Value.DisplayLocally(player.Value.Username);
-            }
-
 #if DEBUG
             if (UseDebug)
             {
                 Debug();
             }
 #endif
+
+            // Display all players
+            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
+            {
+                player.Value.DisplayLocally(player.Value.Username);
+            }
 
             MainNetworking.SendPlayerData();
         }
@@ -280,23 +280,38 @@ namespace CoopClient
             {
                 foreach (KeyValuePair<int, byte> item in ServerItems)
                 {
-                    switch (item.Value)
+                    try
                     {
-                        case 1:
-                            World.GetAllEntities().Where(x => x.Handle == item.Key).First().Delete();
-                            break;
-                        case 2:
-                            World.GetAllVehicles().Where(x => x.Handle == item.Key).First().Delete();
-                            break;
-                        case 3:
-                            World.GetAllProps().Where(x => x.Handle == item.Key).First().Delete();
-                            break;
-                        case 4:
-                            World.GetAllBlips().Where(x => x.Handle == item.Key).First().Delete();
-                            break;
-                        case 5:
-                            World.GetAllCheckpoints().Where(x => x.Handle == item.Key).First().Delete();
-                            break;
+                        switch (item.Value)
+                        {
+                            case 1:
+                                World.GetAllEntities().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
+                                break;
+                            case 2:
+                                World.GetAllVehicles().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
+                                break;
+                            case 3:
+                                World.GetAllProps().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
+                                break;
+                            case 4:
+                                Blip blip = new Blip(item.Key);
+                                if (blip.Exists())
+                                {
+                                    blip.Delete();
+                                }
+                                break;
+                            case 5:
+                                Checkpoint checkpoint = new Checkpoint(item.Key);
+                                if (checkpoint.Exists())
+                                {
+                                    checkpoint.Delete();
+                                }
+                                break;
+                        }
+                    }
+                    catch
+                    {
+                        GTA.UI.Notification.Show($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
                     }
                 }
 
@@ -320,7 +335,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 20)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 350)
             {
                 return;
             }

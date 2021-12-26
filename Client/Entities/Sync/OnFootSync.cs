@@ -218,8 +218,28 @@ namespace CoopClient.Entities
             UpdateOnFootPosition();
         }
 
+        private byte LastStuckCount = 0;
+        private ulong LastStuckTime;
         private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
         {
+            if (Character.Position.DistanceTo(Position) > 5f)
+            {
+                if (Util.GetTickCount64() - LastStuckTime < 1000)
+                {
+                    LastStuckCount = 0;
+                }
+
+                ++LastStuckCount;
+
+                if (LastStuckCount >= 5)
+                {
+                    Character.Position = Position;
+                    LastStuckCount = 0;
+                }
+
+                LastStuckTime = Util.GetTickCount64();
+            }
+
             if (updatePosition)
             {
                 float lerpValue = ((int)((Latency * 1000 / 2) + Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f;
