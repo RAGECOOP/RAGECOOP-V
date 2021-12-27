@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using CoopClient.Entities;
+using CoopClient.Entities.Player;
+using CoopClient.Entities.NPC;
 
 using Lidgren.Network;
 
@@ -643,10 +644,10 @@ namespace CoopClient
             {
                 if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesPed npc = Main.NPCs[packet.NetHandle];
+                    EntitiesNPC npc = Main.NPCs[packet.NetHandle];
 
                     // "if" this NPC has left a vehicle
-                    npc.NPCVehHandle = 0;
+                    npc.PlayerVehicleHandle = 0;
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Clothes = packet.Clothes;
@@ -670,7 +671,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.NetHandle, new EntitiesPed()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesNPC()
                     {
                         ModelHash = packet.ModelHash,
                         Clothes = packet.Clothes,
@@ -702,9 +703,9 @@ namespace CoopClient
             {
                 if (Main.NPCs.ContainsKey(packet.NetHandle))
                 {
-                    EntitiesPed npc = Main.NPCs[packet.NetHandle];
+                    EntitiesNPC npc = Main.NPCs[packet.NetHandle];
 
-                    npc.NPCVehHandle = packet.VehHandle;
+                    npc.PlayerVehicleHandle = packet.VehHandle;
 
                     npc.ModelHash = packet.ModelHash;
                     npc.Clothes = packet.Clothes;
@@ -736,9 +737,9 @@ namespace CoopClient
                 }
                 else
                 {
-                    Main.NPCs.Add(packet.NetHandle, new EntitiesPed()
+                    Main.NPCs.Add(packet.NetHandle, new EntitiesNPC()
                     {
-                        NPCVehHandle = packet.VehHandle,
+                        PlayerVehicleHandle = packet.VehHandle,
 
                         ModelHash = packet.ModelHash,
                         Clothes = packet.Clothes,

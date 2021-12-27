@@ -74,11 +74,13 @@
     <Compile Include="BitReader.cs" />
     <Compile Include="Chat.cs" />
     <Compile Include="COOPAPI.cs" />
-    <Compile Include="Entities\EntitiesPed.cs" />
-    <Compile Include="Entities\EntitiesPlayer.cs" />
+    <Compile Include="Entities\NPC\EntitiesNPC.cs" />
+    <Compile Include="Entities\NPC\Sync\OnFootSync.cs" />
+    <Compile Include="Entities\NPC\Sync\VehicleSync.cs" />
+    <Compile Include="Entities\Player\EntitiesPlayer.cs" />
     <Compile Include="Entities\EntitiesThread.cs" />
-    <Compile Include="Entities\Sync\OnFootSync.cs" />
-    <Compile Include="Entities\Sync\VehicleSync.cs" />
+    <Compile Include="Entities\Player\Sync\OnFootSync.cs" />
+    <Compile Include="Entities\Player\Sync\VehicleSync.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\MenusMain.cs" />
     <Compile Include="Menus\Sub\Servers.cs" />

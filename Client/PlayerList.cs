@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using CoopClient.Entities;
+using CoopClient.Entities.Player;
 
 using GTA;
 using GTA.Native;

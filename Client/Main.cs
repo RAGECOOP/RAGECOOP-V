@@ -4,7 +4,8 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Drawing;
 
-using CoopClient.Entities;
+using CoopClient.Entities.Player;
+using CoopClient.Entities.NPC;
 using CoopClient.Menus;
 
 using GTA;
@@ -38,7 +39,7 @@ namespace CoopClient
 
         internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
-        internal static Dictionary<long, EntitiesPed> NPCs = null;
+        internal static Dictionary<long, EntitiesNPC> NPCs = null;
         internal static Dictionary<long, int> NPCsVehicles = null;
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace CoopClient
 #endif
             MainChat = new Chat();
             Players = new Dictionary<long, EntitiesPlayer>();
-            NPCs = new Dictionary<long, EntitiesPed>();
+            NPCs = new Dictionary<long, EntitiesNPC>();
             NPCsVehicles = new Dictionary<long, int>();
 
             Tick += OnTick;
@@ -240,7 +241,7 @@ namespace CoopClient
             }
             Players.Clear();
 
-            foreach (KeyValuePair<long, EntitiesPed> npc in NPCs)
+            foreach (KeyValuePair<long, EntitiesNPC> npc in NPCs)
             {
                 npc.Value.Character?.CurrentVehicle?.Delete();
                 npc.Value.Character?.Kill();
@@ -335,7 +336,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 350)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 20)
             {
                 return;
             }

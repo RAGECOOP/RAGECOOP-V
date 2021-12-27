@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
-using System.Linq;
 
 using GTA;
 using GTA.Native;
@@ -9,46 +8,24 @@ using GTA.Math;
 
 using LemonUI.Elements;
 
-namespace CoopClient.Entities
+namespace CoopClient.Entities.Player
 {
     /// <summary>
     /// ?
     /// </summary>
-    public partial class EntitiesPed
+    public partial class EntitiesPlayer
     {
-        // If this NPC is in a vehicle, we can find the handle of this vehicle in Main.NPCsVehicles[NPCVehHandle] and prevent multiple vehicles from being created
-        internal long NPCVehHandle { get; set; } = 0;
+        /// <summary>
+        /// ?
+        /// </summary>
+        public string Username { get; set; } = "Player";
+
         private bool AllDataAvailable = false;
         internal bool LastSyncWasFull { get; set; } = false;
         /// <summary>
-        /// PLEASE USE LastUpdateReceived
-        /// </summary>
-        private ulong LastUpdate;
-        /// <summary>
         /// Get the last update = TickCount64()
         /// </summary>
-        public ulong LastUpdateReceived
-        {
-            get => LastUpdate;
-            internal set
-            {
-                if (LastUpdate != 0)
-                {
-                    LatencyAverager.Enqueue(value - LastUpdate);
-                    if (LatencyAverager.Count >= 10)
-                    {
-                        LatencyAverager.Dequeue();
-                    }
-                }
-
-                LastUpdate = value;
-            }
-        }
-        private Queue<double> LatencyAverager = new Queue<double>();
-        private double AverageLatency
-        {
-            get => LatencyAverager.Count == 0 ? 0 : LatencyAverager.Average();
-        }
+        public ulong LastUpdateReceived { get; set; }
         /// <summary>
         /// Get the player latency
         /// </summary>
@@ -87,14 +64,6 @@ namespace CoopClient.Entities
 
         internal void DisplayLocally(string username)
         {
-            /*
-             * username: string
-             *   string: null
-             *     ped: npc
-             *   string: value
-             *     ped: player
-             */
-
             // Check beforehand whether ped has all the required data
             if (!AllDataAvailable)
             {
@@ -271,7 +240,7 @@ namespace CoopClient.Entities
 
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
             characterModel.MarkAsNoLongerNeeded();
-            
+
             // ?
             Character.RelationshipGroup = Main.RelationshipGroup;
 

@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Linq;
 
+using CoopClient.Entities.Player;
+
 namespace CoopClient
 {
     /// <summary>
@@ -134,7 +136,7 @@ namespace CoopClient
             Dictionary<long, int?> result = new Dictionary<long, int?>();
             lock (Main.Players)
             {
-                foreach (KeyValuePair<long, Entities.EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalNetHandle))
+                foreach (KeyValuePair<long, EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalNetHandle))
                 {
                     result.Add(player.Key, player.Value.Character?.Handle);
                 }
@@ -146,7 +148,7 @@ namespace CoopClient
         /// Get a player using their Lidgren Network net handle
         /// </summary>
         /// <param name="handle">Lidgren-Network net handle</param>
-        public static Entities.EntitiesPlayer GetPlayer(long handle)
+        public static EntitiesPlayer GetPlayer(long handle)
         {
             lock (Main.Players)
             {

@@ -6,28 +6,16 @@ using GTA;
 using GTA.Native;
 using GTA.Math;
 
-namespace CoopClient.Entities
+namespace CoopClient.Entities.NPC
 {
-    public partial class EntitiesPed
+    internal partial class EntitiesNPC
     {
         #region -- VARIABLES --
+        internal long PlayerVehicleHandle = 0;
         private ulong VehicleStopTime { get; set; }
 
         internal bool IsInVehicle { get; set; }
-        private int LastVehicleModelHash = 0;
-        private int CurrentVehicleModelHash = 0;
-        /// <summary>
-        /// The latest vehicle model hash (may not have been applied yet)
-        /// </summary>
-        public int VehicleModelHash
-        {
-            get => CurrentVehicleModelHash;
-            internal set
-            {
-                LastVehicleModelHash = CurrentVehicleModelHash == 0 ? value : CurrentVehicleModelHash;
-                CurrentVehicleModelHash = value;
-            }
-        }
+        internal int VehicleModelHash { get; set; }
         private byte[] LastVehicleColors = new byte[] { 0, 0 };
         internal byte[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
@@ -35,14 +23,8 @@ namespace CoopClient.Entities
         internal bool VehicleDead { get; set; }
         internal float VehicleEngineHealth { get; set; }
         internal short VehicleSeatIndex { get; set; }
-        /// <summary>
-        /// ?
-        /// </summary>
-        public Vehicle MainVehicle { get; internal set; }
-        /// <summary>
-        /// The latest vehicle rotation (may not have been applied yet)
-        /// </summary>
-        public Quaternion VehicleRotation { get; internal set; }
+        internal Vehicle MainVehicle { get; set; }
+        internal Quaternion VehicleRotation { get; set; }
         internal Vector3 VehicleVelocity { get; set; }
         private float LastVehicleSpeed { get; set; }
         private float CurrentVehicleSpeed { get; set; }
@@ -73,44 +55,28 @@ namespace CoopClient.Entities
 
         private void DisplayInVehicle()
         {
-            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
                 bool vehFound = false;
 
-                if (NPCVehHandle != 0)
+                lock (Main.NPCsVehicles)
                 {
-                    lock (Main.NPCsVehicles)
+                    if (Main.NPCsVehicles.ContainsKey(PlayerVehicleHandle))
                     {
-                        if (Main.NPCsVehicles.ContainsKey(NPCVehHandle))
+                        Vehicle targetVehicle = World.GetAllVehicles().FirstOrDefault(x => x.Handle == Main.NPCsVehicles[PlayerVehicleHandle]);
+                        if (targetVehicle == null)
                         {
-                            Vehicle targetVehicle = World.GetAllVehicles().First(x => x.Handle == Main.NPCsVehicles[NPCVehHandle]);
-                            if (targetVehicle == null)
-                            {
-                                return;
-                            }
-
-                            MainVehicle = targetVehicle;
-                            vehFound = true;
+                            return;
                         }
-                    }
-                }
-                else
-                {
-                    Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
 
-                    if (targetVehicle != null)
-                    {
-                        if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
-                        {
-                            MainVehicle = targetVehicle;
-                            vehFound = true;
-                        }
+                        MainVehicle = targetVehicle;
+                        vehFound = true;
                     }
                 }
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
+                    Model vehicleModel = VehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
                         //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
@@ -119,11 +85,11 @@ namespace CoopClient.Entities
                     }
 
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
-                    vehicleModel.MarkAsNoLongerNeeded();
-                    if (NPCVehHandle != 0)
+                    lock (Main.NPCsVehicles)
                     {
-                        Main.NPCsVehicles.Add(NPCVehHandle, MainVehicle.Handle);
+                        Main.NPCsVehicles.Add(PlayerVehicleHandle, MainVehicle.Handle);
                     }
+                    vehicleModel.MarkAsNoLongerNeeded();
                     MainVehicle.Quaternion = VehicleRotation;
 
                     if (MainVehicle.HasRoof)
@@ -153,19 +119,6 @@ namespace CoopClient.Entities
             }
 
             #region -- VEHICLE SYNC --
-            if (AimCoords != default)
-            {
-                if (MainVehicle.IsTurretSeat(VehicleSeatIndex))
-                {
-                    int gameTime = Game.GameTime;
-                    if (gameTime - LastVehicleAim > 30)
-                    {
-                        Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-                        LastVehicleAim = gameTime;
-                    }
-                }
-            }
-
             if (MainVehicle.GetResponsiblePedHandle() != Character.Handle)
             {
                 return;
@@ -324,13 +277,13 @@ namespace CoopClient.Entities
         }
 
         #region -- PEDALING --
-            /*
-             * Thanks to @oldnapalm.
-             */
+        /*
+         * Thanks to @oldnapalm.
+         */
 
         private string PedalingAnimDict()
         {
-            switch ((VehicleHash)CurrentVehicleModelHash)
+            switch ((VehicleHash)VehicleModelHash)
             {
                 case VehicleHash.Bmx:
                     return "veh@bicycle@bmx@front@base";

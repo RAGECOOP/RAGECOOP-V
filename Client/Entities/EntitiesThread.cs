@@ -32,13 +32,13 @@ namespace CoopClient.Entities
                 return;
             }
 
-            Dictionary<long, EntitiesPed> localNPCs = null;
+            Dictionary<long, NPC.EntitiesNPC> localNPCs = null;
             lock (Main.NPCs)
             {
-                localNPCs = new Dictionary<long, EntitiesPed>(Main.NPCs);
+                localNPCs = new Dictionary<long, NPC.EntitiesNPC>(Main.NPCs);
 
                 ulong tickCount = Util.GetTickCount64();
-                foreach (KeyValuePair<long, EntitiesPed> npc in new Dictionary<long, EntitiesPed>(localNPCs))
+                foreach (KeyValuePair<long, NPC.EntitiesNPC> npc in new Dictionary<long, NPC.EntitiesNPC>(localNPCs))
                 {
                     if ((tickCount - npc.Value.LastUpdateReceived) > 2500)
                     {
@@ -51,13 +51,13 @@ namespace CoopClient.Entities
 
                         if (npc.Value.MainVehicle != null && npc.Value.MainVehicle.Exists() && npc.Value.MainVehicle.IsSeatFree(VehicleSeat.Driver) && npc.Value.MainVehicle.PassengerCount == 0)
                         {
-                            if (npc.Value.NPCVehHandle != 0)
+                            if (npc.Value.PlayerVehicleHandle != 0)
                             {
                                 lock (Main.NPCsVehicles)
                                 {
-                                    if (Main.NPCsVehicles.ContainsKey(npc.Value.NPCVehHandle))
+                                    if (Main.NPCsVehicles.ContainsKey(npc.Value.PlayerVehicleHandle))
                                     {
-                                        Main.NPCsVehicles.Remove(npc.Value.NPCVehHandle);
+                                        Main.NPCsVehicles.Remove(npc.Value.PlayerVehicleHandle);
                                     }
                                 }
                             }
@@ -75,9 +75,9 @@ namespace CoopClient.Entities
                 }
             }
 
-            foreach (EntitiesPed npc in localNPCs.Values)
+            foreach (NPC.EntitiesNPC npc in localNPCs.Values)
             {
-                npc.DisplayLocally(null);
+                npc.DisplayLocally();
             }
 
             // Only if that player wants to share his NPCs with others

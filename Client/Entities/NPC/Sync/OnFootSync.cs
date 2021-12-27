@@ -4,9 +4,9 @@ using GTA;
 using GTA.Native;
 using GTA.Math;
 
-namespace CoopClient.Entities
+namespace CoopClient.Entities.NPC
 {
-    public partial class EntitiesPed
+    internal partial class EntitiesNPC
     {
         #region -- ON FOOT --
         /// <summary>
@@ -91,7 +91,7 @@ namespace CoopClient.Entities
                 return;
             }
 
-            if (IsReloading)
+            if (IsReloading && Character.IsInRange(Position, 0.5f))
             {
                 if (!Character.IsReloading)
                 {
@@ -203,7 +203,11 @@ namespace CoopClient.Entities
                     LastMoving = true;
                     break;
                 default:
-                    if (LastMoving)
+                    if (range > 0.25f)
+                    {
+                        goto case 1;
+                    }
+                    else if (LastMoving)
                     {
                         Character.Task.StandStill(2000);
                         LastMoving = false;
