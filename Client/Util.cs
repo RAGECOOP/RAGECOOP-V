@@ -259,6 +259,11 @@ namespace CoopClient
                 flags |= (byte)PedDataFlags.IsOnFire;
             }
 
+            if (ped.IsInParachuteFreeFall)
+            {
+                flags |= (byte)PedDataFlags.IsInParachuteFreeFall;
+            }
+
             return flags;
         }
 

@@ -415,6 +415,7 @@ namespace CoopClient
                 DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
                 DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
+                DebugSyncPed.IsInParachuteFreeFall = player.IsInParachuteFreeFall;
                 DebugSyncPed.IsInVehicle = false;
 
                 if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())

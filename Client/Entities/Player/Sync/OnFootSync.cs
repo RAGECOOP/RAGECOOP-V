@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using GTA;
 using GTA.Native;
@@ -20,6 +21,7 @@ namespace CoopClient.Entities.Player
         internal byte Speed { get; set; }
         private bool LastIsJumping = false;
         internal bool IsJumping { get; set; }
+        internal bool IsInParachuteFreeFall { get; set; }
         internal bool IsRagdoll { get; set; }
         internal bool IsOnFire { get; set; }
         internal bool IsAiming { get; set; }
@@ -32,7 +34,7 @@ namespace CoopClient.Entities.Player
         #endregion
 
         private bool IsPlayingAnimation = false;
-        private string[] CurrentAnimation = null;
+        private string[] CurrentAnimation = new string[2] { "", ""};
         private float AnimationStopTime = 0;
 
         private void DisplayOnFoot()
@@ -96,34 +98,41 @@ namespace CoopClient.Entities.Player
                 CurrentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
                 AnimationStopTime = 0.7f;
 
-                Function.Call(Hash.TASK_PLAY_ANIM, Character, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
+                Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
                 return;
+            }
+
+            if (IsInParachuteFreeFall)
+            {
+                DisplayParachuteFreeFall();
             }
 
             if (IsPlayingAnimation)
             {
-                if (CurrentAnimation[0] == "anim@sports@ballgame@handball@")
+                switch (CurrentAnimation[0])
                 {
-                    UpdateOnFootPosition(true, true, false);
-                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
+                    case "skydive@base":
+                        if (IsInParachuteFreeFall)
+                        {
+                            return;
+                        }
+                        break;
+                    case "anim@sports@ballgame@handball@":
+                        UpdateOnFootPosition(true, true, false);
+                        float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
 
-                    if (currentTime < AnimationStopTime)
-                    {
-                        return;
-                    }
+                        if (currentTime < AnimationStopTime)
+                        {
+                            return;
+                        }
+                        break;
+                }
 
-                    Character.Task.ClearAnimation("anim@sports@ballgame@handball@", "ball_get_up");
-                    Character.Task.ClearAll();
-                    IsPlayingAnimation = false;
-                    CurrentAnimation = null;
-                }
-                else
-                {
-                    Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
-                    Character.Task.ClearAll();
-                    IsPlayingAnimation = false;
-                    CurrentAnimation = null;
-                }
+                Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
+                Character.Task.ClearAll();
+                IsPlayingAnimation = false;
+                CurrentAnimation = new string[2] { "", "" };
+                AnimationStopTime = 0;
             }
 
             if (IsJumping || IsOnFire)
@@ -167,7 +176,7 @@ namespace CoopClient.Entities.Player
                             }
                         }
 
-                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character);
+                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character.Handle);
                     }
                 }
 
@@ -179,7 +188,7 @@ namespace CoopClient.Entities.Player
                 if (!Character.IsInRange(Position, 0.5f))
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, true, 0x3F000000, 0x40800000, false, 0, false,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 0x3F000000, 0x40800000, false, 0, false,
                                     unchecked((int)FiringPattern.FullAuto));
                     UpdateOnFootPosition();
                 }
@@ -193,7 +202,7 @@ namespace CoopClient.Entities.Player
                 if (!Character.IsInRange(Position, 0.5f))
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, false, 0x3F000000, 0x40800000, false, 512, false,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 0x3F000000, 0x40800000, false, 512, false,
                                     unchecked((int)FiringPattern.FullAuto));
                     UpdateOnFootPosition();
                 }
@@ -205,6 +214,19 @@ namespace CoopClient.Entities.Player
             else
             {
                 WalkTo();
+            }
+        }
+
+        private void DisplayParachuteFreeFall()
+        {
+            UpdateOnFootPosition();
+
+            if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "skydive@base", "free_idle", 3))
+            {
+                IsPlayingAnimation = true;
+                CurrentAnimation = new string[2] { "skydive@base", "free_idle" };
+
+                Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("skydive@base"), "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
             }
         }
 

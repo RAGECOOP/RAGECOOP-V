@@ -105,11 +105,11 @@ namespace CoopServer
             return task.Result;
         }
 
-        public void InvokePlayerPositionUpdate(PlayerData playerData)
+        public void InvokePlayerPositionUpdate(string username)
         {
             lock (_actionQueue.SyncRoot)
             {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerPositionUpdate(playerData)));
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerPositionUpdate(username)));
             }
         }
 
@@ -121,11 +121,27 @@ namespace CoopServer
             }
         }
 
-        public void InvokePlayerHealthUpdate(PlayerData playerData)
+        public void InvokePlayerHealthUpdate(string username)
         {
             lock (_actionQueue.SyncRoot)
             {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHealthUpdate(playerData)));
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHealthUpdate(username)));
+            }
+        }
+
+        public void InvokePlayerPedHandleUpdate(string username)
+        {
+            lock (_actionQueue.SyncRoot)
+            {
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerPedHandleUpdate(username)));
+            }
+        }
+
+        public void InvokePlayerVehicleHandleUpdate(string username)
+        {
+            lock (_actionQueue.SyncRoot)
+            {
+                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerVehicleHandleUpdate(username)));
             }
         }
 
@@ -190,6 +206,14 @@ namespace CoopServer
         /// </summary>
         public event PlayerEvent OnPlayerPositionUpdate;
         /// <summary>
+        /// Called when a player has a new position
+        /// </summary>
+        public event PlayerEvent OnPlayerPedHandleUpdate;
+        /// <summary>
+        /// Called when a player has a new position
+        /// </summary>
+        public event PlayerEvent OnPlayerVehicleHandleUpdate;
+        /// <summary>
         /// Called when a player sends a packet from another modification
         /// </summary>
         public event ModEvent OnModPacketReceived;
@@ -229,9 +253,9 @@ namespace CoopServer
             OnPlayerUpdate?.Invoke(client);
         }
 
-        internal void InvokePlayerHealthUpdate(PlayerData playerData)
+        internal void InvokePlayerHealthUpdate(string username)
         {
-            OnPlayerHealthUpdate?.Invoke(Server.Clients.First(x => x.Player.Username == playerData.Username));
+            OnPlayerHealthUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
         internal bool InvokeChatMessage(string username, string message)
@@ -241,9 +265,19 @@ namespace CoopServer
             return args.Cancel;
         }
 
-        internal void InvokePlayerPositionUpdate(PlayerData playerData)
+        internal void InvokePlayerPositionUpdate(string username)
         {
-            OnPlayerPositionUpdate?.Invoke(Server.Clients.First(x => x.Player.Username == playerData.Username));
+            OnPlayerPositionUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
+        }
+
+        internal void InvokePlayerPedHandleUpdate(string username)
+        {
+            OnPlayerPedHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
+        }
+
+        internal void InvokePlayerVehicleHandleUpdate(string username)
+        {
+            OnPlayerVehicleHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
         internal bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)
@@ -350,7 +384,7 @@ namespace CoopServer
 
         public static Client GetClientByUsername(string username)
         {
-            return Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
+            return Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
         /// <summary>

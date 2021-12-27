@@ -4,19 +4,23 @@ namespace CoopServer
 {
     public struct PlayerData
     {
-        public string Username { get; set; }
+        public string Username { get; internal set; }
         private int LastPedHandle { get; set; }
         private int CurrentPedHandle { get; set; }
         public int PedHandle
         {
             get => CurrentPedHandle;
-            set
+            internal set
             {
-                LastPedHandle = CurrentPedHandle;
+                LastPedHandle = CurrentPedHandle == default ? value : CurrentPedHandle;
                 CurrentPedHandle = value;
-                if (CurrentPedHandle != LastPedHandle)
+
+                if (CurrentPedHandle != LastPedHandle && Server.Resources.Any())
                 {
-                    // TODO
+                    foreach (Resource resource in Server.Resources)
+                    {
+                        resource.InvokePlayerPedHandleUpdate(Username);
+                    }
                 }
             }
         }
@@ -25,51 +29,57 @@ namespace CoopServer
         public int VehicleHandle
         {
             get => CurrentPedHandle;
-            set
+            internal set
             {
-                LastVehicleHandle = CurrentVehicleHandle;
+                LastVehicleHandle = CurrentVehicleHandle == default ? value : CurrentVehicleHandle;
                 CurrentVehicleHandle = value;
-                if (CurrentVehicleHandle != LastVehicleHandle)
+
+                if (CurrentVehicleHandle != LastVehicleHandle && Server.Resources.Any())
                 {
-                    // TODO
+                    foreach (Resource resource in Server.Resources)
+                    {
+                        resource.InvokePlayerPedHandleUpdate(Username);
+                    }
                 }
             }
         }
-        public bool IsInVehicle { get; set; }
+        public bool IsInVehicle { get; internal set; }
         private LVector3 LastPosition { get; set; }
         private LVector3 CurrentPosition { get; set; }
         public LVector3 Position
         {
             get => CurrentPosition;
-            set
+            internal set
             {
-                LastPosition = CurrentPosition;
+                LastPosition = CurrentPosition.Equals(default(LVector3)) ? value : CurrentPosition;
                 CurrentPosition = value;
 
                 if (Server.Resources.Any() && !LVector3.Equals(CurrentPosition, LastPosition))
                 {
                     foreach (Resource resource in Server.Resources)
                     {
-                        resource.InvokePlayerPositionUpdate(this);
+                        resource.InvokePlayerPositionUpdate(Username);
                     }
                 }
             }
         }
+        private int LastHealth { get; set; }
         private int CurrentHealth { get; set; }
         public int Health
         {
             get => CurrentHealth;
-            set
+            internal set
             {
-                if (Server.Resources.Any() && CurrentHealth != value)
+                LastHealth = CurrentHealth == default ? value : CurrentHealth;
+                CurrentHealth = value;
+
+                if (CurrentHealth != LastHealth && Server.Resources.Any())
                 {
                     foreach (Resource resource in Server.Resources)
                     {
-                        resource.InvokePlayerHealthUpdate(this);
+                        resource.InvokePlayerHealthUpdate(Username);
                     }
                 }
-
-                CurrentHealth = value;
             }
         }
 

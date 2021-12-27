@@ -124,7 +124,7 @@ namespace CoopClient.Entities.NPC
                             }
                         }
 
-                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character);
+                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character.Handle);
                     }
                 }
 
@@ -136,7 +136,7 @@ namespace CoopClient.Entities.NPC
                 if (!Character.IsInRange(Position, 0.5f))
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, true, 0x3F000000, 0x40800000, false, 0, false,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 0x3F000000, 0x40800000, false, 0, false,
                                     unchecked((int)FiringPattern.FullAuto));
                 }
                 else
@@ -149,7 +149,7 @@ namespace CoopClient.Entities.NPC
                 if (!Character.IsInRange(Position, 0.5f))
                 {
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, false, 0x3F000000, 0x40800000, false, 512, false,
+                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 0x3F000000, 0x40800000, false, 512, false,
                                     unchecked((int)FiringPattern.FullAuto));
                 }
                 else
@@ -166,6 +166,12 @@ namespace CoopClient.Entities.NPC
         private bool LastMoving;
         private void WalkTo()
         {
+            if (!Character.IsInRange(Position, 6.0f))
+            {
+                Character.PositionNoOffset = Position;
+                Character.Rotation = Rotation;
+            }
+
             Vector3 predictPosition = Position + (Position - Character.Position) + Velocity;
             float range = predictPosition.DistanceToSquared(Character.Position);
 
@@ -203,9 +209,9 @@ namespace CoopClient.Entities.NPC
                     LastMoving = true;
                     break;
                 default:
-                    if (range > 0.25f)
+                    if (!Character.IsInRange(Position, 0.5f))
                     {
-                        goto case 1;
+                        Character.Task.RunTo(Position, true, 500);
                     }
                     else if (LastMoving)
                     {
