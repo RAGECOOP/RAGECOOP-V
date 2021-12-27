@@ -127,9 +127,8 @@ namespace CoopClient.Entities.NPC
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
             characterModel.MarkAsNoLongerNeeded();
 
-            // ?
             Character.RelationshipGroup = Main.RelationshipGroup;
-
+            Character.Health = Health;
             if (IsInVehicle)
             {
                 Character.IsVisible = false;
@@ -137,13 +136,15 @@ namespace CoopClient.Entities.NPC
             Character.BlockPermanentEvents = true;
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
-            Character.Health = Health;
 
-            Character.CanBeTargetted = true;
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character.Handle, Game.Player, true);
+            Character.CanSufferCriticalHits = false;
 
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Character.Handle, true);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character.Handle, Game.Player, true);
             Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character.Handle, false);
+            Function.Call(Hash.SET_PED_AS_ENEMY, Character.Handle, false);
+            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character.Handle, true, true);
 
             foreach (KeyValuePair<byte, short> cloth in Clothes)
             {

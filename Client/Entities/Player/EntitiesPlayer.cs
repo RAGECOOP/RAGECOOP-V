@@ -241,9 +241,8 @@ namespace CoopClient.Entities.Player
             Character = World.CreatePed(characterModel, Position, Rotation.Z);
             characterModel.MarkAsNoLongerNeeded();
 
-            // ?
             Character.RelationshipGroup = Main.RelationshipGroup;
-
+            Character.Health = Health;
             if (IsInVehicle)
             {
                 Character.IsVisible = false;
@@ -251,22 +250,22 @@ namespace CoopClient.Entities.Player
             Character.BlockPermanentEvents = true;
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
-            Character.Health = Health;
+            
+            Character.CanSufferCriticalHits = false;
 
-            Character.CanBeTargetted = true;
+            // Add a new blip for the ped
+            Character.AddBlip();
+            Character.AttachedBlip.Color = BlipColor.White;
+            Character.AttachedBlip.Scale = 0.8f;
+            Character.AttachedBlip.Name = username;
+
+            Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
+            Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, Character.Handle, false);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Character.Handle, true);
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, Character.Handle, Game.Player, true);
-
-            if (username != null)
-            {
-                // Add a new blip for the ped
-                Character.AddBlip();
-                Character.AttachedBlip.Color = BlipColor.White;
-                Character.AttachedBlip.Scale = 0.8f;
-                Character.AttachedBlip.Name = username;
-
-                Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
-                Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character.Handle, false);
-            }
+            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, Character.Handle, false);
+            Function.Call(Hash.SET_PED_AS_ENEMY, Character.Handle, false);
+            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character.Handle, true, true);
 
             foreach (KeyValuePair<byte, short> cloth in Clothes)
             {

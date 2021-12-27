@@ -31,6 +31,10 @@ namespace CoopClient.Entities.Player
         private int LastWeaponObj = 0;
         #endregion
 
+        private bool IsPlayingAnimation = false;
+        private string[] CurrentAnimation = null;
+        private float AnimationStopTime = 0;
+
         private void DisplayOnFoot()
         {
             if (Character.IsInVehicle())
@@ -73,7 +77,10 @@ namespace CoopClient.Entities.Player
                 if (!Character.IsRagdoll)
                 {
                     // CanRagdoll = true, inside this function
-                    Character.Ragdoll();
+                    //Character.Ragdoll();
+
+                    Character.CanRagdoll = true;
+                    Function.Call(Hash.SET_PED_TO_RAGDOLL, Character.Handle, 50000, 60000, 0, 1, 1, 1);
                 }
 
                 UpdateOnFootPosition(false, false, true);
@@ -85,7 +92,38 @@ namespace CoopClient.Entities.Player
                 Character.CanRagdoll = false;
                 Character.Task.ClearAllImmediately();
 
+                IsPlayingAnimation = true;
+                CurrentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
+                AnimationStopTime = 0.7f;
+
+                Function.Call(Hash.TASK_PLAY_ANIM, Character, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
                 return;
+            }
+
+            if (IsPlayingAnimation)
+            {
+                if (CurrentAnimation[0] == "anim@sports@ballgame@handball@")
+                {
+                    UpdateOnFootPosition(true, true, false);
+                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
+
+                    if (currentTime < AnimationStopTime)
+                    {
+                        return;
+                    }
+
+                    Character.Task.ClearAnimation("anim@sports@ballgame@handball@", "ball_get_up");
+                    Character.Task.ClearAll();
+                    IsPlayingAnimation = false;
+                    CurrentAnimation = null;
+                }
+                else
+                {
+                    Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
+                    Character.Task.ClearAll();
+                    IsPlayingAnimation = false;
+                    CurrentAnimation = null;
+                }
             }
 
             if (IsJumping || IsOnFire)
@@ -261,6 +299,23 @@ namespace CoopClient.Entities.Player
             {
                 Character.Velocity = Velocity;
             }
+        }
+
+        private string LoadAnim(string anim)
+        {
+            ulong startTime = Util.GetTickCount64();
+
+            while (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
+            {
+                Script.Yield();
+                Function.Call(Hash.REQUEST_ANIM_DICT, anim);
+                if (Util.GetTickCount64() - startTime >= 1000)
+                {
+                    break;
+                }
+            }
+
+            return anim;
         }
     }
 }
