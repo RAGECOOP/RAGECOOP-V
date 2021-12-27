@@ -666,7 +666,6 @@ namespace CoopClient
                     npc.IsInVehicle = false;
                     npc.LastSyncWasFull = true;
 
-                    npc.Latency = packet.Latency.Value;
                     npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
@@ -691,7 +690,6 @@ namespace CoopClient
                         IsInVehicle = false,
                         LastSyncWasFull = true,
 
-                        Latency = packet.Latency.Value,
                         LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
@@ -734,7 +732,6 @@ namespace CoopClient
                     npc.IsInVehicle = true;
                     npc.LastSyncWasFull = true;
 
-                    npc.Latency = packet.Latency.Value;
                     npc.LastUpdateReceived = Util.GetTickCount64();
                 }
                 else
@@ -769,7 +766,6 @@ namespace CoopClient
                         IsInVehicle = true,
                         LastSyncWasFull = true,
 
-                        Latency = packet.Latency.Value,
                         LastUpdateReceived = Util.GetTickCount64()
                     });
                 }
@@ -937,8 +933,7 @@ namespace CoopClient
                     VehMods = veh.Mods.GetVehicleMods(),
                     VehDamageModel = veh.GetVehicleDamageModel(),
                     VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0,
-                    Flag = npc.GetVehicleFlags(veh),
-                    Latency = Latency
+                    Flag = npc.GetVehicleFlags(veh)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
             else
@@ -955,8 +950,7 @@ namespace CoopClient
                     Speed = npc.GetPedSpeed(),
                     AimCoords = npc.GetPedAimCoords(true).ToLVector(),
                     CurrentWeaponHash = (uint)npc.Weapons.Current.Hash,
-                    Flag = npc.GetPedFlags(true),
-                    Latency = Latency
+                    Flag = npc.GetPedFlags(true)
                 }.PacketToNetOutGoingMessage(outgoingMessage);
             }
 

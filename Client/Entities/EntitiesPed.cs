@@ -18,12 +18,6 @@ namespace CoopClient.Entities
     {
         // If this NPC is in a vehicle, we can find the handle of this vehicle in Main.NPCsVehicles[NPCVehHandle] and prevent multiple vehicles from being created
         internal long NPCVehHandle { get; set; } = 0;
-        /// <summary>
-        /// 0 = Nothing
-        /// 1 = Character
-        /// 2 = Vehicle
-        /// </summary>
-        private byte ModelNotFound = 0;
         private bool AllDataAvailable = false;
         internal bool LastSyncWasFull { get; set; } = false;
         /// <summary>
@@ -58,7 +52,7 @@ namespace CoopClient.Entities
         /// <summary>
         /// Get the player latency
         /// </summary>
-        public float Latency { get; internal set; } = 1.5f;
+        public float Latency { get; internal set; }
 
         /// <summary>
         /// ?
@@ -127,26 +121,8 @@ namespace CoopClient.Entities
                 AllDataAvailable = true;
             }
 
-            if (ModelNotFound != 0)
-            {
-                if (ModelNotFound == 1)
-                {
-                    if (CurrentModelHash != LastModelHash)
-                    {
-                        ModelNotFound = 0;
-                    }
-                }
-                else
-                {
-                    if (CurrentVehicleModelHash != LastVehicleModelHash)
-                    {
-                        ModelNotFound = 0;
-                    }
-                }
-            }
-
             #region NOT_IN_RANGE
-            if (ModelNotFound != 0 || !Game.Player.Character.IsInRange(Position, 500f))
+            if (!Game.Player.Character.IsInRange(Position, 500f))
             {
                 if (Character != null && Character.Exists())
                 {
@@ -290,7 +266,6 @@ namespace CoopClient.Entities
             if (characterModel == null)
             {
                 //GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
-                ModelNotFound = 1;
                 return false;
             }
 

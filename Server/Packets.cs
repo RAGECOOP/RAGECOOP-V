@@ -1662,8 +1662,6 @@ namespace CoopServer
 
         public byte? Flag { get; set; } = 0;
 
-        public float? Latency { get; set; }
-
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
             #region PacketToNetOutGoingMessage
@@ -1724,12 +1722,6 @@ namespace CoopServer
 
             // Write npc weapon hash
             byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
-
-            // Write player latency
-            if (Latency.HasValue)
-            {
-                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
-            }
 
             byte[] result = byteArray.ToArray();
 
@@ -1815,12 +1807,6 @@ namespace CoopServer
 
             // Read npc weapon hash
             CurrentWeaponHash = reader.ReadUInt();
-
-            // Read player latency
-            if (reader.CanRead(4))
-            {
-                Latency = reader.ReadFloat();
-            }
             #endregion
         }
     }
@@ -1864,8 +1850,6 @@ namespace CoopServer
         public byte VehLandingGear { get; set; }
 
         public ushort? Flag { get; set; }
-
-        public float? Latency { get; set; }
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -1972,12 +1956,6 @@ namespace CoopServer
             {
                 // Write boolean = false
                 byteArray.Add(0x00);
-            }
-
-            // Write player latency
-            if (Latency.HasValue)
-            {
-                byteArray.AddRange(BitConverter.GetBytes(Latency.Value));
             }
 
             byte[] result = byteArray.ToArray();
@@ -2104,12 +2082,6 @@ namespace CoopServer
                     BurstedTires = reader.ReadUShort(),
                     PuncturedTires = reader.ReadUShort()
                 };
-            }
-
-            // Read player latency
-            if (reader.CanRead(4))
-            {
-                Latency = reader.ReadFloat();
             }
             #endregion
         }

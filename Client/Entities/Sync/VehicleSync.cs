@@ -114,7 +114,7 @@ namespace CoopClient.Entities
                     if (vehicleModel == null)
                     {
                         //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
-                        ModelNotFound = 2;
+                        Character.IsVisible = false;
                         return;
                     }
 

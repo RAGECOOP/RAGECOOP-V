@@ -76,7 +76,6 @@ namespace CoopClient.Entities
                     Character.Ragdoll();
                 }
 
-                UpdateOnFootPosition(false, false, true);
                 return;
             }
             else if (!IsRagdoll && Character.IsRagdoll)
@@ -89,7 +88,6 @@ namespace CoopClient.Entities
 
             if (IsJumping || IsOnFire)
             {
-                UpdateOnFootPosition(true, true, false);
                 return;
             }
 
@@ -101,7 +99,6 @@ namespace CoopClient.Entities
                     Character.Task.ReloadWeapon();
                 }
 
-                UpdateOnFootPosition();
                 return;
             }
 
@@ -141,7 +138,6 @@ namespace CoopClient.Entities
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, true, 0x3F000000, 0x40800000, false, 0, false,
                                     unchecked((int)FiringPattern.FullAuto));
-                    UpdateOnFootPosition();
                 }
                 else
                 {
@@ -155,7 +151,6 @@ namespace CoopClient.Entities
                     Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
                                     Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, Speed == 3 ? 3f : 2.5f, false, 0x3F000000, 0x40800000, false, 512, false,
                                     unchecked((int)FiringPattern.FullAuto));
-                    UpdateOnFootPosition();
                 }
                 else
                 {
@@ -214,50 +209,6 @@ namespace CoopClient.Entities
                         LastMoving = false;
                     }
                     break;
-            }
-            UpdateOnFootPosition();
-        }
-
-        private byte LastStuckCount = 0;
-        private ulong LastStuckTime;
-        private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
-        {
-            if (Character.Position.DistanceTo(Position) > 5f)
-            {
-                if (Util.GetTickCount64() - LastStuckTime < 1000)
-                {
-                    LastStuckCount = 0;
-                }
-
-                ++LastStuckCount;
-
-                if (LastStuckCount >= 5)
-                {
-                    Character.Position = Position;
-                    LastStuckCount = 0;
-                }
-
-                LastStuckTime = Util.GetTickCount64();
-            }
-
-            if (updatePosition)
-            {
-                float lerpValue = ((int)((Latency * 1000 / 2) + Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f;
-
-                Vector2 biDimensionalPos = Vector2.Lerp(new Vector2(Character.Position.X, Character.Position.Y), new Vector2(Position.X + (Velocity.X / 5), Position.Y + (Velocity.Y / 5)), lerpValue);
-                float zPos = Util.Lerp(Character.Position.Z, Position.Z, 0.1f);
-                Character.PositionNoOffset = new Vector3(biDimensionalPos.X, biDimensionalPos.Y, zPos);
-            }
-            
-            if (updateRotation)
-            {
-                // You can find the ToQuaternion() for Rotation inside the VectorExtensions
-                Character.Quaternion = Quaternion.Lerp(Character.Quaternion, Rotation.ToQuaternion(), 0.10f);
-            }
-            
-            if (updateVelocity)
-            {
-                Character.Velocity = Velocity;
             }
         }
     }
