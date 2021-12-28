@@ -245,7 +245,7 @@ namespace CoopClient
             NetHandle = reader.ReadLong();
 
             // Read Target
-            NetHandle = reader.ReadLong();
+            Target = reader.ReadLong();
 
             // Read Mod
             int modLength = reader.ReadInt();
