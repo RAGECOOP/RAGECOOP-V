@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
@@ -70,24 +71,31 @@ namespace CoopServer
         {
             XmlSerializer ser = new(typeof(T));
 
+            XmlWriterSettings settings = new()
+            {
+                Indent = true,
+                IndentChars = ("\t"),
+                OmitXmlDeclaration = true
+            };
+
             string path = AppContext.BaseDirectory + file;
             T data;
 
             if (File.Exists(path))
             {
-                using (FileStream stream = File.OpenRead(path))
+                using (XmlReader stream = XmlReader.Create(path))
                 {
                     data = (T)ser.Deserialize(stream);
                 }
 
-                using (FileStream stream = new(path, FileMode.Truncate, FileAccess.ReadWrite))
+                using (XmlWriter stream = XmlWriter.Create(path, settings))
                 {
                     ser.Serialize(stream, data);
                 }
             }
             else
             {
-                using (FileStream stream = File.OpenWrite(path))
+                using (XmlWriter stream = XmlWriter.Create(path, settings))
                 {
                     ser.Serialize(stream, data = new T());
                 }

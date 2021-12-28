@@ -31,7 +31,7 @@ namespace CoopServer
 
         public static NetServer MainNetServer;
 
-        public static List<Resource> Resources = new();
+        public static Resource RunningResource = null;
         public static Dictionary<Command, Action<CommandContext>> Commands;
 
         public static readonly List<Client> Clients = new();
@@ -172,43 +172,40 @@ namespace CoopServer
                 #endregion
             }
 
-            if (MainSettings.Resources.Any())
+            if (!string.IsNullOrEmpty(MainSettings.Resource))
             {
                 Commands = new();
 
-                MainSettings.Resources.ForEach(x =>
+                try
                 {
-                    try
+                    string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll";
+                    Logging.Info($"Loading resource \"{MainSettings.Resource}.dll\"...");
+
+                    Assembly asm = Assembly.LoadFrom(resourcepath);
+                    Type[] types = asm.GetExportedTypes();
+                    IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
+                    Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
+
+                    if (!enumerable.Any())
                     {
-                        string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + x + ".dll";
-                        Logging.Info($"Loading resource \"{x}.dll\"...");
-
-                        Assembly asm = Assembly.LoadFrom(resourcepath);
-                        Type[] types = asm.GetExportedTypes();
-                        IEnumerable<Type> validTypes = types.Where(t => !t.IsInterface && !t.IsAbstract).Where(t => typeof(ServerScript).IsAssignableFrom(t));
-                        Type[] enumerable = validTypes as Type[] ?? validTypes.ToArray();
-
-                        if (!enumerable.Any())
+                        Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
+                    }
+                    else
+                    {
+                        if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
                         {
-                            Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
+                            RunningResource = new(script);
                         }
                         else
                         {
-                            if (Activator.CreateInstance(enumerable.ToArray()[0]) is ServerScript script)
-                            {
-                                Resources.Add(new(script));
-                            }
-                            else
-                            {
-                                Logging.Warning("Could not create resource: it is null.");
-                            }
+                            Logging.Warning("Could not create resource: it is null.");
                         }
                     }
-                    catch (Exception e)
-                    {
-                        Logging.Error(e.InnerException.Message);
-                    }
-                });
+                }
+                catch (Exception e)
+                {
+                    Logging.Error(e.InnerException.Message);
+                }
             }
 
             Listen();
@@ -221,12 +218,9 @@ namespace CoopServer
 
             while (!Program.ReadyToStop)
             {
-                if (Resources.Count != 0)
+                if (RunningResource != null)
                 {
-                    Resources.ForEach(x =>
-                    {
-                        x.InvokeTick(++CurrentTick);
-                    });
+                    RunningResource.InvokeTick(++CurrentTick);
                 }
 
                 NetIncomingMessage message;
@@ -458,15 +452,12 @@ namespace CoopServer
                                                 packet.NetIncomingMessageToPacket(data);
 
                                                 bool resourceResult = false;
-                                                if (Resources.Any())
+                                                if (RunningResource != null)
                                                 {
-                                                    Resources.ForEach(x =>
+                                                    if (RunningResource.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Mod, packet.CustomPacketID, packet.Bytes))
                                                     {
-                                                        if (x.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Mod, packet.CustomPacketID, packet.Bytes))
-                                                        {
-                                                            resourceResult = true;
-                                                        }
-                                                    });
+                                                        resourceResult = true;
+                                                    }
                                                 }
 
                                                 if (!resourceResult && packet.Target != -1)
@@ -542,17 +533,14 @@ namespace CoopServer
             }
 
             Logging.Warning("Server is shutting down!");
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x =>
+                // Waiting for resource...
+                while (!RunningResource.ReadyToStop)
                 {
-                    // Waiting for resource...
-                    while (!x.ReadyToStop)
-                    {
-                        // 16 milliseconds to sleep to reduce CPU usage
-                        Thread.Sleep(1000 / 60);
-                    }
-                });
+                    // 16 milliseconds to sleep to reduce CPU usage
+                    Thread.Sleep(1000 / 60);
+                }
             }
 
             if (MainNetServer.Connections.Count > 0)
@@ -639,7 +627,10 @@ namespace CoopServer
             // Accept the connection and send back a new handshake packet with the connection ID
             local.Approve(outgoingMessage);
 
-            Resources.ForEach(x => x.InvokePlayerHandshake(tmpClient));
+            if (RunningResource != null)
+            {
+                RunningResource.InvokePlayerHandshake(tmpClient);
+            }
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
@@ -683,9 +674,9 @@ namespace CoopServer
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerConnected(localClient));
+                RunningResource.InvokePlayerConnected(localClient);
             }
             else
             {
@@ -720,9 +711,9 @@ namespace CoopServer
 
             Clients.Remove(localClient);
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerDisconnected(localClient));
+                RunningResource.InvokePlayerDisconnected(localClient);
             }
             else
             {
@@ -766,9 +757,9 @@ namespace CoopServer
                 }
             });
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerUpdate(client));
+                RunningResource.InvokePlayerUpdate(client);
             }
         }
 
@@ -810,9 +801,9 @@ namespace CoopServer
                 }
             });
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerUpdate(client));
+                RunningResource.InvokePlayerUpdate(client);
             }
         }
 
@@ -851,9 +842,9 @@ namespace CoopServer
                 }
             });
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerUpdate(client));
+                RunningResource.InvokePlayerUpdate(client);
             }
         }
 
@@ -892,16 +883,16 @@ namespace CoopServer
                 }
             });
 
-            if (Resources.Any())
+            if (RunningResource != null)
             {
-                Resources.ForEach(x => x.InvokePlayerUpdate(client));
+                RunningResource.InvokePlayerUpdate(client);
             }
         }
 
         // Send a message to targets or all players
         private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
         {
-            if (Resources.Any())
+            if (RunningResource != null)
             {
                 if (packet.Message.StartsWith('/'))
                 {
@@ -947,21 +938,9 @@ namespace CoopServer
                     return;
                 }
 
-                if (Resources.Any())
+                if (RunningResource.InvokeChatMessage(packet.Username, packet.Message))
                 {
-                    bool resourceResult = false;
-                    Resources.ForEach(x =>
-                    {
-                        if (x.InvokeChatMessage(packet.Username, packet.Message))
-                        {
-                            resourceResult = true;
-                        }
-                    });
-
-                    if (resourceResult)
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 

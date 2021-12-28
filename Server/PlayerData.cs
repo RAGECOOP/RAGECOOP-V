@@ -15,12 +15,9 @@ namespace CoopServer
                 LastPedHandle = CurrentPedHandle == default ? value : CurrentPedHandle;
                 CurrentPedHandle = value;
 
-                if (CurrentPedHandle != LastPedHandle && Server.Resources.Any())
+                if (CurrentPedHandle != LastPedHandle && Server.RunningResource != null)
                 {
-                    foreach (Resource resource in Server.Resources)
-                    {
-                        resource.InvokePlayerPedHandleUpdate(Username);
-                    }
+                    Server.RunningResource.InvokePlayerPedHandleUpdate(Username);
                 }
             }
         }
@@ -34,12 +31,9 @@ namespace CoopServer
                 LastVehicleHandle = CurrentVehicleHandle == default ? value : CurrentVehicleHandle;
                 CurrentVehicleHandle = value;
 
-                if (CurrentVehicleHandle != LastVehicleHandle && Server.Resources.Any())
+                if (CurrentVehicleHandle != LastVehicleHandle && Server.RunningResource != null)
                 {
-                    foreach (Resource resource in Server.Resources)
-                    {
-                        resource.InvokePlayerPedHandleUpdate(Username);
-                    }
+                    Server.RunningResource.InvokePlayerPedHandleUpdate(Username);
                 }
             }
         }
@@ -54,12 +48,9 @@ namespace CoopServer
                 LastPosition = CurrentPosition.Equals(default(LVector3)) ? value : CurrentPosition;
                 CurrentPosition = value;
 
-                if (Server.Resources.Any() && !LVector3.Equals(CurrentPosition, LastPosition))
+                if (Server.RunningResource != null && !LVector3.Equals(CurrentPosition, LastPosition))
                 {
-                    foreach (Resource resource in Server.Resources)
-                    {
-                        resource.InvokePlayerPositionUpdate(Username);
-                    }
+                    Server.RunningResource.InvokePlayerPositionUpdate(Username);
                 }
             }
         }
@@ -73,12 +64,9 @@ namespace CoopServer
                 LastHealth = CurrentHealth == default ? value : CurrentHealth;
                 CurrentHealth = value;
 
-                if (CurrentHealth != LastHealth && Server.Resources.Any())
+                if (CurrentHealth != LastHealth && Server.RunningResource != null)
                 {
-                    foreach (Resource resource in Server.Resources)
-                    {
-                        resource.InvokePlayerHealthUpdate(Username);
-                    }
+                    Server.RunningResource.InvokePlayerHealthUpdate(Username);
                 }
             }
         }
