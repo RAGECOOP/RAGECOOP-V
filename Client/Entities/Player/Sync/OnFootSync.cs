@@ -49,6 +49,17 @@ namespace CoopClient.Entities.Player
                 MainVehicle = null;
             }
 
+            if (IsInParachuteFreeFall)
+            {
+                if (!Character.IsInParachuteFreeFall)
+                {
+                    Function.Call(Hash.TASK_SKY_DIVE, Character.Handle);
+                }
+                UpdateOnFootPosition(true, true, false);
+
+                return;
+            }
+
             if (IsOnFire && !Character.IsOnFire)
             {
                 Character.IsInvincible = false;
@@ -102,37 +113,9 @@ namespace CoopClient.Entities.Player
                 return;
             }
 
-            if (IsInParachuteFreeFall)
+            if (!StopAnimation())
             {
-                DisplayParachuteFreeFall();
-            }
-
-            if (IsPlayingAnimation)
-            {
-                switch (CurrentAnimation[0])
-                {
-                    case "skydive@base":
-                        if (IsInParachuteFreeFall)
-                        {
-                            return;
-                        }
-                        break;
-                    case "anim@sports@ballgame@handball@":
-                        UpdateOnFootPosition(true, true, false);
-                        float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
-
-                        if (currentTime < AnimationStopTime)
-                        {
-                            return;
-                        }
-                        break;
-                }
-
-                Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
-                Character.Task.ClearAll();
-                IsPlayingAnimation = false;
-                CurrentAnimation = new string[2] { "", "" };
-                AnimationStopTime = 0;
+                return;
             }
 
             if (IsJumping || IsOnFire)
@@ -154,6 +137,25 @@ namespace CoopClient.Entities.Player
                 return;
             }
 
+            CheckCurrentWeapon();
+
+            if (IsShooting)
+            {
+                DisplayShooting();
+            }
+            else if (IsAiming)
+            {
+                DisplayAiming();
+            }
+            else
+            {
+                WalkTo();
+            }
+        }
+
+        #region WEAPON
+        private void CheckCurrentWeapon()
+        {
             if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(LastWeaponComponents))
             {
                 Character.Weapons.RemoveAll();
@@ -182,52 +184,65 @@ namespace CoopClient.Entities.Player
 
                 LastWeaponComponents = WeaponComponents;
             }
+        }
 
-            if (IsShooting)
+        private void DisplayShooting()
+        {
+            if (!Character.IsInRange(Position, 0.5f))
             {
-                if (!Character.IsInRange(Position, 0.5f))
-                {
-                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 0x3F000000, 0x40800000, false, 0, false,
-                                    unchecked((int)FiringPattern.FullAuto));
-                    UpdateOnFootPosition();
-                }
-                else
-                {
-                    Function.Call(Hash.TASK_SHOOT_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z, 1500, unchecked((int)FiringPattern.FullAuto));
-                }
-            }
-            else if (IsAiming)
-            {
-                if (!Character.IsInRange(Position, 0.5f))
-                {
-                    Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
-                                    Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 0x3F000000, 0x40800000, false, 512, false,
-                                    unchecked((int)FiringPattern.FullAuto));
-                    UpdateOnFootPosition();
-                }
-                else
-                {
-                    Character.Task.AimAt(AimCoords, 100);
-                }
+                Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
+                                Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, true, 2.0f, 0.5f, false, 0, false,
+                                unchecked((uint)FiringPattern.FullAuto));
+                UpdateOnFootPosition();
             }
             else
             {
-                WalkTo();
+                Function.Call(Hash.TASK_SHOOT_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z, 1500, unchecked((uint)FiringPattern.FullAuto));
             }
         }
 
-        private void DisplayParachuteFreeFall()
+        private void DisplayAiming()
         {
-            UpdateOnFootPosition();
-
-            if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "skydive@base", "free_idle", 3))
+            if (!Character.IsInRange(Position, 0.5f))
             {
-                IsPlayingAnimation = true;
-                CurrentAnimation = new string[2] { "skydive@base", "free_idle" };
-
-                Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("skydive@base"), "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, Character.Handle, Position.X, Position.Y,
+                                Position.Z, AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 0x3F000000, 0x40800000, false, 512, false, 0);
+                UpdateOnFootPosition();
             }
+            else
+            {
+                Character.Task.AimAt(AimCoords, 100);
+            }
+        }
+        #endregion
+
+        private bool StopAnimation()
+        {
+            if (!IsPlayingAnimation)
+            {
+                return true;
+            }
+
+            switch (CurrentAnimation[0])
+            {
+                case "anim@sports@ballgame@handball@":
+                    UpdateOnFootPosition(true, true, false);
+                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
+
+                    if (currentTime < AnimationStopTime)
+                    {
+                        return false;
+                    }
+                    break;
+            }
+
+            Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
+            Character.Task.ClearAll();
+            IsPlayingAnimation = false;
+            CurrentAnimation = new string[2] { "", "" };
+            AnimationStopTime = 0;
+
+            return true;
         }
 
         private bool LastMoving;
