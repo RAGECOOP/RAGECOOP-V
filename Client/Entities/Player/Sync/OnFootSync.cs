@@ -21,6 +21,8 @@ namespace CoopClient.Entities.Player
         internal byte Speed { get; set; }
         private bool LastIsJumping = false;
         internal bool IsJumping { get; set; }
+        internal bool IsOnLadder { get; set; }
+        internal bool IsVaulting { get; set; }
         internal bool IsInParachuteFreeFall { get; set; }
         internal bool IsRagdoll { get; set; }
         internal bool IsOnFire { get; set; }
@@ -60,6 +62,38 @@ namespace CoopClient.Entities.Player
                 return;
             }
 
+            if (IsOnLadder)
+            {
+                if (!Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, Character.Handle, ETasks.CLIMB_LADDER))
+                {
+                    Character.Task.ClimbLadder();
+                }
+                
+                UpdateOnFootPosition(true, true, false);
+
+                return;
+            }
+            else if (!IsOnLadder && Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, Character.Handle, ETasks.CLIMB_LADDER))
+            {
+                Character.Task.ClearAllImmediately();
+            }
+
+            if (IsVaulting)
+            {
+                if (!Character.IsVaulting)
+                {
+                    Character.Task.Climb();
+                }
+
+                UpdateOnFootPosition(true, true, false);
+
+                return;
+            }
+            else if (!IsVaulting && Character.IsVaulting)
+            {
+                Character.Task.ClearAllImmediately();
+            }
+
             if (IsOnFire && !Character.IsOnFire)
             {
                 Character.IsInvincible = false;
@@ -78,12 +112,18 @@ namespace CoopClient.Entities.Player
                 }
             }
 
-            if (IsJumping && !LastIsJumping)
+            if (IsJumping)
             {
-                Character.Task.Jump();
-            }
+                if (!LastIsJumping)
+                {
+                    LastIsJumping = true;
+                    Character.Task.Jump();
+                }
 
-            LastIsJumping = IsJumping;
+                UpdateOnFootPosition(true, true, false);
+                return;
+            }
+            LastIsJumping = false;
 
             if (IsRagdoll)
             {
@@ -115,12 +155,6 @@ namespace CoopClient.Entities.Player
 
             if (!StopAnimation())
             {
-                return;
-            }
-
-            if (IsJumping || IsOnFire)
-            {
-                UpdateOnFootPosition(true, true, false);
                 return;
             }
 

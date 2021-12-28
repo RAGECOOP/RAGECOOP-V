@@ -390,13 +390,15 @@ namespace CoopClient
                 player.CurrentWeaponHash = packet.CurrentWeaponHash;
                 player.WeaponComponents = packet.WeaponComponents;
                 player.AimCoords = packet.AimCoords.ToVector();
-                player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
-                player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
-                player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
-                player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
-                player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                player.IsInParachuteFreeFall = (packet.Flag.Value & (byte)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsAiming = (packet.Flag.Value & (ushort)PedDataFlags.IsAiming) > 0;
+                player.IsShooting = (packet.Flag.Value & (ushort)PedDataFlags.IsShooting) > 0;
+                player.IsReloading = (packet.Flag.Value & (ushort)PedDataFlags.IsReloading) > 0;
+                player.IsJumping = (packet.Flag.Value & (ushort)PedDataFlags.IsJumping) > 0;
+                player.IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
+                player.IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0;
+                player.IsInParachuteFreeFall = (packet.Flag.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsOnLadder = (packet.Flag.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
+                player.IsVaulting = (packet.Flag.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 player.IsInVehicle = false;
                 player.LastSyncWasFull = true;
 
@@ -457,13 +459,15 @@ namespace CoopClient
                 player.Speed = packet.Speed;
                 player.CurrentWeaponHash = packet.CurrentWeaponHash;
                 player.AimCoords = packet.AimCoords.ToVector();
-                player.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
-                player.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
-                player.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
-                player.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
-                player.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                player.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                player.IsInParachuteFreeFall = (packet.Flag.Value & (byte)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsAiming = (packet.Flag.Value & (ushort)PedDataFlags.IsAiming) > 0;
+                player.IsShooting = (packet.Flag.Value & (ushort)PedDataFlags.IsShooting) > 0;
+                player.IsReloading = (packet.Flag.Value & (ushort)PedDataFlags.IsReloading) > 0;
+                player.IsJumping = (packet.Flag.Value & (ushort)PedDataFlags.IsJumping) > 0;
+                player.IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
+                player.IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0;
+                player.IsInParachuteFreeFall = (packet.Flag.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsOnLadder = (packet.Flag.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
+                player.IsVaulting = (packet.Flag.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 player.IsInVehicle = false;
                 player.LastSyncWasFull = false;
 
@@ -660,12 +664,12 @@ namespace CoopClient
                     npc.Speed = packet.Speed;
                     npc.CurrentWeaponHash = packet.CurrentWeaponHash;
                     npc.AimCoords = packet.AimCoords.ToVector();
-                    npc.IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0;
-                    npc.IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0;
-                    npc.IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0;
-                    npc.IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0;
-                    npc.IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                    npc.IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0;
+                    npc.IsAiming = (packet.Flag.Value & (ushort)PedDataFlags.IsAiming) > 0;
+                    npc.IsShooting = (packet.Flag.Value & (ushort)PedDataFlags.IsShooting) > 0;
+                    npc.IsReloading = (packet.Flag.Value & (ushort)PedDataFlags.IsReloading) > 0;
+                    npc.IsJumping = (packet.Flag.Value & (ushort)PedDataFlags.IsJumping) > 0;
+                    npc.IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
+                    npc.IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0;
                     npc.IsInVehicle = false;
                     npc.LastSyncWasFull = true;
 
@@ -684,12 +688,12 @@ namespace CoopClient
                         Speed = packet.Speed,
                         CurrentWeaponHash = packet.CurrentWeaponHash,
                         AimCoords = packet.AimCoords.ToVector(),
-                        IsAiming = (packet.Flag.Value & (byte)PedDataFlags.IsAiming) > 0,
-                        IsShooting = (packet.Flag.Value & (byte)PedDataFlags.IsShooting) > 0,
-                        IsReloading = (packet.Flag.Value & (byte)PedDataFlags.IsReloading) > 0,
-                        IsJumping = (packet.Flag.Value & (byte)PedDataFlags.IsJumping) > 0,
-                        IsRagdoll = (packet.Flag.Value & (byte)PedDataFlags.IsRagdoll) > 0,
-                        IsOnFire = (packet.Flag.Value & (byte)PedDataFlags.IsOnFire) > 0,
+                        IsAiming = (packet.Flag.Value & (ushort)PedDataFlags.IsAiming) > 0,
+                        IsShooting = (packet.Flag.Value & (ushort)PedDataFlags.IsShooting) > 0,
+                        IsReloading = (packet.Flag.Value & (ushort)PedDataFlags.IsReloading) > 0,
+                        IsJumping = (packet.Flag.Value & (ushort)PedDataFlags.IsJumping) > 0,
+                        IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0,
+                        IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0,
                         IsInVehicle = false,
                         LastSyncWasFull = true,
 

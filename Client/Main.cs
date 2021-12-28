@@ -409,13 +409,15 @@ namespace CoopClient
                 DebugSyncPed.CurrentWeaponHash = (uint)player.Weapons.Current.Hash;
                 DebugSyncPed.WeaponComponents = player.Weapons.Current.GetWeaponComponents();
                 DebugSyncPed.LastSyncWasFull = true;
-                DebugSyncPed.IsAiming = (flags.Value & (byte)PedDataFlags.IsAiming) > 0;
-                DebugSyncPed.IsShooting = (flags.Value & (byte)PedDataFlags.IsShooting) > 0;
-                DebugSyncPed.IsReloading = (flags.Value & (byte)PedDataFlags.IsReloading) > 0;
-                DebugSyncPed.IsJumping = (flags.Value & (byte)PedDataFlags.IsJumping) > 0;
-                DebugSyncPed.IsRagdoll = (flags.Value & (byte)PedDataFlags.IsRagdoll) > 0;
-                DebugSyncPed.IsOnFire = (flags.Value & (byte)PedDataFlags.IsOnFire) > 0;
-                DebugSyncPed.IsInParachuteFreeFall = player.IsInParachuteFreeFall;
+                DebugSyncPed.IsAiming = (flags.Value & (ushort)PedDataFlags.IsAiming) > 0;
+                DebugSyncPed.IsShooting = (flags.Value & (ushort)PedDataFlags.IsShooting) > 0;
+                DebugSyncPed.IsReloading = (flags.Value & (ushort)PedDataFlags.IsReloading) > 0;
+                DebugSyncPed.IsJumping = (flags.Value & (ushort)PedDataFlags.IsJumping) > 0;
+                DebugSyncPed.IsRagdoll = (flags.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
+                DebugSyncPed.IsOnFire = (flags.Value & (ushort)PedDataFlags.IsOnFire) > 0;
+                DebugSyncPed.IsInParachuteFreeFall = (flags.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                DebugSyncPed.IsOnLadder = (flags.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
+                DebugSyncPed.IsVaulting = (flags.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 DebugSyncPed.IsInVehicle = false;
 
                 if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())

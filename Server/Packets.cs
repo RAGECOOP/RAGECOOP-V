@@ -123,7 +123,9 @@ namespace CoopServer
         IsJumping = 1 << 3,
         IsRagdoll = 1 << 4,
         IsOnFire = 1 << 5,
-        IsInParachuteFreeFall = 1 << 6
+        IsInParachuteFreeFall = 1 << 6,
+        IsOnLadder = 1 << 7,
+        IsVaulting = 1 << 8
     }
 
     #region ===== VEHICLE DATA =====
@@ -423,7 +425,7 @@ namespace CoopServer
 
         public Dictionary<uint, bool> WeaponComponents { get; set; }
 
-        public byte? Flag { get; set; }
+        public ushort? Flag { get; set; }
 
         public float? Latency { get; set; }
 
@@ -444,7 +446,7 @@ namespace CoopServer
             byteArray.AddRange(BitConverter.GetBytes(Health));
 
             // Write player flags
-            byteArray.Add(Flag.Value);
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write player model hash
             byteArray.AddRange(BitConverter.GetBytes(ModelHash));
@@ -542,7 +544,7 @@ namespace CoopServer
             Health = reader.ReadInt();
 
             // Read player flag
-            Flag = reader.ReadByte();
+            Flag = reader.ReadUShort();
 
             // Read player model hash
             ModelHash = reader.ReadInt();
@@ -963,7 +965,7 @@ namespace CoopServer
 
         public uint CurrentWeaponHash { get; set; }
 
-        public byte? Flag { get; set; }
+        public ushort? Flag { get; set; }
 
         public float? Latency { get; set; }
 
@@ -978,7 +980,7 @@ namespace CoopServer
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
 
             // Write player flags
-            byteArray.Add(Flag.Value);
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write player health
             byteArray.AddRange(BitConverter.GetBytes(Health));
@@ -1040,7 +1042,7 @@ namespace CoopServer
             NetHandle = reader.ReadLong();
 
             // Read player flags
-            Flag = reader.ReadByte();
+            Flag = reader.ReadUShort();
 
             // Read player health
             Health = reader.ReadInt();
@@ -1661,7 +1663,7 @@ namespace CoopServer
 
         public uint CurrentWeaponHash { get; set; }
 
-        public byte? Flag { get; set; } = 0;
+        public ushort? Flag { get; set; } = 0;
 
         public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
         {
@@ -1674,7 +1676,7 @@ namespace CoopServer
             byteArray.AddRange(BitConverter.GetBytes(NetHandle));
 
             // Write npc flags
-            byteArray.Add(Flag.Value);
+            byteArray.AddRange(BitConverter.GetBytes(Flag.Value));
 
             // Write npc model hash
             byteArray.AddRange(BitConverter.GetBytes(ModelHash));
@@ -1745,7 +1747,7 @@ namespace CoopServer
             NetHandle = reader.ReadLong();
 
             // Read npc flag
-            Flag = reader.ReadByte();
+            Flag = reader.ReadUShort();
 
             // Read npc model hash
             ModelHash = reader.ReadInt();

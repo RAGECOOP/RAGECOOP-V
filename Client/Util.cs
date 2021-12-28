@@ -10,6 +10,11 @@ using GTA.Math;
 
 namespace CoopClient
 {
+    enum ETasks
+    {
+        CLIMB_LADDER = 47
+    }
+
     static class Util
     {
         #region -- POINTER --
@@ -225,43 +230,53 @@ namespace CoopClient
             return flags;
         }
 
-        public static byte? GetPedFlags(this Ped ped, bool isPlayer = false)
+        public static ushort? GetPedFlags(this Ped ped, bool isPlayer = false)
         {
-            byte? flags = 0;
+            ushort? flags = 0;
 
             if (ped.IsAiming)
             {
-                flags |= (byte)PedDataFlags.IsAiming;
+                flags |= (ushort)PedDataFlags.IsAiming;
             }
 
             if ((ped.IsShooting || isPlayer && Game.IsControlPressed(Control.Attack)) && ped.Weapons.Current?.AmmoInClip != 0)
             {
-                flags |= (byte)PedDataFlags.IsShooting;
+                flags |= (ushort)PedDataFlags.IsShooting;
             }
 
             if (ped.IsReloading)
             {
-                flags |= (byte)PedDataFlags.IsReloading;
+                flags |= (ushort)PedDataFlags.IsReloading;
             }
 
             if (ped.IsJumping)
             {
-                flags |= (byte)PedDataFlags.IsJumping;
+                flags |= (ushort)PedDataFlags.IsJumping;
             }
 
             if (ped.IsRagdoll)
             {
-                flags |= (byte)PedDataFlags.IsRagdoll;
+                flags |= (ushort)PedDataFlags.IsRagdoll;
             }
 
             if (ped.IsOnFire)
             {
-                flags |= (byte)PedDataFlags.IsOnFire;
+                flags |= (ushort)PedDataFlags.IsOnFire;
             }
 
             if (ped.IsInParachuteFreeFall)
             {
-                flags |= (byte)PedDataFlags.IsInParachuteFreeFall;
+                flags |= (ushort)PedDataFlags.IsInParachuteFreeFall;
+            }
+
+            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
+            {
+                flags |= (ushort)PedDataFlags.IsOnLadder;
+            }
+
+            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
+            {
+                flags |= (ushort)PedDataFlags.IsVaulting;
             }
 
             return flags;
