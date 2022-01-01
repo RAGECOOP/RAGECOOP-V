@@ -163,137 +163,233 @@ namespace CoopClient
                         {
                             case (byte)PacketTypes.CleanUpWorldPacket:
                                 {
-                                    Main.CleanUpWorld();
+                                    try
+                                    {
+                                        Main.CleanUpWorld();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.PlayerConnectPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    PlayerConnectPacket packet = new PlayerConnectPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        PlayerConnectPacket packet = new PlayerConnectPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    PlayerConnect(packet);
+                                        PlayerConnect(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.PlayerDisconnectPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    PlayerDisconnectPacket packet = new PlayerDisconnectPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        PlayerDisconnectPacket packet = new PlayerDisconnectPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    PlayerDisconnect(packet);
+                                        PlayerDisconnect(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.FullSyncPlayerPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    FullSyncPlayer(packet);
+                                        FullSyncPlayer(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.FullSyncPlayerVehPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    FullSyncPlayerVeh(packet);
+                                        FullSyncPlayerVeh(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.LightSyncPlayerPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    LightSyncPlayer(packet);
+                                        LightSyncPlayer(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.LightSyncPlayerVehPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    LightSyncPlayerVeh(packet);
+                                        LightSyncPlayerVeh(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.SuperLightSyncPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
-
-                                    SuperLightSyncPacket packet = new SuperLightSyncPacket();
-                                    packet.NetIncomingMessageToPacket(data);
-
-                                    if (Main.Players.ContainsKey(packet.NetHandle))
+                                    try
                                     {
-                                        EntitiesPlayer player = Main.Players[packet.NetHandle];
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                        player.Position = packet.Position.ToVector();
-                                        player.Latency = packet.Latency.HasValue ? packet.Latency.Value : 0;
+                                        SuperLightSyncPacket packet = new SuperLightSyncPacket();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        if (Main.Players.ContainsKey(packet.NetHandle))
+                                        {
+                                            EntitiesPlayer player = Main.Players[packet.NetHandle];
+
+                                            player.Position = packet.Position.ToVector();
+                                            player.Latency = packet.Latency.HasValue ? packet.Latency.Value : 0;
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
                                     }
                                 }
                                 break;
                             case (byte)PacketTypes.FullSyncNpcPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    FullSyncNpcPacket packet = new FullSyncNpcPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        FullSyncNpcPacket packet = new FullSyncNpcPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    FullSyncNpc(packet);
+                                        FullSyncNpc(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.FullSyncNpcVehPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    FullSyncNpcVeh(packet);
+                                        FullSyncNpcVeh(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.ChatMessagePacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
-
-                                    ChatMessagePacket packet = new ChatMessagePacket();
-                                    packet.NetIncomingMessageToPacket(data);
-
-                                    if (!COOPAPI.ChatMessageReceived(packet.Username, packet.Message))
+                                    try
                                     {
-                                        Main.MainChat.AddMessage(packet.Username, packet.Message);
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+
+                                        ChatMessagePacket packet = new ChatMessagePacket();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        if (!COOPAPI.ChatMessageReceived(packet.Username, packet.Message))
+                                        {
+                                            Main.MainChat.AddMessage(packet.Username, packet.Message);
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
                                     }
                                 }
                                 break;
                             case (byte)PacketTypes.NativeCallPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    NativeCallPacket packet = new NativeCallPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        NativeCallPacket packet = new NativeCallPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    DecodeNativeCall(packet);
+                                        DecodeNativeCall(packet);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                             case (byte)PacketTypes.NativeResponsePacket:
@@ -310,19 +406,28 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show($"{ex.Message}");
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
                                     }
                                 }
                                 break;
                             case (byte)PacketTypes.ModPacket:
                                 {
-                                    int len = message.ReadInt32();
-                                    byte[] data = message.ReadBytes(len);
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
 
-                                    ModPacket packet = new ModPacket();
-                                    packet.NetIncomingMessageToPacket(data);
+                                        ModPacket packet = new ModPacket();
+                                        packet.NetIncomingMessageToPacket(data);
 
-                                    COOPAPI.ModPacketReceived(packet.NetHandle, packet.Mod, packet.CustomPacketID, packet.Bytes);
+                                        COOPAPI.ModPacketReceived(packet.NetHandle, packet.Mod, packet.CustomPacketID, packet.Bytes);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show(ex.Message);
+                                        Client.Disconnect(ex.Message);
+                                    }
                                 }
                                 break;
                         }
