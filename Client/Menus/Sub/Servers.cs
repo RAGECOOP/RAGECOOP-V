@@ -56,15 +56,21 @@ namespace CoopClient.Menus.Sub
             };
             MainMenu.Closed += (object sender, EventArgs e) =>
             {
-                if (MainMenu.Items.Count > 0)
-                {
-                    for (int i = 0; i < MainMenu.Items.Count; i++)
-                    {
-                        MainMenu.Remove(MainMenu.Items[i]);
-                    }
-                }
+                CleanUpList();
             };
         }
+
+        private void CleanUpList()
+        {
+            if (MainMenu.Items.Count > 0)
+            {
+                for (int i = 0; i < MainMenu.Items.Count; i++)
+                {
+                    MainMenu.Remove(MainMenu.Items[i]);
+                }
+            }
+        }
+
         private void GetAllServer()
         {
             List<ServerListClass> serverList = null;
@@ -88,18 +94,18 @@ namespace CoopClient.Menus.Sub
             
             if (serverList == null)
             {
-                MainMenu.Items[0].Title = "Something went wrong!";
+                ResultItem.Title = "Something went wrong!";
                 return;
             }
             if (serverList.Count == 0)
             {
-                MainMenu.Items[0].Title = "No server was found!";
+                ResultItem.Title = "No server was found!";
                 return;
             }
 
             if (ResultItem != null)
             {
-                MainMenu.Remove(MainMenu.Items[0]);
+                CleanUpList();
                 ResultItem = null;
             }
 

@@ -502,6 +502,7 @@ namespace CoopClient
                 player.IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0;
                 player.IsInParachuteFreeFall = (packet.Flag.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsParachuteOpen = (packet.Flag.Value & (ushort)PedDataFlags.IsParachuteOpen) > 0;
                 player.IsOnLadder = (packet.Flag.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
                 player.IsVaulting = (packet.Flag.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 player.IsInVehicle = false;
@@ -571,6 +572,7 @@ namespace CoopClient
                 player.IsRagdoll = (packet.Flag.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
                 player.IsOnFire = (packet.Flag.Value & (ushort)PedDataFlags.IsOnFire) > 0;
                 player.IsInParachuteFreeFall = (packet.Flag.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                player.IsParachuteOpen = (packet.Flag.Value & (ushort)PedDataFlags.IsParachuteOpen) > 0;
                 player.IsOnLadder = (packet.Flag.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
                 player.IsVaulting = (packet.Flag.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 player.IsInVehicle = false;

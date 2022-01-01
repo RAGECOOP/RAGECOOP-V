@@ -269,6 +269,11 @@ namespace CoopClient
                 flags |= (ushort)PedDataFlags.IsInParachuteFreeFall;
             }
 
+            if (ped.ParachuteState == ParachuteState.Gliding)
+            {
+                flags |= (ushort)PedDataFlags.IsParachuteOpen;
+            }
+
             if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
             {
                 flags |= (ushort)PedDataFlags.IsOnLadder;

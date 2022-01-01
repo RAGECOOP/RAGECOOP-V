@@ -24,6 +24,8 @@ namespace CoopClient.Entities.Player
         internal bool IsOnLadder { get; set; }
         internal bool IsVaulting { get; set; }
         internal bool IsInParachuteFreeFall { get; set; }
+        internal bool IsParachuteOpen { get; set; }
+        internal Prop ParachuteProp { get; set; } = null;
         internal bool IsRagdoll { get; set; }
         internal bool IsOnFire { get; set; }
         internal bool IsAiming { get; set; }
@@ -60,6 +62,37 @@ namespace CoopClient.Entities.Player
                 UpdateOnFootPosition(true, true, false);
 
                 return;
+            }
+
+            if (IsParachuteOpen)
+            {
+                if (ParachuteProp == null)
+                {
+                    ParachuteProp = World.CreateProp(Util.ModelRequest(1740193300), Character.Position, Character.Rotation, false, false);
+                    ParachuteProp.IsPositionFrozen = true;
+                    ParachuteProp.IsCollisionEnabled = false;
+
+                    ParachuteProp.AttachTo(Character.Bones[Bone.SkelSpine2], new Vector3(3.6f, 0f, 0f), new Vector3(0f, 90f, 0f));
+
+                    Character.Task.ClearAllImmediately();
+                    Character.Task.ClearSecondary();
+                }
+                UpdateOnFootPosition(true, true, false);
+
+                if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "skydive@parachute@first_person", "chute_idle_right", 3))
+                {
+                    Function.Call(Hash.TASK_PLAY_ANIM, Character, LoadAnim("skydive@parachute@first_person"), "chute_idle_right", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                }
+
+                return;
+            }
+            if (ParachuteProp != null)
+            {
+                if (ParachuteProp.Exists())
+                {
+                    ParachuteProp.Delete();
+                }
+                ParachuteProp = null;
             }
 
             if (IsOnLadder)

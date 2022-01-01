@@ -238,6 +238,7 @@ namespace CoopClient
                 player.Value.Character?.Kill();
                 player.Value.Character?.Delete();
                 player.Value.PedBlip?.Delete();
+                player.Value.ParachuteProp?.Delete();
             }
             Players.Clear();
 
@@ -416,6 +417,7 @@ namespace CoopClient
                 DebugSyncPed.IsRagdoll = (flags.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
                 DebugSyncPed.IsOnFire = (flags.Value & (ushort)PedDataFlags.IsOnFire) > 0;
                 DebugSyncPed.IsInParachuteFreeFall = (flags.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
+                DebugSyncPed.IsParachuteOpen = (flags.Value & (ushort)PedDataFlags.IsParachuteOpen) > 0;
                 DebugSyncPed.IsOnLadder = (flags.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
                 DebugSyncPed.IsVaulting = (flags.Value & (ushort)PedDataFlags.IsVaulting) > 0;
                 DebugSyncPed.IsInVehicle = false;

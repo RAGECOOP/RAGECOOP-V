@@ -138,8 +138,9 @@ namespace CoopClient
         IsRagdoll = 1 << 4,
         IsOnFire = 1 << 5,
         IsInParachuteFreeFall = 1 << 6,
-        IsOnLadder = 1 << 7,
-        IsVaulting = 1 << 8
+        IsParachuteOpen = 1 << 7,
+        IsOnLadder = 1 << 8,
+        IsVaulting = 1 << 9
     }
 
     #region ===== VEHICLE DATA =====
