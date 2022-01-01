@@ -337,7 +337,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 20)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 274)
             {
                 return;
             }
@@ -433,7 +433,7 @@ namespace CoopClient
             ulong currentTimestamp = Util.GetTickCount64();
 
             DebugSyncPed.LastUpdateReceived = currentTimestamp;
-            DebugSyncPed.Latency = currentTimestamp - ArtificialLagCounter;
+            DebugSyncPed.Latency = (currentTimestamp - ArtificialLagCounter) / 1000f;
 
             ArtificialLagCounter = currentTimestamp;
 

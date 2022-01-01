@@ -538,6 +538,7 @@ namespace CoopClient
                 player.VehLandingGear = packet.VehLandingGear;
                 player.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
                 player.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreBrakeLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreBrakeLightsOn) > 0;
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
@@ -600,6 +601,7 @@ namespace CoopClient
                 player.AimCoords = packet.AimCoords.ToVector();
                 player.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
                 player.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                player.VehAreBrakeLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreBrakeLightsOn) > 0;
                 player.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
                 player.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
                 player.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
@@ -837,6 +839,7 @@ namespace CoopClient
                     npc.VehLandingGear = packet.VehLandingGear;
                     npc.VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
                     npc.VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
+                    npc.VehAreBrakeLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreBrakeLightsOn) > 0;
                     npc.VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
                     npc.VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
                     npc.VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0;
@@ -871,6 +874,7 @@ namespace CoopClient
                         VehLandingGear = packet.VehLandingGear,
                         VehIsEngineRunning = (packet.Flag.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0,
                         VehAreLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0,
+                        VehAreBrakeLightsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreBrakeLightsOn) > 0,
                         VehAreHighBeamsOn = (packet.Flag.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0,
                         VehIsSireneActive = (packet.Flag.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0,
                         VehicleDead = (packet.Flag.Value & (ushort)VehicleDataFlags.IsDead) > 0,

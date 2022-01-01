@@ -55,12 +55,13 @@ namespace CoopClient.Entities.Player
 
             if (IsInParachuteFreeFall)
             {
-                if (!Character.IsInParachuteFreeFall)
-                {
-                    Function.Call(Hash.TASK_SKY_DIVE, Character.Handle);
-                }
-                UpdateOnFootPosition(true, true, false);
+                Character.PositionNoOffset = Vector3.Lerp(Character.Position, Position + Velocity, 0.5f);
+                Character.Quaternion = Rotation.ToQuaternion(); 
 
+                if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "skydive@base", "free_idle", 3))
+                {
+                    Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("skydive@base"), "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                }
                 return;
             }
 
@@ -68,16 +69,22 @@ namespace CoopClient.Entities.Player
             {
                 if (ParachuteProp == null)
                 {
-                    ParachuteProp = World.CreateProp(Util.ModelRequest(1740193300), Character.Position, Character.Rotation, false, false);
-                    ParachuteProp.IsPositionFrozen = true;
-                    ParachuteProp.IsCollisionEnabled = false;
+                    Model model = 1740193300.ModelRequest();
+                    if (model != null)
+                    {
+                        ParachuteProp = World.CreateProp(model, Character.Position, Character.Rotation, false, false);
+                        model.MarkAsNoLongerNeeded();
+                        ParachuteProp.IsPositionFrozen = true;
+                        ParachuteProp.IsCollisionEnabled = false;
 
-                    ParachuteProp.AttachTo(Character.Bones[Bone.SkelSpine2], new Vector3(3.6f, 0f, 0f), new Vector3(0f, 90f, 0f));
-
+                        ParachuteProp.AttachTo(Character.Bones[Bone.SkelSpine2], new Vector3(3.6f, 0f, 0f), new Vector3(0f, 90f, 0f));
+                    }
                     Character.Task.ClearAllImmediately();
                     Character.Task.ClearSecondary();
                 }
-                UpdateOnFootPosition(true, true, false);
+
+                Character.PositionNoOffset = Vector3.Lerp(Character.Position, Position + Velocity, 0.5f);
+                Character.Quaternion = Rotation.ToQuaternion();
 
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "skydive@parachute@first_person", "chute_idle_right", 3))
                 {
@@ -153,7 +160,7 @@ namespace CoopClient.Entities.Player
                     Character.Task.Jump();
                 }
 
-                UpdateOnFootPosition(true, true, false);
+                UpdateOnFootPosition();
                 return;
             }
             LastIsJumping = false;
