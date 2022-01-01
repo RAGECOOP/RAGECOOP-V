@@ -8,7 +8,20 @@ namespace CoopServer
     public class Client
     {
         public long NetHandle = 0;
-        public float Latency = 0.0f;
+        private float CurrentLatency = 0f;
+        public float Latency
+        {
+            get => CurrentLatency;
+            internal set
+            {
+                CurrentLatency = value;
+
+                if ((value * 1000f) > Server.MainSettings.MaxLatency)
+                {
+                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
+                }
+            }
+        }
         public PlayerData Player;
         private readonly Dictionary<string, object> CustomData = new();
         private long CallbacksCount = 0;
