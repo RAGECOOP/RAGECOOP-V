@@ -19425,7 +19425,7 @@
             Applies a force to this <see cref="T:GTA.Entity"/>.
             </summary>
             <param name="direction">The direction to apply the force relative to world coordinates.</param>
-            <param name="rotation">The rotation force to apply</param>
+            <param name="rotation">The offset from the root bone of this <see cref="T:GTA.Entity"/> where the force applies. "rotation" is incorrectly named parameter but is left for scripts that use the method with named parameters.</param>
             <param name="forceType">Type of the force to apply.</param>
         </member>
         <member name="M:GTA.Entity.ApplyForceRelative(GTA.Math.Vector3,GTA.Math.Vector3,GTA.ForceType)">
@@ -19433,7 +19433,7 @@
             Applies a force to this <see cref="T:GTA.Entity"/>.
             </summary>
             <param name="direction">The direction to apply the force relative to this <see cref="T:GTA.Entity"/>s rotation</param>
-            <param name="rotation">The rotation force to apply</param>
+            <param name="rotation">The offset from the root bone of this <see cref="T:GTA.Entity"/> where the force applies. "rotation" is incorrectly named parameter but is left for scripts that use the method with named parameters.</param>
             <param name="forceType">Type of the force to apply.</param>
         </member>
         <member name="M:GTA.Entity.MarkAsNoLongerNeeded">

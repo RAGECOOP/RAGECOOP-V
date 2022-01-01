@@ -22,11 +22,10 @@ GTACOOP:R is NOT intended to replace the GTACOOP modification! GTACOOP:R is an a
 - .NET Framework 4.8
 
 # 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/commit/ca82751b7cc8bdf2203d361b27fe0d1aa895eb55)
-- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/commit/b570dc70e9241b45ae4c53ec7bb69efa3636f79d)
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/tree/4b4b0e6318e2748c186b3f875b90ecc26f686205)
+- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/releases/tag/v1.6)
 - Lidgren Network Custom (***PRIVATE***)
 - - No new features (only improvements)
-- [Protobuf-net](https://www.nuget.org/packages/protobuf-net/2.4.6)
 - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 
 # 🦆 Special thanks to

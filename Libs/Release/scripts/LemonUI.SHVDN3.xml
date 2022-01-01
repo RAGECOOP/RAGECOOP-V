@@ -688,6 +688,21 @@
             The color of the <see cref="P:LemonUI.Menus.NativeItem.RightBadge"/> or <see cref="T:LemonUI.Menus.NativeCheckboxItem"/> checkbox when the <see cref="T:LemonUI.Menus.NativeItem"/> is disabled.
             </summary>
         </member>
+        <member name="P:LemonUI.Menus.ColorSet.BackgroundNormal">
+            <summary>
+            The normal color of the custom background if <see cref="P:LemonUI.Menus.NativeItem.UseCustomBackground"/> is set to <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BackgroundHovered">
+            <summary>
+            The hovered color of the custom background if <see cref="P:LemonUI.Menus.NativeItem.UseCustomBackground"/> is set to <see langword="true"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.ColorSet.BackgroundDisabled">
+            <summary>
+            The disabled color of the custom background if <see cref="P:LemonUI.Menus.NativeItem.UseCustomBackground"/> is set to <see langword="true"/>.
+            </summary>
+        </member>
         <member name="T:LemonUI.Menus.NativeCheckboxItem">
             <summary>
             Rockstar-like checkbox item.
@@ -1341,6 +1356,11 @@
         <member name="P:LemonUI.Menus.NativeItem.Panel">
             <summary>
             The Panel asociated to this <see cref="T:LemonUI.Menus.NativeItem"/>.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Menus.NativeItem.UseCustomBackground">
+            <summary>
+            If a custom colored background should be used. 
             </summary>
         </member>
         <member name="E:LemonUI.Menus.NativeItem.Selected">
