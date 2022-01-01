@@ -187,6 +187,11 @@ namespace CoopClient
                 flags |= (ushort)VehicleDataFlags.AreLightsOn;
             }
 
+            if (veh.BrakePower >= 0.01f)
+            {
+                flags |= (ushort)VehicleDataFlags.AreBrakeLightsOn;
+            }
+
             if (veh.AreHighBeamsOn)
             {
                 flags |= (ushort)VehicleDataFlags.AreHighBeamsOn;

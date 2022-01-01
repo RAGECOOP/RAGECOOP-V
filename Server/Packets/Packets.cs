@@ -135,14 +135,15 @@ namespace CoopServer
     {
         IsEngineRunning = 1 << 0,
         AreLightsOn = 1 << 1,
-        AreHighBeamsOn = 1 << 2,
-        IsSirenActive = 1 << 3,
-        IsDead = 1 << 4,
-        IsHornActive = 1 << 5,
-        IsTransformed = 1 << 6,
-        RoofOpened = 1 << 7,
-        OnTurretSeat = 1 << 8,
-        IsPlane = 1 << 9
+        AreBrakeLightsOn = 1 << 2,
+        AreHighBeamsOn = 1 << 3,
+        IsSirenActive = 1 << 4,
+        IsDead = 1 << 5,
+        IsHornActive = 1 << 6,
+        IsTransformed = 1 << 7,
+        RoofOpened = 1 << 8,
+        OnTurretSeat = 1 << 9,
+        IsPlane = 1 << 10
     }
 
     struct VehicleDamageModel

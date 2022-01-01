@@ -362,26 +362,32 @@ namespace CoopClient.Entities.Player
             UpdateOnFootPosition();
         }
 
-        private byte LastStuckCount = 0;
+        private bool StuckDetection = false;
         private ulong LastStuckTime;
         private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
         {
-            if (Character.Position.DistanceTo(Position) > 5f)
+            ulong time = Util.GetTickCount64();
+
+            if (StuckDetection)
             {
-                if (Util.GetTickCount64() - LastStuckTime < 1000)
+                if (time - LastStuckTime >= 500)
                 {
-                    LastStuckCount = 0;
+                    StuckDetection = false;
+
+                    if (Character.Position.DistanceTo(Position) > 5f)
+                    {
+                        Character.PositionNoOffset = Position;
+                        Character.Rotation = Rotation;
+                    }
                 }
-
-                ++LastStuckCount;
-
-                if (LastStuckCount >= 5)
+            }
+            else if (time - LastStuckTime >= 500)
+            {
+                if (Character.Position.DistanceTo(Position) > 5f)
                 {
-                    Character.Position = Position;
-                    LastStuckCount = 0;
+                    StuckDetection = true;
+                    LastStuckTime = time;
                 }
-
-                LastStuckTime = Util.GetTickCount64();
             }
 
             if (updatePosition)

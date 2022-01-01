@@ -63,6 +63,7 @@ namespace CoopClient.Entities.Player
         private bool LastHornActive = false;
         internal bool IsHornActive { get; set; }
         internal bool VehAreLightsOn { get; set; }
+        internal bool VehAreBrakeLightsOn = false;
         internal bool VehAreHighBeamsOn { get; set; }
         internal byte VehLandingGear { get; set; }
         internal bool VehRoofOpened { get; set; }
@@ -259,7 +260,7 @@ namespace CoopClient.Entities.Player
                         }
                     }
 
-                    Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle, CurrentVehicleSpeed > 0.2f && LastVehicleSpeed > CurrentVehicleSpeed);
+                    Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, VehAreBrakeLightsOn);
 
                     if (LastSyncWasFull)
                     {
