@@ -86,7 +86,9 @@
     <Compile Include="Menus\Sub\Servers.cs" />
     <Compile Include="Menus\Sub\Settings.cs" />
     <Compile Include="Networking.cs" />
-    <Compile Include="Packets.cs" />
+    <Compile Include="Packets\NPCPackets.cs" />
+    <Compile Include="Packets\Packets.cs" />
+    <Compile Include="Packets\PlayerPackets.cs" />
     <Compile Include="PlayerList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WorldThread.cs" />

@@ -38,7 +38,6 @@ namespace CoopClient.Entities.NPC
             }
         }
         internal float VehicleSteeringAngle { get; set; }
-        private int LastVehicleAim;
         internal bool VehIsEngineRunning { get; set; }
         internal float VehRPM { get; set; }
         private bool LastTransformed = false;

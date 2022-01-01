@@ -60,7 +60,7 @@ namespace CoopClient
 
                 // Send HandshakePacket
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-                new HandshakePacket()
+                new Packets.Handshake()
                 {
                     NetHandle =  0,
                     Username = Main.MainSettings.Username,
@@ -106,7 +106,7 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~y~Trying to connect...");
                                 break;
                             case NetConnectionStatus.Connected:
-                                if (message.SenderConnection.RemoteHailMessage.ReadByte() != (byte)PacketTypes.HandshakePacket)
+                                if (message.SenderConnection.RemoteHailMessage.ReadByte() != (byte)PacketTypes.Handshake)
                                 {
                                     Client.Disconnect("Wrong packet!");
                                 }
@@ -115,7 +115,7 @@ namespace CoopClient
                                     int len = message.SenderConnection.RemoteHailMessage.ReadInt32();
                                     byte[] data = message.SenderConnection.RemoteHailMessage.ReadBytes(len);
 
-                                    HandshakePacket handshakePacket = new HandshakePacket();
+                                    Packets.Handshake handshakePacket = new Packets.Handshake();
                                     handshakePacket.NetIncomingMessageToPacket(data);
 
                                     Main.LocalNetHandle = handshakePacket.NetHandle;
@@ -161,7 +161,7 @@ namespace CoopClient
 
                         switch (packetType)
                         {
-                            case (byte)PacketTypes.CleanUpWorldPacket:
+                            case (byte)PacketTypes.CleanUpWorld:
                                 {
                                     try
                                     {
@@ -174,14 +174,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.PlayerConnectPacket:
+                            case (byte)PacketTypes.PlayerConnect:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        PlayerConnectPacket packet = new PlayerConnectPacket();
+                                        Packets.PlayerConnect packet = new Packets.PlayerConnect();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         PlayerConnect(packet);
@@ -193,14 +193,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.PlayerDisconnectPacket:
+                            case (byte)PacketTypes.PlayerDisconnect:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        PlayerDisconnectPacket packet = new PlayerDisconnectPacket();
+                                        Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         PlayerDisconnect(packet);
@@ -212,14 +212,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.FullSyncPlayerPacket:
+                            case (byte)PacketTypes.FullSyncPlayer:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
+                                        Packets.FullSyncPlayer packet = new Packets.FullSyncPlayer();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         FullSyncPlayer(packet);
@@ -231,14 +231,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.FullSyncPlayerVehPacket:
+                            case (byte)PacketTypes.FullSyncPlayerVeh:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
+                                        Packets.FullSyncPlayerVeh packet = new Packets.FullSyncPlayerVeh();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         FullSyncPlayerVeh(packet);
@@ -250,14 +250,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.LightSyncPlayerPacket:
+                            case (byte)PacketTypes.LightSyncPlayer:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
+                                        Packets.LightSyncPlayer packet = new Packets.LightSyncPlayer();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         LightSyncPlayer(packet);
@@ -269,14 +269,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.LightSyncPlayerVehPacket:
+                            case (byte)PacketTypes.LightSyncPlayerVeh:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
+                                        Packets.LightSyncPlayerVeh packet = new Packets.LightSyncPlayerVeh();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         LightSyncPlayerVeh(packet);
@@ -288,14 +288,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.SuperLightSyncPacket:
+                            case (byte)PacketTypes.SuperLightSync:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        SuperLightSyncPacket packet = new SuperLightSyncPacket();
+                                        Packets.SuperLightSync packet = new Packets.SuperLightSync();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         if (Main.Players.ContainsKey(packet.NetHandle))
@@ -313,14 +313,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.FullSyncNpcPacket:
+                            case (byte)PacketTypes.FullSyncNpc:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        FullSyncNpcPacket packet = new FullSyncNpcPacket();
+                                        Packets.FullSyncNpc packet = new Packets.FullSyncNpc();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         FullSyncNpc(packet);
@@ -332,14 +332,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.FullSyncNpcVehPacket:
+                            case (byte)PacketTypes.FullSyncNpcVeh:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
+                                        Packets.FullSyncNpcVeh packet = new Packets.FullSyncNpcVeh();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         FullSyncNpcVeh(packet);
@@ -351,14 +351,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.ChatMessagePacket:
+                            case (byte)PacketTypes.ChatMessage:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        ChatMessagePacket packet = new ChatMessagePacket();
+                                        Packets.ChatMessage packet = new Packets.ChatMessage();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         if (!COOPAPI.ChatMessageReceived(packet.Username, packet.Message))
@@ -373,14 +373,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.NativeCallPacket:
+                            case (byte)PacketTypes.NativeCall:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        NativeCallPacket packet = new NativeCallPacket();
+                                        Packets.NativeCall packet = new Packets.NativeCall();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         DecodeNativeCall(packet);
@@ -392,14 +392,14 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.NativeResponsePacket:
+                            case (byte)PacketTypes.NativeResponse:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        NativeResponsePacket packet = new NativeResponsePacket();
+                                        Packets.NativeResponse packet = new Packets.NativeResponse();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         DecodeNativeResponse(packet);
@@ -411,17 +411,17 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.ModPacket:
+                            case (byte)PacketTypes.Mod:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
 
-                                        ModPacket packet = new ModPacket();
+                                        Packets.Mod packet = new Packets.Mod();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        COOPAPI.ModPacketReceived(packet.NetHandle, packet.Mod, packet.CustomPacketID, packet.Bytes);
+                                        COOPAPI.ModPacketReceived(packet.NetHandle, packet.Name, packet.CustomPacketID, packet.Bytes);
                                     }
                                     catch (Exception ex)
                                     {
@@ -453,7 +453,7 @@ namespace CoopClient
 
         #region -- GET --
         #region -- PLAYER --
-        private void PlayerConnect(PlayerConnectPacket packet)
+        private void PlayerConnect(Packets.PlayerConnect packet)
         {
             EntitiesPlayer player = new EntitiesPlayer() { Username = packet.Username };
 
@@ -461,7 +461,7 @@ namespace CoopClient
             COOPAPI.Connected(packet.NetHandle);
         }
 
-        private void PlayerDisconnect(PlayerDisconnectPacket packet)
+        private void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
             if (Main.Players.ContainsKey(packet.NetHandle))
             {
@@ -479,7 +479,7 @@ namespace CoopClient
             }
         }
 
-        private void FullSyncPlayer(FullSyncPlayerPacket packet)
+        private void FullSyncPlayer(Packets.FullSyncPlayer packet)
         {
             if (Main.Players.ContainsKey(packet.NetHandle))
             {
@@ -512,7 +512,7 @@ namespace CoopClient
             }
         }
 
-        private void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
+        private void FullSyncPlayerVeh(Packets.FullSyncPlayerVeh packet)
         {
             if (Main.Players.ContainsKey(packet.NetHandle))
             {
@@ -551,7 +551,7 @@ namespace CoopClient
             }
         }
 
-        private void LightSyncPlayer(LightSyncPlayerPacket packet)
+        private void LightSyncPlayer(Packets.LightSyncPlayer packet)
         {
             if (Main.Players.ContainsKey(packet.NetHandle))
             {
@@ -581,7 +581,7 @@ namespace CoopClient
             }
         }
 
-        private void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
+        private void LightSyncPlayerVeh(Packets.LightSyncPlayerVeh packet)
         {
             if (Main.Players.ContainsKey(packet.NetHandle))
             {
@@ -612,7 +612,7 @@ namespace CoopClient
             }
         }
 
-        private void DecodeNativeCall(NativeCallPacket packet)
+        private void DecodeNativeCall(Packets.NativeCall packet)
         {
             List<InputArgument> arguments = new List<InputArgument>();
 
@@ -656,7 +656,7 @@ namespace CoopClient
             Function.Call((Hash)packet.Hash, arguments.ToArray());
         }
 
-        private void DecodeNativeResponse(NativeResponsePacket packet)
+        private void DecodeNativeResponse(Packets.NativeResponse packet)
         {
             List<InputArgument> arguments = new List<InputArgument>();
             Type typeOf = null;
@@ -737,7 +737,7 @@ namespace CoopClient
             }
 
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            new NativeResponsePacket()
+            new Packets.NativeResponse()
             {
                 Hash = 0,
                 Args = new List<object>() { result },
@@ -749,7 +749,7 @@ namespace CoopClient
         #endregion // -- PLAYER --
 
         #region -- NPC --
-        private void FullSyncNpc(FullSyncNpcPacket packet)
+        private void FullSyncNpc(Packets.FullSyncNpc packet)
         {
             lock (Main.NPCs)
             {
@@ -808,7 +808,7 @@ namespace CoopClient
             }
         }
 
-        private void FullSyncNpcVeh(FullSyncNpcVehPacket packet)
+        private void FullSyncNpcVeh(Packets.FullSyncNpcVeh packet)
         {
             lock (Main.NPCs)
             {
@@ -912,7 +912,7 @@ namespace CoopClient
                         Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                     }
 
-                    new FullSyncPlayerVehPacket()
+                    new Packets.FullSyncPlayerVeh()
                     {
                         NetHandle = Main.LocalNetHandle,
                         PedHandle = player.Handle,
@@ -939,7 +939,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    new FullSyncPlayerPacket()
+                    new Packets.FullSyncPlayer()
                     {
                         NetHandle = Main.LocalNetHandle,
                         PedHandle = player.Handle,
@@ -968,7 +968,7 @@ namespace CoopClient
                 {
                     Vehicle veh = player.CurrentVehicle;
 
-                    new LightSyncPlayerVehPacket()
+                    new Packets.LightSyncPlayerVeh()
                     {
                         NetHandle = Main.LocalNetHandle,
                         Health = player.Health,
@@ -984,7 +984,7 @@ namespace CoopClient
                 }
                 else
                 {
-                    new LightSyncPlayerPacket()
+                    new Packets.LightSyncPlayer()
                     {
                         NetHandle = Main.LocalNetHandle,
                         Health = player.Health,
@@ -1025,7 +1025,7 @@ namespace CoopClient
                     Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, npc.CurrentVehicle, &primaryColor, &secondaryColor);
                 }
 
-                new FullSyncNpcVehPacket()
+                new Packets.FullSyncNpcVeh()
                 {
                     NetHandle =  Main.LocalNetHandle + npc.Handle,
                     VehHandle = Main.LocalNetHandle + veh.Handle,
@@ -1050,7 +1050,7 @@ namespace CoopClient
             }
             else
             {
-                new FullSyncNpcPacket()
+                new Packets.FullSyncNpc()
                 {
                     NetHandle =  Main.LocalNetHandle + npc.Handle,
                     ModelHash = npc.Model.Hash,
@@ -1081,7 +1081,7 @@ namespace CoopClient
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
-            new ChatMessagePacket() { Username = Main.MainSettings.Username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.ChatMessage() { Username = Main.MainSettings.Username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
             Client.FlushSendQueue();
@@ -1094,14 +1094,14 @@ namespace CoopClient
             #endif
         }
 
-        internal void SendModData(long target, string mod, byte customID, byte[] bytes)
+        internal void SendModData(long target, string modName, byte customID, byte[] bytes)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            new ModPacket()
+            new Packets.Mod()
             {
                 NetHandle =  Main.LocalNetHandle,
                 Target = target,
-                Mod = mod,
+                Name = modName,
                 CustomPacketID =  customID,
                 Bytes = bytes
             }.PacketToNetOutGoingMessage(outgoingMessage);

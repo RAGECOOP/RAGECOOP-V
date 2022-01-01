@@ -63,9 +63,9 @@ namespace CoopServer
             ReadyToStop = true;
         }
 
-        public bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)
+        public bool InvokeModPacketReceived(long from, long target, string modName, byte customID, byte[] bytes)
         {
-            Task<bool> task = new(() => _script.API.InvokeModPacketReceived(from, target, mod, customID, bytes));
+            Task<bool> task = new(() => _script.API.InvokeModPacketReceived(from, target, modName, customID, bytes));
             task.Start();
             task.Wait(5000);
 
@@ -161,7 +161,7 @@ namespace CoopServer
         public delegate void OnTickEvent(long tick);
         public delegate void ChatEvent(string username, string message, CancelEventArgs cancel);
         public delegate void PlayerEvent(Client client);
-        public delegate void ModEvent(long from, long target, string mod, byte customID, byte[] bytes, CancelEventArgs args);
+        public delegate void ModEvent(long from, long target, string modName, byte customID, byte[] bytes, CancelEventArgs args);
         #endregion
 
         #region EVENTS
@@ -280,10 +280,10 @@ namespace CoopServer
             OnPlayerVehicleHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
-        internal bool InvokeModPacketReceived(long from, long target, string mod, byte customID, byte[] bytes)
+        internal bool InvokeModPacketReceived(long from, long target, string modName, byte customID, byte[] bytes)
         {
             CancelEventArgs args = new(false);
-            OnModPacketReceived?.Invoke(from, target, mod, customID, bytes, args);
+            OnModPacketReceived?.Invoke(from, target, modName, customID, bytes, args);
             return args.Cancel;
         }
         #endregion
@@ -292,11 +292,11 @@ namespace CoopServer
         /// <summary>
         /// Send a mod packet to all players
         /// </summary>
-        /// <param name="mod">The name of the modification that will receive the data</param>
+        /// <param name="modName">The name of the modification that will receive the data</param>
         /// <param name="customID">The ID to check what this data is</param>
         /// <param name="bytes">The serialized data</param>
         /// <param name="netHandleList">The list of connections (players) that will receive the data</param>
-        public static void SendModPacketToAll(string mod, byte customID, byte[] bytes, List<long> netHandleList = null)
+        public static void SendModPacketToAll(string modName, byte customID, byte[] bytes, List<long> netHandleList = null)
         {
             try
             {
@@ -305,11 +305,11 @@ namespace CoopServer
                     : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new ModPacket()
+                new Packets.Mod()
                 {
                     NetHandle = 0,
                     Target = 0,
-                    Mod = mod,
+                    Name = modName,
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -343,7 +343,7 @@ namespace CoopServer
                     return;
                 }
 
-                NativeCallPacket packet = new()
+                Packets.NativeCall packet = new()
                 {
                     Hash = hash,
                     Args = new List<object>(args) ?? new List<object>()
@@ -429,7 +429,7 @@ namespace CoopServer
                     : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            outgoingMessage.Write((byte)PacketTypes.CleanUpWorldPacket);
+            outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
             Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 

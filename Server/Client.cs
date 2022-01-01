@@ -91,7 +91,7 @@ namespace CoopServer
                     return;
                 }
 
-                NativeCallPacket packet = new()
+                Packets.NativeCall packet = new()
                 {
                     Hash = hash,
                     Args = new List<object>(args) ?? new List<object>(),
@@ -155,7 +155,7 @@ namespace CoopServer
                 }
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new NativeResponsePacket()
+                new Packets.NativeResponse()
                 {
                     Hash = hash,
                     Args = new List<object>(args) ?? new List<object>(),
@@ -180,11 +180,11 @@ namespace CoopServer
             }
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            outgoingMessage.Write((byte)PacketTypes.CleanUpWorldPacket);
+            outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
-        public void SendModPacket(string mod, byte customID, byte[] bytes)
+        public void SendModPacket(string modName, byte customID, byte[] bytes)
         {
             try
             {
@@ -195,11 +195,11 @@ namespace CoopServer
                 }
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new ModPacket()
+                new Packets.Mod()
                 {
                     NetHandle = 0,
                     Target = 0,
-                    Mod = mod,
+                    Name = modName,
                     CustomPacketID = customID,
                     Bytes = bytes
                 }.PacketToNetOutGoingMessage(outgoingMessage);

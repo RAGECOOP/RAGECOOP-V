@@ -231,7 +231,7 @@ namespace CoopServer
                     {
                         case NetIncomingMessageType.ConnectionApproval:
                             Logging.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
-                            if (message.ReadByte() != (byte)PacketTypes.HandshakePacket)
+                            if (message.ReadByte() != (byte)PacketTypes.Handshake)
                             {
                                 Logging.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
                                 message.SenderConnection.Deny("Wrong packet!");
@@ -243,7 +243,7 @@ namespace CoopServer
                                     int len = message.ReadInt32();
                                     byte[] data = message.ReadBytes(len);
 
-                                    HandshakePacket packet = new HandshakePacket();
+                                    Packets.Handshake packet = new();
                                     packet.NetIncomingMessageToPacket(data);
 
                                     GetHandshake(message.SenderConnection, packet);
@@ -273,14 +273,14 @@ namespace CoopServer
 
                             switch (type)
                             {
-                                case (byte)PacketTypes.FullSyncPlayerPacket:
+                                case (byte)PacketTypes.FullSyncPlayer:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            FullSyncPlayerPacket packet = new FullSyncPlayerPacket();
+                                            Packets.FullSyncPlayer packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             FullSyncPlayer(packet);
@@ -291,14 +291,14 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.FullSyncPlayerVehPacket:
+                                case (byte)PacketTypes.FullSyncPlayerVeh:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            FullSyncPlayerVehPacket packet = new FullSyncPlayerVehPacket();
+                                            Packets.FullSyncPlayerVeh packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             FullSyncPlayerVeh(packet);
@@ -309,14 +309,14 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.LightSyncPlayerPacket:
+                                case (byte)PacketTypes.LightSyncPlayer:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            LightSyncPlayerPacket packet = new LightSyncPlayerPacket();
+                                            Packets.LightSyncPlayer packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             LightSyncPlayer(packet);
@@ -327,14 +327,14 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.LightSyncPlayerVehPacket:
+                                case (byte)PacketTypes.LightSyncPlayerVeh:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            LightSyncPlayerVehPacket packet = new LightSyncPlayerVehPacket();
+                                            Packets.LightSyncPlayerVeh packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             LightSyncPlayerVeh(packet);
@@ -345,14 +345,14 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.ChatMessagePacket:
+                                case (byte)PacketTypes.ChatMessage:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            ChatMessagePacket packet = new ChatMessagePacket();
+                                            Packets.ChatMessage packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             SendChatMessage(packet);
@@ -363,7 +363,7 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.FullSyncNpcPacket:
+                                case (byte)PacketTypes.FullSyncNpc:
                                     {
                                         if (MainSettings.NpcsAllowed)
                                         {
@@ -372,7 +372,7 @@ namespace CoopServer
                                                 int len = message.ReadInt32();
                                                 byte[] data = message.ReadBytes(len);
 
-                                                FullSyncNpcPacket packet = new FullSyncNpcPacket();
+                                                Packets.FullSyncNpc packet = new();
                                                 packet.NetIncomingMessageToPacket(data);
 
                                                 FullSyncNpc(message.SenderConnection, packet);
@@ -388,7 +388,7 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.FullSyncNpcVehPacket:
+                                case (byte)PacketTypes.FullSyncNpcVeh:
                                     {
                                         if (MainSettings.NpcsAllowed)
                                         {
@@ -397,7 +397,7 @@ namespace CoopServer
                                                 int len = message.ReadInt32();
                                                 byte[] data = message.ReadBytes(len);
 
-                                                FullSyncNpcVehPacket packet = new FullSyncNpcVehPacket();
+                                                Packets.FullSyncNpcVeh packet = new();
                                                 packet.NetIncomingMessageToPacket(data);
 
                                                 FullSyncNpcVeh(message.SenderConnection, packet);
@@ -413,14 +413,14 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.NativeResponsePacket:
+                                case (byte)PacketTypes.NativeResponse:
                                     {
                                         try
                                         {
                                             int len = message.ReadInt32();
                                             byte[] data = message.ReadBytes(len);
 
-                                            NativeResponsePacket packet = new NativeResponsePacket();
+                                            Packets.NativeResponse packet = new();
                                             packet.NetIncomingMessageToPacket(data);
 
                                             Client client = Clients.Find(x => x.NetHandle == message.SenderConnection.RemoteUniqueIdentifier);
@@ -439,7 +439,7 @@ namespace CoopServer
                                         }
                                     }
                                     break;
-                                case (byte)PacketTypes.ModPacket:
+                                case (byte)PacketTypes.Mod:
                                     {
                                         if (MainSettings.ModsAllowed)
                                         {
@@ -448,13 +448,13 @@ namespace CoopServer
                                                 int len = message.ReadInt32();
                                                 byte[] data = message.ReadBytes(len);
 
-                                                ModPacket packet = new ModPacket();
+                                                Packets.Mod packet = new Packets.Mod();
                                                 packet.NetIncomingMessageToPacket(data);
 
                                                 bool resourceResult = false;
                                                 if (RunningResource != null)
                                                 {
-                                                    if (RunningResource.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Mod, packet.CustomPacketID, packet.Bytes))
+                                                    if (RunningResource.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Name, packet.CustomPacketID, packet.Bytes))
                                                     {
                                                         resourceResult = true;
                                                     }
@@ -554,7 +554,7 @@ namespace CoopServer
 
         #region -- PLAYER --
         // Before we approve the connection, we must shake hands
-        private void GetHandshake(NetConnection local, HandshakePacket packet)
+        private void GetHandshake(NetConnection local, Packets.Handshake packet)
         {
             Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
@@ -616,7 +616,7 @@ namespace CoopServer
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
             // Create a new handshake packet
-            new HandshakePacket()
+            new Packets.Handshake()
             {
                 NetHandle = localNetHandle,
                 Username = string.Empty,
@@ -655,7 +655,7 @@ namespace CoopServer
                     if (targetClient != null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                        new PlayerConnectPacket()
+                        new Packets.PlayerConnect()
                         {
                             NetHandle = targetNetHandle,
                             Username = targetClient.Player.Username
@@ -666,7 +666,7 @@ namespace CoopServer
 
                 // Send local to all players
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                new PlayerConnectPacket()
+                new Packets.PlayerConnect()
                 {
                     NetHandle = local.RemoteUniqueIdentifier,
                     Username = localClient.Player.Username
@@ -685,7 +685,7 @@ namespace CoopServer
 
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
-                SendChatMessage(new ChatMessagePacket() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
+                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
             }
         }
 
@@ -696,7 +696,7 @@ namespace CoopServer
             if (clients.Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                new PlayerDisconnectPacket()
+                new Packets.PlayerDisconnect()
                 {
                     NetHandle = clientID
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -721,7 +721,7 @@ namespace CoopServer
             }
         }
 
-        private static void FullSyncPlayer(FullSyncPlayerPacket packet)
+        private static void FullSyncPlayer(Packets.FullSyncPlayer packet)
         {
             Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
@@ -747,7 +747,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    new SuperLightSyncPacket()
+                    new Packets.SuperLightSync()
                     {
                         NetHandle = packet.NetHandle,
                         Position = packet.Position,
@@ -763,7 +763,7 @@ namespace CoopServer
             }
         }
 
-        private static void FullSyncPlayerVeh(FullSyncPlayerVehPacket packet)
+        private static void FullSyncPlayerVeh(Packets.FullSyncPlayerVeh packet)
         {
             Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
@@ -791,7 +791,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    new SuperLightSyncPacket()
+                    new Packets.SuperLightSync()
                     {
                         NetHandle = packet.NetHandle,
                         Position = packet.Position,
@@ -807,7 +807,7 @@ namespace CoopServer
             }
         }
 
-        private static void LightSyncPlayer(LightSyncPlayerPacket packet)
+        private static void LightSyncPlayer(Packets.LightSyncPlayer packet)
         {
             Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
@@ -832,7 +832,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    new SuperLightSyncPacket()
+                    new Packets.SuperLightSync()
                     {
                         NetHandle = packet.NetHandle,
                         Position = packet.Position,
@@ -848,7 +848,7 @@ namespace CoopServer
             }
         }
 
-        private static void LightSyncPlayerVeh(LightSyncPlayerVehPacket packet)
+        private static void LightSyncPlayerVeh(Packets.LightSyncPlayerVeh packet)
         {
             Client client = Util.GetClientByNetHandle(packet.NetHandle);
             if (client == null)
@@ -873,7 +873,7 @@ namespace CoopServer
                 }
                 else
                 {
-                    new SuperLightSyncPacket()
+                    new Packets.SuperLightSync()
                     {
                         NetHandle = packet.NetHandle,
                         Position = packet.Position,
@@ -890,7 +890,7 @@ namespace CoopServer
         }
 
         // Send a message to targets or all players
-        private static void SendChatMessage(ChatMessagePacket packet, List<NetConnection> targets = null)
+        private static void SendChatMessage(Packets.ChatMessage packet, List<NetConnection> targets = null)
         {
             if (RunningResource != null)
             {
@@ -955,7 +955,7 @@ namespace CoopServer
         {
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
-            new ChatMessagePacket() { Username = username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.ChatMessage() { Username = username, Message = message }.PacketToNetOutGoingMessage(outgoingMessage);
 
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
         }
@@ -966,7 +966,7 @@ namespace CoopServer
         #endregion
 
         #region -- NPC --
-        private static void FullSyncNpc(NetConnection local, FullSyncNpcPacket packet)
+        private static void FullSyncNpc(NetConnection local, Packets.FullSyncNpc packet)
         {
             List<NetConnection> clients;
             if ((clients = Util.GetAllInRange(packet.Position, 550f, local)).Count == 0)
@@ -979,7 +979,7 @@ namespace CoopServer
             MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.NPCFull);
         }
 
-        private static void FullSyncNpcVeh(NetConnection local, FullSyncNpcVehPacket packet)
+        private static void FullSyncNpcVeh(NetConnection local, Packets.FullSyncNpcVeh packet)
         {
             List<NetConnection> clients;
             if ((clients = Util.GetAllInRange(packet.Position, 550f, local)).Count == 0)

@@ -195,35 +195,35 @@ namespace CoopClient
         /// <summary>
         /// Send any data (bytes) to the server
         /// </summary>
-        /// <param name="mod">The name of this modification (script)</param>
+        /// <param name="modName">The name of this modification (script)</param>
         /// <param name="customID">The ID to know what the data is</param>
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToServer(string mod, byte customID, byte[] bytes)
+        public static void SendDataToServer(string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(-1, mod, customID, bytes);
+            Main.MainNetworking.SendModData(-1, modName, customID, bytes);
         }
 
         /// <summary>
         /// Send any data (bytes) to the all player
         /// </summary>
-        /// <param name="mod">The name of this modification (script)</param>
+        /// <param name="modName">The name of this modification (script)</param>
         /// <param name="customID">The ID to know what the data is</param>
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToAll(string mod, byte customID, byte[] bytes)
+        public static void SendDataToAll(string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(0, mod, customID, bytes);
+            Main.MainNetworking.SendModData(0, modName, customID, bytes);
         }
 
         /// <summary>
         /// Send any data (bytes) to a player
         /// </summary>
         /// <param name="netHandle">The Lidgren Network net handle that receives the data</param>
-        /// <param name="mod">The name of this modification (script)</param>
+        /// <param name="modName">The name of this modification (script)</param>
         /// <param name="customID">The ID to know what the data is</param>
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToPlayer(long netHandle, string mod, byte customID, byte[] bytes)
+        public static void SendDataToPlayer(long netHandle, string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(netHandle, mod, customID, bytes);
+            Main.MainNetworking.SendModData(netHandle, modName, customID, bytes);
         }
 
         /// <summary>
