@@ -170,7 +170,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -189,7 +189,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -208,7 +208,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -227,7 +227,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -246,7 +246,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -265,7 +265,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -284,7 +284,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -309,7 +309,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -328,7 +328,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -347,7 +347,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -369,7 +369,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -388,7 +388,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -407,7 +407,7 @@ namespace CoopClient
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
@@ -417,16 +417,14 @@ namespace CoopClient
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
-
                                         Packets.Mod packet = new Packets.Mod();
                                         packet.NetIncomingMessageToPacket(data);
-
                                         COOPAPI.ModPacketReceived(packet.NetHandle, packet.Name, packet.CustomPacketID, packet.Bytes);
                                     }
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect(ex.Message);
+                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
                                     }
                                 }
                                 break;
