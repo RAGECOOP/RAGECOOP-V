@@ -303,18 +303,23 @@ namespace CoopServer
                 List<NetConnection> connections = netHandleList == null
                     ? Server.MainNetServer.Connections
                     : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.Mod()
+                // A resource can be calling this function on disconnect of the last player in the server and we will
+                // get an empty connection list, make sure connections has at least one handle in it
+                if (connections.Count > 0)
                 {
-                    NetHandle = 0,
-                    Target = 0,
-                    Name = modName,
-                    CustomPacketID = customID,
-                    Bytes = bytes
-                }.PacketToNetOutGoingMessage(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-                Server.MainNetServer.FlushSendQueue();
+                    NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                    new Packets.Mod()
+                    {
+                        NetHandle = 0,
+                        Target = 0,
+                        Name = modName,
+                        CustomPacketID = customID,
+                        Bytes = bytes
+                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                    Logging.Debug($"SendModPacketToAll recipients list {connections.Count}");
+                    Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
+                    Server.MainNetServer.FlushSendQueue();
+                }
             }
             catch (Exception e)
             {
