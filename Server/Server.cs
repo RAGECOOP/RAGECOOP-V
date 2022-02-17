@@ -576,7 +576,7 @@ namespace CoopServer
                 local.Deny("Username is empty or contains spaces!");
                 return;
             }
-            if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
+            if (packet.Username.Any(p => !char.IsLetterOrDigit(p) && !(p == '_') && !(p=='-')))
             {
                 local.Deny("Username contains special chars!");
                 return;
