@@ -287,7 +287,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -305,7 +305,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -323,7 +323,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -341,7 +341,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -359,7 +359,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -379,7 +379,7 @@ namespace CoopServer
                                             }
                                             catch (Exception e)
                                             {
-                                                message.SenderConnection.Disconnect(e.Message);
+                                                DisconnectAndLog(message.SenderConnection, type, e);
                                             }
                                         }
                                         else
@@ -404,7 +404,7 @@ namespace CoopServer
                                             }
                                             catch (Exception e)
                                             {
-                                                message.SenderConnection.Disconnect(e.Message);
+                                                DisconnectAndLog(message.SenderConnection, type, e);
                                             }
                                         }
                                         else
@@ -435,7 +435,7 @@ namespace CoopServer
                                         }
                                         catch (Exception e)
                                         {
-                                            message.SenderConnection.Disconnect(e.Message);
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;
@@ -487,7 +487,7 @@ namespace CoopServer
                                             }
                                             catch (Exception e)
                                             {
-                                                message.SenderConnection.Disconnect(e.Message);
+                                                DisconnectAndLog(message.SenderConnection, type, e);
                                             }
                                         }
                                         else
@@ -552,6 +552,14 @@ namespace CoopServer
             }
         }
 
+        private void DisconnectAndLog(NetConnection senderConnection, byte type, Exception e)
+        {
+            Logging.Error($"Error receiving a packet of type {type}");
+            Logging.Error(e.Message);
+            Logging.Error(e.StackTrace);
+            senderConnection.Disconnect(e.Message);
+        }
+
         #region -- PLAYER --
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, Packets.Handshake packet)
@@ -568,7 +576,7 @@ namespace CoopServer
                 local.Deny("Username is empty or contains spaces!");
                 return;
             }
-            if (packet.Username.Any(p => !char.IsLetterOrDigit(p)))
+            if (packet.Username.Any(p => !char.IsLetterOrDigit(p) && !(p == '_') && !(p=='-')))
             {
                 local.Deny("Username contains special chars!");
                 return;
