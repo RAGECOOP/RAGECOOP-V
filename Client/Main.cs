@@ -77,9 +77,7 @@ namespace CoopClient
             NPCsVehicles = new Dictionary<long, int>();
 
             Tick += OnTick;
-#if !NON_INTERACTIVE
             KeyDown += OnKeyDown;
-#endif
             Aborted += (object sender, EventArgs e) => CleanUp();
 
             Util.NativeMemory();
@@ -223,6 +221,33 @@ namespace CoopClient
                         return;
                     }
                     break;
+            }
+        }
+#else
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (MainChat.Focused)
+            {
+                MainChat.OnKeyDown(e.KeyCode);
+                return;
+            }
+
+            if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
+            {
+                if (MainNetworking.IsOnServer())
+                {
+                    ulong currentTimestamp = Util.GetTickCount64();
+                    PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                }
+                return;
+            }
+            else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
+            {
+                if (MainNetworking.IsOnServer())
+                {
+                    MainChat.Focused = true;
+                }
+                return;
             }
         }
 #endif

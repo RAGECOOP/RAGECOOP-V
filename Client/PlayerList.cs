@@ -13,9 +13,13 @@ namespace CoopClient
     /// </summary>
     public class PlayerList : Script
     {
+        private const float LEFT_POSITION = 0.122f;
+        private const float RIGHT_POSITION = 0.9f;
         private readonly Scaleform MainScaleform = new Scaleform("mp_mm_card_freemode");
         private ulong LastUpdate = Util.GetTickCount64();
         internal static ulong Pressed { get; set; }
+
+        public static bool LeftAlign = true;
 
         /// <summary>
         /// Don't use it!
@@ -51,7 +55,10 @@ namespace CoopClient
 #endif
                 )
             {
-                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, MainScaleform.Handle, 0.122f, 0.3f, 0.28f, 0.6f, 255, 255, 255, 255, 0);
+                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, MainScaleform.Handle, 
+                                LeftAlign? LEFT_POSITION:RIGHT_POSITION, 0.3f,
+                                0.28f, 0.6f,
+                                255, 255, 255, 255, 0);
             }
         }
 

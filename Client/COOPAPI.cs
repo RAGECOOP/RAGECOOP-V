@@ -269,6 +269,16 @@ namespace CoopClient
             Main.DisableTraffic = !enable;
         }
 
+        /// <summary>
+        /// Sets the alignment for the player list, if set to true it will align left, 
+        /// otherwise it will align right
+        /// </summary>
+        /// <param name="leftAlign"></param>
+        public static void SetPlayerListLeftAlign( bool leftAlign )
+        {
+            PlayerList.LeftAlign = leftAlign;
+        }
+
 #if DEBUG
         /// <summary>
         /// ?
