@@ -1588,6 +1588,72 @@
             <returns><see langword="true" /> if <paramref name="value1"/> is the same instance as <paramref name="value2"/> or
             if both are <see langword="null" /> references or if <c>value1.Equals(value2)</c> returns <see langword="true" />; otherwise, <see langword="false" />.</returns>
         </member>
+        <member name="F:GTA.Native.PedHash.Franklin02">
+            <summary>
+            The Franklin Clinton model added in the Contract update, and this model is not used for story mode. The model name is <c>P_Franklin_02</c>.
+            The leader player will control a <see cref="T:GTA.Ped" /> with this model in Short Trip missions.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.ARY">
+            <summary>
+            The first in-game model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.ARY02">
+            <summary>
+            The second in-game model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.JIO">
+            <summary>
+            The first in-game model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.JIO02">
+            <summary>
+            The second in-game model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.MJO">
+            <summary>
+            The first in-game model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.MJO02">
+            <summary>
+            The second in-game model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.ARYCutscene">
+            <summary>
+            The first cutscene model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.ARY02Cutscene">
+            <summary>
+            The second cutscene model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.JIOCutscene">
+            <summary>
+            The first cutscene model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.JIO02Cutscene">
+            <summary>
+            The second cutscene model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.MJOCutscene">
+            <summary>
+            The first cutscene model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.Native.PedHash.MJO02Cutscene">
+            <summary>
+            The second cutscene model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
         <member name="P:GTA.NaturalMotion.Euphoria.ActivePose">
             <summary>
             Gets a ActivePose Helper class for sending ActivePose <see cref="T:GTA.NaturalMotion.Message"/> to this <see cref="T:GTA.Ped"/>.

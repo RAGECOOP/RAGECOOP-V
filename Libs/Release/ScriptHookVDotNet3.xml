@@ -639,6 +639,16 @@
             <param name="b"></param>
             <param name="t"></param>
         </member>
+        <member name="M:GTA.Math.Quaternion.LookRotation(GTA.Math.Vector3)">
+            <summary>
+            Creates a rotation with the specified <paramref name="forward"/> and <see cref="P:GTA.Math.Vector3.WorldUp"/> directions.
+            </summary>
+        </member>
+        <member name="M:GTA.Math.Quaternion.LookRotation(GTA.Math.Vector3,GTA.Math.Vector3)">
+            <summary>
+            Creates a rotation with the specified <paramref name="forward"/> and <paramref name="up"/> directions.
+            </summary>
+        </member>
         <member name="M:GTA.Math.Quaternion.FromToRotation(GTA.Math.Vector3,GTA.Math.Vector3)">
             <summary>
             Creates a rotation which rotates from fromDirection to toDirection.
@@ -18587,6 +18597,172 @@
             Converts a <see cref="T:GTA.CheckpointCustomIcon"/> to a native input argument.
             </summary>
         </member>
+        <member name="M:GTA.AnimatedBuilding.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.AnimatedBuilding"/> from the given handle.
+            </summary>
+            <param name="handle">The building handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.AnimatedBuilding"/> if this handle corresponds to a <see cref="T:GTA.AnimatedBuilding"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.AnimatedBuilding"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.AnimatedBuilding"/>. This property is provided mainly for safer instance handling, but this is also used for equality comparison.
+            </summary>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.AnimatedBuilding"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Model">
+            <summary>
+            Gets the model of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Matrix">
+            <summary>
+            Gets this <see cref="T:GTA.AnimatedBuilding"/>s matrix which stores position and rotation information.
+            </summary>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Rotation">
+            <summary>
+            Gets the rotation of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+            <value>
+            The yaw, pitch, roll rotation values in degree.
+            </value>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Quaternion">
+            <summary>
+            Gets the quaternion of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.AnimatedBuilding.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="M:GTA.AnimatedBuilding.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.Building"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.Building"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.AnimatedBuilding.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.AnimatedBuilding"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.AnimatedBuilding.op_Equality(GTA.AnimatedBuilding,GTA.AnimatedBuilding)">
+            <summary>
+            Determines if two <see cref="T:GTA.AnimatedBuilding"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.AnimatedBuilding"/>.</param>
+            <param name="right">The right <see cref="T:GTA.AnimatedBuilding"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.AnimatedBuilding.op_Inequality(GTA.AnimatedBuilding,GTA.AnimatedBuilding)">
+            <summary>
+            Determines if two <see cref="T:GTA.AnimatedBuilding"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.AnimatedBuilding"/>.</param>
+            <param name="right">The right <see cref="T:GTA.AnimatedBuilding"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.InteriorInstance"/> from the given handle.
+            </summary>
+            <param name="handle">The interior instance handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.InteriorInstance"/> if this handle corresponds to a <see cref="T:GTA.InteriorInstance"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.InteriorInstance"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.InteriorInstance.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.Building"/>. This property is provided mainly for safer instance handling, but this is also used for equality comparison.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.InteriorInstance"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Model">
+            <summary>
+            Gets the model of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Matrix">
+            <summary>
+            Gets this <see cref="T:GTA.InteriorInstance"/>s matrix which stores position and rotation information.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Rotation">
+            <summary>
+            Gets the rotation of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <value>
+            The yaw, pitch, roll rotation values in degree.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorInstance.Quaternion">
+            <summary>
+            Gets the quaternion of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorInstance.InteriorProxy">
+            <summary>
+            Gets the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> this <see cref="T:GTA.InteriorInstance"/> is loaded from.
+            </summary>
+            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorInstance"/> does not exist or SHVDN could not find the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> pool for some reason.</remarks>
+        </member>
+        <member name="M:GTA.InteriorInstance.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.InteriorInstance"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorInstance"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorInstance"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.op_Equality(GTA.InteriorInstance,GTA.InteriorInstance)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorInstance"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.op_Inequality(GTA.InteriorInstance,GTA.InteriorInstance)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorInstance"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
         <member name="F:GTA.EntityPopulationType.Unknown">
             <summary>
             The game does not automatically delete entities when this value is set.
@@ -18627,6 +18803,86 @@
             <summary>
             The game does not automatically delete entities when this value is set.
             </summary>
+        </member>
+        <member name="M:GTA.Building.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.Building"/> from the given handle.
+            </summary>
+            <param name="handle">The building handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.Building"/> if this handle corresponds to a <see cref="T:GTA.Building"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.Building"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.Building.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.Building"/>. This property is provided mainly for safer instance handling, but this is also used for equality comparison.
+            </summary>
+        </member>
+        <member name="P:GTA.Building.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.Building"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.Building.Model">
+            <summary>
+            Gets the model of this <see cref="T:GTA.Building"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.Building.Matrix">
+            <summary>
+            Gets this <see cref="T:GTA.Building"/>s matrix which stores position and rotation information.
+            </summary>
+        </member>
+        <member name="P:GTA.Building.Rotation">
+            <summary>
+            Gets or sets the rotation of this <see cref="T:GTA.Building"/>.
+            </summary>
+            <value>
+            The yaw, pitch, roll rotation values in degree.
+            </value>
+        </member>
+        <member name="P:GTA.Building.Quaternion">
+            <summary>
+            Gets the quaternion of this <see cref="T:GTA.Building"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.Building.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.Building"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="M:GTA.Building.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.Building"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.Building"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.Building.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.Building"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.Building"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.Building.op_Equality(GTA.Building,GTA.Building)">
+            <summary>
+            Determines if two <see cref="T:GTA.Building"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.Building"/>.</param>
+            <param name="right">The right <see cref="T:GTA.Building"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.Building.op_Inequality(GTA.Building,GTA.Building)">
+            <summary>
+            Determines if two <see cref="T:GTA.Building"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.Building"/>.</param>
+            <param name="right">The right <see cref="T:GTA.Building"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
         </member>
         <member name="F:GTA.VehicleType.None">
             <summary>
@@ -18913,6 +19169,7 @@
         <member name="P:GTA.Entity.Position">
             <summary>
             Gets or sets the position of this <see cref="T:GTA.Entity"/>.
+            If the <see cref="T:GTA.Entity"/> is <see cref="T:GTA.Ped"/> and the <see cref="T:GTA.Ped"/> is in a <see cref="T:GTA.Vehicle"/>, the <see cref="T:GTA.Vehicle"/>'s position will be returned or changed.
             </summary>
             <value>
             The position in world space.
@@ -19085,6 +19342,30 @@
             <summary>
             Clears the last weapon damage this <see cref="T:GTA.Entity"/> received.
             </summary>
+        </member>
+        <member name="P:GTA.Entity.FragmentGroupCount">
+            <summary>
+            Returns the number of fragment group of this <see cref="T:GTA.Entity"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.Entity.IsFragmentObject">
+            <summary>
+            Determines if this <see cref="T:GTA.Entity"/> is a fragment object.
+            </summary>
+            <returns>
+            <see langword="true" /> if this <see cref="T:GTA.Entity"/> is a fragment object; otherwise, <see langword="false" />.
+            This will return <see langword="true" /> if this <see cref="T:GTA.Entity"/> is a <see cref="T:GTA.Ped"/> or a <see cref="T:GTA.Vehicle"/>.
+            </returns>
+        </member>
+        <member name="M:GTA.Entity.DetachFragmentPart(System.Int32)">
+            <summary>
+            Detachs a fragment part of this <see cref="T:GTA.Entity"/>. Can create a new <see cref="T:GTA.Entity"/>.
+            </summary>
+            <returns>
+              <para><see langword="true" /> if a new <see cref="T:GTA.Entity"/> is created; otherwise, <see langword="false" />.</para>
+              <para>Returning <see langword="false" /> does not necessarily mean detaching the part did not change the <see cref="T:GTA.Entity"/> in any ways.
+              For example, detaching <c>seat_f</c> for <see cref="T:GTA.Vehicle"/> will return <see langword="false" /> but the <see cref="T:GTA.Ped"/> on the front seat will not be able to sit properly.</para>
+            </returns>
         </member>
         <member name="P:GTA.Entity.IsFireProof">
             <summary>
@@ -19557,6 +19838,11 @@
             Gets the vector that points in front of this <see cref="T:GTA.EntityBone"/> relative to the <see cref="T:GTA.Entity"/> its part of.
             </summary>
         </member>
+        <member name="P:GTA.EntityBone.FragmentGroupIndex">
+            <summary>
+            Gets the fragment group index of this <see cref="T:GTA.EntityBone"/>. -1 will be returned if the <see cref="T:GTA.Entity"/> does not exist or <see cref="P:GTA.EntityBone.Index"/> is invalid.
+            </summary>
+        </member>
         <member name="M:GTA.EntityBone.GetOffsetPosition(GTA.Math.Vector3)">
             <summary>
             Gets the position in world coordinates of an offset relative this <see cref="T:GTA.EntityBone"/>
@@ -19929,6 +20215,14 @@
             <see langword="true" /> if this <see cref="T:GTA.Model"/> is a regular lowrider; otherwise, <see langword="false" />.
             </value>
         </member>
+        <member name="P:GTA.Model.IsMlo">
+            <summary>
+            Gets a value indicating whether this <see cref="T:GTA.Model"/> is a movable interior loader (also known as MLO or MILO).
+            </summary>
+            <value>
+            <see langword="true" /> if this <see cref="T:GTA.Model"/> is a car; otherwise, <see langword="false" />.
+            </value>
+        </member>
         <member name="P:GTA.Model.IsMalePed">
             <summary>
             Gets a value indicating whether this <see cref="T:GTA.Model"/> is a male pedestrian.
@@ -20230,7 +20524,7 @@
         </member>
         <member name="P:GTA.Ped.FiringPattern">
             <summary>
-            Sets the pattern this <see cref="T:GTA.Ped"/> uses to fire weapons.
+            Gets of sets the pattern this <see cref="T:GTA.Ped"/> uses to fire weapons.
             </summary>
         </member>
         <member name="P:GTA.Ped.Weapons">
@@ -20322,6 +20616,39 @@
             <value>
             <see langword="true" /> if this <see cref="T:GTA.Ped"/> was killed by a takedown; otherwise, <see langword="false" />.
             </value>
+        </member>
+        <member name="P:GTA.Ped.Killer">
+            <summary>
+            Gets the <see cref="T:GTA.Entity"/> that killed this <see cref="T:GTA.Ped"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.Ped.CauseOfDeath">
+            <summary>
+            Gets the <see cref="T:GTA.WeaponHash"/> that this <see cref="T:GTA.Ped"/> is killed with. The return value is not necessarily a weapon hash for a human <see cref="T:GTA.Ped"/>s (e.g. can be the hash of <c>WEAPON_COUGAR</c>).
+            </summary>
+        </member>
+        <member name="P:GTA.Ped.TimeOfDeath">
+            <summary>
+            Gets the time when this <see cref="T:GTA.Ped"/> is killed. This value determines how this <see cref="T:GTA.Ped"/> is rendered when <see cref="P:GTA.Game.IsThermalVisionActive"/> is <see langword="true" /> and the <see cref="T:GTA.Ped"/> is dead.
+            </summary>
+        </member>
+        <member name="M:GTA.Ped.ClearKillerRecord">
+            <summary>
+            <para>Clears the <see cref="T:GTA.Entity"/> record that killed this <see cref="T:GTA.Ped"/>. Can be useful after resurrecting this <see cref="T:GTA.Ped"/>.</para>
+            <para>Internally, when a <see cref="T:GTA.Ped"/> killed and the value for the source of death in the instance of this <see cref="T:GTA.Ped"/> is not <c>0</c> (not <see langword="null" />), the game does not write the memory address of the <see cref="T:GTA.Ped"/> that killed this <see cref="T:GTA.Ped"/>.</para>
+            </summary>
+        </member>
+        <member name="M:GTA.Ped.ClearCauseOfDeathRecord">
+            <summary>
+            <para>Clears the record of the cause of death that killed this <see cref="T:GTA.Ped"/> with. Can be useful after resurrecting this <see cref="T:GTA.Ped"/>.</para>
+            <para>Internally, when a <see cref="T:GTA.Ped"/> killed and the value for the cause of death in the instance of this <see cref="T:GTA.Ped"/> is not <c>0</c>, the game does not write the weapon hash value for the cause of death.</para>
+            </summary>
+        </member>
+        <member name="M:GTA.Ped.ClearTimeOfDeathRecord">
+            <summary>
+            <para>Clears the time record when this <see cref="T:GTA.Ped"/> is killed. Can be useful after resurrecting this <see cref="T:GTA.Ped"/>.</para>
+            <para>Internally, when a <see cref="T:GTA.Ped"/> killed and the value for the time of death in the instance of this <see cref="T:GTA.Ped"/> is not <c>0</c>, the game does not write the game time value for the time of death.</para>
+            </summary>
         </member>
         <member name="P:GTA.Ped.CanSufferCriticalHits">
             <summary>
@@ -20463,6 +20790,72 @@
         <member name="M:GTA.PedGroup.op_Implicit(GTA.PedGroup)~GTA.Native.InputArgument">
             <summary>
             Converts a <see cref="T:GTA.PedGroup"/> to a native input argument.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.Franklin02">
+            <summary>
+            The Franklin Clinton model added in the Contract update, and this model is not used for story mode. The model name is <c>P_Franklin_02</c>.
+            The leader player will control a <see cref="T:GTA.Ped" /> with this model in Short Trip missions.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.ARY">
+            <summary>
+            The first in-game model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.ARY02">
+            <summary>
+            The second in-game model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.JIO">
+            <summary>
+            The first in-game model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.JIO02">
+            <summary>
+            The second in-game model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.MJO">
+            <summary>
+            The first in-game model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.MJO02">
+            <summary>
+            The second in-game model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.ARYCutscene">
+            <summary>
+            The first cutscene model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.ARY02Cutscene">
+            <summary>
+            The second cutscene model of Andre Romelle Young, known professionally as Dr. Dre.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.JIOCutscene">
+            <summary>
+            The first cutscene model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.JIO02Cutscene">
+            <summary>
+            The second cutscene model of Jimmy Iovine.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.MJOCutscene">
+            <summary>
+            The first cutscene model of Mark Jordan, known professionally as DJ Pooh.
+            </summary>
+        </member>
+        <member name="F:GTA.PedHash.MJO02Cutscene">
+            <summary>
+            The second cutscene model of Mark Jordan, known professionally as DJ Pooh.
             </summary>
         </member>
         <member name="F:GTA.RagdollType.Relax">
@@ -21761,20 +22154,22 @@
             <param name="index">The index of the profile setting values.</param>
             <returns>The integer value associated with the specified index of the profile setting.</returns>
         </member>
-        <member name="M:GTA.Game.FindPattern(System.String)">
+        <member name="M:GTA.Game.FindPattern(System.String,System.IntPtr)">
             <summary>
             Searches the address space of the current process for a memory pattern.
             </summary>
             <param name="pattern">The pattern.</param>
+            <param name="startAddress">The address to start searching at. If <see cref="F:System.IntPtr.Zero" /> (<see langword="default" />), search is started at the base address.</param>
             <returns>The address of a region matching the pattern, or <see cref="F:System.IntPtr.Zero" /> if none was found.</returns>
             <remarks>This function takes the Cheat Engine/IDA format ("48 8B 0D ?? ?? ? ? 44 8B C6 8B D5 8B D8" for example, where ?? and ? are wildcards).</remarks>
         </member>
-        <member name="M:GTA.Game.FindPattern(System.String,System.String)">
+        <member name="M:GTA.Game.FindPattern(System.String,System.String,System.IntPtr)">
             <summary>
             Searches the address space of the current process for a memory pattern.
             </summary>
             <param name="pattern">The pattern.</param>
             <param name="mask">The pattern mask.</param>
+            <param name="startAddress">The address to start searching at. If <see cref="F:System.IntPtr.Zero" /> (<see langword="default" />), search is started at the base address.</param>
             <returns>The address of a region matching the pattern, or <see cref="F:System.IntPtr.Zero" /> if none was found.</returns>
             <remarks>This function takes the classic format ("\x48\x8B\x0D\x00\x00\x00\x00\x44\x8B\xC6\x8B\xD5\x8B\xD8" as the pattern and "xxx????xxxxxxx" as the mask for example, where \x00 in the pattern and ? In the mask is a wildcard).</remarks>
         </member>
@@ -22544,6 +22939,134 @@
             The handle of the object translated to a native value.
             </summary>
         </member>
+        <member name="M:GTA.InteriorProxy.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.InteriorProxy"/> from the given handle.
+            </summary>
+            <param name="handle">The interior proxy handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.InteriorProxy"/> if this handle corresponds to a <see cref="T:GTA.InteriorProxy"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.Entity"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.InteriorProxy.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.NativeValue">
+            <summary>
+            The handle of this <see cref="T:GTA.InteriorProxy"/> translated to a native value.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.InteriorProxy"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorProxy.CurrentInteriorInstance">
+            <summary>
+            Gets the current <see cref="T:GTA.InteriorInstance"/> this <see cref="T:GTA.InteriorProxy"/> is using.
+            </summary>
+            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorProxy"/> is not using any <see cref="T:GTA.InteriorInstance"/>.</remarks>
+        </member>
+        <member name="P:GTA.InteriorProxy.Model">
+            <summary>
+            Gets the model this <see cref="T:GTA.InteriorProxy"/> will load.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.IsDisabled">
+            <summary>
+            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely.
+            </summary>
+            <value>
+            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely; otherwise, <see langword="false" />.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorProxy.IsCapped">
+            <summary>
+            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
+            Doors can be loaded and the collision is not necessarily completely disabled (e.g. collisions for bullets and projectiles can work).
+            </summary>
+            <value>
+            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior; otherwise, <see langword="false" />.
+            </value>
+        </member>
+        <member name="M:GTA.InteriorProxy.Refresh">
+            <summary>
+            Refreshs the current <see cref="T:GTA.InteriorInstance"/> if loaded. Does not change the memory address or handle of the <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.Disable(System.Boolean)">
+            <summary>
+            Disables the interior, making <see cref="T:GTA.InteriorProxy"/> behave as if interior is not loaded completely. Does not prevent from having a <see cref="T:GTA.InteriorInstance"/>.
+            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.Cap(System.Boolean)">
+            <summary>
+            Caps the interior so this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
+            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.PinInMemory">
+            <summary>
+            Makes this <see cref="T:GTA.InteriorProxy"/> keep the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.UnpinFromMemory">
+            <summary>
+            Lets this <see cref="T:GTA.InteriorProxy"/> free the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.GetInteriorProxyFromGameplayCam">
+            <summary>
+            Gets the <see cref="T:GTA.InteriorProxy"/> if the gameplay camera is in a interior.
+            </summary>
+            <remarks>returns <see langword="null" /> if the gameplay camera is not in any interior space.</remarks>
+        </member>
+        <member name="M:GTA.InteriorProxy.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.InteriorProxy"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorProxy"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Equality(GTA.InteriorProxy,GTA.InteriorProxy)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorProxy"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorProxy"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorProxy"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Inequality(GTA.InteriorProxy,GTA.InteriorProxy)">
+            <summary>
+            Determines if two <see cref="T:GTA.Entity"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.Entity"/>.</param>
+            <param name="right">The right <see cref="T:GTA.Entity"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Implicit(GTA.InteriorProxy)~GTA.Native.InputArgument">
+            <summary>
+            Converts an <see cref="T:GTA.Entity"/> to a native input argument.
+            </summary>
+        </member>
         <member name="M:GTA.EntityDamageRecordCollection.GetAllDamageRecords">
             <summary>
             Gets all the <see cref="T:GTA.EntityDamageRecord" /> at the moment.
@@ -22901,6 +23424,18 @@
             Tells the game we have finished using this <see cref="T:GTA.WeaponAsset"/> and it can be freed from memory.
             </summary>
         </member>
+        <member name="M:GTA.WeaponCollection.Give(GTA.WeaponHash,System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Gives the speficied weapon if the owner <see cref="T:GTA.Ped"/> does not have one, or selects the weapon if they have one and <paramref name="equipNow"/> is set to <see langword="true" />.
+            </summary>
+            <param name="weaponHash">The weapon hash.</param>
+            <param name="ammoCount">The ammo count to be added to the weapon inventory of the owner <see cref="T:GTA.Ped"/>.</param>
+            <param name="equipNow">If set to <see langword="true" />, the owner <see cref="T:GTA.Ped"/> will switch their weapon to the weapon of <paramref name="weaponHash"/> as soon as they can (not instantly).</param>
+            <param name="isAmmoLoaded">
+            Does not work since the ammo in clip is always full if not selected unless the game code related to auto-reload is modified.
+            This was supposed to determine if the ammo will be loaded after the weapon is given to the owner <see cref="T:GTA.Ped"/>.
+            </param>
+        </member>
         <member name="P:GTA.WeaponComponentCollection.Count">
             <summary>
             Gets the number of compatible components.
@@ -23249,9 +23784,34 @@
             A fast way to get the total number of <see cref="T:GTA.Prop"/>s in the world associated with a <see cref="T:GTA.Pickup"/>.
             </summary>
         </member>
+        <member name="P:GTA.World.BuildingCount">
+            <summary>
+            A fast way to get the total number of <see cref="T:GTA.Building"/>s spawned in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.AnimatedBuildingCount">
+            <summary>
+            A fast way to get the total number of <see cref="T:GTA.AnimatedBuilding"/>s spawned in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.InteriorInstanceCount">
+            <summary>
+            A fast way to get the total number of <see cref="T:GTA.InteriorInstance"/>s spawned in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.InteriorProxyCount">
+            <summary>
+            A fast way to get the total number of <see cref="T:GTA.InteriorProxy"/>s managed in the <see cref="T:GTA.InteriorProxy"/> pool.
+            </summary>
+        </member>
         <member name="P:GTA.World.ProjectileCount">
             <summary>
             A fast way to get the total number of <see cref="T:GTA.Projectile"/>s spawned in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.EntityColliderCount">
+            <summary>
+            Returns the total number of <see cref="T:GTA.Entity"/> colliders used.
             </summary>
         </member>
         <member name="P:GTA.World.VehicleCapacity">
@@ -23281,6 +23841,33 @@
             <summary>
             The total number of <see cref="T:GTA.Projectile"/>s that can exist in the world.
             Always returns 50 currently since the limit is hard-coded in the exe.
+            </summary>
+        </member>
+        <member name="P:GTA.World.BuildingCapacity">
+            <summary>
+            The total number of <see cref="T:GTA.Building"/>s that can exist in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.AnimatedBuildingCapacity">
+            <summary>
+            The total number of <see cref="T:GTA.AnimatedBuilding"/>s that can exist in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.InteriorInstanceCapacity">
+            <summary>
+            The total number of <see cref="T:GTA.InteriorInstance"/>s that can exist in the world.
+            </summary>
+        </member>
+        <member name="P:GTA.World.InteriorProxyCapacity">
+            <summary>
+            The total number of <see cref="T:GTA.InteriorProxy"/>s the game can manage at the same time in the <see cref="T:GTA.InteriorProxy"/> pool.
+            </summary>
+        </member>
+        <member name="P:GTA.World.EntityColliderCapacity">
+            <summary>
+            <para>The total number of <see cref="T:GTA.Entity"/> colliders can be used. The return value can be different in different versions.</para>
+            <para>When <see cref="P:GTA.World.EntityColliderCount"/> reaches this value, no more <see cref="T:GTA.Entity"/> will not be able to be physically moved
+            and <see cref="T:GTA.Vehicle"/>s and <see cref="T:GTA.Prop"/>s will not be able to detach fragment parts properly.</para>
             </summary>
         </member>
         <member name="M:GTA.World.GetClosestPed(GTA.Math.Vector3,System.Single,GTA.Model[])">
@@ -23439,6 +24026,70 @@
             <param name="position">The position to check against.</param>
             <param name="spatials">The spatials to check.</param>
             <returns>The closest <see cref="T:GTA.ISpatial"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector3,GTA.Building[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.Building"/> to a given position in the World.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="buildings">The buildings to check.</param>
+            <returns>The closest <see cref="T:GTA.Building"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector2,GTA.Building[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.Building"/> to a given position in the World ignoring height.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="buildings">The buildings to check.</param>
+            <returns>The closest <see cref="T:GTA.Building"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector3,GTA.AnimatedBuilding[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.AnimatedBuilding"/> to a given position in the World.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="animatedBuildings">The animated building to check.</param>
+            <returns>The closest <see cref="T:GTA.AnimatedBuilding"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector2,GTA.AnimatedBuilding[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.AnimatedBuilding"/> to a given position in the World ignoring height.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="animatedBuildings">The animated building to check.</param>
+            <returns>The closest <see cref="T:GTA.AnimatedBuilding"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector3,GTA.InteriorInstance[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.InteriorInstance"/> to a given position in the World.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="interiorInstances">The spatials to check.</param>
+            <returns>The closest <see cref="T:GTA.InteriorInstance"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector2,GTA.InteriorInstance[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.InteriorInstance"/> to a given position in the World ignoring height.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="interiorInstances">The interior instances to check.</param>
+            <returns>The closest <see cref="T:GTA.InteriorInstance"/> to the <paramref name="interiorInstances"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector3,GTA.InteriorProxy[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.InteriorProxy"/> to a given position in the World.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="interiorProxies">The spatials to check.</param>
+            <returns>The closest <see cref="T:GTA.InteriorProxy"/> to the <paramref name="position"/></returns>
+        </member>
+        <member name="M:GTA.World.GetClosest(GTA.Math.Vector2,GTA.InteriorProxy[])">
+            <summary>
+            Gets the closest <see cref="T:GTA.InteriorProxy"/> to a given position in the World ignoring height.
+            </summary>
+            <param name="position">The position to check against.</param>
+            <param name="interiorProxies">The spatials to check.</param>
+            <returns>The closest <see cref="T:GTA.InteriorProxy"/> to the <paramref name="position"/></returns>
         </member>
         <member name="M:GTA.World.CreatePed(GTA.Model,GTA.Math.Vector3,System.Single)">
             <summary>
