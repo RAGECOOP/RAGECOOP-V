@@ -16,7 +16,7 @@
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://coop.entenkoeniq.de/servers";
+        public string MasterServer { get; set; } = "https://gtacoopr.000webhostapp.com/servers.php";
         /// <summary>
         /// Don't use it!
         /// </summary>

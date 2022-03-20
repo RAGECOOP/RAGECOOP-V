@@ -12,7 +12,7 @@
         public bool ModsAllowed {  get; set; } = false;
         public bool UPnP { get; set; } = true;
         public bool AnnounceSelf { get; set; } = false;
-        public string MasterServer { get; set; } = "https://coop.entenkoeniq.de/servers";
+        public string MasterServer { get; set; } = "https://gtacoopr.000webhostapp.com/servers.php";
         public bool DebugMode { get; set; } = false;
     }
 }
