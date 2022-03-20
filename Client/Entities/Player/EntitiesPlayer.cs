@@ -59,6 +59,7 @@ namespace CoopClient.Entities.Player
         /// The latest character position (may not have been applied yet)
         /// </summary>
         public Vector3 Position { get; internal set; }
+        internal Vector3 Velocity { get; set; }
         internal Blip PedBlip = null;
         internal Vector3 AimCoords { get; set; }
 

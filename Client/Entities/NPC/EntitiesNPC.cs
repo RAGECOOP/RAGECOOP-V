@@ -29,6 +29,7 @@ namespace CoopClient.Entities.NPC
         internal Dictionary<byte, short> Clothes { get; set; }
 
         internal Vector3 Position { get; set; }
+        internal Vector3 Velocity { get; set; }
         internal Vector3 AimCoords { get; set; }
 
         internal void DisplayLocally()

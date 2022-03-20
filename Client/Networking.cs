@@ -526,7 +526,7 @@ namespace CoopClient
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
                 player.VehicleEngineHealth = packet.VehEngineHealth;
                 player.VehRPM = packet.VehRPM;
-                player.VehicleVelocity = packet.VehVelocity.ToVector();
+                player.Velocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.AimCoords = packet.VehAimCoords.ToVector();
@@ -593,7 +593,7 @@ namespace CoopClient
                 player.VehicleSeatIndex = packet.VehSeatIndex;
                 player.Position = packet.Position.ToVector();
                 player.VehicleRotation = packet.VehRotation.ToQuaternion();
-                player.VehicleVelocity = packet.VehVelocity.ToVector();
+                player.Velocity = packet.VehVelocity.ToVector();
                 player.VehicleSpeed = packet.VehSpeed;
                 player.VehicleSteeringAngle = packet.VehSteeringAngle;
                 player.AimCoords = packet.AimCoords.ToVector();
@@ -829,7 +829,7 @@ namespace CoopClient
                     npc.VehicleRotation = packet.VehRotation.ToQuaternion();
                     npc.VehicleEngineHealth = packet.VehEngineHealth;
                     npc.VehRPM = packet.VehRPM;
-                    npc.VehicleVelocity = packet.VehVelocity.ToVector();
+                    npc.Velocity = packet.VehVelocity.ToVector();
                     npc.VehicleSpeed = packet.VehSpeed;
                     npc.VehicleSteeringAngle = packet.VehSteeringAngle;
                     npc.VehicleColors = packet.VehColors;
@@ -864,7 +864,7 @@ namespace CoopClient
                         VehicleRotation = packet.VehRotation.ToQuaternion(),
                         VehicleEngineHealth = packet.VehEngineHealth,
                         VehRPM = packet.VehRPM,
-                        VehicleVelocity = packet.VehVelocity.ToVector(),
+                        Velocity = packet.VehVelocity.ToVector(),
                         VehicleSpeed = packet.VehSpeed,
                         VehicleSteeringAngle = packet.VehSteeringAngle,
                         VehicleColors = packet.VehColors,

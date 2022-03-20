@@ -25,18 +25,7 @@ namespace CoopClient.Entities.NPC
         internal short VehicleSeatIndex { get; set; }
         internal Vehicle MainVehicle { get; set; }
         internal Quaternion VehicleRotation { get; set; }
-        internal Vector3 VehicleVelocity { get; set; }
-        private float LastVehicleSpeed { get; set; }
-        private float CurrentVehicleSpeed { get; set; }
-        internal float VehicleSpeed
-        {
-            get => CurrentVehicleSpeed;
-            set
-            {
-                LastVehicleSpeed = CurrentVehicleSpeed;
-                CurrentVehicleSpeed = value;
-            }
-        }
+        internal float VehicleSpeed { get; set; }
         internal float VehicleSteeringAngle { get; set; }
         internal bool VehIsEngineRunning { get; set; }
         internal float VehRPM { get; set; }
@@ -134,15 +123,15 @@ namespace CoopClient.Entities.NPC
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
-                if (CurrentVehicleSpeed < 0.2f)
+                if (VehicleSpeed < 0.2f)
                 {
                     StopPedalingAnim(isFastPedaling);
                 }
-                else if (CurrentVehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
+                else if (VehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
                 {
                     StartPedalingAnim(false);
                 }
-                else if (CurrentVehicleSpeed >= 11f && !isFastPedaling)
+                else if (VehicleSpeed >= 11f && !isFastPedaling)
                 {
                     StartPedalingAnim(true);
                 }
@@ -252,11 +241,11 @@ namespace CoopClient.Entities.NPC
             }
 
             // Good enough for now, but we need to create a better sync
-            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
+            if (VehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
-                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (Position - MainVehicle.Position);
+                MainVehicle.Velocity = Velocity + forceMultiplier * (Position - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Util.GetTickCount64();

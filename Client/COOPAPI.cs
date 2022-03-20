@@ -274,7 +274,7 @@ namespace CoopClient
         /// otherwise it will align right
         /// </summary>
         /// <param name="leftAlign"></param>
-        public static void SetPlayerListLeftAlign( bool leftAlign )
+        public static void SetPlayerListLeftAlign(bool leftAlign)
         {
             PlayerList.LeftAlign = leftAlign;
         }

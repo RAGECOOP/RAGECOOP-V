@@ -8,15 +8,11 @@ namespace CoopClient.Entities.NPC
 {
     internal partial class EntitiesNPC
     {
-        #region -- ON FOOT --
+        #region -- VARIABLES --
         /// <summary>
         /// The latest character rotation (may not have been applied yet)
         /// </summary>
         public Vector3 Rotation { get; internal set; }
-        /// <summary>
-        /// The latest character velocity (may not have been applied yet)
-        /// </summary>
-        public Vector3 Velocity { get; internal set; }
         internal byte Speed { get; set; }
         private bool LastIsJumping = false;
         internal bool IsJumping { get; set; }

@@ -13,20 +13,10 @@ namespace CoopClient.Entities.Player
         private ulong VehicleStopTime { get; set; }
 
         internal bool IsInVehicle { get; set; }
-        private int LastVehicleModelHash = 0;
-        private int CurrentVehicleModelHash = 0;
         /// <summary>
         /// The latest vehicle model hash (may not have been applied yet)
         /// </summary>
-        public int VehicleModelHash
-        {
-            get => CurrentVehicleModelHash;
-            internal set
-            {
-                LastVehicleModelHash = CurrentVehicleModelHash == 0 ? value : CurrentVehicleModelHash;
-                CurrentVehicleModelHash = value;
-            }
-        }
+        public int VehicleModelHash { get; internal set; }
         private byte[] LastVehicleColors = new byte[] { 0, 0 };
         internal byte[] VehicleColors { get; set; }
         private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
@@ -42,18 +32,7 @@ namespace CoopClient.Entities.Player
         /// The latest vehicle rotation (may not have been applied yet)
         /// </summary>
         public Quaternion VehicleRotation { get; internal set; }
-        internal Vector3 VehicleVelocity { get; set; }
-        private float LastVehicleSpeed { get; set; }
-        private float CurrentVehicleSpeed { get; set; }
-        internal float VehicleSpeed
-        {
-            get => CurrentVehicleSpeed;
-            set
-            {
-                LastVehicleSpeed = CurrentVehicleSpeed;
-                CurrentVehicleSpeed = value;
-            }
-        }
+        internal float VehicleSpeed { get; set; }
         internal float VehicleSteeringAngle { get; set; }
         private int LastVehicleAim;
         internal bool VehIsEngineRunning { get; set; }
@@ -73,11 +52,11 @@ namespace CoopClient.Entities.Player
 
         private void DisplayInVehicle()
         {
-            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != CurrentVehicleModelHash)
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
                 bool vehFound = false;
 
-                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { CurrentVehicleModelHash });
+                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { VehicleModelHash });
 
                 if (targetVehicle != null)
                 {
@@ -90,7 +69,7 @@ namespace CoopClient.Entities.Player
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = CurrentVehicleModelHash.ModelRequest();
+                    Model vehicleModel = VehicleModelHash.ModelRequest();
                     if (vehicleModel == null)
                     {
                         //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
@@ -157,15 +136,15 @@ namespace CoopClient.Entities.Player
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
             {
                 bool isFastPedaling = Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "fast_pedal_char", 3);
-                if (CurrentVehicleSpeed < 0.2f)
+                if (VehicleSpeed < 0.2f)
                 {
                     StopPedalingAnim(isFastPedaling);
                 }
-                else if (CurrentVehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
+                else if (VehicleSpeed < 11f && !Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, PedalingAnimDict(), "cruise_pedal_char", 3))
                 {
                     StartPedalingAnim(false);
                 }
-                else if (CurrentVehicleSpeed >= 11f && !isFastPedaling)
+                else if (VehicleSpeed >= 11f && !isFastPedaling)
                 {
                     StartPedalingAnim(true);
                 }
@@ -275,11 +254,11 @@ namespace CoopClient.Entities.Player
             }
 
             // Good enough for now, but we need to create a better sync
-            if (CurrentVehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
+            if (VehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
             {
                 int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
 
-                MainVehicle.Velocity = VehicleVelocity + forceMultiplier * (Position - MainVehicle.Position);
+                MainVehicle.Velocity = Velocity + forceMultiplier * (Position - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
                 VehicleStopTime = Util.GetTickCount64();
@@ -306,7 +285,7 @@ namespace CoopClient.Entities.Player
 
         private string PedalingAnimDict()
         {
-            switch ((VehicleHash)CurrentVehicleModelHash)
+            switch ((VehicleHash)VehicleModelHash)
             {
                 case VehicleHash.Bmx:
                     return "veh@bicycle@bmx@front@base";

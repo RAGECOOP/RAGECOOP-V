@@ -210,7 +210,6 @@ namespace CoopClient
                             ulong currentTimestamp = Util.GetTickCount64();
                             PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                         }
-                        return;
                     }
                     else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
                     {
@@ -218,7 +217,6 @@ namespace CoopClient
                         {
                             MainChat.Focused = true;
                         }
-                        return;
                     }
                     break;
             }
@@ -239,7 +237,6 @@ namespace CoopClient
                     ulong currentTimestamp = Util.GetTickCount64();
                     PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                 }
-                return;
             }
             else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
             {
@@ -247,7 +244,6 @@ namespace CoopClient
                 {
                     MainChat.Focused = true;
                 }
-                return;
             }
         }
 #endif
@@ -399,7 +395,7 @@ namespace CoopClient
                 DebugSyncPed.VehicleRotation = veh.Quaternion;
                 DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
                 DebugSyncPed.VehRPM = veh.CurrentRPM;
-                DebugSyncPed.VehicleVelocity = veh.Velocity;
+                DebugSyncPed.Velocity = veh.Velocity;
                 DebugSyncPed.VehicleSpeed = veh.Speed;
                 DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
                 DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();

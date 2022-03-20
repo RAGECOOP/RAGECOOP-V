@@ -19,7 +19,7 @@ namespace CoopClient
         private ulong LastUpdate = Util.GetTickCount64();
         internal static ulong Pressed { get; set; }
 
-        public static bool LeftAlign = true;
+        internal static bool LeftAlign = true;
 
         /// <summary>
         /// Don't use it!
@@ -56,7 +56,7 @@ namespace CoopClient
                 )
             {
                 Function.Call(Hash.DRAW_SCALEFORM_MOVIE, MainScaleform.Handle, 
-                                LeftAlign? LEFT_POSITION:RIGHT_POSITION, 0.3f,
+                                LeftAlign ? LEFT_POSITION : RIGHT_POSITION, 0.3f,
                                 0.28f, 0.6f,
                                 255, 255, 255, 255, 0);
             }

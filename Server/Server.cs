@@ -94,7 +94,7 @@ namespace CoopServer
 
                         try
                         {
-                            string data = await httpClient.GetStringAsync("https://wimip.info/json");
+                            string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
 
                             info = JsonConvert.DeserializeObject<IpInfo>(data);
                         }
@@ -102,8 +102,6 @@ namespace CoopServer
                         {
                             info = new() { ip = MainNetServer.Configuration.LocalAddress.ToString(), country = "?" };
                         }
-
-                        byte errorCounter = 3;
 
                         while (!Program.ReadyToStop)
                         {
@@ -133,7 +131,7 @@ namespace CoopServer
                             }
                             catch (Exception ex)
                             {
-                                Logging.Error(ex.Message);
+                                Logging.Error($"MasterServer: {ex.Message}");
                                 break;
                             }
 
@@ -141,20 +139,10 @@ namespace CoopServer
                             {
                                 Logging.Error($"MasterServer: [{(int)response.StatusCode}]{response.StatusCode}");
 
-                                if (errorCounter != 0)
-                                {
-                                    Logging.Error($"MasterServer: Remaining attempts {errorCounter--} ...");
-
-                                    // Wait 5 seconds before trying again
-                                    Thread.Sleep(5000);
-                                    continue;
-                                }
-                                
-                                break;
+                                // Wait 5 seconds before trying again
+                                Thread.Sleep(5000);
+                                continue;
                             }
-
-                            // Reset errorCounter
-                            errorCounter = 3;
 
                             // Sleep for 12.5s
                             Thread.Sleep(12500);
