@@ -73,22 +73,35 @@ namespace CoopClient.Entities.NPC
                         return;
                     }
 
-                    MainVehicle = World.CreateVehicle(vehicleModel, Position);
-                    lock (Main.NPCsVehicles)
+                    Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, vehicleModel);
+                    if (targetVehicle != null && targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
                     {
-                        Main.NPCsVehicles.Add(PlayerVehicleHandle, MainVehicle.Handle);
-                    }
-                    vehicleModel.MarkAsNoLongerNeeded();
-                    MainVehicle.Quaternion = VehicleRotation;
-
-                    if (MainVehicle.HasRoof)
-                    {
-                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
-                        if (roofOpened != VehRoofOpened)
+                        MainVehicle = targetVehicle;
+                        lock (Main.NPCsVehicles)
                         {
-                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opened : VehicleRoofState.Closed;
+                            Main.NPCsVehicles.Add(PlayerVehicleHandle, MainVehicle.Handle);
                         }
                     }
+                    else
+                    {
+                        MainVehicle = World.CreateVehicle(vehicleModel, Position);
+                        lock (Main.NPCsVehicles)
+                        {
+                            Main.NPCsVehicles.Add(PlayerVehicleHandle, MainVehicle.Handle);
+                        }
+                        MainVehicle.Quaternion = VehicleRotation;
+
+                        if (MainVehicle.HasRoof)
+                        {
+                            bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                            if (roofOpened != VehRoofOpened)
+                            {
+                                MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opened : VehicleRoofState.Closed;
+                            }
+                        }
+                    }
+
+                    vehicleModel.MarkAsNoLongerNeeded();
                 }
             }
 

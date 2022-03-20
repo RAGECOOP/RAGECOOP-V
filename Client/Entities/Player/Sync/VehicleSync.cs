@@ -54,10 +54,17 @@ namespace CoopClient.Entities.Player
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
             {
+                Model vehicleModel = VehicleModelHash.ModelRequest();
+                if (vehicleModel == null)
+                {
+                    //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                    Character.IsVisible = false;
+                    return;
+                }
+
                 bool vehFound = false;
 
-                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, new Model[] { VehicleModelHash });
-
+                Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, vehicleModel);
                 if (targetVehicle != null)
                 {
                     if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
@@ -69,16 +76,7 @@ namespace CoopClient.Entities.Player
 
                 if (!vehFound)
                 {
-                    Model vehicleModel = VehicleModelHash.ModelRequest();
-                    if (vehicleModel == null)
-                    {
-                        //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
-                        Character.IsVisible = false;
-                        return;
-                    }
-
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
-                    vehicleModel.MarkAsNoLongerNeeded();
                     MainVehicle.Quaternion = VehicleRotation;
 
                     if (MainVehicle.HasRoof)
@@ -90,6 +88,8 @@ namespace CoopClient.Entities.Player
                         }
                     }
                 }
+
+                vehicleModel.MarkAsNoLongerNeeded();
             }
 
             if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Handle != MainVehicle.Handle)
