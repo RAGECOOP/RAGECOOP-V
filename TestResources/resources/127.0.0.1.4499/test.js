@@ -1,0 +1,1 @@
+API.SendMessage('test.js loaded lalala');

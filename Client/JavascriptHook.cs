@@ -42,11 +42,13 @@ namespace CoopClient
 
                 ScriptEngines = new List<V8ScriptEngine>();
 
-                if (!Directory.Exists("scripts\\resources"))
+                string serverAddress = Main.MainSettings.LastServerAddress.Replace(":", ".");
+
+                if (!Directory.Exists("scripts\\resources\\" + serverAddress))
                 {
                     try
                     {
-                        Directory.CreateDirectory("scripts\\resources");
+                        Directory.CreateDirectory("scripts\\resources\\" + serverAddress);
                     }
                     catch (Exception ex)
                     {
@@ -54,7 +56,7 @@ namespace CoopClient
                     }
                 }
 
-                foreach (string script in Directory.GetFiles("scripts\\resources", "*.js"))
+                foreach (string script in Directory.GetFiles("scripts\\resources\\" + serverAddress, "*.js"))
                 {
                     V8ScriptEngine engine = new V8ScriptEngine();
 
