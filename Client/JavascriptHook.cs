@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 using Microsoft.ClearScript.V8;
 
 using GTA;
+using GTA.Native;
 
 namespace CoopClient
 {
@@ -32,46 +34,46 @@ namespace CoopClient
                 return;
             }
 
-            if (LoadedEngine)
+            if (!LoadedEngine)
             {
-                return;
+                LoadedEngine = true;
+
+                ScriptEngines = new List<V8ScriptEngine>();
+
+                if (!Directory.Exists("scripts\\resources"))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory("scripts\\resources");
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO
+                    }
+                }
+
+                foreach (string script in Directory.GetFiles("scripts\\resources", "*.js"))
+                {
+                    V8ScriptEngine engine = new V8ScriptEngine();
+
+                    engine.AddHostObject("API", new ScriptContext());
+
+                    try
+                    {
+                        engine.Execute(File.ReadAllText(script));
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO
+                    }
+                    finally
+                    {
+                        ScriptEngines.Add(engine);
+                    }
+                }
             }
 
-            ScriptEngines = new List<V8ScriptEngine>();
-
-            if (!Directory.Exists("scripts\\resources"))
-            {
-                try
-                {
-                    Directory.CreateDirectory("scripts\\resources");
-                }
-                catch (Exception ex)
-                {
-                    // TODO
-                }
-            }
-
-            foreach (string script in Directory.GetFiles("scripts\\resources", "*.js"))
-            {
-                V8ScriptEngine engine = new V8ScriptEngine();
-
-                engine.AddHostObject("script", new ScriptContext());
-                
-                try
-                {
-                    engine.Execute(File.ReadAllText(script));
-                }
-                catch (Exception ex)
-                {
-                    // TODO
-                }
-                finally
-                {
-                    ScriptEngines.Add(engine);
-                }
-            }
-
-            LoadedEngine = true;
+            ScriptEngines.ForEach(engine => engine.Script.API.InvokeRender());
         }
     }
 
@@ -81,8 +83,34 @@ namespace CoopClient
     public class ScriptContext
     {
         /// <summary>
-        /// Don't use this!
+        /// 
         /// </summary>
+        public event EventHandler OnRender;
+
+        internal void InvokeRender()
+        {
+            OnRender?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        public void CallNative(string hash, params object[] args)
+        {
+            if (!Hash.TryParse(hash, out Hash ourHash))
+            {
+                return;
+            }
+
+            Function.Call(ourHash, args.Select(o => new InputArgument(o)).ToArray());
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void SendMessage(string message)
         {
             Main.MainChat.AddMessage("JAVASCRIPT", message);
