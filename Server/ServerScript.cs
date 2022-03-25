@@ -367,7 +367,7 @@ namespace CoopServer
         /// <summary>
         /// Get all connections as a list of NetHandle(long)
         /// </summary>
-        /// <returns></returns>
+        /// <returns>All connections(NetHandle) as a List</returns>
         public static List<long> GetAllConnections()
         {
             List<long> result = new();
@@ -377,16 +377,29 @@ namespace CoopServer
             return result;
         }
 
+        /// <summary>
+        /// Get the count of all connections
+        /// </summary>
+        /// <returns>The count of all connections as an integer</returns>
         public static int GetAllClientsCount()
         {
             return Server.Clients.Count;
         }
 
+        /// <summary>
+        /// Get a list of all Clients
+        /// </summary>
+        /// <returns>All Clients as a List</returns>
         public static List<Client> GetAllClients()
         {
             return Server.Clients;
         }
 
+        /// <summary>
+        /// Get the client by its username
+        /// </summary>
+        /// <param name="username">The username to search for</param>
+        /// <returns>The Client from this user or null</returns>
         public static Client GetClientByUsername(string username)
         {
             return Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
@@ -420,7 +433,7 @@ namespace CoopServer
         }
 
         /// <summary>
-        /// 
+        /// Send CleanUpWorld to all players to delete all objects created by the server
         /// </summary>
         public static void SendCleanUpWorldToAll(List<long> netHandleList = null)
         {

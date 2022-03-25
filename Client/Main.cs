@@ -276,20 +276,20 @@ namespace CoopClient
 
         internal static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
         {
-            { 0xD49F9B0955C367DE, 1 },
-            { 0xEF29A16337FACADB, 1 },
-            { 0xB4AC7D0CF06BFE8F, 1 },
-            { 0x9B62392B474F44A0, 1 },
-            { 0x7DD959874C1FD534, 1 },
-            { 0xAF35D0D2583051B0, 2 },
-            { 0x63C6CCA8E68AE8C8, 2 },
-            { 0x509D5878EB39E842, 3 },
-            { 0x9A294B2138ABB884, 3 },
-            { 0x46818D79B1F7499A, 4 },
-            { 0x5CDE92C702A8FCE7, 4 },
-            { 0xBE339365C863BD36, 4 },
-            { 0x5A039BB0BCA604B6, 4 },
-            { 0x0134F0835AB6BFCB, 5 }
+            { 0xD49F9B0955C367DE, 1 }, // Entities
+            { 0xEF29A16337FACADB, 1 }, //
+            { 0xB4AC7D0CF06BFE8F, 1 }, //
+            { 0x9B62392B474F44A0, 1 }, //
+            { 0x7DD959874C1FD534, 1 }, //
+            { 0xAF35D0D2583051B0, 2 }, // Vehicles
+            { 0x63C6CCA8E68AE8C8, 2 }, //
+            { 0x509D5878EB39E842, 3 }, // Props
+            { 0x9A294B2138ABB884, 3 }, //
+            { 0x46818D79B1F7499A, 4 }, // Blips
+            { 0x5CDE92C702A8FCE7, 4 }, //
+            { 0xBE339365C863BD36, 4 }, //
+            { 0x5A039BB0BCA604B6, 4 }, //
+            { 0x0134F0835AB6BFCB, 5 }  // Checkpoints
         };
         internal static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
         internal static void CleanUpWorld()

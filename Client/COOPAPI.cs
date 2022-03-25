@@ -94,8 +94,9 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// ?
+        /// Connect to any server
         /// </summary>
+        /// <param name="serverAddress">The server address to connect. Example: 127.0.0.1:4499</param>
         public static void Connect(string serverAddress)
         {
             Main.MainNetworking.DisConnectFromServer(serverAddress);
@@ -120,7 +121,7 @@ namespace CoopClient
         /// <summary>
         /// Get the local net handle from this Lidgren-Network client when connected to a server
         /// </summary>
-        /// <returns>long</returns>
+        /// <returns>NetHandle</returns>
         public static long GetLocalNetHandle()
         {
             return Main.LocalNetHandle;
@@ -128,8 +129,8 @@ namespace CoopClient
 
         /// <summary>
         /// Get all connected player's as a Dictionary.
-        /// Key = Lidgren-Network net handle
-        /// Value = Character handle or null
+        /// Key = Lidgren-Network net handle.
+        /// Value = Character handle or null.
         /// </summary>
         public static Dictionary<long, int?> GetAllPlayers()
         {
@@ -254,7 +255,7 @@ namespace CoopClient
         /// <summary>
         /// Enable or disable sharing of NPCs with other players
         /// </summary>
-        /// <param name="share"></param>
+        /// <param name="share">true to share NPCs</param>
         public static void SetShareNPCs(bool share)
         {
             Main.ShareNPCsWithPlayers = share;
@@ -263,7 +264,7 @@ namespace CoopClient
         /// <summary>
         /// Enable or disable the local traffic for this player
         /// </summary>
-        /// <param name="enable"></param>
+        /// <param name="enable">true to disable traffic</param>
         public static void SetLocalTraffic(bool enable)
         {
             Main.DisableTraffic = !enable;
@@ -273,7 +274,7 @@ namespace CoopClient
         /// Sets the alignment for the player list, if set to true it will align left, 
         /// otherwise it will align right
         /// </summary>
-        /// <param name="leftAlign"></param>
+        /// <param name="leftAlign">true to move the player list to the left</param>
         public static void SetPlayerListLeftAlign(bool leftAlign)
         {
             PlayerList.LeftAlign = leftAlign;

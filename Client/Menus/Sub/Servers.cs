@@ -35,7 +35,7 @@ namespace CoopClient.Menus.Sub
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class Servers
+    internal class Servers
     {
         internal NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Servers", "Go to the server list")
         {
@@ -62,6 +62,12 @@ namespace CoopClient.Menus.Sub
 
         private void CleanUpList()
         {
+            if (ResultItem != null)
+            {
+                MainMenu.Remove(ResultItem);
+                ResultItem = null;
+            }
+
             if (MainMenu.Items.Count > 0)
             {
                 for (int i = 0; i < MainMenu.Items.Count; i++)
@@ -103,11 +109,7 @@ namespace CoopClient.Menus.Sub
                 return;
             }
 
-            if (ResultItem != null)
-            {
-                CleanUpList();
-                ResultItem = null;
-            }
+            CleanUpList();
 
             foreach (ServerListClass server in serverList)
             {
