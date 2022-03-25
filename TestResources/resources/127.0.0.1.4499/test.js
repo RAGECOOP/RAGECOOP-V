@@ -1,1 +1,1 @@
-API.SendMessage('test.js loaded lalala');
+API.SendLocalMessage('test.js loaded lalala');

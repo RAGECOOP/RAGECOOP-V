@@ -1,17 +1,24 @@
-var testVar = 0;
-var testVar2 = false;
+function testFunction(message)
+{
+    SHVDN.GTA.UI.Notification.Show(message);
+}
 
-// Called every frame
-API.OnRender.connect(function() {
-    if (!testVar2)
+var messageCount = 0;
+
+// Called every tick
+API.OnTick.connect(function() {
+    if (messageCount < 5)
     {
-        testVar2 = true;
-
-        SHV.GTA.UI.Notification.Show("test2.js loaded!");
+        API.SendLocalMessage("testFunction " + ++messageCount);
     }
+});
 
-    if (testVar < 10)
-    {
-        API.SendMessage("Test2 number: " + ++testVar);
-    }
+// Called on connect
+API.OnStart.connect(function() {
+    testFunction("hello test2.js!");
+});
+
+// Called on disconnect
+API.OnStop.connect(function() {
+    testFunction("bye test2.js!");
 });

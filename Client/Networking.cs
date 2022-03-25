@@ -129,6 +129,8 @@ namespace CoopClient
 
                                     COOPAPI.Connected();
                                     GTA.UI.Notification.Show("~g~Connected!");
+
+                                    JavascriptHook.LoadAll();
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -153,6 +155,8 @@ namespace CoopClient
 
                                 COOPAPI.Disconnected(reason);
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
+
+                                JavascriptHook.StopAll();
                                 break;
                         }
                         break;

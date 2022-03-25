@@ -8,7 +8,6 @@ using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 using GTA;
-using GTA.Native;
 
 namespace CoopClient
 {
@@ -17,8 +16,6 @@ namespace CoopClient
     /// </summary>
     public class JavascriptHook : Script
     {
-        private bool LoadedEngine = false;
-
         private static List<V8ScriptEngine> ScriptEngines;
 
         /// <summary>
@@ -36,31 +33,37 @@ namespace CoopClient
                 return;
             }
 
-            if (!LoadedEngine)
+            lock (ScriptEngines)
             {
-                LoadedEngine = true;
+                ScriptEngines.ForEach(engine => engine.Script.API.InvokeTick());
+            }
+        }
 
-                ScriptEngines = new List<V8ScriptEngine>();
+        internal static void LoadAll()
+        {
+            ScriptEngines = new List<V8ScriptEngine>();
 
-                string serverAddress = Main.MainSettings.LastServerAddress.Replace(":", ".");
+            string serverAddress = Main.MainSettings.LastServerAddress.Replace(":", ".");
 
-                if (!Directory.Exists("scripts\\resources\\" + serverAddress))
+            if (!Directory.Exists("scripts\\resources\\" + serverAddress))
+            {
+                try
                 {
-                    try
-                    {
-                        Directory.CreateDirectory("scripts\\resources\\" + serverAddress);
-                    }
-                    catch (Exception ex)
-                    {
-                        // TODO
-                    }
+                    Directory.CreateDirectory("scripts\\resources\\" + serverAddress);
                 }
+                catch (Exception ex)
+                {
+                    // TODO
+                }
+            }
 
+            lock (ScriptEngines)
+            {
                 foreach (string script in Directory.GetFiles("scripts\\resources\\" + serverAddress, "*.js"))
                 {
                     V8ScriptEngine engine = new V8ScriptEngine();
 
-                    engine.AddHostObject("SHV", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
+                    engine.AddHostObject("SHVDN", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
                     engine.AddHostObject("LemonUI", new HostTypeCollection(Assembly.LoadFrom("scripts\\LemonUI.SHVDN3.dll")));
                     engine.AddHostObject("API", new ScriptContext());
 
@@ -74,12 +77,20 @@ namespace CoopClient
                     }
                     finally
                     {
+                        engine.Script.API.InvokeStart();
                         ScriptEngines.Add(engine);
                     }
                 }
             }
+        }
 
-            ScriptEngines.ForEach(engine => engine.Script.API.InvokeRender());
+        internal static void StopAll()
+        {
+            lock (ScriptEngines)
+            {
+                ScriptEngines.ForEach(engine => engine.Script.API.InvokeStop());
+                ScriptEngines.Clear();
+            }
         }
     }
 
@@ -91,33 +102,28 @@ namespace CoopClient
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler OnRender;
+        public event EventHandler OnStart, OnStop, OnTick;
 
-        internal void InvokeRender()
+        internal void InvokeStart()
         {
-            OnRender?.Invoke(this, EventArgs.Empty);
+            OnStart?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hash"></param>
-        /// <param name="args"></param>
-        public void CallNative(string hash, params object[] args)
+        internal void InvokeStop()
         {
-            if (!Hash.TryParse(hash, out Hash ourHash))
-            {
-                return;
-            }
+            OnStop?.Invoke(this, EventArgs.Empty);
+        }
 
-            Function.Call(ourHash, args.Select(o => new InputArgument(o)).ToArray());
+        internal void InvokeTick()
+        {
+            OnTick?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="message"></param>
-        public void SendMessage(string message)
+        public void SendLocalMessage(string message)
         {
             Main.MainChat.AddMessage("JAVASCRIPT", message);
         }
