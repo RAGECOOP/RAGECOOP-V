@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 
+using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 using GTA;
@@ -56,6 +58,8 @@ namespace CoopClient
                 {
                     V8ScriptEngine engine = new V8ScriptEngine();
 
+                    engine.AddHostObject("SHV", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
+                    engine.AddHostObject("LemonUI", new HostTypeCollection(Assembly.LoadFrom("scripts\\LemonUI.SHVDN3.dll")));
                     engine.AddHostObject("API", new ScriptContext());
 
                     try
