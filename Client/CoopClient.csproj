@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +41,14 @@
     <DocumentationFile>bin\Release\CoopClient.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClearScript.Core, Version=7.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\Release\scripts\ClearScript.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ClearScript.V8, Version=7.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Libs\Release\scripts\ClearScript.V8.dll</HintPath>
+    </Reference>
     <Reference Include="LemonUI.SHVDN3, Version=1.5.1.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Release\scripts\LemonUI.SHVDN3.dll</HintPath>
@@ -81,6 +91,7 @@
     <Compile Include="Entities\EntitiesThread.cs" />
     <Compile Include="Entities\Player\Sync\OnFootSync.cs" />
     <Compile Include="Entities\Player\Sync\VehicleSync.cs" />
+    <Compile Include="JavascriptHook.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\MenusMain.cs" />
     <Compile Include="Menus\Sub\Servers.cs" />
