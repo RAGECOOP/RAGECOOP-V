@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Collections.Generic;
 
 using Microsoft.ClearScript.V8;
 
@@ -13,7 +15,7 @@ namespace CoopClient
     {
         private bool LoadedEngine = false;
 
-        private static V8ScriptEngine ScriptEngine;
+        private static List<V8ScriptEngine> ScriptEngines;
 
         /// <summary>
         /// Don't use this!
@@ -30,14 +32,46 @@ namespace CoopClient
                 return;
             }
 
-            if (!LoadedEngine)
+            if (LoadedEngine)
             {
-                ScriptEngine = new V8ScriptEngine();
-                LoadedEngine = true;
-
-                ScriptEngine.AddHostObject("script", new ScriptContext());
-                ScriptEngine.Execute(System.IO.File.ReadAllText("scripts\\test.js"));
+                return;
             }
+
+            ScriptEngines = new List<V8ScriptEngine>();
+
+            if (!Directory.Exists("scripts\\resources"))
+            {
+                try
+                {
+                    Directory.CreateDirectory("scripts\\resources");
+                }
+                catch (Exception ex)
+                {
+                    // TODO
+                }
+            }
+
+            foreach (string script in Directory.GetFiles("scripts\\resources", "*.js"))
+            {
+                V8ScriptEngine engine = new V8ScriptEngine();
+
+                engine.AddHostObject("script", new ScriptContext());
+                
+                try
+                {
+                    engine.Execute(File.ReadAllText(script));
+                }
+                catch (Exception ex)
+                {
+                    // TODO
+                }
+                finally
+                {
+                    ScriptEngines.Add(engine);
+                }
+            }
+
+            LoadedEngine = true;
         }
     }
 
