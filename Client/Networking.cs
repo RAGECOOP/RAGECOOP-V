@@ -369,6 +369,8 @@ namespace CoopClient
                                         {
                                             Main.MainChat.AddMessage(packet.Username, packet.Message);
                                         }
+
+                                        JavascriptHook.InvokeChatMessage(packet.Username, packet.Message);
                                     }
                                     catch (Exception ex)
                                     {
@@ -461,6 +463,7 @@ namespace CoopClient
 
             Main.Players.Add(packet.NetHandle, player);
             COOPAPI.Connected(packet.NetHandle);
+            JavascriptHook.InvokePlayerConnect(packet.Username, packet.NetHandle);
         }
 
         private void PlayerDisconnect(Packets.PlayerDisconnect packet)
@@ -477,6 +480,7 @@ namespace CoopClient
                 player.PedBlip?.Delete();
 
                 COOPAPI.Disconnected(packet.NetHandle);
+                JavascriptHook.InvokePlayerDisonnect(player.Username, packet.NetHandle);
                 Main.Players.Remove(packet.NetHandle);
             }
         }

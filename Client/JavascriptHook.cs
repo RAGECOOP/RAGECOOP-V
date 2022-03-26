@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -92,6 +91,30 @@ namespace CoopClient
                 ScriptEngines.Clear();
             }
         }
+
+        internal static void InvokePlayerConnect(string username, long nethandle)
+        {
+            lock (ScriptEngines)
+            {
+                ScriptEngines.ForEach(engine => engine.Script.API.InvokePlayerConnect(username, nethandle));
+            }
+        }
+
+        internal static void InvokePlayerDisonnect(string username, long nethandle, string reason = null)
+        {
+            lock (ScriptEngines)
+            {
+                ScriptEngines.ForEach(engine => engine.Script.API.InvokePlayerDisonnect(username, nethandle, reason));
+            }
+        }
+
+        internal static void InvokeChatMessage(string from, string message)
+        {
+            lock (ScriptEngines)
+            {
+                ScriptEngines.ForEach(engine => engine.Script.API.InvokeChatMessage(from, message));
+            }
+        }
     }
 
     /// <summary>
@@ -102,7 +125,29 @@ namespace CoopClient
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="username"></param>
+        /// <param name="nethandle"></param>
+        /// <param name="reason"></param>
+        public delegate void PlayerConnectEvent(string username, long nethandle, string reason);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="message"></param>
+        public delegate void ChatMessageEvent(string from, string message);
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler OnStart, OnStop, OnTick;
+        /// <summary>
+        /// 
+        /// </summary>
+        public event PlayerConnectEvent OnPlayerConnect, OnPlayerDisconnect;
+        /// <summary>
+        /// 
+        /// </summary>
+        public event ChatMessageEvent OnChatMessage;
 
         internal void InvokeStart()
         {
@@ -117,6 +162,21 @@ namespace CoopClient
         internal void InvokeTick()
         {
             OnTick?.Invoke(this, EventArgs.Empty);
+        }
+
+        internal void InvokePlayerConnect(string username, long nethandle)
+        {
+            OnPlayerConnect?.Invoke(username, nethandle, null);
+        }
+
+        internal void InvokePlayerDisonnect(string username, long nethandle, string reason)
+        {
+            OnPlayerDisconnect?.Invoke(username, nethandle, reason);
+        }
+
+        internal void InvokeChatMessage(string from, string message)
+        {
+            OnChatMessage?.Invoke(from, message);
         }
 
         /// <summary>
