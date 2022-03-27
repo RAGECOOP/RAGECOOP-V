@@ -64,7 +64,7 @@ namespace CoopClient
 
                     engine.AddHostObject("SHVDN", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
                     engine.AddHostObject("LemonUI", new HostTypeCollection(Assembly.LoadFrom("scripts\\LemonUI.SHVDN3.dll")));
-                    engine.AddHostObject("API", new ScriptContext());
+                    engine.AddHostObject("API", HostItemFlags.PrivateAccess, new ScriptContext());
 
                     try
                     {
@@ -117,36 +117,16 @@ namespace CoopClient
         }
     }
 
-    /// <summary>
-    /// FOR JAVASCRIPT ONLY!
-    /// </summary>
-    public class ScriptContext
+    internal class ScriptContext
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="username"></param>
-        /// <param name="nethandle"></param>
-        /// <param name="reason"></param>
+        #region DELEGATES
         public delegate void PlayerConnectEvent(string username, long nethandle, string reason);
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="message"></param>
         public delegate void ChatMessageEvent(string from, string message);
+        #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
+        #region EVENTS
         public event EventHandler OnStart, OnStop, OnTick;
-        /// <summary>
-        /// 
-        /// </summary>
         public event PlayerConnectEvent OnPlayerConnect, OnPlayerDisconnect;
-        /// <summary>
-        /// 
-        /// </summary>
         public event ChatMessageEvent OnChatMessage;
 
         internal void InvokeStart()
@@ -178,11 +158,8 @@ namespace CoopClient
         {
             OnChatMessage?.Invoke(from, message);
         }
+        #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"></param>
         public void SendLocalMessage(string message)
         {
             Main.MainChat.AddMessage("JAVASCRIPT", message);
