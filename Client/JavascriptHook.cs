@@ -15,7 +15,7 @@ namespace CoopClient
     /// </summary>
     public class JavascriptHook : Script
     {
-        private static List<V8ScriptEngine> ScriptEngines;
+        private static readonly List<V8ScriptEngine> ScriptEngines = new List<V8ScriptEngine>();
 
         /// <summary>
         /// Don't use this!
@@ -27,7 +27,7 @@ namespace CoopClient
 
         private void Ontick(object sender, EventArgs e)
         {
-            if (!Main.MainNetworking.IsOnServer() || ScriptEngines == null || ScriptEngines.Count == 0)
+            if (!Main.MainNetworking.IsOnServer() || ScriptEngines.Count == 0)
             {
                 return;
             }
@@ -40,8 +40,6 @@ namespace CoopClient
 
         internal static void LoadAll()
         {
-            ScriptEngines = new List<V8ScriptEngine>();
-
             string serverAddress = Main.MainSettings.LastServerAddress.Replace(":", ".");
 
             if (!Directory.Exists("scripts\\resources\\" + serverAddress))
@@ -90,8 +88,6 @@ namespace CoopClient
                 ScriptEngines.ForEach(engine => engine.Script.API.InvokeStop());
                 ScriptEngines.Clear();
             }
-
-            ScriptEngines = null;
         }
 
         internal static void InvokePlayerConnect(string username, long nethandle)
@@ -165,6 +161,11 @@ namespace CoopClient
         public void SendLocalMessage(string message)
         {
             Main.MainChat.AddMessage("JAVASCRIPT", message);
+        }
+
+        public string GetLocalUsername()
+        {
+            return Main.MainSettings.Username;
         }
     }
 }

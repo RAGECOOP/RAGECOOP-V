@@ -55,9 +55,6 @@ namespace CoopClient
             }
         }
 
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
         public Chat()
         {
             MainScaleForm = new Scaleform("multiplayer_chat");
