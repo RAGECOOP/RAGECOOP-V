@@ -35,6 +35,8 @@ namespace CoopClient
                 return;
             }
 
+            Game.DisableControlThisFrame(Control.FrontendPause);
+
             Function.Call((Hash)0xB96B00E976BE977F, 0.0f); // _SET_WAVES_INTENSITY
 
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character.Handle, true, false);

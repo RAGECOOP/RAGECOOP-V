@@ -170,6 +170,9 @@ namespace CoopClient
 
             switch (e.KeyCode)
             {
+                case Keys.Escape:
+                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                    break;
                 case Keys.F9:
                     if (MainMenu.MenuPool.AreAnyVisible)
                     {
