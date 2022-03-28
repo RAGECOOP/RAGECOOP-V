@@ -182,7 +182,7 @@ namespace CoopClient
         /// </summary>
         public static bool IsPlayerListVisible()
         {
-            return Util.GetTickCount64() - PlayerList.Pressed < 5000;
+            return Main.MainPlayerList != null && Util.GetTickCount64() - Main.MainPlayerList.Pressed < 5000;
         }
 
         /// <summary>
@@ -277,7 +277,10 @@ namespace CoopClient
         /// <param name="leftAlign">true to move the player list to the left</param>
         public static void SetPlayerListLeftAlign(bool leftAlign)
         {
-            PlayerList.LeftAlign = leftAlign;
+            if (Main.MainPlayerList != null)
+            {
+                Main.MainPlayerList.LeftAlign = leftAlign;
+            }
         }
 
 #if DEBUG

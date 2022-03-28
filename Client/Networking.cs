@@ -122,6 +122,7 @@ namespace CoopClient
                                     Main.NPCsAllowed = handshakePacket.NPCsAllowed;
 
                                     Main.MainChat.Init();
+                                    Main.MainPlayerList = new PlayerList();
 
 #if !NON_INTERACTIVE
                                     Main.MainMenu.ConnectedMenuSetting();
@@ -147,6 +148,7 @@ namespace CoopClient
                                     Main.MainChat.Focused = false;
                                 }
 
+                                Main.MainPlayerList = null;
                                 Main.CleanUp();
 
 #if !NON_INTERACTIVE

@@ -27,7 +27,7 @@ namespace CoopClient
 
         private void Ontick(object sender, EventArgs e)
         {
-            if (!Main.MainNetworking.IsOnServer())
+            if (!Main.MainNetworking.IsOnServer() || ScriptEngines == null || ScriptEngines.Count == 0)
             {
                 return;
             }
@@ -90,6 +90,8 @@ namespace CoopClient
                 ScriptEngines.ForEach(engine => engine.Script.API.InvokeStop());
                 ScriptEngines.Clear();
             }
+
+            ScriptEngines = null;
         }
 
         internal static void InvokePlayerConnect(string username, long nethandle)

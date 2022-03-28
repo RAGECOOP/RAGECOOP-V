@@ -36,6 +36,7 @@ namespace CoopClient
         internal static MenusMain MainMenu = null;
 #endif
         internal static Chat MainChat = null;
+        internal static PlayerList MainPlayerList = null;
 
         internal static long LocalNetHandle = 0;
         internal static Dictionary<long, EntitiesPlayer> Players = null;
@@ -140,6 +141,7 @@ namespace CoopClient
 #endif
 
             MainChat.Tick();
+            MainPlayerList.Tick();
 
 #if DEBUG
             if (UseDebug)
@@ -208,7 +210,7 @@ namespace CoopClient
                         if (MainNetworking.IsOnServer())
                         {
                             ulong currentTimestamp = Util.GetTickCount64();
-                            PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                            MainPlayerList.Pressed = (currentTimestamp - MainPlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                         }
                     }
                     else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))

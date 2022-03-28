@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using CoopClient.Entities.Player;
 
@@ -8,36 +7,17 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    /// <summary>
-    /// Don't use it!
-    /// </summary>
-    public class PlayerList : Script
+    internal class PlayerList
     {
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;
         private readonly Scaleform MainScaleform = new Scaleform("mp_mm_card_freemode");
         private ulong LastUpdate = Util.GetTickCount64();
-        internal static ulong Pressed { get; set; }
+        internal ulong Pressed { get; set; }
 
-        internal static bool LeftAlign = true;
+        internal bool LeftAlign = true;
 
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
-        public PlayerList()
-        {
-            // Required for some synchronization!
-            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
-            {
-                return;
-            }
-
-            Init();
-
-            Tick += OnTick;
-        }
-
-        private void OnTick(object sender, EventArgs e)
+        public void Tick()
         {
             if (!Main.MainNetworking.IsOnServer())
             {
@@ -60,14 +40,6 @@ namespace CoopClient
                                 0.28f, 0.6f,
                                 255, 255, 255, 255, 0);
             }
-        }
-
-        private void Init()
-        {
-            MainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            MainScaleform.CallFunction("SET_DATA_SLOT", 0, "", "Me", 116, 0, 0, "", "", 2, "", "", ' ');
-            MainScaleform.CallFunction("SET_TITLE", "Player list", "1 players");
-            MainScaleform.CallFunction("DISPLAY_VIEW");
         }
 
         private void Update(Dictionary<long, EntitiesPlayer> players, string localUsername)
