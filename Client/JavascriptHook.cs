@@ -50,7 +50,11 @@ namespace CoopClient
                 }
                 catch (Exception ex)
                 {
+                    GTA.UI.Notification.Show("~r~~h~Javascript Error");
                     Logger.Write(ex.Message, Logger.LogLevel.Server);
+
+                    // Without the directory we can't do the other stuff
+                    return;
                 }
             }
 
@@ -70,6 +74,7 @@ namespace CoopClient
                     }
                     catch (Exception ex)
                     {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
                         Logger.Write(ex.Message, Logger.LogLevel.Server);
                     }
                     finally

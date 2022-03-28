@@ -339,7 +339,8 @@ namespace CoopClient
                     }
                     catch
                     {
-                        GTA.UI.Notification.Show($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
+                        GTA.UI.Notification.Show("~r~~h~CleanUpWorld() Error");
+                        Logger.Write($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!", Logger.LogLevel.Server);
                     }
                 }
 

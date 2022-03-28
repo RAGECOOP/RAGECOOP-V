@@ -129,6 +129,7 @@ namespace CoopClient
                                     GTA.UI.Notification.Show("~g~Connected!");
 
                                     JavascriptHook.LoadAll();
+                                    Logger.Write(">> Connected <<", Logger.LogLevel.Server);
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
@@ -156,6 +157,8 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 JavascriptHook.StopAll();
+
+                                Logger.Write($">> Disconnected << reason: {reason}", Logger.LogLevel.Server);
                                 break;
                         }
                         break;
@@ -172,8 +175,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -191,8 +195,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -210,8 +215,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -229,8 +235,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -248,8 +255,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -267,8 +275,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -286,8 +295,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -311,8 +321,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -330,8 +341,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -349,8 +361,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -373,8 +386,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -392,8 +406,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -411,8 +426,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
@@ -428,8 +444,9 @@ namespace CoopClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        GTA.UI.Notification.Show(ex.Message);
-                                        Client.Disconnect($"Packet Type:{packetType} Error:{ex.Message}");
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
                                 break;
