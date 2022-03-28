@@ -50,7 +50,7 @@ namespace CoopClient
                 }
                 catch (Exception ex)
                 {
-                    // TODO
+                    Logger.Write(ex.Message, Logger.LogLevel.Server);
                 }
             }
 
@@ -70,7 +70,7 @@ namespace CoopClient
                     }
                     catch (Exception ex)
                     {
-                        // TODO
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
                     }
                     finally
                     {

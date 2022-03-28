@@ -92,6 +92,7 @@
     <Compile Include="Entities\Player\Sync\OnFootSync.cs" />
     <Compile Include="Entities\Player\Sync\VehicleSync.cs" />
     <Compile Include="JavascriptHook.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\MenusMain.cs" />
     <Compile Include="Menus\Sub\Servers.cs" />
