@@ -28,7 +28,7 @@ namespace CoopClient
             };
         }
 
-        internal static void OnTick(object sender, EventArgs e)
+        private void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading)
             {
@@ -62,7 +62,7 @@ namespace CoopClient
             LastDisableTraffic = Main.DisableTraffic;
         }
 
-        private static void Traffic(bool enable)
+        private void Traffic(bool enable)
         {
             if (enable)
             {

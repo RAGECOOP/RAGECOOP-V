@@ -11,20 +11,17 @@ using GTA.Native;
 
 namespace CoopClient
 {
-    /// <summary>
-    /// Don't use it!
-    /// </summary>
-    public class Networking
+    internal class Networking
     {
-        internal NetClient Client;
-        internal float Latency = 0;
+        public NetClient Client;
+        public float Latency = 0;
 
-        internal bool ShowNetworkInfo = false;
+        public bool ShowNetworkInfo = false;
 
-        internal int BytesReceived = 0;
-        internal int BytesSend = 0;
+        public int BytesReceived = 0;
+        public int BytesSend = 0;
 
-        internal void DisConnectFromServer(string address)
+        public void DisConnectFromServer(string address)
         {
             if (IsOnServer())
             {
@@ -72,12 +69,12 @@ namespace CoopClient
             }
         }
 
-        internal bool IsOnServer()
+        public bool IsOnServer()
         {
             return Client?.ConnectionStatus == NetConnectionStatus.Connected;
         }
 
-        internal void ReceiveMessages()
+        public void ReceiveMessages()
         {
             if (Client == null)
             {
@@ -902,7 +899,7 @@ namespace CoopClient
 
         #region -- SEND --
         private ulong LastPlayerFullSync = 0;
-        internal void SendPlayerData()
+        public void SendPlayerData()
         {
             Ped player = Game.Player.Character;
 
@@ -1024,7 +1021,7 @@ namespace CoopClient
             #endif
         }
 
-        internal void SendNpcData(Ped npc)
+        public void SendNpcData(Ped npc)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
@@ -1091,7 +1088,7 @@ namespace CoopClient
             #endif
         }
 
-        internal void SendChatMessage(string message)
+        public void SendChatMessage(string message)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
@@ -1108,7 +1105,7 @@ namespace CoopClient
             #endif
         }
 
-        internal void SendModData(long target, string modName, byte customID, byte[] bytes)
+        public void SendModData(long target, string modName, byte customID, byte[] bytes)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new Packets.Mod()
