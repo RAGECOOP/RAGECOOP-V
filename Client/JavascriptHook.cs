@@ -123,28 +123,31 @@ namespace CoopClient
     internal class ScriptContext
     {
         #region DELEGATES
+        // We currently have a bug here
+        // We can't use delegates with ClearScript without granting access, but how do we do that?
+        public delegate void EmptyEvent();
         public delegate void PlayerConnectEvent(string username, long nethandle, string reason);
         public delegate void ChatMessageEvent(string from, string message);
         #endregion
 
         #region EVENTS
-        public event EventHandler OnStart, OnStop, OnTick;
+        public event EmptyEvent OnStart, OnStop, OnTick;
         public event PlayerConnectEvent OnPlayerConnect, OnPlayerDisconnect;
         public event ChatMessageEvent OnChatMessage;
 
         internal void InvokeStart()
         {
-            OnStart?.Invoke(this, EventArgs.Empty);
+            OnStart?.Invoke();
         }
 
         internal void InvokeStop()
         {
-            OnStop?.Invoke(this, EventArgs.Empty);
+            OnStop?.Invoke();
         }
 
         internal void InvokeTick()
         {
-            OnTick?.Invoke(this, EventArgs.Empty);
+            OnTick?.Invoke();
         }
 
         internal void InvokePlayerConnect(string username, long nethandle)
@@ -171,6 +174,11 @@ namespace CoopClient
         public string GetLocalUsername()
         {
             return Main.MainSettings.Username;
+        }
+
+        public long GetLocalNetHandle()
+        {
+            return Main.LocalNetHandle;
         }
     }
 }

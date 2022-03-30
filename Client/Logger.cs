@@ -13,7 +13,7 @@ namespace CoopClient
             Custom
         }
 
-        public static void Write(string message, LogLevel level = LogLevel.Normal, string filepath = null)
+        private static string GetFilePath(LogLevel level, string filepath)
         {
             string newFilePath = null;
 
@@ -35,6 +35,13 @@ namespace CoopClient
                     break;
             }
 
+            return newFilePath;
+        }
+
+        public static void Write(string message, LogLevel level = LogLevel.Normal, string filepath = null)
+        {
+            string newFilePath = GetFilePath(level, filepath);
+
             try
             {
                 if (File.Exists(newFilePath))
@@ -53,7 +60,7 @@ namespace CoopClient
 
                 using (StreamWriter sw = new StreamWriter(newFilePath, true))
                 {
-                    Log(message, sw);
+                    sw.WriteLine($"[{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}] : {message}");
 
                     sw.Flush();
                     sw.Close();
@@ -61,11 +68,6 @@ namespace CoopClient
             }
             catch
             { }
-        }
-
-        private static void Log(string message, TextWriter writer)
-        {
-            writer.WriteLine($"[{DateTime.Now.ToLongTimeString()} {DateTime.Now.ToLongDateString()}] : {message}");
         }
     }
 }
