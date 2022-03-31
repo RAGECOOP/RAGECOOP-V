@@ -66,7 +66,8 @@ namespace CoopClient
 
                     engine.AddHostObject("SHVDN", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
                     engine.AddHostObject("LemonUI", new HostTypeCollection(Assembly.LoadFrom("scripts\\LemonUI.SHVDN3.dll")));
-                    engine.AddHostObject("API", HostItemFlags.PrivateAccess, new ScriptContext());
+                    engine.AccessContext = typeof(ScriptContext);
+                    engine.AddHostObject("API", new ScriptContext());
 
                     try
                     {
@@ -123,8 +124,6 @@ namespace CoopClient
     internal class ScriptContext
     {
         #region DELEGATES
-        // We currently have a bug here
-        // We can't use delegates with ClearScript without granting access, but how do we do that?
         public delegate void EmptyEvent();
         public delegate void PlayerConnectEvent(string username, long nethandle, string reason);
         public delegate void ChatMessageEvent(string from, string message);
