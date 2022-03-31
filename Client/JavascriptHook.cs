@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -7,6 +8,7 @@ using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 using GTA;
+using GTA.Native;
 
 namespace CoopClient
 {
@@ -165,6 +167,7 @@ namespace CoopClient
         }
         #endregion
 
+        /* ===== PLAYER STUFF ===== */
         public void SendLocalMessage(string message)
         {
             Main.MainChat.AddMessage("JAVASCRIPT", message);
@@ -179,5 +182,37 @@ namespace CoopClient
         {
             return Main.LocalNetHandle;
         }
+
+        // This only applies to server-side created objects
+        public void CleanUpWorld()
+        {
+            Main.CleanUpWorld();
+        }
+
+        // This create an object to delete it with CleanUpWorld() or on disconnect
+        public void CreateObject(string hash, params object[] args)
+        {
+            if (!Hash.TryParse(hash, out Hash ourHash) || !Main.CheckNativeHash.ContainsKey((ulong)ourHash))
+            {
+                GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                Logger.Write($"Hash \"{ourHash}\" has not been found!", Logger.LogLevel.Server);
+                return;
+            }
+
+            int result = Function.Call<int>(ourHash, args.Select(o => new InputArgument(o)).ToArray());
+
+            foreach (KeyValuePair<ulong, byte> checkHash in Main.CheckNativeHash)
+            {
+                if (checkHash.Key == (ulong)ourHash)
+                {
+                    lock (Main.ServerItems)
+                    {
+                        Main.ServerItems.Add(result, checkHash.Value);
+                    }
+                    break;
+                }
+            }
+        }
+        /* ===== PLAYER STUFF ===== */
     }
 }
