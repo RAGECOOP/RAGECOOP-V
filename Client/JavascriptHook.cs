@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Collections.Generic;
 
-using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 using GTA;
 using GTA.Native;
+using GTA.Math;
 
 namespace CoopClient
 {
@@ -66,10 +65,12 @@ namespace CoopClient
                 {
                     V8ScriptEngine engine = new V8ScriptEngine();
 
-                    engine.AddHostObject("SHVDN", new HostTypeCollection(Assembly.LoadFrom("ScriptHookVDotNet3.dll")));
-                    engine.AddHostObject("LemonUI", new HostTypeCollection(Assembly.LoadFrom("scripts\\LemonUI.SHVDN3.dll")));
                     engine.AccessContext = typeof(ScriptContext);
                     engine.AddHostObject("API", new ScriptContext());
+
+                    engine.AddHostType("Dictionary", typeof(Dictionary<,>));
+
+                    engine.AddHostType("Vector3", typeof(Vector3));
 
                     try
                     {
@@ -213,6 +214,83 @@ namespace CoopClient
                 }
             }
         }
-        /* ===== PLAYER STUFF ===== */
+
+        public void SendNotification(string message)
+        {
+            GTA.UI.Notification.Show(message);
+        }
+        public void SendNotification(string[] messages)
+        {
+            SendNotification(string.Concat(messages));
+        }
+
+        public Vector3 GetPlayerPosition()
+        {
+            return Game.Player.Character.Position;
+        }
+        public Vector3 GetPlayerRotation()
+        {
+            return Game.Player.Character.Rotation;
+        }
+
+        public int GetCurrentCharachterHandle()
+        {
+            return Game.Player.Character?.Handle ?? 0;
+        }
+
+        public int GetCurrentVehicleHandle()
+        {
+            return Game.Player.Character?.CurrentVehicle?.Handle ?? 0;
+        }
+
+        public int GetCurrentVehicleSeatIndex()
+        {
+            return Game.Player.Character?.CurrentVehicle != null ? (int)Game.Player.Character?.SeatIndex : 0;
+        }
+
+        /* ===== OTHER PLAYER STUFF ===== */
+        public Vector3 GetPlayerPosition(long nethandle)
+        {
+            lock (Main.Players)
+            {
+                return Main.Players.ContainsKey(nethandle) ? Main.Players.First(x => x.Key == nethandle).Value.Position : default;
+            }
+        }
+        public Vector3 GetPlayerRotation(long nethandle)
+        {
+            lock (Main.Players)
+            {
+                return Main.Players.ContainsKey(nethandle) ? Main.Players.First(x => x.Key == nethandle).Value.Rotation : default;
+            }
+        }
+
+        // Get nethandle and charachter handle
+        public Dictionary<long, int> GetAllNearbyPlayers(float distance)
+        {
+            Dictionary<long, int> result = new Dictionary<long, int>();
+            
+            lock (Main.Players)
+            {
+                Vector3 localPosition = Game.Player.Character.Position;
+                foreach (KeyValuePair<long, Entities.Player.EntitiesPlayer> player in Main.Players)
+                {
+                    if (player.Value.Position.DistanceTo2D(localPosition) < distance)
+                    {
+                        // Character handle = 0 (if no character exists)
+                        result.Add(player.Key, player.Value.Character?.Handle ?? 0);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public long GetNetHandleByUsername(string username)
+        {
+            lock (Main.Players)
+            {
+                return Main.Players.FirstOrDefault(x => x.Value.Username == username).Key;
+            }
+        }
     }
 }
