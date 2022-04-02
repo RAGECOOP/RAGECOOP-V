@@ -113,7 +113,10 @@ namespace CoopClient
         NativeCall,
         NativeResponse,
         Mod,
-        CleanUpWorld
+        CleanUpWorld,
+        FileTransferTick,
+        FileTransferRequest,
+        FileTransferComplete
     }
 
     enum ConnectionChannel
