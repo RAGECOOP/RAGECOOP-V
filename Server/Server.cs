@@ -36,6 +36,8 @@ namespace CoopServer
 
         public static readonly List<Client> Clients = new();
 
+        public static DownloadManager MainDownloadManager = new();
+
         public Server()
         {
             Logging.Info("================");
@@ -203,6 +205,8 @@ namespace CoopServer
         {
             Logging.Info("Listening for clients");
             Logging.Info("Please use CTRL + C if you want to stop the server!");
+
+            MainDownloadManager.Create(0);
 
             while (!Program.ReadyToStop)
             {

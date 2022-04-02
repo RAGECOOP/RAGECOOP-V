@@ -19,7 +19,9 @@ namespace CoopClient
                 Directory.CreateDirectory(downloadFolder);
                 if (FileAlreadyExists(downloadFolder))
                 {
-                    Finish();
+                    // Send the server we are already done
+                    Main.MainNetworking.SendDownloadFinish(FileID);
+                    return;
                 }
             }
 
@@ -54,20 +56,9 @@ namespace CoopClient
             _stream.Write(data, 0, data.Length);
             if (data.Length >= FileLength)
             {
-                Finish();
-            }
-        }
-
-        private void Finish()
-        {
-            if (_stream != null)
-            {
                 _stream.Close();
                 _stream.Dispose();
             }
-
-            // Send the server we are done
-            Main.MainNetworking.SendDownloadFinish(FileID);
         }
     }
 }
