@@ -1,35 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace CoopClient
 {
     internal class DownloadManager
     {
-        public int FileID { get; set; }
+        public byte FileID { get; set; }
         public Packets.DataFileType FileType { get; set; }
         public string FileName { get; set; }
-        public int FileLength { get; set; }
-        public int Downloaded { get; set; } = 0;
+        public long FileLength { get; set; }
 
-        public DownloadManager(int id, Packets.DataFileType type, string name, int length)
+        private readonly FileStream _stream;
+
+        public DownloadManager()
         {
-            FileID = id;
-            FileType = type;
-            FileName = name;
-            FileLength = length;
+            string downloadFolder = $"scripts\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
+            if (!Directory.Exists(downloadFolder))
+            {
+                Directory.CreateDirectory(downloadFolder);
+                if (FileAlreadyExists(downloadFolder))
+                {
+                    Finish();
+                }
+            }
+
+            _stream = new FileStream(downloadFolder + "\\" + FileName, FileMode.CreateNew);
         }
 
-        public void DownloadPart(byte[] bytes)
+        /// <summary>
+        /// Check if the file already exists and if the size correct otherwise delete this file
+        /// </summary>
+        /// <param name="folder"></param>
+        private bool FileAlreadyExists(string folder)
         {
+            string filePath = $"{folder}\\{FileName}";
+            if (File.Exists(filePath))
+            {
+                if (new FileInfo(filePath).Length == FileLength)
+                {
+                    return true;
+                }
+                else
+                {
+                    // Delete the file because the length is wrong (maybe the file was updated)
+                    File.Delete(filePath);
+                }
+            }
 
+            return false;
         }
 
-        public void Finish()
+        public void DownloadPart(byte[] data)
         {
+            _stream.Write(data, 0, data.Length);
+            if (data.Length >= FileLength)
+            {
+                Finish();
+            }
+        }
 
+        private void Finish()
+        {
+            if (_stream != null)
+            {
+                _stream.Close();
+                _stream.Dispose();
+            }
+
+            // Send the server we are done
+            Main.MainNetworking.SendDownloadFinish(FileID);
         }
     }
 }

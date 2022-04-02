@@ -84,6 +84,7 @@
     <Compile Include="BitReader.cs" />
     <Compile Include="Chat.cs" />
     <Compile Include="COOPAPI.cs" />
+    <Compile Include="DownloadManager.cs" />
     <Compile Include="Entities\NPC\EntitiesNPC.cs" />
     <Compile Include="Entities\NPC\Sync\OnFootSync.cs" />
     <Compile Include="Entities\NPC\Sync\VehicleSync.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Menus\Sub\Servers.cs" />
     <Compile Include="Menus\Sub\Settings.cs" />
     <Compile Include="Networking.cs" />
+    <Compile Include="Packets\DownloadPackets.cs" />
     <Compile Include="Packets\NPCPackets.cs" />
     <Compile Include="Packets\Packets.cs" />
     <Compile Include="Packets\PlayerPackets.cs" />

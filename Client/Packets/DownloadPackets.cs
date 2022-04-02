@@ -14,7 +14,7 @@ namespace CoopClient
             Map = 1
         }
 
-        public class FileDownload : Packet
+        public class FileRequest : Packet
         {
             public byte ID { get; set; }
 
@@ -22,7 +22,7 @@ namespace CoopClient
 
             public string FileName { get; set; }
 
-            public int FileLength { get; set; }
+            public long FileLength { get; set; }
 
             public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
             {
@@ -61,7 +61,7 @@ namespace CoopClient
                 FileType = reader.ReadByte();
                 int nameArrayLength = reader.ReadInt();
                 FileName = reader.ReadString(nameArrayLength);
-                FileLength = reader.ReadInt();
+                FileLength = reader.ReadLong();
                 #endregion
             }
         }

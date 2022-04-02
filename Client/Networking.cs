@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using CoopClient.Entities.Player;
@@ -20,6 +21,8 @@ namespace CoopClient
 
         public int BytesReceived = 0;
         public int BytesSend = 0;
+
+        private Dictionary<byte, DownloadManager> _downloads = new Dictionary<byte, DownloadManager>();
 
         public void DisConnectFromServer(string address)
         {
@@ -441,6 +444,54 @@ namespace CoopClient
                                         Packets.Mod packet = new Packets.Mod();
                                         packet.NetIncomingMessageToPacket(data);
                                         COOPAPI.ModPacketReceived(packet.NetHandle, packet.Name, packet.CustomPacketID, packet.Bytes);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
+                                    }
+                                }
+                                break;
+                            case (byte)PacketTypes.FileTransferRequest:
+                                {
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+                                        Packets.FileRequest packet = new Packets.FileRequest();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        _downloads.Add(packet.ID, new DownloadManager()
+                                        {
+                                            FileID = packet.ID,
+                                            FileType = (Packets.DataFileType)packet.FileType,
+                                            FileName = packet.FileName,
+                                            FileLength = packet.FileLength
+                                        });
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
+                                    }
+                                }
+                                break;
+                            case (byte)PacketTypes.FileTransferTick:
+                                {
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+                                        Packets.FileTransferTick packet = new Packets.FileTransferTick();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        KeyValuePair<byte, DownloadManager> dm = _downloads.FirstOrDefault(x => x.Key == packet.ID);
+                                        if (dm.Value != null)
+                                        {
+                                            dm.Value.DownloadPart(packet.FileChunk);
+                                        }
                                     }
                                     catch (Exception ex)
                                     {
@@ -1142,6 +1193,23 @@ namespace CoopClient
                 BytesSend += outgoingMessage.LengthBytes;
             }
             #endif
+        }
+
+        public void SendDownloadFinish(byte id)
+        {
+            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+
+            new Packets.FileTransferComplete() { ID = id }.PacketToNetOutGoingMessage(outgoingMessage);
+
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
+            Client.FlushSendQueue();
+
+#if DEBUG
+            if (ShowNetworkInfo)
+            {
+                BytesSend += outgoingMessage.LengthBytes;
+            }
+#endif
         }
         #endregion
     }

@@ -128,7 +128,8 @@ namespace CoopClient
         NPCFull = 4,
         Chat = 5,
         Native = 6,
-        Mod = 7
+        Mod = 7,
+        File = 8
     }
 
     [Flags]
