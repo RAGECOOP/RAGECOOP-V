@@ -4,31 +4,42 @@ using System.Collections.Generic;
 
 namespace CoopServer
 {
-    internal class DownloadManager
+    internal static class DownloadManager
     {
         const int MAX_BUFFER = 1048576; // 1MB
 
-        // Key = Nethandle
-        // Value = List of Files
-        private Dictionary<long, List<DownloadFile>> _files = new();
+        private static readonly List<DownloadClient> _clients = new();
+        private static readonly List<DownloadFile> _files = new();
+        public static bool AnyFileExists = false;
 
-        public void Create(long nethandle)
+        public static void InsertClient(long nethandle)
         {
-            if (!DirectoryAndFilesExists())
+            if (!AnyFileExists)
             {
                 return;
             }
 
-            List<DownloadFile> files = new();
+            _clients.Add(new DownloadClient() { NetHandle = nethandle, FilesCount = _files.Count });
+        }
 
-            foreach (string file in Directory.GetFiles("clientside"))
+        public static bool CheckForDirectoryAndFiles()
+        {
+            string[] filePaths = Directory.GetFiles("clientside");
+
+            if (!Directory.Exists("clientside") || filePaths.Length == 0)
+            {
+                AnyFileExists = false;
+                return false;
+            }
+
+            foreach (string file in filePaths)
             {
                 FileInfo fileInfo = new(file);
 
                 // ONLY JAVASCRIPT AND JSON FILES!
                 if (!new string[] { ".js", ".json" }.Any(x => x == fileInfo.Extension))
                 {
-                    Logging.Error("Only files with \"*.js\" and \"*.json\" can be sent!");
+                    Logging.Warning("Only files with \"*.js\" and \"*.json\" can be sent!");
                     continue;
                 }
 
@@ -57,17 +68,74 @@ namespace CoopServer
                     }
                 }
 
-                files.Add(newFile);
+                _files.Add(newFile);
             }
 
-            _files.Add(nethandle, files);
+            Logging.Info($"{_files.Count} files found!");
+
+            AnyFileExists = true;
+            return true;
         }
 
-        private bool DirectoryAndFilesExists()
+        public static void Tick()
         {
-            if (!Directory.Exists("clientside") || Directory.GetFiles("clientside").Length == 0)
+            _clients.ForEach(client =>
+            {
+                if (!client.SendFiles(_files))
+                {
+                    Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
+                    if (x != null)
+                    {
+                        x.FilesSent = true;
+                    }
+                }
+            });
+        }
+
+        public static void RemoveClient(long nethandle)
+        {
+            DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
+            if (client != null)
+            {
+                _clients.Remove(client);
+            }
+        }
+    }
+
+    internal class DownloadClient
+    {
+        public long NetHandle { get; set; }
+        public int FilesCount { get; set; }
+        public int FilesSent = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>true if files should be sent otherwise false</returns>
+        public bool SendFiles(List<DownloadFile> files)
+        {
+            if (FilesSent >= FilesCount)
             {
                 return false;
+            }
+
+            DownloadFile file = files.FirstOrDefault(x => !x.DownloadFinished());
+            if (file == null)
+            {
+                return false;
+            }
+
+            file.Send(NetHandle);
+
+            // Check it again, maybe this file is finish now
+            if (file.DownloadFinished())
+            {
+                FilesSent++;
+
+                if (FilesSent >= FilesCount)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -80,10 +148,10 @@ namespace CoopServer
         public string FileName { get; set; }
         public long FileLength { get; set; }
 
-        private List<byte[]> _data = new();
-        private long _sent = 0;
+        private readonly List<byte[]> _data = new();
+        private readonly long _sent = 0;
 
-        public void Upload()
+        public void Send(long nethandle)
         {
             // TODO
         }

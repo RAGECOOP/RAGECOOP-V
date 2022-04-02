@@ -36,8 +36,6 @@ namespace CoopServer
 
         public static readonly List<Client> Clients = new();
 
-        public static DownloadManager MainDownloadManager = new();
-
         public Server()
         {
             Logging.Info("================");
@@ -198,6 +196,9 @@ namespace CoopServer
                 }
             }
 
+            Logging.Info("Client-side files are checked...");
+            DownloadManager.CheckForDirectoryAndFiles();
+
             Listen();
         }
 
@@ -206,8 +207,6 @@ namespace CoopServer
             Logging.Info("Listening for clients");
             Logging.Info("Please use CTRL + C if you want to stop the server!");
 
-            MainDownloadManager.Create(0);
-
             while (!Program.ReadyToStop)
             {
                 if (RunningResource != null)
@@ -215,6 +214,23 @@ namespace CoopServer
                     RunningResource.InvokeTick(++CurrentTick);
                 }
 
+                // Only new clients that did not receive files on connection will receive the current files in "clientside"
+                if (DownloadManager.AnyFileExists)
+                {
+                    lock (Clients)
+                    {
+                        Clients.ForEach(client =>
+                        {
+                            if (!client.FilesSent)
+                            {
+                                DownloadManager.InsertClient(client.NetHandle);
+                            }
+                        });
+                    }
+
+                    DownloadManager.Tick();
+                }
+                
                 NetIncomingMessage message;
 
                 while ((message = MainNetServer.ReadMessage()) != null)
