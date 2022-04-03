@@ -271,7 +271,10 @@ namespace CoopServer
                             {
                                 long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
 
-                                DownloadManager.RemoveClient(nethandle);
+                                lock (DownloadManager.ClientsToDelete)
+                                {
+                                    DownloadManager.ClientsToDelete.Add(nethandle);
+                                }
 
                                 SendPlayerDisconnectPacket(nethandle);
                             }
@@ -736,20 +739,20 @@ namespace CoopServer
         }
 
         // Send all players a message that someone has left the server
-        private static void SendPlayerDisconnectPacket(long clientID)
+        private static void SendPlayerDisconnectPacket(long nethandle)
         {
-            List<NetConnection> clients = MainNetServer.Connections;
+            List<NetConnection> clients = MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != nethandle);
             if (clients.Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerDisconnect()
                 {
-                    NetHandle = clientID
+                    NetHandle = nethandle
                 }.PacketToNetOutGoingMessage(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Client localClient = Clients.Find(x => x.NetHandle == clientID);
+            Client localClient = Clients.FirstOrDefault(x => x.NetHandle == nethandle);
             if (localClient == null)
             {
                 return;

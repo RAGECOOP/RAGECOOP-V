@@ -27,7 +27,7 @@ namespace CoopServer
         private long CallbacksCount = 0;
         internal readonly Dictionary<long, Action<object>> Callbacks = new();
         internal bool FilesReceived = false;
-        public bool FilesSent = false;
+        internal bool FilesSent = false;
 
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)

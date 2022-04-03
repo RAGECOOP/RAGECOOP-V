@@ -8,7 +8,8 @@ namespace CoopServer
 {
     internal static class DownloadManager
     {
-        private static readonly List<DownloadClient> _clients = new();
+        public static readonly List<long> ClientsToDelete = new();
+        private static List<DownloadClient> _clients = new();
         private static readonly List<DownloadFile> _files = new();
         public static bool AnyFileExists = false;
 
@@ -79,14 +80,30 @@ namespace CoopServer
 
         public static void Tick()
         {
+            lock (ClientsToDelete)
+            {
+                foreach (long nethandle in ClientsToDelete)
+                {
+                    DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
+                    if (client != null)
+                    {
+                        _clients.Remove(client);
+                    }
+                }
+                ClientsToDelete.Clear();
+            }
+
             _clients.ForEach(client =>
             {
                 if (!client.SendFiles())
                 {
-                    Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
-                    if (x != null)
+                    lock (Server.Clients)
                     {
-                        x.FilesReceived = true;
+                        Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
+                        if (x != null)
+                        {
+                            x.FilesReceived = true;
+                        }
                     }
                 }
             });
@@ -136,23 +153,29 @@ namespace CoopServer
             _files = files;
 
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == NetHandle);
-            if (conn != null)
+            if (conn == null)
             {
-                _files.ForEach(file =>
+                lock (DownloadManager.ClientsToDelete)
                 {
-                    NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-
-                    new Packets.FileTransferRequest()
-                    {
-                        ID = file.FileID,
-                        FileType = (byte)Packets.DataFileType.Script,
-                        FileName = file.FileName,
-                        FileLength = file.FileLength
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
-
-                    Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
-                });
+                    DownloadManager.ClientsToDelete.Add(NetHandle);
+                }
+                return;
             }
+
+            _files.ForEach(file =>
+            {
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+
+                new Packets.FileTransferRequest()
+                {
+                    ID = file.FileID,
+                    FileType = (byte)Packets.DataFileType.Script,
+                    FileName = file.FileName,
+                    FileLength = file.FileLength
+                }.PacketToNetOutGoingMessage(outgoingMessage);
+
+                Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
+            });
         }
 
         /// <summary>
@@ -186,6 +209,10 @@ namespace CoopServer
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == nethandle);
             if (conn == null)
             {
+                lock (DownloadManager.ClientsToDelete)
+                {
+                    DownloadManager.ClientsToDelete.Add(NetHandle);
+                }
                 return;
             }
 
