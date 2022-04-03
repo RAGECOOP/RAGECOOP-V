@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -20,13 +19,7 @@ namespace CoopServer
                 return;
             }
 
-            List<DownloadFile> DeepCopy = new();
-            foreach (DownloadFile file in _files)
-            {
-                DeepCopy.Add((DownloadFile)file.Clone());
-            }
-
-            _clients.Add(new DownloadClient(nethandle, DeepCopy));
+            _clients.Add(new DownloadClient(nethandle, new(_files)));
         }
 
         public static bool CheckForDirectoryAndFiles()
@@ -35,14 +28,12 @@ namespace CoopServer
 
             if (!Directory.Exists("clientside"))
             {
-                AnyFileExists = false;
                 return false;
             }
 
             filePaths = Directory.GetFiles("clientside");
             if (filePaths.Length == 0)
             {
-                AnyFileExists = false;
                 return false;
             }
 
@@ -69,10 +60,9 @@ namespace CoopServer
                 {
                     while (bs.Read(buffer, 0, MAX_BUFFER) != 0) // Reading 5KB chunks at time
                     {
-                        if (!fileCreated)
+                        if (!fileCreated && (fileCreated = true))
                         {
-                            newFile = new() { FileID = fileCount, FileName = fileInfo.Name, FileLength = fileInfo.Length };
-                            fileCreated = true;
+                            newFile = new() { FileID = fileCount, FileName = fileInfo.Name, FileLength = fileInfo.Length, FileData = new() };
                         }
 
                         newFile.FileData.Add(buffer);
@@ -82,8 +72,6 @@ namespace CoopServer
                 _files.Add(newFile);
                 fileCount++;
             }
-
-            Logging.Info($"{_files.Count} files found!");
 
             AnyFileExists = true;
             return true;
@@ -138,18 +126,19 @@ namespace CoopServer
     internal class DownloadClient
     {
         public long NetHandle = 0;
-        private readonly List<DownloadFile> Files = null;
+        private readonly List<DownloadFile> _files = null;
         public int FilePosition = 0;
+        private int _fileDataPosition = 0;
 
         public DownloadClient(long nethandle, List<DownloadFile> files)
         {
             NetHandle = nethandle;
-            Files = files;
+            _files = files;
 
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == NetHandle);
             if (conn != null)
             {
-                Files.ForEach(file =>
+                _files.ForEach(file =>
                 {
                     NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
@@ -177,13 +166,14 @@ namespace CoopServer
                 return false;
             }
 
-            DownloadFile file = Files[FilePosition];
+            DownloadFile file = _files[FilePosition];
 
-            file.Send(NetHandle);
+            Send(NetHandle, file);
 
-            if (file.FileDataPosition >= file.FileData.Count)
+            if (_fileDataPosition >= file.FileData.Count)
             {
                 FilePosition++;
+                _fileDataPosition = 0;
 
                 return DownloadComplete();
             }
@@ -191,22 +181,7 @@ namespace CoopServer
             return true;
         }
 
-        public bool DownloadComplete()
-        {
-            return FilePosition >= Files.Count;
-        }
-    }
-
-    internal class DownloadFile : ICloneable
-    {
-        public byte FileID { get; set; }
-        public string FileName { get; set; }
-        public long FileLength { get; set; }
-
-        public List<byte[]> FileData { get; set; } = new List<byte[]>();
-        public int FileDataPosition { get; set; } = 0;
-
-        public void Send(long nethandle)
+        private void Send(long nethandle, DownloadFile file)
         {
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == nethandle);
             if (conn == null)
@@ -216,23 +191,23 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
-            new Packets.FileTransferTick() { ID = FileID, FileChunk = FileData[FileDataPosition] }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileData[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
-
-            FileDataPosition++;
         }
 
-        public object Clone()
+        public bool DownloadComplete()
         {
-            return new DownloadFile
-            {
-                FileID = FileID,
-                FileName = FileName,
-                FileLength = FileLength,
-                FileData = FileData,
-                FileDataPosition = 0
-            };
+            return FilePosition >= _files.Count;
         }
+    }
+
+    internal class DownloadFile
+    {
+        public byte FileID { get; set; } = 0;
+        public string FileName { get; set; } = string.Empty;
+        public long FileLength { get; set; } = 0;
+
+        public List<byte[]> FileData { get; set; } = null;
     }
 }

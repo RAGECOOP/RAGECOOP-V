@@ -196,7 +196,7 @@ namespace CoopServer
                 }
             }
 
-            Logging.Info("Client-side files are checked...");
+            Logging.Info("Searching for client-side files...");
             DownloadManager.CheckForDirectoryAndFiles();
 
             Listen();
