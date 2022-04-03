@@ -224,6 +224,7 @@ namespace CoopServer
                             if (!client.FilesSent)
                             {
                                 DownloadManager.InsertClient(client.NetHandle);
+                                client.FilesSent = true;
                             }
                         });
                     }
@@ -268,7 +269,11 @@ namespace CoopServer
 
                             if (status == NetConnectionStatus.Disconnected)
                             {
-                                SendPlayerDisconnectPacket(message.SenderConnection.RemoteUniqueIdentifier);
+                                long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
+
+                                DownloadManager.RemoveClient(nethandle);
+
+                                SendPlayerDisconnectPacket(nethandle);
                             }
                             else if (status == NetConnectionStatus.Connected)
                             {
@@ -501,6 +506,31 @@ namespace CoopServer
                                         else
                                         {
                                             message.SenderConnection.Disconnect("Mods are not allowed!");
+                                        }
+                                    }
+                                    break;
+                                case (byte)PacketTypes.FileTransferComplete:
+                                    {
+                                        try
+                                        {
+                                            if (DownloadManager.AnyFileExists)
+                                            {
+                                                int len = message.ReadInt32();
+                                                byte[] data = message.ReadBytes(len);
+
+                                                Packets.FileTransferComplete packet = new();
+                                                packet.NetIncomingMessageToPacket(data);
+
+                                                Client client = Clients.Find(x => x.NetHandle == message.SenderConnection.RemoteUniqueIdentifier);
+                                                if (client != null && !client.FilesReceived)
+                                                {
+                                                    DownloadManager.TryToRemoveClient(client.NetHandle, packet.ID);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            DisconnectAndLog(message.SenderConnection, type, e);
                                         }
                                     }
                                     break;

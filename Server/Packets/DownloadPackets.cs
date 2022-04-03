@@ -4,7 +4,7 @@ using System.Text;
 
 using Lidgren.Network;
 
-namespace CoopClient
+namespace CoopServer
 {
     internal partial class Packets
     {

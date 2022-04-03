@@ -6,14 +6,16 @@ namespace CoopClient
     {
         public byte FileID { get; set; }
         public Packets.DataFileType FileType { get; set; }
-        public string FileName { get; set; }
+        private string FileName = string.Empty;
         public long FileLength { get; set; }
 
         private readonly FileStream _stream;
 
-        public DownloadManager()
+        public DownloadManager(string fileName)
         {
-            string downloadFolder = $"scripts\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
+            FileName = fileName;
+
+            string downloadFolder = $"scripts\\resources\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
             if (!Directory.Exists(downloadFolder))
             {
                 Directory.CreateDirectory(downloadFolder);
@@ -25,7 +27,7 @@ namespace CoopClient
                 }
             }
 
-            _stream = new FileStream(downloadFolder + "\\" + FileName, FileMode.CreateNew);
+            _stream = new FileStream($"{downloadFolder}\\{fileName}", File.Exists($"{downloadFolder}\\{fileName}") ? FileMode.Truncate : FileMode.CreateNew);
         }
 
         /// <summary>

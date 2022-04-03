@@ -22,7 +22,7 @@ namespace CoopClient
         public int BytesReceived = 0;
         public int BytesSend = 0;
 
-        private Dictionary<byte, DownloadManager> _downloads = new Dictionary<byte, DownloadManager>();
+        private readonly Dictionary<byte, DownloadManager> _downloads = new Dictionary<byte, DownloadManager>();
 
         public void DisConnectFromServer(string address)
         {
@@ -139,6 +139,7 @@ namespace CoopClient
                                 // Reset all values
                                 Latency = 0;
                                 LastPlayerFullSync = 0;
+                                _downloads.Clear();
 
                                 Main.CleanUpWorld();
 
@@ -462,11 +463,10 @@ namespace CoopClient
                                         Packets.FileRequest packet = new Packets.FileRequest();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        _downloads.Add(packet.ID, new DownloadManager()
+                                        _downloads.Add(packet.ID, new DownloadManager(packet.FileName)
                                         {
                                             FileID = packet.ID,
                                             FileType = (Packets.DataFileType)packet.FileType,
-                                            FileName = packet.FileName,
                                             FileLength = packet.FileLength
                                         });
                                     }
@@ -488,10 +488,12 @@ namespace CoopClient
                                         packet.NetIncomingMessageToPacket(data);
 
                                         KeyValuePair<byte, DownloadManager> dm = _downloads.FirstOrDefault(x => x.Key == packet.ID);
-                                        if (dm.Value != null)
+                                        if (dm.Value == null)
                                         {
-                                            dm.Value.DownloadPart(packet.FileChunk);
+                                            throw new Exception("File to download not found!");
                                         }
+
+                                        dm.Value.DownloadPart(packet.FileChunk);
                                     }
                                     catch (Exception ex)
                                     {
