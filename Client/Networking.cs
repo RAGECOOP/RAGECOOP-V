@@ -460,7 +460,7 @@ namespace CoopClient
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
-                                        Packets.FileRequest packet = new Packets.FileRequest();
+                                        Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
                                         packet.NetIncomingMessageToPacket(data);
 
                                         _downloads.Add(packet.ID, new DownloadManager(packet.FileName)

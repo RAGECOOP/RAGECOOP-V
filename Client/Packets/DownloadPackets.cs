@@ -14,7 +14,7 @@ namespace CoopClient
             Map = 1
         }
 
-        public class FileRequest : Packet
+        public class FileTransferRequest : Packet
         {
             public byte ID { get; set; }
 

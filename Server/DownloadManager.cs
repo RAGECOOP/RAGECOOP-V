@@ -142,7 +142,7 @@ namespace CoopServer
                 {
                     NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
-                    new Packets.FileRequest()
+                    new Packets.FileTransferRequest()
                     {
                         ID = file.FileID,
                         FileType = (byte)Packets.DataFileType.Script,
