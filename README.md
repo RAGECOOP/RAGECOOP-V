@@ -1,18 +1,17 @@
 <p align="center">
-  <img src="Images/LOGO.png?raw=true" alt="GTACoop:R Image"/>
+  <img src="https://ragecoop.online/assets/images/logo.png?raw=true" alt="GTACoop:R Image"/>
 </p>
 
-# 🌐 GTACoop:R
+# 🌐 RAGECOOP
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 
-| ⚠️ The original GTACoOp can be found [HERE](https://gtacoop.com/) |
-| --- |
-
 # 🧠 That's it
-GTACOOP:R is NOT intended to replace the GTACOOP modification! GTACOOP:R is an alternative to GTACOOP with new and improved synchronizations. GTACOOP:R is NOT a copy of GTA Online and does NOT want to support pirated copies!
+RAGECOOP is an alternative to GTACOOP with new and improved synchronizations. RAGECOOP is NOT a copy of GTA Online and does NOT want to support pirated copies!
+
+_Old name: GTACOOP:R_
 
 # 📋 Requirements
 - Visual Studio 2022
@@ -29,7 +28,7 @@ GTACOOP:R is NOT intended to replace the GTACOOP modification! GTACOOP:R is an a
 
 # 🦆 Special thanks to
 - [Makinolo](https://github.com/Makinolo), [oldnapalm](https://github.com/oldnapalm)
-- - For testing, ideas, contributions and the first modification with the COOPAPI
+- - For testing, ideas, contributions and the first modification with the API
 - [crosire](https://github.com/crosire)
 - - For the extensive work in ScriptHookVDotNet
 - [justalemon](https://github.com/justalemon)
@@ -38,11 +37,11 @@ GTACOOP:R is NOT intended to replace the GTACOOP modification! GTACOOP:R is an a
 # 📝 License
 This project is licensed under [MIT license](https://github.com/GTACoop-R/GTACoop-R/blob/main/LICENSE)
 
-[contributors-shield]: https://img.shields.io/github/contributors/GTACoop-R/GTACoop-R.svg?style=for-the-badge
-[contributors-url]: https://github.com/GTACoop-R/GTACoop-R/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/GTACoop-R/GTACoop-R.svg?style=for-the-badge
-[forks-url]: https://github.com/GTACoop-R/GTACoop-R/network/members
-[stars-shield]: https://img.shields.io/github/stars/GTACoop-R/GTACoop-R.svg?style=for-the-badge
-[stars-url]: https://github.com/GTACoop-R/GTACoop-R/stargazers
-[issues-shield]: https://img.shields.io/github/issues/GTACoop-R/GTACoop-R.svg?style=for-the-badge
-[issues-url]: https://github.com/GTACoop-R/GTACoop-R/issues
+[contributors-shield]: https://img.shields.io/github/contributors/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
+[contributors-url]: https://github.com/RAGECOOP/RAGECOOP-V/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
+[forks-url]: https://github.com/RAGECOOP/RAGECOOP-V/network/members
+[stars-shield]: https://img.shields.io/github/stars/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
+[stars-url]: https://github.com/RAGECOOP/RAGECOOP-V/stargazers
+[issues-shield]: https://img.shields.io/github/issues/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
+[issues-url]: https://github.com/RAGECOOP/RAGECOOP-V/issues
