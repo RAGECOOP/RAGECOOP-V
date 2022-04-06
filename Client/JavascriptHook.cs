@@ -64,14 +64,18 @@ namespace CoopClient
             {
                 foreach (string script in Directory.GetFiles("scripts\\resources\\" + serverAddress, "*.js"))
                 {
-                    V8ScriptEngine engine = new V8ScriptEngine();
+                    V8ScriptEngine engine = new V8ScriptEngine()
+                    {
+                        AccessContext = typeof(ScriptContext)
+                    };
 
-                    engine.AccessContext = typeof(ScriptContext);
                     engine.AddHostObject("API", new ScriptContext());
 
-                    engine.AddHostType("Dictionary", typeof(Dictionary<,>));
+                    engine.AddHostType(typeof(Dictionary<,>));
 
-                    engine.AddHostType("Vector3", typeof(Vector3));
+                    // SHVDN
+                    engine.AddHostType(typeof(Vector3));
+                    engine.AddHostType(typeof(Quaternion));
 
                     try
                     {
@@ -233,6 +237,15 @@ namespace CoopClient
             SendNotification(string.Concat(messages));
         }
 
+        public bool IsPlayerInvincible()
+        {
+            return Game.Player.Character.IsInvincible;
+        }
+        public void SetPlayerInvincible(bool invincible)
+        {
+            Game.Player.Character.IsInvincible = invincible;
+        }
+
         public Vector3 GetPlayerPosition()
         {
             return Game.Player.Character.Position;
@@ -242,19 +255,111 @@ namespace CoopClient
             return Game.Player.Character.Rotation;
         }
 
-        public int GetCurrentCharachterHandle()
+        public void SetPlayerPosition(Vector3 position)
+        {
+            Game.Player.Character.Position = position;
+        }
+        public void SetPlayerPositionNoOffset(Vector3 position)
+        {
+            Game.Player.Character.PositionNoOffset = position;
+        }
+        public void SetPlayerRotation(Vector3 rotation)
+        {
+            Game.Player.Character.Rotation = rotation;
+        }
+
+        public bool IsPlayerInAnyVehicle()
+        {
+            return Game.Player.Character.IsInVehicle();
+        }
+
+        public int GetCharachterHandle()
         {
             return Game.Player.Character?.Handle ?? 0;
         }
 
-        public int GetCurrentVehicleHandle()
+        public Vector3? GetVehiclePosition()
+        {
+            return Game.Player.Character.CurrentVehicle?.Position;
+        }
+        public Vector3? GetVehicleRotation()
+        {
+            return Game.Player.Character.CurrentVehicle?.Rotation;
+        }
+
+        public void SetVehiclePosition(Vector3 position)
+        {
+            if (Game.Player.Character.IsInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.Position = position;
+            }
+        }
+        public void SetVehiclePositionNoOffset(Vector3 position)
+        {
+            if (Game.Player.Character.IsInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.PositionNoOffset = position;
+            }
+        }
+        public void SetVehicleRotation(Vector3 rotation)
+        {
+            if (Game.Player.Character.IsInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.Rotation = rotation;
+            }
+        }
+
+        public int GetVehicleHandle()
         {
             return Game.Player.Character?.CurrentVehicle?.Handle ?? 0;
         }
 
-        public int GetCurrentVehicleSeatIndex()
+        public int GetVehicleSeatIndex()
         {
             return Game.Player.Character?.CurrentVehicle != null ? (int)Game.Player.Character?.SeatIndex : 0;
+        }
+
+        public void SetVehicleEngineStatus(bool turnedOn)
+        {
+            if (Game.Player.Character.IsInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.IsEngineRunning = turnedOn;
+            }
+        }
+        public bool GetVehicleEngineStatus()
+        {
+            return Game.Player.Character.IsInVehicle() ? Game.Player.Character.CurrentVehicle.IsEngineRunning : false;
+        }
+
+        public void RepairVehicle()
+        {
+            if (Game.Player.Character.IsInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.Repair();
+            }
+        }
+
+        public void GivePlayerWeapon(uint hash, int ammoCount, bool equipNow, bool isAmmoLoaded)
+        {
+            Game.Player.Character.Weapons.Give((WeaponHash)hash, ammoCount, equipNow, isAmmoLoaded);
+        }
+
+        public void SetPlayerHealth(int health)
+        {
+            Game.Player.Character.Health = health;
+        }
+        public void SetPlayerHealth(float health)
+        {
+            Game.Player.Character.HealthFloat = health;
+        }
+
+        public void SetPlayerArmor(int armor)
+        {
+            Game.Player.Character.Armor = armor;
+        }
+        public void SetPlayerArmor(float armor)
+        {
+            Game.Player.Character.ArmorFloat = armor;
         }
 
         /* ===== OTHER PLAYER STUFF ===== */
@@ -300,6 +405,27 @@ namespace CoopClient
             {
                 return Main.Players.FirstOrDefault(x => x.Value.Username == username).Key;
             }
+        }
+
+        /* ===== OTHER STUFF ===== */
+        public bool IsControlJustReleased(int control)
+        {
+            return Game.IsControlJustReleased((Control)control);
+        }
+
+        public bool IsControlJustPressed(int control)
+        {
+            return Game.IsControlJustPressed((Control)control);
+        }
+
+        public bool IsControlPressed(int control)
+        {
+            return Game.IsControlPressed((Control)control);
+        }
+
+        public void TriggerServerEvent(string eventName, params object[] args)
+        {
+            // TODO
         }
     }
 }
