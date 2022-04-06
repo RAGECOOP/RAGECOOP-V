@@ -12,31 +12,12 @@ namespace CoopClient.Menus
     /// </summary>
     public class MenusMain
     {
-        class MenuColor : LemonUI.Elements.I2Dimensional
-        {
-            public PointF Position { get; set; }
-            public SizeF Size { get; set; }
-            public Color Color { get; set; }
-
-            public void Draw()
-            {
-
-            }
-
-            public void Recalculate()
-            {
-
-            }
-        }
-
         internal ObjectPool MenuPool = new ObjectPool();
 
-        // new MenuColor() { Position = new PointF(0, 0), Size = new SizeF(0, 0), Color = Color.FromArgb(0,0,0,0) }
         internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "MAIN")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
-            
         };
         #region SUB
         internal Sub.Settings SubSettings = new Sub.Settings();
