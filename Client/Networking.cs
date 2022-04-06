@@ -1211,7 +1211,7 @@ namespace CoopClient
 
             new Packets.FileTransferComplete() { ID = id }.PacketToNetOutGoingMessage(outgoingMessage);
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
             Client.FlushSendQueue();
 
 #if DEBUG

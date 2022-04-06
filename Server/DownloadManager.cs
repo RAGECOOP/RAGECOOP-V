@@ -92,6 +92,7 @@ namespace CoopServer
                         DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
                         if (client != null)
                         {
+                            client.Finish();
                             _clients.Remove(client);
                         }
                     }
@@ -119,10 +120,13 @@ namespace CoopServer
 
         public static void RemoveClient(long nethandle)
         {
-            DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
-            if (client != null)
+            lock (_clients)
             {
-                _clients.Remove(client);
+                DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
+                if (client != null)
+                {
+                    _clients.Remove(client);
+                }
             }
         }
 
@@ -130,7 +134,7 @@ namespace CoopServer
         /// We try to remove the client when all files have been sent
         /// </summary>
         /// <param name="nethandle"></param>
-        /// <param name="id"></param>
+        /// <param name="id">Not currently used but maybe we can need this sometime</param>
         public static void TryToRemoveClient(long nethandle, int id)
         {
             lock (_clients)
@@ -145,6 +149,7 @@ namespace CoopServer
 
                 if (client.DownloadComplete())
                 {
+                    client.Finish();
                     _clients.Remove(client);
                 }
             }
@@ -190,11 +195,11 @@ namespace CoopServer
                     FileLength = file.FileLength
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 
-                Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
+                Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
             });
         }
 
-        ~DownloadClient()
+        public void Finish()
         {
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == NetHandle);
             if (conn == null)
@@ -244,7 +249,7 @@ namespace CoopServer
 
             new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileData[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
-            Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
+            Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
         }
 
         public bool DownloadComplete()

@@ -103,7 +103,9 @@ namespace CoopClient
                         throw new System.Exception($"File {id} couldn't ne found in list!");
                     }
 
-                    if (data.Length >= file.FileLength)
+                    file.FileWritten += data.Length;
+
+                    if (file.FileWritten >= file.FileLength)
                     {
                         Cancel(id);
                     }
@@ -155,5 +157,6 @@ namespace CoopClient
         public Packets.DataFileType FileType { get; set; } = Packets.DataFileType.Script;
         public string FileName { get; set; } = string.Empty;
         public long FileLength { get; set; } = 0;
+        public long FileWritten { get; set; } = 0;
     }
 }
