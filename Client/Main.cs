@@ -110,6 +110,11 @@ namespace CoopClient
 
             MainNetworking.ReceiveMessages();
 
+            if (!JavascriptHook.JavascriptLoaded && DownloadManager.DownloadComplete)
+            {
+                JavascriptHook.LoadAll();
+            }
+
             if (IsGoingToCar && Game.Player.Character.IsInVehicle())
             {
                 IsGoingToCar = false;

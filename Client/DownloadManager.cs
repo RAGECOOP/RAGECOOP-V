@@ -9,6 +9,7 @@ namespace CoopClient
         private static readonly List<DownloadFile> _downloadFiles = new List<DownloadFile>();
         private static readonly Dictionary<byte, FileStream> _streams = new Dictionary<byte, FileStream>();
         private static readonly List<byte> _filesFinished = new List<byte>();
+        public static bool DownloadComplete = false;
 
         public static void AddFile(byte id, Packets.DataFileType type, string name, long length)
         {
@@ -143,6 +144,8 @@ namespace CoopClient
                 _downloadFiles.Clear();
                 _filesFinished.Clear();
             }
+
+            DownloadComplete = false;
         }
     }
 

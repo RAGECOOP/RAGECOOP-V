@@ -271,10 +271,7 @@ namespace CoopServer
                             {
                                 long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
 
-                                lock (DownloadManager.ClientsToDelete)
-                                {
-                                    DownloadManager.ClientsToDelete.Add(nethandle);
-                                }
+                                DownloadManager.AddClientToRemove(nethandle);
 
                                 SendPlayerDisconnectPacket(nethandle);
                             }

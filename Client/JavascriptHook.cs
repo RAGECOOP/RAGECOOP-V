@@ -17,6 +17,7 @@ namespace CoopClient
     public class JavascriptHook : Script
     {
         private static readonly List<V8ScriptEngine> ScriptEngines = new List<V8ScriptEngine>();
+        internal static bool JavascriptLoaded { get; private set; } = false;
 
         /// <summary>
         /// Don't use this!
@@ -88,15 +89,23 @@ namespace CoopClient
                     }
                 }
             }
+
+            JavascriptLoaded = true;
         }
 
         internal static void StopAll()
         {
             lock (ScriptEngines)
             {
-                ScriptEngines.ForEach(engine => engine.Script.API.InvokeStop());
+                ScriptEngines.ForEach(engine =>
+                {
+                    engine.Script.API.InvokeStop();
+                    engine.Dispose();
+                });
                 ScriptEngines.Clear();
             }
+
+            JavascriptLoaded = false;
         }
 
         internal static void InvokePlayerConnect(string username, long nethandle)

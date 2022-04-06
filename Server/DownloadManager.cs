@@ -8,7 +8,7 @@ namespace CoopServer
 {
     internal static class DownloadManager
     {
-        public static readonly List<long> ClientsToDelete = new();
+        private static readonly List<long> ClientsToDelete = new();
         private static List<DownloadClient> _clients = new();
         private static readonly List<DownloadFile> _files = new();
         public static bool AnyFileExists = false;
@@ -20,7 +20,10 @@ namespace CoopServer
                 return;
             }
 
-            _clients.Add(new DownloadClient(nethandle, new(_files)));
+            lock (_clients)
+            {
+                _clients.Add(new DownloadClient(nethandle, new(_files)));
+            }
         }
 
         public static bool CheckForDirectoryAndFiles()
@@ -80,35 +83,38 @@ namespace CoopServer
 
         public static void Tick()
         {
-            lock (ClientsToDelete)
+            lock (_clients)
             {
-                foreach (long nethandle in ClientsToDelete)
+                lock (ClientsToDelete)
                 {
-                    DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
-                    if (client != null)
+                    foreach (long nethandle in ClientsToDelete)
                     {
-                        _clients.Remove(client);
-                    }
-                }
-                ClientsToDelete.Clear();
-            }
-
-            _clients.ForEach(client =>
-            {
-                if (!client.SendFiles())
-                {
-                    lock (Server.Clients)
-                    {
-                        Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
-                        if (x != null)
+                        DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
+                        if (client != null)
                         {
-                            x.FilesReceived = true;
+                            _clients.Remove(client);
                         }
                     }
+                    ClientsToDelete.Clear();
                 }
-            });
 
-            Logging.Debug($"Clients [{_clients.Count}]");
+                _clients.ForEach(client =>
+                {
+                    if (client.SendFiles())
+                    {
+                        lock (Server.Clients)
+                        {
+                            Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
+                            if (x != null)
+                            {
+                                x.FilesReceived = true;
+                            }
+                        }
+
+                        AddClientToRemove(client.NetHandle);
+                    }
+                });
+            }
         }
 
         public static void RemoveClient(long nethandle)
@@ -127,17 +133,28 @@ namespace CoopServer
         /// <param name="id"></param>
         public static void TryToRemoveClient(long nethandle, int id)
         {
-            DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
-            if (client == null)
+            lock (_clients)
             {
-                return;
+                DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
+                if (client == null)
+                {
+                    return;
+                }
+
+                client.FilePosition++;
+
+                if (client.DownloadComplete())
+                {
+                    _clients.Remove(client);
+                }
             }
+        }
 
-            client.FilePosition++;
-
-            if (client.DownloadComplete())
+        public static void AddClientToRemove(long nethandle)
+        {
+            lock (ClientsToDelete)
             {
-                _clients.Remove(client);
+                ClientsToDelete.Add(nethandle);
             }
         }
     }
@@ -157,10 +174,7 @@ namespace CoopServer
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == NetHandle);
             if (conn == null)
             {
-                lock (DownloadManager.ClientsToDelete)
-                {
-                    DownloadManager.ClientsToDelete.Add(NetHandle);
-                }
+                DownloadManager.AddClientToRemove(NetHandle);
                 return;
             }
 
@@ -201,14 +215,9 @@ namespace CoopServer
         /// <summary>
         /// 
         /// </summary>
-        /// <returns>true if files should be sent otherwise false</returns>
+        /// <returns>true if we are done otherwise false</returns>
         public bool SendFiles()
         {
-            if (DownloadComplete())
-            {
-                return false;
-            }
-
             DownloadFile file = _files[FilePosition];
 
             Send(NetHandle, file);
@@ -217,11 +226,9 @@ namespace CoopServer
             {
                 FilePosition++;
                 _fileDataPosition = 0;
-
-                return DownloadComplete();
             }
 
-            return true;
+            return DownloadComplete();
         }
 
         private void Send(long nethandle, DownloadFile file)
@@ -229,10 +236,7 @@ namespace CoopServer
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == nethandle);
             if (conn == null)
             {
-                lock (DownloadManager.ClientsToDelete)
-                {
-                    DownloadManager.ClientsToDelete.Add(NetHandle);
-                }
+                DownloadManager.AddClientToRemove(NetHandle);
                 return;
             }
 

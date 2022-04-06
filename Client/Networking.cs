@@ -129,7 +129,6 @@ namespace CoopClient
                                     COOPAPI.Connected();
                                     GTA.UI.Notification.Show("~g~Connected!");
 
-                                    JavascriptHook.LoadAll();
                                     Logger.Write(">> Connected <<", Logger.LogLevel.Server);
                                 }
                                 break;
@@ -453,6 +452,27 @@ namespace CoopClient
                                     }
                                 }
                                 break;
+                            case (byte)PacketTypes.FileTransferTick:
+                                {
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+                                        Packets.FileTransferTick packet = new Packets.FileTransferTick();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        DownloadManager.Write(packet.ID, packet.FileChunk);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.Source}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
+                                    }
+                                }
+                                break;
                             case (byte)PacketTypes.FileTransferRequest:
                                 {
                                     try
@@ -472,23 +492,21 @@ namespace CoopClient
                                     }
                                 }
                                 break;
-                            case (byte)PacketTypes.FileTransferTick:
+                            case (byte)PacketTypes.FileTransferComplete:
                                 {
                                     try
                                     {
                                         int len = message.ReadInt32();
                                         byte[] data = message.ReadBytes(len);
-                                        Packets.FileTransferTick packet = new Packets.FileTransferTick();
+                                        Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        DownloadManager.Write(packet.ID, packet.FileChunk);
+                                        DownloadManager.DownloadComplete = true;
                                     }
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show("~r~~h~Packet Error");
                                         Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.Source}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
                                         Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
