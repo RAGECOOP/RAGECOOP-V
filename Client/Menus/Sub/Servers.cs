@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Drawing;
 using System.Collections.Generic;
 
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace CoopClient.Menus.Sub
     /// </summary>
     internal class Servers
     {
-        internal NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Servers", "Go to the server list")
+        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
@@ -49,6 +50,9 @@ namespace CoopClient.Menus.Sub
         /// </summary>
         public Servers()
         {
+            MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
+
             MainMenu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {
                 MainMenu.Add(ResultItem = new NativeItem("Loading..."));

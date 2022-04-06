@@ -16,7 +16,7 @@
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://gtacoopr.000webhostapp.com/servers.php";
+        public string MasterServer { get; set; } = "https://ragecoop.online/servers";
         /// <summary>
         /// Don't use it!
         /// </summary>

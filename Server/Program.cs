@@ -18,13 +18,13 @@ namespace CoopServer
                 {
                     do
                     {
-                        Console.Title = string.Format("GTAC:R [{0,5:P2}] [{1:F}MB]", await GetCpuUsageForProcess(), Process.GetCurrentProcess().PrivateMemorySize64 * 0.000001);
+                        Console.Title = string.Format("RAGECOOP [{0,5:P2}] [{1:F}MB]", await GetCpuUsageForProcess(), Process.GetCurrentProcess().PrivateMemorySize64 * 0.000001);
 
                         Thread.Sleep(500);
                     } while (true);
                 }).Start();
 #else
-                Console.Title = "GTACOOP:R";
+                Console.Title = "RAGECOOP";
 #endif
 
                 if (File.Exists("log.txt"))

@@ -158,7 +158,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Check if a GTACOOP:R menu is visible
+        /// Check if a RAGECOOP menu is visible
         /// </summary>
         public static bool IsMenuVisible()
         {
@@ -170,7 +170,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Check if the GTACOOP:R chat is visible
+        /// Check if the RAGECOOP chat is visible
         /// </summary>
         public static bool IsChatFocused()
         {
@@ -178,7 +178,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Check if the GTACOOP:R list of players is visible
+        /// Check if the RAGECOOP list of players is visible
         /// </summary>
         public static bool IsPlayerListVisible()
         {
@@ -186,7 +186,7 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get the version of GTACOOP:R
+        /// Get the version of RAGECOOP
         /// </summary>
         public static string GetCurrentVersion()
         {

@@ -22,10 +22,10 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V1_3";
+        private static readonly string CompatibleVersion = "V1_4";
         private static long CurrentTick = 0;
 
-        public static readonly Settings MainSettings = Util.Read<Settings>("CoopSettings.xml");
+        public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
         private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
         private readonly Allowlist MainAllowlist = Util.Read<Allowlist>("Allowlist.xml");
 
@@ -40,11 +40,11 @@ namespace CoopServer
         {
             Logging.Info("================");
             Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
-            Logging.Info($"Compatible GTACoOp:R versions: {CompatibleVersion.Replace('_', '.')}.x");
+            Logging.Info($"Compatible RAGECOOP versions: {CompatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
 
-            // 6d4ec318f1c43bd62fe13d5a7ab28650 = GTACOOP:R
-            NetPeerConfiguration config = new("6d4ec318f1c43bd62fe13d5a7ab28650")
+            // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
+            NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
             {
                 MaximumConnections = MainSettings.MaxPlayers,
                 Port = MainSettings.Port,
@@ -63,14 +63,14 @@ namespace CoopServer
             {
                 Logging.Info(string.Format("Attempting to forward port {0}", MainSettings.Port));
 
-                if (MainNetServer.UPnP.ForwardPort(MainSettings.Port, "GTACOOP:R server"))
+                if (MainNetServer.UPnP.ForwardPort(MainSettings.Port, "RAGECOOP server"))
                 {
                     Logging.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
                 }
                 else
                 {
                     Logging.Error("Port forwarding failed! Your router may not support UPnP.");
-                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in CoopSettings.xml to false!");
+                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
                 }
             }
 
@@ -137,7 +137,7 @@ namespace CoopServer
 
                             if (response.StatusCode != System.Net.HttpStatusCode.OK)
                             {
-                                Logging.Error($"MasterServer: [{(int)response.StatusCode}]{response.StatusCode}");
+                                Logging.Error($"MasterServer: [{(int)response.StatusCode}]");
 
                                 // Wait 5 seconds before trying again
                                 Thread.Sleep(5000);
@@ -609,7 +609,7 @@ namespace CoopServer
 
             if (!packet.ModVersion.StartsWith(CompatibleVersion))
             {
-                local.Deny($"GTACoOp:R version {CompatibleVersion.Replace('_', '.')}.x required!");
+                local.Deny($"RAGECOOP version {CompatibleVersion.Replace('_', '.')}.x required!");
                 return;
             }
             if (string.IsNullOrWhiteSpace(packet.Username))

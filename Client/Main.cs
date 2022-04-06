@@ -22,7 +22,7 @@ namespace CoopClient
 
         private bool GameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_3_0";
+        internal static readonly string CurrentVersion = "V1_4_0";
 
         internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
@@ -100,7 +100,7 @@ namespace CoopClient
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(RelationshipGroup, Relationship.Neutral, true);
 #if !NON_INTERACTIVE
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "GTACOOP:R", "Welcome!", "Press ~g~F9~s~ to open the menu.");
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", "Press ~g~F9~s~ to open the menu.");
 #endif
             }
 

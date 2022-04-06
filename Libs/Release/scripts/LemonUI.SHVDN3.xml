@@ -1363,6 +1363,11 @@
             If a custom colored background should be used. 
             </summary>
         </member>
+        <member name="P:LemonUI.Menus.NativeItem.IsHovered">
+            <summary>
+            If this item is being hovered.
+            </summary>
+        </member>
         <member name="E:LemonUI.Menus.NativeItem.Selected">
             <summary>
             Event triggered when the item is selected.
@@ -2380,6 +2385,11 @@
             The current value of the slider.
             </summary>
         </member>
+        <member name="P:LemonUI.Menus.NativeSliderItem.SliderColor">
+            <summary>
+            The color of the Slider.
+            </summary>
+        </member>
         <member name="P:LemonUI.Menus.NativeSliderItem.Maximum">
             <summary>
             The maximum value of the slider.
@@ -2999,6 +3009,15 @@
             Updates the Message information in the Scaleform.
             </summary>
         </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.FadeOut(System.Int32)">
+            <summary>
+            Fades the big message out.
+            </summary>
+            <param name="time">The time it will take to do the fade.</param>
+        </member>
+        <member name="M:LemonUI.Scaleform.BigMessage.DrawFullScreen">
+            <inheritdoc/>
+        </member>
         <member name="T:LemonUI.Scaleform.BruteForceBackground">
             <summary>
             The Background of the BruteForce Hack Minigame.
@@ -3305,6 +3324,46 @@
         <member name="M:LemonUI.Scaleform.LoadingScreen.Update">
             <summary>
             Updates the Title, Description and Image of the loading screen.
+            </summary>
+        </member>
+        <member name="T:LemonUI.Scaleform.PopUp">
+            <summary>
+            A warning pop-up.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.PopUp.Title">
+            <summary>
+            The title of the Pop-up.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.PopUp.Subtitle">
+            <summary>
+            The subtitle of the Pop-up.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.PopUp.Prompt">
+            <summary>
+            The prompt of the Pop-up.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.PopUp.ShowBackground">
+            <summary>
+            If the black background should be shown.
+            </summary>
+        </member>
+        <member name="P:LemonUI.Scaleform.PopUp.Error">
+            <summary>
+            The error message to show.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.PopUp.#ctor">
+            <summary>
+            Creates a new Pop-up instance.
+            </summary>
+        </member>
+        <member name="M:LemonUI.Scaleform.PopUp.Update">
+            <summary>
+            Updates the texts of the Pop-up.
             </summary>
         </member>
         <member name="T:LemonUI.GFXAlignment">

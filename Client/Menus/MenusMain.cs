@@ -1,5 +1,7 @@
 ﻿using GTA;
 
+using System.Drawing;
+
 using LemonUI;
 using LemonUI.Menus;
 
@@ -10,12 +12,31 @@ namespace CoopClient.Menus
     /// </summary>
     public class MenusMain
     {
+        class MenuColor : LemonUI.Elements.I2Dimensional
+        {
+            public PointF Position { get; set; }
+            public SizeF Size { get; set; }
+            public Color Color { get; set; }
+
+            public void Draw()
+            {
+
+            }
+
+            public void Recalculate()
+            {
+
+            }
+        }
+
         internal ObjectPool MenuPool = new ObjectPool();
 
-        internal NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "MAIN")
+        // new MenuColor() { Position = new PointF(0, 0), Size = new SizeF(0, 0), Color = Color.FromArgb(0,0,0,0) }
+        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "MAIN")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            
         };
         #region SUB
         internal Sub.Settings SubSettings = new Sub.Settings();
@@ -27,7 +48,7 @@ namespace CoopClient.Menus
         internal readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
         private readonly NativeItem ServerConnectItem = new NativeItem("Connect");
         private readonly NativeItem AboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
-            "https://github.com/GTACOOP-R~n~" +
+            "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +
             Main.CurrentVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
         #endregion
@@ -37,6 +58,9 @@ namespace CoopClient.Menus
         /// </summary>
         public MenusMain()
         {
+            MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
+
             UsernameItem.Activated += UsernameActivated;
             ServerIpItem.Activated += ServerIpActivated;
             ServerConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.MainSettings.LastServerAddress); };

@@ -1,4 +1,6 @@
-﻿using LemonUI.Menus;
+﻿using System.Drawing;
+
+using LemonUI.Menus;
 
 namespace CoopClient.Menus.Sub
 {
@@ -7,7 +9,7 @@ namespace CoopClient.Menus.Sub
     /// </summary>
     public class Settings
     {
-        internal NativeMenu MainMenu = new NativeMenu("GTACOOP:R", "Settings", "Go to the settings")
+        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
             UseMouse = false,
             Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
@@ -26,6 +28,9 @@ namespace CoopClient.Menus.Sub
         /// </summary>
         public Settings()
         {
+            MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
+
             DisableTraffic.CheckboxChanged += DisableTrafficCheckboxChanged;
             ShareNPCsItem.CheckboxChanged += (item, check) => { Main.ShareNPCsWithPlayers = ShareNPCsItem.Checked; };
             FlipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
