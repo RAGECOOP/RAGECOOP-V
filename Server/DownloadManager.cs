@@ -54,27 +54,26 @@ namespace CoopServer
                     continue;
                 }
 
-                int MAX_BUFFER = fileInfo.Length < 5120 ? (int)fileInfo.Length : 5120; // 5KB
+                const int MAX_BUFFER = 5120; // 5KB
                 byte[] buffer = new byte[MAX_BUFFER];
+                ushort bytesRead = 0;
                 bool fileCreated = false;
                 DownloadFile newFile = null;
 
                 using (FileStream fs = File.Open(file, FileMode.Open, FileAccess.Read))
                 using (BufferedStream bs = new(fs))
                 {
-                    while (bs.Read(buffer, 0, MAX_BUFFER) != 0) // Reading 5KB chunks at time
+                    while ((bytesRead = (ushort)bs.Read(buffer, 0, MAX_BUFFER)) != 0) // Reading 5KB chunks at time
                     {
                         if (!fileCreated && (fileCreated = true))
                         {
-                            newFile = new() { FileID = fileCount, FileName = fileInfo.Name, FileLength = fileInfo.Length, FileData = new() };
+                            newFile = new() { FileID = fileCount, FileName = fileInfo.Name, FileLength = fileInfo.Length, FileChunks = new() };
                         }
 
-                        newFile.FileData.Add(buffer);
-                        Logging.Debug($"[{fileInfo.Name}] {buffer.Length}");
+                        newFile.FileChunks.Add(buffer.Take(bytesRead).ToArray());
                     }
                 }
 
-                Logging.Debug($"[{fileInfo.Name}] RESULT {newFile.FileData.Count} / {newFile.FileLength}");
                 _files.Add(newFile);
                 fileCount++;
             }
@@ -197,7 +196,7 @@ namespace CoopServer
                     FileLength = file.FileLength
                 }.PacketToNetOutGoingMessage(outgoingMessage);
 
-                Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
+                Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
             });
         }
 
@@ -229,7 +228,7 @@ namespace CoopServer
 
             Send(NetHandle, file);
 
-            if (_fileDataPosition >= file.FileData.Count)
+            if (_fileDataPosition >= file.FileChunks.Count)
             {
                 FilePosition++;
                 _fileDataPosition = 0;
@@ -240,8 +239,6 @@ namespace CoopServer
 
         private void Send(long nethandle, DownloadFile file)
         {
-            Logging.Debug($"SEND [{file.FileName}][{_fileDataPosition}/{file.FileData.Count - 1}]");
-
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == nethandle);
             if (conn == null)
             {
@@ -251,7 +248,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
-            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileData[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
         }
@@ -267,7 +264,6 @@ namespace CoopServer
         public byte FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;
         public long FileLength { get; set; } = 0;
-
-        public List<byte[]> FileData { get; set; } = null;
+        public List<byte[]> FileChunks { get; set; } = null;
     }
 }

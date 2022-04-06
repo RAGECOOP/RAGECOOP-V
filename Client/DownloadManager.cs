@@ -74,7 +74,7 @@ namespace CoopClient
             return false;
         }
 
-        public static void Write(byte id, byte[] data)
+        public static void Write(byte id, byte[] chunk)
         {
             lock (_filesFinished)
             {
@@ -94,7 +94,7 @@ namespace CoopClient
                     return;
                 }
 
-                fs.Write(data, 0, data.Length);
+                fs.Write(chunk, 0, chunk.Length);
 
                 lock (_downloadFiles)
                 {
@@ -105,7 +105,7 @@ namespace CoopClient
                         return;
                     }
 
-                    file.FileWritten += data.Length;
+                    file.FileWritten += chunk.Length;
 
                     if (file.FileWritten >= file.FileLength)
                     {

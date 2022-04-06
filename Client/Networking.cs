@@ -467,8 +467,6 @@ namespace CoopClient
                                     {
                                         GTA.UI.Notification.Show("~r~~h~Packet Error");
                                         Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.Source}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
                                         Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
