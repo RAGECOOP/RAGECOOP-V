@@ -45,7 +45,7 @@ namespace CoopClient
 
             lock (_streams)
             {
-                _streams.Add(id, new FileStream($"{downloadFolder}\\{name}", FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite));
+                _streams.Add(id, new FileStream($"{downloadFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite));
             }
         }
 
@@ -87,10 +87,11 @@ namespace CoopClient
 
             lock (_streams)
             {
-                FileStream fs = _streams.ContainsKey(id) ? _streams[id] : null;
+                FileStream fs = _streams.FirstOrDefault(x => x.Key == id).Value;
                 if (fs == null)
                 {
-                    throw new System.Exception($"Stream for file {id} doesn't found!");
+                    Logger.Write($"Stream for file {id} not found!", Logger.LogLevel.Server);
+                    return;
                 }
 
                 fs.Write(data, 0, data.Length);
@@ -100,7 +101,8 @@ namespace CoopClient
                     DownloadFile file = _downloadFiles.FirstOrDefault(x => x.FileID == id);
                     if (file == null)
                     {
-                        throw new System.Exception($"File {id} couldn't ne found in list!");
+                        Logger.Write($"File {id} couldn't be found in the list!", Logger.LogLevel.Server);
+                        return;
                     }
 
                     file.FileWritten += data.Length;
@@ -133,11 +135,11 @@ namespace CoopClient
             }
         }
 
-        public static void Cleanup()
+        public static void Cleanup(bool everything)
         {
             lock (_streams) lock (_downloadFiles) lock (_filesFinished)
             {
-                foreach (var stream in _streams)
+                foreach (KeyValuePair<byte, FileStream> stream in _streams)
                 {
                     stream.Value.Close();
                     stream.Value.Dispose();
@@ -147,7 +149,10 @@ namespace CoopClient
                 _filesFinished.Clear();
             }
 
-            DownloadComplete = false;
+            if (everything)
+            {
+                DownloadComplete = false;
+            }
         }
     }
 

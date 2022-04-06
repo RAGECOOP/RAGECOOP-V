@@ -133,7 +133,7 @@ namespace CoopClient
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
-                                DownloadManager.Cleanup();
+                                DownloadManager.Cleanup(true);
 
                                 // Reset all values
                                 Latency = 0;
@@ -501,6 +501,7 @@ namespace CoopClient
                                         Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
                                         packet.NetIncomingMessageToPacket(data);
 
+                                        DownloadManager.Cleanup(false);
                                         DownloadManager.DownloadComplete = true;
                                     }
                                     catch (Exception ex)

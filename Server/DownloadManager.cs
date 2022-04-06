@@ -70,9 +70,11 @@ namespace CoopServer
                         }
 
                         newFile.FileData.Add(buffer);
+                        Logging.Debug($"[{fileInfo.Name}] {buffer.Length}");
                     }
                 }
 
+                Logging.Debug($"[{fileInfo.Name}] RESULT {newFile.FileData.Count} / {newFile.FileLength}");
                 _files.Add(newFile);
                 fileCount++;
             }
@@ -238,6 +240,8 @@ namespace CoopServer
 
         private void Send(long nethandle, DownloadFile file)
         {
+            Logging.Debug($"SEND [{file.FileName}][{_fileDataPosition}/{file.FileData.Count - 1}]");
+
             NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == nethandle);
             if (conn == null)
             {
