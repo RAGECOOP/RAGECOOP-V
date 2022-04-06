@@ -22,8 +22,6 @@ namespace CoopClient
         public int BytesReceived = 0;
         public int BytesSend = 0;
 
-        private readonly Dictionary<byte, DownloadManager> _downloads = new Dictionary<byte, DownloadManager>();
-
         public void DisConnectFromServer(string address)
         {
             if (IsOnServer())
@@ -136,10 +134,11 @@ namespace CoopClient
                                 }
                                 break;
                             case NetConnectionStatus.Disconnected:
+                                DownloadManager.Cleanup();
+
                                 // Reset all values
                                 Latency = 0;
                                 LastPlayerFullSync = 0;
-                                _downloads.Clear();
 
                                 Main.CleanUpWorld();
 
@@ -463,12 +462,7 @@ namespace CoopClient
                                         Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        _downloads.Add(packet.ID, new DownloadManager(packet.FileName)
-                                        {
-                                            FileID = packet.ID,
-                                            FileType = (Packets.DataFileType)packet.FileType,
-                                            FileLength = packet.FileLength
-                                        });
+                                        DownloadManager.AddFile(packet.ID, (Packets.DataFileType)packet.FileType, packet.FileName, packet.FileLength);
                                     }
                                     catch (Exception ex)
                                     {
@@ -487,18 +481,14 @@ namespace CoopClient
                                         Packets.FileTransferTick packet = new Packets.FileTransferTick();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        KeyValuePair<byte, DownloadManager> dm = _downloads.FirstOrDefault(x => x.Key == packet.ID);
-                                        if (dm.Value == null)
-                                        {
-                                            throw new Exception("File to download not found!");
-                                        }
-
-                                        dm.Value.DownloadPart(packet.FileChunk);
+                                        DownloadManager.Write(packet.ID, packet.FileChunk);
                                     }
                                     catch (Exception ex)
                                     {
                                         GTA.UI.Notification.Show("~r~~h~Packet Error");
                                         Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.Source}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
                                         Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }

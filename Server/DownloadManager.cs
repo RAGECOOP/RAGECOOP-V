@@ -107,6 +107,8 @@ namespace CoopServer
                     }
                 }
             });
+
+            Logging.Debug($"Clients [{_clients.Count}]");
         }
 
         public static void RemoveClient(long nethandle)
@@ -176,6 +178,24 @@ namespace CoopServer
 
                 Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
             });
+        }
+
+        ~DownloadClient()
+        {
+            NetConnection conn = Server.MainNetServer.Connections.FirstOrDefault(x => x.RemoteUniqueIdentifier == NetHandle);
+            if (conn == null)
+            {
+                return;
+            }
+
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+
+            new Packets.FileTransferComplete()
+            {
+                ID = 0x0
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+
+            Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
         }
 
         /// <summary>
