@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://ragecoop.online/assets/images/logo.png?raw=true" alt="GTACoop:R Image"/>
+  <img src="https://ragecoop.online/assets/logo.0e546533.png?raw=true" alt="GTACoop:R Image"/>
 </p>
 
 # 🌐 RAGECOOP
@@ -9,7 +9,7 @@
 [![Issues][issues-shield]][issues-url]
 
 # 🧠 That's it
-RAGECOOP is an alternative to GTACOOP with new and improved synchronizations. RAGECOOP is NOT a copy of GTA Online and does NOT want to support pirated copies!
+RAGECOOP is a multiplayer mod to play the story or some mods made for RAGECOOP with your buddy or just drive around with your buddy.
 
 _Old name: GTACOOP:R_
 
