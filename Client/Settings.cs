@@ -16,7 +16,7 @@
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://ragecoop.online/servers";
+        public string MasterServer { get; set; } = "https://ragecoop.online/gtav/servers";
         /// <summary>
         /// Don't use it!
         /// </summary>

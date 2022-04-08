@@ -279,9 +279,9 @@ namespace CoopClient.Entities.Player
         }
 
         #region -- PEDALING --
-            /*
-             * Thanks to @oldnapalm.
-             */
+        /*
+         * Thanks to @oldnapalm.
+         */
 
         private string PedalingAnimDict()
         {

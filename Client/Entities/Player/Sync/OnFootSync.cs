@@ -395,7 +395,7 @@ namespace CoopClient.Entities.Player
 
             if (updatePosition)
             {
-                float lerpValue = ((int)((Latency * 1000 / 2) + Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f;
+                float lerpValue = ((int)((Latency * 1000 / 2) + (Main.MainNetworking.Latency * 1000 / 2))) * 2 / 50000f;
 
                 Vector2 biDimensionalPos = Vector2.Lerp(new Vector2(Character.Position.X, Character.Position.Y), new Vector2(Position.X + (Velocity.X / 5), Position.Y + (Velocity.Y / 5)), lerpValue);
                 float zPos = Util.Lerp(Character.Position.Z, Position.Z, 0.1f);

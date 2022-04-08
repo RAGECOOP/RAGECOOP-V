@@ -15,11 +15,6 @@ namespace CoopServer
 
         public static void InsertClient(long nethandle)
         {
-            if (!AnyFileExists)
-            {
-                return;
-            }
-
             lock (_clients)
             {
                 _clients.Add(new DownloadClient(nethandle, new(_files)));
@@ -28,14 +23,12 @@ namespace CoopServer
 
         public static bool CheckForDirectoryAndFiles()
         {
-            string[] filePaths;
-
             if (!Directory.Exists("clientside"))
             {
                 return false;
             }
 
-            filePaths = Directory.GetFiles("clientside");
+            string[] filePaths = Directory.GetFiles("clientside");
             if (filePaths.Length == 0)
             {
                 return false;

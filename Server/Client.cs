@@ -62,13 +62,13 @@ namespace CoopServer
         #endregion
 
         #region FUNCTIONS
-        public void Kick(string[] reason)
-        {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect(string.Join(" ", reason));
-        }
         public void Kick(string reason)
         {
             Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect(reason);
+        }
+        public void Kick(string[] reason)
+        {
+            Kick(string.Join(" ", reason));
         }
 
         public void SendChatMessage(string message, string from = "Server")

@@ -369,12 +369,12 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 274)
+            if ((Util.GetTickCount64() - ArtificialLagCounter) < 231)
             {
                 return;
             }
 
-            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 500;
+            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 39;
 
             if (fullSync)
             {
