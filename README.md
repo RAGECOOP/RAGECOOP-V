@@ -35,7 +35,7 @@ _Old name: GTACOOP:R_
 - - For the extensive work in LemonUI
 
 # 📝 License
-This project is licensed under [MIT license](https://github.com/GTACoop-R/GTACoop-R/blob/main/LICENSE)
+This project is licensed under [MIT license](https://github.com/RAGECOOP/RAGECOOP-V/blob/main/LICENSE)
 
 [contributors-shield]: https://img.shields.io/github/contributors/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
 [contributors-url]: https://github.com/RAGECOOP/RAGECOOP-V/graphs/contributors
