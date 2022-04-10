@@ -364,6 +364,9 @@ namespace CoopClient
                 if (wheel.IsBursted)
                 {
                     result.BurstedTires |= (ushort)(1 << (int)wheel.BoneId);
+
+                    // Tire is bursted so we don't need to check if the tire punctured
+                    continue;
                 }
                 
                 if (wheel.IsPunctured)
@@ -402,6 +405,21 @@ namespace CoopClient
 
             foreach (VehicleWheel wheel in veh.Wheels)
             {
+                if ((model.BurstedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
+                {
+                    if (!wheel.IsBursted)
+                    {
+                        wheel.Burst();
+                    }
+
+                    // Tire is bursted so we don't need to check if the tire punctured
+                    continue;
+                }
+                else if (wheel.IsBursted)
+                {
+                    wheel.Fix();
+                }
+
                 if ((model.PuncturedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
                 {
                     if (!wheel.IsPunctured)
@@ -410,18 +428,6 @@ namespace CoopClient
                     }
                 }
                 else if (wheel.IsPunctured)
-                {
-                    wheel.Fix();
-                }
-
-                if ((model.BurstedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
-                {
-                    if (!wheel.IsBursted)
-                    {
-                        wheel.Burst();
-                    }
-                }
-                else if (wheel.IsBursted)
                 {
                     wheel.Fix();
                 }
