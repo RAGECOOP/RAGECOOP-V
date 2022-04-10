@@ -22,12 +22,12 @@ namespace CoopServer
 
     internal class Server
     {
-        private static readonly string CompatibleVersion = "V1_4";
-        private static long CurrentTick = 0;
+        private static readonly string _compatibleVersion = "V1_4";
+        private static long _currentTick = 0;
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
-        private readonly Blocklist MainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
-        private readonly Allowlist MainAllowlist = Util.Read<Allowlist>("Allowlist.xml");
+        private readonly Blocklist _mainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
+        private readonly Allowlist _mainAllowlist = Util.Read<Allowlist>("Allowlist.xml");
 
         public static NetServer MainNetServer;
 
@@ -40,7 +40,7 @@ namespace CoopServer
         {
             Logging.Info("================");
             Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
-            Logging.Info($"Compatible RAGECOOP versions: {CompatibleVersion.Replace('_', '.')}.x");
+            Logging.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
 
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
@@ -110,10 +110,10 @@ namespace CoopServer
                                 "\"address\": \"" + info.ip + "\", " +
                                 "\"port\": \"" + MainSettings.Port + "\", " +
                                 "\"name\": \"" + MainSettings.Name + "\", " +
-                                "\"version\": \"" + CompatibleVersion.Replace("_", ".") + "\", " +
+                                "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
                                 "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
-                                "\"allowlist\": \"" + MainAllowlist.Username.Any() + "\", " +
+                                "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
                                 "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
                                 "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
                                 "\"country\": \"" + info.country + "\"" +
@@ -211,7 +211,7 @@ namespace CoopServer
             {
                 if (RunningResource != null)
                 {
-                    RunningResource.InvokeTick(++CurrentTick);
+                    RunningResource.InvokeTick(++_currentTick);
                 }
 
                 // Only new clients that did not receive files on connection will receive the current files in "clientside"
@@ -604,9 +604,9 @@ namespace CoopServer
         {
             Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
-            if (!packet.ModVersion.StartsWith(CompatibleVersion))
+            if (!packet.ModVersion.StartsWith(_compatibleVersion))
             {
-                local.Deny($"RAGECOOP version {CompatibleVersion.Replace('_', '.')}.x required!");
+                local.Deny($"RAGECOOP version {_compatibleVersion.Replace('_', '.')}.x required!");
                 return;
             }
             if (string.IsNullOrWhiteSpace(packet.Username))
@@ -619,17 +619,17 @@ namespace CoopServer
                 local.Deny("Username contains special chars!");
                 return;
             }
-            if (MainAllowlist.Username.Any() && !MainAllowlist.Username.Contains(packet.Username.ToLower()))
+            if (_mainAllowlist.Username.Any() && !_mainAllowlist.Username.Contains(packet.Username.ToLower()))
             {
                 local.Deny("This Username is not on the allow list!");
                 return;
             }
-            if (MainBlocklist.Username.Contains(packet.Username.ToLower()))
+            if (_mainBlocklist.Username.Contains(packet.Username.ToLower()))
             {
                 local.Deny("This Username has been blocked by this server!");
                 return;
             }
-            if (MainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
+            if (_mainBlocklist.IP.Contains(local.RemoteEndPoint.ToString().Split(":")[0]))
             {
                 local.Deny("This IP was blocked by this server!");
                 return;

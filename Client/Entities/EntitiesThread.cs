@@ -77,7 +77,7 @@ namespace CoopClient.Entities
 
             foreach (NPC.EntitiesNPC npc in localNPCs.Values)
             {
-                npc.DisplayLocally();
+                npc.Update();
             }
 
             // Only if that player wants to share his NPCs with others

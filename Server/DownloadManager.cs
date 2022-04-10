@@ -8,7 +8,7 @@ namespace CoopServer
 {
     internal static class DownloadManager
     {
-        private static readonly List<long> ClientsToDelete = new();
+        private static readonly List<long> _clientsToDelete = new();
         private static List<DownloadClient> _clients = new();
         private static readonly List<DownloadFile> _files = new();
         public static bool AnyFileExists = false;
@@ -79,9 +79,9 @@ namespace CoopServer
         {
             lock (_clients)
             {
-                lock (ClientsToDelete)
+                lock (_clientsToDelete)
                 {
-                    foreach (long nethandle in ClientsToDelete)
+                    foreach (long nethandle in _clientsToDelete)
                     {
                         DownloadClient client = _clients.FirstOrDefault(x => x.NetHandle == nethandle);
                         if (client != null)
@@ -90,7 +90,7 @@ namespace CoopServer
                             _clients.Remove(client);
                         }
                     }
-                    ClientsToDelete.Clear();
+                    _clientsToDelete.Clear();
                 }
 
                 _clients.ForEach(client =>
@@ -151,9 +151,9 @@ namespace CoopServer
 
         public static void AddClientToRemove(long nethandle)
         {
-            lock (ClientsToDelete)
+            lock (_clientsToDelete)
             {
-                ClientsToDelete.Add(nethandle);
+                _clientsToDelete.Add(nethandle);
             }
         }
     }

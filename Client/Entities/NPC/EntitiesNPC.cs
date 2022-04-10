@@ -13,26 +13,25 @@ namespace CoopClient.Entities.NPC
 
         internal Ped Character { get; set; }
         internal int Health { get; set; }
-        private int LastModelHash = 0;
-        private int CurrentModelHash = 0;
-
+        private int _lastModelHash = 0;
+        private int _currentModelHash = 0;
         internal int ModelHash
         {
-            get => CurrentModelHash;
+            get => _currentModelHash;
             set
             {
-                LastModelHash = LastModelHash == 0 ? value : CurrentModelHash;
-                CurrentModelHash = value;
+                _lastModelHash = _lastModelHash == 0 ? value : _currentModelHash;
+                _currentModelHash = value;
             }
         }
-        private Dictionary<byte, short> LastClothes = null;
+        private Dictionary<byte, short> _lastClothes = null;
         internal Dictionary<byte, short> Clothes { get; set; }
 
         internal Vector3 Position { get; set; }
         internal Vector3 Velocity { get; set; }
         internal Vector3 AimCoords { get; set; }
 
-        internal void DisplayLocally()
+        internal void Update()
         {
             #region NOT_IN_RANGE
             if (!Game.Player.Character.IsInRange(Position, 500f))
@@ -61,7 +60,7 @@ namespace CoopClient.Entities.NPC
             }
             else if (LastSyncWasFull)
             {
-                if (CurrentModelHash != LastModelHash)
+                if (_currentModelHash != _lastModelHash)
                 {
                     Character.Kill();
                     Character.Delete();
@@ -71,14 +70,9 @@ namespace CoopClient.Entities.NPC
                         return;
                     }
                 }
-                else if (!Clothes.Compare(LastClothes))
+                else if (!Clothes.Compare(_lastClothes))
                 {
-                    foreach (KeyValuePair<byte, short> cloth in Clothes)
-                    {
-                        Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
-                    }
-
-                    LastClothes = Clothes;
+                    SetClothes();
                 }
             }
 
@@ -117,7 +111,7 @@ namespace CoopClient.Entities.NPC
 
         private bool CreateCharacter()
         {
-            Model characterModel = CurrentModelHash.ModelRequest();
+            Model characterModel = _currentModelHash.ModelRequest();
 
             if (characterModel == null)
             {
@@ -147,12 +141,19 @@ namespace CoopClient.Entities.NPC
             Function.Call(Hash.SET_PED_AS_ENEMY, Character.Handle, false);
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character.Handle, true, true);
 
+            SetClothes();
+
+            return true;
+        }
+
+        private void SetClothes()
+        {
             foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
             }
 
-            return true;
+            _lastClothes = Clothes;
         }
     }
 }

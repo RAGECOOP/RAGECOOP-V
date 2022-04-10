@@ -14,7 +14,7 @@ namespace CoopClient.Entities.NPC
         /// </summary>
         public Vector3 Rotation { get; internal set; }
         internal byte Speed { get; set; }
-        private bool LastIsJumping = false;
+        private bool _lastIsJumping = false;
         internal bool IsJumping { get; set; }
         internal bool IsRagdoll { get; set; }
         internal bool IsOnFire { get; set; }
@@ -22,9 +22,9 @@ namespace CoopClient.Entities.NPC
         internal bool IsShooting { get; set; }
         internal bool IsReloading { get; set; }
         internal uint CurrentWeaponHash { get; set; }
-        private Dictionary<uint, bool> LastWeaponComponents = null;
+        private Dictionary<uint, bool> _lastWeaponComponents = null;
         internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
-        private int LastWeaponObj = 0;
+        private int _lastWeaponObj = 0;
         #endregion
 
         private void DisplayOnFoot()
@@ -57,12 +57,12 @@ namespace CoopClient.Entities.NPC
                 }
             }
 
-            if (IsJumping && !LastIsJumping)
+            if (IsJumping && !_lastIsJumping)
             {
                 Character.Task.Jump();
             }
 
-            LastIsJumping = IsJumping;
+            _lastIsJumping = IsJumping;
 
             if (IsRagdoll)
             {
@@ -98,7 +98,7 @@ namespace CoopClient.Entities.NPC
                 return;
             }
 
-            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(LastWeaponComponents))
+            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
             {
                 Character.Weapons.RemoveAll();
 
@@ -110,21 +110,21 @@ namespace CoopClient.Entities.NPC
                     }
                     else
                     {
-                        LastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
+                        _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
 
                         foreach (KeyValuePair<uint, bool> comp in WeaponComponents)
                         {
                             if (comp.Value)
                             {
-                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, LastWeaponObj, comp.Key);
+                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _lastWeaponObj, comp.Key);
                             }
                         }
 
-                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character.Handle);
+                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, Character.Handle);
                     }
                 }
 
-                LastWeaponComponents = WeaponComponents;
+                _lastWeaponComponents = WeaponComponents;
             }
 
             if (IsShooting)

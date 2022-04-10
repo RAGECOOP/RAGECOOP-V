@@ -11,8 +11,8 @@ namespace CoopClient
     {
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;
-        private readonly Scaleform MainScaleform = new Scaleform("mp_mm_card_freemode");
-        private ulong LastUpdate = Util.GetTickCount64();
+        private readonly Scaleform _mainScaleform = new Scaleform("mp_mm_card_freemode");
+        private ulong _lastUpdate = Util.GetTickCount64();
         internal ulong Pressed { get; set; }
 
         internal bool LeftAlign = true;
@@ -24,7 +24,7 @@ namespace CoopClient
                 return;
             }
 
-            if ((Util.GetTickCount64() - LastUpdate) >= 1000)
+            if ((Util.GetTickCount64() - _lastUpdate) >= 1000)
             {
                 Update(Main.Players, Main.MainSettings.Username);
             }
@@ -35,7 +35,7 @@ namespace CoopClient
 #endif
                 )
             {
-                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, MainScaleform.Handle, 
+                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, _mainScaleform.Handle, 
                                 LeftAlign ? LEFT_POSITION : RIGHT_POSITION, 0.3f,
                                 0.28f, 0.6f,
                                 255, 255, 255, 255, 0);
@@ -44,20 +44,20 @@ namespace CoopClient
 
         private void Update(Dictionary<long, EntitiesPlayer> players, string localUsername)
         {
-            LastUpdate = Util.GetTickCount64();
+            _lastUpdate = Util.GetTickCount64();
 
-            MainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            MainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Main.MainNetworking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
+            _mainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
+            _mainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Main.MainNetworking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
 
             int i = 1;
             
             foreach (KeyValuePair<long, EntitiesPlayer> player in players)
             {
-                MainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
+                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
-            MainScaleform.CallFunction("SET_TITLE", "Player list", (players.Count + 1) + " players");
-            MainScaleform.CallFunction("DISPLAY_VIEW");
+            _mainScaleform.CallFunction("SET_TITLE", "Player list", (players.Count + 1) + " players");
+            _mainScaleform.CallFunction("DISPLAY_VIEW");
         }
     }
 }

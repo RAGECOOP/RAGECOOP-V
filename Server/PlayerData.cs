@@ -4,67 +4,67 @@ namespace CoopServer
 {
     public struct PlayerData
     {
-        public string Username { get; internal set; }
-        private int LastPedHandle { get; set; }
-        private int CurrentPedHandle { get; set; }
+        public string Username { get; internal set; } = string.Empty;
+        private int _lastPedHandle { get; set; } = 0;
+        private int _currentPedHandle { get; set; } = 0;
         public int PedHandle
         {
-            get => CurrentPedHandle;
+            get => _currentPedHandle;
             internal set
             {
-                LastPedHandle = CurrentPedHandle == default ? value : CurrentPedHandle;
-                CurrentPedHandle = value;
+                _lastPedHandle = _currentPedHandle == 0 ? value : _currentPedHandle;
+                _currentPedHandle = value;
 
-                if (CurrentPedHandle != LastPedHandle && Server.RunningResource != null)
+                if (_currentPedHandle != _lastPedHandle && Server.RunningResource != null)
                 {
                     Server.RunningResource.InvokePlayerPedHandleUpdate(Username);
                 }
             }
         }
-        private int LastVehicleHandle { get; set; }
-        private int CurrentVehicleHandle { get; set; }
+        private int _lastVehicleHandle { get; set; } = 0;
+        private int _currentVehicleHandle { get; set; } = 0;
         public int VehicleHandle
         {
-            get => CurrentPedHandle;
+            get => _currentVehicleHandle;
             internal set
             {
-                LastVehicleHandle = CurrentVehicleHandle == default ? value : CurrentVehicleHandle;
-                CurrentVehicleHandle = value;
+                _lastVehicleHandle = _currentVehicleHandle == 0 ? value : _currentVehicleHandle;
+                _currentVehicleHandle = value;
 
-                if (CurrentVehicleHandle != LastVehicleHandle && Server.RunningResource != null)
+                if (_currentVehicleHandle != _lastVehicleHandle && Server.RunningResource != null)
                 {
                     Server.RunningResource.InvokePlayerPedHandleUpdate(Username);
                 }
             }
         }
-        public bool IsInVehicle { get; internal set; }
-        private LVector3 LastPosition { get; set; }
-        private LVector3 CurrentPosition { get; set; }
+        public bool IsInVehicle { get; internal set; } = false;
+        private LVector3 _lastPosition { get; set; } = new LVector3();
+        private LVector3 _currentPosition { get; set; } = new LVector3();
         public LVector3 Position
         {
-            get => CurrentPosition;
+            get => _currentPosition;
             internal set
             {
-                LastPosition = CurrentPosition.Equals(default(LVector3)) ? value : CurrentPosition;
-                CurrentPosition = value;
+                _lastPosition = _currentPosition.Equals(default(LVector3)) ? value : _currentPosition;
+                _currentPosition = value;
 
-                if (Server.RunningResource != null && !LVector3.Equals(CurrentPosition, LastPosition))
+                if (Server.RunningResource != null && !LVector3.Equals(_currentPosition, _lastPosition))
                 {
                     Server.RunningResource.InvokePlayerPositionUpdate(Username);
                 }
             }
         }
-        private int LastHealth { get; set; }
-        private int CurrentHealth { get; set; }
+        private int _lastHealth { get; set; } = 0;
+        private int _currentHealth { get; set; } = 0;
         public int Health
         {
-            get => CurrentHealth;
+            get => _currentHealth;
             internal set
             {
-                LastHealth = CurrentHealth == default ? value : CurrentHealth;
-                CurrentHealth = value;
+                _lastHealth = _currentHealth == 0 ? value : _currentHealth;
+                _currentHealth = value;
 
-                if (CurrentHealth != LastHealth && Server.RunningResource != null)
+                if (_currentHealth != _lastHealth && Server.RunningResource != null)
                 {
                     Server.RunningResource.InvokePlayerHealthUpdate(Username);
                 }

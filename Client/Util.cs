@@ -18,7 +18,7 @@ namespace CoopClient
     static class Util
     {
         #region -- POINTER --
-        private static int SteeringAngleOffset { get; set; }
+        private static int _steeringAngleOffset { get; set; }
 
         public static unsafe void NativeMemory()
         {
@@ -27,7 +27,7 @@ namespace CoopClient
             address = Game.FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
             if (address != IntPtr.Zero)
             {
-                SteeringAngleOffset = *(int*)(address + 6) + 8;
+                _steeringAngleOffset = *(int*)(address + 6) + 8;
             }
 
             address = Game.FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
@@ -43,12 +43,12 @@ namespace CoopClient
         public static unsafe void CustomSteeringAngle(this Vehicle veh, float value)
         {
             IntPtr address = new IntPtr((long)veh.MemoryAddress);
-            if (address == IntPtr.Zero || SteeringAngleOffset == 0)
+            if (address == IntPtr.Zero || _steeringAngleOffset == 0)
             {
                 return;
             }
 
-            *(float*)(address + SteeringAngleOffset).ToPointer() = value;
+            *(float*)(address + _steeringAngleOffset).ToPointer() = value;
         }
         #endregion
 

@@ -20,7 +20,7 @@ namespace CoopClient.Entities.Player
         /// </summary>
         public string Username { get; set; } = "Player";
 
-        private bool AllDataAvailable = false;
+        private bool _allDataAvailable = false;
         internal bool LastSyncWasFull { get; set; } = false;
         /// <summary>
         /// Get the last update = TickCount64()
@@ -39,21 +39,21 @@ namespace CoopClient.Entities.Player
         /// The latest character health (may not have been applied yet)
         /// </summary>
         public int Health { get; internal set; }
-        private int LastModelHash = 0;
-        private int CurrentModelHash = 0;
+        private int _lastModelHash = 0;
+        private int _currentModelHash = 0;
         /// <summary>
         /// The latest character model hash (may not have been applied yet)
         /// </summary>
         public int ModelHash
         {
-            get => CurrentModelHash;
+            get => _currentModelHash;
             internal set
             {
-                LastModelHash = LastModelHash == 0 ? value : CurrentModelHash;
-                CurrentModelHash = value;
+                _lastModelHash = _lastModelHash == 0 ? value : _currentModelHash;
+                _currentModelHash = value;
             }
         }
-        private Dictionary<byte, short> LastClothes = null;
+        private Dictionary<byte, short> _lastClothes = null;
         internal Dictionary<byte, short> Clothes { get; set; }
         /// <summary>
         /// The latest character position (may not have been applied yet)
@@ -63,10 +63,10 @@ namespace CoopClient.Entities.Player
         internal Blip PedBlip = null;
         internal Vector3 AimCoords { get; set; }
 
-        internal void DisplayLocally(string username)
+        internal void Update()
         {
             // Check beforehand whether ped has all the required data
-            if (!AllDataAvailable)
+            if (!_allDataAvailable)
             {
                 if (!LastSyncWasFull)
                 {
@@ -81,14 +81,14 @@ namespace CoopClient.Entities.Player
                             PedBlip = World.CreateBlip(Position);
                             PedBlip.Color = BlipColor.White;
                             PedBlip.Scale = 0.8f;
-                            PedBlip.Name = username;
+                            PedBlip.Name = Username;
                         }
                     }
 
                     return;
                 }
 
-                AllDataAvailable = true;
+                _allDataAvailable = true;
             }
 
             #region NOT_IN_RANGE
@@ -109,19 +109,16 @@ namespace CoopClient.Entities.Player
                     MainVehicle = null;
                 }
 
-                if (username != null)
+                if (PedBlip != null && PedBlip.Exists())
                 {
-                    if (PedBlip != null && PedBlip.Exists())
-                    {
-                        PedBlip.Position = Position;
-                    }
-                    else
-                    {
-                        PedBlip = World.CreateBlip(Position);
-                        PedBlip.Color = BlipColor.White;
-                        PedBlip.Scale = 0.8f;
-                        PedBlip.Name = username;
-                    }
+                    PedBlip.Position = Position;
+                }
+                else
+                {
+                    PedBlip = World.CreateBlip(Position);
+                    PedBlip.Color = BlipColor.White;
+                    PedBlip.Scale = 0.8f;
+                    PedBlip.Name = Username;
                 }
 
                 return;
@@ -133,62 +130,30 @@ namespace CoopClient.Entities.Player
 
             if (!characterExist)
             {
-                if (!CreateCharacter(username))
+                if (!CreateCharacter())
                 {
                     return;
                 }
             }
             else if (LastSyncWasFull)
             {
-                if (CurrentModelHash != LastModelHash)
+                if (ModelHash != _lastModelHash)
                 {
                     Character.Kill();
                     Character.Delete();
 
-                    if (!CreateCharacter(username))
+                    if (!CreateCharacter())
                     {
                         return;
                     }
                 }
-                else if (!Clothes.Compare(LastClothes))
+                else if (!Clothes.Compare(_lastClothes))
                 {
-                    foreach (KeyValuePair<byte, short> cloth in Clothes)
-                    {
-                        Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
-                    }
-
-                    LastClothes = Clothes;
+                    SetClothes();
                 }
             }
 
-            if (username != null && Character.IsVisible && Character.IsInRange(Game.Player.Character.Position, 20f))
-            {
-                float sizeOffset;
-                if (GameplayCamera.IsFirstPersonAimCamActive)
-                {
-                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.10f) + (Character.Velocity / Game.FPS);
-
-                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
-
-                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 30f), 0.30f);
-                }
-                else
-                {
-                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f) + (Character.Velocity / Game.FPS);
-
-                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
-
-                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 25f), 0.25f);
-                }
-
-                new ScaledText(new PointF(0, 0), username, 0.4f * sizeOffset, GTA.UI.Font.ChaletLondon)
-                {
-                    Outline = true,
-                    Alignment = GTA.UI.Alignment.Center
-                }.Draw();
-
-                Function.Call(Hash.CLEAR_DRAW_ORIGIN);
-            }
+            RenderNameTag();
 
             if (Character.IsDead)
             {
@@ -223,7 +188,39 @@ namespace CoopClient.Entities.Player
             #endregion
         }
 
-        private bool CreateCharacter(string username)
+        private void RenderNameTag()
+        {
+            if (Character.IsVisible && Character.IsInRange(Game.Player.Character.Position, 20f))
+            {
+                float sizeOffset;
+                if (GameplayCamera.IsFirstPersonAimCamActive)
+                {
+                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.10f) + (Character.Velocity / Game.FPS);
+
+                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
+
+                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 30f), 0.30f);
+                }
+                else
+                {
+                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f) + (Character.Velocity / Game.FPS);
+
+                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
+
+                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 25f), 0.25f);
+                }
+
+                new ScaledText(new PointF(0, 0), Username, 0.4f * sizeOffset, GTA.UI.Font.ChaletLondon)
+                {
+                    Outline = true,
+                    Alignment = GTA.UI.Alignment.Center
+                }.Draw();
+
+                Function.Call(Hash.CLEAR_DRAW_ORIGIN);
+            }
+        }
+
+        private bool CreateCharacter()
         {
             if (PedBlip != null && PedBlip.Exists())
             {
@@ -231,7 +228,7 @@ namespace CoopClient.Entities.Player
                 PedBlip = null;
             }
 
-            Model characterModel = CurrentModelHash.ModelRequest();
+            Model characterModel = ModelHash.ModelRequest();
 
             if (characterModel == null)
             {
@@ -258,7 +255,7 @@ namespace CoopClient.Entities.Player
             Character.AddBlip();
             Character.AttachedBlip.Color = BlipColor.White;
             Character.AttachedBlip.Scale = 0.8f;
-            Character.AttachedBlip.Name = username;
+            Character.AttachedBlip.Name = Username;
 
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
             Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, Character.Handle, false);
@@ -268,12 +265,19 @@ namespace CoopClient.Entities.Player
             Function.Call(Hash.SET_PED_AS_ENEMY, Character.Handle, false);
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character.Handle, true, true);
 
+            SetClothes();
+
+            return true;
+        }
+
+        private void SetClothes()
+        {
             foreach (KeyValuePair<byte, short> cloth in Clothes)
             {
                 Function.Call(Hash.SET_PED_COMPONENT_VARIATION, Character.Handle, cloth.Key, cloth.Value, 0, 0);
             }
 
-            return true;
+            _lastClothes = Clothes;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace CoopClient
     /// </summary>
     public class WorldThread : Script
     {
-        private static bool LastDisableTraffic = false;
+        private static bool _lastDisableTraffic = false;
 
         /// <summary>
         /// Don't use it!
@@ -21,7 +21,7 @@ namespace CoopClient
             Tick += OnTick;
             Aborted += (sender, e) =>
             {
-                if (LastDisableTraffic)
+                if (_lastDisableTraffic)
                 {
                     Traffic(true);
                 }
@@ -43,7 +43,7 @@ namespace CoopClient
 
             if (Main.DisableTraffic)
             {
-                if (!LastDisableTraffic)
+                if (!_lastDisableTraffic)
                 {
                     Traffic(false);
                 }
@@ -56,12 +56,12 @@ namespace CoopClient
                 Function.Call((Hash)0x2F9A292AD0A3BD89);
                 Function.Call((Hash)0x5F3B7749C112D552);
             }
-            else if (LastDisableTraffic)
+            else if (_lastDisableTraffic)
             {
                 Traffic(true);
             }
 
-            LastDisableTraffic = Main.DisableTraffic;
+            _lastDisableTraffic = Main.DisableTraffic;
         }
 
         private void Traffic(bool enable)

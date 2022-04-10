@@ -16,7 +16,7 @@ namespace CoopClient
     /// </summary>
     public class JavascriptHook : Script
     {
-        private static readonly List<V8ScriptEngine> ScriptEngines = new List<V8ScriptEngine>();
+        private static readonly List<V8ScriptEngine> _scriptEngines = new List<V8ScriptEngine>();
         internal static bool JavascriptLoaded { get; private set; } = false;
 
         /// <summary>
@@ -29,14 +29,14 @@ namespace CoopClient
 
         private void Ontick(object sender, EventArgs e)
         {
-            if (!Main.MainNetworking.IsOnServer() || ScriptEngines.Count == 0)
+            if (!Main.MainNetworking.IsOnServer() || _scriptEngines.Count == 0)
             {
                 return;
             }
 
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
-                ScriptEngines.ForEach(engine => engine.Script.API.InvokeTick());
+                _scriptEngines.ForEach(engine => engine.Script.API.InvokeTick());
             }
         }
 
@@ -60,7 +60,7 @@ namespace CoopClient
                 }
             }
 
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
                 foreach (string script in Directory.GetFiles("scripts\\resources\\" + serverAddress, "*.js"))
                 {
@@ -89,7 +89,7 @@ namespace CoopClient
                     finally
                     {
                         engine.Script.API.InvokeStart();
-                        ScriptEngines.Add(engine);
+                        _scriptEngines.Add(engine);
                     }
                 }
             }
@@ -99,14 +99,14 @@ namespace CoopClient
 
         internal static void StopAll()
         {
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
-                ScriptEngines.ForEach(engine =>
+                _scriptEngines.ForEach(engine =>
                 {
                     engine.Script.API.InvokeStop();
                     engine.Dispose();
                 });
-                ScriptEngines.Clear();
+                _scriptEngines.Clear();
             }
 
             JavascriptLoaded = false;
@@ -114,25 +114,25 @@ namespace CoopClient
 
         internal static void InvokePlayerConnect(string username, long nethandle)
         {
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
-                ScriptEngines.ForEach(engine => engine.Script.API.InvokePlayerConnect(username, nethandle));
+                _scriptEngines.ForEach(engine => engine.Script.API.InvokePlayerConnect(username, nethandle));
             }
         }
 
         internal static void InvokePlayerDisonnect(string username, long nethandle, string reason = null)
         {
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
-                ScriptEngines.ForEach(engine => engine.Script.API.InvokePlayerDisonnect(username, nethandle, reason));
+                _scriptEngines.ForEach(engine => engine.Script.API.InvokePlayerDisonnect(username, nethandle, reason));
             }
         }
 
         internal static void InvokeChatMessage(string from, string message)
         {
-            lock (ScriptEngines)
+            lock (_scriptEngines)
             {
-                ScriptEngines.ForEach(engine => engine.Script.API.InvokeChatMessage(from, message));
+                _scriptEngines.ForEach(engine => engine.Script.API.InvokeChatMessage(from, message));
             }
         }
     }

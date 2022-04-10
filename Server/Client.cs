@@ -8,13 +8,13 @@ namespace CoopServer
     public class Client
     {
         public long NetHandle = 0;
-        private float CurrentLatency = 0f;
+        private float _currentLatency = 0f;
         public float Latency
         {
-            get => CurrentLatency;
+            get => _currentLatency;
             internal set
             {
-                CurrentLatency = value;
+                _currentLatency = value;
 
                 if ((value * 1000f) > Server.MainSettings.MaxLatency)
                 {
@@ -23,8 +23,8 @@ namespace CoopServer
             }
         }
         public PlayerData Player;
-        private readonly Dictionary<string, object> CustomData = new();
-        private long CallbacksCount = 0;
+        private readonly Dictionary<string, object> _customData = new();
+        private long _callbacksCount = 0;
         internal readonly Dictionary<long, Action<object>> Callbacks = new();
         internal bool FilesReceived = false;
         internal bool FilesSent = false;
@@ -34,29 +34,29 @@ namespace CoopServer
         {
             if (HasData(name))
             {
-                CustomData[name] = data;
+                _customData[name] = data;
             }
             else
             {
-                CustomData.Add(name, data);
+                _customData.Add(name, data);
             }
         }
 
         public bool HasData(string name)
         {
-            return CustomData.ContainsKey(name);
+            return _customData.ContainsKey(name);
         }
 
         public T GetData<T>(string name)
         {
-            return HasData(name) ? (T)CustomData[name] : default;
+            return HasData(name) ? (T)_customData[name] : default;
         }
 
         public void RemoveData(string name)
         {
             if (HasData(name))
             {
-                CustomData.Remove(name);
+                _customData.Remove(name);
             }
         }
         #endregion
@@ -139,7 +139,7 @@ namespace CoopServer
                     return;
                 }
 
-                long id = ++CallbacksCount;
+                long id = ++_callbacksCount;
                 Callbacks.Add(id, callback);
 
                 byte returnTypeValue = 0x00;

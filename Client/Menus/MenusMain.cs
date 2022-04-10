@@ -25,10 +25,10 @@ namespace CoopClient.Menus
         #endregion
 
         #region ITEMS
-        private readonly NativeItem UsernameItem = new NativeItem("Username") { AltTitle = Main.MainSettings.Username };
+        private readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.MainSettings.Username };
         internal readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
-        private readonly NativeItem ServerConnectItem = new NativeItem("Connect");
-        private readonly NativeItem AboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
+        private readonly NativeItem _serverConnectItem = new NativeItem("Connect");
+        private readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +
             Main.CurrentVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
@@ -42,19 +42,19 @@ namespace CoopClient.Menus
             MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
 
-            UsernameItem.Activated += UsernameActivated;
+            _usernameItem.Activated += UsernameActivated;
             ServerIpItem.Activated += ServerIpActivated;
-            ServerConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.MainSettings.LastServerAddress); };
+            _serverConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.MainSettings.LastServerAddress); };
 
             MainMenu.AddSubMenu(ServerList.MainMenu);
 
-            MainMenu.Add(UsernameItem);
+            MainMenu.Add(_usernameItem);
             MainMenu.Add(ServerIpItem);
-            MainMenu.Add(ServerConnectItem);
+            MainMenu.Add(_serverConnectItem);
 
             MainMenu.AddSubMenu(SubSettings.MainMenu);
 
-            MainMenu.Add(AboutItem);
+            MainMenu.Add(_aboutItem);
 
             MenuPool.Add(ServerList.MainMenu);
             MenuPool.Add(MainMenu);
@@ -63,13 +63,13 @@ namespace CoopClient.Menus
 
         internal void UsernameActivated(object a, System.EventArgs b)
         {
-            string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, UsernameItem.AltTitle, 20);
+            string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
             if (!string.IsNullOrWhiteSpace(newUsername))
             {
                 Main.MainSettings.Username = newUsername;
                 Util.SaveSettings();
 
-                UsernameItem.AltTitle = newUsername;
+                _usernameItem.AltTitle = newUsername;
             }
         }
 

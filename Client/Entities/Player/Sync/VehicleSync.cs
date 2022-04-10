@@ -10,16 +10,16 @@ namespace CoopClient.Entities.Player
     public partial class EntitiesPlayer
     {
         #region -- VARIABLES --
-        private ulong VehicleStopTime { get; set; }
+        private ulong _vehicleStopTime { get; set; }
 
         internal bool IsInVehicle { get; set; }
         /// <summary>
         /// The latest vehicle model hash (may not have been applied yet)
         /// </summary>
         public int VehicleModelHash { get; internal set; }
-        private byte[] LastVehicleColors = new byte[] { 0, 0 };
+        private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         internal byte[] VehicleColors { get; set; }
-        private Dictionary<int, int> LastVehicleMods = new Dictionary<int, int>();
+        private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
         internal Dictionary<int, int> VehicleMods { get; set; }
         internal bool VehicleDead { get; set; }
         internal float VehicleEngineHealth { get; set; }
@@ -34,12 +34,12 @@ namespace CoopClient.Entities.Player
         public Quaternion VehicleRotation { get; internal set; }
         internal float VehicleSpeed { get; set; }
         internal float VehicleSteeringAngle { get; set; }
-        private int LastVehicleAim;
+        private int _lastVehicleAim = 0;
         internal bool VehIsEngineRunning { get; set; }
         internal float VehRPM { get; set; }
-        private bool LastTransformed = false;
+        private bool _lastTransformed = false;
         internal bool Transformed { get; set; }
-        private bool LastHornActive = false;
+        private bool _lastHornActive = false;
         internal bool IsHornActive { get; set; }
         internal bool VehAreLightsOn { get; set; }
         internal bool VehAreBrakeLightsOn = false;
@@ -113,10 +113,10 @@ namespace CoopClient.Entities.Player
                 if (MainVehicle.IsTurretSeat(VehicleSeatIndex))
                 {
                     int gameTime = Game.GameTime;
-                    if (gameTime - LastVehicleAim > 30)
+                    if (gameTime - _lastVehicleAim > 30)
                     {
                         Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, Character.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-                        LastVehicleAim = gameTime;
+                        _lastVehicleAim = gameTime;
                     }
                 }
             }
@@ -126,11 +126,11 @@ namespace CoopClient.Entities.Player
                 return;
             }
 
-            if (VehicleColors != null && VehicleColors != LastVehicleColors)
+            if (VehicleColors != null && VehicleColors != _lastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
 
-                LastVehicleColors = VehicleColors;
+                _lastVehicleColors = VehicleColors;
             }
 
             if (Character.IsOnBike && MainVehicle.ClassType == VehicleClass.Cycles)
@@ -151,7 +151,7 @@ namespace CoopClient.Entities.Player
             }
             else
             {
-                if (VehicleMods != null && !VehicleMods.Compare(LastVehicleMods))
+                if (VehicleMods != null && !VehicleMods.Compare(_lastVehicleMods))
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
@@ -160,7 +160,7 @@ namespace CoopClient.Entities.Player
                         MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
                     }
 
-                    LastVehicleMods = VehicleMods;
+                    _lastVehicleMods = VehicleMods;
                 }
 
                 MainVehicle.EngineHealth = VehicleEngineHealth;
@@ -193,14 +193,17 @@ namespace CoopClient.Entities.Player
 
                 if (MainVehicle.IsSubmarineCar)
                 {
-                    if (Transformed && !LastTransformed)
+                    if (Transformed)
                     {
-                        LastTransformed = true;
-                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
+                        if (!_lastTransformed)
+                        {
+                            _lastTransformed = true;
+                            Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
+                        }
                     }
-                    else if (!Transformed && LastTransformed)
+                    else if (_lastTransformed)
                     {
-                        LastTransformed = false;
+                        _lastTransformed = false;
                         Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
                     }
                 }
@@ -219,14 +222,17 @@ namespace CoopClient.Entities.Player
                         MainVehicle.IsSirenActive = VehIsSireneActive;
                     }
 
-                    if (IsHornActive && !LastHornActive)
+                    if (IsHornActive)
                     {
-                        LastHornActive = true;
-                        MainVehicle.SoundHorn(99999);
+                        if (!_lastHornActive)
+                        {
+                            _lastHornActive = true;
+                            MainVehicle.SoundHorn(99999);
+                        }
                     }
-                    else if (!IsHornActive && LastHornActive)
+                    else if (_lastHornActive)
                     {
-                        LastHornActive = false;
+                        _lastHornActive = false;
                         MainVehicle.SoundHorn(1);
                     }
 
@@ -261,11 +267,11 @@ namespace CoopClient.Entities.Player
                 MainVehicle.Velocity = Velocity + forceMultiplier * (Position - MainVehicle.Position);
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
 
-                VehicleStopTime = Util.GetTickCount64();
+                _vehicleStopTime = Util.GetTickCount64();
             }
-            else if ((Util.GetTickCount64() - VehicleStopTime) <= 1000)
+            else if ((Util.GetTickCount64() - _vehicleStopTime) <= 1000)
             {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - VehicleStopTime, 1000);
+                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - _vehicleStopTime, 1000);
 
                 MainVehicle.PositionNoOffset = posTarget;
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);

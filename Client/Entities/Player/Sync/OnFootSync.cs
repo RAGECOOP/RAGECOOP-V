@@ -15,7 +15,7 @@ namespace CoopClient.Entities.Player
         /// </summary>
         public Vector3 Rotation { get; internal set; }
         internal byte Speed { get; set; }
-        private bool LastIsJumping = false;
+        private bool _lastIsJumping = false;
         internal bool IsJumping { get; set; }
         internal bool IsOnLadder { get; set; }
         internal bool IsVaulting { get; set; }
@@ -28,14 +28,14 @@ namespace CoopClient.Entities.Player
         internal bool IsShooting { get; set; }
         internal bool IsReloading { get; set; }
         internal uint CurrentWeaponHash { get; set; }
-        private Dictionary<uint, bool> LastWeaponComponents = null;
+        private Dictionary<uint, bool> _lastWeaponComponents = null;
         internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
-        private int LastWeaponObj = 0;
+        private int _lastWeaponObj = 0;
         #endregion
 
-        private bool IsPlayingAnimation = false;
-        private string[] CurrentAnimation = new string[2] { "", ""};
-        private float AnimationStopTime = 0;
+        private bool _isPlayingAnimation = false;
+        private string[] _currentAnimation = new string[2] { "", "" };
+        private float _animationStopTime = 0;
 
         private void DisplayOnFoot()
         {
@@ -150,16 +150,16 @@ namespace CoopClient.Entities.Player
 
             if (IsJumping)
             {
-                if (!LastIsJumping)
+                if (!_lastIsJumping)
                 {
-                    LastIsJumping = true;
+                    _lastIsJumping = true;
                     Character.Task.Jump();
                 }
 
                 UpdateOnFootPosition();
                 return;
             }
-            LastIsJumping = false;
+            _lastIsJumping = false;
 
             if (IsRagdoll)
             {
@@ -181,9 +181,9 @@ namespace CoopClient.Entities.Player
                 Character.CanRagdoll = false;
                 Character.Task.ClearAllImmediately();
 
-                IsPlayingAnimation = true;
-                CurrentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
-                AnimationStopTime = 0.7f;
+                _isPlayingAnimation = true;
+                _currentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
+                _animationStopTime = 0.7f;
 
                 Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
                 return;
@@ -226,7 +226,7 @@ namespace CoopClient.Entities.Player
         #region WEAPON
         private void CheckCurrentWeapon()
         {
-            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(LastWeaponComponents))
+            if (Character.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
             {
                 Character.Weapons.RemoveAll();
 
@@ -238,21 +238,21 @@ namespace CoopClient.Entities.Player
                     }
                     else
                     {
-                        LastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
+                        _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
 
                         foreach (KeyValuePair<uint, bool> comp in WeaponComponents)
                         {
                             if (comp.Value)
                             {
-                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, LastWeaponObj, comp.Key);
+                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _lastWeaponObj, comp.Key);
                             }
                         }
 
-                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, LastWeaponObj, Character.Handle);
+                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, Character.Handle);
                     }
                 }
 
-                LastWeaponComponents = WeaponComponents;
+                _lastWeaponComponents = WeaponComponents;
             }
         }
 
@@ -288,29 +288,29 @@ namespace CoopClient.Entities.Player
 
         private bool StopAnimation()
         {
-            if (!IsPlayingAnimation)
+            if (!_isPlayingAnimation)
             {
                 return true;
             }
 
-            switch (CurrentAnimation[0])
+            switch (_currentAnimation[0])
             {
                 case "anim@sports@ballgame@handball@":
                     UpdateOnFootPosition(true, true, false);
-                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", CurrentAnimation[1]);
+                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", _currentAnimation[1]);
 
-                    if (currentTime < AnimationStopTime)
+                    if (currentTime < _animationStopTime)
                     {
                         return false;
                     }
                     break;
             }
 
-            Character.Task.ClearAnimation(CurrentAnimation[0], CurrentAnimation[1]);
+            Character.Task.ClearAnimation(_currentAnimation[0], _currentAnimation[1]);
             Character.Task.ClearAll();
-            IsPlayingAnimation = false;
-            CurrentAnimation = new string[2] { "", "" };
-            AnimationStopTime = 0;
+            _isPlayingAnimation = false;
+            _currentAnimation = new string[2] { "", "" };
+            _animationStopTime = 0;
 
             return true;
         }

@@ -20,14 +20,14 @@ namespace CoopClient
     {
         internal static RelationshipGroup RelationshipGroup;
 
-        private bool GameLoaded = false;
+        private bool _gameLoaded = false;
 
         internal static readonly string CurrentVersion = "V1_4_0";
 
         internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
         internal static bool NPCsAllowed = false;
-        private static bool IsGoingToCar = false;
+        private static bool _isGoingToCar = false;
 
         internal static Settings MainSettings = null;
         internal static Networking MainNetworking = null;
@@ -58,10 +58,10 @@ namespace CoopClient
                         return;
                     }
 
-                    if (!GameLoaded)
+                    if (!_gameLoaded)
                     {
                         GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
-                        GameLoaded = true;
+                        _gameLoaded = true;
                     }
                 };
                 return;
@@ -85,9 +85,9 @@ namespace CoopClient
         }
 
 #if DEBUG
-        private ulong LastDebugData;
-        private int DebugBytesSend;
-        private int DebugBytesReceived;
+        private ulong _lastDebugData;
+        private int _debugBytesSend;
+        private int _debugBytesReceived;
 #endif
         private void OnTick(object sender, EventArgs e)
         {
@@ -95,7 +95,7 @@ namespace CoopClient
             {
                 return;
             }
-            else if (!GameLoaded && (GameLoaded = true))
+            else if (!_gameLoaded && (_gameLoaded = true))
             {
                 RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
                 Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(RelationshipGroup, Relationship.Neutral, true);
@@ -115,9 +115,9 @@ namespace CoopClient
                 JavascriptHook.LoadAll();
             }
 
-            if (IsGoingToCar && Game.Player.Character.IsInVehicle())
+            if (_isGoingToCar && Game.Player.Character.IsInVehicle())
             {
-                IsGoingToCar = false;
+                _isGoingToCar = false;
             }
 
             if (!MainNetworking.IsOnServer())
@@ -129,19 +129,19 @@ namespace CoopClient
             if (MainNetworking.ShowNetworkInfo)
             {
                 ulong time = Util.GetTickCount64();
-                if (time - LastDebugData > 1000)
+                if (time - _lastDebugData > 1000)
                 {
-                    LastDebugData = time;
+                    _lastDebugData = time;
 
-                    DebugBytesReceived = MainNetworking.BytesReceived;
+                    _debugBytesReceived = MainNetworking.BytesReceived;
                     MainNetworking.BytesReceived = 0;
-                    DebugBytesSend = MainNetworking.BytesSend;
+                    _debugBytesSend = MainNetworking.BytesSend;
                     MainNetworking.BytesSend = 0;
                 }
 
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(DebugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 
@@ -158,7 +158,7 @@ namespace CoopClient
             // Display all players
             foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
             {
-                player.Value.DisplayLocally(player.Value.Username);
+                player.Value.Update();
             }
 
             MainNetworking.SendPlayerData();
@@ -190,10 +190,10 @@ namespace CoopClient
                     }
                     break;
                 case Keys.G:
-                    if (IsGoingToCar)
+                    if (_isGoingToCar)
                     {
                         Game.Player.Character.Task.ClearAll();
-                        IsGoingToCar = false;
+                        _isGoingToCar = false;
                     }
                     else if (!Game.Player.Character.IsInVehicle())
                     {
@@ -205,7 +205,7 @@ namespace CoopClient
                                 if (veh.IsSeatFree((VehicleSeat)i))
                                 {
                                     Game.Player.Character.Task.EnterVehicle(veh, (VehicleSeat)i);
-                                    IsGoingToCar = true;
+                                    _isGoingToCar = true;
                                     break;
                                 }
                             }
@@ -354,7 +354,7 @@ namespace CoopClient
         }
 
 #if DEBUG
-        private ulong ArtificialLagCounter;
+        private ulong _artificialLagCounter;
         internal static EntitiesPlayer DebugSyncPed;
         internal static ulong LastFullDebugSync = 0;
         internal static bool UseDebug = false;
@@ -369,7 +369,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - ArtificialLagCounter) < 231)
+            if ((Util.GetTickCount64() - _artificialLagCounter) < 231)
             {
                 return;
             }
@@ -465,9 +465,9 @@ namespace CoopClient
             ulong currentTimestamp = Util.GetTickCount64();
 
             DebugSyncPed.LastUpdateReceived = currentTimestamp;
-            DebugSyncPed.Latency = (currentTimestamp - ArtificialLagCounter) / 1000f;
+            DebugSyncPed.Latency = (currentTimestamp - _artificialLagCounter) / 1000f;
 
-            ArtificialLagCounter = currentTimestamp;
+            _artificialLagCounter = currentTimestamp;
 
             if (fullSync)
             {

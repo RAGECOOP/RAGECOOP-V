@@ -5,11 +5,11 @@ namespace CoopServer
 {
     public class Logging
     {
-        private static readonly object Lock = new();
+        private static readonly object _lock = new();
 
         public static void Info(string message)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 string msg = string.Format("[{0}] [INFO] {1}", Date(), message);
 
@@ -24,7 +24,7 @@ namespace CoopServer
 
         public static void Warning(string message)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 string msg = string.Format("[{0}] [WARNING] {1}", Date(), message);
 
@@ -39,7 +39,7 @@ namespace CoopServer
 
         public static void Error(string message)
         {
-            lock (Lock)
+            lock (_lock)
             {
                 string msg = string.Format("[{0}] [ERROR] {1}", Date(), message);
 
@@ -59,7 +59,7 @@ namespace CoopServer
                 return;
             }
 
-            lock (Lock)
+            lock (_lock)
             {
                 string msg = string.Format("[{0}] [DEBUG] {1}", Date(), message);
 
