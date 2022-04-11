@@ -39,15 +39,20 @@ namespace CoopServer
         public Server()
         {
             Logging.Info("================");
+            Logging.Info($"Server bound to: {MainSettings.Address}:{MainSettings.Port}");
             Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
             Logging.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
 
+            IPAddress parsedAddress = IPAddress.Parse(MainSettings.Address);
+
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
             {
-                MaximumConnections = MainSettings.MaxPlayers,
+                LocalAddress = parsedAddress,
+                BroadcastAddress = parsedAddress,
                 Port = MainSettings.Port,
+                MaximumConnections = MainSettings.MaxPlayers,
                 EnableUPnP = MainSettings.UPnP
             };
 

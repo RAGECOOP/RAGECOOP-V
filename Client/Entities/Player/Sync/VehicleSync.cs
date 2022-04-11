@@ -31,9 +31,21 @@ namespace CoopClient.Entities.Player
         /// <summary>
         /// The latest vehicle rotation (may not have been applied yet)
         /// </summary>
-        public Quaternion VehicleRotation { get; internal set; }
+        public Quaternion VehicleRotation
+        {
+            get => _vehicleRotation;
+            set
+            {
+                _lastVehicleRotation = _vehicleRotation;
+                _vehicleRotation = value;
+            }
+        }
+        private Quaternion _vehicleRotation;
+        private Quaternion? _lastVehicleRotation;
         internal float VehicleSpeed { get; set; }
+        private float _lastVehicleSpeed;
         internal float VehicleSteeringAngle { get; set; }
+        private float _lastVehicleSteeringAngle;
         private int _lastVehicleAim = 0;
         internal bool VehIsEngineRunning { get; set; }
         internal float VehRPM { get; set; }
@@ -77,7 +89,9 @@ namespace CoopClient.Entities.Player
                 if (!vehFound)
                 {
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
-                    MainVehicle.Quaternion = VehicleRotation;
+                    MainVehicle.Quaternion = _vehicleRotation;
+
+                    MainVehicle.IsInvincible = true;
 
                     if (MainVehicle.HasRoof)
                     {
@@ -167,10 +181,12 @@ namespace CoopClient.Entities.Player
 
                 if (VehicleDead && !MainVehicle.IsDead)
                 {
+                    MainVehicle.IsInvincible = false;
                     MainVehicle.Explode();
                 }
                 else if (!VehicleDead && MainVehicle.IsDead)
                 {
+                    MainVehicle.IsInvincible = true;
                     MainVehicle.Repair();
                 }
 
@@ -254,18 +270,27 @@ namespace CoopClient.Entities.Player
                 }
             }
 
-            if (VehicleSteeringAngle != MainVehicle.SteeringAngle)
+            float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / AverageLatency);
+
+            if (_lastVehicleSteeringAngle != VehicleSteeringAngle)
             {
-                MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * VehicleSteeringAngle);
+                float steeringLerp = Util.Lerp(_lastVehicleSteeringAngle.ToRadians(), VehicleSteeringAngle.ToRadians(), avrLat);
+                _lastVehicleSteeringAngle = VehicleSteeringAngle;
+
+                MainVehicle.CustomSteeringAngle(steeringLerp);
             }
 
             // Good enough for now, but we need to create a better sync
             if (VehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
             {
-                int forceMultiplier = (Game.Player.Character.IsInVehicle() && MainVehicle.IsTouching(Game.Player.Character.CurrentVehicle)) ? 1 : 3;
+                dynamic speedLerp = Util.Lerp(_lastVehicleSpeed, VehicleSpeed, avrLat);
+                _lastVehicleSpeed = Speed;
 
-                MainVehicle.Velocity = Velocity + forceMultiplier * (Position - MainVehicle.Position);
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+                dynamic force = 1.10f + (float)Math.Sqrt(AverageLatency / 2500) + (speedLerp / 250);
+                dynamic forceVelo = 0.77f + (float)Math.Sqrt(AverageLatency / 5000) + (speedLerp / 750);
+
+                MainVehicle.Velocity = Velocity * forceVelo + ((Position - MainVehicle.Position) * force);
+                MainVehicle.Quaternion = _lastVehicleRotation != null ? Quaternion.Slerp(_lastVehicleRotation.Value, _vehicleRotation, avrLat) : _vehicleRotation;
 
                 _vehicleStopTime = Util.GetTickCount64();
             }
@@ -274,12 +299,12 @@ namespace CoopClient.Entities.Player
                 Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - _vehicleStopTime, 1000);
 
                 MainVehicle.PositionNoOffset = posTarget;
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.Quaternion, VehicleRotation, 0.5f);
+                MainVehicle.Quaternion = Quaternion.Slerp(_lastVehicleRotation.Value, _vehicleRotation, avrLat);
             }
             else
             {
                 MainVehicle.PositionNoOffset = Position;
-                MainVehicle.Quaternion = VehicleRotation;
+                MainVehicle.Quaternion = _vehicleRotation;
             }
             #endregion
         }
