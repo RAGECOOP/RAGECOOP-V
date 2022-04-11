@@ -80,15 +80,9 @@ namespace CoopClient
                         map = (CoopMap)serializer.Deserialize(stream);
                     }
 
-                    GTA.UI.Notification.Show($"{map.Props.Count()}");
-
                     string fileName = Path.GetFileName(filePath);
                     _maps.Add(fileName, map);
-
-                    GTA.UI.Notification.Show($"test: {_maps["ATV.xml"].Props.Count()}");
                 }
-
-                //GTA.UI.Notification.Show($"{_maps["ATV.xml"].Objects[0].Position.X}");
             }
         }
 
@@ -105,10 +99,8 @@ namespace CoopClient
         
                 CoopMap map = _maps[name];
         
-                for (int i = 0; i < map.Props.Count(); i++)
+                foreach (CoopProp prop in map.Props)
                 {
-                    CoopProp prop = map.Props[i];
-        
                     Model model = prop.Hash.ModelRequest();
                     if (model == null)
                     {
@@ -130,15 +122,13 @@ namespace CoopClient
                     {
                         Function.Call(Hash._SET_OBJECT_TEXTURE_VARIATION, handle, prop.Texture);
                     }
-
-                    Logger.Write($"Object [{model.Hash}] created at {prop.Position.X}, {prop.Position.Y}, {prop.Position.Z}", Logger.LogLevel.Server);
                 }
             }
         }
 
         public static bool AnyMapLoaded()
         {
-            return _createdObjects.Any();
+            lock (_createdObjects) return _createdObjects.Any();
         }
 
         public static void DeleteMap()
