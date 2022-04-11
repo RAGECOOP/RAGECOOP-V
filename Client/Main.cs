@@ -110,11 +110,6 @@ namespace CoopClient
 
             MainNetworking.ReceiveMessages();
 
-            if (!JavascriptHook.JavascriptLoaded && DownloadManager.DownloadComplete)
-            {
-                JavascriptHook.LoadAll();
-            }
-
             if (_isGoingToCar && Game.Player.Character.IsInVehicle())
             {
                 _isGoingToCar = false;
@@ -123,6 +118,12 @@ namespace CoopClient
             if (!MainNetworking.IsOnServer())
             {
                 return;
+            }
+
+            if (!JavascriptHook.JavascriptLoaded && DownloadManager.DownloadComplete)
+            {
+                MapLoader.LoadAll();
+                JavascriptHook.LoadAll();
             }
 
 #if DEBUG

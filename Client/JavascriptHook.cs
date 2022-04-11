@@ -423,6 +423,21 @@ namespace CoopClient
             return Game.IsControlPressed((Control)control);
         }
 
+        public bool IsMapLoaded()
+        {
+            return MapLoader.AnyMapLoaded();
+        }
+
+        public void LoadMap(string name)
+        {
+            MapLoader.LoadMap(name);
+        }
+
+        public void DeleteMap()
+        {
+            MapLoader.DeleteMap();
+        }
+
         public void TriggerServerEvent(string eventName, params object[] args)
         {
             // TODO

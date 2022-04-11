@@ -95,6 +95,7 @@
     <Compile Include="JavascriptHook.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Main.cs" />
+    <Compile Include="MapLoader.cs" />
     <Compile Include="Menus\MenusMain.cs" />
     <Compile Include="Menus\Sub\Servers.cs" />
     <Compile Include="Menus\Sub\Settings.cs" />

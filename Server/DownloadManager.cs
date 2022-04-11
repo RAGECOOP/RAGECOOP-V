@@ -41,9 +41,9 @@ namespace CoopServer
                 FileInfo fileInfo = new(file);
 
                 // ONLY JAVASCRIPT AND JSON FILES!
-                if (!new string[] { ".js", ".json" }.Any(x => x == fileInfo.Extension))
+                if (!new string[] { ".js", ".xml" }.Any(x => x == fileInfo.Extension))
                 {
-                    Logging.Warning("Only files with \"*.js\" and \"*.json\" can be sent!");
+                    Logging.Warning("Only files with \"*.js\" and \"*.xml\" can be sent!");
                     continue;
                 }
 
@@ -60,7 +60,14 @@ namespace CoopServer
                     {
                         if (!fileCreated && (fileCreated = true))
                         {
-                            newFile = new() { FileID = fileCount, FileName = fileInfo.Name, FileLength = fileInfo.Length, FileChunks = new() };
+                            newFile = new()
+                            {
+                                FileID = fileCount,
+                                FileName = fileInfo.Name,
+                                FileType = fileInfo.Extension == ".json" ? Packets.DataFileType.Script : Packets.DataFileType.Map,
+                                FileLength = fileInfo.Length,
+                                FileChunks = new()
+                            };
                         }
 
                         newFile.FileChunks.Add(buffer.Take(bytesRead).ToArray());
@@ -184,7 +191,7 @@ namespace CoopServer
                 new Packets.FileTransferRequest()
                 {
                     ID = file.FileID,
-                    FileType = (byte)Packets.DataFileType.Script,
+                    FileType = (byte)file.FileType,
                     FileName = file.FileName,
                     FileLength = file.FileLength
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -256,6 +263,7 @@ namespace CoopServer
     {
         public byte FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;
+        public Packets.DataFileType FileType { get; set; } = Packets.DataFileType.Script;
         public long FileLength { get; set; } = 0;
         public List<byte[]> FileChunks { get; set; } = null;
     }

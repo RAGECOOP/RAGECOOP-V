@@ -251,12 +251,6 @@ namespace CoopClient.Entities.Player
             
             Character.CanSufferCriticalHits = false;
 
-            // Add a new blip for the ped
-            Character.AddBlip();
-            Character.AttachedBlip.Color = BlipColor.White;
-            Character.AttachedBlip.Scale = 0.8f;
-            Character.AttachedBlip.Name = Username;
-
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, Character.Handle, false);
             Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, Character.Handle, false);
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, Character.Handle, true);
@@ -266,6 +260,12 @@ namespace CoopClient.Entities.Player
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Character.Handle, true, true);
 
             SetClothes();
+
+            // Add a new blip for the ped
+            Character.AddBlip();
+            Character.AttachedBlip.Color = BlipColor.White;
+            Character.AttachedBlip.Scale = 0.8f;
+            Character.AttachedBlip.Name = Username;
 
             return true;
         }

@@ -159,6 +159,7 @@ namespace CoopClient
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
 
                                 JavascriptHook.StopAll();
+                                MapLoader.DeleteAll();
 
                                 Logger.Write($">> Disconnected << reason: {reason}", Logger.LogLevel.Server);
                                 break;

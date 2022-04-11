@@ -31,6 +31,17 @@ namespace CoopClient
                 }
                 return;
             }
+            else if (!new string[] { ".js", ".xml" }.Any(x => x == Path.GetExtension(name)))
+            {
+                lock (_filesFinished)
+                {
+                    _filesFinished.Add(id);
+                }
+
+                GTA.UI.Notification.Show($"The download of a file from the server was blocked! [{name}]", true);
+                Logger.Write($"The download of a file from the server was blocked! [{name}]", Logger.LogLevel.Server);
+                return;
+            }
 
             lock (_downloadFiles)
             {
