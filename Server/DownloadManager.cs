@@ -135,7 +135,7 @@ namespace CoopServer
         /// We try to remove the client when all files have been sent
         /// </summary>
         /// <param name="nethandle"></param>
-        /// <param name="id">Not currently used but maybe we can need this sometime</param>
+        /// <param name="id"></param>
         public static void TryToRemoveClient(long nethandle, int id)
         {
             lock (_clients)
@@ -146,12 +146,14 @@ namespace CoopServer
                     return;
                 }
 
-                client.FilePosition++;
+                if (client.IsCurrentFile(id))
+                {
+                    client.FilePosition++;
+                }
 
                 if (client.DownloadComplete())
                 {
-                    client.Finish();
-                    _clients.Remove(client);
+                    AddClientToRemove(client.NetHandle);
                 }
             }
         }
@@ -160,7 +162,10 @@ namespace CoopServer
         {
             lock (_clientsToDelete)
             {
-                _clientsToDelete.Add(nethandle);
+                if (!_clientsToDelete.Contains(nethandle))
+                {
+                    _clientsToDelete.Add(nethandle);
+                }
             }
         }
     }
@@ -251,6 +256,11 @@ namespace CoopServer
             new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
+        }
+
+        public bool IsCurrentFile(int id)
+        {
+            return _files[FilePosition].FileID == id;
         }
 
         public bool DownloadComplete()
