@@ -25,19 +25,13 @@ namespace CoopClient
                 // Send the server we are already done
                 Main.MainNetworking.SendDownloadFinish(id);
 
-                lock (_filesFinished)
-                {
-                    _filesFinished.Add(id);
-                }
+                Cancel(id);
                 return;
             }
             
             if (!new string[] { ".js", ".xml" }.Any(x => x == Path.GetExtension(name)))
             {
-                lock (_filesFinished)
-                {
-                    _filesFinished.Add(id);
-                }
+                Cancel(id);
 
                 GTA.UI.Notification.Show($"The download of a file from the server was blocked! [{name}]", true);
                 Logger.Write($"The download of a file from the server was blocked! [{name}]", Logger.LogLevel.Server);
@@ -86,13 +80,25 @@ namespace CoopClient
             return false;
         }
 
+        public static void DownloadProgressTick()
+        {
+            if (_downloadFiles.Count == 0)
+            {
+                return;
+            }
+            
+            lock (_downloadFiles) lock (_filesFinished)
+            {
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width / 2, System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 60), $"Downloading files {_filesFinished.Count()} / {_downloadFiles.Count() + _filesFinished.Count()}", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+            }
+        }
+
         public static void Write(byte id, byte[] chunk)
         {
             lock (_filesFinished)
             {
                 if (_filesFinished.Contains(id))
                 {
-                    Cancel(id);
                     return;
                 }
             }
@@ -129,7 +135,7 @@ namespace CoopClient
 
         public static void Cancel(byte id)
         {
-            lock (_streams) lock (_downloadFiles)
+            lock (_streams) lock (_downloadFiles) lock (_filesFinished)
             {
                 FileStream fs = _streams.ContainsKey(id) ? _streams[id] : null;
                 if (fs != null)
@@ -144,6 +150,8 @@ namespace CoopClient
                 {
                     _downloadFiles.Remove(_downloadFiles.First(x => x.FileID == id));
                 }
+
+                _filesFinished.Add(id);
             }
         }
 

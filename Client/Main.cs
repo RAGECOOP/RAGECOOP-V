@@ -120,7 +120,11 @@ namespace CoopClient
                 return;
             }
 
-            if (!JavascriptHook.JavascriptLoaded && DownloadManager.DownloadComplete)
+            if (!DownloadManager.DownloadComplete)
+            {
+                DownloadManager.DownloadProgressTick();
+            }
+            else if (!JavascriptHook.JavascriptLoaded)
             {
                 MapLoader.LoadAll();
                 JavascriptHook.LoadAll();
