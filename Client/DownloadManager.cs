@@ -31,7 +31,8 @@ namespace CoopClient
                 }
                 return;
             }
-            else if (!new string[] { ".js", ".xml" }.Any(x => x == Path.GetExtension(name)))
+            
+            if (!new string[] { ".js", ".xml" }.Any(x => x == Path.GetExtension(name)))
             {
                 lock (_filesFinished)
                 {

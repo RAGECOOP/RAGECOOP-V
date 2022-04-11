@@ -6,30 +6,54 @@ using System.Collections.Generic;
 using GTA;
 using GTA.Math;
 using GTA.Native;
-using System.Xml;
 
 namespace CoopClient
 {
-    public class Map
+    /// <summary>
+    /// 
+    /// </summary>
+    [XmlRoot(ElementName = "Map")]
+    public class CoopMap
     {
+        /// <summary>
+        /// 
+        /// </summary>
         [XmlArray("Props")]
         [XmlArrayItem("Prop")]
-        public Props[] Props { get; set; }
+        public List<CoopProp> Props { get; set; } = new List<CoopProp>();
     }
 
-    public class Props
+    /// <summary>
+    /// 
+    /// </summary>
+    public struct CoopProp
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3 Position { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public Vector3 Rotation { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Hash { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool Dynamic { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int Texture { get; set; }
     }
 
     internal static class MapLoader
     {
         // string = file name
-        private static readonly Dictionary<string, Map> _maps = new Dictionary<string, Map>();
+        private static readonly Dictionary<string, CoopMap> _maps = new Dictionary<string, CoopMap>();
         private static readonly List<int> _createdObjects = new List<int>();
 
         public static void LoadAll()
@@ -48,12 +72,12 @@ namespace CoopClient
                 {
                     string filePath = files[i];
 
-                    XmlSerializer serializer = new XmlSerializer(typeof(Map));
-                    Map map;
+                    XmlSerializer serializer = new XmlSerializer(typeof(CoopMap));
+                    CoopMap map;
 
                     using (var stream = new FileStream(filePath, FileMode.Open))
                     {
-                        map = (Map)serializer.Deserialize(stream);
+                        map = (CoopMap)serializer.Deserialize(stream);
                     }
 
                     GTA.UI.Notification.Show($"{map.Props.Count()}");
@@ -75,14 +99,15 @@ namespace CoopClient
                 if (!_maps.ContainsKey(name) || _createdObjects.Count != 0)
                 {
                     GTA.UI.Notification.Show($"The map with the name \"{name}\" couldn't be loaded!");
+                    Logger.Write($"The map with the name \"{name}\" couldn't be loaded!", Logger.LogLevel.Server);
                     return;
                 }
         
-                Map map = _maps[name];
+                CoopMap map = _maps[name];
         
                 for (int i = 0; i < map.Props.Count(); i++)
                 {
-                    Props prop = map.Props[i];
+                    CoopProp prop = map.Props[i];
         
                     Model model = prop.Hash.ModelRequest();
                     if (model == null)
