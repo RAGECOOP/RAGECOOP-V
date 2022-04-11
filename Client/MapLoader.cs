@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using System.Collections.Generic;
@@ -62,7 +63,17 @@ namespace CoopClient
 
             if (!Directory.Exists(downloadFolder))
             {
-                Directory.CreateDirectory(downloadFolder);
+                try
+                {
+                    Directory.CreateDirectory(downloadFolder);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ex.Message, Logger.LogLevel.Server);
+
+                    // Without the directory we can't do the other stuff
+                    return;
+                }
             }
 
             string[] files = Directory.GetFiles(downloadFolder, "*.xml");
@@ -71,16 +82,25 @@ namespace CoopClient
                 for (int i = 0; i < files.Length; i++)
                 {
                     string filePath = files[i];
+                    string fileName = Path.GetFileName(filePath);
 
                     XmlSerializer serializer = new XmlSerializer(typeof(CoopMap));
                     CoopMap map;
 
                     using (var stream = new FileStream(filePath, FileMode.Open))
                     {
-                        map = (CoopMap)serializer.Deserialize(stream);
+                        try
+                        {
+                            map = (CoopMap)serializer.Deserialize(stream);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Write($"The map with the name \"{fileName}\" couldn't be added!", Logger.LogLevel.Server);
+                            Logger.Write($"{ex.Message}", Logger.LogLevel.Server);
+                            continue;
+                        }
                     }
 
-                    string fileName = Path.GetFileName(filePath);
                     _maps.Add(fileName, map);
                 }
             }
@@ -109,12 +129,12 @@ namespace CoopClient
                     }
         
                     int handle = Function.Call<int>(Hash.CREATE_OBJECT, model.Hash, prop.Position.X, prop.Position.Y, prop.Position.Z, 1, 1, prop.Dynamic);
+                    model.MarkAsNoLongerNeeded();
                     if (handle == 0)
                     {
-                        Logger.Write($"Object \"{model.Hash}\" couldn't be created!", Logger.LogLevel.Server);
+                        Logger.Write($"Object \"{prop.Hash}\" couldn't be created!", Logger.LogLevel.Server);
                         continue;
                     }
-                    model.MarkAsNoLongerNeeded();
 
                     _createdObjects.Add(handle);
         

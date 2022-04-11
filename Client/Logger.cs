@@ -46,12 +46,12 @@ namespace CoopClient
             {
                 if (File.Exists(newFilePath))
                 {
-                    // Check if the rows are under 20 and delete the first 10 if so to avoid large logs
+                    // Check if the rows are under 30 and delete the first 10 if so to avoid large logs
                     // Firstly get all lines
                     string[] oldLines = File.ReadAllLines(newFilePath);
 
                     // Check the length of the lines
-                    if (oldLines.Length >= 20)
+                    if (oldLines.Length >= 30)
                     {
                         // Now overwrite the file without the first 10 lines
                         File.WriteAllLines(newFilePath, oldLines.Skip(10).ToArray());
