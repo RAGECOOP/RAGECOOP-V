@@ -146,9 +146,10 @@ namespace CoopServer
                     return;
                 }
 
-                if (client.IsCurrentFile(id))
+                if (!client.DownloadComplete() && client.IsCurrentFile(id))
                 {
                     client.FilePosition++;
+                    client.FileDataPosition = 0;
                 }
 
                 if (client.DownloadComplete())
@@ -175,7 +176,7 @@ namespace CoopServer
         public long NetHandle = 0;
         private readonly List<DownloadFile> _files = null;
         public int FilePosition = 0;
-        private int _fileDataPosition = 0;
+        public int FileDataPosition = 0;
 
         public DownloadClient(long nethandle, List<DownloadFile> files)
         {
@@ -233,10 +234,10 @@ namespace CoopServer
 
             Send(NetHandle, file);
 
-            if (_fileDataPosition >= file.FileChunks.Count)
+            if (FileDataPosition >= file.FileChunks.Count)
             {
                 FilePosition++;
-                _fileDataPosition = 0;
+                FileDataPosition = 0;
             }
 
             return DownloadComplete();
@@ -253,7 +254,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
-            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[_fileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[FileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
         }

@@ -437,7 +437,7 @@ namespace CoopClient
             return Game.IsControlPressed((Control)control);
         }
 
-        public bool IsMapLoaded()
+        public bool AnyMapLoaded()
         {
             return MapLoader.AnyMapLoaded();
         }
