@@ -135,6 +135,14 @@ namespace CoopClient
                 _scriptEngines.ForEach(engine => engine.Script.API.InvokeChatMessage(from, message));
             }
         }
+
+        internal static void InvokeServerEvent(string eventName, params object[] args)
+        {
+            lock (_scriptEngines)
+            {
+                _scriptEngines.ForEach(engine => engine.Script.API.InvokeServerEvent(eventName, args));
+            }
+        }
     }
 
     internal class ScriptContext
@@ -146,6 +154,7 @@ namespace CoopClient
         #endregion
 
         #region EVENTS
+        private Dictionary<string, Action<object[]>> _serverEvents = new Dictionary<string, Action<object[]>>();
         public event EmptyEvent OnStart, OnStop, OnTick;
         public event PlayerConnectEvent OnPlayerConnect, OnPlayerDisconnect;
         public event ChatMessageEvent OnChatMessage;
@@ -178,6 +187,11 @@ namespace CoopClient
         internal void InvokeChatMessage(string from, string message)
         {
             OnChatMessage?.Invoke(from, message);
+        }
+
+        public void InvokeServerEvent(string eventName, params object[] args)
+        {
+            _serverEvents.FirstOrDefault(x => x.Key == eventName).Value?.Invoke(args);
         }
         #endregion
 
@@ -436,6 +450,18 @@ namespace CoopClient
         public void DeleteMap()
         {
             MapLoader.DeleteMap();
+        }
+
+        private void AddServerEvent(string eventName, Action<object[]> action)
+        {
+            if (!_serverEvents.ContainsKey(eventName))
+            {
+                _serverEvents.Add(eventName, action);
+            }
+        }
+        public void AddServerEvent(string eventName, dynamic action)
+        {
+            AddServerEvent(eventName, arg => action(arg));
         }
 
         public void TriggerServerEvent(string eventName, params object[] args)
