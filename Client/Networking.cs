@@ -1242,6 +1242,20 @@ namespace CoopClient
             }
 #endif
         }
+
+        public void SendTriggerEvent(string eventName, params object[] args)
+        {
+            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+
+            new Packets.ServerClientEvent()
+            {
+                EventName = eventName,
+                Args = new List<object>(args)
+            }.PacketToNetOutGoingMessage(outgoingMessage);
+
+            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.Event);
+            Client.FlushSendQueue();
+        }
         #endregion
     }
 }

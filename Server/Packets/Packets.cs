@@ -350,6 +350,7 @@ namespace CoopServer
                 EventName = reader.ReadString(eventNameBytes);
 
                 // Read args
+                Args = new List<object>();
                 int argsCount = reader.ReadInt();
                 for (int i = 0; i < argsCount; i++)
                 {

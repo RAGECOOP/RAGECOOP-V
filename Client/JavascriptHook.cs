@@ -189,7 +189,7 @@ namespace CoopClient
             OnChatMessage?.Invoke(from, message);
         }
 
-        public void InvokeServerEvent(string eventName, params object[] args)
+        public void InvokeServerEvent(string eventName, object[] args)
         {
             _serverEvents.FirstOrDefault(x => x.Key == eventName).Value?.Invoke(args);
         }
@@ -464,9 +464,9 @@ namespace CoopClient
             AddServerEvent(eventName, arg => action(arg));
         }
 
-        public void TriggerServerEvent(string eventName, params object[] args)
+        public void SendTriggerEvent(string eventName, params object[] args)
         {
-            // TODO
+            Main.MainNetworking.SendTriggerEvent(eventName, args);
         }
     }
 }

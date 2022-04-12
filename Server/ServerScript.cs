@@ -480,10 +480,43 @@ namespace CoopServer
         {
             Server.RegisterCommands<T>();
         }
+
+        /// <summary>
+        /// Register a class of events
+        /// </summary>
+        /// <typeparam name="T">The name of your class with functions</typeparam>
+        public static void RegisterEvents<T>()
+        {
+            Server.RegisterEvents<T>();
+        }
         #endregion
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    public class TriggerEvent : Attribute
+    {
+        public string EventName { get; set; }
+
+        public TriggerEvent(string eventName)
+        {
+            EventName = eventName;
+        }
+    }
+
+    public class EventContext
+    {
+        /// <summary>
+        /// Gets the client which executed the command
+        /// </summary>
+        public Client Client { get; internal set; }
+
+        /// <summary>
+        /// Arguments (all standard but no string!)
+        /// </summary>
+        public object[] Args { get; internal set; }
+    }
+
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class Command : Attribute
     {
         /// <summary>

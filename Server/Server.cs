@@ -33,6 +33,7 @@ namespace CoopServer
 
         public static Resource RunningResource = null;
         public static Dictionary<Command, Action<CommandContext>> Commands;
+        public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
 
         public static readonly List<Client> Clients = new();
 
@@ -530,6 +531,47 @@ namespace CoopServer
                                                 if (client != null && !client.FilesReceived)
                                                 {
                                                     DownloadManager.TryToRemoveClient(client.NetHandle, packet.ID);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            DisconnectAndLog(message.SenderConnection, type, e);
+                                        }
+                                    }
+                                    break;
+                                case (byte)PacketTypes.ServerClientEvent:
+                                    {
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
+                                            packet.NetIncomingMessageToPacket(data);
+
+                                            long senderNetHandle = message.SenderConnection.RemoteUniqueIdentifier;
+                                            Client client = null;
+                                            lock (Clients)
+                                            {
+                                                client = Util.GetClientByNetHandle(senderNetHandle);
+                                            }
+
+                                            if (client != null)
+                                            {
+                                                if (TriggerEvents.Any(x => x.Key.EventName == packet.EventName))
+                                                {
+                                                    EventContext ctx = new()
+                                                    {
+                                                        Client = client,
+                                                        Args = packet.Args.ToArray()
+                                                    };
+
+                                                    TriggerEvents.FirstOrDefault(x => x.Key.EventName == packet.EventName).Value?.Invoke(ctx);
+                                                }
+                                                else
+                                                {
+                                                    Logging.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
                                                 }
                                             }
                                         }
@@ -1076,6 +1118,29 @@ namespace CoopServer
                 Command attribute = method.GetCustomAttribute<Command>(true);
 
                 RegisterCommand(attribute.Name, attribute.Usage, attribute.ArgsLength, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
+            }
+        }
+
+        public static void RegisterEvent(string eventName, Action<EventContext> callback)
+        {
+            TriggerEvent ev = new(eventName);
+
+            if (TriggerEvents.ContainsKey(ev))
+            {
+                throw new Exception("TriggerEvent \"" + ev.EventName + "\" was already been registered!");
+            }
+
+            TriggerEvents.Add(ev, callback);
+        }
+        public static void RegisterEvents<T>()
+        {
+            IEnumerable<MethodInfo> events = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(TriggerEvent), false).Any());
+
+            foreach (MethodInfo method in events)
+            {
+                TriggerEvent attribute = method.GetCustomAttribute<TriggerEvent>(true);
+
+                RegisterEvent(attribute.EventName, (Action<EventContext>)Delegate.CreateDelegate(typeof(Action<EventContext>), method));
             }
         }
     }

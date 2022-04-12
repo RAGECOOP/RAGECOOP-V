@@ -227,7 +227,7 @@ namespace CoopServer
             }
         }
 
-        public void TriggerServerEvent(string eventName, params object[] args)
+        public void SendTriggerEvent(string eventName, params object[] args)
         {
             try
             {
