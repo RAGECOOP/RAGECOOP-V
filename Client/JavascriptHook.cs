@@ -36,7 +36,18 @@ namespace CoopClient
 
             lock (_scriptEngines)
             {
-                _scriptEngines.ForEach(engine => engine.Script.API.InvokeTick());
+                _scriptEngines.ForEach(engine =>
+                {
+                    try
+                    {
+                        engine.Script.API.InvokeTick();
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                });
             }
         }
 
@@ -81,7 +92,16 @@ namespace CoopClient
 
                         engine.Execute(File.ReadAllText(script));
 
-                        engine.Script.API.InvokeStart();
+                        try
+                        {
+                            engine.Script.API.InvokeStart();
+                        }
+                        catch (Exception ex)
+                        {
+                            GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                            Logger.Write(ex.Message, Logger.LogLevel.Server);
+                        }
+                        
                         _scriptEngines.Add(engine);
                     }
                     catch (Exception ex)
@@ -101,7 +121,16 @@ namespace CoopClient
             {
                 _scriptEngines.ForEach(engine =>
                 {
-                    engine.Script.API.InvokeStop();
+                    try
+                    {
+                        engine.Script.API.InvokeStop();
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                    
                     engine.Dispose();
                 });
                 _scriptEngines.Clear();
@@ -114,7 +143,18 @@ namespace CoopClient
         {
             lock (_scriptEngines)
             {
-                _scriptEngines.ForEach(engine => engine.Script.API.InvokePlayerConnect(username, nethandle));
+                _scriptEngines.ForEach(engine =>
+                {
+                    try
+                    {
+                        engine.Script.API.InvokePlayerConnect(username, nethandle);
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                });
             }
         }
 
@@ -122,7 +162,18 @@ namespace CoopClient
         {
             lock (_scriptEngines)
             {
-                _scriptEngines.ForEach(engine => engine.Script.API.InvokePlayerDisonnect(username, nethandle, reason));
+                _scriptEngines.ForEach(engine =>
+                {
+                    try
+                    {
+                        engine.Script.API.InvokePlayerDisonnect(username, nethandle, reason);
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                });
             }
         }
 
@@ -130,7 +181,18 @@ namespace CoopClient
         {
             lock (_scriptEngines)
             {
-                _scriptEngines.ForEach(engine => engine.Script.API.InvokeChatMessage(from, message));
+                _scriptEngines.ForEach(engine =>
+                {
+                    try
+                    {
+                        engine.Script.API.InvokeChatMessage(from, message);
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                });
             }
         }
 
@@ -138,7 +200,18 @@ namespace CoopClient
         {
             lock (_scriptEngines)
             {
-                _scriptEngines.ForEach(engine => engine.Script.API.InvokeServerEvent(eventName, args));
+                _scriptEngines.ForEach(engine =>
+                {
+                    try
+                    {
+                        engine.Script.API.InvokeServerEvent(eventName, args);
+                    }
+                    catch (Exception ex)
+                    {
+                        GTA.UI.Notification.Show("~r~~h~Javascript Error");
+                        Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    }
+                });
             }
         }
     }
@@ -484,9 +557,9 @@ namespace CoopClient
             MapLoader.LoadMap(name);
         }
 
-        public void DeleteMap()
+        public void UnloadMap()
         {
-            MapLoader.DeleteMap();
+            MapLoader.UnloadMap();
         }
 
         private void AddServerEvent(string eventName, Action<object[]> action)

@@ -151,7 +151,7 @@ namespace CoopClient
             lock (_createdObjects) return _createdObjects.Any();
         }
 
-        public static void DeleteMap()
+        public static void UnloadMap()
         {
             lock (_createdObjects)
             {
@@ -170,7 +170,7 @@ namespace CoopClient
 
         public static void DeleteAll()
         {
-            DeleteMap();
+            UnloadMap();
             lock (_maps)
             {
                 _maps.Clear();

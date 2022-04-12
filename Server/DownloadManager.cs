@@ -254,7 +254,7 @@ namespace CoopServer
 
             new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[FileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
 
-            Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.File);
+            Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
         }
 
         public bool IsCurrentFile(int id)
