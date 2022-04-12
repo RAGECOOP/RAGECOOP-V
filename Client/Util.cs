@@ -337,7 +337,9 @@ namespace CoopClient
                 BrokenDoors = 0,
                 BrokenWindows = 0,
                 BurstedTires = 0,
-                PuncturedTires = 0
+                PuncturedTires = 0,
+                LeftHeadLightBroken = (byte)(veh.IsLeftHeadLightBroken ? 1 : 0),
+                RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
             };
 
             // Broken windows
@@ -426,6 +428,9 @@ namespace CoopClient
                     wheel.Fix();
                 }
             }
+
+            veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
+            veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
 
         public static Settings ReadSettings()

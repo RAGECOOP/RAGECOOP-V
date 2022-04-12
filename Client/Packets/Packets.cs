@@ -97,7 +97,7 @@ namespace CoopClient
         public float W { get; set; }
     }
 
-    enum PacketTypes
+    internal enum PacketTypes
     {
         Handshake,
         PlayerConnect,
@@ -119,7 +119,7 @@ namespace CoopClient
         FileTransferComplete
     }
 
-    enum ConnectionChannel
+    internal enum ConnectionChannel
     {
         Default = 0,
         PlayerLight = 1,
@@ -132,8 +132,7 @@ namespace CoopClient
         File = 8
     }
 
-    [Flags]
-    enum PedDataFlags
+    internal enum PedDataFlags
     {
         IsAiming = 1 << 0,
         IsShooting = 1 << 1,
@@ -148,8 +147,7 @@ namespace CoopClient
     }
 
     #region ===== VEHICLE DATA =====
-    [Flags]
-    enum VehicleDataFlags
+    internal enum VehicleDataFlags
     {
         IsEngineRunning = 1 << 0,
         AreLightsOn = 1 << 1,
@@ -164,18 +162,14 @@ namespace CoopClient
         IsPlane = 1 << 10
     }
 
-    /// <summary>
-    /// ?
-    /// </summary>
-    struct VehicleDamageModel
+    internal struct VehicleDamageModel
     {
         public byte BrokenWindows { get; set; }
-
         public byte BrokenDoors { get; set; }
-
         public ushort BurstedTires { get; set; }
-
         public ushort PuncturedTires { get; set; }
+        public byte LeftHeadLightBroken { get; set; }
+        public byte RightHeadLightBroken { get; set; }
     }
     #endregion
 
