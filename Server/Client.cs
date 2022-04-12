@@ -26,7 +26,7 @@ namespace CoopServer
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
         internal readonly Dictionary<long, Action<object>> Callbacks = new();
-        internal bool FilesReceived = false;
+        public bool FilesReceived { get; internal set; } = false;
         internal bool FilesSent = false;
 
         #region CUSTOMDATA FUNCTIONS
@@ -229,6 +229,12 @@ namespace CoopServer
 
         public void SendTriggerEvent(string eventName, params object[] args)
         {
+            if (!FilesReceived)
+            {
+                Logging.Warning($"Player \"{Player.Username}\" doesn't have all the files yet!");
+                return;
+            }
+
             try
             {
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);

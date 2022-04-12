@@ -64,32 +64,30 @@ namespace CoopClient
             {
                 foreach (string script in Directory.GetFiles("scripts\\resources\\" + serverAddress, "*.js"))
                 {
-                    V8ScriptEngine engine = new V8ScriptEngine()
-                    {
-                        AccessContext = typeof(ScriptContext)
-                    };
-
-                    engine.AddHostObject("API", new ScriptContext());
-
-                    engine.AddHostType(typeof(Dictionary<,>));
-
-                    // SHVDN
-                    engine.AddHostType(typeof(Vector3));
-                    engine.AddHostType(typeof(Quaternion));
-
                     try
                     {
+                        V8ScriptEngine engine = new V8ScriptEngine()
+                        {
+                            AccessContext = typeof(ScriptContext)
+                        };
+
+                        engine.AddHostObject("API", new ScriptContext());
+
+                        engine.AddHostType(typeof(Dictionary<,>));
+
+                        // SHVDN
+                        engine.AddHostType(typeof(Vector3));
+                        engine.AddHostType(typeof(Quaternion));
+
                         engine.Execute(File.ReadAllText(script));
+
+                        engine.Script.API.InvokeStart();
+                        _scriptEngines.Add(engine);
                     }
                     catch (Exception ex)
                     {
                         GTA.UI.Notification.Show("~r~~h~Javascript Error");
                         Logger.Write(ex.Message, Logger.LogLevel.Server);
-                    }
-                    finally
-                    {
-                        engine.Script.API.InvokeStart();
-                        _scriptEngines.Add(engine);
                     }
                 }
             }
@@ -253,20 +251,20 @@ namespace CoopClient
 
         public bool IsPlayerInvincible()
         {
-            return Game.Player.Character.IsInvincible;
+            return Game.Player.Character?.IsInvincible ?? false;
         }
         public void SetPlayerInvincible(bool invincible)
         {
             Game.Player.Character.IsInvincible = invincible;
         }
 
-        public Vector3 GetPlayerPosition()
+        public Vector3? GetPlayerPosition()
         {
-            return Game.Player.Character.Position;
+            return Game.Player.Character?.Position;
         }
-        public Vector3 GetPlayerRotation()
+        public Vector3? GetPlayerRotation()
         {
-            return Game.Player.Character.Rotation;
+            return Game.Player.Character?.Rotation;
         }
 
         public void SetPlayerPosition(Vector3 position)
@@ -287,9 +285,32 @@ namespace CoopClient
             return Game.Player.Character.IsInVehicle();
         }
 
-        public int GetCharachterHandle()
+        public int? GetCharachterHandle()
         {
-            return Game.Player.Character?.Handle ?? 0;
+            return Game.Player.Character?.Handle;
+        }
+
+        public int? CreateVehicle(int hash, Vector3 position, Quaternion? Rotation = null)
+        {
+            Model model = hash.ModelRequest();
+            if (model == null)
+            {
+                return null;
+            }
+
+            Vehicle veh = World.CreateVehicle(model, position);
+            model.MarkAsNoLongerNeeded();
+            if (veh == null)
+            {
+                return null;
+            }
+
+            if (Rotation != null)
+            {
+                veh.Quaternion = Rotation.Value;
+            }
+
+            return veh.Handle;
         }
 
         public Vector3? GetVehiclePosition()
@@ -323,14 +344,14 @@ namespace CoopClient
             }
         }
 
-        public int GetVehicleHandle()
+        public int? GetVehicleHandle()
         {
-            return Game.Player.Character?.CurrentVehicle?.Handle ?? 0;
+            return Game.Player.Character?.CurrentVehicle?.Handle;
         }
 
-        public int GetVehicleSeatIndex()
+        public int? GetVehicleSeatIndex()
         {
-            return Game.Player.Character?.CurrentVehicle != null ? (int)Game.Player.Character?.SeatIndex : 0;
+            return (int)Game.Player.Character?.SeatIndex;
         }
 
         public void SetVehicleEngineStatus(bool turnedOn)
@@ -342,7 +363,23 @@ namespace CoopClient
         }
         public bool GetVehicleEngineStatus()
         {
-            return Game.Player.Character.IsInVehicle() ? Game.Player.Character.CurrentVehicle.IsEngineRunning : false;
+            return Game.Player.Character.CurrentVehicle?.IsEngineRunning ?? false;
+        }
+
+        public float? GetVehicleHeightAboveGround()
+        {
+            return Game.Player.Character.CurrentVehicle?.HeightAboveGround;
+        }
+
+        public string GetVehicleType()
+        {
+            Vehicle veh = Game.Player.Character?.CurrentVehicle;
+            if (veh == null)
+            {
+                return null;
+            }
+
+            return Enum.GetName(typeof(VehicleType), veh.Type);
         }
 
         public void RepairVehicle()
