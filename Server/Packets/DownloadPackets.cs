@@ -8,17 +8,9 @@ namespace CoopServer
 {
     internal partial class Packets
     {
-        public enum DataFileType
-        {
-            Script = 0,
-            Map = 1
-        }
-
         public class FileTransferRequest : Packet
         {
             public byte ID { get; set; }
-
-            public byte FileType { get; set; }
 
             public string FileName { get; set; }
 
@@ -33,9 +25,6 @@ namespace CoopServer
 
                 // The ID from the download
                 byteArray.Add(ID);
-
-                // The type of the file
-                byteArray.Add(FileType);
 
                 // The name of the file
                 byte[] nameBytes = Encoding.UTF8.GetBytes(FileName);
@@ -58,7 +47,6 @@ namespace CoopServer
                 BitReader reader = new BitReader(array);
 
                 ID = reader.ReadByte();
-                FileType = reader.ReadByte();
                 int nameArrayLength = reader.ReadInt();
                 FileName = reader.ReadString(nameArrayLength);
                 FileLength = reader.ReadLong();

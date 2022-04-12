@@ -9,7 +9,7 @@ namespace CoopServer
     internal static class DownloadManager
     {
         private static readonly List<long> _clientsToDelete = new();
-        private static List<DownloadClient> _clients = new();
+        private static readonly List<DownloadClient> _clients = new();
         private static readonly List<DownloadFile> _files = new();
         public static bool AnyFileExists = false;
 
@@ -64,7 +64,6 @@ namespace CoopServer
                             {
                                 FileID = fileCount,
                                 FileName = fileInfo.Name,
-                                FileType = fileInfo.Extension == ".json" ? Packets.DataFileType.Script : Packets.DataFileType.Map,
                                 FileLength = fileInfo.Length,
                                 FileChunks = new()
                             };
@@ -197,7 +196,6 @@ namespace CoopServer
                 new Packets.FileTransferRequest()
                 {
                     ID = file.FileID,
-                    FileType = (byte)file.FileType,
                     FileName = file.FileName,
                     FileLength = file.FileLength
                 }.PacketToNetOutGoingMessage(outgoingMessage);
@@ -274,7 +272,6 @@ namespace CoopServer
     {
         public byte FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;
-        public Packets.DataFileType FileType { get; set; } = Packets.DataFileType.Script;
         public long FileLength { get; set; } = 0;
         public List<byte[]> FileChunks { get; set; } = null;
     }

@@ -11,7 +11,7 @@ namespace CoopClient
         private static readonly List<byte> _filesFinished = new List<byte>();
         public static bool DownloadComplete = false;
 
-        public static void AddFile(byte id, Packets.DataFileType type, string name, long length)
+        public static void AddFile(byte id, string name, long length)
         {
             string downloadFolder = $"scripts\\resources\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
 
@@ -43,7 +43,6 @@ namespace CoopClient
                 _downloadFiles.Add(new DownloadFile()
                 {
                     FileID = id,
-                    FileType = type,
                     FileName = name,
                     FileLength = length
                 });
@@ -179,7 +178,6 @@ namespace CoopClient
     internal class DownloadFile
     {
         public byte FileID { get; set; } = 0;
-        public Packets.DataFileType FileType { get; set; } = Packets.DataFileType.Script;
         public string FileName { get; set; } = string.Empty;
         public long FileLength { get; set; } = 0;
         public long FileWritten { get; set; } = 0;

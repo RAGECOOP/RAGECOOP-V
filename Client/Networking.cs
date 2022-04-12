@@ -481,7 +481,7 @@ namespace CoopClient
                                         Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        DownloadManager.AddFile(packet.ID, (Packets.DataFileType)packet.FileType, packet.FileName, packet.FileLength);
+                                        DownloadManager.AddFile(packet.ID, packet.FileName, packet.FileLength);
                                     }
                                     catch (Exception ex)
                                     {
@@ -526,8 +526,6 @@ namespace CoopClient
                                     {
                                         GTA.UI.Notification.Show("~r~~h~Packet Error");
                                         Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.InnerException}", Logger.LogLevel.Server);
-                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
                                         Client.Disconnect($"Packet Error [{packetType}]");
                                     }
                                 }
