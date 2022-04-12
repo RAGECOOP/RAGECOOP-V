@@ -52,6 +52,33 @@ namespace CoopClient
         }
         #endregion
 
+        public static (byte, byte[]) GetBytesFromObject(object obj)
+        {
+            switch (obj)
+            {
+                case byte _:
+                    return (0x01, BitConverter.GetBytes((byte)obj));
+                case short _:
+                    return (0x02, BitConverter.GetBytes((short)obj));
+                case ushort _:
+                    return (0x03, BitConverter.GetBytes((ushort)obj));
+                case int _:
+                    return (0x04, BitConverter.GetBytes((int)obj));
+                case uint _:
+                    return (0x05, BitConverter.GetBytes((uint)obj));
+                case long _:
+                    return (0x06, BitConverter.GetBytes((long)obj));
+                case ulong _:
+                    return (0x07, BitConverter.GetBytes((ulong)obj));
+                case float _:
+                    return (0x08, BitConverter.GetBytes((float)obj));
+                case bool _:
+                    return (0x09, BitConverter.GetBytes((bool)obj));
+                default:
+                    return (0x0, null);
+            }
+        }
+
         public static Model ModelRequest(this int hash)
         {
             Model model = new Model(hash);

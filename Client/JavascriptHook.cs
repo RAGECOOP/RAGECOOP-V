@@ -136,7 +136,7 @@ namespace CoopClient
             }
         }
 
-        internal static void InvokeServerEvent(string eventName, params object[] args)
+        internal static void InvokeServerEvent(string eventName, object[] args)
         {
             lock (_scriptEngines)
             {

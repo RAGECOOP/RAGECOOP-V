@@ -102,7 +102,8 @@ namespace CoopServer
         CleanUpWorld,
         FileTransferTick,
         FileTransferRequest,
-        FileTransferComplete
+        FileTransferComplete,
+        ServerClientEvent
     }
 
     internal enum ConnectionChannel
@@ -115,7 +116,8 @@ namespace CoopServer
         Chat = 5,
         Native = 6,
         Mod = 7,
-        File = 8
+        File = 8,
+        Event = 9
     }
 
     [Flags]
@@ -291,6 +293,98 @@ namespace CoopServer
                 // Read message
                 int messageLength = reader.ReadInt();
                 Message = reader.ReadString(messageLength);
+                #endregion
+            }
+        }
+
+        public class ServerClientEvent : Packet
+        {
+            public string EventName { get; set; }
+
+            public List<object> Args { get; set; }
+
+            public override void PacketToNetOutGoingMessage(NetOutgoingMessage message)
+            {
+                #region PacketToNetOutGoingMessage
+                message.Write((byte)PacketTypes.ServerClientEvent);
+
+                List<byte> byteArray = new List<byte>();
+
+                byte[] eventNameBytes = Encoding.UTF8.GetBytes(EventName);
+
+                // Write event name
+                byteArray.AddRange(BitConverter.GetBytes(eventNameBytes.Length));
+                byteArray.AddRange(eventNameBytes);
+
+                // Write args
+                byteArray.AddRange(BitConverter.GetBytes(Args.Count));
+                foreach (object arg in Args)
+                {
+                    var test = Util.GetBytesFromObject(arg);
+                    if (test.Item1 == 0x0)
+                    {
+                        Logging.Warning("Can't get type of an object!");
+                        byteArray.Add(0x0);
+                    }
+                    else
+                    {
+                        byteArray.Add(test.Item1);
+                        byteArray.AddRange(test.Item2);
+                    }
+                }
+
+                byte[] result = byteArray.ToArray();
+
+                message.Write(result.Length);
+                message.Write(result);
+                #endregion
+            }
+
+            public override void NetIncomingMessageToPacket(byte[] array)
+            {
+                #region NetIncomingMessageToPacket
+                BitReader reader = new BitReader(array);
+
+                // Read event name
+                int eventNameBytes = reader.ReadInt();
+                EventName = reader.ReadString(eventNameBytes);
+
+                // Read args
+                int argsCount = reader.ReadInt();
+                for (int i = 0; i < argsCount; i++)
+                {
+                    byte argType = reader.ReadByte();
+                    switch (argType)
+                    {
+                        case 0x01:
+                            Args.Add(reader.ReadByte());
+                            break;
+                        case 0x02:
+                            Args.Add(reader.ReadShort());
+                            break;
+                        case 0x03:
+                            Args.Add(reader.ReadUShort());
+                            break;
+                        case 0x04:
+                            Args.Add(reader.ReadInt());
+                            break;
+                        case 0x05:
+                            Args.Add(reader.ReadUInt());
+                            break;
+                        case 0x06:
+                            Args.Add(reader.ReadLong());
+                            break;
+                        case 0x07:
+                            Args.Add(reader.ReadULong());
+                            break;
+                        case 0x08:
+                            Args.Add(reader.ReadFloat());
+                            break;
+                        case 0x09:
+                            Args.Add(reader.ReadBool());
+                            break;
+                    }
+                }
                 #endregion
             }
         }

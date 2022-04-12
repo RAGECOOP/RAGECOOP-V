@@ -511,6 +511,27 @@ namespace CoopClient
                                     }
                                 }
                                 break;
+                            case (byte)PacketTypes.ServerClientEvent:
+                                {
+                                    try
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+                                        Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
+                                        packet.NetIncomingMessageToPacket(data);
+
+                                        JavascriptHook.InvokeServerEvent(packet.EventName, packet.Args.ToArray());
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                        Logger.Write($"[{packetType}] {ex.Message}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.InnerException}", Logger.LogLevel.Server);
+                                        Logger.Write($"[{packetType}] {ex.StackTrace}", Logger.LogLevel.Server);
+                                        Client.Disconnect($"Packet Error [{packetType}]");
+                                    }
+                                }
+                                break;
                         }
                         break;
                     case NetIncomingMessageType.ConnectionLatencyUpdated:

@@ -226,6 +226,31 @@ namespace CoopServer
                 Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
+
+        public void TriggerServerEvent(string eventName, params object[] args)
+        {
+            try
+            {
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                if (userConnection == null)
+                {
+                    return;
+                }
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                new Packets.ServerClientEvent()
+                {
+                    EventName = eventName,
+                    Args = new List<object>(args)
+                }.PacketToNetOutGoingMessage(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
+                Server.MainNetServer.FlushSendQueue();
+            }
+            catch (Exception e)
+            {
+                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
+        }
         #endregion
     }
 }
