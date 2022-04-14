@@ -153,18 +153,16 @@ namespace CoopClient.Entities.Player
                 CreateCharacter();
                 return;
             }
-            else if (LastSyncWasFull)
+            
+            if (LastSyncWasFull)
             {
                 if (ModelHash != _lastModelHash)
                 {
-                    Character.Kill();
-                    Character.MarkAsNoLongerNeeded();
-                    Character.Delete();
-
                     CreateCharacter();
                     return;
                 }
-                else if (!Clothes.Compare(_lastClothes))
+                
+                if (!Clothes.Compare(_lastClothes))
                 {
                     SetClothes();
                 }

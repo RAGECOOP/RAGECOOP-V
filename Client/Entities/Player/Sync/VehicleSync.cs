@@ -80,6 +80,11 @@ namespace CoopClient.Entities.Player
                 else
                 {
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
+                    if (MainVehicle == null)
+                    {
+                        vehicleModel.MarkAsNoLongerNeeded();
+                        return;
+                    }
                     MainVehicle.IsInvincible = true;
                     MainVehicle.Quaternion = _vehicleRotation;
 
@@ -105,7 +110,7 @@ namespace CoopClient.Entities.Player
 
                 _lastVehicleEnter = 0;
 
-                Character.Task.ClearAllImmediately();
+                Character.Task.ClearAll();
                 Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
             }
             else if (!Character.IsInVehicle() || Character.CurrentVehicle.Handle != MainVehicle.Handle)
@@ -125,7 +130,7 @@ namespace CoopClient.Entities.Player
                 {
                     _lastVehicleEnter = Util.GetTickCount64();
 
-                    Character.Task.ClearAllImmediately();
+                    Character.Task.ClearAll();
                     Character.Task.EnterVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex, -1, 2f, EnterVehicleFlags.WarpToDoor);
                 }
 
@@ -134,7 +139,7 @@ namespace CoopClient.Entities.Player
 
             if ((int)Character.SeatIndex != VehicleSeatIndex)
             {
-                Character.Task.ShuffleToNextVehicleSeat(MainVehicle);
+                Character.Task.WarpIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
             }
 
             if (AimCoords != default)
