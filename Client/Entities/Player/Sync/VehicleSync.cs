@@ -10,8 +10,6 @@ namespace CoopClient.Entities.Player
     public partial class EntitiesPlayer
     {
         #region -- VARIABLES --
-        private ulong _vehicleStopTime { get; set; }
-
         internal bool IsInVehicle { get; set; }
         /// <summary>
         /// The latest vehicle model hash (may not have been applied yet)
@@ -62,6 +60,8 @@ namespace CoopClient.Entities.Player
         internal VehicleDamageModel VehDamageModel { get; set; }
         #endregion
 
+        private ulong _lastVehicleEnter = 0;
+
         private void DisplayInVehicle()
         {
             if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model.Hash != VehicleModelHash)
@@ -89,6 +89,7 @@ namespace CoopClient.Entities.Player
                 if (!vehFound)
                 {
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
+                    MainVehicle.IsVisible = false;
                     MainVehicle.Quaternion = _vehicleRotation;
 
                     MainVehicle.IsInvincible = true;
@@ -104,24 +105,53 @@ namespace CoopClient.Entities.Player
                 }
 
                 vehicleModel.MarkAsNoLongerNeeded();
+                return;
             }
 
-            if (!Character.IsInVehicle() || (int)Character.SeatIndex != VehicleSeatIndex || Character.CurrentVehicle.Handle != MainVehicle.Handle)
+            if (_lastVehicleEnter != 0)
             {
-                if (VehicleSeatIndex == -1 &&
-                    Game.Player.Character.IsInVehicle() &&
-                    (int)Game.Player.Character.SeatIndex == -1 &&
-                    Game.Player.Character.CurrentVehicle.Handle == MainVehicle.Handle)
+                if (Util.GetTickCount64() - _lastVehicleEnter < 1500)
+                {
+                    return;
+                }
+
+                _lastVehicleEnter = 0;
+
+                Character.Task.ClearAllImmediately();
+                Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
+            }
+            else if (!Character.IsInVehicle() || Character.CurrentVehicle.Handle != MainVehicle.Handle)
+            {
+                MainVehicle.IsVisible = true;
+
+                if (Game.Player.Character.CurrentVehicle?.Handle == MainVehicle.Handle &&
+                    VehicleSeatIndex == (int)Game.Player.Character.SeatIndex)
                 {
                     Game.Player.Character.Task.WarpOutOfVehicle(MainVehicle);
                     GTA.UI.Notification.Show("~r~Car jacked!");
                 }
 
-                Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
-                Character.IsVisible = true;
+                if (VehicleSpeed > 0.2f || !Character.IsInRange(MainVehicle.Position, 4f))
+                {
+                    Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
+                    Character.IsVisible = true;
+                }
+                else
+                {
+                    _lastVehicleEnter = Util.GetTickCount64();
+
+                    Character.Task.ClearAllImmediately();
+                    Character.IsVisible = true;
+                    Character.Task.EnterVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex, -1, 2f, EnterVehicleFlags.WarpToDoor);
+                    return;
+                }
             }
 
-            #region -- VEHICLE SYNC --
+            if ((int)Character.SeatIndex != VehicleSeatIndex)
+            {
+                Character.Task.ShuffleToNextVehicleSeat(MainVehicle);
+            }
+
             if (AimCoords != default)
             {
                 if (MainVehicle.IsTurretSeat(VehicleSeatIndex))
@@ -140,6 +170,12 @@ namespace CoopClient.Entities.Player
                 return;
             }
 
+            UpdateVehicleInfo();
+            UpdateVehiclePosition();
+        }
+
+        private void UpdateVehicleInfo()
+        {
             if (VehicleColors != null && VehicleColors != _lastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
@@ -269,7 +305,10 @@ namespace CoopClient.Entities.Player
                     }
                 }
             }
+        }
 
+        private void UpdateVehiclePosition()
+        {
             float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / AverageLatency);
 
             if (_lastVehicleSteeringAngle != VehicleSteeringAngle)
@@ -280,8 +319,7 @@ namespace CoopClient.Entities.Player
                 MainVehicle.CustomSteeringAngle(steeringLerp);
             }
 
-            // Good enough for now, but we need to create a better sync
-            if (VehicleSpeed > 0.05f && MainVehicle.IsInRange(Position, 7.0f))
+            if (VehicleSpeed != 0f && MainVehicle.IsInRange(Position, 7.0f))
             {
                 dynamic speedLerp = Util.Lerp(_lastVehicleSpeed, VehicleSpeed, avrLat);
                 _lastVehicleSpeed = Speed;
@@ -291,22 +329,12 @@ namespace CoopClient.Entities.Player
 
                 MainVehicle.Velocity = Velocity * forceVelo + ((Position - MainVehicle.Position) * force);
                 MainVehicle.Quaternion = _lastVehicleRotation != null ? Quaternion.Slerp(_lastVehicleRotation.Value, _vehicleRotation, avrLat) : _vehicleRotation;
-
-                _vehicleStopTime = Util.GetTickCount64();
-            }
-            else if ((Util.GetTickCount64() - _vehicleStopTime) <= 1000)
-            {
-                Vector3 posTarget = Util.LinearVectorLerp(MainVehicle.Position, Position + (Position - MainVehicle.Position), Util.GetTickCount64() - _vehicleStopTime, 1000);
-
-                MainVehicle.PositionNoOffset = posTarget;
-                MainVehicle.Quaternion = Quaternion.Slerp(_lastVehicleRotation.Value, _vehicleRotation, avrLat);
             }
             else
             {
                 MainVehicle.PositionNoOffset = Position;
                 MainVehicle.Quaternion = _vehicleRotation;
             }
-            #endregion
         }
 
         #region -- PEDALING --

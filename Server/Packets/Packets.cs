@@ -156,8 +156,8 @@ namespace CoopServer
     {
         public byte BrokenWindows { get; set; }
         public byte BrokenDoors { get; set; }
-        public ushort BurstedTires { get; set; }
-        public ushort PuncturedTires { get; set; }
+        public short BurstedTires { get; set; }
+        public short PuncturedTires { get; set; }
         public byte LeftHeadLightBroken { get; set; }
         public byte RightHeadLightBroken { get; set; }
     }

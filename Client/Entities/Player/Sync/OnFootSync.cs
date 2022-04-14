@@ -41,12 +41,23 @@ namespace CoopClient.Entities.Player
         {
             if (Character.IsInVehicle())
             {
-                Character.Task.LeaveVehicle();
-            }
+                Character.Task.ClearAll();
+                Character.Task.ClearSecondary();
 
-            if (MainVehicle != null)
-            {
-                MainVehicle = null;
+                if (MainVehicle == null)
+                {
+                    Character.Task.LeaveVehicle();
+                }
+                else
+                {
+                    MainVehicle.Doors[(VehicleDoorIndex)VehicleSeatIndex + 1]?.Open(true, true);
+                    Character.Task.LeaveVehicle(MainVehicle, false);
+
+                    MainVehicle = null;
+                }
+
+                Character.PositionNoOffset = Position;
+                return;
             }
 
             if (IsInParachuteFreeFall)
@@ -109,7 +120,7 @@ namespace CoopClient.Entities.Player
 
                 return;
             }
-            else if (!IsOnLadder && Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, Character.Handle, ETasks.CLIMB_LADDER))
+            if (!IsOnLadder && Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, Character.Handle, ETasks.CLIMB_LADDER))
             {
                 Character.Task.ClearAllImmediately();
             }
@@ -125,7 +136,7 @@ namespace CoopClient.Entities.Player
 
                 return;
             }
-            else if (!IsVaulting && Character.IsVaulting)
+            if (!IsVaulting && Character.IsVaulting)
             {
                 Character.Task.ClearAllImmediately();
             }
@@ -176,7 +187,7 @@ namespace CoopClient.Entities.Player
 
                 return;
             }
-            else if (!IsRagdoll && Character.IsRagdoll)
+            if (!IsRagdoll && Character.IsRagdoll)
             {
                 Character.CanRagdoll = false;
                 Character.Task.ClearAllImmediately();

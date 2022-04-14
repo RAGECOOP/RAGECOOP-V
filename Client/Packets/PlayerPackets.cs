@@ -672,8 +672,8 @@ namespace CoopClient
                     {
                         BrokenDoors = reader.ReadByte(),
                         BrokenWindows = reader.ReadByte(),
-                        BurstedTires = reader.ReadUShort(),
-                        PuncturedTires = reader.ReadUShort(),
+                        BurstedTires = reader.ReadShort(),
+                        PuncturedTires = reader.ReadShort(),
                         LeftHeadLightBroken = reader.ReadByte(),
                         RightHeadLightBroken = reader.ReadByte()
                     };

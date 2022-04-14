@@ -359,49 +359,52 @@ namespace CoopClient
 
         public static VehicleDamageModel GetVehicleDamageModel(this Vehicle veh)
         {
-            VehicleDamageModel result = new VehicleDamageModel()
-            {
-                BrokenDoors = 0,
-                BrokenWindows = 0,
-                BurstedTires = 0,
-                PuncturedTires = 0,
-                LeftHeadLightBroken = (byte)(veh.IsLeftHeadLightBroken ? 1 : 0),
-                RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
-            };
-
             // Broken windows
+            byte brokenWindows = 0;
             for (int i = 0; i < 8; i++)
             {
                 if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
                 {
-                    result.BrokenWindows |= (byte)(1 << i);
+                    brokenWindows |= (byte)(1 << i);
                 }
             }
 
             // Broken doors
+            byte brokenDoors = 0;
             foreach (VehicleDoor door in veh.Doors)
             {
                 if (door.IsBroken)
                 {
-                    result.BrokenDoors |= (byte)(1 << (byte)door.Index);
+                    brokenDoors |= (byte)(1 << (byte)door.Index);
                 }
             }
 
             // Bursted and Punctured tires
+            short puncturedTires = 0;
+            short burstedTires = 0;
             foreach (VehicleWheel wheel in veh.Wheels.GetAllWheels())
             {
-                if (wheel.IsPunctured)
-                {
-                    result.PuncturedTires |= (ushort)(1 << (int)wheel.BoneId);
-                }
-
                 if (wheel.IsBursted)
                 {
-                    result.BurstedTires |= (ushort)(1 << (int)wheel.BoneId);
+                    burstedTires |= (short)(1 << (int)wheel.BoneId);
+                    continue;
+                }
+
+                if (wheel.IsPunctured)
+                {
+                    puncturedTires |= (short)(1 << (int)wheel.BoneId);
                 }
             }
 
-            return result;
+            return new VehicleDamageModel()
+            {
+                BrokenDoors = brokenDoors,
+                BrokenWindows = brokenWindows,
+                BurstedTires = burstedTires,
+                PuncturedTires = puncturedTires,
+                LeftHeadLightBroken = (byte)(veh.IsLeftHeadLightBroken ? 1 : 0),
+                RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
+            };
         }
 
         public static void SetVehicleDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
@@ -431,7 +434,22 @@ namespace CoopClient
 
             foreach (VehicleWheel wheel in veh.Wheels)
             {
-                if ((model.PuncturedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
+                if ((model.BurstedTires & (short)(1 << (int)wheel.BoneId)) != 0)
+                {
+                    if (!wheel.IsBursted)
+                    {
+                        wheel.Puncture();
+                        wheel.Burst();
+                    }
+
+                    continue;
+                }
+                else if (wheel.IsBursted)
+                {
+                    wheel.Fix();
+                }
+
+                if ((model.PuncturedTires & (short)(1 << (int)wheel.BoneId)) != 0)
                 {
                     if (!wheel.IsPunctured)
                     {
@@ -439,18 +457,6 @@ namespace CoopClient
                     }
                 }
                 else if (wheel.IsPunctured)
-                {
-                    wheel.Fix();
-                }
-
-                if ((model.BurstedTires & (ushort)(1 << (int)wheel.BoneId)) != 0)
-                {
-                    if (!wheel.IsBursted)
-                    {
-                        wheel.Burst();
-                    }
-                }
-                else if (wheel.IsBursted)
                 {
                     wheel.Fix();
                 }

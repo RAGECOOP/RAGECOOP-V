@@ -526,6 +526,8 @@ namespace CoopServer
                     byteArray.Add(VehDamageModel.BrokenWindows);
                     byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.BurstedTires));
                     byteArray.AddRange(BitConverter.GetBytes(VehDamageModel.PuncturedTires));
+                    byteArray.Add(VehDamageModel.LeftHeadLightBroken);
+                    byteArray.Add(VehDamageModel.RightHeadLightBroken);
                 }
                 else
                 {
@@ -670,8 +672,10 @@ namespace CoopServer
                     {
                         BrokenDoors = reader.ReadByte(),
                         BrokenWindows = reader.ReadByte(),
-                        BurstedTires = reader.ReadUShort(),
-                        PuncturedTires = reader.ReadUShort()
+                        BurstedTires = reader.ReadShort(),
+                        PuncturedTires = reader.ReadShort(),
+                        LeftHeadLightBroken = reader.ReadByte(),
+                        RightHeadLightBroken = reader.ReadByte()
                     };
                 }
 
