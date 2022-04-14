@@ -41,9 +41,6 @@ namespace CoopClient.Entities.Player
         {
             if (Character.IsInVehicle())
             {
-                Character.Task.ClearAll();
-                Character.Task.ClearSecondary();
-
                 if (MainVehicle == null)
                 {
                     Character.Task.LeaveVehicle();

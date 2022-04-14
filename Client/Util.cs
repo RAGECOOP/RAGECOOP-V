@@ -379,20 +379,13 @@ namespace CoopClient
                 }
             }
 
-            // Bursted and Punctured tires
-            short puncturedTires = 0;
+            // Bursted tires
             short burstedTires = 0;
             foreach (VehicleWheel wheel in veh.Wheels.GetAllWheels())
             {
                 if (wheel.IsBursted)
                 {
                     burstedTires |= (short)(1 << (int)wheel.BoneId);
-                    continue;
-                }
-
-                if (wheel.IsPunctured)
-                {
-                    puncturedTires |= (short)(1 << (int)wheel.BoneId);
                 }
             }
 
@@ -401,7 +394,6 @@ namespace CoopClient
                 BrokenDoors = brokenDoors,
                 BrokenWindows = brokenWindows,
                 BurstedTires = burstedTires,
-                PuncturedTires = puncturedTires,
                 LeftHeadLightBroken = (byte)(veh.IsLeftHeadLightBroken ? 1 : 0),
                 RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
             };
@@ -441,22 +433,8 @@ namespace CoopClient
                         wheel.Puncture();
                         wheel.Burst();
                     }
-
-                    continue;
                 }
                 else if (wheel.IsBursted)
-                {
-                    wheel.Fix();
-                }
-
-                if ((model.PuncturedTires & (short)(1 << (int)wheel.BoneId)) != 0)
-                {
-                    if (!wheel.IsPunctured)
-                    {
-                        wheel.Puncture();
-                    }
-                }
-                else if (wheel.IsPunctured)
                 {
                     wheel.Fix();
                 }

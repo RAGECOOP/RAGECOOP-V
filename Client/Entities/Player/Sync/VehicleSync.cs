@@ -69,30 +69,19 @@ namespace CoopClient.Entities.Player
                 Model vehicleModel = VehicleModelHash.ModelRequest();
                 if (vehicleModel == null)
                 {
-                    //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
-                    Character.IsVisible = false;
                     return;
                 }
 
-                bool vehFound = false;
-
                 Vehicle targetVehicle = World.GetClosestVehicle(Position, 7f, vehicleModel);
-                if (targetVehicle != null)
+                if (targetVehicle != null && targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
                 {
-                    if (targetVehicle.IsSeatFree((VehicleSeat)VehicleSeatIndex))
-                    {
-                        MainVehicle = targetVehicle;
-                        vehFound = true;
-                    }
+                    MainVehicle = targetVehicle;
                 }
-
-                if (!vehFound)
+                else
                 {
                     MainVehicle = World.CreateVehicle(vehicleModel, Position);
-                    MainVehicle.IsVisible = false;
-                    MainVehicle.Quaternion = _vehicleRotation;
-
                     MainVehicle.IsInvincible = true;
+                    MainVehicle.Quaternion = _vehicleRotation;
 
                     if (MainVehicle.HasRoof)
                     {
@@ -105,7 +94,6 @@ namespace CoopClient.Entities.Player
                 }
 
                 vehicleModel.MarkAsNoLongerNeeded();
-                return;
             }
 
             if (_lastVehicleEnter != 0)
@@ -122,8 +110,6 @@ namespace CoopClient.Entities.Player
             }
             else if (!Character.IsInVehicle() || Character.CurrentVehicle.Handle != MainVehicle.Handle)
             {
-                MainVehicle.IsVisible = true;
-
                 if (Game.Player.Character.CurrentVehicle?.Handle == MainVehicle.Handle &&
                     VehicleSeatIndex == (int)Game.Player.Character.SeatIndex)
                 {
@@ -134,17 +120,16 @@ namespace CoopClient.Entities.Player
                 if (VehicleSpeed > 0.2f || !Character.IsInRange(MainVehicle.Position, 4f))
                 {
                     Character.SetIntoVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex);
-                    Character.IsVisible = true;
                 }
                 else
                 {
                     _lastVehicleEnter = Util.GetTickCount64();
 
                     Character.Task.ClearAllImmediately();
-                    Character.IsVisible = true;
                     Character.Task.EnterVehicle(MainVehicle, (VehicleSeat)VehicleSeatIndex, -1, 2f, EnterVehicleFlags.WarpToDoor);
-                    return;
                 }
+
+                return;
             }
 
             if ((int)Character.SeatIndex != VehicleSeatIndex)
@@ -176,6 +161,11 @@ namespace CoopClient.Entities.Player
 
         private void UpdateVehicleInfo()
         {
+            if (LastSyncWasFull)
+            {
+                MainVehicle.SetVehicleDamageModel(VehDamageModel);
+            }
+
             if (VehicleColors != null && VehicleColors != _lastVehicleColors)
             {
                 Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, VehicleColors[0], VehicleColors[1]);
@@ -231,34 +221,6 @@ namespace CoopClient.Entities.Player
                     MainVehicle.IsEngineRunning = VehIsEngineRunning;
                 }
 
-                MainVehicle.CurrentRPM = VehRPM;
-
-                if (VehAreLightsOn != MainVehicle.AreLightsOn)
-                {
-                    MainVehicle.AreLightsOn = VehAreLightsOn;
-                }
-
-                if (VehAreHighBeamsOn != MainVehicle.AreHighBeamsOn)
-                {
-                    MainVehicle.AreHighBeamsOn = VehAreHighBeamsOn;
-                }
-
-                if (MainVehicle.IsSubmarineCar)
-                {
-                    if (Transformed)
-                    {
-                        if (!_lastTransformed)
-                        {
-                            _lastTransformed = true;
-                            Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
-                        }
-                    }
-                    else if (_lastTransformed)
-                    {
-                        _lastTransformed = false;
-                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
-                    }
-                }
 
                 if (MainVehicle.IsPlane)
                 {
@@ -269,10 +231,39 @@ namespace CoopClient.Entities.Player
                 }
                 else
                 {
+                    if (MainVehicle.IsSubmarineCar)
+                    {
+                        if (Transformed)
+                        {
+                            if (!_lastTransformed)
+                            {
+                                _lastTransformed = true;
+                                Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
+                            }
+                        }
+                        else if (_lastTransformed)
+                        {
+                            _lastTransformed = false;
+                            Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
+                        }
+                    }
+
+                    if (VehAreLightsOn != MainVehicle.AreLightsOn)
+                    {
+                        MainVehicle.AreLightsOn = VehAreLightsOn;
+                    }
+
+                    if (VehAreHighBeamsOn != MainVehicle.AreHighBeamsOn)
+                    {
+                        MainVehicle.AreHighBeamsOn = VehAreHighBeamsOn;
+                    }
+
                     if (MainVehicle.HasSiren && VehIsSireneActive != MainVehicle.IsSirenActive)
                     {
                         MainVehicle.IsSirenActive = VehIsSireneActive;
                     }
+
+                    MainVehicle.AreBrakeLightsOn = VehAreBrakeLightsOn;
 
                     if (IsHornActive)
                     {
@@ -296,19 +287,14 @@ namespace CoopClient.Entities.Player
                             MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
                         }
                     }
-
-                    Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, VehAreBrakeLightsOn);
-
-                    if (LastSyncWasFull)
-                    {
-                        MainVehicle.SetVehicleDamageModel(VehDamageModel);
-                    }
                 }
             }
         }
 
         private void UpdateVehiclePosition()
         {
+            MainVehicle.CurrentRPM = VehRPM;
+
             float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / AverageLatency);
 
             if (_lastVehicleSteeringAngle != VehicleSteeringAngle)

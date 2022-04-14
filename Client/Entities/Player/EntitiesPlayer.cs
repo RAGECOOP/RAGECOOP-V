@@ -150,22 +150,19 @@ namespace CoopClient.Entities.Player
 
             if (!characterExist)
             {
-                if (!CreateCharacter())
-                {
-                    return;
-                }
+                CreateCharacter();
+                return;
             }
             else if (LastSyncWasFull)
             {
                 if (ModelHash != _lastModelHash)
                 {
                     Character.Kill();
+                    Character.MarkAsNoLongerNeeded();
                     Character.Delete();
 
-                    if (!CreateCharacter())
-                    {
-                        return;
-                    }
+                    CreateCharacter();
+                    return;
                 }
                 else if (!Clothes.Compare(_lastClothes))
                 {
@@ -210,38 +207,42 @@ namespace CoopClient.Entities.Player
 
         private void RenderNameTag()
         {
-            if (Character.IsVisible && Character.IsInRange(Game.Player.Character.Position, 20f))
+            if (!Character.IsVisible || !Character.IsInRange(Game.Player.Character.Position, 20f))
             {
-                float sizeOffset;
-                if (GameplayCamera.IsFirstPersonAimCamActive)
-                {
-                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.10f) + (Character.Velocity / Game.FPS);
-
-                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
-
-                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 30f), 0.30f);
-                }
-                else
-                {
-                    Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f) + (Character.Velocity / Game.FPS);
-
-                    Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
-
-                    sizeOffset = Math.Max(1f - ((GameplayCamera.Position - Character.Position).Length() / 25f), 0.25f);
-                }
-
-                new ScaledText(new PointF(0, 0), Username, 0.4f * sizeOffset, GTA.UI.Font.ChaletLondon)
-                {
-                    Outline = true,
-                    Alignment = GTA.UI.Alignment.Center
-                }.Draw();
-
-                Function.Call(Hash.CLEAR_DRAW_ORIGIN);
+                return;
             }
+
+            string renderText = (Util.GetTickCount64() - LastUpdateReceived) > 5000 ? "~r~AFK" : Username;
+            Vector3 targetPos = Character.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f) + (Character.Velocity / Game.FPS);
+
+            Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
+
+            float dist = (GameplayCamera.Position - Character.Position).Length();
+            var sizeOffset = Math.Max(1f - (dist / 30f), 0.3f);
+
+            new ScaledText(new PointF(0, 0), renderText, 0.4f * sizeOffset, GTA.UI.Font.ChaletLondon)
+            {
+                Outline = true,
+                Alignment = GTA.UI.Alignment.Center
+            }.Draw();
+
+            Function.Call(Hash.CLEAR_DRAW_ORIGIN);
         }
 
-        private bool CreateCharacter()
+        private void CreateCharacter()
         {
+            if (Character != null)
+            {
+                if (Character.Exists())
+                {
+                    Character.Kill();
+                    Character.MarkAsNoLongerNeeded();
+                    Character.Delete();
+                }
+                
+                Character = null;
+            }
+
             if (PedBlip != null && PedBlip.Exists())
             {
                 PedBlip.Delete();
@@ -249,22 +250,20 @@ namespace CoopClient.Entities.Player
             }
 
             Model characterModel = ModelHash.ModelRequest();
-
             if (characterModel == null)
             {
-                //GTA.UI.Notification.Show($"~r~(Character)Model ({CurrentModelHash}) cannot be loaded!");
-                return false;
+                return;
             }
 
-            Character = World.CreatePed(characterModel, Position, Rotation.Z);
+            Character = World.CreatePed(characterModel, Position);
             characterModel.MarkAsNoLongerNeeded();
+            if (Character == null)
+            {
+                return;
+            }
 
             Character.RelationshipGroup = Main.RelationshipGroup;
             Character.Health = Health;
-            if (IsInVehicle)
-            {
-                Character.IsVisible = false;
-            }
             Character.BlockPermanentEvents = true;
             Character.CanRagdoll = false;
             Character.IsInvincible = true;
@@ -286,8 +285,6 @@ namespace CoopClient.Entities.Player
             Character.AttachedBlip.Color = BlipColor.White;
             Character.AttachedBlip.Scale = 0.8f;
             Character.AttachedBlip.Name = Username;
-
-            return true;
         }
 
         private void SetClothes()

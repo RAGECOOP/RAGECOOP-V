@@ -169,7 +169,6 @@ namespace CoopClient
         public byte BrokenWindows { get; set; }
         public byte BrokenDoors { get; set; }
         public short BurstedTires { get; set; }
-        public short PuncturedTires { get; set; }
         public byte LeftHeadLightBroken { get; set; }
         public byte RightHeadLightBroken { get; set; }
     }

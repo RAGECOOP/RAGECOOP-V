@@ -374,7 +374,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - _artificialLagCounter) < 279)
+            if ((Util.GetTickCount64() - _artificialLagCounter) < 243)
             {
                 return;
             }
