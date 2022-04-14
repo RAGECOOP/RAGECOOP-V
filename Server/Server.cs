@@ -31,7 +31,7 @@ namespace CoopServer
         public static NetServer MainNetServer;
 
         public static Resource RunningResource = null;
-        public static Dictionary<Command, Action<CommandContext>> Commands;
+        public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
 
         public static readonly List<Client> Clients = new();
