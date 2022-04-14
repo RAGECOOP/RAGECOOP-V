@@ -226,7 +226,6 @@ namespace CoopClient.Entities.Player
                     MainVehicle.IsEngineRunning = VehIsEngineRunning;
                 }
 
-
                 if (MainVehicle.IsPlane)
                 {
                     if (VehLandingGear != (byte)MainVehicle.LandingGearState)
@@ -250,6 +249,15 @@ namespace CoopClient.Entities.Player
                         {
                             _lastTransformed = false;
                             Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
+                        }
+                    }
+                    
+                    if (MainVehicle.HasRoof)
+                    {
+                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
+                        if (roofOpened != VehRoofOpened)
+                        {
+                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
                         }
                     }
 
@@ -283,23 +291,14 @@ namespace CoopClient.Entities.Player
                         _lastHornActive = false;
                         MainVehicle.SoundHorn(1);
                     }
-
-                    if (MainVehicle.HasRoof)
-                    {
-                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
-                        if (roofOpened != VehRoofOpened)
-                        {
-                            MainVehicle.RoofState = VehRoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
-                        }
-                    }
                 }
             }
+
+            MainVehicle.CurrentRPM = VehRPM;
         }
 
         private void UpdateVehiclePosition()
         {
-            MainVehicle.CurrentRPM = VehRPM;
-
             float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / AverageLatency);
 
             if (_lastVehicleSteeringAngle != VehicleSteeringAngle)

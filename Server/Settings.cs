@@ -13,7 +13,7 @@
         public bool ModsAllowed {  get; set; } = false;
         public bool UPnP { get; set; } = true;
         public bool AnnounceSelf { get; set; } = false;
-        public string MasterServer { get; set; } = "https://ragecoop.online/servers";
+        public string MasterServer { get; set; } = "https://ragecoop.online/gtav/servers";
         public bool DebugMode { get; set; } = false;
     }
 }
