@@ -52,6 +52,27 @@ namespace CoopClient
         }
         #endregion
 
+        public static double Average(this IEnumerable<ulong> source)
+        {
+            ulong num = 0L;
+            ulong num2 = 0L;
+            checked
+            {
+                foreach (ulong item in source)
+                {
+                    num += item;
+                    num2++;
+                }
+
+                if (num2 > 0)
+                {
+                    return num / num2;
+                }
+
+                throw new Exception("No elements");
+            }
+        }
+
         public static (byte, byte[]) GetBytesFromObject(object obj)
         {
             switch (obj)
@@ -139,9 +160,9 @@ namespace CoopClient
             return (end - start) * currentTime / duration + start;
         }
 
-        public static dynamic Lerp(dynamic from, dynamic to, float fAlpha)
+        public static float Lerp(float from, float to, float fAlpha)
         {
-            return (to - from) * fAlpha + from;
+            return (from * (1.0f - fAlpha)) + (to * fAlpha); //from + (to - from) * fAlpha
         }
 
         public static int GetResponsiblePedHandle(this Vehicle veh)

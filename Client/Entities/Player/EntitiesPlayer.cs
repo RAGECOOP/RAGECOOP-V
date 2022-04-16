@@ -44,8 +44,8 @@ namespace CoopClient.Entities.Player
             }
         }
         private ulong _lastUpdateReceived = 0;
-        internal float AverageLatency => _latencyAverager.Count == 0 ? 0 : _latencyAverager.Average();
-        private readonly Queue<float> _latencyAverager = new Queue<float>();
+        internal double AverageLatency => _latencyAverager.Count == 0 ? 0 : _latencyAverager.Average();
+        private readonly Queue<ulong> _latencyAverager = new Queue<ulong>();
         /// <summary>
         /// Get the player latency
         /// </summary>

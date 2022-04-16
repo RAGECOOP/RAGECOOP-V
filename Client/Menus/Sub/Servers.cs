@@ -58,7 +58,7 @@ namespace CoopClient.Menus.Sub
                 MainMenu.Add(ResultItem = new NativeItem("Loading..."));
                 GetAllServer();
             };
-            MainMenu.Closed += (object sender, EventArgs e) =>
+            MainMenu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {
                 CleanUpList();
             };
@@ -66,19 +66,8 @@ namespace CoopClient.Menus.Sub
 
         private void CleanUpList()
         {
-            if (ResultItem != null)
-            {
-                MainMenu.Remove(ResultItem);
-                ResultItem = null;
-            }
-
-            if (MainMenu.Items.Count > 0)
-            {
-                for (int i = 0; i < MainMenu.Items.Count; i++)
-                {
-                    MainMenu.Remove(MainMenu.Items[i]);
-                }
-            }
+            MainMenu.Clear();
+            ResultItem = null;
         }
 
         private void GetAllServer()
@@ -118,8 +107,7 @@ namespace CoopClient.Menus.Sub
             foreach (ServerListClass server in serverList)
             {
                 string address = $"{server.Address}:{server.Port}";
-                NativeItem tmpItem = null;
-                MainMenu.Add(tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]"});
+                NativeItem tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]" };
                 tmpItem.Activated += (object sender, EventArgs e) =>
                 {
                     try
@@ -140,6 +128,7 @@ namespace CoopClient.Menus.Sub
                         GTA.UI.Notification.Show($"~r~{ex.Message}");
                     }
                 };
+                MainMenu.Add(tmpItem);
             }
         }
     }

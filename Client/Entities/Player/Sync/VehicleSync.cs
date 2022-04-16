@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using GTA;
@@ -39,7 +40,7 @@ namespace CoopClient.Entities.Player
             }
         }
         private Quaternion _vehicleRotation;
-        private Quaternion? _lastVehicleRotation;
+        private Quaternion _lastVehicleRotation;
         internal float VehicleSpeed { get; set; }
         private float _lastVehicleSpeed;
         internal float VehicleSteeringAngle { get; set; }
@@ -299,26 +300,35 @@ namespace CoopClient.Entities.Player
 
         private void UpdateVehiclePosition()
         {
-            float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / AverageLatency);
-
-            if (_lastVehicleSteeringAngle != VehicleSteeringAngle)
+            // We cannot calculate without content
+            if (_latencyAverager.Count == 0)
             {
-                float steeringLerp = Util.Lerp(_lastVehicleSteeringAngle.ToRadians(), VehicleSteeringAngle.ToRadians(), avrLat);
-                _lastVehicleSteeringAngle = VehicleSteeringAngle;
-
-                MainVehicle.CustomSteeringAngle(steeringLerp);
+                MainVehicle.PositionNoOffset = Position;
+                MainVehicle.Quaternion = _vehicleRotation;
+                return;
             }
 
-            if (VehicleSpeed != 0f && MainVehicle.IsInRange(Position, 7.0f))
+            float avrLat = Math.Min(1.5f, (Util.GetTickCount64() - LastUpdateReceived) / (float)AverageLatency);
+
+            float steerLerp = Util.Lerp(_lastVehicleSteeringAngle.ToRadians(), VehicleSteeringAngle.ToRadians(), avrLat);
+            _lastVehicleSteeringAngle = VehicleSteeringAngle;
+            MainVehicle.CustomSteeringAngle(steerLerp);
+
+            if (!MainVehicle.IsInRange(Position, 7.0f))
             {
-                dynamic speedLerp = Util.Lerp(_lastVehicleSpeed, VehicleSpeed, avrLat);
+                MainVehicle.PositionNoOffset = Position;
+            }
+
+            if (VehicleSpeed != 0f)
+            {
+                float speedLerp = Util.Lerp(_lastVehicleSpeed, VehicleSpeed, avrLat);
                 _lastVehicleSpeed = Speed;
 
-                dynamic force = 1.10f + (float)Math.Sqrt(AverageLatency / 2500) + (speedLerp / 250);
-                dynamic forceVelo = 0.77f + (float)Math.Sqrt(AverageLatency / 5000) + (speedLerp / 750);
+                float force = 1.10f + (float)Math.Sqrt(_latencyAverager.Average() / 2500) + (speedLerp / 250);
+                float forceVelo = 0.77f + (float)Math.Sqrt(_latencyAverager.Average() / 5000) + (speedLerp / 750);
 
                 MainVehicle.Velocity = Velocity * forceVelo + ((Position - MainVehicle.Position) * force);
-                MainVehicle.Quaternion = _lastVehicleRotation != null ? Quaternion.Slerp(_lastVehicleRotation.Value, _vehicleRotation, avrLat) : _vehicleRotation;
+                MainVehicle.Quaternion = _lastVehicleRotation != null ? Quaternion.Slerp(_lastVehicleRotation, _vehicleRotation, avrLat) : _vehicleRotation;
             }
             else
             {
