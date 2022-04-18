@@ -52,27 +52,6 @@ namespace CoopClient
         }
         #endregion
 
-        public static double Average(this IEnumerable<ulong> source)
-        {
-            ulong num = 0L;
-            ulong num2 = 0L;
-            checked
-            {
-                foreach (ulong item in source)
-                {
-                    num += item;
-                    num2++;
-                }
-
-                if (num2 > 0)
-                {
-                    return num / num2;
-                }
-
-                throw new Exception("No elements");
-            }
-        }
-
         public static (byte, byte[]) GetBytesFromObject(object obj)
         {
             switch (obj)

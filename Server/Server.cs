@@ -16,7 +16,8 @@ namespace CoopServer
 {
     internal class IpInfo
     {
-        public string country { get; set; }
+        [JsonProperty("country")]
+        public string Country { get; set; }
     }
 
     internal class Server
@@ -119,7 +120,7 @@ namespace CoopServer
                             }
                             catch
                             {
-                                info = new() { country = "?" };
+                                info = new() { Country = "?" };
                             }
 
                             while (!Program.ReadyToStop)
@@ -135,7 +136,7 @@ namespace CoopServer
                                     "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
                                     "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
                                     "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
-                                    "\"country\": \"" + info.country + "\"" +
+                                    "\"country\": \"" + info.Country + "\"" +
                                     " }";
 
                                 HttpResponseMessage response = null;

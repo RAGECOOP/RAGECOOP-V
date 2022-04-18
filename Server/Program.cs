@@ -45,7 +45,7 @@ namespace CoopServer
             }
             catch (Exception e)
             {
-                Logging.Error(e.ToString());
+                Logging.Error(e.InnerException?.Message ?? e.Message);
                 Console.ReadLine();
             }
         }
