@@ -405,7 +405,7 @@ namespace CoopClient
                                         Packets.NativeCall packet = new Packets.NativeCall();
                                         packet.NetIncomingMessageToPacket(data);
 
-                                        DecodeNativeCall(packet);
+                                        DecodeNativeCall(packet.Hash, packet.Args, false);
                                     }
                                     catch (Exception ex)
                                     {
@@ -718,114 +718,71 @@ namespace CoopClient
             }
         }
 
-        private void DecodeNativeCall(Packets.NativeCall packet)
+        private object DecodeNativeCall(ulong hash, List<object> args, bool returnValue, byte? returnType = null)
         {
             List<InputArgument> arguments = new List<InputArgument>();
 
-            if (packet.Args != null && packet.Args.Count > 0)
+            if (args == null || args.Count == 0)
             {
-                packet.Args.ForEach(x =>
-                {
-                    Type type = x.GetType();
+                return null;
+            }
 
-                    if (type == typeof(int))
-                    {
+            for (ushort i = 0; i < args.Count; i++)
+            {
+                object x = args.ElementAt(i);
+                switch (x)
+                {
+                    case int _:
                         arguments.Add((int)x);
-                    }
-                    else if (type == typeof(bool))
-                    {
+                        break;
+                    case bool _:
                         arguments.Add((bool)x);
-                    }
-                    else if (type == typeof(float))
-                    {
+                        break;
+                    case float _:
                         arguments.Add((float)x);
-                    }
-                    else if (type == typeof(string))
-                    {
+                        break;
+                    case string _:
                         arguments.Add((string)x);
-                    }
-                    else if (type == typeof(LVector3))
-                    {
+                        break;
+                    case LVector3 _:
                         LVector3 vector = (LVector3)x;
                         arguments.Add((float)vector.X);
                         arguments.Add((float)vector.Y);
                         arguments.Add((float)vector.Z);
-                    }
-                    else
-                    {
-                        GTA.UI.Notification.Show("[DecodeNativeCall][" + packet.Hash + "]: Type of argument not found!");
-                        return;
-                    }
-                });
+                        break;
+                    default:
+                        GTA.UI.Notification.Show("[DecodeNativeCall][" + hash + "]: Type of argument not found!");
+                        return null;
+                }
             }
 
-            Function.Call((Hash)packet.Hash, arguments.ToArray());
+            if (!returnValue)
+            {
+                Function.Call((Hash)hash, arguments.ToArray());
+                return null;
+            }
+
+            switch (returnType.Value)
+            {
+                case 0x00: // int
+                    return Function.Call<int>((Hash)hash, arguments.ToArray());
+                case 0x01: // bool
+                    return Function.Call<bool>((Hash)hash, arguments.ToArray());
+                case 0x02: // float
+                    return Function.Call<float>((Hash)hash, arguments.ToArray());
+                case 0x03: // string
+                    return Function.Call<string>((Hash)hash, arguments.ToArray());
+                case 0x04: // vector3
+                    return Function.Call<GTA.Math.Vector3>((Hash)hash, arguments.ToArray()).ToLVector();
+                default:
+                    GTA.UI.Notification.Show("[DecodeNativeCall][" + hash + "]: Type of return not found!");
+                    return null;
+            }
         }
 
         private void DecodeNativeResponse(Packets.NativeResponse packet)
         {
-            List<InputArgument> arguments = new List<InputArgument>();
-            Type typeOf = null;
-
-            if (packet.Args != null && packet.Args.Count > 0)
-            {
-                packet.Args.ForEach(x =>
-                {
-                    typeOf = x.GetType();
-
-                    if (typeOf == typeof(int))
-                    {
-                        arguments.Add((int)x);
-                    }
-                    else if (typeOf == typeof(bool))
-                    {
-                        arguments.Add((bool)x);
-                    }
-                    else if (typeOf == typeof(float))
-                    {
-                        arguments.Add((float)x);
-                    }
-                    else if (typeOf == typeof(string))
-                    {
-                        arguments.Add((string)x);
-                    }
-                    else if (typeOf == typeof(LVector3))
-                    {
-                        LVector3 vector = (LVector3)x;
-                        arguments.Add((float)vector.X);
-                        arguments.Add((float)vector.Y);
-                        arguments.Add((float)vector.Z);
-                    }
-                    else
-                    {
-                        GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of argument not found!");
-                        return;
-                    }
-                });
-            }
-
-            object result;
-            switch (packet.ResultType.Value)
-            {
-                case 0x00: // int
-                    result = Function.Call<int>((Hash)packet.Hash, arguments.ToArray());
-                    break;
-                case 0x01: // bool
-                    result = Function.Call<bool>((Hash)packet.Hash, arguments.ToArray());
-                    break;
-                case 0x02: // float
-                    result = Function.Call<float>((Hash)packet.Hash, arguments.ToArray());
-                    break;
-                case 0x03: // string
-                    result = Function.Call<string>((Hash)packet.Hash, arguments.ToArray());
-                    break;
-                case 0x04: // vector3
-                    result = Function.Call<GTA.Math.Vector3>((Hash)packet.Hash, arguments.ToArray()).ToLVector();
-                    break;
-                default:
-                    GTA.UI.Notification.Show("[DecodeNativeResponse][" + packet.Hash + "]: Type of return not found!");
-                    return;
-            }
+            object result = DecodeNativeCall(packet.Hash, packet.Args, true, packet.ResultType);
 
             if (Main.CheckNativeHash.ContainsKey(packet.Hash))
             {
