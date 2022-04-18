@@ -319,7 +319,7 @@ namespace CoopClient
                                             EntitiesPlayer player = Main.Players[packet.NetHandle];
 
                                             player.Position = packet.Position.ToVector();
-                                            player.Latency = packet.Latency.HasValue ? packet.Latency.Value : 0;
+                                            player.Latency = packet.Latency ?? 0;
                                         }
                                     }
                                     catch (Exception ex)

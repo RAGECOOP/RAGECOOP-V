@@ -35,9 +35,11 @@ namespace CoopClient
                 return;
             }
 
-            Game.DisableControlThisFrame(Control.FrontendPause);
+            Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
 
-            Function.Call((Hash)0xB96B00E976BE977F, 0.0f); // _SET_WAVES_INTENSITY
+            // Sets a value that determines how aggressive the ocean waves will be.
+            // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
+            Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
 
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character.Handle, true, false);
 
@@ -53,8 +55,8 @@ namespace CoopClient
                 Function.Call(Hash.SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
                 Function.Call(Hash.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
                 Function.Call(Hash.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call((Hash)0x2F9A292AD0A3BD89);
-                Function.Call((Hash)0x5F3B7749C112D552);
+                Function.Call(Hash.SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
+                Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
             }
             else if (_lastDisableTraffic)
             {
@@ -78,7 +80,7 @@ namespace CoopClient
                 Function.Call(Hash.SET_ALL_VEHICLE_GENERATORS_ACTIVE);
                 Function.Call(Hash.SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, true);
                 Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, -1);
-                Function.Call((Hash)0xF796359A959DF65D, true); // Display distant vehicles
+                Function.Call(Hash.SET_DISTANT_CARS_ENABLED, true);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, false);
             }
             else
@@ -94,7 +96,7 @@ namespace CoopClient
                 Function.Call(Hash.SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, false);
                 Function.Call(Hash.SET_FAR_DRAW_VEHICLES, false);
                 Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, 0);
-                Function.Call((Hash)0xF796359A959DF65D, false); //Display distant vehicles
+                Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
 
                 foreach (Ped ped in World.GetAllPeds().Where(p => p.RelationshipGroup != "SYNCPED" && p.Handle != Game.Player.Character?.Handle))

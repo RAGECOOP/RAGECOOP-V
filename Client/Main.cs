@@ -178,11 +178,14 @@ namespace CoopClient
                 return;
             }
 
+            if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate))
+            {
+                Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                return;
+            }
+
             switch (e.KeyCode)
             {
-                case Keys.Escape:
-                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
-                    break;
                 case Keys.F9:
                     if (MainMenu.MenuPool.AreAnyVisible)
                     {
@@ -374,7 +377,7 @@ namespace CoopClient
                 DebugSyncPed = Players[0];
             }
 
-            if ((Util.GetTickCount64() - _artificialLagCounter) < 243)
+            if ((Util.GetTickCount64() - _artificialLagCounter) < 147)
             {
                 return;
             }

@@ -7,7 +7,6 @@ using GTA.Native;
 using GTA.Math;
 
 using LemonUI.Elements;
-using System.Linq;
 
 namespace CoopClient.Entities.Player
 {
@@ -26,26 +25,7 @@ namespace CoopClient.Entities.Player
         /// <summary>
         /// Get the last update = TickCount64()
         /// </summary>
-        public ulong LastUpdateReceived
-        {
-            get => _lastUpdateReceived;
-            set
-            {
-                if (_lastUpdateReceived != 0)
-                {
-                    _latencyAverager.Enqueue(value - _lastUpdateReceived);
-                    if (_latencyAverager.Count >= 10)
-                    {
-                        _latencyAverager.Dequeue();
-                    }
-                }
-
-                _lastUpdateReceived = value;
-            }
-        }
-        private ulong _lastUpdateReceived = 0;
-        internal double AverageLatency => _latencyAverager.Count == 0 ? 0 : _latencyAverager.Average();
-        private readonly Queue<ulong> _latencyAverager = new Queue<ulong>();
+        public ulong LastUpdateReceived { get; set; } = 0;
         /// <summary>
         /// Get the player latency
         /// </summary>
