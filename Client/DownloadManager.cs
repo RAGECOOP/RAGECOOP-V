@@ -79,7 +79,7 @@ namespace CoopClient
             return false;
         }
 
-        public static void DownloadProgressTick()
+        public static void RenderProgress()
         {
             if (_downloadFiles.Count == 0)
             {

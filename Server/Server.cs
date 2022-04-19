@@ -96,9 +96,9 @@ namespace CoopServer
                         try
                         {
                             HttpResponseMessage response = await httpClient.GetAsync("https://ipinfo.io/json");
-                            if (!response.IsSuccessStatusCode)
+                            if (response.StatusCode != HttpStatusCode.OK)
                             {
-                                throw new Exception("IPv4 request failed!");
+                                throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
                             }
 
                             string content = await response.Content.ReadAsStringAsync();

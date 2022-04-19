@@ -122,7 +122,7 @@ namespace CoopClient
 
             if (!DownloadManager.DownloadComplete)
             {
-                DownloadManager.DownloadProgressTick();
+                DownloadManager.RenderProgress();
             }
             else if (!JavascriptHook.JavascriptLoaded)
             {

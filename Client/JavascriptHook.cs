@@ -260,7 +260,7 @@ namespace CoopClient
             OnChatMessage?.Invoke(from, message);
         }
 
-        public void InvokeServerEvent(string eventName, object[] args)
+        internal void InvokeServerEvent(string eventName, object[] args)
         {
             _serverEvents.FirstOrDefault(x => x.Key == eventName).Value?.Invoke(args);
         }
