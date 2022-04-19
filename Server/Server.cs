@@ -8,18 +8,10 @@ using System.Reflection;
 using System.IO;
 using System.Net.Http;
 
-using Newtonsoft.Json;
-
 using Lidgren.Network;
 
 namespace CoopServer
 {
-    internal class IpInfo
-    {
-        [JsonProperty("country")]
-        public string Country { get; set; }
-    }
-
     internal class Server
     {
         private static readonly string _compatibleVersion = "V1_4";
@@ -39,18 +31,8 @@ namespace CoopServer
 
         public Server()
         {
-            if (IPAddress.TryParse(MainSettings.Address, out IPAddress parsedAddress) == false)
-            {
-                throw new Exception($"Something went wrong while parsing IP {MainSettings.Address}!");
-            }
-
-            if (parsedAddress.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork)
-            {
-                throw new Exception("Please use a valid IPv4 address!");
-            }
-
             Logging.Info("================");
-            Logging.Info($"Server bound to: {MainSettings.Address}:{MainSettings.Port}");
+            Logging.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
             Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
             Logging.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
             Logging.Info("================");
@@ -58,8 +40,6 @@ namespace CoopServer
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
             {
-                LocalAddress = parsedAddress,
-                BroadcastAddress = parsedAddress,
                 Port = MainSettings.Port,
                 MaximumConnections = MainSettings.MaxPlayers,
                 EnableUPnP = MainSettings.UPnP
@@ -91,92 +71,78 @@ namespace CoopServer
             if (MainSettings.AnnounceSelf)
             {
                 Logging.Info("Announcing to master server...");
-                
-                if (new string[5] { "127.0.0.1", "192.168.", "0.0.0.0", "1.1.1.1", "1.2.3.4" }.Any(el => MainSettings.Address.Contains(el, StringComparison.CurrentCultureIgnoreCase)))
+
+                #region -- MASTERSERVER --
+                new Thread(async () =>
                 {
-                    Logging.Error($"Announcing to the master server failed because this is not a public address!");
-                }
-                else
-                {
-                    #region -- MASTERSERVER --
-                    new Thread(async () =>
+                    try
                     {
-                        try
+                        // TLS only
+                        ServicePointManager.Expect100Continue = true;
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                        HttpClient httpClient = new();
+
+                        while (!Program.ReadyToStop)
                         {
-                            // TLS only
-                            ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
-                            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+                            string msg =
+                                "{ " +
+                                "\"port\": \"" + MainSettings.Port + "\", " +
+                                "\"name\": \"" + MainSettings.Name + "\", " +
+                                "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
+                                "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
+                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
+                                "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
+                                "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
+                                "\"npcs\": \"" + MainSettings.NpcsAllowed + "\"" +
+                                " }";
 
-                            HttpClient httpClient = new();
-
-                            IpInfo info;
-
+                            HttpResponseMessage response = null;
                             try
                             {
-                                string data = await httpClient.GetStringAsync("https://ipinfo.io/json");
-
-                                info = JsonConvert.DeserializeObject<IpInfo>(data);
+                                response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
                             }
-                            catch
+                            catch (Exception ex)
                             {
-                                info = new() { Country = "?" };
+                                Logging.Error($"MasterServer: {ex.Message}");
+
+                                // Sleep for 5s
+                                Thread.Sleep(5000);
+                                continue;
                             }
 
-                            while (!Program.ReadyToStop)
+                            if (response == null)
                             {
-                                string msg =
-                                    "{ " +
-                                    "\"address\": \"" + MainSettings.Address + "\", " +
-                                    "\"port\": \"" + MainSettings.Port + "\", " +
-                                    "\"name\": \"" + MainSettings.Name + "\", " +
-                                    "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
-                                    "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                                    "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
-                                    "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
-                                    "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
-                                    "\"npcs\": \"" + MainSettings.NpcsAllowed + "\", " +
-                                    "\"country\": \"" + info.Country + "\"" +
-                                    " }";
-
-                                HttpResponseMessage response = null;
-                                try
+                                Logging.Error("MasterServer: Something went wrong!");
+                            }
+                            else if (response.StatusCode != HttpStatusCode.OK)
+                            {
+                                if (response.StatusCode == HttpStatusCode.BadRequest)
                                 {
-                                    response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+                                    string requestContent = await response.Content.ReadAsStringAsync();
+                                    Logging.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
                                 }
-                                catch (Exception ex)
-                                {
-                                    Logging.Error($"MasterServer: {ex.Message}");
-
-                                    // Sleep for 5s
-                                    Thread.Sleep(5000);
-                                    continue;
-                                }
-
-                                if (response == null)
-                                {
-                                    Logging.Error("MasterServer: Something went wrong!");
-                                }
-                                else if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                                else
                                 {
                                     Logging.Error($"MasterServer: [{(int)response.StatusCode}]");
                                 }
-
-                                // Sleep for 10s
-                                Thread.Sleep(10000);
                             }
+
+                            // Sleep for 10s
+                            Thread.Sleep(10000);
                         }
-                        catch (HttpRequestException ex)
-                        {
-                            Logging.Error($"MasterServer: {ex.InnerException.Message}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Logging.Error($"MasterServer: {ex.Message}");
-                        }
-                    }).Start();
-                    #endregion
-                }
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Logging.Error($"MasterServer: {ex.InnerException.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logging.Error($"MasterServer: {ex.Message}");
+                    }
+                }).Start();
+                #endregion
             }
 
             if (!string.IsNullOrEmpty(MainSettings.Resource))

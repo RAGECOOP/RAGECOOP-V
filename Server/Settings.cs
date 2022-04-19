@@ -2,7 +2,6 @@
 {
     public class Settings
     {
-        public string Address { get; set; } = "127.0.0.1";
         public int Port { get; set; } = 4499;
         public int MaxPlayers { get; set; } = 16;
         public int MaxLatency { get; set; } = 300;
