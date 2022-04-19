@@ -8,10 +8,18 @@ using System.Reflection;
 using System.IO;
 using System.Net.Http;
 
+using Newtonsoft.Json;
+
 using Lidgren.Network;
 
 namespace CoopServer
 {
+    internal struct IpInfo
+    {
+        [JsonProperty("ip")]
+        public string Address { get; set; }
+    }
+
     internal class Server
     {
         private static readonly string _compatibleVersion = "V1_4";
@@ -84,10 +92,29 @@ namespace CoopServer
 
                         HttpClient httpClient = new();
 
+                        IpInfo info;
+                        try
+                        {
+                            HttpResponseMessage response = await httpClient.GetAsync("https://ipinfo.io/json");
+                            if (!response.IsSuccessStatusCode)
+                            {
+                                throw new Exception("IPv4 request failed!");
+                            }
+
+                            string content = await response.Content.ReadAsStringAsync();
+                            info = JsonConvert.DeserializeObject<IpInfo>(content);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logging.Error(ex.InnerException?.Message ?? ex.Message);
+                            return;
+                        }
+
                         while (!Program.ReadyToStop)
                         {
                             string msg =
                                 "{ " +
+                                "\"address\": \"" + info.Address + "\", " +
                                 "\"port\": \"" + MainSettings.Port + "\", " +
                                 "\"name\": \"" + MainSettings.Name + "\", " +
                                 "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
