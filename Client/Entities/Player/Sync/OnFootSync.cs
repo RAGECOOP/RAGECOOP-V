@@ -108,38 +108,7 @@ namespace CoopClient.Entities.Player
 
             if (IsOnLadder)
             {
-                if (_currentAnimation[0] != "laddersbase")
-                {
-                    _currentAnimation[0] = "laddersbase";
-                }
-
-                if (Math.Abs(Velocity.Z) < 0.5)
-                {
-                    if (_currentAnimation[1] != "base_left_hand_up")
-                    {
-                        Character.Task.ClearAllImmediately();
-                        _currentAnimation[1] = "base_left_hand_up";
-                    }
-
-                    if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "laddersbase", "base_left_hand_up", 3))
-                    {
-                        Character.Task.PlayAnimation("laddersbase", "base_left_hand_up", 8f, -1, AnimationFlags.Loop);
-                    }
-                }
-                else if (Velocity.Z > 0)
-                {
-                    if (_currentAnimation[1] != "climb_up")
-                    {
-                        Character.Task.ClearAllImmediately();
-                        _currentAnimation[1] = "climb_up";
-                    }
-
-                    if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "laddersbase", "climb_up", 3))
-                    {
-                        Character.Task.PlayAnimation("laddersbase", "climb_up", 8f, -1, AnimationFlags.Loop);
-                    }
-                }
-                else if (Velocity.Z < 0)
+                if (Velocity.Z < 0)
                 {
                     string anim = Velocity.Z < -2f ? "slide_climb_down" : "climb_down";
                     if (_currentAnimation[1] != anim)
@@ -153,6 +122,35 @@ namespace CoopClient.Entities.Player
                         Character.Task.PlayAnimation("laddersbase", anim, 8f, -1, AnimationFlags.Loop);
                     }
                 }
+                else
+                {
+                    if (Math.Abs(Velocity.Z) < 0.5)
+                    {
+                        if (_currentAnimation[1] != "base_left_hand_up")
+                        {
+                            Character.Task.ClearAllImmediately();
+                            _currentAnimation[1] = "base_left_hand_up";
+                        }
+
+                        if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "laddersbase", "base_left_hand_up", 3))
+                        {
+                            Character.Task.PlayAnimation("laddersbase", "base_left_hand_up", 8f, -1, AnimationFlags.Loop);
+                        }
+                    }
+                    else
+                    {
+                        if (_currentAnimation[1] != "climb_up")
+                        {
+                            Character.Task.ClearAllImmediately();
+                            _currentAnimation[1] = "climb_up";
+                        }
+
+                        if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Character.Handle, "laddersbase", "climb_up", 3))
+                        {
+                            Character.Task.PlayAnimation("laddersbase", "climb_up", 8f, -1, AnimationFlags.Loop);
+                        }
+                    }
+                }
                 
                 UpdateOnFootPosition(true, true, false);
 
@@ -161,7 +159,7 @@ namespace CoopClient.Entities.Player
             if (!IsOnLadder && Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, Character.Handle, ETasks.CLIMB_LADDER))
             {
                 Character.Task.ClearAllImmediately();
-                _currentAnimation = new string[2] { "", "" };
+                _currentAnimation[1] = "";
             }
 
             if (IsVaulting)
