@@ -347,23 +347,23 @@ namespace CoopClient.Entities.Player
                     return new string[2] { "weapons@pistol@pistol_str", "reload_aim" };
                 case WeaponHash.AssaultRifle:
                 case WeaponHash.AssaultrifleMk2:
-                    return new string[2] { "weapons@rifle@aussault_rifle_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@hi@assault_rifle_str", "reload_aim" };
                 case WeaponHash.SniperRifle:
-                    return new string[2] { "weapons@rifle@sniper_rifle_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@hi@sniper_rifle_str", "reload_aim" };
                 case WeaponHash.HeavySniper:
                 case WeaponHash.HeavySniperMk2:
-                    return new string[2] { "weapons@rifle@sniper_heavy_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@lo@sniper_heavy_str", "reload_aim" };
                 case WeaponHash.PumpShotgun:
                 case WeaponHash.PumpShotgunMk2:
                     return new string[2] { "weapons@rifle@pump_str", "reload_aim" };
                 case WeaponHash.Railgun:
-                    return new string[2] { "weapons@rifle@rail_gun_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@lo@rail_gun_str", "reload_aim" };
                 case WeaponHash.SawnOffShotgun:
-                    return new string[2] { "weapons@rifle@sawnoff_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@lo@sawnoff_str", "reload_aim" };
                 case WeaponHash.AssaultShotgun:
-                    return new string[2] { "weapons@rifle@shotgun_assault_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@lo@shotgun_assault_str", "reload_aim" };
                 case WeaponHash.BullpupShotgun:
-                    return new string[2] { "weapons@rifle@shotgun_bullpup_str", "reload_aim" };
+                    return new string[2] { "weapons@rifle@lo@shotgun_bullpup_str", "reload_aim" };
                 case WeaponHash.AdvancedRifle:
                     return new string[2] { "weapons@submg@advanced_rifle_str", "reload_aim" };
                 case WeaponHash.CarbineRifle:
@@ -383,26 +383,27 @@ namespace CoopClient.Entities.Player
                     return new string[2] { "anim@weapons@rifle@lo@pdw_str", "reload_aim" };
                 case WeaponHash.BullpupRifle:
                 case WeaponHash.BullpupRifleMk2:
-                    return new string[2] { "anim@weapons@rifle@lo@bullpup_rifle_str", "reload_aim" };
+                    return new string[2] { "anim@weapons@submg@bullpup_rifle_str", "reload_aim" };
                 case WeaponHash.AssaultSMG:
                     return new string[2] { "weapons@submg@assault_smg_str", "reload_aim" };
                 case WeaponHash.MicroSMG:
                 case WeaponHash.MiniSMG:
-                    return new string[2] { "weapons@submg@micro_smg_str", "reload_aim" };
+                    return new string[2] { "weapons@submg@lo@micro_smg_str", "reload_aim" };
                 case WeaponHash.SMG:
                 case WeaponHash.SMGMk2:
                     return new string[2] { "weapons@rifle@smg_str", "reload_aim" };
                 case WeaponHash.GrenadeLauncher:
                 case WeaponHash.GrenadeLauncherSmoke:
                 case WeaponHash.CompactGrenadeLauncher:
-                    return new string[2] { "weapons@heavy@lo@grenade_launcher_str", "reload_aim" };
+                    return new string[2] { "weapons@heavy@grenade_launcher_str", "reload_aim" };
                 case WeaponHash.RPG:
-                    return new string[2] { "weapons@heavy@lo@rpg_str", "reload_aim" };
+                case WeaponHash.Firework:
+                    return new string[2] { "weapons@heavy@rpg_str", "reload_aim" };
                 case WeaponHash.CombatMG:
                 case WeaponHash.CombatMGMk2:
-                    return new string[2] { "weapons@machinegun@lo@combat_mg_str", "reload_aim" };
+                    return new string[2] { "weapons@machinegun@combat_mg_str", "reload_aim" };
                 case WeaponHash.MG:
-                    return new string[2] { "weapons@machinegun@lo@mg_str", "reload_aim" };
+                    return new string[2] { "weapons@machinegun@mg_str", "reload_aim" };
                 default:
                     GTA.UI.Notification.Show($"~r~Reloading failed! Weapon ~g~[{CurrentWeaponHash}]~r~ no found!");
                     return null;
