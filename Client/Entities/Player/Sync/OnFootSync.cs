@@ -213,9 +213,6 @@ namespace CoopClient.Entities.Player
             {
                 if (!Character.IsRagdoll)
                 {
-                    // CanRagdoll = true, inside this function
-                    //Character.Ragdoll();
-
                     Character.CanRagdoll = true;
                     Function.Call(Hash.SET_PED_TO_RAGDOLL, Character.Handle, 50000, 60000, 0, 1, 1, 1);
                 }
@@ -224,38 +221,59 @@ namespace CoopClient.Entities.Player
 
                 return;
             }
-            if (!IsRagdoll && Character.IsRagdoll)
+            else
             {
-                Character.CanRagdoll = false;
-                Character.Task.ClearAllImmediately();
-
-                _isPlayingAnimation = true;
-                _currentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
-                _animationStopTime = 0.7f;
-
-                Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
-                return;
-            }
-
-            if (!StopAnimation())
-            {
-                return;
-            }
-
-            if (IsReloading)
-            {
-                if (!Character.IsReloading)
+                if (Character.IsRagdoll)
                 {
-                    Character.Task.ClearAll();
-                    Character.Task.ReloadWeapon();
+                    Character.CanRagdoll = false;
+                    Character.Task.ClearAllImmediately();
+
+                    _isPlayingAnimation = true;
+                    _currentAnimation = new string[2] { "anim@sports@ballgame@handball@", "ball_get_up" };
+                    _animationStopTime = 0.7f;
+
+                    Function.Call(Hash.TASK_PLAY_ANIM, Character.Handle, LoadAnim("anim@sports@ballgame@handball@"), "ball_get_up", 12f, 12f, -1, 0, -10f, 1, 1, 1);
+                    return;
                 }
+                else if (_currentAnimation[1] == "ball_get_up")
+                {
+                    UpdateOnFootPosition(true, true, false);
+                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", _currentAnimation[1]);
 
-                UpdateOnFootPosition();
+                    if (currentTime < _animationStopTime)
+                    {
+                        return;
+                    }
 
-                return;
+                    Character.Task.ClearAnimation(_currentAnimation[0], _currentAnimation[1]);
+                    Character.Task.ClearAll();
+                    _isPlayingAnimation = false;
+                    _currentAnimation = new string[2] { "", "" };
+                    _animationStopTime = 0;
+                }
             }
 
             CheckCurrentWeapon();
+
+            if (IsReloading)
+            {
+                if (!_isPlayingAnimation)
+                {
+                    string[] reloadingAnim = GetReloadingAnimation();
+                    if (reloadingAnim != null)
+                    {
+                        _isPlayingAnimation = true;
+                        _currentAnimation = reloadingAnim;
+                        Character.Task.PlayAnimation(_currentAnimation[0], _currentAnimation[1], 8f, -1, AnimationFlags.AllowRotation | AnimationFlags.UpperBodyOnly);
+                    }
+                }
+            }
+            else if (_currentAnimation[1] == "reload_aim")
+            {
+                Character.Task.ClearAnimation(_currentAnimation[0], _currentAnimation[1]);
+                _isPlayingAnimation = false;
+                _currentAnimation = new string[2] { "", "" };
+            }
 
             if (IsShooting)
             {
@@ -304,6 +322,93 @@ namespace CoopClient.Entities.Player
             }
         }
 
+        private string[] GetReloadingAnimation()
+        {
+            switch (Character.Weapons.Current.Hash)
+            {
+                case WeaponHash.Revolver:
+                case WeaponHash.RevolverMk2:
+                case WeaponHash.DoubleActionRevolver:
+                case WeaponHash.NavyRevolver:
+                    return new string[2] { "anim@weapons@pistol@revolver_str", "reload_aim" };
+                case WeaponHash.APPistol:
+                    return new string[2] { "weapons@pistol@ap_pistol_str", "reload_aim" };
+                case WeaponHash.Pistol50:
+                    return new string[2] { "weapons@pistol@pistol_50_str", "reload_aim" };
+                case WeaponHash.Pistol:
+                case WeaponHash.PistolMk2:
+                case WeaponHash.PericoPistol:
+                case WeaponHash.SNSPistol:
+                case WeaponHash.SNSPistolMk2:
+                case WeaponHash.HeavyPistol:
+                case WeaponHash.VintagePistol:
+                case WeaponHash.CeramicPistol:
+                case WeaponHash.MachinePistol:
+                    return new string[2] { "weapons@pistol@pistol_str", "reload_aim" };
+                case WeaponHash.AssaultRifle:
+                case WeaponHash.AssaultrifleMk2:
+                    return new string[2] { "weapons@rifle@aussault_rifle_str", "reload_aim" };
+                case WeaponHash.SniperRifle:
+                    return new string[2] { "weapons@rifle@sniper_rifle_str", "reload_aim" };
+                case WeaponHash.HeavySniper:
+                case WeaponHash.HeavySniperMk2:
+                    return new string[2] { "weapons@rifle@sniper_heavy_str", "reload_aim" };
+                case WeaponHash.PumpShotgun:
+                case WeaponHash.PumpShotgunMk2:
+                    return new string[2] { "weapons@rifle@pump_str", "reload_aim" };
+                case WeaponHash.Railgun:
+                    return new string[2] { "weapons@rifle@rail_gun_str", "reload_aim" };
+                case WeaponHash.SawnOffShotgun:
+                    return new string[2] { "weapons@rifle@sawnoff_str", "reload_aim" };
+                case WeaponHash.AssaultShotgun:
+                    return new string[2] { "weapons@rifle@shotgun_assault_str", "reload_aim" };
+                case WeaponHash.BullpupShotgun:
+                    return new string[2] { "weapons@rifle@shotgun_bullpup_str", "reload_aim" };
+                case WeaponHash.AdvancedRifle:
+                    return new string[2] { "weapons@submg@advanced_rifle_str", "reload_aim" };
+                case WeaponHash.CarbineRifle:
+                case WeaponHash.CarbineRifleMk2:
+                case WeaponHash.CompactRifle:
+                    return new string[2] { "weapons@rifle@lo@carbine_str", "reload_aim" };
+                case WeaponHash.Gusenberg:
+                    return new string[2] { "anim@weapons@machinegun@gusenberg_str", "reload_aim" };
+                case WeaponHash.Musket:
+                    return new string[2] { "anim@weapons@musket@musket_str", "reload_aim" };
+                case WeaponHash.FlareGun:
+                    return new string[2] { "anim@weapons@pistol@flare_str", "reload_aim" };
+                case WeaponHash.SpecialCarbine:
+                case WeaponHash.SpecialCarbineMk2:
+                    return new string[2] { "anim@weapons@rifle@lo@spcarbine_str", "reload_aim" };
+                case WeaponHash.CombatPDW:
+                    return new string[2] { "anim@weapons@rifle@lo@pdw_str", "reload_aim" };
+                case WeaponHash.BullpupRifle:
+                case WeaponHash.BullpupRifleMk2:
+                    return new string[2] { "anim@weapons@rifle@lo@bullpup_rifle_str", "reload_aim" };
+                case WeaponHash.AssaultSMG:
+                    return new string[2] { "weapons@submg@assault_smg_str", "reload_aim" };
+                case WeaponHash.MicroSMG:
+                case WeaponHash.MiniSMG:
+                    return new string[2] { "weapons@submg@micro_smg_str", "reload_aim" };
+                case WeaponHash.SMG:
+                case WeaponHash.SMGMk2:
+                    return new string[2] { "weapons@rifle@smg_str", "reload_aim" };
+                case WeaponHash.GrenadeLauncher:
+                case WeaponHash.GrenadeLauncherSmoke:
+                case WeaponHash.CompactGrenadeLauncher:
+                    return new string[2] { "weapons@heavy@lo@grenade_launcher_str", "reload_aim" };
+                case WeaponHash.RPG:
+                    return new string[2] { "weapons@heavy@lo@rpg_str", "reload_aim" };
+                case WeaponHash.CombatMG:
+                case WeaponHash.CombatMGMk2:
+                    return new string[2] { "weapons@machinegun@lo@combat_mg_str", "reload_aim" };
+                case WeaponHash.MG:
+                    return new string[2] { "weapons@machinegun@lo@mg_str", "reload_aim" };
+                default:
+                    GTA.UI.Notification.Show($"~r~Reloading failed! Weapon ~g~[{CurrentWeaponHash}]~r~ no found!");
+                    return null;
+            }
+        }
+
         private void DisplayShooting()
         {
             if (!Character.IsInRange(Position, 0.5f))
@@ -333,35 +438,6 @@ namespace CoopClient.Entities.Player
             }
         }
         #endregion
-
-        private bool StopAnimation()
-        {
-            if (!_isPlayingAnimation)
-            {
-                return true;
-            }
-
-            switch (_currentAnimation[0])
-            {
-                case "anim@sports@ballgame@handball@":
-                    UpdateOnFootPosition(true, true, false);
-                    float currentTime = Function.Call<float>(Hash.GET_ENTITY_ANIM_CURRENT_TIME, Character.Handle, "anim@sports@ballgame@handball@", _currentAnimation[1]);
-
-                    if (currentTime < _animationStopTime)
-                    {
-                        return false;
-                    }
-                    break;
-            }
-
-            Character.Task.ClearAnimation(_currentAnimation[0], _currentAnimation[1]);
-            Character.Task.ClearAll();
-            _isPlayingAnimation = false;
-            _currentAnimation = new string[2] { "", "" };
-            _animationStopTime = 0;
-
-            return true;
-        }
 
         private bool LastMoving;
         private void WalkTo()
