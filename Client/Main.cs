@@ -22,7 +22,7 @@ namespace CoopClient
 
         private bool _gameLoaded = false;
 
-        internal static readonly string CurrentVersion = "V1_4_0";
+        internal static readonly string CurrentVersion = "V1_4_1";
 
         internal static bool ShareNPCsWithPlayers = false;
         internal static bool DisableTraffic = false;
