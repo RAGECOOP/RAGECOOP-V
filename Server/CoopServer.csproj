@@ -5,7 +5,13 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyVersion>1.52.6.0001</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <RepositoryUrl>https://github.com/GTACOOP-R/GTACoop-R</RepositoryUrl>
+    <RepositoryUrl>https://github.com/RAGECOOP/RAGECOOP-V</RepositoryUrl>
+    <PackageProjectUrl>https://ragecoop.online/</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Product>$(AssemblyName)-V</Product>
+    <PackageId>RAGECOOP-V</PackageId>
+    <Authors>RAGECOOP</Authors>
   </PropertyGroup>
 
   <ItemGroup>
