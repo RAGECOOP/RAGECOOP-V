@@ -20,7 +20,10 @@ Base sync logic has been updated. Peds and Vehicles are now synchronized indepen
 2. Cover sync is still buggy.
 3. Weaponized vehicle doen't work currently
 4. Framerate drop with high number of synchronized entities.
+5. Scripting API is screwed.(will be rewritten in the future)
 
 # Downloads
 Download compiled binaries here: 
 [Release](https://gitlab.com/justasausage/RageCOOP-V/-/tree/main/Release)
+
+Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing this.
