@@ -1,33 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using RageCoop.Core;
 using Lidgren.Network;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
     public class Client
     {
-        public long NetHandle = 0;
+        public long ClientID = 0;
         private float _currentLatency = 0f;
         public float Latency
         {
             get => _currentLatency;
-            internal set
+            set
             {
                 _currentLatency = value;
 
                 if ((value * 1000f) > Server.MainSettings.MaxLatency)
                 {
-                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
+                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
                 }
             }
         }
         public PlayerData Player;
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
-        internal readonly Dictionary<long, Action<object>> Callbacks = new();
-        public bool FilesReceived { get; internal set; } = false;
-        internal bool FilesSent = false;
+        public readonly Dictionary<long, Action<object>> Callbacks = new();
+        public bool FilesReceived { get; set; } = false;
+        public bool FilesSent = false;
 
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)
@@ -64,7 +64,7 @@ namespace CoopServer
         #region FUNCTIONS
         public void Kick(string reason)
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle)?.Disconnect(reason);
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID)?.Disconnect(reason);
         }
         public void Kick(string[] reason)
         {
@@ -75,7 +75,7 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
                 if (userConnection == null)
                 {
                     return;
@@ -93,10 +93,10 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetHandle}\" not found!");
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{ClientID}\" not found!");
                     return;
                 }
 
@@ -113,7 +113,7 @@ namespace CoopServer
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                packet.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)
@@ -126,10 +126,10 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetHandle}\" not found!");
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{ClientID}\" not found!");
                     return;
                 }
 
@@ -176,7 +176,7 @@ namespace CoopServer
                     Args = new List<object>(args) ?? new List<object>(),
                     ResultType = returnTypeValue,
                     ID = id
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)
@@ -187,10 +187,10 @@ namespace CoopServer
 
         public void SendCleanUpWorld()
         {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
             if (userConnection == null)
             {
-                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetHandle}\" not found!");
+                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{ClientID}\" not found!");
                 return;
             }
 
@@ -203,7 +203,7 @@ namespace CoopServer
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
                 if (userConnection == null)
                 {
                     return;
@@ -217,7 +217,7 @@ namespace CoopServer
                     Name = modName,
                     CustomPacketID = customID,
                     Bytes = bytes
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                 Server.MainNetServer.FlushSendQueue();
             }
@@ -237,7 +237,7 @@ namespace CoopServer
 
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetHandle);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
                 if (userConnection == null)
                 {
                     return;
@@ -248,7 +248,7 @@ namespace CoopServer
                 {
                     EventName = eventName,
                     Args = new List<object>(args)
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
                 Server.MainNetServer.FlushSendQueue();
             }

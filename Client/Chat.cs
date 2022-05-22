@@ -2,13 +2,13 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-
+using RageCoop.Core;
 using GTA;
 using GTA.Native;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
-    internal class Chat
+    public class Chat
     {
         private readonly Scaleform MainScaleForm;
 

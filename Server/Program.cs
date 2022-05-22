@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
     class Program
     {

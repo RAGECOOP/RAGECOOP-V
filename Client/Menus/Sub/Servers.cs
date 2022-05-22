@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 
 using LemonUI.Menus;
 
-namespace CoopClient.Menus.Sub
+namespace RageCoop.Client.Menus.Sub
 {
-    internal class ServerListClass
+    public class ServerListClass
     {
         [JsonProperty("address")]
         public string Address { get; set; }
@@ -36,14 +36,14 @@ namespace CoopClient.Menus.Sub
     /// <summary>
     /// Don't use it!
     /// </summary>
-    internal class Servers
+    public class Servers
     {
-        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
+        public NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
-            Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        internal NativeItem ResultItem = null;
+        public NativeItem ResultItem = null;
 
         /// <summary>
         /// Don't use it!
@@ -81,7 +81,7 @@ namespace CoopClient.Menus.Sub
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                 WebClient client = new WebClient();
-                string data = client.DownloadString(Main.MainSettings.MasterServer);
+                string data = client.DownloadString(Main.Settings.MasterServer);
                 serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
             }
             catch (Exception ex)
@@ -120,7 +120,7 @@ namespace CoopClient.Menus.Sub
 
                         Main.MainMenu.MainMenu.Visible = true;
 #endif
-                        Main.MainSettings.LastServerAddress = address;
+                        Main.Settings.LastServerAddress = address;
                         Util.SaveSettings();
                     }
                     catch (Exception ex)

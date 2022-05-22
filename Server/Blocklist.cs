@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
     public class Blocklist
     {

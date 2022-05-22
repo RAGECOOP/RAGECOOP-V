@@ -5,33 +5,35 @@ using System.Drawing;
 using LemonUI;
 using LemonUI.Menus;
 
-namespace CoopClient.Menus
+namespace RageCoop.Client.Menus
 {
     /// <summary>
     /// Don't use it!
     /// </summary>
     public class MenusMain
     {
-        internal ObjectPool MenuPool = new ObjectPool();
+        public ObjectPool MenuPool = new ObjectPool();
 
-        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "MAIN")
+        public NativeMenu MainMenu = new NativeMenu("RAGECOOP", "MAIN")
         {
             UseMouse = false,
-            Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         #region SUB
-        internal Sub.Settings SubSettings = new Sub.Settings();
-        internal Sub.Servers ServerList = new Sub.Servers();
+        public Sub.Settings SubSettings = new Sub.Settings();
+        public Sub.Servers ServerList = new Sub.Servers();
         #endregion
 
         #region ITEMS
-        private readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.MainSettings.Username };
-        internal readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.MainSettings.LastServerAddress };
+        private readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.Settings.Username };
+        public readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.Settings.LastServerAddress };
         private readonly NativeItem _serverConnectItem = new NativeItem("Connect");
         private readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +
             Main.CurrentVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
+        
+
         #endregion
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace CoopClient.Menus
 
             _usernameItem.Activated += UsernameActivated;
             ServerIpItem.Activated += ServerIpActivated;
-            _serverConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.MainSettings.LastServerAddress); };
+            _serverConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.Settings.LastServerAddress); };
 
             MainMenu.AddSubMenu(ServerList.MainMenu);
 
@@ -53,39 +55,40 @@ namespace CoopClient.Menus
             MainMenu.Add(_serverConnectItem);
 
             MainMenu.AddSubMenu(SubSettings.MainMenu);
-
+            MainMenu.AddSubMenu(DebugMenu.Menu);
             MainMenu.Add(_aboutItem);
 
             MenuPool.Add(ServerList.MainMenu);
             MenuPool.Add(MainMenu);
             MenuPool.Add(SubSettings.MainMenu);
+            MenuPool.Add(DebugMenu.Menu);
         }
 
-        internal void UsernameActivated(object a, System.EventArgs b)
+        public void UsernameActivated(object a, System.EventArgs b)
         {
             string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
             if (!string.IsNullOrWhiteSpace(newUsername))
             {
-                Main.MainSettings.Username = newUsername;
+                Main.Settings.Username = newUsername;
                 Util.SaveSettings();
 
                 _usernameItem.AltTitle = newUsername;
             }
         }
 
-        internal void ServerIpActivated(object a, System.EventArgs b)
+        public void ServerIpActivated(object a, System.EventArgs b)
         {
             string newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, ServerIpItem.AltTitle, 60);
             if (!string.IsNullOrWhiteSpace(newServerIp) && newServerIp.Contains(":"))
             {
-                Main.MainSettings.LastServerAddress = newServerIp;
+                Main.Settings.LastServerAddress = newServerIp;
                 Util.SaveSettings();
 
                 ServerIpItem.AltTitle = newServerIp;
             }
         }
 
-        internal void InitiateConnectionMenuSetting()
+        public void InitiateConnectionMenuSetting()
         {
             MainMenu.Items[0].Enabled = false;
             MainMenu.Items[1].Enabled = false;
@@ -93,7 +96,7 @@ namespace CoopClient.Menus
             MainMenu.Items[3].Enabled = false;
         }
 
-        internal void ConnectedMenuSetting()
+        public void ConnectedMenuSetting()
         {
             MainMenu.Items[3].Enabled = true;
             MainMenu.Items[3].Title = "Disconnect";
@@ -103,7 +106,7 @@ namespace CoopClient.Menus
             ServerList.MainMenu.Visible = false;
         }
 
-        internal void DisconnectedMenuSetting()
+        public void DisconnectedMenuSetting()
         {
             MainMenu.Items[0].Enabled = true;
             MainMenu.Items[1].Enabled = true;

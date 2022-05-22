@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#undef DEBUG
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using RageCoop.Core;
 
-using CoopClient.Entities.Player;
-
-namespace CoopClient
+namespace RageCoop.Client
 {
     /// <summary>
     /// ?
@@ -50,32 +50,32 @@ namespace CoopClient
         /// </summary>
         public static event ModEvent OnModPacketReceived;
 
-        internal static void Connected()
+        public static void Connected()
         {
-            OnConnection?.Invoke(true, GetLocalNetHandle());
+            OnConnection?.Invoke(true, GetPlayerID());
         }
 
-        internal static void Disconnected(string reason)
+        public static void Disconnected(string reason)
         {
-            OnConnection?.Invoke(false, GetLocalNetHandle(), reason);
+            OnConnection?.Invoke(false, GetPlayerID(), reason);
         }
 
-        internal static void Connected(long netHandle)
+        public static void Connected(long netHandle)
         {
             OnConnection?.Invoke(true, netHandle);
         }
 
-        internal static void Disconnected(long netHandle)
+        public static void Disconnected(long netHandle)
         {
             OnConnection?.Invoke(false, netHandle);
         }
 
-        internal static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
+        public static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
         {
             OnModPacketReceived?.Invoke(from, mod, customID, bytes);
         }
 
-        internal static bool ChatMessageReceived(string from, string message)
+        public static bool ChatMessageReceived(string from, string message)
         {
             CancelEventArgs args = new CancelEventArgs(false);
             OnChatMessage?.Invoke(from, message, args);
@@ -119,44 +119,28 @@ namespace CoopClient
         }
 
         /// <summary>
-        /// Get the local net handle from this Lidgren-Network client when connected to a server
+        /// Get the local player's ID
         /// </summary>
-        /// <returns>NetHandle</returns>
-        public static long GetLocalNetHandle()
+        /// <returns>PlayerID</returns>
+        public static long GetPlayerID()
         {
-            return Main.LocalNetHandle;
+            return Main.MyPlayerID;
         }
 
-        /// <summary>
-        /// Get all connected player's as a Dictionary.
-        /// Key = Lidgren-Network net handle.
-        /// Value = Character handle or null.
-        /// </summary>
-        public static Dictionary<long, int?> GetAllPlayers()
-        {
-            Dictionary<long, int?> result = new Dictionary<long, int?>();
-            lock (Main.Players)
-            {
-                foreach (KeyValuePair<long, EntitiesPlayer> player in Main.Players.Where(x => x.Key != Main.LocalNetHandle))
-                {
-                    result.Add(player.Key, player.Value.Character?.Handle);
-                }
-            }
-            return result;
-        }
+        /*
 
         /// <summary>
         /// Get a player using their Lidgren Network net handle
         /// </summary>
         /// <param name="handle">Lidgren-Network net handle</param>
-        public static EntitiesPlayer GetPlayer(long handle)
+        public static CharacterEntity GetPed(int ID)
         {
-            lock (Main.Players)
+            lock (Main.Characters)
             {
-                return Main.Players.ContainsKey(handle) ? Main.Players[handle] : null;
+                return Main.Characters.ContainsKey(ID) ? Main.Characters[ID] : null;
             }
         }
-
+        */
         /// <summary>
         /// Check if a RAGECOOP menu is visible
         /// </summary>
@@ -232,7 +216,7 @@ namespace CoopClient
         /// </summary>
         public static string GetUsername()
         {
-            return Main.MainSettings.Username;
+            return Main.Settings.Username;
         }
 
         /// <summary>
@@ -247,19 +231,11 @@ namespace CoopClient
                 return false;
             }
 
-            Main.MainSettings.Username = username;
+            Main.Settings.Username = username;
 
             return true;
         }
 
-        /// <summary>
-        /// Enable or disable sharing of NPCs with other players
-        /// </summary>
-        /// <param name="share">true to share NPCs</param>
-        public static void SetShareNPCs(bool share)
-        {
-            Main.ShareNPCsWithPlayers = share;
-        }
 
         /// <summary>
         /// Enable or disable the local traffic for this player

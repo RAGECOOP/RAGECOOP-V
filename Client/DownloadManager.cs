@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Collections.Generic;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
-    internal static class DownloadManager
+    public static class DownloadManager
     {
         private static readonly List<DownloadFile> _downloadFiles = new List<DownloadFile>();
         private static readonly Dictionary<byte, FileStream> _streams = new Dictionary<byte, FileStream>();
@@ -13,7 +13,7 @@ namespace CoopClient
 
         public static void AddFile(byte id, string name, long length)
         {
-            string downloadFolder = $"scripts\\resources\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
+            string downloadFolder = $"scripts\\resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
 
             if (!Directory.Exists(downloadFolder))
             {
@@ -34,7 +34,7 @@ namespace CoopClient
                 Cancel(id);
 
                 GTA.UI.Notification.Show($"The download of a file from the server was blocked! [{name}]", true);
-                Logger.Write($"The download of a file from the server was blocked! [{name}]", Logger.LogLevel.Server);
+                Main.Logger.Error($"The download of a file from the server was blocked! [{name}]");
                 return;
             }
 
@@ -107,7 +107,7 @@ namespace CoopClient
                 FileStream fs = _streams.FirstOrDefault(x => x.Key == id).Value;
                 if (fs == null)
                 {
-                    Logger.Write($"Stream for file {id} not found!", Logger.LogLevel.Server);
+                    Main.Logger.Error($"Stream for file {id} not found!");
                     return;
                 }
 
@@ -118,7 +118,7 @@ namespace CoopClient
                     DownloadFile file = _downloadFiles.FirstOrDefault(x => x.FileID == id);
                     if (file == null)
                     {
-                        Logger.Write($"File {id} couldn't be found in the list!", Logger.LogLevel.Server);
+                        Main.Logger.Error($"File {id} couldn't be found in the list!");
                         return;
                     }
 
@@ -175,7 +175,7 @@ namespace CoopClient
         }
     }
 
-    internal class DownloadFile
+    public class DownloadFile
     {
         public byte FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;

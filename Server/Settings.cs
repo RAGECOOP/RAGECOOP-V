@@ -1,4 +1,4 @@
-﻿namespace CoopServer
+﻿namespace RageCoop.Server
 {
     public class Settings
     {

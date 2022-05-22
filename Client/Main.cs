@@ -1,47 +1,58 @@
-﻿using System;
+﻿#undef DEBUG
+using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Drawing;
-
-using CoopClient.Entities.Player;
-using CoopClient.Entities.NPC;
-using CoopClient.Menus;
-
+using System.Threading;
+using System.Diagnostics;
+using RageCoop.Client.Menus;
+using RageCoop.Core;
 using GTA;
 using GTA.Native;
+using GTA.Math;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
     /// <summary>
     /// Don't use it!
     /// </summary>
     public class Main : Script
     {
-        internal static RelationshipGroup RelationshipGroup;
 
         private bool _gameLoaded = false;
-
-        internal static readonly string CurrentVersion = "V1_4_1";
-
-        internal static bool ShareNPCsWithPlayers = false;
-        internal static bool DisableTraffic = false;
-        internal static bool NPCsAllowed = false;
         private static bool _isGoingToCar = false;
 
-        internal static Settings MainSettings = null;
-        internal static Networking MainNetworking = null;
+        public static readonly string CurrentVersion = "V1_4_1";
+
+        public static int MyPlayerID=0;
+        public static bool DisableTraffic = true;
+        public static bool NPCsAllowed = false;
+         internal static RelationshipGroup SyncedPedsGroup;
+
+        public static Settings Settings = null;
+        public static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
-        internal static MenusMain MainMenu = null;
+        public static MenusMain MainMenu = null;
 #endif
-        internal static Chat MainChat = null;
-        internal static PlayerList MainPlayerList = null;
+        public static Chat MainChat = null;
+        public static PlayerList MainPlayerList = new PlayerList();
+        public static Stopwatch Counter = new Stopwatch();
 
-        internal static long LocalNetHandle = 0;
-        internal static Dictionary<long, EntitiesPlayer> Players = null;
-        internal static Dictionary<long, EntitiesNPC> NPCs = null;
-        internal static Dictionary<long, int> NPCsVehicles = null;
+        public static ulong Ticked = 0;
+
+        /*
+        // <ID,Entity>
+        public static Dictionary<int, CharacterEntity> Characters = new Dictionary<int, CharacterEntity>();
+
+        // Dictionary<int ID, Entuty>
+        public static Dictionary<int, VehicleEntity> Vehicles = new Dictionary<int, VehicleEntity>();
+        */
+        public static Loggger Logger=new Loggger("Scripts\\RageCoop\\RageCoop.Client.log");
+        
+        private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
 
         /// <summary>
         /// Don't use it!
@@ -49,7 +60,7 @@ namespace CoopClient
         public Main()
         {
             // Required for some synchronization!
-            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            /*if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
                 Tick += (object sender, EventArgs e) =>
                 {
@@ -57,7 +68,7 @@ namespace CoopClient
                     {
                         return;
                     }
-
+                    
                     if (!_gameLoaded)
                     {
                         GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
@@ -65,25 +76,25 @@ namespace CoopClient
                     }
                 };
                 return;
-            }
-
-            MainSettings = Util.ReadSettings();
+            }*/
+            SyncedPedsGroup=World.AddRelationshipGroup("SYNCPED");
+            Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral, true);
+            Settings = Util.ReadSettings();
             MainNetworking = new Networking();
+            MainNetworking.Start();
 #if !NON_INTERACTIVE
             MainMenu = new MenusMain();
 #endif
             MainChat = new Chat();
-            Players = new Dictionary<long, EntitiesPlayer>();
-            NPCs = new Dictionary<long, EntitiesNPC>();
-            NPCsVehicles = new Dictionary<long, int>();
-
+            Logger.LogLevel =0;
             Tick += OnTick;
             KeyDown += OnKeyDown;
             Aborted += (object sender, EventArgs e) => CleanUp();
-
+            
             Util.NativeMemory();
+            Counter.Restart();
         }
-
+        
 #if DEBUG
         private ulong _lastDebugData;
         private int _debugBytesSend;
@@ -97,8 +108,6 @@ namespace CoopClient
             }
             else if (!_gameLoaded && (_gameLoaded = true))
             {
-                RelationshipGroup = World.AddRelationshipGroup("SYNCPED");
-                Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(RelationshipGroup, Relationship.Neutral, true);
 #if !NON_INTERACTIVE
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", "Press ~g~F9~s~ to open the menu.");
 #endif
@@ -107,28 +116,36 @@ namespace CoopClient
 #if !NON_INTERACTIVE
             MainMenu.MenuPool.Process();
 #endif
-
-            MainNetworking.ReceiveMessages();
+            
 
             if (_isGoingToCar && Game.Player.Character.IsInVehicle())
             {
                 _isGoingToCar = false;
             }
-
+            DoQueuedActions();
             if (!MainNetworking.IsOnServer())
             {
                 return;
             }
-
+            if (Game.TimeScale!=1)
+            {
+                Game.TimeScale=1;
+            }
+            try
+            {
+                MainNetworking.Tick();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            
             if (!DownloadManager.DownloadComplete)
             {
                 DownloadManager.RenderProgress();
             }
-            else if (!JavascriptHook.JavascriptLoaded)
-            {
-                MapLoader.LoadAll();
-                JavascriptHook.LoadAll();
-            }
+
+            MapLoader.LoadAll();
 
 #if DEBUG
             if (MainNetworking.ShowNetworkInfo)
@@ -150,6 +167,8 @@ namespace CoopClient
             }
 #endif
 
+
+
             MainChat.Tick();
             MainPlayerList.Tick();
 
@@ -160,16 +179,13 @@ namespace CoopClient
             }
 #endif
 
-            // Display all players
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
-            {
-                player.Value.Update();
-            }
 
-            MainNetworking.SendPlayerData();
+
+            Ticked++;
         }
 
 #if !NON_INTERACTIVE
+        bool _lastEnteringVeh=false;
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
@@ -177,7 +193,6 @@ namespace CoopClient
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
             }
-
             if (Game.IsControlPressed(GTA.Control.FrontendPause))
             {
                 Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
@@ -197,28 +212,10 @@ namespace CoopClient
                         MainMenu.MainMenu.Visible = true;
                     }
                     break;
-                case Keys.G:
-                    if (_isGoingToCar)
-                    {
-                        Game.Player.Character.Task.ClearAll();
-                        _isGoingToCar = false;
-                    }
-                    else if (!Game.Player.Character.IsInVehicle())
-                    {
-                        Vehicle veh = World.GetNearbyVehicles(Game.Player.Character, 5f).FirstOrDefault();
-                        if (veh != null)
-                        {
-                            for (int i = 0; i < veh.PassengerCapacity; i++)
-                            {
-                                if (veh.IsSeatFree((VehicleSeat)i))
-                                {
-                                    Game.Player.Character.Task.EnterVehicle(veh, (VehicleSeat)i);
-                                    _isGoingToCar = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                case Keys.J:
+                    Game.Player.Character.CurrentVehicle.ApplyForce(new Vector3(0, 0, 100));
+                    Script.Yield();
+                    GTA.UI.Notification.Show(Game.Player.Character.CurrentVehicle.Speed.ToString());
                     break;
                 default:
                     if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
@@ -237,6 +234,46 @@ namespace CoopClient
                         }
                     }
                     break;
+            }
+
+
+            if (e.KeyCode==Keys.L)
+            {
+                GTA.UI.Notification.Show(DumpCharacters());
+            }
+            if (e.KeyCode==Keys.I)
+            {
+                GTA.UI.Notification.Show(DumpPlayers());
+            }
+            if (e.KeyCode==Keys.U)
+            {
+                Debug.ShowTimeStamps();
+            }
+            if (e.KeyCode==Keys.G)
+            {
+                var P = Game.Player.Character;
+                if (P.IsInVehicle())
+                {
+                    _lastEnteringVeh=false;
+                    P.Task.LeaveVehicle();
+                }
+                else
+                {
+                    var V = World.GetClosestVehicle(P.Position, 50);
+
+                    if (_lastEnteringVeh)
+                    {
+                        P.Task.ClearAllImmediately();
+                        
+                        _lastEnteringVeh = false;
+                    }
+                    else if (V!=null)
+                    {
+                        var seat = Util.getNearestSeat(P, V);
+                        P.Task.EnterVehicle(V, seat);
+                        _lastEnteringVeh=true;
+                    }
+                }
             }
         }
 #else
@@ -266,33 +303,18 @@ namespace CoopClient
         }
 #endif
 
-        internal static void CleanUp()
+        public static void CleanUp()
         {
+
             MainChat.Clear();
+            EntityPool.Cleanup();
+            MainPlayerList=new PlayerList();
 
-            foreach (KeyValuePair<long, EntitiesPlayer> player in Players)
-            {
-                player.Value.Character?.AttachedBlip?.Delete();
-                player.Value.Character?.CurrentVehicle?.Delete();
-                player.Value.Character?.Kill();
-                player.Value.Character?.Delete();
-                player.Value.PedBlip?.Delete();
-                player.Value.ParachuteProp?.Delete();
-            }
-            Players.Clear();
+            Main.MyPlayerID=default;
 
-            foreach (KeyValuePair<long, EntitiesNPC> npc in NPCs)
-            {
-                npc.Value.Character?.CurrentVehicle?.Delete();
-                npc.Value.Character?.Kill();
-                npc.Value.Character?.Delete();
-            }
-            NPCs.Clear();
-
-            NPCsVehicles.Clear();
         }
 
-        internal static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
+        public static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
         {
             { 0xD49F9B0955C367DE, 1 }, // Entities
             { 0xEF29A16337FACADB, 1 }, //
@@ -309,8 +331,8 @@ namespace CoopClient
             { 0x5A039BB0BCA604B6, 4 }, //
             { 0x0134F0835AB6BFCB, 5 }  // Checkpoints
         };
-        internal static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
-        internal static void CleanUpWorld()
+        public static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
+        public static void CleanUpWorld()
         {
             if (ServerItems.Count == 0)
             {
@@ -353,7 +375,7 @@ namespace CoopClient
                     catch
                     {
                         GTA.UI.Notification.Show("~r~~h~CleanUpWorld() Error");
-                        Logger.Write($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!", Logger.LogLevel.Server);
+                        Logger.Error($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
                     }
                 }
 
@@ -361,11 +383,86 @@ namespace CoopClient
             }
         }
 
+        private static void DoQueuedActions()
+        {
+            lock (QueuedActions)
+            {
+                foreach (var action in QueuedActions.ToArray())
+                {
+                    try
+                    {
+                        if (action())
+                        {
+                            QueuedActions.Remove(action);
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        GTA.UI.Screen.ShowSubtitle(ex.ToString());
+                        QueuedActions.Remove(action);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Queue an action  to be executed on next tick, allowing you to call scripting API from another thread.
+        /// </summary>
+        /// <param name="a"> The action to be executed, must return a bool indicating whether the action cane be removed after execution.</param>
+        public static void QueueAction(Func<bool> a)
+        {
+            lock (QueuedActions)
+            {
+                QueuedActions.Add(a);
+            }
+        }
+        public static void QueueAction(Action a)
+        {
+            lock (QueuedActions)
+            {
+                QueuedActions.Add(() => { a(); return true; }) ;
+            }
+        }
+        /// <summary>
+        /// Clears all queued actions
+        /// </summary>
+        public static void ClearQueuedActions()
+        {
+            lock (QueuedActions) { QueuedActions.Clear(); }
+        }
+
+        public static string DumpCharacters()
+        {
+            string s = "Characters:";
+            lock (EntityPool.PedsLock)
+            {
+                foreach (int id in EntityPool.GetPedIDs())
+                {
+                    var c = EntityPool.GetPedByID(id);
+                    s+=$"\r\nID:{c.ID} Owner:{c.OwnerID} LastUpdated:{c.LastUpdated} LastSynced:{c.LastSynced} LastStateSynced:{c.LastStateSynced}";
+                    // s+=$"\r\n{c.IsAiming} {c.IsJumping} {c.IsOnFire} {c.IsOnLadder} {c.IsRagdoll} {c.IsReloading} {c.IsShooting} {c.Speed}";
+                }
+            }
+            Logger.Trace(s);
+            return s;
+        }
+        public static string DumpPlayers()
+        {
+            string s = "Players:";
+            foreach (PlayerData p in MainPlayerList.Players)
+            {
+                
+                s+=$"\r\nID:{p.PedID} Username:{p.Username}";
+            }
+            Logger.Trace(s);
+            return s;
+        }
+
 #if DEBUG
         private ulong _artificialLagCounter;
-        internal static EntitiesPlayer DebugSyncPed;
-        internal static ulong LastFullDebugSync = 0;
-        internal static bool UseDebug = false;
+        public static EntitiesPlayer DebugSyncPed;
+        public static ulong LastFullDebugSync = 0;
+        public static bool UseDebug = false;
 
         private void Debug()
         {

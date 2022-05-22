@@ -4,12 +4,12 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
-
+using RageCoop.Core;
 using Lidgren.Network;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
-    internal class Util
+    static partial class Util
     {
         public static (byte, byte[]) GetBytesFromObject(object obj)
         {
@@ -28,12 +28,12 @@ namespace CoopServer
             };
         }
 
-        public static Client GetClientByNetHandle(long netHandle)
+        public static Client GetClientByID(long id)
         {
-            Client result = Server.Clients.Find(x => x.NetHandle == netHandle);
+            Client result = Server.Clients.Find(x => x.ClientID == id);
             if (result == null)
             {
-                NetConnection localConn = Server.MainNetServer.Connections.Find(x => netHandle == x.RemoteUniqueIdentifier);
+                NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
                 if (localConn != null)
                 {
                     localConn.Disconnect("No data found!");
@@ -52,7 +52,7 @@ namespace CoopServer
                 return null;
             }
 
-            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.NetHandle);
+            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.ClientID);
         }
 
         // Return a list of all connections but not the local connection
@@ -70,7 +70,7 @@ namespace CoopServer
         {
             return new(Server.MainNetServer.Connections.FindAll(e =>
             {
-                Client client = Server.Clients.First(x => x.NetHandle == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.First(x => x.ClientID == e.RemoteUniqueIdentifier);
                 return client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
@@ -79,7 +79,7 @@ namespace CoopServer
         {
             return new(Server.MainNetServer.Connections.Where(e =>
             {
-                Client client = Server.Clients.First(x => x.NetHandle == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.First(x => x.ClientID == e.RemoteUniqueIdentifier);
                 return e != local && client != null && client.Player.IsInRangeOf(position, range);
             }));
         }

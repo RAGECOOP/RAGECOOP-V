@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
     public class Logging
     {

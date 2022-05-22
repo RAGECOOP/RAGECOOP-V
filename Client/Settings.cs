@@ -1,4 +1,5 @@
-﻿namespace CoopClient
+﻿#undef DEBUG
+namespace RageCoop.Client
 {
     /// <summary>
     /// Don't use it!
@@ -21,5 +22,7 @@
         /// Don't use it!
         /// </summary>
         public bool FlipMenu { get; set; } = false;
+
+
     }
 }

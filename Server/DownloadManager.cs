@@ -1,12 +1,12 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-
+using RageCoop.Core;
 using Lidgren.Network;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
-    internal static class DownloadManager
+    public static class DownloadManager
     {
         private static readonly List<long> _clientsToDelete = new();
         private static readonly List<DownloadClient> _clients = new();
@@ -105,7 +105,7 @@ namespace CoopServer
                     {
                         lock (Server.Clients)
                         {
-                            Client x = Server.Clients.FirstOrDefault(x => x.NetHandle == client.NetHandle);
+                            Client x = Server.Clients.FirstOrDefault(x => x.ClientID == client.NetHandle);
                             if (x != null)
                             {
                                 x.FilesReceived = true;
@@ -170,7 +170,7 @@ namespace CoopServer
         }
     }
 
-    internal class DownloadClient
+    public class DownloadClient
     {
         public long NetHandle = 0;
         private readonly List<DownloadFile> _files = null;
@@ -198,7 +198,7 @@ namespace CoopServer
                     ID = file.FileID,
                     FileName = file.FileName,
                     FileLength = file.FileLength
-                }.PacketToNetOutGoingMessage(outgoingMessage);
+                }.Pack(outgoingMessage);
 
                 Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
             });
@@ -217,7 +217,7 @@ namespace CoopServer
             new Packets.FileTransferComplete()
             {
                 ID = 0x0
-            }.PacketToNetOutGoingMessage(outgoingMessage);
+            }.Pack(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
         }
@@ -252,7 +252,7 @@ namespace CoopServer
 
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
 
-            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[FileDataPosition++] }.PacketToNetOutGoingMessage(outgoingMessage);
+            new Packets.FileTransferTick() { ID = file.FileID, FileChunk = file.FileChunks[FileDataPosition++] }.Pack(outgoingMessage);
 
             Server.MainNetServer.SendMessage(outgoingMessage, conn, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
         }
@@ -268,7 +268,7 @@ namespace CoopServer
         }
     }
 
-    internal class DownloadFile
+    public class DownloadFile
     {
         public byte FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;

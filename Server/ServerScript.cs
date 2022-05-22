@@ -5,17 +5,17 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using RageCoop.Core;
 using Lidgren.Network;
 
-namespace CoopServer
+namespace RageCoop.Server
 {
     public abstract class ServerScript
     {
         public API API { get; } = new();
     }
 
-    internal class Resource
+    public class Resource
     {
         public bool ReadyToStop = false;
 
@@ -218,69 +218,69 @@ namespace CoopServer
         /// </summary>
         public event ModEvent OnModPacketReceived;
 
-        internal void InvokeTick(long tick)
+        public void InvokeTick(long tick)
         {
             OnTick?.Invoke(tick);
         }
 
-        internal void InvokeStart()
+        public void InvokeStart()
         {
             OnStart?.Invoke();
         }
 
-        internal void InvokeStop()
+        public void InvokeStop()
         {
             OnStop?.Invoke();
         }
 
-        internal void InvokePlayerHandshake(Client client)
+        public void InvokePlayerHandshake(Client client)
         {
             OnPlayerHandshake?.Invoke(client);
         }
 
-        internal void InvokePlayerConnected(Client client)
+        public void InvokePlayerConnected(Client client)
         {
             OnPlayerConnected?.Invoke(client);
         }
 
-        internal void InvokePlayerDisconnected(Client client)
+        public void InvokePlayerDisconnected(Client client)
         {
             OnPlayerDisconnected?.Invoke(client);
         }
 
-        internal void InvokePlayerUpdate(Client client)
+        public void InvokePlayerUpdate(Client client)
         {
             OnPlayerUpdate?.Invoke(client);
         }
 
-        internal void InvokePlayerHealthUpdate(string username)
+        public void InvokePlayerHealthUpdate(string username)
         {
             OnPlayerHealthUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
-        internal bool InvokeChatMessage(string username, string message)
+        public bool InvokeChatMessage(string username, string message)
         {
             CancelEventArgs args = new(false);
             OnChatMessage?.Invoke(username, message, args);
             return args.Cancel;
         }
 
-        internal void InvokePlayerPositionUpdate(string username)
+        public void InvokePlayerPositionUpdate(string username)
         {
             OnPlayerPositionUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
-        internal void InvokePlayerPedHandleUpdate(string username)
+        public void InvokePlayerPedHandleUpdate(string username)
         {
             OnPlayerPedHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
-        internal void InvokePlayerVehicleHandleUpdate(string username)
+        public void InvokePlayerVehicleHandleUpdate(string username)
         {
             OnPlayerVehicleHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
-        internal bool InvokeModPacketReceived(long from, long target, string modName, byte customID, byte[] bytes)
+        public bool InvokeModPacketReceived(long from, long target, string modName, byte customID, byte[] bytes)
         {
             CancelEventArgs args = new(false);
             OnModPacketReceived?.Invoke(from, target, modName, customID, bytes, args);
@@ -315,7 +315,7 @@ namespace CoopServer
                         Name = modName,
                         CustomPacketID = customID,
                         Bytes = bytes
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
+                    }.Pack(outgoingMessage);
                     Logging.Debug($"SendModPacketToAll recipients list {connections.Count}");
                     Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                     Server.MainNetServer.FlushSendQueue();
@@ -355,7 +355,7 @@ namespace CoopServer
                 };
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
+                packet.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             }
             catch (Exception e)

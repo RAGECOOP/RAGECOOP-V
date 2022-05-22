@@ -1,23 +1,23 @@
-﻿using System.Drawing;
+﻿#undef DEBUG
+using System.Drawing;
 
 using LemonUI.Menus;
 
-namespace CoopClient.Menus.Sub
+namespace RageCoop.Client.Menus.Sub
 {
     /// <summary>
     /// Don't use it!
     /// </summary>
     public class Settings
     {
-        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
+        public NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
             UseMouse = false,
-            Alignment = Main.MainSettings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
         private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
-        private readonly NativeCheckboxItem _shareNPCsItem = new NativeCheckboxItem("Share NPCs", "~y~WARNING:~s~ High network traffic!", Main.ShareNPCsWithPlayers) { Enabled = false };
-        private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.MainSettings.FlipMenu);
+        private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
 #if DEBUG
         private readonly NativeCheckboxItem _useDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
         private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Main.MainNetworking.ShowNetworkInfo);
@@ -32,7 +32,6 @@ namespace CoopClient.Menus.Sub
             MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
-            _shareNPCsItem.CheckboxChanged += (item, check) => { Main.ShareNPCsWithPlayers = _shareNPCsItem.Checked; };
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
 #if DEBUG
             _useDebugItem.CheckboxChanged += UseDebugCheckboxChanged;
@@ -40,7 +39,6 @@ namespace CoopClient.Menus.Sub
 #endif
 
             MainMenu.Add(_disableTrafficItem);
-            MainMenu.Add(_shareNPCsItem);
             MainMenu.Add(_flipMenuItem);
 #if DEBUG
             MainMenu.Add(_useDebugItem);
@@ -48,26 +46,12 @@ namespace CoopClient.Menus.Sub
 #endif
         }
 
-        internal void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
+        public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             Main.DisableTraffic = _disableTrafficItem.Checked;
-
-            if (_disableTrafficItem.Checked)
-            {
-                if (_shareNPCsItem.Checked)
-                {
-                    _shareNPCsItem.Checked = false;
-                }
-
-                _shareNPCsItem.Enabled = false;
-            }
-            else if (Main.NPCsAllowed && !_shareNPCsItem.Enabled)
-            {
-                _shareNPCsItem.Enabled = true;
-            }
         }
 
-        internal void FlipMenuCheckboxChanged(object a, System.EventArgs b)
+        public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
         {
 #if !NON_INTERACTIVE
             Main.MainMenu.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
@@ -75,12 +59,12 @@ namespace CoopClient.Menus.Sub
             MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
             Main.MainMenu.ServerList.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
-            Main.MainSettings.FlipMenu = _flipMenuItem.Checked;
+            Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }
 
 #if DEBUG
-        internal void UseDebugCheckboxChanged(object a, System.EventArgs b)
+        public void UseDebugCheckboxChanged(object a, System.EventArgs b)
         {
             Main.UseDebug = _useDebugItem.Checked;
 
@@ -98,7 +82,7 @@ namespace CoopClient.Menus.Sub
             }
         }
 
-        internal void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
+        public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
         {
             Main.MainNetworking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
 

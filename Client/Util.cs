@@ -3,19 +3,21 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
+using RageCoop.Core;
 using GTA;
 using GTA.Native;
 using GTA.Math;
+using System.Linq;
+using System.Diagnostics;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
-    enum ETasks
+    public enum ETasks
     {
         CLIMB_LADDER = 47
     }
 
-    static class Util
+    internal static partial class Util
     {
         #region -- POINTER --
         private static int _steeringAngleOffset { get; set; }
@@ -30,6 +32,8 @@ namespace CoopClient
                 _steeringAngleOffset = *(int*)(address + 6) + 8;
             }
 
+            // breaks some stuff.
+            /*
             address = Game.FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
             if (address != IntPtr.Zero)
             {
@@ -38,6 +42,7 @@ namespace CoopClient
                     *(byte*)(address + i).ToPointer() = 0x90;
                 }
             }
+            */
         }
 
         public static unsafe void CustomSteeringAngle(this Vehicle veh, float value)
@@ -52,32 +57,53 @@ namespace CoopClient
         }
         #endregion
 
-        public static (byte, byte[]) GetBytesFromObject(object obj)
+        public static Settings ReadSettings()
         {
-            switch (obj)
+            XmlSerializer ser = new XmlSerializer(typeof(Settings));
+
+            string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
+            Settings settings = null;
+
+            if (File.Exists(path))
             {
-                case byte _:
-                    return (0x01, BitConverter.GetBytes((byte)obj));
-                case short _:
-                    return (0x02, BitConverter.GetBytes((short)obj));
-                case ushort _:
-                    return (0x03, BitConverter.GetBytes((ushort)obj));
-                case int _:
-                    return (0x04, BitConverter.GetBytes((int)obj));
-                case uint _:
-                    return (0x05, BitConverter.GetBytes((uint)obj));
-                case long _:
-                    return (0x06, BitConverter.GetBytes((long)obj));
-                case ulong _:
-                    return (0x07, BitConverter.GetBytes((ulong)obj));
-                case float _:
-                    return (0x08, BitConverter.GetBytes((float)obj));
-                case bool _:
-                    return (0x09, BitConverter.GetBytes((bool)obj));
-                default:
-                    return (0x0, null);
+                using (FileStream stream = File.OpenRead(path))
+                {
+                    settings = (RageCoop.Client.Settings)ser.Deserialize(stream);
+                }
+
+                using (FileStream stream = new FileStream(path, FileMode.Truncate, FileAccess.ReadWrite))
+                {
+                    ser.Serialize(stream, settings);
+                }
+            }
+            else
+            {
+                using (FileStream stream = File.OpenWrite(path))
+                {
+                    ser.Serialize(stream, settings = new Settings());
+                }
+            }
+
+            return settings;
+        }
+        public static void SaveSettings()
+        {
+            try
+            {
+                string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
+
+                using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
+                {
+                    XmlSerializer ser = new XmlSerializer(typeof(Settings));
+                    ser.Serialize(stream, Main.Settings);
+                }
+            }
+            catch (Exception ex)
+            {
+                GTA.UI.Notification.Show("Error saving player settings: " + ex.Message);
             }
         }
+
 
         public static string[] GetReloadingAnimation(this Ped ped)
         {
@@ -232,29 +258,6 @@ namespace CoopClient
             return (from * (1.0f - fAlpha)) + (to * fAlpha); //from + (to - from) * fAlpha
         }
 
-        public static int GetResponsiblePedHandle(this Vehicle veh)
-        {
-            if (veh == null || veh.Handle == 0 || !veh.Exists())
-            {
-                return 0;
-            }
-
-            if (!veh.IsSeatFree(VehicleSeat.Driver))
-            {
-                return veh.GetPedOnSeat(VehicleSeat.Driver).Handle;
-            }
-
-            for (int i = 0; i < veh.PassengerCapacity; i++)
-            {
-                if (!veh.IsSeatFree((VehicleSeat)i))
-                {
-                    return veh.GetPedOnSeat((VehicleSeat)i).Handle;
-                }
-            }
-
-            return 0;
-        }
-
         public static byte GetPedSpeed(this Ped ped)
         {
             if (ped.IsSprinting)
@@ -273,138 +276,132 @@ namespace CoopClient
             return 0;
         }
 
-        public static Vector3 GetPedAimCoords(this Ped ped, bool isNpc)
-        {
-            bool aimOrShoot = ped.IsAiming || ped.IsShooting && ped.Weapons.Current?.AmmoInClip != 0;
-            return aimOrShoot ? (isNpc ? GetLastWeaponImpact(ped) : RaycastEverything(new Vector2(0, 0))) : new Vector3();
-        }
 
-        /// <summary>
-        /// Only works for players NOT NPCs
-        /// </summary>
-        /// <returns>Vector3</returns>
-        public static Vector3 GetVehicleAimCoords()
+        public static VehicleDataFlags GetVehicleFlags(this Vehicle veh)
         {
-            return RaycastEverything(new Vector2(0, 0));
-        }
-
-        public static ushort? GetVehicleFlags(this Ped ped, Vehicle veh)
-        {
-            ushort? flags = 0;
+            VehicleDataFlags flags = 0;
 
             if (veh.IsEngineRunning)
             {
-                flags |= (ushort)VehicleDataFlags.IsEngineRunning;
+                flags |= VehicleDataFlags.IsEngineRunning;
             }
 
             if (veh.AreLightsOn)
             {
-                flags |= (ushort)VehicleDataFlags.AreLightsOn;
+                flags |= VehicleDataFlags.AreLightsOn;
             }
 
             if (veh.BrakePower >= 0.01f)
             {
-                flags |= (ushort)VehicleDataFlags.AreBrakeLightsOn;
+                flags |= VehicleDataFlags.AreBrakeLightsOn;
             }
 
             if (veh.AreHighBeamsOn)
             {
-                flags |= (ushort)VehicleDataFlags.AreHighBeamsOn;
+                flags |= VehicleDataFlags.AreHighBeamsOn;
             }
 
             if (veh.IsSirenActive)
             {
-                flags |= (ushort)VehicleDataFlags.IsSirenActive;
+                flags |= VehicleDataFlags.IsSirenActive;
             }
 
             if (veh.IsDead)
             {
-                flags |= (ushort)VehicleDataFlags.IsDead;
+                flags |= VehicleDataFlags.IsDead;
             }
 
             if (Function.Call<bool>(Hash.IS_HORN_ACTIVE, veh.Handle))
             {
-                flags |= (ushort)VehicleDataFlags.IsHornActive;
+                flags |= VehicleDataFlags.IsHornActive;
             }
 
             if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
             {
-                flags |= (ushort)VehicleDataFlags.IsTransformed;
+                flags |= VehicleDataFlags.IsTransformed;
             }
 
             if (veh.HasRoof && (veh.RoofState == VehicleRoofState.Opened || veh.RoofState == VehicleRoofState.Opening))
             {
-                flags |= (ushort)VehicleDataFlags.RoofOpened;
+                flags |= VehicleDataFlags.RoofOpened;
             }
 
-            if (veh.IsTurretSeat((int)ped.SeatIndex))
+
+            if (veh.IsAircraft)
             {
-                flags |= (ushort)VehicleDataFlags.OnTurretSeat;
+                flags |= VehicleDataFlags.IsAircraft;
             }
 
-            if (veh.IsPlane)
+
+            return flags;
+        }
+
+        public static PedDataFlags GetPedFlags(this Ped ped)
+        {
+            PedDataFlags flags = PedDataFlags.None;
+
+            if (ped.IsAiming || ped.IsOnTurretSeat())
             {
-                flags |= (ushort)VehicleDataFlags.IsPlane;
+                flags |= PedDataFlags.IsAiming;
+            }
+
+
+            if (ped.IsReloading)
+            {
+                flags |= PedDataFlags.IsReloading;
+            }
+
+            if (ped.IsJumping)
+            {
+                flags |= PedDataFlags.IsJumping;
+            }
+
+            if (ped.IsRagdoll)
+            {
+                flags |= PedDataFlags.IsRagdoll;
+            }
+
+            if (ped.IsOnFire)
+            {
+                flags |= PedDataFlags.IsOnFire;
+            }
+
+            if (ped.IsInParachuteFreeFall)
+            {
+                flags |= PedDataFlags.IsInParachuteFreeFall;
+            }
+
+            if (ped.ParachuteState == ParachuteState.Gliding)
+            {
+                flags |= PedDataFlags.IsParachuteOpen;
+            }
+
+            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
+            {
+                flags |= PedDataFlags.IsOnLadder;
+            }
+
+            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
+            {
+                flags |= PedDataFlags.IsVaulting;
+            }
+
+            if (ped.IsInCover || ped.IsGoingIntoCover)
+            {
+                flags |=PedDataFlags.IsInCover;
             }
 
             return flags;
         }
 
-        public static ushort? GetPedFlags(this Ped ped, bool isPlayer = false)
+        public static bool HasFlag(this PedDataFlags flagToCheck,PedDataFlags flag)
         {
-            ushort? flags = 0;
+            return (flagToCheck & flag)!=0;
+        }
 
-            if (ped.IsAiming)
-            {
-                flags |= (ushort)PedDataFlags.IsAiming;
-            }
-
-            if ((ped.IsShooting || isPlayer && Game.IsControlPressed(Control.Attack)) && ped.Weapons.Current?.AmmoInClip != 0)
-            {
-                flags |= (ushort)PedDataFlags.IsShooting;
-            }
-
-            if (ped.IsReloading)
-            {
-                flags |= (ushort)PedDataFlags.IsReloading;
-            }
-
-            if (ped.IsJumping)
-            {
-                flags |= (ushort)PedDataFlags.IsJumping;
-            }
-
-            if (ped.IsRagdoll)
-            {
-                flags |= (ushort)PedDataFlags.IsRagdoll;
-            }
-
-            if (ped.IsOnFire)
-            {
-                flags |= (ushort)PedDataFlags.IsOnFire;
-            }
-
-            if (ped.IsInParachuteFreeFall)
-            {
-                flags |= (ushort)PedDataFlags.IsInParachuteFreeFall;
-            }
-
-            if (ped.ParachuteState == ParachuteState.Gliding)
-            {
-                flags |= (ushort)PedDataFlags.IsParachuteOpen;
-            }
-
-            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
-            {
-                flags |= (ushort)PedDataFlags.IsOnLadder;
-            }
-
-            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
-            {
-                flags |= (ushort)PedDataFlags.IsVaulting;
-            }
-
-            return flags;
+        public static bool HasFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
+        {
+            return (flagToCheck & flag)!=0;
         }
 
         public static Dictionary<byte, short> GetPedClothes(this Ped ped)
@@ -459,13 +456,19 @@ namespace CoopClient
 
             // Broken doors
             byte brokenDoors = 0;
+            byte openedDoors = 0;
             foreach (VehicleDoor door in veh.Doors)
             {
                 if (door.IsBroken)
                 {
                     brokenDoors |= (byte)(1 << (byte)door.Index);
                 }
+                else if (door.IsOpen)
+                {
+                    openedDoors |= (byte)(1 << (byte)door.Index);
+                }
             }
+
 
             // Bursted tires
             short burstedTires = 0;
@@ -480,6 +483,7 @@ namespace CoopClient
             return new VehicleDamageModel()
             {
                 BrokenDoors = brokenDoors,
+                OpenedDoors = openedDoors,
                 BrokenWindows = brokenWindows,
                 BurstedTires = burstedTires,
                 LeftHeadLightBroken = (byte)(veh.IsLeftHeadLightBroken ? 1 : 0),
@@ -487,19 +491,73 @@ namespace CoopClient
             };
         }
 
+        public static Dictionary<int,int> GetPassengers(this Vehicle veh)
+        {
+            Dictionary<int,int> ps=new Dictionary<int, int>();
+            var d = veh.Driver;
+            if (d!=null&&d.IsSittingInVehicle())
+            {
+                ps.Add(-1, d.GetSyncEntity().ID);
+            }
+            foreach(Ped p in veh.Passengers)
+            {
+                if (p.IsSittingInVehicle())
+                {
+                    ps.Add((int)p.SeatIndex, (int)p.GetSyncEntity().ID);
+                }
+            }
+            return ps;
+        }
+        public static void SetOnFire(this Entity e,bool toggle)
+        {
+            if (toggle)
+            {
+                Function.Call(Hash.START_ENTITY_FIRE, e.Handle);
+            }
+            else
+            {
+                Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
+            }
+        }
+        public static SyncedPed GetSyncEntity(this Ped p)
+        {
+            if(p == null) { return null; }
+            var c = EntityPool.GetPedByHandle(p.Handle);
+            if(c==null) { EntityPool.Add(c=new SyncedPed(p)); }
+            return c;
+        }
+        public static SyncedVehicle GetSyncEntity(this Vehicle veh)
+        {
+            if(veh == null) { return null; }
+            var v=EntityPool.GetVehicleByHandle(veh.Handle);
+            if (v==null) { EntityPool.Add(v=new SyncedVehicle(veh)); }
+            return v;
+        }
         public static void SetVehicleDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
             for (int i = 0; i < 8; i++)
             {
+                var door = veh.Doors[(VehicleDoorIndex)i];
                 if ((model.BrokenDoors & (byte)(1 << i)) != 0)
                 {
-                    veh.Doors[(VehicleDoorIndex)i].Break(leavedoors);
+                    door.Break(leavedoors);
                 }
-                else if (veh.Doors[(VehicleDoorIndex)i].IsBroken)
+                else if (door.IsBroken)
                 {
                     // The vehicle can only fix a door if the vehicle was completely fixed
                     veh.Repair();
                     return;
+                }
+                if ((model.OpenedDoors & (byte)(1 << i)) != 0)
+                {
+                    if ((!door.IsOpen)&&(!door.IsBroken))
+                    {
+                        door.Open();
+                    }
+                }
+                else if (door.IsOpen)
+                {
+                    if (!door.IsBroken) { door.Close(); }
                 }
 
                 if ((model.BrokenWindows & (byte)(1 << i)) != 0)
@@ -532,65 +590,132 @@ namespace CoopClient
             veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
 
-        public static Settings ReadSettings()
+        public static double DegToRad(double deg)
         {
-            XmlSerializer ser = new XmlSerializer(typeof(Settings));
+            return deg * Math.PI / 180.0;
+        }
 
-            string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
-            Settings settings = null;
+        public static Vector3 RotationToDirection(Vector3 rotation)
+        {
+            double z = DegToRad(rotation.Z);
+            double x = DegToRad(rotation.X);
+            double num = Math.Abs(Math.Cos(x));
 
-            if (File.Exists(path))
+            return new Vector3
             {
-                using (FileStream stream = File.OpenRead(path))
-                {
-                    settings = (Settings)ser.Deserialize(stream);
-                }
+                X = (float)(-Math.Sin(z) * num),
+                Y = (float)(Math.Cos(z) * num),
+                Z = (float)Math.Sin(x)
+            };
+        }
 
-                using (FileStream stream = new FileStream(path, FileMode.Truncate, FileAccess.ReadWrite))
+
+        public static VehicleSeat getNearestSeat(Ped ped, Vehicle veh, float distanceToignoreDoors=50f)
+        {
+            float num = 99f;
+            int result = -2;
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            dictionary.Add("door_dside_f", -1);
+            dictionary.Add("door_pside_f", 0);
+            dictionary.Add("door_dside_r", 1);
+            dictionary.Add("door_pside_r", 2);
+            foreach (string text in dictionary.Keys)
+            {
+                bool flag = veh.Bones[text].Position != Vector3.Zero;
+                if (flag)
                 {
-                    ser.Serialize(stream, settings);
+                    float num2 = ped.Position.DistanceTo(Function.Call<Vector3>(Hash.GET_WORLD_POSITION_OF_ENTITY_BONE, new InputArgument[]
+                    {
+                        veh,
+                        veh.Bones[text].Index
+                    }));
+                    bool flag2 = (num2 < distanceToignoreDoors) && (num2 < num )&& IsSeatUsableByPed(ped, veh, dictionary[text]);
+                    if (flag2)
+                    {
+                        num = num2;
+                        result = dictionary[text];
+                    }
                 }
+            }
+            return (VehicleSeat)result;
+        }
+        public static bool IsSeatUsableByPed(Ped ped, Vehicle veh, int _seat, bool allowJacking=false)
+        {
+            /*
+            
+            */
+            if (!allowJacking)
+            {
+                return veh.IsSeatFree((VehicleSeat)_seat);
             }
             else
             {
-                using (FileStream stream = File.OpenWrite(path))
+                VehicleSeat seat = (VehicleSeat)_seat;
+                bool result = false;
+                bool flag = veh.IsSeatFree(seat);
+                if (flag)
                 {
-                    ser.Serialize(stream, settings = new Settings());
+                    result = true;
+                }
+                else
+                {
+
+                    bool isDead = veh.GetPedOnSeat(seat).IsDead;
+                    if (isDead)
+                    {
+                        result = true;
+                    }
+                    else
+                    {
+                        int num = Function.Call<int>(Hash.GET_RELATIONSHIP_BETWEEN_PEDS, new InputArgument[]
+                        {
+                        ped,
+                        veh.GetPedOnSeat(seat)
+                        });
+                        bool flag2 = num > 2;
+                        if (flag2)
+                        {
+                            result = true;
+                        }
+                    }
+
+                }
+                return result;
+            }
+        }
+        public static Vector3 GetAimCoord(this Ped p)
+        {
+            var weapon = p.Weapons.CurrentWeaponObject;
+            if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
+            if (weapon!=null)
+            {
+                Vector3 dir = weapon.RightVector;
+                return weapon.Position+dir*20;
+
+                
+                RaycastResult result = World.Raycast(weapon.Position+dir, weapon.Position+dir*10000, IntersectFlags.Everything, p.IsInVehicle() ? (Entity)p : p.CurrentVehicle);
+                
+                if (result.DidHit)
+                {
+                    return result.HitPosition;
+                }
+                else
+                {
+                    return weapon.Position+dir*20;
                 }
             }
-
-            return settings;
+            return GetLookingCoord(p);
         }
-
-        public static void SaveSettings()
+        public static Vector3 GetLookingCoord(this Ped p)
         {
-            try
-            {
-                string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
-
-                using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
-                {
-                    XmlSerializer ser = new XmlSerializer(typeof(Settings));
-                    ser.Serialize(stream, Main.MainSettings);
-                }
-            }
-            catch (Exception ex)
-            {
-                GTA.UI.Notification.Show("Error saving player settings: " + ex.Message);
-            }
+            EntityBone b = p.Bones[Bone.FacialForehead];
+            Vector3 v = b.UpVector.Normalized;
+            return b.Position+200*v;
         }
-
-        public static Vector3 GetLastWeaponImpact(Ped ped)
+        public static bool IsWeapon(this Entity e)
         {
-            OutputArgument coord = new OutputArgument();
-            if (!Function.Call<bool>(Hash.GET_PED_LAST_WEAPON_IMPACT_COORD, ped.Handle, coord))
-            {
-                return new Vector3();
-            }
-
-            return coord.GetResult<Vector3>();
+            return WeaponModels.Contains(e.Model);
         }
-
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
             if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
@@ -631,116 +756,124 @@ namespace CoopClient
 
             return false;
         }
-
-        public static double DegToRad(double deg)
+        public static bool IsOnTurretSeat(this Ped P)
         {
-            return deg * Math.PI / 180.0;
+            if (P.CurrentVehicle == null) { return false; }
+            return IsTurretSeat(P.CurrentVehicle, (int)P.SeatIndex);
+        }
+        public static void StayInCover(this Ped p)
+        {
+            Function.Call(Hash.TASK_STAY_IN_COVER, p);
+        }
+        public static VehicleSeat GetSeatTryingToEnter(this Ped p)
+        {
+            return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
         }
 
-        public static Vector3 RotationToDirection(Vector3 rotation)
-        {
-            double z = DegToRad(rotation.Z);
-            double x = DegToRad(rotation.X);
-            double num = Math.Abs(Math.Cos(x));
 
-            return new Vector3
-            {
-                X = (float)(-Math.Sin(z) * num),
-                Y = (float)(Math.Cos(z) * num),
-                Z = (float)Math.Sin(x)
-            };
-        }
-
-        public static bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
-        {
-            OutputArgument num1 = new OutputArgument();
-            OutputArgument num2 = new OutputArgument();
-
-            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
-            {
-                screenCoords = new Vector2();
-                return false;
-            }
-
-            screenCoords = new Vector2((num1.GetResult<float>() - 0.5f) * 2, (num2.GetResult<float>() - 0.5f) * 2);
-            return true;
-        }
-
-        public static Vector3 ScreenRelToWorld(Vector3 camPos, Vector3 camRot, Vector2 coord)
-        {
-            Vector3 camForward = RotationToDirection(camRot);
-            Vector3 rotUp = camRot + new Vector3(10, 0, 0);
-            Vector3 rotDown = camRot + new Vector3(-10, 0, 0);
-            Vector3 rotLeft = camRot + new Vector3(0, 0, -10);
-            Vector3 rotRight = camRot + new Vector3(0, 0, 10);
-
-            Vector3 camRight = RotationToDirection(rotRight) - RotationToDirection(rotLeft);
-            Vector3 camUp = RotationToDirection(rotUp) - RotationToDirection(rotDown);
-
-            double rollRad = -DegToRad(camRot.Y);
-
-            Vector3 camRightRoll = camRight * (float)Math.Cos(rollRad) - camUp * (float)Math.Sin(rollRad);
-            Vector3 camUpRoll = camRight * (float)Math.Sin(rollRad) + camUp * (float)Math.Cos(rollRad);
-
-            Vector3 point3D = camPos + camForward * 10.0f + camRightRoll + camUpRoll;
-            if (!WorldToScreenRel(point3D, out Vector2 point2D))
-            {
-                return camPos + camForward * 10.0f;
-            }
-
-            Vector3 point3DZero = camPos + camForward * 10.0f;
-            if (!WorldToScreenRel(point3DZero, out Vector2 point2DZero))
-            {
-                return camPos + camForward * 10.0f;
-            }
-
-            const double eps = 0.001;
-            if (Math.Abs(point2D.X - point2DZero.X) < eps || Math.Abs(point2D.Y - point2DZero.Y) < eps)
-            {
-                return camPos + camForward * 10.0f;
-            }
-
-            float scaleX = (coord.X - point2DZero.X) / (point2D.X - point2DZero.X);
-            float scaleY = (coord.Y - point2DZero.Y) / (point2D.Y - point2DZero.Y);
-
-            return camPos + camForward * 10.0f + camRightRoll * scaleX + camUpRoll * scaleY;
-        }
-
-        public static Vector3 RaycastEverything(Vector2 screenCoord)
-        {
-            Vector3 camPos = GameplayCamera.Position;
-            Vector3 camRot = GameplayCamera.Rotation;
-            const float raycastToDist = 100.0f;
-            const float raycastFromDist = 1f;
-
-            Vector3 target3D = ScreenRelToWorld(camPos, camRot, screenCoord);
-            Vector3 source3D = camPos;
-
-            Entity ignoreEntity = Game.Player.Character;
-            if (Game.Player.Character.IsInVehicle())
-            {
-                ignoreEntity = Game.Player.Character.CurrentVehicle;
-            }
-
-            Vector3 dir = target3D - source3D;
-            dir.Normalize();
-            RaycastResult raycastResults = World.Raycast(source3D + dir * raycastFromDist,
-                source3D + dir * raycastToDist,
-                IntersectFlags.Everything,
-                ignoreEntity);
-
-            if (raycastResults.DidHit)
-            {
-                return raycastResults.HitPosition;
-            }
-
-            return camPos + dir * raycastToDist;
-        }
-
+        public static readonly Model[] WeaponModels = Weapon.GetAllModels();
+        
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();
-    }
+        public static int GetDamage(this Weapon w)
+        {
+            int damage=0;
+            switch (w.Group)
+            {
+                case WeaponGroup.AssaultRifle: damage=30;break;
+                case WeaponGroup.Heavy: damage=30;break;
+                case WeaponGroup.MG: damage=30;break;
+                case WeaponGroup.PetrolCan: damage=0;break;
+                case WeaponGroup.Pistol: damage=30;break;
+                case WeaponGroup.Shotgun: damage=30; break;
+                case WeaponGroup.SMG: damage=20; break;
+                case WeaponGroup.Sniper: damage=100; break;
+                case WeaponGroup.Thrown: damage=0; break;
+                case WeaponGroup.Unarmed: damage=0; break;
+            }
+            return damage;
+        }
+        public static Vector3 GetMuzzlePosition(this Ped p)
+        {
+            var w = p.Weapons.CurrentWeaponObject;
+            if (w!=null)
+            {
+                var hash = p.Weapons.Current.Hash;
+                if (MuzzleBoneIndexes.ContainsKey(hash)) { return w.Bones[MuzzleBoneIndexes[hash]].Position; }
+                return w.Position;
+            }
+            return p.Bones[Bone.SkelRightHand].Position;
+        }
+        public static readonly Dictionary<WeaponHash, int> MuzzleBoneIndexes = new Dictionary<WeaponHash, int>
+        {
+            {WeaponHash.HeavySniper,6},
+            {WeaponHash.MarksmanRifle,9},
+            {WeaponHash.SniperRifle,9},
+            {WeaponHash.AdvancedRifle,5},
+            {WeaponHash.SpecialCarbine,9},
+            {WeaponHash.BullpupRifle,7},
+            {WeaponHash.AssaultRifle,9},
+            {WeaponHash.CarbineRifle,6},
+            {WeaponHash.MachinePistol,5},
+            {WeaponHash.SMG,5},
+            {WeaponHash.AssaultSMG,6},
+            {WeaponHash.CombatPDW,5},
+            {WeaponHash.MG,6},
+            {WeaponHash.CombatMG,7},
+            {WeaponHash.Gusenberg,7},
+            {WeaponHash.MicroSMG,10},
+            {WeaponHash.APPistol,8},
+            {WeaponHash.StunGun,4},
+            {WeaponHash.Pistol,8},
+            {WeaponHash.CombatPistol,8},
+            {WeaponHash.Pistol50,7},
+            {WeaponHash.SNSPistol,8},
+            {WeaponHash.HeavyPistol,8},
+            {WeaponHash.VintagePistol,8},
+            {WeaponHash.Railgun,9},
+            {WeaponHash.Minigun,5},
+            {WeaponHash.Musket,3},
+            {WeaponHash.HeavyShotgun,10},
+            {WeaponHash.PumpShotgun,11},
+            {WeaponHash.SawnOffShotgun,8},
+            {WeaponHash.BullpupShotgun,8},
+            {WeaponHash.AssaultShotgun,9},
+            {WeaponHash.HeavySniperMk2,11},
+            {WeaponHash.MarksmanRifleMk2,9},
+            {WeaponHash.CarbineRifleMk2,13},
+            {WeaponHash.SpecialCarbineMk2,16},
+            {WeaponHash.BullpupRifleMk2,8},
+            {WeaponHash.CompactRifle,7},
+            {WeaponHash.MilitaryRifle,11},
+            {WeaponHash.AssaultrifleMk2,17},
+            {WeaponHash.MiniSMG,5},
+            {WeaponHash.SMGMk2,6},
+            {WeaponHash.CombatMGMk2,16},
+            {WeaponHash.UnholyHellbringer,4},
+            {WeaponHash.PistolMk2,12},
+            {WeaponHash.SNSPistolMk2,15},
+            {WeaponHash.CeramicPistol,10},
+            {WeaponHash.MarksmanPistol,4},
+            {WeaponHash.Revolver,7},
+            {WeaponHash.RevolverMk2,7},
+            {WeaponHash.DoubleActionRevolver,7},
+            {WeaponHash.NavyRevolver,7},
+            {WeaponHash.PericoPistol,4},
+            {WeaponHash.FlareGun,4},
+            {WeaponHash.UpNAtomizer,4},
+            {WeaponHash.HomingLauncher,5},
+            {WeaponHash.CompactGrenadeLauncher,8},
+            {WeaponHash.Widowmaker,6},
+            {WeaponHash.GrenadeLauncher,3},
+            {WeaponHash.RPG,9},
+            {WeaponHash.DoubleBarrelShotgun,8},
+            {WeaponHash.SweeperShotgun,7},
+            {WeaponHash.CombatShotgun,7},
+            {WeaponHash.PumpShotgunMk2,7},
 
+        };
+
+    }
     /// <summary>
     /// 
     /// </summary>
@@ -773,17 +906,17 @@ namespace CoopClient
             };
         }
 
-        internal static float Denormalize(this float h)
+        public static float Denormalize(this float h)
         {
             return h < 0f ? h + 360f : h;
         }
 
-        internal static float ToRadians(this float val)
+        public static float ToRadians(this float val)
         {
             return (float)(Math.PI / 180) * val;
         }
 
-        internal static Vector3 ToRadians(this Vector3 i)
+        public static Vector3 ToRadians(this Vector3 i)
         {
             return new Vector3()
             {
@@ -793,7 +926,7 @@ namespace CoopClient
             };
         }
 
-        internal static Quaternion ToQuaternion(this Vector3 vect)
+        public static Quaternion ToQuaternion(this Vector3 vect)
         {
             vect = new Vector3()
             {
@@ -850,4 +983,5 @@ namespace CoopClient
             };
         }
     }
+    
 }

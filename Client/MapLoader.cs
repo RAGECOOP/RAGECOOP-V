@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using System.Collections.Generic;
-
+using RageCoop.Core;
 using GTA;
 using GTA.Math;
 using GTA.Native;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
     /// <summary>
     /// 
@@ -51,7 +51,7 @@ namespace CoopClient
         public int Texture { get; set; }
     }
 
-    internal static class MapLoader
+    public static class MapLoader
     {
         // string = file name
         private static readonly Dictionary<string, CoopMap> _maps = new Dictionary<string, CoopMap>();
@@ -59,7 +59,7 @@ namespace CoopClient
 
         public static void LoadAll()
         {
-            string downloadFolder = $"scripts\\resources\\{Main.MainSettings.LastServerAddress.Replace(":", ".")}";
+            string downloadFolder = $"scripts\\resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
 
             if (!Directory.Exists(downloadFolder))
             {
@@ -69,7 +69,7 @@ namespace CoopClient
                 }
                 catch (Exception ex)
                 {
-                    Logger.Write(ex.Message, Logger.LogLevel.Server);
+                    Main.Logger.Error(ex.Message);
 
                     // Without the directory we can't do the other stuff
                     return;
@@ -95,8 +95,8 @@ namespace CoopClient
                         }
                         catch (Exception ex)
                         {
-                            Logger.Write($"The map with the name \"{fileName}\" couldn't be added!", Logger.LogLevel.Server);
-                            Logger.Write($"{ex.Message}", Logger.LogLevel.Server);
+                            Main.Logger.Error($"The map with the name \"{fileName}\" couldn't be added!");
+                            Main.Logger.Error($"{ex.Message}");
                             continue;
                         }
                     }
@@ -113,7 +113,7 @@ namespace CoopClient
                 if (!_maps.ContainsKey(name) || _createdObjects.Count != 0)
                 {
                     GTA.UI.Notification.Show($"The map with the name \"{name}\" couldn't be loaded!");
-                    Logger.Write($"The map with the name \"{name}\" couldn't be loaded!", Logger.LogLevel.Server);
+                    Main.Logger.Error($"The map with the name \"{name}\" couldn't be loaded!");
                     return;
                 }
         
@@ -124,7 +124,7 @@ namespace CoopClient
                     Model model = prop.Hash.ModelRequest();
                     if (model == null)
                     {
-                        Logger.Write($"Model for object \"{model.Hash}\" couldn't be loaded!", Logger.LogLevel.Server);
+                            Main.Logger.Error($"Model for object \"{model.Hash}\" couldn't be loaded!");
                         continue;
                     }
         
@@ -132,7 +132,7 @@ namespace CoopClient
                     model.MarkAsNoLongerNeeded();
                     if (handle == 0)
                     {
-                        Logger.Write($"Object \"{prop.Hash}\" couldn't be created!", Logger.LogLevel.Server);
+                            Main.Logger.Error($"Object \"{prop.Hash}\" couldn't be created!");
                         continue;
                     }
 

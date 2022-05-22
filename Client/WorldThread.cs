@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
-
+using RageCoop.Core;
 using GTA;
 using GTA.Native;
 
-namespace CoopClient
+namespace RageCoop.Client
 {
     /// <summary>
     /// Don't use it!
@@ -75,8 +75,8 @@ namespace CoopClient
                 Function.Call(Hash.SET_RANDOM_TRAINS, true);
                 Function.Call(Hash.SET_RANDOM_BOATS, true);
                 Function.Call(Hash.SET_GARBAGE_TRUCKS, true);
-                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 3); // 0 - 3
-                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 3); // 0 - 3
+                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 1); // 0 - 3
+                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 1); // 0 - 3
                 Function.Call(Hash.SET_ALL_VEHICLE_GENERATORS_ACTIVE);
                 Function.Call(Hash.SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, true);
                 Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, -1);
@@ -99,16 +99,31 @@ namespace CoopClient
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
 
-                foreach (Ped ped in World.GetAllPeds().Where(p => p.RelationshipGroup != "SYNCPED" && p.Handle != Game.Player.Character?.Handle))
-                {
-                    ped.CurrentVehicle?.Delete();
-                    ped.Kill();
-                    ped.Delete();
-                }
 
-                foreach (Vehicle veh in World.GetAllVehicles().Where(v => v.IsSeatFree(VehicleSeat.Driver) && v.PassengerCount == 0))
+                foreach (Ped ped in World.GetAllPeds())
                 {
-                    veh.Delete();
+                    SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
+                    if ((c==null) || (c.IsMine && (ped.Handle!=Game.Player.Character.Handle)&&ped.PopulationType!=EntityPopulationType.Mission))
+                    {
+                        if (ped.Handle==Game.Player.Character.Handle) { continue; }
+
+                        Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        ped.CurrentVehicle?.Delete();
+                        ped.Kill();
+                        ped.Delete();
+                    }
+                    
+                }
+                
+                foreach (Vehicle veh in World.GetAllVehicles())
+                {
+                    SyncedVehicle v = veh.GetSyncEntity();
+                    if((v== null) || (v.IsMine&&veh.PopulationType!=EntityPopulationType.Mission))
+                    {
+                        Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+
+                        veh.Delete();
+                    }
                 }
             }
         }
