@@ -26,4 +26,4 @@ Base sync logic has been updated. Peds and Vehicles are now synchronized indepen
 Download compiled binaries here: 
 [Release](https://gitlab.com/justasausage/RageCOOP-V/-/tree/main/Release)
 
-Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing this.
+Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing.
