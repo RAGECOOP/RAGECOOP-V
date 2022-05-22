@@ -16,7 +16,7 @@ Basic sync logic has been updated. Peds and Vehicles are now synchronized indepe
 9. Other small fixes
 
 # Known issues
-1. Firearm sounds are missing.
+1. Weapon sounds are missing.
 2. Cover sync is still buggy.
 3. Weaponized vehicle doen't work currently
 4. Framerate drop with high number of synchronized entities.
