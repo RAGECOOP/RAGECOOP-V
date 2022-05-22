@@ -4,7 +4,7 @@ This is a reworked version of [RageCoop](https://github.com/RAGECOOP/RAGECOOP-V)
 
 Base sync logic has been updated. Peds and Vehicles are now synchronized independently.
 
-# Features Added
+# Features
 1. Synchronized bullets
 2. Synchronized vehicle/player/NPC
 3. Basic ragdoll sync
@@ -13,7 +13,8 @@ Base sync logic has been updated. Peds and Vehicles are now synchronized indepen
 6. Ownership based sync logic, carjacking is now working properly.
 7. Introduced SyncEvents.
 8. Code refactoring and namespace cleanup
-9. Other small fixes
+9. Synchronized vehicle doors, brake and throttle.
+10. Other improvements
 
 # Known issues
 1. Weapon sounds are missing.
