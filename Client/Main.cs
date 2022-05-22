@@ -24,7 +24,7 @@ namespace RageCoop.Client
         private bool _gameLoaded = false;
         private static bool _isGoingToCar = false;
 
-        public static readonly string CurrentVersion = "V1_4_1";
+        public static readonly string CurrentVersion = "V0_1";
 
         public static int MyPlayerID=0;
         public static bool DisableTraffic = true;
