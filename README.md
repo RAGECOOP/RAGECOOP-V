@@ -1,8 +1,8 @@
 
 # 🌐 RAGECOOP
-This is a reworked version of RageCoop : https://github.com/RAGECOOP/RAGECOOP-V
+This is a reworked version of [RageCoop](https://github.com/RAGECOOP/RAGECOOP-V) , which has sadly been discontinued.
 
-Basic sync logic has been updated. Peds and Vehicles are now synchronized independently.
+Base sync logic has been updated. Peds and Vehicles are now synchronized independently.
 
 # Features Added
 1. Synchronized bullets
