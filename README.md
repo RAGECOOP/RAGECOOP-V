@@ -1,6 +1,7 @@
 
 # 🌐 RAGECOOP
 This is a reworked version of RageCoop : https://github.com/RAGECOOP/RAGECOOP-V
+
 Basic sync logic has been updated. Peds and Vehicles are now synchronized independently.
 
 # Features Added
