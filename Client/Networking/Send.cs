@@ -13,29 +13,24 @@ namespace RageCoop.Client
 {
     public partial class Networking
     {
-        /*
-        public static void MakePlayer()
-        {
-            // Create entity for local player
-            Ped p = Game.Player.Character;
-            Main.Logger.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
-            CharacterEntity c = new CharacterEntity(p);
-            Main.Characters.Add(c.ID, c);
-            Main.MyPlayerID=c.OwnerID=c.ID;
-            Main.Logger.Debug($"My player ID is:{c.ID}");
-            Main.MainPlayerList.SetPlayer(new PlayerData { PedID=c.ID, Username=Main.MainSettings.Username });
 
+        /// <summary>
+        /// Pack the packet then send to server.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="channel"></param>
+        /// <param name="method"></param>
+        public void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default,NetDeliveryMethod method=NetDeliveryMethod.UnreliableSequenced)
+        {
+            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            p.Pack(outgoingMessage);
+            Client.SendMessage(outgoingMessage, method, (int)channel);
         }
-        */
+
         #region -- SEND --
         public void SendPed(SyncedPed c)
         {
             Ped p = c.MainPed;
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.CharacterSync;
-            
             var packet=new Packets.PedSync()
             {
                 ID =c.ID,
@@ -56,36 +51,27 @@ namespace RageCoop.Client
             {
                 packet.RotationVelocity=p.RotationVelocity.ToLVector();
             }
-            packet.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
+            Send(packet, ConnectionChannel.CharacterSync);
         }
         public void SendPedState(SyncedPed c)
         {
             Ped p = c.MainPed;
 
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.CharacterSync;
-            new Packets.PedStateSync()
+            var packet=new Packets.PedStateSync()
             {
                 ID = c.ID,
                 OwnerID=c.OwnerID,
                 Clothes=p.GetPedClothes(),
                 ModelHash=p.Model.Hash,
                 WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
+            };
+
+            Send(packet, ConnectionChannel.CharacterSync);
         }
         public void SendVehicle(SyncedVehicle v)
         {
             Vehicle veh = v.MainVehicle;
-
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.VehicleSync;
-            new Packets.VehicleSync()
+            var packet = new Packets.VehicleSync()
             {
                 ID =v.ID,
                 SteeringAngle = veh.SteeringAngle,
@@ -95,24 +81,19 @@ namespace RageCoop.Client
                 RotationVelocity=veh.RotationVelocity.ToLVector(),
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
+            };
+            Send(packet,ConnectionChannel.VehicleSync);
         }
         public void SendVehicleState(SyncedVehicle v)
         {
             Vehicle veh = v.MainVehicle;
-
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.VehicleSync;
             byte primaryColor = 0;
             byte secondaryColor = 0;
             unsafe
             {
                 Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
             }
-            new Packets.VehicleStateSync()
+            var packet=new Packets.VehicleStateSync()
             {
                 ID =v.ID,
                 OwnerID = v.OwnerID,
@@ -125,70 +106,20 @@ namespace RageCoop.Client
                 EngineHealth=veh.EngineHealth,
                 Passengers=veh.GetPassengers(),
                 LockStatus=veh.LockStatus,
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
+            };
+            Send(packet, ConnectionChannel.VehicleSync);
         }
+
         #region SYNC EVENTS
-        public void Send(Packet p,ConnectionChannel channel=ConnectionChannel.Default)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            p.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, (int)channel);
-        }
         public void SendBulletShot(Vector3 start,Vector3 end,uint weapon,int ownerID)
         {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.SyncEvents;
-            new Packets.BulletShot()
+            Send(new Packets.BulletShot()
             {
                 StartPosition = start.ToLVector(),
                 EndPosition = end.ToLVector(),
                 OwnerID = ownerID,
                 WeaponHash=weapon,
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
-        }
-        public void SendOwnerChanged(int id,int newOwnerId)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.SyncEvents;
-            new Packets.OwnerChanged()
-            {
-                ID= id,
-                NewOwnerID= newOwnerId,
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
-        }
-        public void SendEnteringVehicle(int pedId,int vehId,short seat)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.SyncEvents;
-            new Packets.EnteringVehicle()
-            {
-                PedID=pedId,
-                VehicleID= vehId,
-                VehicleSeat=seat,
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
-        }
-        public void SendLeaveVehicle(int id)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            NetDeliveryMethod messageType = NetDeliveryMethod.UnreliableSequenced;
-            int connectionChannel = (byte)ConnectionChannel.SyncEvents;
-            new Packets.LeaveVehicle()
-            {
-                ID=id
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, messageType, connectionChannel);
+            }, ConnectionChannel.SyncEvents);
         }
         #endregion
         public void SendChatMessage(string message)

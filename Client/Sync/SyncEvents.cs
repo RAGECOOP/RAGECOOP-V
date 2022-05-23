@@ -24,7 +24,13 @@ namespace RageCoop.Client {
 
         public static void TriggerEnteringVehicle(SyncedPed c,SyncedVehicle veh, VehicleSeat seat)
         {
-            Main.MainNetworking.SendEnteringVehicle(c.ID,veh.ID,(short)seat);
+            Main.MainNetworking.
+            Send(new Packets.EnteringVehicle()
+            {
+                PedID=c.ID,
+                VehicleID= veh.ID,
+                VehicleSeat=(short)seat,
+            }, ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerEnteredVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
@@ -45,7 +51,13 @@ namespace RageCoop.Client {
 
         public static void TriggerChangeOwner(SyncedVehicle c, int newOwnerID)
         {
-            Main.MainNetworking.SendOwnerChanged(c.ID,newOwnerID);
+
+            Main.MainNetworking.Send(new Packets.OwnerChanged()
+            {
+                ID= c.ID,
+                NewOwnerID= newOwnerID,
+            }, ConnectionChannel.SyncEvents);
+
         }
 
         public static void TriggerBulletShot(uint hash,SyncedPed owner,Vector3 impactPosition)
@@ -69,7 +81,11 @@ namespace RageCoop.Client {
         }
         public static void TriggerLeaveVehicle(int id)
         {
-            Main.MainNetworking.SendLeaveVehicle(id);
+            Main.MainNetworking.
+            Send(new Packets.LeaveVehicle()
+            {
+                ID=id
+            }, ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerVehBulletShot(uint hash, Vehicle veh)
