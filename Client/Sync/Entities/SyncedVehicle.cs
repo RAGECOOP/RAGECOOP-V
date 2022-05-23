@@ -66,10 +66,7 @@ namespace RageCoop.Client
         #endregion
 
         #region -- CRITICAL STUFF --
-        public Vector3 Position { get; set; }
-        public Vector3 Velocity { get; set; }
         public Vector3 RotationVelocity { get; set; }
-        public Vector3 Rotation { get; set; }
         public float SteeringAngle { get; set; }
         public float ThrottlePower { get; set; }
         public float BrakePower { get; set; }

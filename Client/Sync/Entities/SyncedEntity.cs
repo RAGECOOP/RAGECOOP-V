@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTA;
+using GTA.Math;
 
 namespace RageCoop.Client
 {
@@ -44,6 +45,10 @@ namespace RageCoop.Client
         /// </summary>
         public ulong LastUpdated { get; set; } = 0;
         #endregion
+
+        public Vector3 Position { get; set; }
+        public Vector3 Rotation { get; set; }
+        public Vector3 Velocity { get; set; }
 
     }
 }

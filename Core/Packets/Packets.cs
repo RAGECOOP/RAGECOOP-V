@@ -135,31 +135,20 @@ namespace RageCoop.Core
         VehicleStateSync = 21,
         CharacterSync = 22,
         CharacterStateSync = 23,
+        ProjectileSync=24,
         #endregion
 
         #region EVENT
 
         PedKilled=30,
         BulletShot=31,
-        ProjectileShot=32,
-        ProjectileExploded=33,
-        EnteringVehicle=34,
-        LeaveVehicle = 35,
-        EnteredVehicle=36,
-        OwnerChanged=37,
-        VehicleBulletShot = 38,
+        EnteringVehicle=32,
+        LeaveVehicle = 33,
+        EnteredVehicle=34,
+        OwnerChanged=35,
+        VehicleBulletShot = 36,
 
         #endregion
-        /// obsolete sync method
-        /* 
-        FullSyncPlayer = 3,
-        FullSyncPlayerVeh = 4,
-        LightSyncPlayer = 5,
-        LightSyncPlayerVeh = 6,
-        SuperLightSync = 7,
-        FullSyncNpc = 8,
-        FullSyncNpcVeh = 9,
-        */
 
         #endregion
     }

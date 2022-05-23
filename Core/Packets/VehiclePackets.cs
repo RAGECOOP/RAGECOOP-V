@@ -228,7 +228,7 @@ namespace RageCoop.Core
                 List<byte> byteArray = new List<byte>();
 
                 // Write vehicle id
-                byteArray.AddRange(BitConverter.GetBytes(ID));
+                byteArray.AddInt(ID);
 
                 // Write position
                 byteArray.AddLVector3(Position);

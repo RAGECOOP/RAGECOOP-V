@@ -82,12 +82,6 @@ namespace RageCoop.Client
         public Dictionary<byte, short> Clothes { get; set; }
 
         public float Heading { get; set; }
-
-        /// <summary>
-        /// The latest character position (may not have been applied yet)
-        /// </summary>
-        public Vector3 Position { get; internal set; }
-        public Vector3 Velocity { get; set; }
         public Vector3 RotationVelocity { get; set; }
         public Vector3 AimCoords { get; set; }
 
@@ -311,7 +305,6 @@ namespace RageCoop.Client
         /// <summary>
         /// The latest character rotation (may not have been applied yet)
         /// </summary>
-        public Vector3 Rotation { get; internal set; }
         public byte Speed { get; set; }
         private bool _lastIsJumping = false;
         public bool IsJumping { get; set; }

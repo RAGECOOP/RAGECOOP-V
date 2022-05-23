@@ -34,11 +34,11 @@ namespace RageCoop.Core
 
                 List<byte> byteArray = new List<byte>();
 
-                // Write player netHandle
-                byteArray.AddRange(BitConverter.GetBytes(ID));
+                // Write ID
+                byteArray.AddInt(ID);
 
-                // Write player model hash
-                byteArray.AddRange(BitConverter.GetBytes(ModelHash));
+                // Write model hash
+                byteArray.AddInt(ModelHash);
 
                 // Write player clothes
                 // Write the count of clothes
@@ -150,7 +150,7 @@ namespace RageCoop.Core
                 List<byte> byteArray = new List<byte>();
 
                 // Write ped ID
-                byteArray.AddRange(BitConverter.GetBytes(ID));
+                byteArray.AddInt(ID);
 
 
                 // Write ped flags
@@ -160,19 +160,13 @@ namespace RageCoop.Core
                 byteArray.AddRange(BitConverter.GetBytes(Health));
 
                 // Write ped position
-                byteArray.AddRange(BitConverter.GetBytes(Position.X));
-                byteArray.AddRange(BitConverter.GetBytes(Position.Y));
-                byteArray.AddRange(BitConverter.GetBytes(Position.Z));
+                byteArray.AddLVector3(Position);
 
                 // Write ped rotation
-                byteArray.AddRange(BitConverter.GetBytes(Rotation.X));
-                byteArray.AddRange(BitConverter.GetBytes(Rotation.Y));
-                byteArray.AddRange(BitConverter.GetBytes(Rotation.Z));
+                byteArray.AddLVector3(Rotation);
 
                 // Write ped velocity
-                byteArray.AddRange(BitConverter.GetBytes(Velocity.X));
-                byteArray.AddRange(BitConverter.GetBytes(Velocity.Y));
-                byteArray.AddRange(BitConverter.GetBytes(Velocity.Z));
+                byteArray.AddLVector3(Velocity);
 
                 if (Flag.HasFlag(PedDataFlags.IsRagdoll))
                 {
@@ -188,9 +182,7 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(PedDataFlags.IsAiming))
                 {
                     // Write ped aim coords
-                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.X));
-                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.Y));
-                    byteArray.AddRange(BitConverter.GetBytes(AimCoords.Z));
+                    byteArray.AddLVector3(AimCoords);
                 }
 
                 byteArray.AddFloat(Heading);
@@ -217,28 +209,13 @@ namespace RageCoop.Core
                 Health = reader.ReadInt();
 
                 // Read player position
-                Position = new LVector3()
-                {
-                    X = reader.ReadFloat(),
-                    Y = reader.ReadFloat(),
-                    Z = reader.ReadFloat()
-                };
+                Position = reader.ReadLVector3();
 
                 // Read player rotation
-                Rotation = new LVector3()
-                {
-                    X = reader.ReadFloat(),
-                    Y = reader.ReadFloat(),
-                    Z = reader.ReadFloat()
-                };
+                Rotation = reader.ReadLVector3();
 
                 // Read player velocity
-                Velocity = new LVector3()
-                {
-                    X = reader.ReadFloat(),
-                    Y = reader.ReadFloat(),
-                    Z = reader.ReadFloat()
-                };
+                Velocity = reader.ReadLVector3();
 
                 // Read rotation velocity if in ragdoll
                 if (Flag.HasFlag(PedDataFlags.IsRagdoll))
@@ -256,12 +233,7 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(PedDataFlags.IsAiming))
                 {
                     // Read player aim coords
-                    AimCoords = new LVector3()
-                    {
-                        X = reader.ReadFloat(),
-                        Y = reader.ReadFloat(),
-                        Z = reader.ReadFloat()
-                    };
+                    AimCoords = reader.ReadLVector3();
                 }
 
                 Heading=reader.ReadFloat();

@@ -68,7 +68,6 @@ namespace RageCoop.Client.Menus.Sub
                     Main.Settings.PassengerKey.ToString(), 20));
                 _passengerKey.AltTitle=Main.Settings.PassengerKey.ToString();
                 Util.SaveSettings();
-
             }
             catch { }
         }
