@@ -61,7 +61,7 @@ namespace RageCoop.Client
         {
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
 
-            string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
+            string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\Settings.xml";
             Settings settings = null;
 
             if (File.Exists(path))

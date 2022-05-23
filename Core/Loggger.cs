@@ -13,14 +13,19 @@ namespace RageCoop.Core
         public string LogPath;
         private StreamWriter logWriter;
         private bool UseConsole=false;
+
+        /// <summary>
+        /// 0:Trace, 1:Debug, 2:Info, 3:Warning, 4:Error
+        /// </summary>
         public int LogLevel = 0;
         private string Buffer="";
         
-        public Loggger(string path)
+        public Loggger(string path,bool overwrite=true)
         {
             
             
             LogPath=path;
+            if (File.Exists(path)&&overwrite) { File.Delete(path); }
             Task.Run(() =>
             {
                 while (true)
@@ -102,7 +107,7 @@ namespace RageCoop.Core
 
         public void Trace(string message)
         {
-            if (LogLevel>1) { return; }
+            if (LogLevel>0) { return; }
             lock (Buffer)
             {
                 string msg = string.Format("[{0}][{2}] [TRC] {1}", Date(), message, Process.GetCurrentProcess().Id);
@@ -121,14 +126,22 @@ namespace RageCoop.Core
             {
                 if (Buffer!="")
                 {
-                    try
+                    if (UseConsole)
                     {
-                        logWriter=new StreamWriter(LogPath ,true,Encoding.UTF8);
-                        logWriter.Write(Buffer);
-                        logWriter.Close();
+                        Console.Write(Buffer);
                         Buffer="";
                     }
-                    catch { }
+                    else
+                    {
+                        try
+                        {
+                            logWriter=new StreamWriter(LogPath, true, Encoding.UTF8);
+                            logWriter.Write(Buffer);
+                            logWriter.Close();
+                            Buffer="";
+                        }
+                        catch { }
+                    }
                 }
 
             }

@@ -23,6 +23,12 @@ namespace RageCoop.Client
         /// </summary>
         public bool FlipMenu { get; set; } = false;
 
+        /// <summary>
+        /// LogLevel for RageCoop.
+        /// 0:Trace, 1:Debug, 2:Info, 3:Warning, 4:Error
+        /// </summary>
+        public int LogLevel = 2;
+
 
     }
 }

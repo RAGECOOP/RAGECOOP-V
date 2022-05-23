@@ -1,5 +1,4 @@
-﻿#undef DEBUG
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -42,14 +41,6 @@ namespace RageCoop.Client
         public static Stopwatch Counter = new Stopwatch();
 
         public static ulong Ticked = 0;
-
-        /*
-        // <ID,Entity>
-        public static Dictionary<int, CharacterEntity> Characters = new Dictionary<int, CharacterEntity>();
-
-        // Dictionary<int ID, Entuty>
-        public static Dictionary<int, VehicleEntity> Vehicles = new Dictionary<int, VehicleEntity>();
-        */
         public static Loggger Logger=new Loggger("Scripts\\RageCoop\\RageCoop.Client.log");
         
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
@@ -59,6 +50,7 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
+
             // Required for some synchronization!
             /*if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
@@ -86,7 +78,12 @@ namespace RageCoop.Client
             MainMenu = new MenusMain();
 #endif
             MainChat = new Chat();
+#if DEBUG
             Logger.LogLevel =0;
+#else
+            Logger.LogLevel=Settings.LogLevel;
+#endif
+
             Tick += OnTick;
             KeyDown += OnKeyDown;
             Aborted += (object sender, EventArgs e) => CleanUp();
@@ -172,12 +169,6 @@ namespace RageCoop.Client
             MainChat.Tick();
             MainPlayerList.Tick();
 
-#if DEBUG
-            if (UseDebug)
-            {
-                Debug();
-            }
-#endif
 
 
 
@@ -458,127 +449,5 @@ namespace RageCoop.Client
             return s;
         }
 
-#if DEBUG
-        private ulong _artificialLagCounter;
-        public static EntitiesPlayer DebugSyncPed;
-        public static ulong LastFullDebugSync = 0;
-        public static bool UseDebug = false;
-
-        private void Debug()
-        {
-            Ped player = Game.Player.Character;
-
-            if (!Players.ContainsKey(0))
-            {
-                Players.Add(0, new EntitiesPlayer() { Username = "DebugPlayer" });
-                DebugSyncPed = Players[0];
-            }
-
-            if ((Util.GetTickCount64() - _artificialLagCounter) < 147)
-            {
-                return;
-            }
-
-            bool fullSync = (Util.GetTickCount64() - LastFullDebugSync) > 39;
-
-            if (fullSync)
-            {
-                DebugSyncPed.ModelHash = player.Model.Hash;
-                DebugSyncPed.Clothes = player.GetPedClothes();
-            }
-            DebugSyncPed.Health = player.Health;
-            DebugSyncPed.Position = player.Position;
-
-            ushort? flags;
-
-            if (player.IsInVehicle())
-            {
-                Vehicle veh = player.CurrentVehicle;
-                veh.Opacity = 75;
-
-                flags = player.GetVehicleFlags(veh);
-
-                byte secondaryColor;
-                byte primaryColor;
-                unsafe
-                {
-                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
-                }
-
-                DebugSyncPed.VehicleModelHash = veh.Model.Hash;
-                DebugSyncPed.VehicleSeatIndex = (short)player.SeatIndex;
-                DebugSyncPed.Position = veh.Position;
-                DebugSyncPed.VehicleRotation = veh.Quaternion;
-                DebugSyncPed.VehicleEngineHealth = veh.EngineHealth;
-                DebugSyncPed.VehRPM = veh.CurrentRPM;
-                DebugSyncPed.Velocity = veh.Velocity;
-                DebugSyncPed.VehicleSpeed = veh.Speed;
-                DebugSyncPed.VehicleSteeringAngle = veh.SteeringAngle;
-                DebugSyncPed.AimCoords = veh.IsTurretSeat((int)player.SeatIndex) ? Util.GetVehicleAimCoords() : new GTA.Math.Vector3();
-                DebugSyncPed.VehicleColors = new byte[] { primaryColor, secondaryColor };
-                DebugSyncPed.VehicleMods = veh.Mods.GetVehicleMods();
-                DebugSyncPed.VehDamageModel = veh.GetVehicleDamageModel();
-                DebugSyncPed.LastSyncWasFull = true;
-                DebugSyncPed.IsInVehicle = true;
-                DebugSyncPed.VehIsEngineRunning = (flags.Value & (ushort)VehicleDataFlags.IsEngineRunning) > 0;
-                DebugSyncPed.VehAreLightsOn = (flags.Value & (ushort)VehicleDataFlags.AreLightsOn) > 0;
-                DebugSyncPed.VehAreBrakeLightsOn = (flags.Value & (ushort)VehicleDataFlags.AreBrakeLightsOn) > 0;
-                DebugSyncPed.VehAreHighBeamsOn = (flags.Value & (ushort)VehicleDataFlags.AreHighBeamsOn) > 0;
-                DebugSyncPed.VehIsSireneActive = (flags.Value & (ushort)VehicleDataFlags.IsSirenActive) > 0;
-                DebugSyncPed.VehicleDead = (flags.Value & (ushort)VehicleDataFlags.IsDead) > 0;
-                DebugSyncPed.IsHornActive = (flags.Value & (ushort)VehicleDataFlags.IsHornActive) > 0;
-                DebugSyncPed.Transformed = (flags.Value & (ushort)VehicleDataFlags.IsTransformed) > 0;
-                DebugSyncPed.VehRoofOpened = (flags.Value & (ushort)VehicleDataFlags.RoofOpened) > 0;
-                DebugSyncPed.VehLandingGear = veh.IsPlane ? (byte)veh.LandingGearState : (byte)0;
-                
-                if (DebugSyncPed.MainVehicle != null && DebugSyncPed.MainVehicle.Exists() && player.IsInVehicle())
-                {
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.MainVehicle.Handle, veh.Handle, false);
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, veh.Handle, DebugSyncPed.MainVehicle.Handle, false);
-                }
-            }
-            else
-            {
-                flags = player.GetPedFlags(true);
-
-                DebugSyncPed.Rotation = player.Rotation;
-                DebugSyncPed.Velocity = player.Velocity;
-                DebugSyncPed.Speed = player.GetPedSpeed();
-                DebugSyncPed.AimCoords = player.GetPedAimCoords(false);
-                DebugSyncPed.CurrentWeaponHash = (uint)player.Weapons.Current.Hash;
-                DebugSyncPed.WeaponComponents = player.Weapons.Current.GetWeaponComponents();
-                DebugSyncPed.LastSyncWasFull = true;
-                DebugSyncPed.IsAiming = (flags.Value & (ushort)PedDataFlags.IsAiming) > 0;
-                DebugSyncPed.IsShooting = (flags.Value & (ushort)PedDataFlags.IsShooting) > 0;
-                DebugSyncPed.IsReloading = (flags.Value & (ushort)PedDataFlags.IsReloading) > 0;
-                DebugSyncPed.IsJumping = (flags.Value & (ushort)PedDataFlags.IsJumping) > 0;
-                DebugSyncPed.IsRagdoll = (flags.Value & (ushort)PedDataFlags.IsRagdoll) > 0;
-                DebugSyncPed.IsOnFire = (flags.Value & (ushort)PedDataFlags.IsOnFire) > 0;
-                DebugSyncPed.IsInParachuteFreeFall = (flags.Value & (ushort)PedDataFlags.IsInParachuteFreeFall) > 0;
-                DebugSyncPed.IsParachuteOpen = (flags.Value & (ushort)PedDataFlags.IsParachuteOpen) > 0;
-                DebugSyncPed.IsOnLadder = (flags.Value & (ushort)PedDataFlags.IsOnLadder) > 0;
-                DebugSyncPed.IsVaulting = (flags.Value & (ushort)PedDataFlags.IsVaulting) > 0;
-                DebugSyncPed.IsInVehicle = false;
-
-                if (DebugSyncPed.Character != null && DebugSyncPed.Character.Exists())
-                {
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, DebugSyncPed.Character.Handle, player.Handle, false);
-                    Function.Call(Hash.SET_ENTITY_NO_COLLISION_ENTITY, player.Handle, DebugSyncPed.Character.Handle, false);
-                }
-            }
-
-            ulong currentTimestamp = Util.GetTickCount64();
-
-            DebugSyncPed.LastUpdateReceived = currentTimestamp;
-            DebugSyncPed.Latency = (currentTimestamp - _artificialLagCounter) / 1000f;
-
-            _artificialLagCounter = currentTimestamp;
-
-            if (fullSync)
-            {
-                LastFullDebugSync = currentTimestamp;
-            }
-        }
-#endif
     }
 }
