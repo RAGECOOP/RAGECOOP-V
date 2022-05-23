@@ -221,7 +221,7 @@ namespace RageCoop.Client
                 
                 if (!P.IsInVehicle())
                 {
-                    if (P.IsTaskActive(ETasks.EnterVehicle))
+                    if (P.IsTaskActive(TaskType.CTaskEnterVehicle))
                     {
                         P.Task.ClearAll();
                     }

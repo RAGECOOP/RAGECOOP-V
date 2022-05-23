@@ -15,11 +15,6 @@ namespace RageCoop.Client
     /// <summary>
     /// 
     /// </summary>
-    internal enum ETasks
-    {
-        CLIMB_LADDER = 47,
-        EnterVehicle = 160,
-    }
 
     internal static partial class Util
     {
@@ -265,12 +260,13 @@ namespace RageCoop.Client
                 flags |= PedDataFlags.IsParachuteOpen;
             }
 
-            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
+            bool climbingLadder = ped.IsTaskActive(TaskType.CTaskGoToAndClimbLadder);
+            if (climbingLadder)
             {
                 flags |= PedDataFlags.IsOnLadder;
             }
 
-            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
+            if (ped.IsVaulting && !climbingLadder)
             {
                 flags |= PedDataFlags.IsVaulting;
             }
@@ -434,7 +430,7 @@ namespace RageCoop.Client
             }
             return result;
         }
-        public static bool IsTaskActive(this Ped p,ETasks task)
+        public static bool IsTaskActive(this Ped p,TaskType task)
         {
             return Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, p.Handle, task);
         }

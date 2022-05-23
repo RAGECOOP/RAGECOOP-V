@@ -434,7 +434,7 @@ namespace RageCoop.Client
                 SmoothTransition();
                 return;
             }
-            if (!IsOnLadder && Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, MainPed.Handle, ETasks.CLIMB_LADDER))
+            if (!IsOnLadder && MainPed.IsTaskActive(TaskType.CTaskGoToAndClimbLadder))
             {
                 MainPed.Task.ClearAllImmediately();
                 _currentAnimation[1] = "";
