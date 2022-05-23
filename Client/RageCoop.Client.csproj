@@ -124,7 +124,7 @@
     <Compile Include="COOPAPI.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
-    <Compile Include="Misc\eTaskTypeIndex.cs" />
+    <Compile Include="Misc\TaskType.cs" />
     <Compile Include="Menus\Sub\DebugMenu.cs" />
     <Compile Include="Networking\Receive.cs" />
     <Compile Include="Networking\Send.cs" />
@@ -138,7 +138,6 @@
     <Compile Include="Main.cs" />
     <Compile Include="Networking\MapLoader.cs" />
     <Compile Include="Menus\RageCoopMenu.cs" />
-    <Compile Include="Menus\Sub\Servers.cs" />
     <Compile Include="Menus\Sub\SettingsMenu.cs" />
     <Compile Include="Networking\Networking.cs" />
     <Compile Include="PlayerList.cs" />

@@ -21,7 +21,6 @@ namespace RageCoop.Client.Menus
         };
         #region SUB
         public Sub.SettingsMenu SubSettings = new Sub.SettingsMenu();
-        public Sub.Servers ServerList = new Sub.Servers();
         #endregion
 
         #region ITEMS
@@ -48,7 +47,6 @@ namespace RageCoop.Client.Menus
             ServerIpItem.Activated += ServerIpActivated;
             _serverConnectItem.Activated += (sender, item) => { Main.MainNetworking.DisConnectFromServer(Main.Settings.LastServerAddress); };
 
-            MainMenu.AddSubMenu(ServerList.MainMenu);
 
             MainMenu.Add(_usernameItem);
             MainMenu.Add(ServerIpItem);
@@ -58,7 +56,6 @@ namespace RageCoop.Client.Menus
             MainMenu.AddSubMenu(DebugMenu.MainMenu);
             MainMenu.Add(_aboutItem);
 
-            MenuPool.Add(ServerList.MainMenu);
             MenuPool.Add(MainMenu);
             MenuPool.Add(SubSettings.MainMenu);
             MenuPool.Add(DebugMenu.MainMenu);
@@ -94,17 +91,15 @@ namespace RageCoop.Client.Menus
             MainMenu.Items[0].Enabled = false;
             MainMenu.Items[1].Enabled = false;
             MainMenu.Items[2].Enabled = false;
-            MainMenu.Items[3].Enabled = false;
         }
 
         public void ConnectedMenuSetting()
         {
-            MainMenu.Items[3].Enabled = true;
-            MainMenu.Items[3].Title = "Disconnect";
+            MainMenu.Items[2].Enabled = true;
+            MainMenu.Items[2].Title = "Disconnect";
             SubSettings.MainMenu.Items[1].Enabled = !Main.DisableTraffic && Main.NPCsAllowed;
 
             MainMenu.Visible = false;
-            ServerList.MainMenu.Visible = false;
         }
 
         public void DisconnectedMenuSetting()
@@ -112,8 +107,7 @@ namespace RageCoop.Client.Menus
             MainMenu.Items[0].Enabled = true;
             MainMenu.Items[1].Enabled = true;
             MainMenu.Items[2].Enabled = true;
-            MainMenu.Items[3].Enabled = true;
-            MainMenu.Items[3].Title = "Connect";
+            MainMenu.Items[2].Title = "Connect";
             SubSettings.MainMenu.Items[1].Enabled = false;
         }
     }

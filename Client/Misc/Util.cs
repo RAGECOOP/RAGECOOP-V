@@ -89,7 +89,7 @@ namespace RageCoop.Client
         {
             try
             {
-                string path = Directory.GetCurrentDirectory() + "\\scripts\\CoopSettings.xml";
+                string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\Settings.xml";
 
                 using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
                 {

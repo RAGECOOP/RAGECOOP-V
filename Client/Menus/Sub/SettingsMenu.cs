@@ -53,6 +53,7 @@ namespace RageCoop.Client.Menus.Sub
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.MenuKey.ToString(), 20));
                 _menuKey.AltTitle=Main.Settings.MenuKey.ToString();
+                Util.SaveSettings();
             }
             catch { }
         }
@@ -66,6 +67,8 @@ namespace RageCoop.Client.Menus.Sub
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.PassengerKey.ToString(), 20));
                 _passengerKey.AltTitle=Main.Settings.PassengerKey.ToString();
+                Util.SaveSettings();
+
             }
             catch { }
         }
@@ -80,8 +83,6 @@ namespace RageCoop.Client.Menus.Sub
             Main.MainMenu.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
             MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
-            Main.MainMenu.ServerList.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
-
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }
