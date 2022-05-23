@@ -338,7 +338,7 @@ namespace RageCoop.Client
                     }
 
                     Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
-                    MainVehicle.SetVehicleDamageModel(DamageModel);
+                    MainVehicle.SetDamageModel(DamageModel);
 
                 }
                 MainVehicle.LockStatus=LockStatus;

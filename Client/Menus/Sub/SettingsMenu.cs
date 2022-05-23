@@ -1,6 +1,7 @@
-﻿#undef DEBUG
-using System.Drawing;
-
+﻿using System.Drawing;
+using System;
+using System.Windows.Forms;
+using GTA;
 using LemonUI.Menus;
 
 namespace RageCoop.Client.Menus.Sub
@@ -8,7 +9,7 @@ namespace RageCoop.Client.Menus.Sub
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class Settings
+    public class SettingsMenu
     {
         public NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
@@ -18,32 +19,55 @@ namespace RageCoop.Client.Menus.Sub
 
         private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
         private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
-#if DEBUG
-        private readonly NativeCheckboxItem _useDebugItem = new NativeCheckboxItem("Debug", Main.UseDebug);
         private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Main.MainNetworking.ShowNetworkInfo);
-#endif
+        private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
+        private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
 
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public Settings()
+        public SettingsMenu()
         {
             MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
-#if DEBUG
-            _useDebugItem.CheckboxChanged += UseDebugCheckboxChanged;
             _showNetworkInfoItem.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
-#endif
+            _menuKey.Activated+=ChaneMenuKey;
+            _passengerKey.Activated+=ChangePassengerKey;
 
             MainMenu.Add(_disableTrafficItem);
             MainMenu.Add(_flipMenuItem);
-#if DEBUG
-            MainMenu.Add(_useDebugItem);
             MainMenu.Add(_showNetworkInfoItem);
-#endif
+            MainMenu.Add(_menuKey);
+            MainMenu.Add(_passengerKey);
+        }
+
+        private void ChaneMenuKey(object sender, EventArgs e)
+        {
+            try
+            {
+                Main.Settings.MenuKey =(Keys)Enum.Parse(
+                    typeof(Keys),
+                    Game.GetUserInput(WindowTitle.EnterMessage20,
+                    Main.Settings.MenuKey.ToString(), 20));
+                _menuKey.AltTitle=Main.Settings.MenuKey.ToString();
+            }
+            catch { }
+        }
+
+        private void ChangePassengerKey(object sender, EventArgs e)
+        {
+            try
+            {
+                Main.Settings.PassengerKey =(Keys)Enum.Parse(
+                    typeof(Keys),
+                    Game.GetUserInput(WindowTitle.EnterMessage20,
+                    Main.Settings.PassengerKey.ToString(), 20));
+                _passengerKey.AltTitle=Main.Settings.PassengerKey.ToString();
+            }
+            catch { }
         }
 
         public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
@@ -53,33 +77,13 @@ namespace RageCoop.Client.Menus.Sub
 
         public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
         {
-#if !NON_INTERACTIVE
             Main.MainMenu.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
-#endif
+
             MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
             Main.MainMenu.ServerList.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
-        }
-
-#if DEBUG
-        public void UseDebugCheckboxChanged(object a, System.EventArgs b)
-        {
-            Main.UseDebug = _useDebugItem.Checked;
-
-            if (!_useDebugItem.Checked && Main.DebugSyncPed != null)
-            {
-                if (Main.DebugSyncPed.Character.Exists())
-                {
-                    Main.DebugSyncPed.Character.Kill();
-                    Main.DebugSyncPed.Character.Delete();
-                }
-
-                Main.DebugSyncPed = null;
-                Main.LastFullDebugSync = 0;
-                Main.Players.Remove(0);
-            }
         }
 
         public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
@@ -92,6 +96,5 @@ namespace RageCoop.Client.Menus.Sub
                 Main.MainNetworking.BytesSend = 0;
             }
         }
-#endif
     }
 }

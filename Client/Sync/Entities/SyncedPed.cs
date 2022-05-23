@@ -71,7 +71,6 @@ namespace RageCoop.Client
         private bool _lastRagdoll=false;
         private ulong _lastRagdollTime=0;
         private bool _lastInCover = false;
-        private bool _isEnteringVehicle = false;
         /// <summary>
         /// The latest character model hash (may not have been applied yet)
         /// </summary>
@@ -334,7 +333,6 @@ namespace RageCoop.Client
 
         private bool _isPlayingAnimation = false;
         private string[] _currentAnimation = new string[2] { "", "" };
-        private float _animationStopTime = 0;
 
         private void DisplayOnFoot()
         {
@@ -693,8 +691,6 @@ namespace RageCoop.Client
             SmoothTransition();
         }
 
-        private bool StuckDetection = false;
-        private ulong LastStuckTime;
         private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
         {
             /*
@@ -767,19 +763,6 @@ namespace RageCoop.Client
             }
             MainPed.ApplyForce(f);
         }
-        private Vector3 GetCalibrationRotation()
-        {
-            var r = Rotation-MainPed.Rotation;
-            if (r.X>180) { r.X=(180-r.X); }
-            else if (r.X<-180) { r.X=360+r.X; }
-
-            if (r.Y>180||r.Y<-180) { r.Y=(180-r.Y); }
-            else if (r.Y<-180) { r.Y=360+r.Y; }
-
-            if (r.Z>180||r.Z<-180) { r.Z=(180-r.Z); }
-            else if (r.Z<-180) { r.Z=360+r.Z; }
-            return r;
-        }
         private string LoadAnim(string anim)
         {
             ulong startTime = Util.GetTickCount64();
@@ -796,42 +779,6 @@ namespace RageCoop.Client
 
             return anim;
         }
-        #endregion
-
-        #region QUEUED ACTIONS
-        #region ENTER-VEHICLE
-
-        /// <summary>
-        /// Tell this character to enter a vehicle and do callback when the task is finished.
-        /// </summary>
-        /// <param name="veh"></param>
-        /// <param name="seat"></param>
-        /// <param name="callback"> callback function to be invoked when done, accepting first argument that indicates whether the operation is successful.</param>
-        public void EnterVehicle(SyncedVehicle veh,VehicleSeat seat, Action<bool> callback)
-        {
-            Main.QueueAction(new Func<bool>(() =>
-            {
-                MainPed.Task.EnterVehicle(veh.MainVehicle, seat,-1,2,EnterVehicleFlags.AllowJacking|EnterVehicleFlags.WarpToDoor);
-                return true;
-            }));
-            int i = 0;
-            float maxwait = Game.FPS*5;
-            Main.QueueAction(new Func<bool>(() =>
-            {
-                i++;
-                if ((_lastEnteringVehicle && !MainPed.IsGettingIntoVehicle)||i>maxwait)
-                {
-                    callback(MainPed.IsInVehicle());
-                    _isEnteringVehicle=false;
-                    return true;
-                }
-                _lastEnteringVehicle = MainPed.IsGettingIntoVehicle;
-                return false;
-            }));
-            
-        }
-        #endregion
-        
         #endregion
     }
 }

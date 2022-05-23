@@ -17,7 +17,7 @@ namespace RageCoop.Client
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class Main : Script
+    internal class Main : Script
     {
 
         private bool _gameLoaded = false;
@@ -28,13 +28,13 @@ namespace RageCoop.Client
         public static int MyPlayerID=0;
         public static bool DisableTraffic = true;
         public static bool NPCsAllowed = false;
-         internal static RelationshipGroup SyncedPedsGroup;
+        internal static RelationshipGroup SyncedPedsGroup;
 
-        public static Settings Settings = null;
+        public static new Settings Settings = null;
         public static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
-        public static MenusMain MainMenu = null;
+        public static RageCoopMenu MainMenu = null;
 #endif
         public static Chat MainChat = null;
         public static PlayerList MainPlayerList = new PlayerList();
@@ -75,7 +75,7 @@ namespace RageCoop.Client
             MainNetworking = new Networking();
             MainNetworking.Start();
 #if !NON_INTERACTIVE
-            MainMenu = new MenusMain();
+            MainMenu = new RageCoopMenu();
 #endif
             MainChat = new Chat();
 #if DEBUG
@@ -106,7 +106,7 @@ namespace RageCoop.Client
             else if (!_gameLoaded && (_gameLoaded = true))
             {
 #if !NON_INTERACTIVE
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", "Press ~g~F9~s~ to open the menu.");
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP","Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
 #endif
             }
 
@@ -176,7 +176,6 @@ namespace RageCoop.Client
         }
 
 #if !NON_INTERACTIVE
-        bool _lastEnteringVeh=false;
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
@@ -189,80 +188,52 @@ namespace RageCoop.Client
                 Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
                 return;
             }
-
-            switch (e.KeyCode)
+            if(e.KeyCode == Settings.MenuKey)
             {
-                case Keys.F9:
-                    if (MainMenu.MenuPool.AreAnyVisible)
-                    {
-                        MainMenu.MainMenu.Visible = false;
-                        MainMenu.SubSettings.MainMenu.Visible = false;
-                    }
-                    else
-                    {
-                        MainMenu.MainMenu.Visible = true;
-                    }
-                    break;
-                case Keys.J:
-                    Game.Player.Character.CurrentVehicle.ApplyForce(new Vector3(0, 0, 100));
-                    Script.Yield();
-                    GTA.UI.Notification.Show(Game.Player.Character.CurrentVehicle.Speed.ToString());
-                    break;
-                default:
-                    if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
-                    {
-                        if (MainNetworking.IsOnServer())
-                        {
-                            ulong currentTimestamp = Util.GetTickCount64();
-                            MainPlayerList.Pressed = (currentTimestamp - MainPlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
-                        }
-                    }
-                    else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
-                    {
-                        if (MainNetworking.IsOnServer())
-                        {
-                            MainChat.Focused = true;
-                        }
-                    }
-                    break;
-            }
-
-
-            if (e.KeyCode==Keys.L)
-            {
-                GTA.UI.Notification.Show(DumpCharacters());
-            }
-            if (e.KeyCode==Keys.I)
-            {
-                GTA.UI.Notification.Show(DumpPlayers());
-            }
-            if (e.KeyCode==Keys.U)
-            {
-                Debug.ShowTimeStamps();
-            }
-            if (e.KeyCode==Keys.G)
-            {
-                var P = Game.Player.Character;
-                if (P.IsInVehicle())
+                if (MainMenu.MenuPool.AreAnyVisible)
                 {
-                    _lastEnteringVeh=false;
-                    P.Task.LeaveVehicle();
+                    MainMenu.MainMenu.Visible = false;
+                    MainMenu.SubSettings.MainMenu.Visible = false;
                 }
                 else
                 {
-                    var V = World.GetClosestVehicle(P.Position, 50);
-
-                    if (_lastEnteringVeh)
+                    MainMenu.MainMenu.Visible = true;
+                }
+            }
+            else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
+            {
+                if (MainNetworking.IsOnServer())
+                {
+                    ulong currentTimestamp = Util.GetTickCount64();
+                    MainPlayerList.Pressed = (currentTimestamp - MainPlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                }
+            }
+            else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
+            {
+                if (MainNetworking.IsOnServer())
+                {
+                    MainChat.Focused = true;
+                }
+            }
+            else if (e.KeyCode==Settings.PassengerKey)
+            {
+                var P = Game.Player.Character;
+                
+                if (!P.IsInVehicle())
+                {
+                    if (P.IsTaskActive(ETasks.EnterVehicle))
                     {
-                        P.Task.ClearAllImmediately();
-                        
-                        _lastEnteringVeh = false;
+                        P.Task.ClearAll();
                     }
-                    else if (V!=null)
+                    else
                     {
-                        var seat = Util.getNearestSeat(P, V);
-                        P.Task.EnterVehicle(V, seat);
-                        _lastEnteringVeh=true;
+                        var V = World.GetClosestVehicle(P.Position, 50);
+
+                        if (V!=null)
+                        {
+                            var seat = Util.GetNearestSeat(P, V);
+                            P.Task.EnterVehicle(V, seat);
+                        }
                     }
                 }
             }

@@ -1,4 +1,5 @@
 ﻿#undef DEBUG
+using System.Windows.Forms;
 namespace RageCoop.Client
 {
     /// <summary>
@@ -29,6 +30,15 @@ namespace RageCoop.Client
         /// </summary>
         public int LogLevel = 2;
 
+        /// <summary>
+        /// The key to open menu
+        /// </summary>
+        public Keys MenuKey { get; set; } = Keys.F9;
+
+        /// <summary>
+        /// The key to enter a vehicle as passenger.
+        /// </summary>
+        public Keys PassengerKey { get; set; }=Keys.G;
 
     }
 }

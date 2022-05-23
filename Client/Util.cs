@@ -12,9 +12,13 @@ using System.Diagnostics;
 
 namespace RageCoop.Client
 {
-    public enum ETasks
+    /// <summary>
+    /// 
+    /// </summary>
+    internal enum ETasks
     {
-        CLIMB_LADDER = 47
+        CLIMB_LADDER = 47,
+        EnterVehicle = 160,
     }
 
     internal static partial class Util
@@ -105,6 +109,180 @@ namespace RageCoop.Client
         }
 
 
+
+
+        public static bool IsBetween<T>(this T item, T start, T end)
+        {
+            return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
+        }
+
+        public static bool Compare<T, Y>(this Dictionary<T, Y> item, Dictionary<T, Y> item2)
+        {
+            if (item == null || item2 == null || item.Count != item2.Count)
+            {
+                return false;
+            }
+
+            foreach (KeyValuePair<T, Y> pair in item)
+            {
+                if (item2.TryGetValue(pair.Key, out Y value) && Equals(value, pair.Value))
+                {
+                    continue;
+                }
+
+                // TryGetValue() or Equals failed
+                return false;
+            }
+
+            // No difference between item and item2
+            return true;
+        }
+
+        #region MATH
+        public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, ulong currentTime, int duration)
+        {
+            return new Vector3()
+            {
+                X = LinearFloatLerp(start.X, end.X, currentTime, duration),
+                Y = LinearFloatLerp(start.Y, end.Y, currentTime, duration),
+                Z = LinearFloatLerp(start.Z, end.Z, currentTime, duration),
+            };
+        }
+
+        public static float LinearFloatLerp(float start, float end, ulong currentTime, int duration)
+        {
+            return (end - start) * currentTime / duration + start;
+        }
+
+        public static float Lerp(float from, float to, float fAlpha)
+        {
+            return (from * (1.0f - fAlpha)) + (to * fAlpha); //from + (to - from) * fAlpha
+        }
+
+        public static Vector3 RotationToDirection(Vector3 rotation)
+        {
+            double z = DegToRad(rotation.Z);
+            double x = DegToRad(rotation.X);
+            double num = Math.Abs(Math.Cos(x));
+
+            return new Vector3
+            {
+                X = (float)(-Math.Sin(z) * num),
+                Y = (float)(Math.Cos(z) * num),
+                Z = (float)Math.Sin(x)
+            };
+        }
+
+
+        #endregion
+
+        public static Model ModelRequest(this int hash)
+        {
+            Model model = new Model(hash);
+
+            if (!model.IsValid)
+            {
+                //GTA.UI.Notification.Show("~y~Not valid!");
+                return null;
+            }
+
+            if (!model.IsLoaded)
+            {
+                return model.Request(1000) ? model : null;
+            }
+
+            return model;
+        }
+
+        #region PED
+
+        public static byte GetPedSpeed(this Ped ped)
+        {
+            if (ped.IsSprinting)
+            {
+                return 3;
+            }
+            if (ped.IsRunning)
+            {
+                return 2;
+            }
+            if (ped.IsWalking)
+            {
+                return 1;
+            }
+            
+            return 0;
+        }
+
+        public static Dictionary<byte, short> GetPedClothes(this Ped ped)
+        {
+            Dictionary<byte, short> result = new Dictionary<byte, short>();
+            for (byte i = 0; i < 11; i++)
+            {
+                short mod = Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                result.Add(i, mod);
+            }
+            return result;
+        }
+
+        public static PedDataFlags GetPedFlags(this Ped ped)
+        {
+            PedDataFlags flags = PedDataFlags.None;
+
+            if (ped.IsAiming || ped.IsOnTurretSeat())
+            {
+                flags |= PedDataFlags.IsAiming;
+            }
+
+
+            if (ped.IsReloading)
+            {
+                flags |= PedDataFlags.IsReloading;
+            }
+
+            if (ped.IsJumping)
+            {
+                flags |= PedDataFlags.IsJumping;
+            }
+
+            if (ped.IsRagdoll)
+            {
+                flags |= PedDataFlags.IsRagdoll;
+            }
+
+            if (ped.IsOnFire)
+            {
+                flags |= PedDataFlags.IsOnFire;
+            }
+
+            if (ped.IsInParachuteFreeFall)
+            {
+                flags |= PedDataFlags.IsInParachuteFreeFall;
+            }
+
+            if (ped.ParachuteState == ParachuteState.Gliding)
+            {
+                flags |= PedDataFlags.IsParachuteOpen;
+            }
+
+            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
+            {
+                flags |= PedDataFlags.IsOnLadder;
+            }
+
+            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
+            {
+                flags |= PedDataFlags.IsVaulting;
+            }
+
+            if (ped.IsInCover || ped.IsGoingIntoCover)
+            {
+                flags |=PedDataFlags.IsInCover;
+            }
+
+            return flags;
+        }
+
         public static string[] GetReloadingAnimation(this Ped ped)
         {
             switch (ped.Weapons.Current.Hash)
@@ -188,94 +366,134 @@ namespace RageCoop.Client
                 case WeaponHash.MG:
                     return new string[2] { "weapons@machinegun@mg_str", "reload_aim" };
                 default:
-                    GTA.UI.Notification.Show($"~r~Reloading failed! Weapon ~g~[{ped.Weapons.Current.Hash}]~r~ could not be found!");
+                    Main.Logger.Warning($"~r~Reloading failed! Weapon ~g~[{ped.Weapons.Current.Hash}]~r~ could not be found!");
                     return null;
             }
         }
 
-        public static Model ModelRequest(this int hash)
+        public static VehicleSeat GetNearestSeat(Ped ped, Vehicle veh, float distanceToignoreDoors = 50f)
         {
-            Model model = new Model(hash);
-
-            if (!model.IsValid)
+            float num = 99f;
+            int result = -2;
+            Dictionary<string, int> dictionary = new Dictionary<string, int>();
+            dictionary.Add("door_dside_f", -1);
+            dictionary.Add("door_pside_f", 0);
+            dictionary.Add("door_dside_r", 1);
+            dictionary.Add("door_pside_r", 2);
+            foreach (string text in dictionary.Keys)
             {
-                //GTA.UI.Notification.Show("~y~Not valid!");
-                return null;
-            }
-
-            if (!model.IsLoaded)
-            {
-                return model.Request(1000) ? model : null;
-            }
-
-            return model;
-        }
-
-        public static bool IsBetween<T>(this T item, T start, T end)
-        {
-            return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
-        }
-
-        public static bool Compare<T, Y>(this Dictionary<T, Y> item, Dictionary<T, Y> item2)
-        {
-            if (item == null || item2 == null || item.Count != item2.Count)
-            {
-                return false;
-            }
-
-            foreach (KeyValuePair<T, Y> pair in item)
-            {
-                if (item2.TryGetValue(pair.Key, out Y value) && Equals(value, pair.Value))
+                bool flag = veh.Bones[text].Position != Vector3.Zero;
+                if (flag)
                 {
-                    continue;
+                    float num2 = ped.Position.DistanceTo(Function.Call<Vector3>(Hash.GET_WORLD_POSITION_OF_ENTITY_BONE, new InputArgument[]
+                    {
+                        veh,
+                        veh.Bones[text].Index
+                    }));
+                    bool flag2 = (num2 < distanceToignoreDoors) && (num2 < num)&& IsSeatUsableByPed(ped, veh, dictionary[text]);
+                    if (flag2)
+                    {
+                        num = num2;
+                        result = dictionary[text];
+                    }
+                }
+            }
+            return (VehicleSeat)result;
+        }
+        public static bool IsSeatUsableByPed(Ped ped, Vehicle veh, int _seat)
+        {
+            VehicleSeat seat = (VehicleSeat)_seat;
+            bool result = false;
+            bool flag = veh.IsSeatFree(seat);
+            if (flag)
+            {
+                result = true;
+            }
+            else
+            {
+
+                bool isDead = veh.GetPedOnSeat(seat).IsDead;
+                if (isDead)
+                {
+                    result = true;
+                }
+                else
+                {
+                    int num = Function.Call<int>(Hash.GET_RELATIONSHIP_BETWEEN_PEDS, new InputArgument[]
+                    {
+                        ped,
+                        veh.GetPedOnSeat(seat)
+                    });
+                    bool flag2 = num > 2;
+                    if (flag2)
+                    {
+                        result = true;
+                    }
                 }
 
-                // TryGetValue() or Equals failed
-                return false;
             }
-
-            // No difference between item and item2
-            return true;
+            return result;
         }
-
-        public static Vector3 LinearVectorLerp(Vector3 start, Vector3 end, ulong currentTime, int duration)
+        public static bool IsTaskActive(this Ped p,ETasks task)
         {
-            return new Vector3()
+            return Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, p.Handle, task);
+        }
+        public static Vector3 GetAimCoord(this Ped p)
+        {
+            var weapon = p.Weapons.CurrentWeaponObject;
+            if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
+            if (weapon!=null)
             {
-                X = LinearFloatLerp(start.X, end.X, currentTime, duration),
-                Y = LinearFloatLerp(start.Y, end.Y, currentTime, duration),
-                Z = LinearFloatLerp(start.Z, end.Z, currentTime, duration),
-            };
-        }
+                // Not very accurate, but doesn't matter
+                Vector3 dir = weapon.RightVector;
+                return weapon.Position+dir*20;
 
-        public static float LinearFloatLerp(float start, float end, ulong currentTime, int duration)
-        {
-            return (end - start) * currentTime / duration + start;
-        }
+                /*
+                RaycastResult result = World.Raycast(weapon.Position+dir, weapon.Position+dir*10000, IntersectFlags.Everything, p.IsInVehicle() ? (Entity)p : p.CurrentVehicle);
 
-        public static float Lerp(float from, float to, float fAlpha)
-        {
-            return (from * (1.0f - fAlpha)) + (to * fAlpha); //from + (to - from) * fAlpha
-        }
-
-        public static byte GetPedSpeed(this Ped ped)
-        {
-            if (ped.IsSprinting)
-            {
-                return 3;
+                if (result.DidHit)
+                {
+                    return result.HitPosition;
+                }
+                else
+                {
+                    return weapon.Position+dir*20;
+                }
+                */
             }
-            if (ped.IsRunning)
-            {
-                return 2;
-            }
-            if (ped.IsWalking)
-            {
-                return 1;
-            }
-            
-            return 0;
+            return GetLookingCoord(p);
+        }
+        public static Vector3 GetLookingCoord(this Ped p)
+        {
+            EntityBone b = p.Bones[Bone.FacialForehead];
+            Vector3 v = b.UpVector.Normalized;
+            return b.Position+200*v;
         }
 
+        public static void StayInCover(this Ped p)
+        {
+            Function.Call(Hash.TASK_STAY_IN_COVER, p);
+        }
+        public static VehicleSeat GetSeatTryingToEnter(this Ped p)
+        {
+            return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
+        }
+
+        public static Vector3 GetMuzzlePosition(this Ped p)
+        {
+            var w = p.Weapons.CurrentWeaponObject;
+            if (w!=null)
+            {
+                var hash = p.Weapons.Current.Hash;
+                if (MuzzleBoneIndexes.ContainsKey(hash)) { return w.Bones[MuzzleBoneIndexes[hash]].Position; }
+                return w.Position;
+            }
+            return p.Bones[Bone.SkelRightHand].Position;
+        }
+
+        #endregion
+
+        #region VEHICLE
 
         public static VehicleDataFlags GetVehicleFlags(this Vehicle veh)
         {
@@ -336,63 +554,6 @@ namespace RageCoop.Client
             return flags;
         }
 
-        public static PedDataFlags GetPedFlags(this Ped ped)
-        {
-            PedDataFlags flags = PedDataFlags.None;
-
-            if (ped.IsAiming || ped.IsOnTurretSeat())
-            {
-                flags |= PedDataFlags.IsAiming;
-            }
-
-
-            if (ped.IsReloading)
-            {
-                flags |= PedDataFlags.IsReloading;
-            }
-
-            if (ped.IsJumping)
-            {
-                flags |= PedDataFlags.IsJumping;
-            }
-
-            if (ped.IsRagdoll)
-            {
-                flags |= PedDataFlags.IsRagdoll;
-            }
-
-            if (ped.IsOnFire)
-            {
-                flags |= PedDataFlags.IsOnFire;
-            }
-
-            if (ped.IsInParachuteFreeFall)
-            {
-                flags |= PedDataFlags.IsInParachuteFreeFall;
-            }
-
-            if (ped.ParachuteState == ParachuteState.Gliding)
-            {
-                flags |= PedDataFlags.IsParachuteOpen;
-            }
-
-            if (Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER)) // USING_LADDER
-            {
-                flags |= PedDataFlags.IsOnLadder;
-            }
-
-            if (ped.IsVaulting && !Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, ped.Handle, ETasks.CLIMB_LADDER))
-            {
-                flags |= PedDataFlags.IsVaulting;
-            }
-
-            if (ped.IsInCover || ped.IsGoingIntoCover)
-            {
-                flags |=PedDataFlags.IsInCover;
-            }
-
-            return flags;
-        }
 
         public static bool HasFlag(this PedDataFlags flagToCheck,PedDataFlags flag)
         {
@@ -404,16 +565,6 @@ namespace RageCoop.Client
             return (flagToCheck & flag)!=0;
         }
 
-        public static Dictionary<byte, short> GetPedClothes(this Ped ped)
-        {
-            Dictionary<byte, short> result = new Dictionary<byte, short>();
-            for (byte i = 0; i < 11; i++)
-            {
-                short mod = Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
-                result.Add(i, mod);
-            }
-            return result;
-        }
 
         public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)
         {
@@ -508,32 +659,8 @@ namespace RageCoop.Client
             }
             return ps;
         }
-        public static void SetOnFire(this Entity e,bool toggle)
-        {
-            if (toggle)
-            {
-                Function.Call(Hash.START_ENTITY_FIRE, e.Handle);
-            }
-            else
-            {
-                Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
-            }
-        }
-        public static SyncedPed GetSyncEntity(this Ped p)
-        {
-            if(p == null) { return null; }
-            var c = EntityPool.GetPedByHandle(p.Handle);
-            if(c==null) { EntityPool.Add(c=new SyncedPed(p)); }
-            return c;
-        }
-        public static SyncedVehicle GetSyncEntity(this Vehicle veh)
-        {
-            if(veh == null) { return null; }
-            var v=EntityPool.GetVehicleByHandle(veh.Handle);
-            if (v==null) { EntityPool.Add(v=new SyncedVehicle(veh)); }
-            return v;
-        }
-        public static void SetVehicleDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
+
+        public static void SetDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
             for (int i = 0; i < 8; i++)
             {
@@ -590,132 +717,46 @@ namespace RageCoop.Client
             veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
 
+
+        #endregion
+
+        public static void SetOnFire(this Entity e,bool toggle)
+        {
+            if (toggle)
+            {
+                Function.Call(Hash.START_ENTITY_FIRE, e.Handle);
+            }
+            else
+            {
+                Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
+            }
+        }
+        
+        public static SyncedPed GetSyncEntity(this Ped p)
+        {
+            if(p == null) { return null; }
+            var c = EntityPool.GetPedByHandle(p.Handle);
+            if(c==null) { EntityPool.Add(c=new SyncedPed(p)); }
+            return c;
+        }
+        
+        public static SyncedVehicle GetSyncEntity(this Vehicle veh)
+        {
+            if(veh == null) { return null; }
+            var v=EntityPool.GetVehicleByHandle(veh.Handle);
+            if (v==null) { EntityPool.Add(v=new SyncedVehicle(veh)); }
+            return v;
+        }
+        
+        
         public static double DegToRad(double deg)
         {
             return deg * Math.PI / 180.0;
         }
 
-        public static Vector3 RotationToDirection(Vector3 rotation)
-        {
-            double z = DegToRad(rotation.Z);
-            double x = DegToRad(rotation.X);
-            double num = Math.Abs(Math.Cos(x));
+        
 
-            return new Vector3
-            {
-                X = (float)(-Math.Sin(z) * num),
-                Y = (float)(Math.Cos(z) * num),
-                Z = (float)Math.Sin(x)
-            };
-        }
-
-
-        public static VehicleSeat getNearestSeat(Ped ped, Vehicle veh, float distanceToignoreDoors=50f)
-        {
-            float num = 99f;
-            int result = -2;
-            Dictionary<string, int> dictionary = new Dictionary<string, int>();
-            dictionary.Add("door_dside_f", -1);
-            dictionary.Add("door_pside_f", 0);
-            dictionary.Add("door_dside_r", 1);
-            dictionary.Add("door_pside_r", 2);
-            foreach (string text in dictionary.Keys)
-            {
-                bool flag = veh.Bones[text].Position != Vector3.Zero;
-                if (flag)
-                {
-                    float num2 = ped.Position.DistanceTo(Function.Call<Vector3>(Hash.GET_WORLD_POSITION_OF_ENTITY_BONE, new InputArgument[]
-                    {
-                        veh,
-                        veh.Bones[text].Index
-                    }));
-                    bool flag2 = (num2 < distanceToignoreDoors) && (num2 < num )&& IsSeatUsableByPed(ped, veh, dictionary[text]);
-                    if (flag2)
-                    {
-                        num = num2;
-                        result = dictionary[text];
-                    }
-                }
-            }
-            return (VehicleSeat)result;
-        }
-        public static bool IsSeatUsableByPed(Ped ped, Vehicle veh, int _seat, bool allowJacking=false)
-        {
-            /*
-            
-            */
-            if (!allowJacking)
-            {
-                return veh.IsSeatFree((VehicleSeat)_seat);
-            }
-            else
-            {
-                VehicleSeat seat = (VehicleSeat)_seat;
-                bool result = false;
-                bool flag = veh.IsSeatFree(seat);
-                if (flag)
-                {
-                    result = true;
-                }
-                else
-                {
-
-                    bool isDead = veh.GetPedOnSeat(seat).IsDead;
-                    if (isDead)
-                    {
-                        result = true;
-                    }
-                    else
-                    {
-                        int num = Function.Call<int>(Hash.GET_RELATIONSHIP_BETWEEN_PEDS, new InputArgument[]
-                        {
-                        ped,
-                        veh.GetPedOnSeat(seat)
-                        });
-                        bool flag2 = num > 2;
-                        if (flag2)
-                        {
-                            result = true;
-                        }
-                    }
-
-                }
-                return result;
-            }
-        }
-        public static Vector3 GetAimCoord(this Ped p)
-        {
-            var weapon = p.Weapons.CurrentWeaponObject;
-            if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
-            if (weapon!=null)
-            {
-                Vector3 dir = weapon.RightVector;
-                return weapon.Position+dir*20;
-
-                
-                RaycastResult result = World.Raycast(weapon.Position+dir, weapon.Position+dir*10000, IntersectFlags.Everything, p.IsInVehicle() ? (Entity)p : p.CurrentVehicle);
-                
-                if (result.DidHit)
-                {
-                    return result.HitPosition;
-                }
-                else
-                {
-                    return weapon.Position+dir*20;
-                }
-            }
-            return GetLookingCoord(p);
-        }
-        public static Vector3 GetLookingCoord(this Ped p)
-        {
-            EntityBone b = p.Bones[Bone.FacialForehead];
-            Vector3 v = b.UpVector.Normalized;
-            return b.Position+200*v;
-        }
-        public static bool IsWeapon(this Entity e)
-        {
-            return WeaponModels.Contains(e.Model);
-        }
+        
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
             if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
@@ -761,14 +802,6 @@ namespace RageCoop.Client
             if (P.CurrentVehicle == null) { return false; }
             return IsTurretSeat(P.CurrentVehicle, (int)P.SeatIndex);
         }
-        public static void StayInCover(this Ped p)
-        {
-            Function.Call(Hash.TASK_STAY_IN_COVER, p);
-        }
-        public static VehicleSeat GetSeatTryingToEnter(this Ped p)
-        {
-            return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
-        }
 
 
         public static readonly Model[] WeaponModels = Weapon.GetAllModels();
@@ -792,17 +825,6 @@ namespace RageCoop.Client
                 case WeaponGroup.Unarmed: damage=0; break;
             }
             return damage;
-        }
-        public static Vector3 GetMuzzlePosition(this Ped p)
-        {
-            var w = p.Weapons.CurrentWeaponObject;
-            if (w!=null)
-            {
-                var hash = p.Weapons.Current.Hash;
-                if (MuzzleBoneIndexes.ContainsKey(hash)) { return w.Bones[MuzzleBoneIndexes[hash]].Position; }
-                return w.Position;
-            }
-            return p.Bones[Bone.SkelRightHand].Position;
         }
         public static readonly Dictionary<WeaponHash, int> MuzzleBoneIndexes = new Dictionary<WeaponHash, int>
         {

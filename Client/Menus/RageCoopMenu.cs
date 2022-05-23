@@ -10,7 +10,7 @@ namespace RageCoop.Client.Menus
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class MenusMain
+    public class RageCoopMenu
     {
         public ObjectPool MenuPool = new ObjectPool();
 
@@ -20,7 +20,7 @@ namespace RageCoop.Client.Menus
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         #region SUB
-        public Sub.Settings SubSettings = new Sub.Settings();
+        public Sub.SettingsMenu SubSettings = new Sub.SettingsMenu();
         public Sub.Servers ServerList = new Sub.Servers();
         #endregion
 
@@ -39,7 +39,7 @@ namespace RageCoop.Client.Menus
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public MenusMain()
+        public RageCoopMenu()
         {
             MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
@@ -55,13 +55,14 @@ namespace RageCoop.Client.Menus
             MainMenu.Add(_serverConnectItem);
 
             MainMenu.AddSubMenu(SubSettings.MainMenu);
-            MainMenu.AddSubMenu(DebugMenu.Menu);
+            MainMenu.AddSubMenu(DebugMenu.MainMenu);
             MainMenu.Add(_aboutItem);
 
             MenuPool.Add(ServerList.MainMenu);
             MenuPool.Add(MainMenu);
             MenuPool.Add(SubSettings.MainMenu);
-            MenuPool.Add(DebugMenu.Menu);
+            MenuPool.Add(DebugMenu.MainMenu);
+            MenuPool.Add(DebugMenu.DiagnosticMenu);
         }
 
         public void UsernameActivated(object a, System.EventArgs b)
