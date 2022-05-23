@@ -33,7 +33,7 @@ namespace RageCoop.Client
             }
             MainVehicle=v;
             MainVehicle.CanPretendOccupants=false;
-            OwnerID=Main.MyPlayerID;
+            OwnerID=Main.LocalPlayerID;
 
         }
 
@@ -99,18 +99,16 @@ namespace RageCoop.Client
         private long _lastPositionCalibrated { get; set; }
 
         #endregion
-        public void Update()
+        public override void Update()
         {
 
             #region -- INITIAL CHECK --
 
-            if (IsMine) { return; }
             // Check if all data avalible
-            if (LastStateSynced == 0) { return; }
-            if (LastSynced==0) { return; }
+            if(!IsReady) { return; }
 
             // Skip update if no new sync message has arrived.
-            if (LastUpdated>=LastSynced) { return; }
+            if (!NeedUpdate) { return; }
 
             #endregion
             #region -- CHECK EXISTENCE --
@@ -122,10 +120,6 @@ namespace RageCoop.Client
             #endregion
             
             #region -- SYNC CRITICAL --
-
-
-
-
 
 
             if (SteeringAngle != MainVehicle.SteeringAngle)

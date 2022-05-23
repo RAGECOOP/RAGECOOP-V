@@ -36,7 +36,7 @@ namespace RageCoop.Client
             p.CanWrithe=false;
             p.IsOnlyDamagedByPlayer=false;
             MainPed=p;
-            OwnerID=Main.MyPlayerID;
+            OwnerID=Main.LocalPlayerID;
 
         }
 
@@ -87,58 +87,46 @@ namespace RageCoop.Client
 
         
 
-        public bool Update()
+        public override void Update()
         {
-            
-            if (IsMine) {
-                // Main.Logger.Trace($"Skipping update for ped {ID}. Reason:WrongWay");
-                return false; 
-            }
-
-            if (IsPlayer && (MainPed!=null))
+            if (IsPlayer &&PedBlip!=null)
             {
 
                 if (Username=="N/A")
                 {
-                    var p = Main.MainPlayerList.GetPlayer(ID);
+                    var p = PlayerList.GetPlayer(ID);
                     if (p!=null)
                     {
                         Username=p.Username;
                         PedBlip.Name=Username;
-                        Main.Logger.Debug($"Username updated:{Username}");
                     }
 
                 }
                 RenderNameTag();
             }
 
-
             // Check if all data avalible
-            if ( LastSynced== 0) {
-                // Main.Logger.Trace($"Skipping update for ped {ID}. Reason:NotReady");
-                return false; 
-            }
-            if(LastStateSynced==0) {
-                // Main.Logger.Trace($"Skipping update for ped {ID}. Reason:StateNotReady");
-                return false; 
-            }
+            if (!IsReady) { return; }
 
             // Skip update if no new sync message has arrived.
-            if (LastUpdated>=LastSynced) {
-                // Main.Logger.Trace($"Skipping update for ped {ID}. Reason:NoNewMessage"); 
-                return false; 
+            if (!NeedUpdate)
+            {
+                return;
             }
 
 
 
 
-            bool characterExist = MainPed != null && MainPed.Exists();
+
+
+            bool characterExist = (MainPed != null) && MainPed.Exists();
 
             if (!characterExist)
             {
                 CreateCharacter();
-                return false;
+                return;
             }
+            
 
 
             // Need to update state
@@ -148,7 +136,7 @@ namespace RageCoop.Client
                 if (MainPed!=null&& (ModelHash != MainPed.Model.Hash))
                 {
                     CreateCharacter();
-                    return false;
+                    return;
                 }
 
                 if (!Clothes.Compare(_lastClothes))
@@ -183,7 +171,7 @@ namespace RageCoop.Client
                     MainPed.IsInvincible = false;
                     Main.Logger.Debug($"Killing ped {ID}. Reason:PedDied");
                     MainPed.Kill();
-                    return false;
+                    return;
                 }
             }
 
@@ -196,8 +184,7 @@ namespace RageCoop.Client
                 DisplayOnFoot();
             }
             LastUpdated=Main.Ticked;
-            // Main.Logger.Trace($"Character updated:{ID} LastUpdated:{LastUpdated}");
-            return true;
+            return;
         }
 
         
@@ -715,7 +702,7 @@ namespace RageCoop.Client
             {
                 MainPed.PositionNoOffset = Position;
                 /*
-                float lerpValue = (int)((Latency * 1000 / 2) + (Main.MainNetworking.Latency * 1000 / 2)) * 2 / 50000f;
+                float lerpValue = (int)((Latency * 1000 / 2) + (Networking.Latency * 1000 / 2)) * 2 / 50000f;
 
                 Vector2 biDimensionalPos = Vector2.Lerp(new Vector2(Character.Position.X, Character.Position.Y), new Vector2(Position.X + (Velocity.X / 5), Position.Y + (Velocity.Y / 5)), lerpValue);
                 float zPos = Util.Lerp(Character.Position.Z, Position.Z, 0.1f);

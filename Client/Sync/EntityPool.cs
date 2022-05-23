@@ -30,8 +30,8 @@ namespace RageCoop.Client
         {
             foreach(int id in new List<int>(ID_Peds.Keys))
             {
-                if (keepPlayer&&(id==Main.MyPlayerID)) { continue; }
-                if (keepMine&&(ID_Peds[id].OwnerID==Main.MyPlayerID)) { continue; }
+                if (keepPlayer&&(id==Main.LocalPlayerID)) { continue; }
+                if (keepMine&&(ID_Peds[id].OwnerID==Main.LocalPlayerID)) { continue; }
                 RemovePed(id);
             }
             ID_Peds.Clear();
@@ -39,7 +39,7 @@ namespace RageCoop.Client
 
             foreach (int id in new List<int>(ID_Vehicles.Keys))
             {
-                if (keepMine&&(ID_Vehicles[id].OwnerID==Main.MyPlayerID)) { continue; }
+                if (keepMine&&(ID_Vehicles[id].OwnerID==Main.LocalPlayerID)) { continue; }
                 RemoveVehicle(id);
             }
             ID_Vehicles.Clear();
@@ -60,7 +60,7 @@ namespace RageCoop.Client
         public static bool AddPlayer()
         {
             Ped p = Game.Player.Character;
-            SyncedPed player = GetPedByID(Main.MyPlayerID);
+            SyncedPed player = GetPedByID(Main.LocalPlayerID);
             if (player!=null)
             {
                 if (player.MainPed!=p)
@@ -88,10 +88,10 @@ namespace RageCoop.Client
             {
                 Main.Logger.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
                 SyncedPed c = new SyncedPed(p);
-                Main.MyPlayerID=c.OwnerID=c.ID;
+                Main.LocalPlayerID=c.OwnerID=c.ID;
                 Add(c);
                 Main.Logger.Debug($"My player ID is:{c.ID}");
-                Main.MainPlayerList.SetPlayer(c.ID, Main.Settings.Username );
+                PlayerList.SetPlayer(c.ID, Main.Settings.Username );
                 return true;
             }
             return false;
@@ -243,11 +243,11 @@ namespace RageCoop.Client
 
                         if (Main.Ticked%20==0)
                         {
-                            Main.MainNetworking.SendPedState(c);
+                            Networking.SendPedState(c);
                         }
                         else
                         {
-                            Main.MainNetworking.SendPed(c);
+                            Networking.SendPed(c);
                         }
                         
                     }
@@ -300,12 +300,12 @@ namespace RageCoop.Client
                     {
                         if (Main.Ticked%20==0)
                         {
-                            Main.MainNetworking.SendVehicleState(v);
+                            Networking.SendVehicleState(v);
                             
                         }
                         else
                         {
-                            Main.MainNetworking.SendVehicle(v);
+                            Networking.SendVehicle(v);
                         }
 
                     }

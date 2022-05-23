@@ -13,18 +13,14 @@ namespace RageCoop.Client {
     internal static class SyncEvents
     {
         #region TRIGGER
-        /// <summary>
-        /// Informs other players that this ped has been killed.
-        /// </summary>
-        /// <param name="c"></param>
         public static void TriggerPedKilled(SyncedPed victim)
         {
-            Main.MainNetworking.Send(new Packets.PedKilled() { VictimID=victim.ID},ConnectionChannel.SyncEvents);
+            Networking.Send(new Packets.PedKilled() { VictimID=victim.ID},ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerEnteringVehicle(SyncedPed c,SyncedVehicle veh, VehicleSeat seat)
         {
-            Main.MainNetworking.
+            Networking.
             Send(new Packets.EnteringVehicle()
             {
                 PedID=c.ID,
@@ -35,24 +31,24 @@ namespace RageCoop.Client {
 
         public static void TriggerEnteredVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
         {
-            Main.MainNetworking.Send(new Packets.EnteredVehicle()
+            if (seat==VehicleSeat.Driver)
+            {
+                TriggerChangeOwner(veh, c.ID);
+                veh.OwnerID=Main.LocalPlayerID;
+                veh.LastSynced=Main.Ticked;
+            }
+            Networking.Send(new Packets.EnteredVehicle()
             {
                 VehicleSeat=(short)seat,
                 PedID=c.ID,
                 VehicleID=veh.ID
             },ConnectionChannel.SyncEvents);
-            if (seat==VehicleSeat.Driver)
-            {
-                TriggerChangeOwner(veh, c.ID);
-                veh.OwnerID=Main.MyPlayerID;
-                veh.LastSynced=Main.Ticked;
-            }
         }
 
         public static void TriggerChangeOwner(SyncedVehicle c, int newOwnerID)
         {
 
-            Main.MainNetworking.Send(new Packets.OwnerChanged()
+            Networking.Send(new Packets.OwnerChanged()
             {
                 ID= c.ID,
                 NewOwnerID= newOwnerID,
@@ -77,11 +73,11 @@ namespace RageCoop.Client {
                 // Reduce latency
                 start=impactPosition-(impactPosition-start).Normalized*10;
             }
-            Main.MainNetworking.SendBulletShot(start, impactPosition, hash, owner.ID);
+            Networking.SendBulletShot(start, impactPosition, hash, owner.ID);
         }
         public static void TriggerLeaveVehicle(int id)
         {
-            Main.MainNetworking.
+            Networking.
             Send(new Packets.LeaveVehicle()
             {
                 ID=id
@@ -101,7 +97,7 @@ namespace RageCoop.Client {
                 
                 var start = p.Position;
                 var end = start+p.Velocity;
-                Main.MainNetworking.SendBulletShot(start, end, (uint)p.WeaponHash, pp.GetSyncEntity().ID);
+                Networking.SendBulletShot(start, end, (uint)p.WeaponHash, pp.GetSyncEntity().ID);
             }
         }
         #endregion
@@ -136,7 +132,11 @@ namespace RageCoop.Client {
             var v = EntityPool.GetVehicleByID(p.ID);
             if (v==null) { return; }
             v.OwnerID=p.NewOwnerID;
+
+            v.ModelHash=v.MainVehicle.Model;
+            // So this vehicle doesn's get re-spawned
         }
+
         private static ParticleEffectAsset CorePFXAsset = default;
 
         static WeaponAsset _weaponAsset = default;

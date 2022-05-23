@@ -23,7 +23,7 @@ namespace RageCoop.Client
             if (FileAlreadyExists(downloadFolder, name, length))
             {
                 // Send the server we are already done
-                Main.MainNetworking.SendDownloadFinish(id);
+                Networking.SendDownloadFinish(id);
 
                 Cancel(id);
                 return;

@@ -11,18 +11,16 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public partial class Networking
+    public static partial class Networking
     {
-        public NetClient Client;
-        public float Latency = 0;
+        public static NetClient Client;
+        public static float Latency = 0;
+        public static bool ShowNetworkInfo = false;
+        public static int BytesReceived = 0;
+        public static int BytesSend = 0;
+        private static Thread ReceiveThread;
 
-        public bool ShowNetworkInfo = false;
-
-        public int BytesReceived = 0;
-        public int BytesSend = 0;
-        private Thread ReceiveThread;
-
-        public void DisConnectFromServer(string address)
+        public static void DisConnectFromServer(string address)
         {
             if (IsOnServer())
             {
@@ -61,7 +59,7 @@ namespace RageCoop.Client
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                 new Packets.Handshake()
                 {
-                    PedID =  Main.MyPlayerID,
+                    PedID =  Main.LocalPlayerID,
                     Username = Main.Settings.Username,
                     ModVersion = Main.CurrentVersion,
                     NPCsAllowed = false
@@ -70,12 +68,11 @@ namespace RageCoop.Client
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
             }
         }
-
-        public bool IsOnServer()
+        public static bool IsOnServer()
         {
             return Client?.ConnectionStatus == NetConnectionStatus.Connected;
         }
-        public void Start()
+        public static void Start()
         {
             ReceiveThread=new Thread(() =>
             {
@@ -95,10 +92,9 @@ namespace RageCoop.Client
             ReceiveThread.Start();
         }
         
-
         #region -- GET --
         #region -- PLAYER --
-        private void PlayerConnect(Packets.PlayerConnect packet)
+        private static void PlayerConnect(Packets.PlayerConnect packet)
         {
             var p = new PlayerData
             {
@@ -106,24 +102,23 @@ namespace RageCoop.Client
                 Username= packet.Username,
             };
             GTA.UI.Notification.Show($"{p.Username} connected.");
-            Main.MainPlayerList.SetPlayer(packet.PedID, packet.Username);
+            PlayerList.SetPlayer(packet.PedID, packet.Username);
 
             Main.Logger.Debug($"player connected:{p.Username}");
             Main.DumpCharacters();
             COOPAPI.Connected(packet.PedID);
         }
-
-        private void PlayerDisconnect(Packets.PlayerDisconnect packet)
+        private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
-            var name=Main.MainPlayerList.GetPlayer(packet.PedID).Username;
+            var name=PlayerList.GetPlayer(packet.PedID).Username;
             GTA.UI.Notification.Show($"{name} left.");
             COOPAPI.Disconnected(packet.PedID);
-            Main.MainPlayerList.RemovePlayer(packet.PedID);
+            PlayerList.RemovePlayer(packet.PedID);
             EntityPool.RemoveAllFromPlayer(packet.PedID);
 
 
         }
-        private object DecodeNativeCall(ulong hash, List<object> args, bool returnValue, byte? returnType = null)
+        private static object DecodeNativeCall(ulong hash, List<object> args, bool returnValue, byte? returnType = null)
         {
             List<InputArgument> arguments = new List<InputArgument>();
 
@@ -185,7 +180,7 @@ namespace RageCoop.Client
             }
         }
 
-        private void DecodeNativeResponse(Packets.NativeResponse packet)
+        private static void DecodeNativeResponse(Packets.NativeResponse packet)
         {
             object result = DecodeNativeCall(packet.Hash, packet.Args, true, packet.ResultType);
 
@@ -217,7 +212,7 @@ namespace RageCoop.Client
         #endregion // -- PLAYER --
 
         #endregion
-        public void Tick()
+        public static void Tick()
         {
             
 

@@ -137,7 +137,7 @@ namespace RageCoop.Client
 
                     if (!string.IsNullOrWhiteSpace(CurrentInput))
                     {
-                        Main.MainNetworking.SendChatMessage(CurrentInput);
+                        Networking.SendChatMessage(CurrentInput);
                     }
 
                     Focused = false;

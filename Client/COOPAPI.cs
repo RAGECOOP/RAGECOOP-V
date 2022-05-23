@@ -99,7 +99,7 @@ namespace RageCoop.Client
         /// <param name="serverAddress">The server address to connect. Example: 127.0.0.1:4499</param>
         public static void Connect(string serverAddress)
         {
-            Main.MainNetworking.DisConnectFromServer(serverAddress);
+            Networking.DisConnectFromServer(serverAddress);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace RageCoop.Client
         /// </summary>
         public static void Disconnect()
         {
-            Main.MainNetworking.DisConnectFromServer(null);
+            Networking.DisConnectFromServer(null);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace RageCoop.Client
         /// </summary>
         public static bool IsOnServer()
         {
-            return Main.MainNetworking.IsOnServer();
+            return Networking.IsOnServer();
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace RageCoop.Client
         /// <returns>PlayerID</returns>
         public static long GetPlayerID()
         {
-            return Main.MyPlayerID;
+            return Main.LocalPlayerID;
         }
 
         /*
@@ -166,7 +166,7 @@ namespace RageCoop.Client
         /// </summary>
         public static bool IsPlayerListVisible()
         {
-            return Main.MainPlayerList != null && Util.GetTickCount64() - Main.MainPlayerList.Pressed < 5000;
+            return Util.GetTickCount64() - PlayerList.Pressed < 5000;
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace RageCoop.Client
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
         public static void SendDataToServer(string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(-1, modName, customID, bytes);
+            Networking.SendModData(-1, modName, customID, bytes);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace RageCoop.Client
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
         public static void SendDataToAll(string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(0, modName, customID, bytes);
+            Networking.SendModData(0, modName, customID, bytes);
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace RageCoop.Client
         /// <param name="bytes">Your class, structure or whatever in bytes</param>
         public static void SendDataToPlayer(long netHandle, string modName, byte customID, byte[] bytes)
         {
-            Main.MainNetworking.SendModData(netHandle, modName, customID, bytes);
+            Networking.SendModData(netHandle, modName, customID, bytes);
         }
 
         /// <summary>
@@ -253,10 +253,7 @@ namespace RageCoop.Client
         /// <param name="leftAlign">true to move the player list to the left</param>
         public static void SetPlayerListLeftAlign(bool leftAlign)
         {
-            if (Main.MainPlayerList != null)
-            {
-                Main.MainPlayerList.LeftAlign = leftAlign;
-            }
+            PlayerList.LeftAlign = leftAlign;
         }
 
 #if DEBUG

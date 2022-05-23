@@ -25,19 +25,17 @@ namespace RageCoop.Client
 
         public static readonly string CurrentVersion = "V0_1";
 
-        public static int MyPlayerID=0;
+        public static int LocalPlayerID=0;
         public static bool DisableTraffic = true;
         public static bool NPCsAllowed = false;
         internal static RelationshipGroup SyncedPedsGroup;
 
         public static new Settings Settings = null;
-        public static Networking MainNetworking = null;
 
 #if !NON_INTERACTIVE
         public static RageCoopMenu MainMenu = null;
 #endif
         public static Chat MainChat = null;
-        public static PlayerList MainPlayerList = new PlayerList();
         public static Stopwatch Counter = new Stopwatch();
 
         public static ulong Ticked = 0;
@@ -72,8 +70,7 @@ namespace RageCoop.Client
             SyncedPedsGroup=World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral, true);
             Settings = Util.ReadSettings();
-            MainNetworking = new Networking();
-            MainNetworking.Start();
+            Networking.Start();
 #if !NON_INTERACTIVE
             MainMenu = new RageCoopMenu();
 #endif
@@ -120,7 +117,7 @@ namespace RageCoop.Client
                 _isGoingToCar = false;
             }
             DoQueuedActions();
-            if (!MainNetworking.IsOnServer())
+            if (!Networking.IsOnServer())
             {
                 return;
             }
@@ -130,7 +127,7 @@ namespace RageCoop.Client
             }
             try
             {
-                MainNetworking.Tick();
+                Networking.Tick();
             }
             catch (Exception ex)
             {
@@ -145,20 +142,20 @@ namespace RageCoop.Client
             MapLoader.LoadAll();
 
 #if DEBUG
-            if (MainNetworking.ShowNetworkInfo)
+            if (Networking.ShowNetworkInfo)
             {
                 ulong time = Util.GetTickCount64();
                 if (time - _lastDebugData > 1000)
                 {
                     _lastDebugData = time;
 
-                    _debugBytesReceived = MainNetworking.BytesReceived;
-                    MainNetworking.BytesReceived = 0;
-                    _debugBytesSend = MainNetworking.BytesSend;
-                    MainNetworking.BytesSend = 0;
+                    _debugBytesReceived = Networking.BytesReceived;
+                    Networking.BytesReceived = 0;
+                    _debugBytesSend = Networking.BytesSend;
+                    Networking.BytesSend = 0;
                 }
 
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {MainNetworking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
@@ -167,7 +164,7 @@ namespace RageCoop.Client
 
 
             MainChat.Tick();
-            MainPlayerList.Tick();
+            PlayerList.Tick();
 
 
 
@@ -175,7 +172,6 @@ namespace RageCoop.Client
             Ticked++;
         }
 
-#if !NON_INTERACTIVE
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
@@ -202,15 +198,15 @@ namespace RageCoop.Client
             }
             else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
             {
-                if (MainNetworking.IsOnServer())
+                if (Networking.IsOnServer())
                 {
                     ulong currentTimestamp = Util.GetTickCount64();
-                    MainPlayerList.Pressed = (currentTimestamp - MainPlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                    PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                 }
             }
             else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
             {
-                if (MainNetworking.IsOnServer())
+                if (Networking.IsOnServer())
                 {
                     MainChat.Focused = true;
                 }
@@ -238,41 +234,12 @@ namespace RageCoop.Client
                 }
             }
         }
-#else
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (MainChat.Focused)
-            {
-                MainChat.OnKeyDown(e.KeyCode);
-                return;
-            }
-
-            if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
-            {
-                if (MainNetworking.IsOnServer())
-                {
-                    ulong currentTimestamp = Util.GetTickCount64();
-                    PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
-                }
-            }
-            else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
-            {
-                if (MainNetworking.IsOnServer())
-                {
-                    MainChat.Focused = true;
-                }
-            }
-        }
-#endif
-
         public static void CleanUp()
         {
-
             MainChat.Clear();
             EntityPool.Cleanup();
-            MainPlayerList=new PlayerList();
-
-            Main.MyPlayerID=default;
+            PlayerList.Cleanup();
+            Main.LocalPlayerID=default;
 
         }
 
@@ -411,7 +378,7 @@ namespace RageCoop.Client
         public static string DumpPlayers()
         {
             string s = "Players:";
-            foreach (PlayerData p in MainPlayerList.Players)
+            foreach (PlayerData p in PlayerList.Players)
             {
                 
                 s+=$"\r\nID:{p.PedID} Username:{p.Username}";

@@ -11,7 +11,7 @@ using GTA.Math;
 
 namespace RageCoop.Client
 {
-    public partial class Networking
+    public static partial class Networking
     {
 
         /// <summary>
@@ -20,7 +20,7 @@ namespace RageCoop.Client
         /// <param name="p"></param>
         /// <param name="channel"></param>
         /// <param name="method"></param>
-        public void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default,NetDeliveryMethod method=NetDeliveryMethod.UnreliableSequenced)
+        public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default,NetDeliveryMethod method=NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             p.Pack(outgoingMessage);
@@ -28,7 +28,7 @@ namespace RageCoop.Client
         }
 
         #region -- SEND --
-        public void SendPed(SyncedPed c)
+        public static void SendPed(SyncedPed c)
         {
             Ped p = c.MainPed;
             var packet=new Packets.PedSync()
@@ -53,7 +53,7 @@ namespace RageCoop.Client
             }
             Send(packet, ConnectionChannel.CharacterSync);
         }
-        public void SendPedState(SyncedPed c)
+        public static void SendPedState(SyncedPed c)
         {
             Ped p = c.MainPed;
 
@@ -68,7 +68,7 @@ namespace RageCoop.Client
 
             Send(packet, ConnectionChannel.CharacterSync);
         }
-        public void SendVehicle(SyncedVehicle v)
+        public static void SendVehicle(SyncedVehicle v)
         {
             Vehicle veh = v.MainVehicle;
             var packet = new Packets.VehicleSync()
@@ -84,7 +84,7 @@ namespace RageCoop.Client
             };
             Send(packet,ConnectionChannel.VehicleSync);
         }
-        public void SendVehicleState(SyncedVehicle v)
+        public static void SendVehicleState(SyncedVehicle v)
         {
             Vehicle veh = v.MainVehicle;
             byte primaryColor = 0;
@@ -111,7 +111,7 @@ namespace RageCoop.Client
         }
 
         #region SYNC EVENTS
-        public void SendBulletShot(Vector3 start,Vector3 end,uint weapon,int ownerID)
+        public static void SendBulletShot(Vector3 start,Vector3 end,uint weapon,int ownerID)
         {
             Send(new Packets.BulletShot()
             {
@@ -122,7 +122,7 @@ namespace RageCoop.Client
             }, ConnectionChannel.SyncEvents);
         }
         #endregion
-        public void SendChatMessage(string message)
+        public static void SendChatMessage(string message)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
@@ -138,8 +138,7 @@ namespace RageCoop.Client
             }
 #endif
         }
-
-        public void SendModData(long target, string modName, byte customID, byte[] bytes)
+        public static void SendModData(long target, string modName, byte customID, byte[] bytes)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             new Packets.Mod()
@@ -160,8 +159,7 @@ namespace RageCoop.Client
             }
 #endif
         }
-
-        public void SendDownloadFinish(byte id)
+        public static void SendDownloadFinish(byte id)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
@@ -177,8 +175,7 @@ namespace RageCoop.Client
             }
 #endif
         }
-
-        public void SendTriggerEvent(string eventName, params object[] args)
+        public static void SendTriggerEvent(string eventName, params object[] args)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 

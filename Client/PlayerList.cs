@@ -6,19 +6,19 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public class PlayerList
+    public static class PlayerList
     {
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;
-        private readonly Scaleform _mainScaleform = new Scaleform("mp_mm_card_freemode");
-        private ulong _lastUpdate = Util.GetTickCount64();
-        public ulong Pressed { get; set; }
+        private static readonly Scaleform _mainScaleform = new Scaleform("mp_mm_card_freemode");
+        private static ulong _lastUpdate = Util.GetTickCount64();
+        public static ulong Pressed { get; set; }
 
-        public bool LeftAlign = true;
-        public List<PlayerData> Players=new List<PlayerData> { };
-        public void Tick()
+        public static bool LeftAlign = true;
+        public static List<PlayerData> Players=new List<PlayerData> { };
+        public static void Tick()
         {
-            if (!Main.MainNetworking.IsOnServer())
+            if (!Networking.IsOnServer())
             {
                 return;
             }
@@ -41,12 +41,12 @@ namespace RageCoop.Client
             }
         }
 
-        private void Update( string localUsername)
+        private static void Update( string localUsername)
         {
             _lastUpdate = Util.GetTickCount64();
 
             _mainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            _mainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Main.MainNetworking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
+            _mainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Networking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
 
             int i = 1;
             
@@ -58,7 +58,7 @@ namespace RageCoop.Client
             _mainScaleform.CallFunction("SET_TITLE", "Player list", (Players.Count) + " players");
             _mainScaleform.CallFunction("DISPLAY_VIEW");
         }
-        public void SetPlayer(int id, string username)
+        public static void SetPlayer(int id, string username)
         {
             
             var toset = Players.Where(x => x.PedID==id);
@@ -74,17 +74,21 @@ namespace RageCoop.Client
                 Players.Add(p);
             }
         }
-        public PlayerData GetPlayer(int id)
+        public static PlayerData GetPlayer(int id)
         {
             return Players.Find(x => x.PedID==id);
         }
-        public void RemovePlayer(int id)
+        public static void RemovePlayer(int id)
         {
             var p = Players.Where(x => x.PedID==id);
             if (p.Any())
             {
                 Players.Remove(p.First());
             }
+        }
+        public static void Cleanup()
+        {
+            Players=new List<PlayerData> { };
         }
 
     }

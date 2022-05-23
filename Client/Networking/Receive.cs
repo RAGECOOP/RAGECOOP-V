@@ -10,9 +10,9 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public partial class Networking
+    public static partial class Networking
     {
-        public void ReceiveMessages()
+        public static void ReceiveMessages()
         {
             if (Client == null)
             {
@@ -65,7 +65,7 @@ namespace RageCoop.Client
                                     Main.QueueAction(() => {
                                         Main.MainMenu.ConnectedMenuSetting();
                                         Main.MainChat.Init();
-                                        Main.MainPlayerList = new PlayerList();
+                                        PlayerList.Cleanup();
                                         GTA.UI.Notification.Show("~g~Connected!");
                                     });
 
@@ -87,7 +87,6 @@ namespace RageCoop.Client
                                     Main.MainChat.Focused = false;
                                 }
 
-                                Main.MainPlayerList = null;
                                 Main.QueueAction(() => Main.CleanUp());
 
 #if !NON_INTERACTIVE
@@ -290,7 +289,7 @@ namespace RageCoop.Client
                 Client.Recycle(message);
             }
         }
-        private void PedSync(Packets.PedSync packet)
+        private static void PedSync(Packets.PedSync packet)
         {
             lock (EntityPool.PedsLock)
             {
@@ -332,7 +331,7 @@ namespace RageCoop.Client
                 }
             }
         }
-        private void PedStateSync(Packets.PedStateSync packet)
+        private static void PedStateSync(Packets.PedStateSync packet)
         {
             lock (EntityPool.PedsLock)
             {
@@ -351,7 +350,7 @@ namespace RageCoop.Client
                 c.LastSynced=c.LastStateSynced = Main.Ticked;
             }
         }
-        private void VehicleSync(Packets.VehicleSync packet)
+        private static void VehicleSync(Packets.VehicleSync packet)
         {
             lock (EntityPool.VehiclesLock)
             {
@@ -371,7 +370,7 @@ namespace RageCoop.Client
                 v.LastSynced=Main.Ticked;
             }
         }
-        private void VehicleStateSync(Packets.VehicleStateSync packet)
+        private static void VehicleStateSync(Packets.VehicleStateSync packet)
         {
             lock (EntityPool.VehiclesLock)
             {

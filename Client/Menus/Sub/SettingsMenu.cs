@@ -19,7 +19,7 @@ namespace RageCoop.Client.Menus.Sub
 
         private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
         private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
-        private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Main.MainNetworking.ShowNetworkInfo);
+        private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
         private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
 
@@ -88,12 +88,12 @@ namespace RageCoop.Client.Menus.Sub
 
         public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
         {
-            Main.MainNetworking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
+            Networking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
 
-            if (!Main.MainNetworking.ShowNetworkInfo)
+            if (!Networking.ShowNetworkInfo)
             {
-                Main.MainNetworking.BytesReceived = 0;
-                Main.MainNetworking.BytesSend = 0;
+                Networking.BytesReceived = 0;
+                Networking.BytesSend = 0;
             }
         }
     }

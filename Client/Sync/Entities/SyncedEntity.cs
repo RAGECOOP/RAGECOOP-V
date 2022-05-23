@@ -8,7 +8,7 @@ using GTA.Math;
 
 namespace RageCoop.Client
 {
-    public class SyncedEntity
+    public abstract class SyncedEntity
     {
         
         /// <summary>
@@ -18,7 +18,7 @@ namespace RageCoop.Client
         {
             get
             {
-                return OwnerID==Main.MyPlayerID;
+                return OwnerID==Main.LocalPlayerID;
             }
         }
 
@@ -30,6 +30,14 @@ namespace RageCoop.Client
             {
                 return Main.Ticked-LastSynced>200;
             }
+        }
+        public bool IsReady
+        {
+            get {return !(LastSynced==0||LastStateSynced==0);}
+        }
+        public bool NeedUpdate
+        {
+            get { return LastSynced>LastUpdated; }
         }
         #region LAST STATE
         /// <summary>
@@ -49,6 +57,7 @@ namespace RageCoop.Client
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public Vector3 Velocity { get; set; }
+        public abstract void Update();
 
     }
 }
