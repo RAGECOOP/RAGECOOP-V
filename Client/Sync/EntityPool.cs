@@ -66,7 +66,6 @@ namespace RageCoop.Client
                 if (player.MainPed!=p)
                 {
                     // Player model changed
-
                     player.MainPed = p;
 
                     // Remove it from Handle_Characters
@@ -74,6 +73,7 @@ namespace RageCoop.Client
                     if (pairs.Any())
                     {
                         var pair=pairs.First();
+
                         // Re-add
                         Handle_Peds.Remove(pair.Key);
                         if (Handle_Peds.ContainsKey(p.Handle))
@@ -191,6 +191,8 @@ namespace RageCoop.Client
                 ID_Vehicles.Remove(id);
             }
         }
+
+
 
         public static bool Exists(int id)
         {
@@ -354,6 +356,15 @@ namespace RageCoop.Client
         {
             Function.Call(Hash.SET_PED_POPULATION_BUDGET, b); // 0 - 3
             Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
+        }
+        public static string DumpDebug()
+        {
+            string s= "";
+            s+="\nID_Peds: "+ID_Peds.Count;
+            s+="\nHandle_Peds: "+Handle_Peds.Count;
+            s+="\nID_Vehicles: "+ID_Vehicles.Count;
+            s+="\nHandle_Vehicles: "+Handle_Vehicles.Count;
+            return s;
         }
     }
 }

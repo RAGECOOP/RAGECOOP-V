@@ -144,29 +144,6 @@ namespace RageCoop.Client
                 MainVehicle.Position=Position;
                 MainVehicle.Velocity=Velocity;
             }
-            #region OBSOLETE
-            // Good enough for now, but we need to create a better sync
-            /*
-            float dist = Position.DistanceTo(MainVehicle.Position);
-            Vector3 f = 5*dist * (Position+Velocity*0.06f - (MainVehicle.Position+MainVehicle.Velocity*delay));
-            
-            if (dist < 5f)
-            {
-                // Precised calibration
-                if (Velocity.Length()<0.05) { f*=10f; }
-                else if (dist<1)
-                {
-                    // Avoid vibration
-                    f+=(Velocity-MainVehicle.Velocity);
-                }
-                MainVehicle.ApplyForce(f);
-            }
-            else
-            {
-                MainVehicle.PositionNoOffset = Position;
-            }
-            */
-            #endregion
             Vector3 r = GetCalibrationRotation();
             if (r.Length() < 20f)
             {

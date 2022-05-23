@@ -89,7 +89,7 @@ namespace RageCoop.Client
 
         public override void Update()
         {
-            if (IsPlayer &&PedBlip!=null)
+            if (IsPlayer && PedBlip!=null)
             {
 
                 if (Username=="N/A")
@@ -427,7 +427,7 @@ namespace RageCoop.Client
                     MainPed.Task.Climb();
                 }
 
-                UpdateOnFootPosition(true, true, false);
+                SmoothTransition();
 
                 return;
             }
@@ -514,7 +514,7 @@ namespace RageCoop.Client
                         MainPed.Task.PlayAnimation(_currentAnimation[0], _currentAnimation[1], 8f, -1, AnimationFlags.AllowRotation | AnimationFlags.UpperBodyOnly);
                     }
                 }
-                UpdateOnFootPosition();
+                SmoothTransition();
             }
             else if (_currentAnimation[1] == "reload_aim")
             {
@@ -671,56 +671,6 @@ namespace RageCoop.Client
             SmoothTransition();
         }
 
-        private void UpdateOnFootPosition(bool updatePosition = true, bool updateRotation = true, bool updateVelocity = true)
-        {
-            /*
-            ulong time = Util.GetTickCount64();
-            
-            if (StuckDetection)
-            {
-                if (time - LastStuckTime >= 500)
-                {
-                    StuckDetection = false;
-
-                    if (Character.Position.DistanceTo(Position) > 5f)
-                    {
-                        Character.PositionNoOffset = Position;
-                        Character.Rotation = Rotation;
-                    }
-                }
-            }
-            else if (time - LastStuckTime >= 500)
-            {
-                if (Character.Position.DistanceTo(Position) > 5f)
-                {
-                    StuckDetection = true;
-                    LastStuckTime = time;
-                }
-            }
-            */
-            if (updatePosition)
-            {
-                MainPed.PositionNoOffset = Position;
-                /*
-                float lerpValue = (int)((Latency * 1000 / 2) + (Networking.Latency * 1000 / 2)) * 2 / 50000f;
-
-                Vector2 biDimensionalPos = Vector2.Lerp(new Vector2(Character.Position.X, Character.Position.Y), new Vector2(Position.X + (Velocity.X / 5), Position.Y + (Velocity.Y / 5)), lerpValue);
-                float zPos = Util.Lerp(Character.Position.Z, Position.Z, 0.1f);
-                Character.PositionNoOffset = new Vector3(biDimensionalPos.X, biDimensionalPos.Y, zPos);
-                */
-            }
-
-            if (updateRotation)
-            {
-                // You can find the ToQuaternion() for Rotation inside the VectorExtensions
-                MainPed.Quaternion = Rotation.ToQuaternion();
-            }
-
-            if (updateVelocity)
-            {
-                MainPed.Velocity = Velocity;
-            }
-        }
         private void SmoothTransition()
         {
             var localRagdoll = MainPed.IsRagdoll;

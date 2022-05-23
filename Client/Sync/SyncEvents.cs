@@ -12,6 +12,17 @@ using System.Threading;
 namespace RageCoop.Client { 
     internal static class SyncEvents
     {
+        public static event EventHandler<ProjectileShotEventArgs> OnProjectileShot;
+
+        static SyncEvents() {
+            OnProjectileShot+=(s, e) =>
+            {
+                if (e.IsMine)
+                {
+                    TriggerProjectileShot(e.Projectile);
+                }
+            };
+        }
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
@@ -267,12 +278,28 @@ namespace RageCoop.Client {
             _projectileShot=false;
             foreach (Projectile p in projectiles)
             {
-                var owner = p.Owner.GetSyncEntity();
-                if ((!lastProjectiles.Contains(p)) && (owner!=null) && owner.IsMine)
+                var owner = p.Owner?.GetSyncEntity();
+                if (!lastProjectiles.Contains(p))
                 {
-                    TriggerProjectileShot(p);
-                    _projectileShot=true;
+                    if((owner!=null) && owner.IsMine)
+                    {
+                        _projectileShot=true;
+                        OnProjectileShot?.Invoke(null, new ProjectileShotEventArgs()
+                        {
+                            Projectile=p,
+                            IsMine=true
+                        }) ;
+                    }
+                    else
+                    {
+                        OnProjectileShot?.Invoke(null, new ProjectileShotEventArgs()
+                        {
+                            Projectile=p,
+                            IsMine=false
+                        });
+                    }
                 }
+                
             }
 
             lastProjectiles=projectiles;
