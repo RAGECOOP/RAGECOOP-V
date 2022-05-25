@@ -9,3 +9,6 @@
 - Fixed wrong file and directory path, you may need to remove old versions before installing.
 - You can now change LogLevl in RageCoop.Client.Settings.xml. (default 2)
 
+# Known issues
+- Sticky bomb will randomly explode if attached to other player's vehicle
+
