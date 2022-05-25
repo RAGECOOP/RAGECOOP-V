@@ -133,7 +133,6 @@
     <None Include="packages.config" />
     <Compile Include="Sync\Entities\SyncedProjectile.cs" />
     <Compile Include="Sync\EntityPool.cs" />
-    <Compile Include="Sync\EventArgs\ProjectileShotEventArgs.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Entities\SyncedEntity.cs" />
     <Compile Include="Sync\Entities\SyncedVehicle.cs" />
