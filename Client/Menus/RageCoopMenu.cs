@@ -97,8 +97,6 @@ namespace RageCoop.Client.Menus
         {
             MainMenu.Items[2].Enabled = true;
             MainMenu.Items[2].Title = "Disconnect";
-            SubSettings.MainMenu.Items[1].Enabled = !Main.Settings.DisableTraffic && Main.NPCsAllowed;
-
             MainMenu.Visible = false;
         }
 

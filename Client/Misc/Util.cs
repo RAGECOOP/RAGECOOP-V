@@ -903,7 +903,8 @@ namespace RageCoop.Client
             WeaponHash.UpNAtomizer,
             WeaponHash.GrenadeLauncher,
             WeaponHash.GrenadeLauncherSmoke,
-            WeaponHash.CompactGrenadeLauncher
+            WeaponHash.CompactGrenadeLauncher,
+            WeaponHash.FlareGun,
         };
         /*
         public static readonly Dictionary<WeaponHash, ExplosionType> WeaponExplosionTypes = new Dictionary<WeaponHash, ExplosionType> {

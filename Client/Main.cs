@@ -178,15 +178,18 @@ namespace RageCoop.Client
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
             }
-            if (Game.IsControlPressed(GTA.Control.FrontendPause))
+            if (Networking.IsOnServer)
             {
-                Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
-                return;
-            }
-            if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate)&&Settings.DisableAlternatePause)
-            {
-                Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
-                return;
+                if (Game.IsControlPressed(GTA.Control.FrontendPause))
+                {
+                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                    return;
+                }
+                if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate)&&Settings.DisableAlternatePause)
+                {
+                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                    return;
+                }
             }
             if (e.KeyCode == Settings.MenuKey)
             {

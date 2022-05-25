@@ -14,7 +14,11 @@ namespace RageCoop.Client
             ID=EntityPool.RequestNewID();
             IsMine=true;
             MainProjectile = p;
-            ShooterID=p.Owner.GetSyncEntity().ID;
+            var shooter = p.Owner.GetSyncEntity();
+            if(shooter != null)
+            {
+                ShooterID=shooter.ID;
+            }
         }
         public SyncedProjectile(int id)
         {

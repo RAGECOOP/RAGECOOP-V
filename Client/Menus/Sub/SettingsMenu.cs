@@ -25,6 +25,7 @@ namespace RageCoop.Client.Menus.Sub
         
         private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
+        private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).",Main.Settings.WorldVehicleSoftLimit.ToString());
 
         /// <summary>
         /// Don't use it!
@@ -40,6 +41,7 @@ namespace RageCoop.Client.Menus.Sub
             _showNetworkInfoItem.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
             _menuKey.Activated+=ChaneMenuKey;
             _passengerKey.Activated+=ChangePassengerKey;
+            _vehicleSoftLimit.Activated+=vehicleSoftLimit_Activated;
 
             MainMenu.Add(_disableTrafficItem);
             MainMenu.Add(_disablePauseAlt);
@@ -47,14 +49,28 @@ namespace RageCoop.Client.Menus.Sub
             MainMenu.Add(_showNetworkInfoItem);
             MainMenu.Add(_menuKey);
             MainMenu.Add(_passengerKey);
+            MainMenu.Add(_vehicleSoftLimit);
         }
+
+        
 
         private void _disablePauseAlt_CheckboxChanged(object sender, EventArgs e)
         {
             Main.Settings.DisableAlternatePause=_disablePauseAlt.Checked;
             Util.SaveSettings();
         }
-
+        private void vehicleSoftLimit_Activated(object sender, EventArgs e)
+        {
+            try
+            {
+                Main.Settings.WorldVehicleSoftLimit =int.Parse(
+                    Game.GetUserInput(WindowTitle.EnterMessage20,
+                    Main.Settings.WorldVehicleSoftLimit.ToString(), 20));
+                _menuKey.AltTitle=Main.Settings.WorldVehicleSoftLimit.ToString();
+                Util.SaveSettings();
+            }
+            catch { }
+        }
         private void ChaneMenuKey(object sender, EventArgs e)
         {
             try

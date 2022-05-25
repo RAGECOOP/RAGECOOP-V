@@ -496,6 +496,11 @@ namespace RageCoop.Client
 
             if (IsReloading)
             {
+                if (!MainPed.IsTaskActive(TaskType.CTaskReloadGun))
+                {
+                    MainPed.Task.ReloadWeapon();
+                }
+                /*
                 if (!_isPlayingAnimation)
                 {
                     string[] reloadingAnim = MainPed.GetReloadingAnimation();
@@ -506,6 +511,7 @@ namespace RageCoop.Client
                         MainPed.Task.PlayAnimation(_currentAnimation[0], _currentAnimation[1], 8f, -1, AnimationFlags.AllowRotation | AnimationFlags.UpperBodyOnly);
                     }
                 }
+                */
                 SmoothTransition();
             }
             else if (_currentAnimation[1] == "reload_aim")
@@ -563,6 +569,7 @@ namespace RageCoop.Client
         }
 
         #region WEAPON
+        WeaponHash appliedWeaponhash = WeaponHash.Unarmed;
         private void CheckCurrentWeapon()
         {
             if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
@@ -592,7 +599,6 @@ namespace RageCoop.Client
                 _lastWeaponComponents = WeaponComponents;
             }
         }
-
 
         private void DisplayAiming()
         {

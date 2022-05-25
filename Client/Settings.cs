@@ -50,6 +50,11 @@ namespace RageCoop.Client
         /// </summary>
         public bool DisableAlternatePause { get; set; } = true;
 
+        /// <summary>
+        /// The game won't spawn more NPC traffic if the limit is exceeded. -1 for unlimited (not recommended).
+        /// </summary>
+        public int WorldVehicleSoftLimit { get; set; } = 35;
+
 
     }
 }

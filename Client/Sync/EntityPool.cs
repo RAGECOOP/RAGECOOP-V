@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using GTA;
 using GTA.Native;
 using RageCoop.Core;
@@ -16,7 +17,10 @@ namespace RageCoop.Client
         public static object PedsLock = new object();
         private static Dictionary<int, SyncedPed> ID_Peds = new Dictionary<int, SyncedPed>();
         public static int CharactersCount { get { return ID_Peds.Count; } }
+#if BENCHMARK
         private static Stopwatch PerfCounter=new Stopwatch();
+        private static Stopwatch PerfCounter2=Stopwatch.StartNew();
+#endif
         /// <summary>
         /// Faster access to Character with Handle, but values may not equal to <see cref="ID_Peds"/> since Ped might not have been created.
         /// </summary>
@@ -54,6 +58,8 @@ namespace RageCoop.Client
             ID_Projectiles.Clear();
             Handle_Projectiles.Clear();
         }
+
+        #region PEDS
         public static SyncedPed GetPedByID(int id)
         {
             return ID_Peds.ContainsKey(id) ? ID_Peds[id] : null;
@@ -140,6 +146,7 @@ namespace RageCoop.Client
                     Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
                     p.AttachedBlip?.Delete();
                     p.Kill();
+                    p.MarkAsNoLongerNeeded();
                     p.Delete();
                 }
                 c.PedBlip?.Delete();
@@ -147,8 +154,9 @@ namespace RageCoop.Client
                 ID_Peds.Remove(id);
             }
         }
+        #endregion
 
-
+        #region VEHICLES
         public static SyncedVehicle GetVehicleByID(int id)
         {
             return ID_Vehicles.ContainsKey(id) ? ID_Vehicles[id] : null;
@@ -195,13 +203,16 @@ namespace RageCoop.Client
                     }
                     Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
                     veh.AttachedBlip?.Delete();
+                    veh.MarkAsNoLongerNeeded();
                     veh.Delete();
                 }
                 ID_Vehicles.Remove(id);
             }
         }
 
+        #endregion
 
+        #region PROJECTILES
         public static SyncedProjectile GetProjectileByID(int id)
         {
             return ID_Projectiles.ContainsKey(id) ? ID_Projectiles[id] : null;
@@ -257,16 +268,26 @@ namespace RageCoop.Client
         {
             return ID_Projectiles.ContainsKey(id);
         }
+        #endregion
+
         public static void DoSync()
         {
+#if BENCHMARK
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles]=PerfCounter.ElapsedTicks;
+#endif
             var allPeds = World.GetAllPeds();
             var allVehicles=World.GetAllVehicles();
             var allProjectiles=World.GetAllProjectiles();
+            if (Main.Settings.WorldVehicleSoftLimit>-1)
+            {
+                if (Main.Ticked%100==0) { if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit) { SetBudget(0); } else { SetBudget(1); } }
+            }
 
-            if (Main.Ticked%100==0) { if (allVehicles.Length>50) { SetBudget(0); } else { SetBudget(1); } }
+#if BENCHMARK
+
             Debug.TimeStamps[TimeStamp.GetAllEntities]=PerfCounter.ElapsedTicks;
+#endif            
             lock (ProjectilesLock)
             {
 
@@ -306,6 +327,8 @@ namespace RageCoop.Client
                 }
 
             }
+
+
             lock (PedsLock)
             {
                 EntityPool.AddPlayer();
@@ -323,8 +346,10 @@ namespace RageCoop.Client
 
                     }
                 }
-                Debug.TimeStamps[TimeStamp.AddPeds]=PerfCounter.ElapsedTicks;
+#if BENCHMARK
 
+                Debug.TimeStamps[TimeStamp.AddPeds]=PerfCounter.ElapsedTicks;
+#endif
 
                 foreach (SyncedPed c in ID_Peds.Values.ToArray())
                 {
@@ -337,7 +362,9 @@ namespace RageCoop.Client
                     // Outgoing sync
                     if (c.IsMine)
                     {
-                        
+#if BENCHMARK
+                        var start = PerfCounter2.ElapsedTicks;
+#endif
                         // event check
                         SyncEvents.Check(c);
 
@@ -349,20 +376,31 @@ namespace RageCoop.Client
                         {
                             Networking.SendPed(c);
                         }
-                        
+#if BENCHMARK
+
+                        Debug.TimeStamps[TimeStamp.SendPed]=PerfCounter2.ElapsedTicks-start;
+#endif                        
                     }
                     else // Incoming sync
                     {
+#if BENCHMARK
+                        var start = PerfCounter2.ElapsedTicks;
+#endif
                         c.Update();
                         if (c.IsOutOfSync)
                         {
                             RemovePed(c.ID, "OutOfSync");
                         }
+#if BENCHMARK
 
+                        Debug.TimeStamps[TimeStamp.UpdatePed]=PerfCounter2.ElapsedTicks-start;
+#endif
                     }
                 }
-                Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
+#if BENCHMARK
 
+                Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
+#endif
             }
             lock (VehiclesLock)
             {
@@ -378,8 +416,10 @@ namespace RageCoop.Client
 
                     }
                 }
-                Debug.TimeStamps[TimeStamp.AddVehicles]=PerfCounter.ElapsedTicks;
+#if BENCHMARK
 
+                Debug.TimeStamps[TimeStamp.AddVehicles]=PerfCounter.ElapsedTicks;
+#endif
                 foreach (SyncedVehicle v in ID_Vehicles.Values.ToArray())
                 {
                     if ((v.MainVehicle!=null)&&(!v.MainVehicle.Exists()))
@@ -415,9 +455,9 @@ namespace RageCoop.Client
                     }
 
                 }
-                
+#if BENCHMARK
                 Debug.TimeStamps[TimeStamp.VehicleTotal]=PerfCounter.ElapsedTicks;
-
+#endif
             }
 
 
