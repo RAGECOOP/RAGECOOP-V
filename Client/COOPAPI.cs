@@ -115,7 +115,7 @@ namespace RageCoop.Client
         /// </summary>
         public static bool IsOnServer()
         {
-            return Networking.IsOnServer();
+            return Networking.IsOnServer;
         }
 
         /// <summary>

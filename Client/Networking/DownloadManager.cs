@@ -13,7 +13,7 @@ namespace RageCoop.Client
 
         public static void AddFile(byte id, string name, long length)
         {
-            string downloadFolder = $"scripts\\resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
+            string downloadFolder = $"Scripts\\RageCoop\\Resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
 
             if (!Directory.Exists(downloadFolder))
             {

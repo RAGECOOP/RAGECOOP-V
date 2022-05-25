@@ -18,7 +18,7 @@ namespace RageCoop.Client
         public static List<PlayerData> Players=new List<PlayerData> { };
         public static void Tick()
         {
-            if (!Networking.IsOnServer())
+            if (!Networking.IsOnServer)
             {
                 return;
             }

@@ -45,6 +45,11 @@ namespace RageCoop.Client
         /// </summary>
         public bool DisableTraffic { get; set; } = true;
 
+        /// <summary>
+        /// Bring up pause menu but don't freeze time when FrontEndPauseAlternate(Esc) is pressed.
+        /// </summary>
+        public bool DisableAlternatePause { get; set; } = true;
+
 
     }
 }

@@ -23,7 +23,7 @@ namespace RageCoop.Client
         private bool _gameLoaded = false;
         private static bool _isGoingToCar = false;
 
-        public static readonly string CurrentVersion = "V0_1";
+        public static readonly string CurrentVersion = "V0_2";
 
         public static int LocalPlayerID=0;
         public static bool NPCsAllowed = false;
@@ -116,7 +116,7 @@ namespace RageCoop.Client
                 _isGoingToCar = false;
             }
             DoQueuedActions();
-            if (!Networking.IsOnServer())
+            if (!Networking.IsOnServer)
             {
                 return;
             }
@@ -183,7 +183,12 @@ namespace RageCoop.Client
                 Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
                 return;
             }
-            if(e.KeyCode == Settings.MenuKey)
+            if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate)&&Settings.DisableAlternatePause)
+            {
+                Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                return;
+            }
+            if (e.KeyCode == Settings.MenuKey)
             {
                 if (MainMenu.MenuPool.AreAnyVisible)
                 {
@@ -197,7 +202,7 @@ namespace RageCoop.Client
             }
             else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
             {
-                if (Networking.IsOnServer())
+                if (Networking.IsOnServer)
                 {
                     ulong currentTimestamp = Util.GetTickCount64();
                     PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
@@ -205,7 +210,7 @@ namespace RageCoop.Client
             }
             else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
             {
-                if (Networking.IsOnServer())
+                if (Networking.IsOnServer)
                 {
                     MainChat.Focused = true;
                 }

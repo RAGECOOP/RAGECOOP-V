@@ -35,7 +35,14 @@ namespace RageCoop.Client
                 return;
             }
 
-            Game.DisableControlThisFrame(Control.FrontendPause);
+            if (Networking.IsOnServer)
+            {
+                Game.DisableControlThisFrame(Control.FrontendPause);
+                if (Main.Settings.DisableAlternatePause)
+                {
+                    Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
+                }
+            }
 
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.

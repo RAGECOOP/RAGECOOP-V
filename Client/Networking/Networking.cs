@@ -22,7 +22,7 @@ namespace RageCoop.Client
 
         public static void DisConnectFromServer(string address)
         {
-            if (IsOnServer())
+            if (IsOnServer)
             {
                 Client.Disconnect("Bye!");
             }
@@ -68,9 +68,9 @@ namespace RageCoop.Client
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
             }
         }
-        public static bool IsOnServer()
+        public static bool IsOnServer
         {
-            return Client?.ConnectionStatus == NetConnectionStatus.Connected;
+            get { return Client?.ConnectionStatus == NetConnectionStatus.Connected; }
         }
         public static void Start()
         {

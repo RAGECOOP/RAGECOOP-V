@@ -19,7 +19,10 @@ namespace RageCoop.Client.Menus.Sub
 
         private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
         private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
+        private readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
+
         private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
+        
         private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
 
@@ -32,16 +35,24 @@ namespace RageCoop.Client.Menus.Sub
             MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
+            _disablePauseAlt.CheckboxChanged+=_disablePauseAlt_CheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
             _showNetworkInfoItem.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
             _menuKey.Activated+=ChaneMenuKey;
             _passengerKey.Activated+=ChangePassengerKey;
 
             MainMenu.Add(_disableTrafficItem);
+            MainMenu.Add(_disablePauseAlt);
             MainMenu.Add(_flipMenuItem);
             MainMenu.Add(_showNetworkInfoItem);
             MainMenu.Add(_menuKey);
             MainMenu.Add(_passengerKey);
+        }
+
+        private void _disablePauseAlt_CheckboxChanged(object sender, EventArgs e)
+        {
+            Main.Settings.DisableAlternatePause=_disablePauseAlt.Checked;
+            Util.SaveSettings();
         }
 
         private void ChaneMenuKey(object sender, EventArgs e)
@@ -75,6 +86,7 @@ namespace RageCoop.Client.Menus.Sub
         public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
+            Util.SaveSettings() ;
         }
 
         public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
