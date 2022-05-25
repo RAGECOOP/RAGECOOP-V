@@ -5,4 +5,7 @@
 - Added option to disable FrontEndPauseAlternate (Esc), enabled by default.
 - Fixed weapon that doesn't have any components not displaying properly.
 - Small fix for passenger sync.
+- Added linux-x64, linux-arm and osx-x64 builds
+- Fixed wrong file and directory path, you may need to remove old versions before installing.
+- You can now change LogLevl in RageCoop.Client.Settings.xml. (default 2)
 
