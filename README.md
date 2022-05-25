@@ -23,6 +23,14 @@ Base sync logic has been updated. Peds and Vehicles are now synchronized indepen
 4. Framerate drop with high number of synchronized entities.
 5. Scripting API is screwed.(will be rewritten in the future)
 
+# Installation
+
+## Client
+Download latest release, remove old version of the mod. Extract the zip and put **RageCoop** in **Grand Theft Auto V/Scripts**.
+
+## Server
+Download latest release for your OS, then extract and run.
+
 # Downloads
 Download compiled binaries here: 
 [Release](https://gitlab.com/justasausage/RageCOOP-V/-/tree/main/Release)
