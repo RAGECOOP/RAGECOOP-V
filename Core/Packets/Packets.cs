@@ -117,6 +117,7 @@ namespace RageCoop.Core
         Handshake=0,
         PlayerConnect=1,
         PlayerDisconnect=2,
+        PlayerInfoUpdate=3,
         
         ChatMessage=10,
         NativeCall=11,
@@ -133,8 +134,8 @@ namespace RageCoop.Core
         #region INTERVAL
         VehicleSync = 20,
         VehicleStateSync = 21,
-        CharacterSync = 22,
-        CharacterStateSync = 23,
+        PedSync = 22,
+        PedStateSync = 23,
         ProjectileSync=24,
         #endregion
 
@@ -169,15 +170,9 @@ namespace RageCoop.Core
         File = 8,
         Event = 9,
         VehicleSync=20,
-        CharacterSync=21,
-        SyncEvents=30,
-        ///obsolete
-        /*
-        PlayerLight = 1,
-        PlayerFull = 2,
-        PlayerSuperLight = 3,
-        NPCFull = 4,
-        */
+        PedSync=21,
+        ProjectileSync = 22,
+        SyncEvents =30,
     }
 
     [Flags]

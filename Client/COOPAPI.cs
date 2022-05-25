@@ -243,7 +243,7 @@ namespace RageCoop.Client
         /// <param name="enable">true to disable traffic</param>
         public static void SetLocalTraffic(bool enable)
         {
-            Main.DisableTraffic = !enable;
+            Main.Settings.DisableTraffic = !enable;
         }
 
         /// <summary>

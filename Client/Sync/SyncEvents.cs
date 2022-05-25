@@ -12,17 +12,7 @@ using System.Threading;
 namespace RageCoop.Client { 
     internal static class SyncEvents
     {
-        public static event EventHandler<ProjectileShotEventArgs> OnProjectileShot;
 
-        static SyncEvents() {
-            OnProjectileShot+=(s, e) =>
-            {
-                if (e.IsMine)
-                {
-                    TriggerProjectileShot(e.Projectile);
-                }
-            };
-        }
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
@@ -69,6 +59,8 @@ namespace RageCoop.Client {
 
         public static void TriggerBulletShot(uint hash,SyncedPed owner,Vector3 impactPosition)
         {
+            Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
+
             // Minigun, not working for some reason
             if (hash==(uint)WeaponHash.Minigun)
             {
@@ -100,17 +92,6 @@ namespace RageCoop.Client {
 
         }
 
-        public static void TriggerProjectileShot(Projectile p)
-        {
-            var pp = p.Owner;
-            if (pp.IsShooting)
-            {
-                
-                var start = p.Position;
-                var end = start+p.Velocity;
-                Networking.SendBulletShot(start, end, (uint)p.WeaponHash, pp.GetSyncEntity().ID);
-            }
-        }
         #endregion
 
         #region HANDLE
@@ -135,8 +116,16 @@ namespace RageCoop.Client {
         public static void HandleEnteredVehicle(int pedId, int vehId, VehicleSeat seat)
         {
             var v = EntityPool.GetVehicleByID(vehId);
-            if (v==null) { return; }
-            EntityPool.GetPedByID(pedId)?.MainPed?.SetIntoVehicle(v.MainVehicle, seat);
+            var p = EntityPool.GetPedByID(pedId)?.MainPed;
+            if (v==null||p==null) { return; }
+            if (!v.MainVehicle.IsSeatFree(seat))
+            {
+                if (v.MainVehicle.GetPedOnSeat(seat)!=p)
+                {
+                    v.MainVehicle.GetPedOnSeat(seat).Task.WarpOutOfVehicle(v.MainVehicle);
+                }
+            }
+            p.SetIntoVehicle(v.MainVehicle, seat);
         }
         public static void HandleOwnerChanged(Packets.OwnerChanged p)
         {
@@ -269,46 +258,11 @@ namespace RageCoop.Client {
         */
         #region CHECK EVENTS
 
-        static bool _projectileShot = false;
-        static Projectile[] lastProjectiles=new Projectile[0];
-        public static void CheckProjectiles()
-        {
-            Projectile[] projectiles = World.GetAllProjectiles();
-
-            _projectileShot=false;
-            foreach (Projectile p in projectiles)
-            {
-                var owner = p.Owner?.GetSyncEntity();
-                if (!lastProjectiles.Contains(p))
-                {
-                    if((owner!=null) && owner.IsMine)
-                    {
-                        _projectileShot=true;
-                        OnProjectileShot?.Invoke(null, new ProjectileShotEventArgs()
-                        {
-                            Projectile=p,
-                            IsMine=true
-                        }) ;
-                    }
-                    else
-                    {
-                        OnProjectileShot?.Invoke(null, new ProjectileShotEventArgs()
-                        {
-                            Projectile=p,
-                            IsMine=false
-                        });
-                    }
-                }
-                
-            }
-
-            lastProjectiles=projectiles;
-        }
 
         public static void Check(SyncedPed c)
         {
             Ped subject = c.MainPed;
-            if (subject.IsShooting && !_projectileShot)
+            if (subject.IsShooting && !subject.IsUsingProjectileWeapon())
             {
                 int i = 0;
                 Func<bool> getBulletImpact = (() =>

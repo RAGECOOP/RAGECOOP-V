@@ -42,8 +42,8 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
 
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, Game.Player.Character.Handle, true, false);
-
-            if (Main.DisableTraffic)
+            if (Main.Settings==null) { return; }
+            if (Main.Settings.DisableTraffic)
             {
                 if (!_lastDisableTraffic)
                 {
@@ -63,7 +63,7 @@ namespace RageCoop.Client
                 Traffic(true);
             }
 
-            _lastDisableTraffic = Main.DisableTraffic;
+            _lastDisableTraffic = Main.Settings.DisableTraffic;
         }
 
         private void Traffic(bool enable)

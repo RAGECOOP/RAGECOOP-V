@@ -26,7 +26,6 @@ namespace RageCoop.Client
         public static readonly string CurrentVersion = "V0_1";
 
         public static int LocalPlayerID=0;
-        public static bool DisableTraffic = true;
         public static bool NPCsAllowed = false;
         internal static RelationshipGroup SyncedPedsGroup;
 

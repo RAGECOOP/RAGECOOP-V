@@ -17,7 +17,7 @@ namespace RageCoop.Client.Menus.Sub
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
-        private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.DisableTraffic);
+        private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
         private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
         private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
@@ -74,7 +74,7 @@ namespace RageCoop.Client.Menus.Sub
 
         public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
-            Main.DisableTraffic = _disableTrafficItem.Checked;
+            Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
         }
 
         public void FlipMenuCheckboxChanged(object a, System.EventArgs b)

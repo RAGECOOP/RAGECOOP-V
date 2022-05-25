@@ -11,23 +11,24 @@ using GTA.Math;
 
 namespace RageCoop.Client
 {
-    public static partial class Networking
+    internal static partial class Networking
     {
 
+
+        #region -- SEND --
         /// <summary>
         /// Pack the packet then send to server.
         /// </summary>
         /// <param name="p"></param>
         /// <param name="channel"></param>
         /// <param name="method"></param>
-        public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default,NetDeliveryMethod method=NetDeliveryMethod.UnreliableSequenced)
+        public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
             p.Pack(outgoingMessage);
             Client.SendMessage(outgoingMessage, method, (int)channel);
         }
 
-        #region -- SEND --
         public static void SendPed(SyncedPed c)
         {
             Ped p = c.MainPed;
@@ -51,7 +52,7 @@ namespace RageCoop.Client
             {
                 packet.RotationVelocity=p.RotationVelocity.ToLVector();
             }
-            Send(packet, ConnectionChannel.CharacterSync);
+            Send(packet, ConnectionChannel.PedSync);
         }
         public static void SendPedState(SyncedPed c)
         {
@@ -66,7 +67,7 @@ namespace RageCoop.Client
                 WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
             };
 
-            Send(packet, ConnectionChannel.CharacterSync);
+            Send(packet, ConnectionChannel.PedSync);
         }
         public static void SendVehicle(SyncedVehicle v)
         {
@@ -109,6 +110,23 @@ namespace RageCoop.Client
             };
             Send(packet, ConnectionChannel.VehicleSync);
         }
+        public static void SendProjectile(SyncedProjectile sp)
+        {
+            var p = sp.MainProjectile;
+            var packet = new Packets.ProjectileSync()
+            {
+                ID =sp.ID,
+                ShooterID=sp.ShooterID,
+                Position=p.Position.ToLVector(),
+                Rotation=p.Rotation.ToLVector(),
+                Velocity=p.Velocity.ToLVector(),
+                WeaponHash=(uint)p.WeaponHash,
+                Exploded=p.IsDead
+            };
+            if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID,"Dead"); }
+            Send(packet, ConnectionChannel.ProjectileSync);
+        }
+
 
         #region SYNC EVENTS
         public static void SendBulletShot(Vector3 start,Vector3 end,uint weapon,int ownerID)

@@ -147,17 +147,18 @@ namespace RageCoop.Core
             }
         }
 
-        public class PlayerPedID : Packet
+        public class PlayerInfoUpdate : Packet
         {
             /// <summary>
             /// Ped ID for this Player
             /// </summary>
             public int PedID { get; set; }
             public string Username { get; set; }
+            public float Latency { get; set; }
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PlayerConnect);
+                message.Write((byte)PacketTypes.PlayerInfoUpdate);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -167,11 +168,15 @@ namespace RageCoop.Core
                 // Get Username bytes
                 byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
 
+
                 // Write UsernameLength
                 byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
 
                 // Write Username
                 byteArray.AddRange(usernameBytes);
+
+                // Write Latency
+                byteArray.AddFloat(Latency);
 
                 byte[] result = byteArray.ToArray();
 
@@ -190,6 +195,8 @@ namespace RageCoop.Core
                 // Read Username
                 int usernameLength = reader.ReadInt();
                 Username = reader.ReadString(usernameLength);
+
+                Latency=reader.ReadFloat();
             }
         }
     }

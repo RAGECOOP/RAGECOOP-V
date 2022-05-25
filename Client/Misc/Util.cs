@@ -60,7 +60,7 @@ namespace RageCoop.Client
         {
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
 
-            string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\Settings.xml";
+            string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\RageCoop.Client.Settings.xml";
             Settings settings = null;
 
             if (File.Exists(path))
@@ -89,7 +89,7 @@ namespace RageCoop.Client
         {
             try
             {
-                string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\Settings.xml";
+                string path = Directory.GetCurrentDirectory() + "\\Scripts\\RageCoop\\RageCoop.Client.Settings.xml";
 
                 using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
                 {
@@ -485,6 +485,12 @@ namespace RageCoop.Client
                 return w.Position;
             }
             return p.Bones[Bone.SkelRightHand].Position;
+        }
+
+        public static bool IsUsingProjectileWeapon(this Ped p)
+        {
+            var w = p.Weapons.Current;
+            return w.Group==WeaponGroup.Thrown||ProjectileWeapons.Contains(w.Hash);
         }
 
         #endregion
@@ -890,7 +896,33 @@ namespace RageCoop.Client
             {WeaponHash.PumpShotgunMk2,7},
 
         };
-
+        public static readonly HashSet<WeaponHash> ProjectileWeapons = new HashSet<WeaponHash> {
+            WeaponHash.HomingLauncher,
+            WeaponHash.RPG,
+            WeaponHash.Firework,
+            WeaponHash.UpNAtomizer,
+            WeaponHash.GrenadeLauncher,
+            WeaponHash.GrenadeLauncherSmoke,
+            WeaponHash.CompactGrenadeLauncher
+        };
+        /*
+        public static readonly Dictionary<WeaponHash, ExplosionType> WeaponExplosionTypes = new Dictionary<WeaponHash, ExplosionType> {
+            { WeaponHash.Grenade,ExplosionType.Grenade},
+            { WeaponHash.GrenadeLauncher,ExplosionType.Grenade},
+            { WeaponHash.CompactGrenadeLauncher,ExplosionType.Grenade},
+            { WeaponHash.SmokeGrenade,ExplosionType.SmokeG},
+            { WeaponHash.GrenadeLauncherSmoke,ExplosionType.SmokeG},
+            { WeaponHash.StickyBomb,ExplosionType.StickyBomb},
+            { WeaponHash.Flare,ExplosionType.Flare},
+            { WeaponHash.FlareGun,ExplosionType.Flare},
+            { WeaponHash.Molotov,ExplosionType.Molotov1},
+            { WeaponHash.BZGas,ExplosionType.BZGas},
+            { WeaponHash.PipeBomb,ExplosionType.PipeBomb},
+            { WeaponHash.ProximityMine,ExplosionType.ProxMine},
+            { WeaponHash.Firework,ExplosionType.FireWork},
+            { WeaponHash.RPG,ExplosionType.Rocket},
+        };
+        */
     }
     /// <summary>
     /// 

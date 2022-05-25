@@ -58,7 +58,7 @@ namespace RageCoop.Client
             _mainScaleform.CallFunction("SET_TITLE", "Player list", (Players.Count) + " players");
             _mainScaleform.CallFunction("DISPLAY_VIEW");
         }
-        public static void SetPlayer(int id, string username)
+        public static void SetPlayer(int id, string username,float latency=0)
         {
             
             var toset = Players.Where(x => x.PedID==id);
@@ -67,10 +67,11 @@ namespace RageCoop.Client
                 var p=toset.First();
                 p.Username=username;
                 p.PedID=id;
+                p.Latency=latency;
             }
             else
             {
-                PlayerData p = new PlayerData { PedID=id, Username=username };
+                PlayerData p = new PlayerData { PedID=id, Username=username,Latency=latency };
                 Players.Add(p);
             }
         }

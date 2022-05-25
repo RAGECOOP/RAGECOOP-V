@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace RageCoop.Client
 {
@@ -26,6 +27,11 @@ namespace RageCoop.Client
         private static Dictionary<int, SyncedVehicle> ID_Vehicles = new Dictionary<int, SyncedVehicle>();
         private static Dictionary<int, SyncedVehicle> Handle_Vehicles = new Dictionary<int, SyncedVehicle>();
 
+        public static object ProjectilesLock = new object();
+        private static Dictionary<int, SyncedProjectile> ID_Projectiles = new Dictionary<int, SyncedProjectile>();
+        private static Dictionary<int, SyncedProjectile> Handle_Projectiles = new Dictionary<int, SyncedProjectile>();
+
+
         public static void Cleanup(bool keepPlayer=true,bool keepMine=true)
         {
             foreach(int id in new List<int>(ID_Peds.Keys))
@@ -44,6 +50,9 @@ namespace RageCoop.Client
             }
             ID_Vehicles.Clear();
             Handle_Vehicles.Clear();
+
+            ID_Projectiles.Clear();
+            Handle_Projectiles.Clear();
         }
         public static SyncedPed GetPedByID(int id)
         {
@@ -193,22 +202,111 @@ namespace RageCoop.Client
         }
 
 
-
-        public static bool Exists(int id)
+        public static SyncedProjectile GetProjectileByID(int id)
         {
-            return ID_Peds.ContainsKey(id) || ID_Vehicles.ContainsKey(id);
+            return ID_Projectiles.ContainsKey(id) ? ID_Projectiles[id] : null;
+        }
+        public static void Add(SyncedProjectile p)
+        {
+            if (ID_Projectiles.ContainsKey(p.ID))
+            {
+                ID_Projectiles[p.ID]=p;
+            }
+            else
+            {
+                ID_Projectiles.Add(p.ID, p);
+            }
+            if (p.MainProjectile==null) { return; }
+            if (Handle_Projectiles.ContainsKey(p.MainProjectile.Handle))
+            {
+                Handle_Projectiles[p.MainProjectile.Handle]=p;
+            }
+            else
+            {
+                Handle_Projectiles.Add(p.MainProjectile.Handle, p);
+            }
+        }
+        public static void RemoveProjectile(int id, string reason)
+        {
+            if (ID_Projectiles.ContainsKey(id))
+            {
+                SyncedProjectile sp = ID_Projectiles[id];
+                var p = sp.MainProjectile;
+                if (p!=null)
+                {
+                    if (Handle_Projectiles.ContainsKey(p.Handle))
+                    {
+                        Handle_Projectiles.Remove(p.Handle);
+                    }
+                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    p.Explode();
+                }
+                ID_Projectiles.Remove(id);
+            }
+        }
+
+        public static bool PedExists(int id)
+        {
+            return ID_Peds.ContainsKey(id);
+        }
+        public static bool VehicleExists(int id)
+        {
+            return ID_Vehicles.ContainsKey(id);
+        }
+        public static bool ProjectileExists(int id)
+        {
+            return ID_Projectiles.ContainsKey(id);
         }
         public static void DoSync()
         {
             PerfCounter.Restart();
-            SyncEvents.CheckProjectiles();
             Debug.TimeStamps[TimeStamp.CheckProjectiles]=PerfCounter.ElapsedTicks;
             var allPeds = World.GetAllPeds();
             var allVehicles=World.GetAllVehicles();
+            var allProjectiles=World.GetAllProjectiles();
+
             if (Main.Ticked%100==0) { if (allVehicles.Length>50) { SetBudget(0); } else { SetBudget(1); } }
             Debug.TimeStamps[TimeStamp.GetAllEntities]=PerfCounter.ElapsedTicks;
+            lock (ProjectilesLock)
+            {
 
-            lock (EntityPool.PedsLock)
+                foreach (Projectile p in allProjectiles)
+                {
+                    if (!Handle_Projectiles.ContainsKey(p.Handle))
+                    {
+                        Add(new SyncedProjectile(p));
+                        Main.Logger.Debug($"Projectile shot: {p.Handle}");
+                    }
+                }
+
+                foreach (SyncedProjectile p in ID_Projectiles.Values.ToArray())
+                {
+
+                    // Outgoing sync
+                    if (p.IsMine)
+                    {
+                        if (p.MainProjectile.AttachedEntity==null)
+                        {
+                            Networking.SendProjectile(p);
+                        }
+                    }
+                    else // Incoming sync
+                    {
+                        if (p.Exploded || p.IsOutOfSync)
+                        {
+                            RemoveProjectile(p.ID, "OutOfSync | Exploded");
+                        }
+                        else
+                        {
+                            p.Update();
+                        }
+
+                    }
+
+                }
+
+            }
+            lock (PedsLock)
             {
                 EntityPool.AddPlayer();
 
@@ -255,16 +353,10 @@ namespace RageCoop.Client
                     }
                     else // Incoming sync
                     {
-                        
-
                         c.Update();
                         if (c.IsOutOfSync)
                         {
-                            try
-                            {
-                                EntityPool.RemovePed(c.ID,"OutOfSync");
-                            }
-                            catch { }
+                            RemovePed(c.ID, "OutOfSync");
                         }
 
                     }
@@ -272,13 +364,12 @@ namespace RageCoop.Client
                 Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
 
             }
-            lock (EntityPool.VehiclesLock)
+            lock (VehiclesLock)
             {
 
                 foreach (Vehicle veh in allVehicles)
                 {
-                    SyncedVehicle v = EntityPool.GetVehicleByHandle(veh.Handle);
-                    if (v==null)
+                    if (!Handle_Vehicles.ContainsKey(veh.Handle))
                     {
                         Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
@@ -318,11 +409,7 @@ namespace RageCoop.Client
                         v.Update();
                         if (v.IsOutOfSync)
                         {
-                            try
-                            {
-                                EntityPool.RemoveVehicle(v.ID, "OutOfSync");
-                            }
-                            catch { }
+                            RemoveVehicle(v.ID, "OutOfSync");
                         }
 
                     }
@@ -335,6 +422,8 @@ namespace RageCoop.Client
 
 
         }
+
+
         public static void RemoveAllFromPlayer(int playerPedId)
         {
             foreach(SyncedPed p in ID_Peds.Values.ToArray())
@@ -352,6 +441,24 @@ namespace RageCoop.Client
                 }
             }
         }
+
+        public static int RequestNewID()
+        {
+            int ID=0;
+            while ((ID==0) 
+                || ID_Peds.ContainsKey(ID) 
+                || ID_Vehicles.ContainsKey(ID) 
+                || ID_Projectiles.ContainsKey(ID))
+            {
+                byte[] rngBytes = new byte[4];
+
+                RandomNumberGenerator.Create().GetBytes(rngBytes);
+
+                // Convert the bytes into an integer
+                ID = BitConverter.ToInt32(rngBytes, 0);
+            }
+            return ID;
+        }
         private static void SetBudget(int b)
         {
             Function.Call(Hash.SET_PED_POPULATION_BUDGET, b); // 0 - 3
@@ -365,6 +472,30 @@ namespace RageCoop.Client
             s+="\nID_Vehicles: "+ID_Vehicles.Count;
             s+="\nHandle_Vehicles: "+Handle_Vehicles.Count;
             return s;
+        }
+        public static class ThreadSafe
+        {
+            public static void Add(SyncedVehicle v)
+            {
+                lock (EntityPool.VehiclesLock)
+                {
+                    EntityPool.Add(v);
+                }
+            }
+            public static void Add(SyncedPed p)
+            {
+                lock (EntityPool.PedsLock)
+                {
+                    EntityPool.Add(p);
+                }
+            }
+            public static void Add(SyncedProjectile sp)
+            {
+                lock (EntityPool.ProjectilesLock)
+                {
+                    EntityPool.Add(sp);
+                }
+            }
         }
     }
 }

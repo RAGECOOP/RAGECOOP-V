@@ -10,7 +10,7 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public static partial class Networking
+    internal static partial class Networking
     {
         public static void ReceiveMessages()
         {
@@ -137,6 +137,13 @@ namespace RageCoop.Client
 
                                     }
                                     break;
+                                case PacketTypes.PlayerInfoUpdate:
+                                    {
+                                        var packet = new Packets.PlayerInfoUpdate();
+                                        packet.Unpack(data);
+                                        PlayerList.SetPlayer(packet.PedID,packet.Username,packet.Latency);
+                                        break;
+                                    }
                                 #region ENTITY SYNC
                                 case PacketTypes.VehicleSync:
                                     {
@@ -147,7 +154,7 @@ namespace RageCoop.Client
 
                                     }
                                     break;
-                                case PacketTypes.CharacterSync:
+                                case PacketTypes.PedSync:
                                     {
 
                                         Packets.PedSync packet = new Packets.PedSync();
@@ -165,7 +172,7 @@ namespace RageCoop.Client
 
                                     }
                                     break;
-                                case PacketTypes.CharacterStateSync:
+                                case PacketTypes.PedStateSync:
                                     {
 
 
@@ -175,6 +182,13 @@ namespace RageCoop.Client
 
                                     }
                                     break;
+                                case PacketTypes.ProjectileSync:
+                                    { 
+                                        Packets.ProjectileSync packet = new Packets.ProjectileSync();
+                                        packet.Unpack(data);
+                                        ProjectileSync(packet);
+                                        break;
+                                    }
                                 #endregion
                                 case PacketTypes.ChatMessage:
                                     {
@@ -289,125 +303,132 @@ namespace RageCoop.Client
                 Client.Recycle(message);
             }
         }
+
+
         private static void PedSync(Packets.PedSync packet)
         {
-            lock (EntityPool.PedsLock)
+            if (!EntityPool.PedExists(packet.ID))
             {
-                if (!EntityPool.Exists(packet.ID))
-                {
-                    Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                    
-                    EntityPool.Add(new SyncedPed(packet.ID));
-                }
-                PedDataFlags flags=packet.Flag;
-                SyncedPed c = EntityPool.GetPedByID(packet.ID);
-                c.ID=packet.ID;
-                //c.OwnerID=packet.OwnerID;
-                c.Health = packet.Health;
-                c.Position = packet.Position.ToVector();
-                c.Rotation = packet.Rotation.ToVector();
-                c.Velocity = packet.Velocity.ToVector();
-                c.Speed = packet.Speed;
-                c.CurrentWeaponHash = packet.CurrentWeaponHash;
-                c.IsAiming = flags.HasFlag(PedDataFlags.IsAiming);
-                c.IsReloading = flags.HasFlag(PedDataFlags.IsReloading);
-                c.IsJumping = flags.HasFlag(PedDataFlags.IsJumping) ;
-                c.IsRagdoll = flags.HasFlag(PedDataFlags.IsRagdoll);
-                c.IsOnFire = flags.HasFlag(PedDataFlags.IsOnFire) ;
-                c.IsInParachuteFreeFall = flags.HasFlag(PedDataFlags.IsInParachuteFreeFall);
-                c.IsParachuteOpen = flags.HasFlag(PedDataFlags.IsParachuteOpen);
-                c.IsOnLadder = flags.HasFlag(PedDataFlags.IsOnLadder);
-                c.IsVaulting = flags.HasFlag(PedDataFlags.IsVaulting);
-                c.IsInCover = flags.HasFlag(PedDataFlags.IsInCover);
-                c.Heading=packet.Heading;
-                c.LastSynced =  Main.Ticked;
-                if (c.IsAiming)
-                {
-                    c.AimCoords = packet.AimCoords.ToVector();
-                }
-                if (c.IsRagdoll)
-                {
-                    c.RotationVelocity=packet.RotationVelocity.ToVector();
-                }
+                Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+
+                EntityPool.ThreadSafe.Add(new SyncedPed(packet.ID));
+            }
+            PedDataFlags flags = packet.Flag;
+            SyncedPed c = EntityPool.GetPedByID(packet.ID);
+            c.ID=packet.ID;
+            //c.OwnerID=packet.OwnerID;
+            c.Health = packet.Health;
+            c.Position = packet.Position.ToVector();
+            c.Rotation = packet.Rotation.ToVector();
+            c.Velocity = packet.Velocity.ToVector();
+            c.Speed = packet.Speed;
+            c.CurrentWeaponHash = packet.CurrentWeaponHash;
+            c.IsAiming = flags.HasFlag(PedDataFlags.IsAiming);
+            c.IsReloading = flags.HasFlag(PedDataFlags.IsReloading);
+            c.IsJumping = flags.HasFlag(PedDataFlags.IsJumping);
+            c.IsRagdoll = flags.HasFlag(PedDataFlags.IsRagdoll);
+            c.IsOnFire = flags.HasFlag(PedDataFlags.IsOnFire);
+            c.IsInParachuteFreeFall = flags.HasFlag(PedDataFlags.IsInParachuteFreeFall);
+            c.IsParachuteOpen = flags.HasFlag(PedDataFlags.IsParachuteOpen);
+            c.IsOnLadder = flags.HasFlag(PedDataFlags.IsOnLadder);
+            c.IsVaulting = flags.HasFlag(PedDataFlags.IsVaulting);
+            c.IsInCover = flags.HasFlag(PedDataFlags.IsInCover);
+            c.Heading=packet.Heading;
+            c.LastSynced =  Main.Ticked;
+            if (c.IsAiming)
+            {
+                c.AimCoords = packet.AimCoords.ToVector();
+            }
+            if (c.IsRagdoll)
+            {
+                c.RotationVelocity=packet.RotationVelocity.ToVector();
             }
         }
         private static void PedStateSync(Packets.PedStateSync packet)
         {
-            lock (EntityPool.PedsLock)
+            if (!EntityPool.PedExists(packet.ID))
             {
-                if (!EntityPool.Exists(packet.ID))
-                {
-                    Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+                Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
 
-                    EntityPool.Add(new SyncedPed(packet.ID));
-                }
-                SyncedPed c = EntityPool.GetPedByID(packet.ID);
-                c.ID=packet.ID;
-                c.OwnerID=packet.OwnerID;
-                c.Clothes=packet.Clothes;
-                c.WeaponComponents=packet.WeaponComponents;
-                c.ModelHash=packet.ModelHash;
-                c.LastSynced=c.LastStateSynced = Main.Ticked;
+                EntityPool.ThreadSafe.Add(new SyncedPed(packet.ID));
             }
+            SyncedPed c = EntityPool.GetPedByID(packet.ID);
+            c.ID=packet.ID;
+            c.OwnerID=packet.OwnerID;
+            c.Clothes=packet.Clothes;
+            c.WeaponComponents=packet.WeaponComponents;
+            c.ModelHash=packet.ModelHash;
+            c.LastSynced=c.LastStateSynced = Main.Ticked;
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {
-            lock (EntityPool.VehiclesLock)
+            if (!EntityPool.VehicleExists(packet.ID))
             {
-                if (!EntityPool.Exists(packet.ID))
-                {
-                    EntityPool.Add(new SyncedVehicle(packet.ID));
-                }
-                SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-                v.ID= packet.ID;
-                v.Position=packet.Position.ToVector();
-                v.Rotation=packet.Rotation.ToVector();
-                v.SteeringAngle=packet.SteeringAngle;
-                v.ThrottlePower=packet.ThrottlePower;
-                v.BrakePower=packet.BrakePower;
-                v.Velocity=packet.Velocity.ToVector();
-                v.RotationVelocity=packet.RotationVelocity.ToVector();
-                v.LastSynced=Main.Ticked;
+                EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
             }
+            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
+            v.ID= packet.ID;
+            v.Position=packet.Position.ToVector();
+            v.Rotation=packet.Rotation.ToVector();
+            v.SteeringAngle=packet.SteeringAngle;
+            v.ThrottlePower=packet.ThrottlePower;
+            v.BrakePower=packet.BrakePower;
+            v.Velocity=packet.Velocity.ToVector();
+            v.RotationVelocity=packet.RotationVelocity.ToVector();
+            v.LastSynced=Main.Ticked;
         }
         private static void VehicleStateSync(Packets.VehicleStateSync packet)
         {
-            lock (EntityPool.VehiclesLock)
+            if (!EntityPool.VehicleExists(packet.ID))
             {
-                if (!EntityPool.Exists(packet.ID))
-                {
-                    EntityPool.Add( new SyncedVehicle(packet.ID));
-                }
-                SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-                v.ID= packet.ID;
-                v.OwnerID= packet.OwnerID;
-                v.DamageModel=packet.DamageModel;
-                v.EngineHealth=packet.EngineHealth;
-                v.OwnerID=packet.OwnerID;
-                v.Mods=packet.Mods;
-                v.ModelHash=packet.ModelHash;
-                v.Colors=packet.Colors;
-                v.LandingGear=packet.LandingGear;
-                v.EngineRunning = packet.Flag.HasFlag(VehicleDataFlags.IsEngineRunning);
-                v.LightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreLightsOn);
-                v.BrakeLightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreBrakeLightsOn);
-                v.HighBeamsOn = packet.Flag.HasFlag(VehicleDataFlags.AreHighBeamsOn);
-                v.SireneActive = packet.Flag.HasFlag(VehicleDataFlags.IsSirenActive) ;
-                v.IsDead = packet.Flag.HasFlag(VehicleDataFlags.IsDead) ;
-                v.HornActive = packet.Flag.HasFlag(VehicleDataFlags.IsHornActive);
-                v.Transformed = packet.Flag.HasFlag(VehicleDataFlags.IsTransformed);
-                v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
-                v.LockStatus=packet.LockStatus;
-                foreach (KeyValuePair<int, int> pair in packet.Passengers)
-                {
-                    if (EntityPool.Exists(pair.Value))
-                    {
-                        v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
-                    }
-                }
-                v.LastStateSynced=v.LastSynced= Main.Ticked;
+                EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
             }
+            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
+            v.ID= packet.ID;
+            v.OwnerID= packet.OwnerID;
+            v.DamageModel=packet.DamageModel;
+            v.EngineHealth=packet.EngineHealth;
+            v.OwnerID=packet.OwnerID;
+            v.Mods=packet.Mods;
+            v.ModelHash=packet.ModelHash;
+            v.Colors=packet.Colors;
+            v.LandingGear=packet.LandingGear;
+            v.EngineRunning = packet.Flag.HasFlag(VehicleDataFlags.IsEngineRunning);
+            v.LightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreLightsOn);
+            v.BrakeLightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreBrakeLightsOn);
+            v.HighBeamsOn = packet.Flag.HasFlag(VehicleDataFlags.AreHighBeamsOn);
+            v.SireneActive = packet.Flag.HasFlag(VehicleDataFlags.IsSirenActive);
+            v.IsDead = packet.Flag.HasFlag(VehicleDataFlags.IsDead);
+            v.HornActive = packet.Flag.HasFlag(VehicleDataFlags.IsHornActive);
+            v.Transformed = packet.Flag.HasFlag(VehicleDataFlags.IsTransformed);
+            v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
+            v.LockStatus=packet.LockStatus;
+            foreach (KeyValuePair<int, int> pair in packet.Passengers)
+            {
+                if (EntityPool.PedExists(pair.Value))
+                {
+                    v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
+                }
+            }
+            v.LastStateSynced=v.LastSynced= Main.Ticked;
+            
         }
-        
+        private static void ProjectileSync(Packets.ProjectileSync packet)
+        {
+            var p = EntityPool.GetProjectileByID(packet.ID);
+            if (p==null)
+            {
+                if (packet.Exploded) { return; }
+                Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
+                EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));
+            }
+            p.Position=packet.Position.ToVector();
+            p.Rotation=packet.Rotation.ToVector();
+            p.Velocity=packet.Velocity.ToVector();
+            p.Hash=(WeaponHash)packet.WeaponHash;
+            p.ShooterID=packet.ShooterID;
+            p.Exploded=packet.Exploded;
+            p.LastSynced=Main.Ticked;
+        }
     }
 }

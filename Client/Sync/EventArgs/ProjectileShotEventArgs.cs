@@ -10,5 +10,7 @@ namespace RageCoop.Client
     {
         public bool IsMine { get; set; }
         public Projectile Projectile { get; set; }
+
+        public SyncedPed Owner { get; set; }
     }
 }

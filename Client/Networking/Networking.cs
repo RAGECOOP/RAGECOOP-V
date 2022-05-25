@@ -11,7 +11,7 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public static partial class Networking
+    internal static partial class Networking
     {
         public static NetClient Client;
         public static float Latency = 0;

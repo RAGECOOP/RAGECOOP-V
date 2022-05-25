@@ -24,15 +24,7 @@ namespace RageCoop.Client
         /// <param name="p"></param>
         public SyncedPed(Ped p)
         {
-            while((ID==0) || (EntityPool.GetPedByID(ID)!=null))
-            {
-                byte[] rngBytes = new byte[4];
-
-                RandomNumberGenerator.Create().GetBytes(rngBytes);
-
-                // Convert the bytes into an integer
-                ID = BitConverter.ToInt32(rngBytes,0);
-            }
+            ID=EntityPool.RequestNewID();
             p.CanWrithe=false;
             p.IsOnlyDamagedByPlayer=false;
             MainPed=p;
@@ -143,7 +135,8 @@ namespace RageCoop.Client
                 {
                     SetClothes();
                 }
-                
+
+                CheckCurrentWeapon();
             }
             
 
@@ -500,7 +493,6 @@ namespace RageCoop.Client
                 }
             }
 
-            CheckCurrentWeapon();
 
             if (IsReloading)
             {
@@ -576,27 +568,25 @@ namespace RageCoop.Client
             if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
             {
                 MainPed.Weapons.RemoveAll();
-                
+                _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
+
                 if (CurrentWeaponHash != (uint)WeaponHash.Unarmed)
                 {
-                    if (WeaponComponents == null || WeaponComponents.Count == 0)
+                    if (WeaponComponents != null && WeaponComponents.Count != 0)
                     {
-                        MainPed.Weapons.Give((WeaponHash)CurrentWeaponHash, 0, true, true);
-                    }
-                    else
-                    {
-                        _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
-
                         foreach (KeyValuePair<uint, bool> comp in WeaponComponents)
                         {
+
                             if (comp.Value)
                             {
                                 Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _lastWeaponObj, comp.Key);
                             }
+
                         }
 
-                        Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, MainPed.Handle);
                     }
+                    Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, MainPed.Handle);
+
                 }
 
                 _lastWeaponComponents = WeaponComponents;

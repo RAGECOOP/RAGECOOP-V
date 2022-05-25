@@ -5,63 +5,89 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    internal class ProjectileSync:Packet
+    public partial class Packets
     {
-
-        public int ID { get; set; }
-
-        public LVector3 Position { get; set; }
-
-        public LVector3 Rotation { get; set; }
-
-        public LVector3 Velocity { get; set; }
-
-
-        public override void Pack(NetOutgoingMessage message)
+        public class ProjectileSync : Packet
         {
-            #region PacketToNetOutGoingMessage
-            message.Write((byte)PacketTypes.ProjectileSync);
 
-            List<byte> byteArray = new List<byte>();
+            public int ID { get; set; }
 
-            // Write vehicle id
-            byteArray.AddInt(ID);
+            public int ShooterID { get; set; }
+            public uint WeaponHash { get; set; }
 
-            // Write position
-            byteArray.AddLVector3(Position);
+            public LVector3 Position { get; set; }
+
+            public LVector3 Rotation { get; set; }
+
+            public LVector3 Velocity { get; set; }
+
+            public bool Exploded { get; set; }
 
 
-            // Write rotation
-            byteArray.AddLVector3(Rotation);
 
-            // Write velocity
-            byteArray.AddLVector3(Velocity);
+            public override void Pack(NetOutgoingMessage message)
+            {
+                #region PacketToNetOutGoingMessage
+                message.Write((byte)PacketTypes.ProjectileSync);
 
-            byte[] result = byteArray.ToArray();
+                List<byte> byteArray = new List<byte>();
 
-            message.Write(result.Length);
-            message.Write(result);
-            #endregion
-        }
+                // Write id
+                byteArray.AddInt(ID);
 
-        public override void Unpack(byte[] array)
-        {
-            #region NetIncomingMessageToPacket
-            BitReader reader = new BitReader(array);
+                // Write ShooterID
+                byteArray.AddInt(ShooterID);
 
-            // Read id
-            ID = reader.ReadInt();
+                byteArray.AddUint(WeaponHash);
 
-            // Read position
-            Position = reader.ReadLVector3();
+                // Write position
+                byteArray.AddLVector3(Position);
 
-            // Read rotation
-            Rotation = reader.ReadLVector3();
 
-            // Read velocity
-            Velocity =reader.ReadLVector3();
+                // Write rotation
+                byteArray.AddLVector3(Rotation);
 
-            #endregion
+                // Write velocity
+                byteArray.AddLVector3(Velocity);
+
+                if (Exploded) { byteArray.Add(1); }
+
+                byte[] result = byteArray.ToArray();
+
+                message.Write(result.Length);
+                message.Write(result);
+                #endregion
+            }
+
+            public override void Unpack(byte[] array)
+            {
+                #region NetIncomingMessageToPacket
+                BitReader reader = new BitReader(array);
+
+                // Read id
+                ID = reader.ReadInt();
+
+                // Read ShooterID
+                ShooterID= reader.ReadInt();
+
+                WeaponHash= reader.ReadUInt();
+
+                // Read position
+                Position = reader.ReadLVector3();
+
+                // Read rotation
+                Rotation = reader.ReadLVector3();
+
+                // Read velocity
+                Velocity =reader.ReadLVector3();
+
+                if (reader.CanRead(1))
+                {
+                    Exploded=true;
+                }
+
+                #endregion
+            }
         }
     }
 }

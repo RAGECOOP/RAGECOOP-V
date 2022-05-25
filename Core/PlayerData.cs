@@ -19,7 +19,11 @@ namespace RageCoop.Core
         public int VehicleID { get; set; }
         public bool IsInVehicle { get; internal set; }
         public LVector3 Position { get; set; }
-        public int Latency { get; set; }
+
+        /// <summary>
+        /// Player Latency in second.
+        /// </summary>
+        public float Latency { get; set; }
         public int Health { get; set; }
 
         public bool IsInRangeOf(LVector3 position, float distance)

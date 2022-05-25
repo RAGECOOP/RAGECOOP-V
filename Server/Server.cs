@@ -34,6 +34,7 @@ namespace RageCoop.Server
         public static Resource RunningResource = null;
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
+        private static Thread BackgroundThread;
 
         public static readonly List<Client> Clients = new();
 
@@ -210,6 +211,8 @@ namespace RageCoop.Server
             DownloadManager.CheckForDirectoryAndFiles();
 
             Listen();
+
+            BackgroundThread=new Thread(() => Background());
         }
 
         private void Listen()
@@ -304,7 +307,7 @@ namespace RageCoop.Server
 
                                 #region SyncData
 
-                                case PacketTypes.CharacterStateSync:
+                                case PacketTypes.PedStateSync:
                                     {
                                         try
                                         {
@@ -340,7 +343,7 @@ namespace RageCoop.Server
                                         }
                                     }
                                     break;
-                                case PacketTypes.CharacterSync:
+                                case PacketTypes.PedSync:
                                     {
                                         try
                                         {
@@ -369,6 +372,23 @@ namespace RageCoop.Server
                                             packet.Unpack(data);
 
                                             VehicleSync(packet,message.SenderConnection.RemoteUniqueIdentifier);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            DisconnectAndLog(message.SenderConnection, type, e);
+                                        }
+                                    }
+                                    break;
+                                case PacketTypes.ProjectileSync:
+                                    {
+                                        try
+                                        {
+                                            int len = message.ReadInt32();
+                                            byte[] data = message.ReadBytes(len);
+
+                                            Packets.ProjectileSync packet = new();
+                                            packet.Unpack(data);
+                                            ProjectileSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
                                         }
                                         catch (Exception e)
                                         {
@@ -563,7 +583,7 @@ namespace RageCoop.Server
                                             MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != message.SenderConnection.RemoteUniqueIdentifier).ForEach(x =>
                                             {
 
-                                                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.CharacterSync);
+                                                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
 
                                             });
                                         }
@@ -627,6 +647,29 @@ namespace RageCoop.Server
                 // We have to wait some time for all Disconnect() messages to be sent successfully
                 // Sleep for 1 second
                 Thread.Sleep(1000);
+            }
+        }
+        private void Background()
+        {
+            while (true)
+            {
+                foreach(Client c in Clients)
+                {
+                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.ClientID).ForEach(x =>
+                    {
+                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                        new Packets.PlayerInfoUpdate()
+                        {
+                            PedID=c.Player.PedID,
+                            Username=c.Player.Username,
+                            Latency=c.Player.Latency=c.Latency,
+                        }.Pack(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
+                    });
+                }
+
+                // Update Latency every 20 seconds.
+                Thread.Sleep(1000*20);
             }
         }
 
@@ -830,7 +873,7 @@ namespace RageCoop.Server
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.CharacterSync);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
 
             });
 
@@ -839,7 +882,6 @@ namespace RageCoop.Server
                 RunningResource.InvokePlayerUpdate(client);
             }
         }
-
         private static void VehicleStateSync(Packets.VehicleStateSync packet, long ClientID)
         {
             Client client = Util.GetClientByID(ClientID);
@@ -862,7 +904,6 @@ namespace RageCoop.Server
 
             });
         }
-
         private static void CharacterSync(Packets.PedSync packet, long ClientID)
         {
             Client client = Util.GetClientByID(ClientID);
@@ -877,7 +918,7 @@ namespace RageCoop.Server
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.CharacterSync);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
 
             });
 
@@ -886,7 +927,6 @@ namespace RageCoop.Server
                 RunningResource.InvokePlayerUpdate(client);
             }
         }
-
         private static void VehicleSync(Packets.VehicleSync packet, long ClientID)
         {
             Client client = Util.GetClientByID(ClientID);
@@ -932,177 +972,22 @@ namespace RageCoop.Server
             }
             */
         }
-        #region Obsolete
-        /*
-        private static void FullSyncPlayer(Packets.FullSyncPlayer packet)
+        private static void ProjectileSync(Packets.ProjectileSync packet, long ClientID)
         {
-            Client client = Util.GetClientByNetHandle(packet.NetHandle);
+            Client client = Util.GetClientByID(ClientID);
             if (client == null)
             {
                 return;
             }
-            // Save the new data
-            client.Player.PedHandle = packet.PedHandle;
-            client.Player.IsInVehicle = false;
-            client.Player.Position = packet.Position;
-            client.Player.Health = packet.Health;
 
-            // Override the latency
-            packet.Latency = client.Latency;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
+            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
-                {
-                    packet.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerFull);
-                }
-                else
-                {
-                    new Packets.SuperLightSync()
-                    {
-                        NetHandle = packet.NetHandle,
-                        Position = packet.Position,
-                        Latency = packet.Latency
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
-                }
+                packet.Pack(outgoingMessage);
+                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.ProjectileSync);
             });
-
-            if (RunningResource != null)
-            {
-                RunningResource.InvokePlayerUpdate(client);
-            }
         }
 
-        private static void FullSyncPlayerVeh(Packets.FullSyncPlayerVeh packet)
-        {
-            Client client = Util.GetClientByNetHandle(packet.NetHandle);
-            if (client == null)
-            {
-                return;
-            }
-            // Save the new data
-            client.Player.PedHandle = packet.PedHandle;
-            client.Player.VehicleHandle = packet.VehicleHandle;
-            client.Player.IsInVehicle = true;
-            client.Player.Position = packet.Position;
-            client.Player.Health = packet.Health;
-
-            // Override the latency
-            packet.Latency = client.Latency;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
-                {
-                    packet.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerFull);
-                }
-                else
-                {
-                    new Packets.SuperLightSync()
-                    {
-                        NetHandle = packet.NetHandle,
-                        Position = packet.Position,
-                        Latency = packet.Latency
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
-                }
-            });
-
-            if (RunningResource != null)
-            {
-                RunningResource.InvokePlayerUpdate(client);
-            }
-        }
-
-        private static void LightSyncPlayer(Packets.LightSyncPlayer packet)
-        {
-            Client client = Util.GetClientByNetHandle(packet.NetHandle);
-            if (client == null)
-            {
-                return;
-            }
-            // Save the new data
-            client.Player.Position = packet.Position;
-            client.Player.Health = packet.Health;
-
-            // Override the latency
-            packet.Latency = client.Latency;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
-                {
-                    packet.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerLight);
-                }
-                else
-                {
-                    new Packets.SuperLightSync()
-                    {
-                        NetHandle = packet.NetHandle,
-                        Position = packet.Position,
-                        Latency = packet.Latency
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
-                }
-            });
-
-            if (RunningResource != null)
-            {
-                RunningResource.InvokePlayerUpdate(client);
-            }
-        }
-
-        private static void LightSyncPlayerVeh(Packets.LightSyncPlayerVeh packet)
-        {
-            Client client = Util.GetClientByNetHandle(packet.NetHandle);
-            if (client == null)
-            {
-                return;
-            }
-            // Save the new data
-            client.Player.Position = packet.Position;
-            client.Player.Health = packet.Health;
-
-            // Override the latency
-            packet.Latency = client.Latency;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != packet.NetHandle).ForEach(x =>
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-                if (Clients.First(y => y.NetHandle == x.RemoteUniqueIdentifier).Player.IsInRangeOf(packet.Position, 550f))
-                {
-                    packet.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerLight);
-                }
-                else
-                {
-                    new Packets.SuperLightSync()
-                    {
-                        NetHandle = packet.NetHandle,
-                        Position = packet.Position,
-                        Latency = packet.Latency
-                    }.PacketToNetOutGoingMessage(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerSuperLight);
-                }
-            });
-
-            if (RunningResource != null)
-            {
-                RunningResource.InvokePlayerUpdate(client);
-            }
-        }
-        */
-        #endregion
         #endregion
         // Send a message to targets or all players
         private static void SendChatMessage(Packets.ChatMessage packet, List<NetConnection> targets = null)

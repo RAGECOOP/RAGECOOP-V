@@ -30,7 +30,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.CharacterStateSync);
+                message.Write((byte)PacketTypes.PedStateSync);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -145,7 +145,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.CharacterSync);
+                message.Write((byte)PacketTypes.PedSync);
                 
                 List<byte> byteArray = new List<byte>();
 

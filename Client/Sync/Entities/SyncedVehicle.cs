@@ -22,15 +22,8 @@ namespace RageCoop.Client
         /// <param name="p"></param>
         public SyncedVehicle(Vehicle v)
         {
-            while ((ID==0) || EntityPool.Exists(ID))
-            {
-                byte[] rngBytes = new byte[4];
 
-                RandomNumberGenerator.Create().GetBytes(rngBytes);
-
-                // Convert the bytes into an integer
-                ID = BitConverter.ToInt32(rngBytes, 0);
-            }
+            ID=EntityPool.RequestNewID();
             MainVehicle=v;
             MainVehicle.CanPretendOccupants=false;
             OwnerID=Main.LocalPlayerID;

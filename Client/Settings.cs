@@ -40,5 +40,11 @@ namespace RageCoop.Client
         /// </summary>
         public Keys PassengerKey { get; set; }=Keys.G;
 
+        /// <summary>
+        /// Disable world NPC traffic, mission entities won't be affected
+        /// </summary>
+        public bool DisableTraffic { get; set; } = true;
+
+
     }
 }
