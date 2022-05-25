@@ -1,4 +1,4 @@
-# Changelog for version 0.2 alpha
+# Changelog for v0.2 alpha
 
 - Synchronized projectile, all throwable weapons is now working properly, missiles will also be synchronized.
 - Added customizable keybinding, you can now change menu key and passenger key in setting.
