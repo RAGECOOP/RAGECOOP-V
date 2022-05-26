@@ -19,10 +19,22 @@ namespace RageCoop.Client
             var shooter = EntityPool.GetPedByHandle(p.Owner.Handle);
             if(shooter != null)
             {
-                Main.Logger.Warning($"Could not find owner for projectile, owner handle:{}");
                 ShooterID=shooter.ID;
             }
-            
+            else
+            {
+                // Owner will be the vehicle if projectile is shot with a vehicle
+                var shooterVeh = EntityPool.GetVehicleByHandle(p.Owner.Handle);
+                if (shooterVeh!=null && shooterVeh.MainVehicle.Driver!=null)
+                {
+                    ShooterID=shooterVeh.MainVehicle.Driver.GetSyncEntity().ID;
+                }
+                else
+                {
+                    Main.Logger.Warning($"Could not find owner for projectile, owner handle:{p.Owner.Handle}");
+                }
+            }
+
         }
         public SyncedProjectile(int id)
         {

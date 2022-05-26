@@ -96,7 +96,7 @@ namespace RageCoop.Client {
 
         #region HANDLE
 
-        public static void HandleLeaveVehicle(Packets.LeaveVehicle p)
+        private static void HandleLeaveVehicle(Packets.LeaveVehicle p)
         {
             var ped = EntityPool.GetPedByID(p.ID)?.MainPed;
             var flag = LeaveVehicleFlags.None;
@@ -105,15 +105,15 @@ namespace RageCoop.Client {
             if (ped.CurrentVehicle.Speed>5) { flag|=LeaveVehicleFlags.BailOut;}
             ped.Task.LeaveVehicle(flag) ;
         }
-        public static void HandlePedKilled(Packets.PedKilled p)
+        private static void HandlePedKilled(Packets.PedKilled p)
         {
             EntityPool.GetPedByID(p.VictimID)?.MainPed?.Kill();
         }
-        public static void HandleEnteringVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
+        private static void HandleEnteringVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
         {
             c.MainPed?.Task.EnterVehicle(veh.MainVehicle, seat,-1,2,EnterVehicleFlags.WarpToDoor|EnterVehicleFlags.AllowJacking);
         }
-        public static void HandleEnteredVehicle(int pedId, int vehId, VehicleSeat seat)
+        private static void HandleEnteredVehicle(int pedId, int vehId, VehicleSeat seat)
         {
             var v = EntityPool.GetVehicleByID(vehId);
             var p = EntityPool.GetPedByID(pedId)?.MainPed;
@@ -127,7 +127,7 @@ namespace RageCoop.Client {
             }
             p.SetIntoVehicle(v.MainVehicle, seat);
         }
-        public static void HandleOwnerChanged(Packets.OwnerChanged p)
+        private static void HandleOwnerChanged(Packets.OwnerChanged p)
         {
             var v = EntityPool.GetVehicleByID(p.ID);
             if (v==null) { return; }
@@ -141,7 +141,7 @@ namespace RageCoop.Client {
 
         static WeaponAsset _weaponAsset = default;
         static uint _lastWeaponHash;
-        public static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
+        private static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
         {
             if (CorePFXAsset==default) { 
                 CorePFXAsset= new ParticleEffectAsset("core");
@@ -170,7 +170,6 @@ namespace RageCoop.Client {
 
             }
         }
-        
         public static void HandleEvent(PacketTypes type,byte[] data)
         {
             switch (type)
@@ -221,7 +220,6 @@ namespace RageCoop.Client {
                     }
             }
         }
-
         public static int GetWeaponDamage(this Ped p)
         {
             if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
@@ -243,19 +241,7 @@ namespace RageCoop.Client {
 
 
         #endregion
-        /*
-        public static List<WeaponHash> ProjectileWeapons = new List<WeaponHash>
-        {
-            WeaponHash.RPG,
-            WeaponHash.Grenade,
-            WeaponHash.GrenadeLauncher,
-            WeaponHash.Ball,
-            WeaponHash.Bottle,
-            WeaponHash.BZGas,
-            WeaponHash.Firework,
 
-        };
-        */
         #region CHECK EVENTS
 
 

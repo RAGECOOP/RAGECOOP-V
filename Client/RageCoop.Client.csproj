@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DevTools\DevTool.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="COOPAPI.cs" />
     <Compile Include="Debug.cs" />

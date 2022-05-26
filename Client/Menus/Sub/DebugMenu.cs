@@ -21,6 +21,8 @@ namespace RageCoop.Client
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         private static NativeItem d1=new NativeItem("PositionPrediction");
+        private static NativeCheckboxItem devToolItem=new NativeCheckboxItem("DevTool");
+        public static NativeItem boneIndexItem = new NativeItem("Current bone index");
         static DebugMenu()
         {
             d1.Activated+=(sender,e) =>
@@ -29,9 +31,12 @@ namespace RageCoop.Client
                 catch { }
                 Update();
             };
-            
+            devToolItem.Activated+=DevToolItem_Activated;
+            devToolItem.Checked=false;
 
             MainMenu.Add(d1);
+            MainMenu.Add(devToolItem);
+            MainMenu.Add(boneIndexItem);
             MainMenu.AddSubMenu(DiagnosticMenu);
             MainMenu.Opening+=(sender, e) =>Update(); 
             DiagnosticMenu.Opening+=(sender, e) =>
@@ -46,6 +51,19 @@ namespace RageCoop.Client
 
             Update();
         }
+
+        private static void DevToolItem_Activated(object sender, EventArgs e)
+        {
+            if (devToolItem.Checked)
+            {
+                DevTool.ToMark=Game.Player.Character.CurrentVehicle;
+            }
+            else
+            {
+                DevTool.ToMark=null;
+            }
+        }
+
         private static void Update()
         {
             d1.AltTitle = SyncParameters.PositioinPrediction.ToString();

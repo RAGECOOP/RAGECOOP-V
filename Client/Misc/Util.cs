@@ -437,6 +437,11 @@ namespace RageCoop.Client
         public static Vector3 GetAimCoord(this Ped p)
         {
             var weapon = p.Weapons.CurrentWeaponObject;
+            // Rhino
+            if (p.CurrentVehicle.Model.Hash==782665360)
+            {
+                return p.CurrentVehicle.Bones[35].Position+p.CurrentVehicle.Bones[35].ForwardVector*100;
+            }
             if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
             if (weapon!=null)
             {
@@ -444,18 +449,6 @@ namespace RageCoop.Client
                 Vector3 dir = weapon.RightVector;
                 return weapon.Position+dir*20;
 
-                /*
-                RaycastResult result = World.Raycast(weapon.Position+dir, weapon.Position+dir*10000, IntersectFlags.Everything, p.IsInVehicle() ? (Entity)p : p.CurrentVehicle);
-
-                if (result.DidHit)
-                {
-                    return result.HitPosition;
-                }
-                else
-                {
-                    return weapon.Position+dir*20;
-                }
-                */
             }
             return GetLookingCoord(p);
         }
