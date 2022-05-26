@@ -50,7 +50,7 @@ Download latest release for your OS, then extract and run.
 
 # Downloads
 
-Download compiled binaries here: 
-[Release](https://gitlab.com/justasausage/RageCOOP-V/-/tree/main/Release)
+
+Old release can be downloaded [here](https://github.com/Sardelka9515/RageCoop-V/tree/main/Release)
 
 Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing.
