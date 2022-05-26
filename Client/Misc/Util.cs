@@ -489,8 +489,16 @@ namespace RageCoop.Client
 
         public static bool IsUsingProjectileWeapon(this Ped p)
         {
-            var w = p.Weapons.Current;
-            return w.Group==WeaponGroup.Thrown||ProjectileWeapons.Contains(w.Hash);
+            var vp = p.VehicleWeapon;
+            if (vp!=VehicleWeaponHash.Invalid)
+            {
+                return VehicleProjectileWeapons.Contains(vp);
+            }
+            else
+            {
+                var w = p.Weapons.Current;
+                return w.Group==WeaponGroup.Thrown || ProjectileWeapons.Contains(w.Hash);
+            }
         }
 
         #endregion
@@ -906,24 +914,11 @@ namespace RageCoop.Client
             WeaponHash.CompactGrenadeLauncher,
             WeaponHash.FlareGun,
         };
-        /*
-        public static readonly Dictionary<WeaponHash, ExplosionType> WeaponExplosionTypes = new Dictionary<WeaponHash, ExplosionType> {
-            { WeaponHash.Grenade,ExplosionType.Grenade},
-            { WeaponHash.GrenadeLauncher,ExplosionType.Grenade},
-            { WeaponHash.CompactGrenadeLauncher,ExplosionType.Grenade},
-            { WeaponHash.SmokeGrenade,ExplosionType.SmokeG},
-            { WeaponHash.GrenadeLauncherSmoke,ExplosionType.SmokeG},
-            { WeaponHash.StickyBomb,ExplosionType.StickyBomb},
-            { WeaponHash.Flare,ExplosionType.Flare},
-            { WeaponHash.FlareGun,ExplosionType.Flare},
-            { WeaponHash.Molotov,ExplosionType.Molotov1},
-            { WeaponHash.BZGas,ExplosionType.BZGas},
-            { WeaponHash.PipeBomb,ExplosionType.PipeBomb},
-            { WeaponHash.ProximityMine,ExplosionType.ProxMine},
-            { WeaponHash.Firework,ExplosionType.FireWork},
-            { WeaponHash.RPG,ExplosionType.Rocket},
+        public static readonly HashSet<VehicleWeaponHash> VehicleProjectileWeapons = new HashSet<VehicleWeaponHash> { 
+            VehicleWeaponHash.PlaneRocket,
+            VehicleWeaponHash.SpaceRocket,
+            VehicleWeaponHash.Tank,
         };
-        */
     }
     /// <summary>
     /// 

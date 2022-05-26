@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTA;
+using GTA.Math;
 
 namespace RageCoop.Client
 {
@@ -14,11 +15,14 @@ namespace RageCoop.Client
             ID=EntityPool.RequestNewID();
             IsMine=true;
             MainProjectile = p;
-            var shooter = p.Owner.GetSyncEntity();
+            Origin=p.Position;
+            var shooter = EntityPool.GetPedByHandle(p.Owner.Handle);
             if(shooter != null)
             {
+                Main.Logger.Warning($"Could not find owner for projectile, owner handle:{}");
                 ShooterID=shooter.ID;
             }
+            
         }
         public SyncedProjectile(int id)
         {
@@ -29,6 +33,8 @@ namespace RageCoop.Client
         public bool Exploded { get; set; } = false;
         public Projectile MainProjectile { get; set; }
         public int ShooterID { get; set; }
+
+        public Vector3 Origin { get; set; }
 
         /// <summary>
         /// Invalid property for projectile.

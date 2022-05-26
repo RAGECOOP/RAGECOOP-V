@@ -55,6 +55,13 @@ namespace RageCoop.Client
             ID_Vehicles.Clear();
             Handle_Vehicles.Clear();
 
+            foreach(var p in ID_Projectiles.Values)
+            {
+                if (p.ShooterID!=Main.LocalPlayerID && p.MainProjectile!=null && p.MainProjectile.Exists())
+                {
+                    p.MainProjectile.Delete();
+                }
+            }
             ID_Projectiles.Clear();
             Handle_Projectiles.Clear();
         }
@@ -287,7 +294,8 @@ namespace RageCoop.Client
 #if BENCHMARK
 
             Debug.TimeStamps[TimeStamp.GetAllEntities]=PerfCounter.ElapsedTicks;
-#endif            
+#endif        
+            
             lock (ProjectilesLock)
             {
 
@@ -296,7 +304,7 @@ namespace RageCoop.Client
                     if (!Handle_Projectiles.ContainsKey(p.Handle))
                     {
                         Add(new SyncedProjectile(p));
-                        Main.Logger.Debug($"Projectile shot: {p.Handle}");
+                        
                     }
                 }
 
@@ -308,6 +316,16 @@ namespace RageCoop.Client
                     {
                         if (p.MainProjectile.AttachedEntity==null)
                         {
+
+                            /// Prevent projectiles from exploding next to vehicle
+                            if (Util.VehicleProjectileWeapons.Contains((VehicleWeaponHash)p.MainProjectile.WeaponHash))
+                            {
+                                if (p.Origin.DistanceTo(p.MainProjectile.Position)<2)
+                                {
+                                    continue;
+                                }
+                            }
+
                             Networking.SendProjectile(p);
                         }
                     }
@@ -327,7 +345,7 @@ namespace RageCoop.Client
                 }
 
             }
-
+            
 
             lock (PedsLock)
             {
