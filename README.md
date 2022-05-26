@@ -1,7 +1,7 @@
 
 # 🌐 RAGECOOP
-This is a reworked version of [RageCoop](https://github.com/RAGECOOP/RAGECOOP-V) with the original author's permission.
-
+The original author of this project is @EntenKoeniq.
+The project has been reworked and is currently maintained by @Sardelka9515.
 
 # **Help to survive the project**
 
@@ -15,6 +15,7 @@ Please **CONTRIBUTE** to the project and make RageCoop better together!
 
 **[Become a patreon](https://www.patreon.com/Sardelka)** to help keep the project alive and get exclusive support to individual issues.
 <br><br><br>
+
 
 
 # Features
