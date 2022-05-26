@@ -75,7 +75,7 @@ namespace RageCoop.Client
 #endif
             MainChat = new Chat();
 #if DEBUG
-            Logger.LogLevel =0;
+            Logger.LogLevel = 0;
 #else
             Logger.LogLevel=Settings.LogLevel;
 #endif
