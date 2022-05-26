@@ -437,10 +437,12 @@ namespace RageCoop.Client
         public static Vector3 GetAimCoord(this Ped p)
         {
             var weapon = p.Weapons.CurrentWeaponObject;
+
+            var v = p.CurrentVehicle;
             // Rhino
-            if (p.CurrentVehicle.Model.Hash==782665360)
+            if (v!=null && v.Model.Hash==782665360)
             {
-                return p.CurrentVehicle.Bones[35].Position+p.CurrentVehicle.Bones[35].ForwardVector*100;
+                return v.Bones[35].Position+v.Bones[35].ForwardVector*100;
             }
             if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
             if (weapon!=null)
