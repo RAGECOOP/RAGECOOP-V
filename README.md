@@ -9,7 +9,7 @@ The project has been reworked and is currently maintained by @Sardelka9515.
 
 ## if you are a developer...
 
-Please **CONTRIBUTE** to the project and make RageCoop better together!
+Please **CONTRIBUTE** to the project and make RAGECOOP better together!
 
 ## otherwise...
 
@@ -43,7 +43,7 @@ Please **CONTRIBUTE** to the project and make RageCoop better together!
 
 ## Client
 
-Download latest release, remove old version of the mod. Extract the zip and put **RageCoop** in **Grand Theft Auto V/Scripts**.
+Download latest release, remove old version of the mod. Extract the zip and put **`RageCoop`** in **`Grand Theft Auto V/Scripts`**.
 
 ## Server
 
