@@ -39,7 +39,7 @@ Please **CONTRIBUTE** to the project and make RAGECOOP better together!
 
 ## otherwise...
 
-**[Become a patreon](https://www.patreon.com/Sardelka)** to help keep the project alive and get exclusive support to individual issues.
+[Become a patreon](https://www.patreon.com/Sardelka) to support my work and keep the project alive.
 <br><br><br>
 
 
