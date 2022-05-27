@@ -35,13 +35,14 @@ namespace RageCoop.Client
                 return;
             }
 
-            if (Networking.IsOnServer)
+            if (!Networking.IsOnServer)
             {
-                Game.DisableControlThisFrame(Control.FrontendPause);
-                if (Main.Settings.DisableAlternatePause)
-                {
-                    Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
-                }
+                return ;
+            }
+            Game.DisableControlThisFrame(Control.FrontendPause);
+            if (Main.Settings.DisableAlternatePause)
+            {
+                Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
             }
 
             // Sets a value that determines how aggressive the ocean waves will be.

@@ -168,7 +168,7 @@ namespace RageCoop.Client
                         {
 
                             SyncedPed c = Passengers[seat];
-                            if ((c!=null)&&c.MainPed!=null&&(!currentPassengers.ContainsKey(i))) {
+                            if ((c!=null)&&c.MainPed!=null&&(!currentPassengers.ContainsKey(i))&&(!c.MainPed.IsBeingJacked)) {
                                 Passengers[seat].MainPed.SetIntoVehicle(MainVehicle, seat);
                             }
                         }

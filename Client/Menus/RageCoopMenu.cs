@@ -51,14 +51,17 @@ namespace RageCoop.Client.Menus
             MainMenu.Add(_usernameItem);
             MainMenu.Add(ServerIpItem);
             MainMenu.Add(_serverConnectItem);
-
-            MainMenu.AddSubMenu(SubSettings.MainMenu);
-            MainMenu.AddSubMenu(DebugMenu.MainMenu);
             MainMenu.Add(_aboutItem);
 
+            MainMenu.AddSubMenu(SubSettings.Menu);
+            MainMenu.AddSubMenu(DevToolMenu.Menu);
+            MainMenu.AddSubMenu(DebugMenu.Menu);
+
+
             MenuPool.Add(MainMenu);
-            MenuPool.Add(SubSettings.MainMenu);
-            MenuPool.Add(DebugMenu.MainMenu);
+            MenuPool.Add(SubSettings.Menu);
+            MenuPool.Add(DevToolMenu.Menu);
+            MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
         }
 
@@ -106,7 +109,7 @@ namespace RageCoop.Client.Menus
             MainMenu.Items[1].Enabled = true;
             MainMenu.Items[2].Enabled = true;
             MainMenu.Items[2].Title = "Connect";
-            SubSettings.MainMenu.Items[1].Enabled = false;
+            SubSettings.Menu.Items[1].Enabled = false;
         }
     }
 }

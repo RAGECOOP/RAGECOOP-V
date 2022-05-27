@@ -122,6 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DevTools\DevTool.cs" />
+    <Compile Include="Menus\Sub\DevToolMenu.cs" />
+    <Compile Include="Misc\WeaponUtil.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="COOPAPI.cs" />
     <Compile Include="Debug.cs" />

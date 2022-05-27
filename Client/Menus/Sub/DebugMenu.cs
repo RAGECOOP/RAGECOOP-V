@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using LemonUI;
 using LemonUI.Menus;
 using GTA;
+using System.Drawing;
 
 namespace RageCoop.Client
 {
     internal static class DebugMenu
     {
-        public static NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Debug", "Debug settings") { 
+        public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Debug", "Debug settings") { 
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
@@ -21,24 +22,22 @@ namespace RageCoop.Client
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         private static NativeItem d1=new NativeItem("PositionPrediction");
-        private static NativeCheckboxItem devToolItem=new NativeCheckboxItem("DevTool");
-        public static NativeItem boneIndexItem = new NativeItem("Current bone index");
         static DebugMenu()
         {
+            Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+
             d1.Activated+=(sender,e) =>
             {
                 try{ SyncParameters.PositioinPrediction =float.Parse(Game.GetUserInput(WindowTitle.EnterMessage20, SyncParameters.PositioinPrediction.ToString(), 20));}
                 catch { }
                 Update();
             };
-            devToolItem.Activated+=DevToolItem_Activated;
-            devToolItem.Checked=false;
+            
 
-            MainMenu.Add(d1);
-            MainMenu.Add(devToolItem);
-            MainMenu.Add(boneIndexItem);
-            MainMenu.AddSubMenu(DiagnosticMenu);
-            MainMenu.Opening+=(sender, e) =>Update(); 
+            Menu.Add(d1);
+            Menu.AddSubMenu(DiagnosticMenu);
+            Menu.Opening+=(sender, e) =>Update(); 
             DiagnosticMenu.Opening+=(sender, e) =>
             {
                 DiagnosticMenu.Clear();
@@ -52,17 +51,7 @@ namespace RageCoop.Client
             Update();
         }
 
-        private static void DevToolItem_Activated(object sender, EventArgs e)
-        {
-            if (devToolItem.Checked)
-            {
-                DevTool.ToMark=Game.Player.Character.CurrentVehicle;
-            }
-            else
-            {
-                DevTool.ToMark=null;
-            }
-        }
+       
 
         private static void Update()
         {

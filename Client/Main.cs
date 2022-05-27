@@ -196,7 +196,7 @@ namespace RageCoop.Client
                 if (MainMenu.MenuPool.AreAnyVisible)
                 {
                     MainMenu.MainMenu.Visible = false;
-                    MainMenu.SubSettings.MainMenu.Visible = false;
+                    MainMenu.SubSettings.Menu.Visible = false;
                 }
                 else
                 {

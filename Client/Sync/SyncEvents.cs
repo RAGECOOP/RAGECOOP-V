@@ -87,9 +87,25 @@ namespace RageCoop.Client {
             }, ConnectionChannel.SyncEvents);
         }
 
-        public static void TriggerVehBulletShot(uint hash, Vehicle veh)
+        public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
         {
+            if (hash==(uint)VehicleWeaponHash.PlayerBuzzard)
+            {
+                hash=(uint)WeaponHash.HeavyRifle;
+            }
+            // ANNIHL
+            if (veh.Model.Hash==837858166)
+            {
+                Networking.SendBulletShot(veh.Bones[35].Position, veh.Bones[35].Position+veh.Bones[35].ForwardVector,hash,owner.ID);
+                Networking.SendBulletShot(veh.Bones[36].Position, veh.Bones[36].Position+veh.Bones[36].ForwardVector,hash, owner.ID);
+                Networking.SendBulletShot(veh.Bones[37].Position, veh.Bones[37].Position+veh.Bones[37].ForwardVector,hash, owner.ID);
+                Networking.SendBulletShot(veh.Bones[38].Position, veh.Bones[38].Position+veh.Bones[38].ForwardVector,hash, owner.ID);
+                return;
+            }
 
+            var info = veh.GetMuzzleInfo();
+            if (info==null) { Main.Logger.Warning($"Failed to get muzzle info for vehicle:{veh.DisplayName}");return; }
+            Networking.SendBulletShot(info.Position,info.Position+info.ForawardVector,hash,owner.ID);
         }
 
         #endregion
@@ -248,26 +264,50 @@ namespace RageCoop.Client {
         public static void Check(SyncedPed c)
         {
             Ped subject = c.MainPed;
-            if (subject.IsShooting && !subject.IsUsingProjectileWeapon())
+            if (subject.IsShooting)
             {
-                int i = 0;
-                Func<bool> getBulletImpact = (() =>
+                if (!subject.IsUsingProjectileWeapon())
                 {
-                    Vector3 endPos = subject.LastWeaponImpactPosition;
-                    if (endPos==default ) 
+                    int i = 0;
+                    Func<bool> getBulletImpact = (() =>
                     {
-                        if (i>5)
+                        Vector3 endPos = subject.LastWeaponImpactPosition;
+                        if (endPos==default)
                         {
-                            endPos=subject.GetAimCoord();
+                            if (i>5)
+                            {
+                                endPos=subject.GetAimCoord();
+                                if (subject.IsInVehicle() && subject.VehicleWeapon!=VehicleWeaponHash.Invalid)
+                                {
+                                    if (subject.IsOnTurretSeat())
+                                    {
+                                        TriggerBulletShot((uint)subject.VehicleWeapon, subject.GetSyncEntity(), endPos);
+                                    }
+                                    else
+                                    {
+                                        TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle,c);
+                                    }
+                                }
+                                else
+                                {
+                                    TriggerBulletShot((uint)subject.Weapons.Current.Hash, subject.GetSyncEntity(), endPos);
+                                }
+                                return true;
+                            }
+                            i++;
+                            return false;
+                        }
+                        else
+                        {
                             if (subject.IsInVehicle() && subject.VehicleWeapon!=VehicleWeaponHash.Invalid)
                             {
                                 if (subject.IsOnTurretSeat())
                                 {
-                                    TriggerBulletShot((uint)subject.VehicleWeapon,subject.GetSyncEntity(), endPos);
+                                    TriggerBulletShot((uint)subject.VehicleWeapon, subject.GetSyncEntity(), endPos);
                                 }
                                 else
                                 {
-                                    TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle);
+                                    TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle,c);
                                 }
                             }
                             else
@@ -276,37 +316,21 @@ namespace RageCoop.Client {
                             }
                             return true;
                         }
-                        i++;
-                        return false;
-                    }
-                    else 
+
+
+                    });
+                    if (!getBulletImpact())
                     {
-                        if (subject.IsInVehicle() && subject.VehicleWeapon!=VehicleWeaponHash.Invalid)
-                        {
-                            if (subject.IsOnTurretSeat())
-                            {
-                                TriggerBulletShot((uint)subject.VehicleWeapon, subject.GetSyncEntity(), endPos);
-                            }
-                            else
-                            {
-                                TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle);
-                            }
-                        }
-                        else
-                        {
-                            TriggerBulletShot((uint)subject.Weapons.Current.Hash, subject.GetSyncEntity(), endPos);
-                        }
-                        return true; 
+                        Main.QueueAction(getBulletImpact);
                     }
-                    
-                    
-                });
-                if (!getBulletImpact())
+                }
+                else if (subject.VehicleWeapon==VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition!=default)
                 {
-                    Main.QueueAction(getBulletImpact);
+                    TriggerBulletShot((uint)VehicleWeaponHash.Tank, subject.GetSyncEntity(),subject.LastWeaponImpactPosition);
                 }
                 
             }
+            
 
             // Vehicles
             var g = subject.IsGettingIntoVehicle;

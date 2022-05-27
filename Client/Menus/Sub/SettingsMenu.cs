@@ -11,7 +11,7 @@ namespace RageCoop.Client.Menus.Sub
     /// </summary>
     public class SettingsMenu
     {
-        public NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
+        public NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
@@ -32,8 +32,8 @@ namespace RageCoop.Client.Menus.Sub
         /// </summary>
         public SettingsMenu()
         {
-            MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _disablePauseAlt.CheckboxChanged+=_disablePauseAlt_CheckboxChanged;
@@ -43,13 +43,13 @@ namespace RageCoop.Client.Menus.Sub
             _passengerKey.Activated+=ChangePassengerKey;
             _vehicleSoftLimit.Activated+=vehicleSoftLimit_Activated;
 
-            MainMenu.Add(_disableTrafficItem);
-            MainMenu.Add(_disablePauseAlt);
-            MainMenu.Add(_flipMenuItem);
-            MainMenu.Add(_showNetworkInfoItem);
-            MainMenu.Add(_menuKey);
-            MainMenu.Add(_passengerKey);
-            MainMenu.Add(_vehicleSoftLimit);
+            Menu.Add(_disableTrafficItem);
+            Menu.Add(_disablePauseAlt);
+            Menu.Add(_flipMenuItem);
+            Menu.Add(_showNetworkInfoItem);
+            Menu.Add(_menuKey);
+            Menu.Add(_passengerKey);
+            Menu.Add(_vehicleSoftLimit);
         }
 
         
@@ -109,7 +109,7 @@ namespace RageCoop.Client.Menus.Sub
         {
             Main.MainMenu.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
-            MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
+            Menu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }
