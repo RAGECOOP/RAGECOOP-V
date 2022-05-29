@@ -29,7 +29,7 @@ namespace RageCoop.Client
 
             d1.Activated+=(sender,e) =>
             {
-                try{ SyncParameters.PositioinPrediction =float.Parse(Game.GetUserInput(WindowTitle.EnterMessage20, SyncParameters.PositioinPrediction.ToString(), 20));}
+                try{ SyncParameters.PositioinPredictionDefault =float.Parse(Game.GetUserInput(WindowTitle.EnterMessage20, SyncParameters.PositioinPredictionDefault.ToString(), 20));}
                 catch { }
                 Update();
             };
@@ -55,7 +55,7 @@ namespace RageCoop.Client
 
         private static void Update()
         {
-            d1.AltTitle = SyncParameters.PositioinPrediction.ToString();
+            d1.AltTitle = SyncParameters.PositioinPredictionDefault.ToString();
         }
     }
 }

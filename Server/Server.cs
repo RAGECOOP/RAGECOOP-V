@@ -22,7 +22,7 @@ namespace RageCoop.Server
 
     public class Server
     {
-        private static readonly string _compatibleVersion = "V0_2";
+        private static readonly string _compatibleVersion = "V0_3";
         private static long _currentTick = 0;
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");

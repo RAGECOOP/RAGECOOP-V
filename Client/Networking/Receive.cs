@@ -403,6 +403,7 @@ namespace RageCoop.Client
             v.Transformed = packet.Flag.HasFlag(VehicleDataFlags.IsTransformed);
             v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
             v.LockStatus=packet.LockStatus;
+            v.Flags=packet.Flag;
             foreach (KeyValuePair<int, int> pair in packet.Passengers)
             {
                 if (EntityPool.PedExists(pair.Value))

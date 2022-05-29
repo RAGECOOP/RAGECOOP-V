@@ -148,6 +148,7 @@ namespace RageCoop.Core
         EnteredVehicle=34,
         OwnerChanged=35,
         VehicleBulletShot = 36,
+        NozzleTransform=37,
 
         #endregion
 
@@ -205,7 +206,7 @@ namespace RageCoop.Core
         RoofOpened = 1 << 8,
         OnTurretSeat = 1 << 9,
         IsAircraft = 1 << 10,
-        IsHandBrakeOn=1<<11,
+        IsDeluxoHovering=1 << 11, 
     }
     
     

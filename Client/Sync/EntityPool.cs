@@ -388,6 +388,7 @@ namespace RageCoop.Client
 
                         if (Main.Ticked%20==0)
                         {
+                            Networking.SendPed(c);
                             Networking.SendPedState(c);
                         }
                         else
@@ -449,10 +450,11 @@ namespace RageCoop.Client
                     // Outgoing sync
                     if (v.IsMine)
                     {
+                        SyncEvents.Check(v);
                         if (Main.Ticked%20==0)
                         {
+                            Networking.SendVehicle(v);
                             Networking.SendVehicleState(v);
-                            
                         }
                         else
                         {

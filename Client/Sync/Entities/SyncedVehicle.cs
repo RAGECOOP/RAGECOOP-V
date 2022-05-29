@@ -66,6 +66,7 @@ namespace RageCoop.Client
         #endregion
 
         #region -- VEHICLE STATE --
+        public VehicleDataFlags Flags { get; set; }
         public bool EngineRunning { get; set; }
         private bool _lastTransformed = false;
         public bool Transformed { get; set; }
@@ -129,7 +130,7 @@ namespace RageCoop.Client
             }
             if (MainVehicle.Position.DistanceTo(Position)<5)
             {
-                MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPrediction - MainVehicle.Position);
+                MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
                 _lastPositionCalibrated=Main.Counter.ElapsedMilliseconds;
             }
             else
@@ -303,7 +304,20 @@ namespace RageCoop.Client
 
                 }
                 MainVehicle.LockStatus=LockStatus;
-                
+                if (Flags.HasFlag(VehicleDataFlags.IsDeluxoHovering))
+                {
+                    if (!MainVehicle.IsDeluxoHovering())
+                    {
+                        MainVehicle.SetDeluxoHoverState(true);
+                    }
+                }
+                else if(ModelHash==1483171323)
+                {
+                    if (MainVehicle.IsDeluxoHovering())
+                    {
+                        MainVehicle.SetDeluxoHoverState(false);
+                    }
+                }
 
                 #endregion
             }
@@ -385,7 +399,9 @@ namespace RageCoop.Client
         }
         #endregion
 
-
+        #region OUTGOING
+        public float LastNozzleAngle { get; set; }
+        #endregion
     }
 
 }

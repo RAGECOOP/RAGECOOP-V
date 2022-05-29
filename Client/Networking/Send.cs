@@ -76,7 +76,7 @@ namespace RageCoop.Client
             {
                 ID =v.ID,
                 SteeringAngle = veh.SteeringAngle,
-                Position = veh.Position.ToLVector(),
+                Position = veh.PredictPosition().ToLVector(),
                 Rotation = veh.Rotation.ToLVector(),
                 Velocity = veh.Velocity.ToLVector(),
                 RotationVelocity=veh.RotationVelocity.ToLVector(),
@@ -117,7 +117,7 @@ namespace RageCoop.Client
             {
                 ID =sp.ID,
                 ShooterID=sp.ShooterID,
-                Position=p.Position.ToLVector(),
+                Position=p.PredictPosition().ToLVector(),
                 Rotation=p.Rotation.ToLVector(),
                 Velocity=p.Velocity.ToLVector(),
                 WeaponHash=(uint)p.WeaponHash,

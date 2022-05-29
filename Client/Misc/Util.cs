@@ -156,8 +156,8 @@ namespace RageCoop.Client
 
         public static Vector3 RotationToDirection(Vector3 rotation)
         {
-            double z = DegToRad(rotation.Z);
-            double x = DegToRad(rotation.X);
+            double z = MathExtensions.DegToRad(rotation.Z);
+            double x = MathExtensions.DegToRad(rotation.X);
             double num = Math.Abs(Math.Cos(x));
 
             return new Vector3
@@ -530,12 +530,15 @@ namespace RageCoop.Client
             {
                 flags |= VehicleDataFlags.IsAircraft;
             }
+            if (veh.Model.Hash==1483171323 && veh.IsDeluxoHovering())
+            {
+                flags|= VehicleDataFlags.IsDeluxoHovering;
+            }
 
+            
 
             return flags;
         }
-
-
         public static bool HasFlag(this PedDataFlags flagToCheck,PedDataFlags flag)
         {
             return (flagToCheck & flag)!=0;
@@ -641,6 +644,44 @@ namespace RageCoop.Client
             return ps;
         }
 
+
+        public static void SetDeluxoHoverState(this Vehicle deluxo,bool hover)
+        {
+            Function.Call(Hash._SET_VEHICLE_HOVER_TRANSFORM_PERCENTAGE, deluxo, hover? 1f: 0f);
+        }
+        public static bool IsDeluxoHovering(this Vehicle deluxo)
+        {
+            return Math.Abs(deluxo.Bones[27].ForwardVector.GetCosTheta(deluxo.ForwardVector)-1)>0.05;
+        }
+
+        public static float GetNozzleAngel(this Vehicle plane)
+        {
+            return Function.Call<float>(Hash._GET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane);
+        }
+        public static bool HasNozzle(this Vehicle v)
+        {
+
+            switch (v.Model.Hash)
+            {
+                // Hydra
+                case 970385471:
+                    return true;
+
+                // Avenger
+                case -2118308144:
+                    return true;
+
+                // Avenger
+                case 408970549:
+                    return true;
+
+            }
+            return false;
+        }
+        public static void SetNozzleAngel(this Vehicle plane,float ratio)
+        {
+            Function.Call(Hash.SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
+        }
         public static void SetDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
             for (int i = 0; i < 8; i++)
@@ -697,7 +738,10 @@ namespace RageCoop.Client
             veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
             veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
-
+        public static Vector3 PredictPosition(this Entity e)
+        {
+            return e.Position+e.Velocity*(SyncParameters.PositioinPredictionDefault+Networking.Latency);
+        }
 
         #endregion
 
@@ -730,10 +774,6 @@ namespace RageCoop.Client
         }
         
         
-        public static double DegToRad(double deg)
-        {
-            return deg * Math.PI / 180.0;
-        }
 
         
 
@@ -793,7 +833,7 @@ namespace RageCoop.Client
     /// <summary>
     /// 
     /// </summary>
-    public static class VectorExtensions
+    public static class MathExtensions
     {
         /// <summary>
         /// 
@@ -897,6 +937,71 @@ namespace RageCoop.Client
                 Z = vec.Z,
                 W = vec.W
             };
+        }
+
+
+        public static double DegToRad(double deg)
+        {
+            return deg * Math.PI / 180.0;
+        }
+        public static Vector3 ToEulerRotation(this Vector3 dir,Vector3 up)
+        {
+            var rot = Quaternion.LookRotation(dir.Normalized,up).ToEulerAngles().ToDegree();
+            return rot;
+
+        }
+        public static Vector3 ToDegree(this Vector3 radian)
+        {
+            return radian*(float)(180/Math.PI);
+        }
+        public static Vector3 ToEulerAngles(this Quaternion q)
+        {
+            Vector3 angles = new Vector3();
+
+            // roll / x
+            double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+            double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+            angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+
+            // pitch / y
+            double sinp = 2 * (q.W * q.Y - q.Z * q.X);
+            if (Math.Abs(sinp) >= 1)
+            {
+                angles.Y = CopySign(Math.PI / 2, sinp);
+            }
+            else
+            {
+                angles.Y = (float)Math.Asin(sinp);
+            }
+
+            // yaw / z
+            double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+            double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+            angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
+            return angles;
+        }
+        private static float CopySign(double x, double y)
+        {
+            bool isPositive = y>=0;
+            if (isPositive)
+            {
+                if (x>=0) { return (float)x; } else { return (float)-x; }
+            }
+            else
+            {
+                if (x>=0) { return (float)-x; } else { return (float)x; }
+
+            }
+        }
+        public static double AngelTo(this Vector3 v1, Vector3 v2)
+        {
+            return Math.Acos(v1.GetCosTheta(v2));
+        }
+        public static float GetCosTheta(this Vector3 v1, Vector3 v2)
+        {
+
+            return Vector3.Dot(v1, v2)/(v1.Length()*v2.Length());
         }
     }
     

@@ -304,7 +304,6 @@ namespace RageCoop.Client
         private int _lastWeaponObj = 0;
         #endregion
 
-        private bool _isPlayingAnimation = false;
         private string[] _currentAnimation = new string[2] { "", "" };
 
         private void DisplayOnFoot()
@@ -514,12 +513,6 @@ namespace RageCoop.Client
                 */
                 SmoothTransition();
             }
-            else if (_currentAnimation[1] == "reload_aim")
-            {
-                MainPed.Task.ClearAnimation(_currentAnimation[0], _currentAnimation[1]);
-                _isPlayingAnimation = false;
-                _currentAnimation = new string[2] { "", "" };
-            }
             else if (IsInCover)
             {
 
@@ -569,7 +562,6 @@ namespace RageCoop.Client
         }
 
         #region WEAPON
-        WeaponHash appliedWeaponhash = WeaponHash.Unarmed;
         private void CheckCurrentWeapon()
         {
             if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
@@ -676,7 +668,7 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset=Position;
                 return;
             }
-            var f = dist*(Position+SyncParameters.PositioinPrediction*Velocity-MainPed.Position)+(Velocity-MainPed.Velocity)*0.2f;
+            var f = dist*(Position+SyncParameters.PositioinPredictionDefault*Velocity-MainPed.Position)+(Velocity-MainPed.Velocity)*0.2f;
             if (!localRagdoll) { f*=5; }
             if (!(localRagdoll|| MainPed.IsDead))
             {

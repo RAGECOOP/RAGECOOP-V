@@ -8,6 +8,6 @@ namespace RageCoop.Client
 {
     internal class SyncParameters
     {
-        public static float PositioinPrediction = 0.03f;
+        public static float PositioinPredictionDefault = 0.01f;
     }
 }

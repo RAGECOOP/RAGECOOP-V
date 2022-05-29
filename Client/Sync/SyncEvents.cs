@@ -107,10 +107,19 @@ namespace RageCoop.Client {
             if (info==null) { Main.Logger.Warning($"Failed to get muzzle info for vehicle:{veh.DisplayName}");return; }
             Networking.SendBulletShot(info.Position,info.Position+info.ForawardVector,hash,owner.ID);
         }
+        public static void TriggerNozzleTransform(int vehID,bool hover)
+        {
+            Networking.Send(new Packets.NozzleTransform() { VehicleID=vehID, Hover=hover }, ConnectionChannel.SyncEvents);
+        }
 
         #endregion
 
         #region HANDLE
+
+        private static ParticleEffectAsset CorePFXAsset = default;
+
+        static WeaponAsset _weaponAsset = default;
+        static uint _lastWeaponHash;
 
         private static void HandleLeaveVehicle(Packets.LeaveVehicle p)
         {
@@ -152,11 +161,10 @@ namespace RageCoop.Client {
             v.ModelHash=v.MainVehicle.Model;
             // So this vehicle doesn's get re-spawned
         }
-
-        private static ParticleEffectAsset CorePFXAsset = default;
-
-        static WeaponAsset _weaponAsset = default;
-        static uint _lastWeaponHash;
+        private static void HandleNozzleTransform(Packets.NozzleTransform p)
+        {
+            EntityPool.GetVehicleByID(p.VehicleID)?.MainVehicle?.SetNozzleAngel(p.Hover ? 1 : 0);
+        }
         private static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
         {
             if (CorePFXAsset==default) { 
@@ -185,6 +193,15 @@ namespace RageCoop.Client {
                 }
 
             }
+            /*
+            else if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
+            {
+                if (p.VehicleWeapon==VehicleWeaponHash.Tank)
+                {
+                    World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_tank", p.CurrentVehicle.GetMuzzleInfo().Position, p.CurrentVehicle.Bones[35].ForwardVector.ToEulerRotation(p.CurrentVehicle.Bones[35].UpVector), 1);
+                }
+            }
+            */
         }
         public static void HandleEvent(PacketTypes type,byte[] data)
         {
@@ -232,6 +249,13 @@ namespace RageCoop.Client {
                         var packet = new Packets.EnteredVehicle();
                         packet.Unpack(data);
                         HandleEnteredVehicle(packet.PedID,packet.VehicleID,(VehicleSeat)packet.VehicleSeat);
+                        break;
+                    }
+                case PacketTypes.NozzleTransform:
+                    {
+                        var packet = new Packets.NozzleTransform();
+                        packet.Unpack(data);
+                        HandleNozzleTransform(packet);
                         break;
                     }
             }
@@ -360,7 +384,21 @@ namespace RageCoop.Client {
             c._lastEnteringVehicle=g;
         }
         
-        
+        public static void Check(SyncedVehicle v)
+        {
+            if (v.MainVehicle!=null&&v.MainVehicle.HasNozzle())
+            {
+                if((v.LastNozzleAngle==1) && (v.MainVehicle.GetNozzleAngel()!=1))
+                {
+                    TriggerNozzleTransform(v.ID,false);
+                }
+                else if((v.LastNozzleAngle==0) && (v.MainVehicle.GetNozzleAngel()!=0))
+                {
+                    TriggerNozzleTransform(v.ID,true);
+                }
+                v.LastNozzleAngle=v.MainVehicle.GetNozzleAngel();
+            }
+        }
         #endregion
     }
 }
