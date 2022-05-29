@@ -367,6 +367,7 @@ namespace RageCoop.Client
                 EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
             }
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
+            if (v.IsMine) { return; }
             v.ID= packet.ID;
             v.Position=packet.Position.ToVector();
             v.Rotation=packet.Rotation.ToVector();
@@ -384,6 +385,7 @@ namespace RageCoop.Client
                 EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
             }
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
+            if (v.IsMine) { return; }
             v.ID= packet.ID;
             v.OwnerID= packet.OwnerID;
             v.DamageModel=packet.DamageModel;

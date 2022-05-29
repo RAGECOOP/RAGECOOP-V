@@ -34,9 +34,9 @@ namespace RageCoop.Client {
         {
             if (seat==VehicleSeat.Driver)
             {
-                TriggerChangeOwner(veh, c.ID);
                 veh.OwnerID=Main.LocalPlayerID;
                 veh.LastSynced=Main.Ticked;
+                TriggerChangeOwner(veh, c.ID);
             }
             Networking.Send(new Packets.EnteredVehicle()
             {
