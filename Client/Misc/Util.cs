@@ -738,9 +738,9 @@ namespace RageCoop.Client
             veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
             veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
-        public static Vector3 PredictPosition(this Entity e)
+        public static Vector3 PredictPosition(this Entity e,bool applyDefault=true)
         {
-            return e.Position+e.Velocity*(SyncParameters.PositioinPredictionDefault+Networking.Latency);
+            return e.Position+e.Velocity*((applyDefault?SyncParameters.PositioinPredictionDefault:0)+Networking.Latency);
         }
 
         #endregion

@@ -9,6 +9,7 @@ namespace RageCoop.Server
     {
         public long ClientID = 0;
         private float _currentLatency = 0f;
+        public NetConnection Connection { get; set; }
         public float Latency
         {
             get => _currentLatency;

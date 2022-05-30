@@ -36,7 +36,7 @@ namespace RageCoop.Server
         public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
         private static Thread BackgroundThread;
 
-        public static readonly List<Client> Clients = new();
+        public static readonly Dictionary<long,Client> Clients = new();
 
         public Server()
         {
@@ -213,6 +213,7 @@ namespace RageCoop.Server
             Listen();
 
             BackgroundThread=new Thread(() => Background());
+            BackgroundThread.Start();
         }
 
         private void Listen()
@@ -232,7 +233,7 @@ namespace RageCoop.Server
                 {
                     lock (Clients)
                     {
-                        Clients.ForEach(client =>
+                        Clients.Values.ToList().ForEach(client =>
                         {
                             if (!client.FilesSent)
                             {
@@ -317,7 +318,7 @@ namespace RageCoop.Server
                                             Packets.PedStateSync packet = new();
                                             packet.Unpack(data);
 
-                                            CharacterStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                            PedStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
                                         }
                                         catch (Exception e)
                                         {
@@ -353,7 +354,7 @@ namespace RageCoop.Server
                                             Packets.PedSync packet = new();
                                             packet.Unpack(data);
 
-                                            CharacterSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                            PedSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
                                         }
                                         catch (Exception e)
                                         {
@@ -429,7 +430,7 @@ namespace RageCoop.Server
                                             Packets.NativeResponse packet = new();
                                             packet.Unpack(data);
 
-                                            Client client = Clients.Find(x => x.ClientID == message.SenderConnection.RemoteUniqueIdentifier);
+                                            Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
                                             if (client != null)
                                             {
                                                 if (client.Callbacks.ContainsKey(packet.ID))
@@ -514,7 +515,7 @@ namespace RageCoop.Server
                                                 Packets.FileTransferComplete packet = new();
                                                 packet.Unpack(data);
 
-                                                Client client = Clients.Find(x => x.ClientID == message.SenderConnection.RemoteUniqueIdentifier);
+                                                Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier); 
                                                 if (client != null && !client.FilesReceived)
                                                 {
                                                     DownloadManager.TryToRemoveClient(client.ClientID, packet.ID);
@@ -601,7 +602,7 @@ namespace RageCoop.Server
                             break;
                         case NetIncomingMessageType.ConnectionLatencyUpdated:
                             {
-                                Client client = Clients.Find(x => x.ClientID == message.SenderConnection.RemoteUniqueIdentifier);
+                                Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
                                 if (client != null)
                                 {
                                     client.Latency = message.ReadFloat();
@@ -653,7 +654,7 @@ namespace RageCoop.Server
         {
             while (true)
             {
-                foreach(Client c in Clients)
+                foreach(Client c in Clients.Values)
                 {
                     MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.ClientID).ForEach(x =>
                     {
@@ -717,7 +718,7 @@ namespace RageCoop.Server
                 local.Deny("This IP was blocked by this server!");
                 return;
             }
-            if (Clients.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
+            if (Clients.Values.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 local.Deny("Username is already taken!");
                 return;
@@ -730,14 +731,15 @@ namespace RageCoop.Server
             // Add the player to Players
             lock (Clients)
             {
-                Clients.Add(
+                Clients.Add(local.RemoteUniqueIdentifier,
                     tmpClient = new Client()
                     {
                         ClientID = local.RemoteUniqueIdentifier,
+                        Connection=local,
                         Player = new()
                         {
                             Username = packet.Username,
-                            PedID=packet.PedID
+                            PedID=packet.PedID,
                         }
                     }
                 );;
@@ -766,7 +768,7 @@ namespace RageCoop.Server
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private static void SendPlayerConnectPacket(NetConnection local)
         {
-            Client localClient = Clients.Find(x => x.ClientID == local.RemoteUniqueIdentifier);
+            Client localClient = Util.GetClientByID(local.RemoteUniqueIdentifier);
             if (localClient == null)
             {
                 local.Disconnect("No data found!");
@@ -781,7 +783,7 @@ namespace RageCoop.Server
                 {
                     long targetNetHandle = targetPlayer.RemoteUniqueIdentifier;
 
-                    Client targetClient = Clients.Find(x => x.ClientID == targetNetHandle);
+                    Client targetClient = Util.GetClientByID(targetNetHandle);
                     if (targetClient != null)
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -826,7 +828,7 @@ namespace RageCoop.Server
         private static void SendPlayerDisconnectPacket(long nethandle)
         {
             List<NetConnection> clients = MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != nethandle);
-            int playerPedID = Clients.Where(x => x.ClientID==nethandle).First().Player.PedID;
+            int playerPedID = Clients[nethandle].Player.PedID;
             if (clients.Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -838,13 +840,13 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
             }
 
-            Client localClient = Clients.FirstOrDefault(x => x.ClientID == nethandle);
+            Client localClient = Util.GetClientByID( nethandle);
             if (localClient == null)
             {
                 return;
             }
 
-            Clients.Remove(localClient);
+            Clients.Remove(localClient.ClientID);
 
             if (RunningResource != null)
             {
@@ -857,7 +859,7 @@ namespace RageCoop.Server
         }
 
         #region SyncEntities
-        private static void CharacterStateSync(Packets.PedStateSync packet,long ClientID)
+        private static void PedStateSync(Packets.PedStateSync packet,long ClientID)
         {
             
 
@@ -868,14 +870,13 @@ namespace RageCoop.Server
             }
 
 
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
+            foreach (var c in Clients.Values)
             {
+                if (c.ClientID==client.ClientID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-
-            });
+                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+            }
 
             if (RunningResource != null && packet.ID==client.Player.PedID)
             {
@@ -896,15 +897,15 @@ namespace RageCoop.Server
                 client.Player.VehicleID = packet.ID;
             }
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
+            foreach (var c in Clients.Values)
             {
+                if (c.ClientID==client.ClientID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.VehicleSync);
-
-            });
+                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+            }
         }
-        private static void CharacterSync(Packets.PedSync packet, long ClientID)
+        private static void PedSync(Packets.PedSync packet, long ClientID)
         {
             Client client = Util.GetClientByID(ClientID);
             if (client == null)
@@ -913,14 +914,14 @@ namespace RageCoop.Server
             }
 
 
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
+            foreach(var c in Clients.Values)
             {
+                // Don't send data back
+                if (c.ClientID==client.ClientID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-
-            });
+                MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+            }
 
             if (RunningResource != null && packet.ID==client.Player.PedID)
             {
@@ -935,13 +936,13 @@ namespace RageCoop.Server
                 return;
             }
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
+            foreach (var c in Clients.Values)
             {
+                if (c.ClientID==client.ClientID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.VehicleSync);
-
-            });
+                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+            }
             /*
             Client client = Util.GetClientByID(ClientID);
             if (client == null)
@@ -980,12 +981,13 @@ namespace RageCoop.Server
                 return;
             }
 
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
+            foreach (var c in Clients.Values)
             {
+                if (c.ClientID==client.ClientID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.ProjectileSync);
-            });
+                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+            }
         }
 
         #endregion
@@ -1004,7 +1006,7 @@ namespace RageCoop.Server
 
                         CommandContext ctx = new()
                         {
-                            Client = Clients.Find(x => x.Player.Username == packet.Username),
+                            Client = Clients.Values.Where(x => x.Player.Username == packet.Username).FirstOrDefault(),
                             Args = argsWithoutCmd
                         };
 

@@ -30,7 +30,8 @@ namespace RageCoop.Server
 
         public static Client GetClientByID(long id)
         {
-            Client result = Server.Clients.Find(x => x.ClientID == id);
+            Client result = null;
+            Server.Clients.TryGetValue(id,out result);
             if (result == null)
             {
                 NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
@@ -46,7 +47,7 @@ namespace RageCoop.Server
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            Client client = Server.Clients.Find(x => x.Player.Username.ToLower() == username.ToLower());
+            Client client = Server.Clients.Values.ToList().Find(x => x.Player.Username.ToLower() == username.ToLower());
             if (client == null)
             {
                 return null;
@@ -70,7 +71,7 @@ namespace RageCoop.Server
         {
             return new(Server.MainNetServer.Connections.FindAll(e =>
             {
-                Client client = Server.Clients.First(x => x.ClientID == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.Values.First(x => x.ClientID == e.RemoteUniqueIdentifier);
                 return client != null && client.Player.IsInRangeOf(position, range);
             }));
         }
@@ -79,7 +80,7 @@ namespace RageCoop.Server
         {
             return new(Server.MainNetServer.Connections.Where(e =>
             {
-                Client client = Server.Clients.First(x => x.ClientID == e.RemoteUniqueIdentifier);
+                Client client = Server.Clients.Values.First(x => x.ClientID == e.RemoteUniqueIdentifier);
                 return e != local && client != null && client.Player.IsInRangeOf(position, range);
             }));
         }

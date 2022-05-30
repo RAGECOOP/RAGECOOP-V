@@ -105,13 +105,6 @@ namespace RageCoop.Server
             return task.Result;
         }
 
-        public void InvokePlayerPositionUpdate(string username)
-        {
-            lock (_actionQueue.SyncRoot)
-            {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerPositionUpdate(username)));
-            }
-        }
 
         public void InvokePlayerUpdate(Client client)
         {
@@ -121,29 +114,6 @@ namespace RageCoop.Server
             }
         }
 
-        public void InvokePlayerHealthUpdate(string username)
-        {
-            lock (_actionQueue.SyncRoot)
-            {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerHealthUpdate(username)));
-            }
-        }
-
-        public void InvokePlayerPedHandleUpdate(string username)
-        {
-            lock (_actionQueue.SyncRoot)
-            {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerPedHandleUpdate(username)));
-            }
-        }
-
-        public void InvokePlayerVehicleHandleUpdate(string username)
-        {
-            lock (_actionQueue.SyncRoot)
-            {
-                _actionQueue.Enqueue(new Action(() => _script.API.InvokePlayerVehicleHandleUpdate(username)));
-            }
-        }
 
         public void InvokeTick(long tick)
         {
@@ -253,31 +223,11 @@ namespace RageCoop.Server
             OnPlayerUpdate?.Invoke(client);
         }
 
-        public void InvokePlayerHealthUpdate(string username)
-        {
-            OnPlayerHealthUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
-        }
-
         public bool InvokeChatMessage(string username, string message)
         {
             CancelEventArgs args = new(false);
             OnChatMessage?.Invoke(username, message, args);
             return args.Cancel;
-        }
-
-        public void InvokePlayerPositionUpdate(string username)
-        {
-            OnPlayerPositionUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
-        }
-
-        public void InvokePlayerPedHandleUpdate(string username)
-        {
-            OnPlayerPedHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
-        }
-
-        public void InvokePlayerVehicleHandleUpdate(string username)
-        {
-            OnPlayerVehicleHandleUpdate?.Invoke(Server.Clients.FirstOrDefault(x => x.Player.Username == username));
         }
 
         public bool InvokeModPacketReceived(long from, long target, string modName, byte customID, byte[] bytes)
@@ -389,8 +339,8 @@ namespace RageCoop.Server
         /// <summary>
         /// Get a list of all Clients
         /// </summary>
-        /// <returns>All Clients as a List</returns>
-        public static List<Client> GetAllClients()
+        /// <returns>All Clients as a dictionary indexed by ClientID</returns>
+        public static Dictionary<long,Client> GetAllClients()
         {
             return Server.Clients;
         }
@@ -402,7 +352,7 @@ namespace RageCoop.Server
         /// <returns>The Client from this user or null</returns>
         public static Client GetClientByUsername(string username)
         {
-            return Server.Clients.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
+            return Server.Clients.Values.FirstOrDefault(x => x.Player.Username.ToLower() == username.ToLower());
         }
 
         /// <summary>

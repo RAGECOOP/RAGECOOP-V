@@ -14,5 +14,13 @@
         public bool AnnounceSelf { get; set; } = false;
         public string MasterServer { get; set; } = "https://ragecoop.online/gtav/servers";
         public bool DebugMode { get; set; } = false;
+        /// <summary>
+        /// NPC data won't be sent to a player if distance is greater than this value. -1 for unlimited.
+        /// </summary>
+        public float NpcStreamingDistance { get; set; } = 200;
+        /// <summary>
+        /// Player's data won't be sent to another player if their distance is greater than this value. -1 for unlimited.
+        /// </summary>
+        public float PlayerStreamingDistance { get; set; } = -1;
     }
 }

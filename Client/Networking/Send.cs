@@ -117,7 +117,7 @@ namespace RageCoop.Client
             {
                 ID =sp.ID,
                 ShooterID=sp.ShooterID,
-                Position=p.PredictPosition().ToLVector(),
+                Position=p.Position.ToLVector(),
                 Rotation=p.Rotation.ToLVector(),
                 Velocity=p.Velocity.ToLVector(),
                 WeaponHash=(uint)p.WeaponHash,

@@ -55,7 +55,7 @@ namespace RageCoop.Client
                 _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Latency * 1000:N0}ms", player.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
-            _mainScaleform.CallFunction("SET_TITLE", "Player list", (Players.Count) + " players");
+            _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count+1} players");
             _mainScaleform.CallFunction("DISPLAY_VIEW");
         }
         public static void SetPlayer(int id, string username,float latency=0)

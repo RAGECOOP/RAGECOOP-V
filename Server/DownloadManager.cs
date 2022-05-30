@@ -105,7 +105,7 @@ namespace RageCoop.Server
                     {
                         lock (Server.Clients)
                         {
-                            Client x = Server.Clients.FirstOrDefault(x => x.ClientID == client.NetHandle);
+                            Client x = Util.GetClientByID(client.NetHandle);
                             if (x != null)
                             {
                                 x.FilesReceived = true;
