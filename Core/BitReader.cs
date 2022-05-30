@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Linq;
+using GTA.Math;
 
 namespace RageCoop.Core
 {
@@ -103,18 +104,18 @@ namespace RageCoop.Core
             return value;
         }
 
-        public LVector3 ReadLVector3()
+        public Vector3 ReadVector3()
         {
-            return new LVector3()
+            return new Vector3()
             {
                 X = ReadFloat(),
                 Y = ReadFloat(),
                 Z = ReadFloat()
             };
         }
-        public LQuaternion ReadLQuaternion()
+        public Quaternion ReadLQuaternion()
         {
-            return new LQuaternion()
+            return new Quaternion()
             {
                 X = ReadFloat(),
                 Y = ReadFloat(),

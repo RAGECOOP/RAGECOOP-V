@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using GTA.Math;
 namespace RageCoop.Core
 {
     public class PlayerData
@@ -18,17 +19,12 @@ namespace RageCoop.Core
         /// </summary>
         public int VehicleID { get; set; }
         public bool IsInVehicle { get; internal set; }
-        public LVector3 Position { get; set; }
+        public Vector3 Position { get; set; }
 
         /// <summary>
         /// Player Latency in second.
         /// </summary>
         public float Latency { get; set; }
         public int Health { get; set; }
-
-        public bool IsInRangeOf(LVector3 position, float distance)
-        {
-            return LVector3.Subtract(Position, position).Length() < distance;
-        }
     }
 }

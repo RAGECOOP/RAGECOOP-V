@@ -20,7 +20,7 @@ namespace RageCoop.Client.Menus
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         #region SUB
-        public Sub.SettingsMenu SubSettings = new Sub.SettingsMenu();
+        public SettingsMenu SubSettings = new SettingsMenu();
         #endregion
 
         #region ITEMS
@@ -51,7 +51,6 @@ namespace RageCoop.Client.Menus
             MainMenu.Add(_usernameItem);
             MainMenu.Add(ServerIpItem);
             MainMenu.Add(_serverConnectItem);
-            MainMenu.Add(_aboutItem);
 
             MainMenu.AddSubMenu(SubSettings.Menu);
             MainMenu.AddSubMenu(DevToolMenu.Menu);
@@ -63,6 +62,8 @@ namespace RageCoop.Client.Menus
             MenuPool.Add(DevToolMenu.Menu);
             MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
+
+            MainMenu.Add(_aboutItem);
         }
 
         public void UsernameActivated(object a, System.EventArgs b)
@@ -91,25 +92,24 @@ namespace RageCoop.Client.Menus
 
         public void InitiateConnectionMenuSetting()
         {
-            MainMenu.Items[0].Enabled = false;
-            MainMenu.Items[1].Enabled = false;
-            MainMenu.Items[2].Enabled = false;
+            _usernameItem.Enabled = false;
+            ServerIpItem.Enabled = false;
+            _serverConnectItem.Enabled = false;
         }
 
         public void ConnectedMenuSetting()
         {
-            MainMenu.Items[2].Enabled = true;
-            MainMenu.Items[2].Title = "Disconnect";
+            _serverConnectItem.Enabled = true;
+            _serverConnectItem.Title = "Disconnect";
             MainMenu.Visible = false;
         }
 
         public void DisconnectedMenuSetting()
         {
-            MainMenu.Items[0].Enabled = true;
-            MainMenu.Items[1].Enabled = true;
-            MainMenu.Items[2].Enabled = true;
-            MainMenu.Items[2].Title = "Connect";
-            SubSettings.Menu.Items[1].Enabled = false;
+            _usernameItem.Enabled = true;
+            ServerIpItem.Enabled = true;
+            _serverConnectItem.Enabled = true;
+            _serverConnectItem.Title = "Connect";
         }
     }
 }

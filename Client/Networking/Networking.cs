@@ -6,7 +6,7 @@ using Lidgren.Network;
 using RageCoop.Core;
 using System.Threading.Tasks;
 using System.Threading;
-using GTA;
+using GTA.Math;
 using GTA.Native;
 
 namespace RageCoop.Client
@@ -144,8 +144,8 @@ namespace RageCoop.Client
                     case string _:
                         arguments.Add((string)x);
                         break;
-                    case LVector3 _:
-                        LVector3 vector = (LVector3)x;
+                    case Vector3 _:
+                        Vector3 vector = (Vector3)x;
                         arguments.Add((float)vector.X);
                         arguments.Add((float)vector.Y);
                         arguments.Add((float)vector.Z);
@@ -173,7 +173,7 @@ namespace RageCoop.Client
                 case 0x03: // string
                     return Function.Call<string>((Hash)hash, arguments.ToArray());
                 case 0x04: // vector3
-                    return Function.Call<GTA.Math.Vector3>((Hash)hash, arguments.ToArray()).ToLVector();
+                    return Function.Call<Vector3>((Hash)hash, arguments.ToArray());
                 default:
                     GTA.UI.Notification.Show("[DecodeNativeCall][" + hash + "]: Type of return not found!");
                     return null;

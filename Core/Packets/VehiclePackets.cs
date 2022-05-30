@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GTA;
+using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -207,13 +208,13 @@ namespace RageCoop.Core
         {
             public int ID { get; set; }
 
-            public LVector3 Position { get; set; }
+            public Vector3 Position { get; set; }
 
-            public LVector3 Rotation { get; set; }
+            public Vector3 Rotation { get; set; }
 
-            public LVector3 Velocity { get; set; }
+            public Vector3 Velocity { get; set; }
 
-            public LVector3 RotationVelocity { get; set; }
+            public Vector3 RotationVelocity { get; set; }
 
             public float ThrottlePower { get; set; }
             public float BrakePower { get; set; }
@@ -231,17 +232,17 @@ namespace RageCoop.Core
                 byteArray.AddInt(ID);
 
                 // Write position
-                byteArray.AddLVector3(Position);
+                byteArray.AddVector3(Position);
 
 
                 // Write rotation
-                byteArray.AddLVector3(Rotation);
+                byteArray.AddVector3(Rotation);
 
                 // Write velocity
-                byteArray.AddLVector3(Velocity);
+                byteArray.AddVector3(Velocity);
 
                 // Write rotation velocity
-                byteArray.AddLVector3(RotationVelocity);
+                byteArray.AddVector3(RotationVelocity);
 
 
                 byteArray.AddFloat(ThrottlePower);
@@ -268,16 +269,16 @@ namespace RageCoop.Core
                 ID = reader.ReadInt();
 
                 // Read position
-                Position = reader.ReadLVector3();
+                Position = reader.ReadVector3();
 
                 // Read rotation
-                Rotation = reader.ReadLVector3();
+                Rotation = reader.ReadVector3();
 
                 // Read velocity
-                Velocity =reader.ReadLVector3();
+                Velocity =reader.ReadVector3();
 
                 // Read rotation velocity
-                RotationVelocity=reader.ReadLVector3();
+                RotationVelocity=reader.ReadVector3();
 
                 // Read throttle power
                 ThrottlePower=reader.ReadFloat();

@@ -7,6 +7,7 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
+    /*
     /// <summary>
     /// 
     /// </summary>
@@ -111,7 +112,7 @@ namespace RageCoop.Core
         /// </summary>
         public float W { get; set; }
     }
-
+    */
     public enum PacketTypes:byte
     {
         Handshake=0,
@@ -190,6 +191,7 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover=1<< 10,
+        IsPlayer=1<<11,
     }
 
     #region ===== VEHICLE DATA =====
@@ -493,10 +495,10 @@ namespace RageCoop.Core
                         byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
                         byteArray.AddRange(stringBytes);
                     }
-                    else if (type == typeof(LVector3))
+                    else if (type == typeof(Vector3))
                     {
                         byteArray.Add(0x04);
-                        LVector3 vector = (LVector3)x;
+                        Vector3 vector = (Vector3)x;
                         byteArray.AddRange(BitConverter.GetBytes(vector.X));
                         byteArray.AddRange(BitConverter.GetBytes(vector.Y));
                         byteArray.AddRange(BitConverter.GetBytes(vector.Z));
@@ -540,7 +542,7 @@ namespace RageCoop.Core
                             Args.Add(reader.ReadString(stringLength));
                             break;
                         case 0x04:
-                            Args.Add(new LVector3()
+                            Args.Add(new Vector3()
                             {
                                 X = reader.ReadFloat(),
                                 Y = reader.ReadFloat(),
@@ -603,10 +605,10 @@ namespace RageCoop.Core
                         byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
                         byteArray.AddRange(stringBytes);
                     }
-                    else if (type == typeof(LVector3))
+                    else if (type == typeof(Vector3))
                     {
                         byteArray.Add(0x04);
-                        LVector3 vector = (LVector3)x;
+                        Vector3 vector = (Vector3)x;
                         byteArray.AddRange(BitConverter.GetBytes(vector.X));
                         byteArray.AddRange(BitConverter.GetBytes(vector.Y));
                         byteArray.AddRange(BitConverter.GetBytes(vector.Z));
@@ -658,7 +660,7 @@ namespace RageCoop.Core
                             Args.Add(reader.ReadString(stringLength));
                             break;
                         case 0x04:
-                            Args.Add(new LVector3()
+                            Args.Add(new Vector3()
                             {
                                 X = reader.ReadFloat(),
                                 Y = reader.ReadFloat(),

@@ -66,25 +66,6 @@ namespace RageCoop.Server
             return new(Server.MainNetServer.Connections.Where(e => e.RemoteUniqueIdentifier != local));
         }
 
-        // Return a list of players within range of ...
-        public static List<NetConnection> GetAllInRange(LVector3 position, float range)
-        {
-            return new(Server.MainNetServer.Connections.FindAll(e =>
-            {
-                Client client = Server.Clients.Values.First(x => x.ClientID == e.RemoteUniqueIdentifier);
-                return client != null && client.Player.IsInRangeOf(position, range);
-            }));
-        }
-        // Return a list of players within range of ... but not the local one
-        public static List<NetConnection> GetAllInRange(LVector3 position, float range, NetConnection local)
-        {
-            return new(Server.MainNetServer.Connections.Where(e =>
-            {
-                Client client = Server.Clients.Values.First(x => x.ClientID == e.RemoteUniqueIdentifier);
-                return e != local && client != null && client.Player.IsInRangeOf(position, range);
-            }));
-        }
-
         public static T Read<T>(string file) where T : new()
         {
             XmlSerializer ser = new(typeof(T));

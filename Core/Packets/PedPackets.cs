@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -126,17 +126,17 @@ namespace RageCoop.Core
 
             public int Health { get; set; }
 
-            public LVector3 Position { get; set; }
+            public Vector3 Position { get; set; }
 
-            public LVector3 Rotation { get; set; }
+            public Vector3 Rotation { get; set; }
 
-            public LVector3 Velocity { get; set; }
+            public Vector3 Velocity { get; set; }
 
-            public LVector3 RotationVelocity { get; set; }
+            public Vector3 RotationVelocity { get; set; }
 
             public byte Speed { get; set; }
 
-            public LVector3 AimCoords { get; set; }
+            public Vector3 AimCoords { get; set; }
 
             public uint CurrentWeaponHash { get; set; }
 
@@ -160,17 +160,17 @@ namespace RageCoop.Core
                 byteArray.AddRange(BitConverter.GetBytes(Health));
 
                 // Write ped position
-                byteArray.AddLVector3(Position);
+                byteArray.AddVector3(Position);
 
                 // Write ped rotation
-                byteArray.AddLVector3(Rotation);
+                byteArray.AddVector3(Rotation);
 
                 // Write ped velocity
-                byteArray.AddLVector3(Velocity);
+                byteArray.AddVector3(Velocity);
 
                 if (Flag.HasFlag(PedDataFlags.IsRagdoll))
                 {
-                    byteArray.AddLVector3(RotationVelocity);
+                    byteArray.AddVector3(RotationVelocity);
                 }
 
                 // Write ped speed
@@ -182,7 +182,7 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(PedDataFlags.IsAiming))
                 {
                     // Write ped aim coords
-                    byteArray.AddLVector3(AimCoords);
+                    byteArray.AddVector3(AimCoords);
                 }
 
                 byteArray.AddFloat(Heading);
@@ -209,18 +209,18 @@ namespace RageCoop.Core
                 Health = reader.ReadInt();
 
                 // Read player position
-                Position = reader.ReadLVector3();
+                Position = reader.ReadVector3();
 
                 // Read player rotation
-                Rotation = reader.ReadLVector3();
+                Rotation = reader.ReadVector3();
 
                 // Read player velocity
-                Velocity = reader.ReadLVector3();
+                Velocity = reader.ReadVector3();
 
                 // Read rotation velocity if in ragdoll
                 if (Flag.HasFlag(PedDataFlags.IsRagdoll))
                 {
-                    RotationVelocity=reader.ReadLVector3();
+                    RotationVelocity=reader.ReadVector3();
                 }
 
                 // Read player speed
@@ -233,7 +233,7 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(PedDataFlags.IsAiming))
                 {
                     // Read player aim coords
-                    AimCoords = reader.ReadLVector3();
+                    AimCoords = reader.ReadVector3();
                 }
 
                 Heading=reader.ReadFloat();

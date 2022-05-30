@@ -36,9 +36,9 @@ namespace RageCoop.Client
             {
                 ID =c.ID,
                 Health = p.Health,
-                Position = p.Position.ToLVector(),
-                Rotation = p.Rotation.ToLVector(),
-                Velocity = p.Velocity.ToLVector(),
+                Position = p.Position,
+                Rotation = p.Rotation,
+                Velocity = p.Velocity,
                 Speed = p.GetPedSpeed(),
                 CurrentWeaponHash = (uint)p.Weapons.Current.Hash,
                 Flag = p.GetPedFlags(),
@@ -46,11 +46,11 @@ namespace RageCoop.Client
             };
             if (packet.Flag.HasFlag(PedDataFlags.IsAiming))
             {
-                packet.AimCoords = p.GetAimCoord().ToLVector();
+                packet.AimCoords = p.GetAimCoord();
             }
             if (packet.Flag.HasFlag(PedDataFlags.IsRagdoll))
             {
-                packet.RotationVelocity=p.RotationVelocity.ToLVector();
+                packet.RotationVelocity=p.RotationVelocity;
             }
             Send(packet, ConnectionChannel.PedSync);
         }
@@ -76,10 +76,10 @@ namespace RageCoop.Client
             {
                 ID =v.ID,
                 SteeringAngle = veh.SteeringAngle,
-                Position = veh.PredictPosition().ToLVector(),
-                Rotation = veh.Rotation.ToLVector(),
-                Velocity = veh.Velocity.ToLVector(),
-                RotationVelocity=veh.RotationVelocity.ToLVector(),
+                Position = veh.PredictPosition(),
+                Rotation = veh.Rotation,
+                Velocity = veh.Velocity,
+                RotationVelocity=veh.RotationVelocity,
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
@@ -117,9 +117,9 @@ namespace RageCoop.Client
             {
                 ID =sp.ID,
                 ShooterID=sp.ShooterID,
-                Position=p.Position.ToLVector(),
-                Rotation=p.Rotation.ToLVector(),
-                Velocity=p.Velocity.ToLVector(),
+                Position=p.Position,
+                Rotation=p.Rotation,
+                Velocity=p.Velocity,
                 WeaponHash=(uint)p.WeaponHash,
                 Exploded=p.IsDead
             };
@@ -133,8 +133,8 @@ namespace RageCoop.Client
         {
             Send(new Packets.BulletShot()
             {
-                StartPosition = start.ToLVector(),
-                EndPosition = end.ToLVector(),
+                StartPosition = start,
+                EndPosition = end,
                 OwnerID = ownerID,
                 WeaponHash=weapon,
             }, ConnectionChannel.SyncEvents);

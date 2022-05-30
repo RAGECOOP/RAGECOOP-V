@@ -307,20 +307,19 @@ namespace RageCoop.Client
 
         private static void PedSync(Packets.PedSync packet)
         {
-            if (!EntityPool.PedExists(packet.ID))
+            SyncedPed c = EntityPool.GetPedByID(packet.ID);
+            if (c==null)
             {
                 Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-
-                EntityPool.ThreadSafe.Add(new SyncedPed(packet.ID));
+                EntityPool.ThreadSafe.Add(c=new SyncedPed(packet.ID));
             }
             PedDataFlags flags = packet.Flag;
-            SyncedPed c = EntityPool.GetPedByID(packet.ID);
             c.ID=packet.ID;
             //c.OwnerID=packet.OwnerID;
             c.Health = packet.Health;
-            c.Position = packet.Position.ToVector();
-            c.Rotation = packet.Rotation.ToVector();
-            c.Velocity = packet.Velocity.ToVector();
+            c.Position = packet.Position;
+            c.Rotation = packet.Rotation;
+            c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
             c.CurrentWeaponHash = packet.CurrentWeaponHash;
             c.IsAiming = flags.HasFlag(PedDataFlags.IsAiming);
@@ -337,22 +336,17 @@ namespace RageCoop.Client
             c.LastSynced =  Main.Ticked;
             if (c.IsAiming)
             {
-                c.AimCoords = packet.AimCoords.ToVector();
+                c.AimCoords = packet.AimCoords;
             }
             if (c.IsRagdoll)
             {
-                c.RotationVelocity=packet.RotationVelocity.ToVector();
+                c.RotationVelocity=packet.RotationVelocity;
             }
         }
         private static void PedStateSync(Packets.PedStateSync packet)
         {
-            if (!EntityPool.PedExists(packet.ID))
-            {
-                Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-
-                EntityPool.ThreadSafe.Add(new SyncedPed(packet.ID));
-            }
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
+            if (c==null) { return; }
             c.ID=packet.ID;
             c.OwnerID=packet.OwnerID;
             c.Clothes=packet.Clothes;
@@ -362,30 +356,26 @@ namespace RageCoop.Client
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {
-            if (!EntityPool.VehicleExists(packet.ID))
+            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID); 
+            if (v==null)
             {
-                EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
+                EntityPool.ThreadSafe.Add(v=new SyncedVehicle(packet.ID));
             }
-            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v.IsMine) { return; }
             v.ID= packet.ID;
-            v.Position=packet.Position.ToVector();
-            v.Rotation=packet.Rotation.ToVector();
+            v.Position=packet.Position;
+            v.Rotation=packet.Rotation;
             v.SteeringAngle=packet.SteeringAngle;
             v.ThrottlePower=packet.ThrottlePower;
             v.BrakePower=packet.BrakePower;
-            v.Velocity=packet.Velocity.ToVector();
-            v.RotationVelocity=packet.RotationVelocity.ToVector();
+            v.Velocity=packet.Velocity;
+            v.RotationVelocity=packet.RotationVelocity;
             v.LastSynced=Main.Ticked;
         }
         private static void VehicleStateSync(Packets.VehicleStateSync packet)
         {
-            if (!EntityPool.VehicleExists(packet.ID))
-            {
-                EntityPool.ThreadSafe.Add(new SyncedVehicle(packet.ID));
-            }
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-            if (v.IsMine) { return; }
+            if (v==null||v.IsMine) { return; }
             v.ID= packet.ID;
             v.OwnerID= packet.OwnerID;
             v.DamageModel=packet.DamageModel;
@@ -425,9 +415,9 @@ namespace RageCoop.Client
                 Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));
             }
-            p.Position=packet.Position.ToVector();
-            p.Rotation=packet.Rotation.ToVector();
-            p.Velocity=packet.Velocity.ToVector();
+            p.Position=packet.Position;
+            p.Rotation=packet.Rotation;
+            p.Velocity=packet.Velocity;
             p.Hash=(WeaponHash)packet.WeaponHash;
             p.ShooterID=packet.ShooterID;
             p.Exploded=packet.Exploded;

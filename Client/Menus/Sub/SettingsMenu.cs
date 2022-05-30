@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using GTA;
 using LemonUI.Menus;
 
-namespace RageCoop.Client.Menus.Sub
+namespace RageCoop.Client.Menus
 {
     /// <summary>
     /// Don't use it!

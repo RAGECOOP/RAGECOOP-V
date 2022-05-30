@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -15,11 +16,11 @@ namespace RageCoop.Core
             public int ShooterID { get; set; }
             public uint WeaponHash { get; set; }
 
-            public LVector3 Position { get; set; }
+            public Vector3 Position { get; set; }
 
-            public LVector3 Rotation { get; set; }
+            public Vector3 Rotation { get; set; }
 
-            public LVector3 Velocity { get; set; }
+            public Vector3 Velocity { get; set; }
 
             public bool Exploded { get; set; }
 
@@ -41,14 +42,14 @@ namespace RageCoop.Core
                 byteArray.AddUint(WeaponHash);
 
                 // Write position
-                byteArray.AddLVector3(Position);
+                byteArray.AddVector3(Position);
 
 
                 // Write rotation
-                byteArray.AddLVector3(Rotation);
+                byteArray.AddVector3(Rotation);
 
                 // Write velocity
-                byteArray.AddLVector3(Velocity);
+                byteArray.AddVector3(Velocity);
 
                 if (Exploded) { byteArray.Add(1); }
 
@@ -73,13 +74,13 @@ namespace RageCoop.Core
                 WeaponHash= reader.ReadUInt();
 
                 // Read position
-                Position = reader.ReadLVector3();
+                Position = reader.ReadVector3();
 
                 // Read rotation
-                Rotation = reader.ReadLVector3();
+                Rotation = reader.ReadVector3();
 
                 // Read velocity
-                Velocity =reader.ReadLVector3();
+                Velocity =reader.ReadVector3();
 
                 if (reader.CanRead(1))
                 {

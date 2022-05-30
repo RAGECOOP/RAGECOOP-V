@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GTA.Math;
 namespace RageCoop.Core
 {
     public class CoreUtils
@@ -37,13 +38,13 @@ namespace RageCoop.Core
     }
     public static class Extensions
     {
-        public static void AddLVector3(this List<byte> bytes, LVector3 vec3)
+        public static void AddVector3(this List<byte> bytes, Vector3 vec3)
         {
             bytes.AddRange(BitConverter.GetBytes(vec3.X));
             bytes.AddRange(BitConverter.GetBytes(vec3.Y));
             bytes.AddRange(BitConverter.GetBytes(vec3.Z));
         }
-        public static void AddLQuaternion(this List<byte> bytes, LQuaternion quat)
+        public static void AddQuaternion(this List<byte> bytes, Quaternion quat)
         {
             bytes.AddRange(BitConverter.GetBytes(quat.X));
             bytes.AddRange(BitConverter.GetBytes(quat.Y));

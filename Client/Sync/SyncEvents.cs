@@ -211,7 +211,7 @@ namespace RageCoop.Client {
                     {
                         Packets.BulletShot p = new Packets.BulletShot();
                         p.Unpack(data);
-                        HandleBulletShot(p.StartPosition.ToVector(), p.EndPosition.ToVector(), p.WeaponHash, p.OwnerID);
+                        HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }
                 case PacketTypes.EnteringVehicle:

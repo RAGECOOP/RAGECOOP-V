@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -15,8 +15,8 @@ namespace RageCoop.Core
 
             public uint WeaponHash { get; set; }
 
-            public LVector3 StartPosition { get; set; }
-            public LVector3 EndPosition { get; set; }
+            public Vector3 StartPosition { get; set; }
+            public Vector3 EndPosition { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -32,10 +32,10 @@ namespace RageCoop.Core
                 byteArray.AddRange(BitConverter.GetBytes(WeaponHash));
 
                 // Write StartPosition
-                byteArray.AddLVector3(StartPosition);
+                byteArray.AddVector3(StartPosition);
 
                 // Write EndPosition
-                byteArray.AddLVector3(EndPosition);
+                byteArray.AddVector3(EndPosition);
 
 
                 byte[] result = byteArray.ToArray();
@@ -57,10 +57,10 @@ namespace RageCoop.Core
                 WeaponHash=reader.ReadUInt();
 
                 // Read StartPosition
-                StartPosition=reader.ReadLVector3();
+                StartPosition=reader.ReadVector3();
 
                 // Read EndPosition
-                EndPosition=reader.ReadLVector3();
+                EndPosition=reader.ReadVector3();
                 #endregion
             }
         }

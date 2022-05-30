@@ -912,12 +912,26 @@ namespace RageCoop.Server
             {
                 return;
             }
-
-
-            foreach(var c in Clients.Values)
+            bool isPlayer = packet.Flag.HasFlag(PedDataFlags.IsPlayer);
+            if (isPlayer) { client.Player.Position=packet.Position; }
+            foreach (var c in Clients.Values)
             {
+
                 // Don't send data back
                 if (c.ClientID==client.ClientID) { continue; }
+
+                // Check streaming distance
+                if (isPlayer)
+                {
+                    if ((MainSettings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.PlayerStreamingDistance))
+                    {
+                        continue;
+                    }
+                }
+                else if ((MainSettings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.NpcStreamingDistance))
+                {
+                    continue;
+                }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
@@ -935,43 +949,27 @@ namespace RageCoop.Server
             {
                 return;
             }
-
+            bool isPlayer = packet.ID==client.Player.VehicleID;
             foreach (var c in Clients.Values)
             {
                 if (c.ClientID==client.ClientID) { continue; }
+                if (isPlayer)
+                {
+                    // Player's vehicle
+                    if ((MainSettings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.PlayerStreamingDistance))
+                    {
+                        continue;
+                    }
+
+                }
+                else if((MainSettings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.NpcStreamingDistance))
+                {
+                    continue;
+                }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
-            /*
-            Client client = Util.GetClientByID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
-            // Save the new data
-            client.Player.PedHandle = packet.PedHandle;
-            client.Player.VehicleHandle = packet.VehicleHandle;
-            client.Player.IsInVehicle = true;
-            client.Player.Position = packet.Position;
-            client.Player.Health = packet.Health;
-
-            // Override the latency
-            packet.Latency = client.Latency;
-
-            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != ClientID).ForEach(x =>
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.PacketToNetOutGoingMessage(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PlayerFull);
-
-            });
-
-            if (RunningResource != null)
-            {
-                RunningResource.InvokePlayerUpdate(client);
-            }
-            */
         }
         private static void ProjectileSync(Packets.ProjectileSync packet, long ClientID)
         {

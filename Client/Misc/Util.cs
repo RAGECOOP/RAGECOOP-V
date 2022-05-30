@@ -275,7 +275,10 @@ namespace RageCoop.Client
             {
                 flags |=PedDataFlags.IsInCover;
             }
-
+            if (ped.IsPlayer)
+            {
+                flags|=PedDataFlags.IsPlayer;
+            }
             return flags;
         }
 
@@ -911,35 +914,6 @@ namespace RageCoop.Client
             };
             return result;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static LVector3 ToLVector(this Vector3 vec)
-        {
-            return new LVector3()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z
-            };
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static LQuaternion ToLQuaternion(this Quaternion vec)
-        {
-            return new LQuaternion()
-            {
-                X = vec.X,
-                Y = vec.Y,
-                Z = vec.Z,
-                W = vec.W
-            };
-        }
-
-
         public static double DegToRad(double deg)
         {
             return deg * Math.PI / 180.0;

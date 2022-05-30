@@ -288,7 +288,7 @@ namespace RageCoop.Client
             var allProjectiles=World.GetAllProjectiles();
             if (Main.Settings.WorldVehicleSoftLimit>-1)
             {
-                if (Main.Ticked%100==0) { if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit) { SetBudget(0); } else { SetBudget(1); } }
+                if (Main.Ticked%100==0) { if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit) { SetBudget(0); } else { SetBudget(3); } }
             }
 
 #if BENCHMARK

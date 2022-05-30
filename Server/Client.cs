@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
+using GTA.Math;
 
 namespace RageCoop.Server
 {
@@ -160,7 +161,7 @@ namespace RageCoop.Server
                 {
                     returnTypeValue = 0x03;
                 }
-                else if (returnType == typeof(LVector3))
+                else if (returnType == typeof(Vector3))
                 {
                     returnTypeValue = 0x04;
                 }
