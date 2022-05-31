@@ -216,6 +216,10 @@ namespace RageCoop.Client
                 case -2118308144:
                     return true;
 
+                // Tula
+                case 1043222410:
+                    return true;
+
                 // Avenger
                 case 408970549:
                     return true;
