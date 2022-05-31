@@ -55,8 +55,8 @@ namespace RageCoop.Server
                     (localQueue.Dequeue() as Action)?.Invoke();
                 }
 
-                // 16 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(1000 / 60);
+                // 15 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(15);
             }
 
             _script.API.InvokeStop();
@@ -167,25 +167,6 @@ namespace RageCoop.Server
         /// Called when a new player sends data like health
         /// </summary>
         public event PlayerEvent OnPlayerUpdate;
-        /// <summary>
-        /// Called when a player has a new health value
-        /// </summary>
-        public event PlayerEvent OnPlayerHealthUpdate;
-        /// <summary>
-        /// Called when a player has a new position
-        /// </summary>
-        public event PlayerEvent OnPlayerPositionUpdate;
-        /// <summary>
-        /// Called when a player has a new position
-        /// </summary>
-        public event PlayerEvent OnPlayerPedHandleUpdate;
-        /// <summary>
-        /// Called when a player has a new position
-        /// </summary>
-        public event PlayerEvent OnPlayerVehicleHandleUpdate;
-        /// <summary>
-        /// Called when a player sends a packet from another modification
-        /// </summary>
         public event ModEvent OnModPacketReceived;
 
         public void InvokeTick(long tick)
@@ -245,31 +226,35 @@ namespace RageCoop.Server
         /// <param name="modName">The name of the modification that will receive the data</param>
         /// <param name="customID">The ID to check what this data is</param>
         /// <param name="bytes">The serialized data</param>
-        /// <param name="netHandleList">The list of connections (players) that will receive the data</param>
-        public static void SendModPacketToAll(string modName, byte customID, byte[] bytes, List<long> netHandleList = null)
+        /// <param name="playerList">The list of player ID (PedID) that will receive the data</param>
+        public static void SendModPacketToAll(string modName, byte customID, byte[] bytes, List<int> playerList = null)
         {
             try
-            {
-                List<NetConnection> connections = netHandleList == null
-                    ? Server.MainNetServer.Connections
-                    : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
-                // A resource can be calling this function on disconnect of the last player in the server and we will
+            {// A resource can be calling this function on disconnect of the last player in the server and we will
                 // get an empty connection list, make sure connections has at least one handle in it
-                if (connections.Count > 0)
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                new Packets.Mod()
                 {
-                    NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                    new Packets.Mod()
-                    {
-                        NetHandle = 0,
-                        Target = 0,
-                        Name = modName,
-                        CustomPacketID = customID,
-                        Bytes = bytes
-                    }.Pack(outgoingMessage);
-                    Logging.Debug($"SendModPacketToAll recipients list {connections.Count}");
-                    Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-                    Server.MainNetServer.FlushSendQueue();
+                    Name = modName,
+                    CustomPacketID = customID,
+                    Bytes = bytes
+                }.Pack(outgoingMessage);
+                if (playerList==null)
+                {
+                    Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
                 }
+                else
+                {
+                    foreach(var c in Server.Clients.Values)
+                    {
+                        if (playerList.Contains(c.Player.PedID))
+                        {
+                            Server.MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
+                        }
+                    }
+                    
+                }
+                Server.MainNetServer.FlushSendQueue();
             }
             catch (Exception e)
             {
@@ -315,31 +300,9 @@ namespace RageCoop.Server
         }
 
         /// <summary>
-        /// Get all connections as a list of NetHandle(long)
-        /// </summary>
-        /// <returns>All connections(NetHandle) as a List</returns>
-        public static List<long> GetAllConnections()
-        {
-            List<long> result = new();
-
-            Server.MainNetServer.Connections.ForEach(x => result.Add(x.RemoteUniqueIdentifier));
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get the count of all connections
-        /// </summary>
-        /// <returns>The count of all connections as an integer</returns>
-        public static int GetAllClientsCount()
-        {
-            return Server.Clients.Count;
-        }
-
-        /// <summary>
         /// Get a list of all Clients
         /// </summary>
-        /// <returns>All Clients as a dictionary indexed by ClientID</returns>
+        /// <returns>All clients as a dictionary indexed by NetID</returns>
         public static Dictionary<long,Client> GetAllClients()
         {
             return Server.Clients;

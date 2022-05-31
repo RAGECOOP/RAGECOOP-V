@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
-    public static class DownloadManager
+    internal static class DownloadManager
     {
         private static readonly List<DownloadFile> _downloadFiles = new List<DownloadFile>();
         private static readonly Dictionary<byte, FileStream> _streams = new Dictionary<byte, FileStream>();

@@ -8,19 +8,19 @@ namespace RageCoop.Server
 {
     public class Client
     {
-        public long ClientID = 0;
+        public long NetID = 0;
         private float _currentLatency = 0f;
         public NetConnection Connection { get; set; }
         public float Latency
         {
             get => _currentLatency;
-            set
+            internal set
             {
                 _currentLatency = value;
 
                 if ((value * 1000f) > Server.MainSettings.MaxLatency)
                 {
-                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
+                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
                 }
             }
         }
@@ -28,7 +28,7 @@ namespace RageCoop.Server
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
         public readonly Dictionary<long, Action<object>> Callbacks = new();
-        public bool FilesReceived { get; set; } = false;
+        public bool FilesReceived { get;internal set; } = false;
         public bool FilesSent = false;
 
         #region CUSTOMDATA FUNCTIONS
@@ -66,7 +66,7 @@ namespace RageCoop.Server
         #region FUNCTIONS
         public void Kick(string reason)
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID)?.Disconnect(reason);
+            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID)?.Disconnect(reason);
         }
         public void Kick(string[] reason)
         {
@@ -77,7 +77,7 @@ namespace RageCoop.Server
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
                     return;
@@ -95,10 +95,10 @@ namespace RageCoop.Server
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{ClientID}\" not found!");
+                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetID}\" not found!");
                     return;
                 }
 
@@ -128,10 +128,10 @@ namespace RageCoop.Server
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{ClientID}\" not found!");
+                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetID}\" not found!");
                     return;
                 }
 
@@ -189,10 +189,10 @@ namespace RageCoop.Server
 
         public void SendCleanUpWorld()
         {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
             if (userConnection == null)
             {
-                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{ClientID}\" not found!");
+                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetID}\" not found!");
                 return;
             }
 
@@ -205,7 +205,7 @@ namespace RageCoop.Server
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
                     return;
@@ -214,8 +214,6 @@ namespace RageCoop.Server
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new Packets.Mod()
                 {
-                    NetHandle = 0,
-                    Target = 0,
                     Name = modName,
                     CustomPacketID = customID,
                     Bytes = bytes
@@ -239,7 +237,7 @@ namespace RageCoop.Server
 
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == ClientID);
+                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
                     return;

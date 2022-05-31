@@ -14,7 +14,7 @@ namespace RageCoop.Client
     /// <summary>
     /// ?
     /// </summary>
-    public partial class SyncedPed:SyncedEntity
+    internal class SyncedPed:SyncedEntity
     {
         #region CONSTRUCTORS
 

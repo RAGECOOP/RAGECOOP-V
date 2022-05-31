@@ -16,8 +16,6 @@ namespace RageCoop.Core
 
             public string ModVersion { get; set; }
 
-            public bool NPCsAllowed { get; set; }
-
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
@@ -37,9 +35,6 @@ namespace RageCoop.Core
                 byte[] modVersionBytes = Encoding.UTF8.GetBytes(ModVersion);
                 byteArray.AddRange(BitConverter.GetBytes(modVersionBytes.Length));
                 byteArray.AddRange(modVersionBytes);
-
-                // Write NpcsAllowed
-                byteArray.Add(NPCsAllowed ? (byte)0x01 : (byte)0x00);
 
                 byte[] result = byteArray.ToArray();
 
@@ -63,9 +58,6 @@ namespace RageCoop.Core
                 // Read ModVersion
                 int modVersionLength = reader.ReadInt();
                 ModVersion = reader.ReadString(modVersionLength);
-
-                // Read NPCsAllowed
-                NPCsAllowed = reader.ReadBool();
                 #endregion
             }
         }

@@ -123,12 +123,15 @@
   <ItemGroup>
     <Compile Include="DevTools\DevTool.cs" />
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
-    <Compile Include="Misc\WeaponUtil.cs" />
+    <Compile Include="Util\MathExtensions.cs" />
+    <Compile Include="Util\Util.cs" />
+    <Compile Include="Util\VehicleExtensions.cs" />
+    <Compile Include="Util\WeaponUtil.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="COOPAPI.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
-    <Compile Include="Misc\TaskType.cs" />
+    <Compile Include="Util\TaskType.cs" />
     <Compile Include="Menus\Sub\DebugMenu.cs" />
     <Compile Include="Networking\Receive.cs" />
     <Compile Include="Networking\Send.cs" />
@@ -142,13 +145,13 @@
     <Compile Include="Sync\Entities\SyncedVehicle.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Networking\MapLoader.cs" />
-    <Compile Include="Menus\RageCoopMenu.cs" />
+    <Compile Include="Menus\CoopMenu.cs" />
     <Compile Include="Menus\Sub\SettingsMenu.cs" />
     <Compile Include="Networking\Networking.cs" />
     <Compile Include="PlayerList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sync\SyncParameters.cs" />
-    <Compile Include="Misc\Util.cs" />
+    <Compile Include="Util\PedExtensions.cs" />
     <Compile Include="WorldThread.cs" />
     <Compile Include="Settings.cs" />
   </ItemGroup>

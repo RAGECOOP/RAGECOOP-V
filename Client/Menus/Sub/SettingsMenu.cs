@@ -9,19 +9,19 @@ namespace RageCoop.Client.Menus
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class SettingsMenu
+    internal static class SettingsMenu
     {
-        public NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
+        public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 
-        private readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
-        private readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
-        private readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
+        private static readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
+        private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
+        private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
 
-        private readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
+        private static readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
         
         private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
@@ -30,7 +30,7 @@ namespace RageCoop.Client.Menus
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public SettingsMenu()
+        static SettingsMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
@@ -52,14 +52,14 @@ namespace RageCoop.Client.Menus
             Menu.Add(_vehicleSoftLimit);
         }
 
-        
 
-        private void _disablePauseAlt_CheckboxChanged(object sender, EventArgs e)
+
+        private static void _disablePauseAlt_CheckboxChanged(object sender, EventArgs e)
         {
             Main.Settings.DisableAlternatePause=_disablePauseAlt.Checked;
             Util.SaveSettings();
         }
-        private void vehicleSoftLimit_Activated(object sender, EventArgs e)
+        private static void vehicleSoftLimit_Activated(object sender, EventArgs e)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace RageCoop.Client.Menus
             }
             catch { }
         }
-        private void ChaneMenuKey(object sender, EventArgs e)
+        private static void ChaneMenuKey(object sender, EventArgs e)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace RageCoop.Client.Menus
             catch { }
         }
 
-        private void ChangePassengerKey(object sender, EventArgs e)
+        private static void ChangePassengerKey(object sender, EventArgs e)
         {
             try
             {
@@ -99,22 +99,22 @@ namespace RageCoop.Client.Menus
             catch { }
         }
 
-        public void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
+        public static void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
             Util.SaveSettings() ;
         }
 
-        public void FlipMenuCheckboxChanged(object a, System.EventArgs b)
+        public static void FlipMenuCheckboxChanged(object a, System.EventArgs b)
         {
-            Main.MainMenu.MainMenu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
+            CoopMenu.Menu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
 
             Menu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }
 
-        public void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
+        public static void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
         {
             Networking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
 

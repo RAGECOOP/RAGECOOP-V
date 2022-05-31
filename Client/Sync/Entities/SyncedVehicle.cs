@@ -11,7 +11,7 @@ using RageCoop.Core;
 
 namespace RageCoop.Client
 {
-    public class SyncedVehicle : SyncedEntity
+    internal class SyncedVehicle : SyncedEntity
     {
 
         #region -- CONSTRUCTORS --
@@ -89,7 +89,7 @@ namespace RageCoop.Client
         /// VehicleSeat,PedID
         /// </summary>
         public Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
-
+        public float DeluxoWingRatio { get; set; } = -1;
         private long _lastPositionCalibrated { get; set; }
 
         #endregion
@@ -148,9 +148,11 @@ namespace RageCoop.Client
                 MainVehicle.Rotation = Rotation;
                 MainVehicle.RotationVelocity = RotationVelocity;
             }
-            _vehicleStopTime = Util.GetTickCount64();
+            if (DeluxoWingRatio!=-1)
+            {
+                MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
+            }
             #endregion
-
             if (LastStateSynced>LastUpdated)
             {
                 #region -- SYNC STATE --

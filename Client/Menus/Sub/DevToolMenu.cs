@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace RageCoop.Client
 {
-    internal class DevToolMenu
+    internal static class DevToolMenu
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Help with the development")
         {

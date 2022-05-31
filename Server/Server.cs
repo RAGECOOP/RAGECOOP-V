@@ -122,8 +122,6 @@ namespace RageCoop.Server
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
                                 "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
                                 "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
-                                "\"mods\": \"" + MainSettings.ModsAllowed + "\", " +
-                                "\"npcs\": \"" + MainSettings.NpcsAllowed + "\"" +
                                 " }";
 
                             HttpResponseMessage response = null;
@@ -237,7 +235,7 @@ namespace RageCoop.Server
                         {
                             if (!client.FilesSent)
                             {
-                                DownloadManager.InsertClient(client.ClientID);
+                                DownloadManager.InsertClient(client.NetID);
                                 client.FilesSent = true;
                             }
                         });
@@ -446,63 +444,6 @@ namespace RageCoop.Server
                                         }
                                     }
                                     break;
-                                case PacketTypes.Mod:
-                                    {
-                                        if (MainSettings.ModsAllowed)
-                                        {
-                                            try
-                                            {
-                                                int len = message.ReadInt32();
-                                                byte[] data = message.ReadBytes(len);
-
-                                                Packets.Mod packet = new Packets.Mod();
-                                                packet.Unpack(data);
-
-                                                bool resourceResult = false;
-                                                if (RunningResource != null)
-                                                {
-                                                    if (RunningResource.InvokeModPacketReceived(packet.NetHandle, packet.Target, packet.Name, packet.CustomPacketID, packet.Bytes))
-                                                    {
-                                                        resourceResult = true;
-                                                    }
-                                                }
-
-                                                if (!resourceResult && packet.Target != -1)
-                                                {
-                                                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                                                    packet.Pack(outgoingMessage);
-
-                                                    if (packet.Target != 0)
-                                                    {
-                                                        NetConnection target = MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == packet.Target);
-                                                        if (target == null)
-                                                        {
-                                                            Logging.Error($"[ModPacket] target \"{packet.Target}\" not found!");
-                                                        }
-                                                        else
-                                                        {
-                                                            // Send back to target
-                                                            MainNetServer.SendMessage(outgoingMessage, target, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        // Send back to all players
-                                                        MainNetServer.SendMessage(outgoingMessage, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-                                                    }
-                                                }
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                DisconnectAndLog(message.SenderConnection, type, e);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            message.SenderConnection.Disconnect("Mods are not allowed!");
-                                        }
-                                    }
-                                    break;
                                 case PacketTypes.FileTransferComplete:
                                     {
                                         try
@@ -518,7 +459,7 @@ namespace RageCoop.Server
                                                 Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier); 
                                                 if (client != null && !client.FilesReceived)
                                                 {
-                                                    DownloadManager.TryToRemoveClient(client.ClientID, packet.ID);
+                                                    DownloadManager.TryToRemoveClient(client.NetID, packet.ID);
                                                 }
                                             }
                                         }
@@ -656,7 +597,7 @@ namespace RageCoop.Server
             {
                 foreach(Client c in Clients.Values)
                 {
-                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.ClientID).ForEach(x =>
+                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                         new Packets.PlayerInfoUpdate()
@@ -734,7 +675,7 @@ namespace RageCoop.Server
                 Clients.Add(local.RemoteUniqueIdentifier,
                     tmpClient = new Client()
                     {
-                        ClientID = local.RemoteUniqueIdentifier,
+                        NetID = local.RemoteUniqueIdentifier,
                         Connection=local,
                         Player = new()
                         {
@@ -753,7 +694,6 @@ namespace RageCoop.Server
                 PedID = packet.PedID,
                 Username = string.Empty,
                 ModVersion = string.Empty,
-                NPCsAllowed = MainSettings.NpcsAllowed
             }.Pack(outgoingMessage);
 
             // Accept the connection and send back a new handshake packet with the connection ID
@@ -846,7 +786,7 @@ namespace RageCoop.Server
                 return;
             }
 
-            Clients.Remove(localClient.ClientID);
+            Clients.Remove(localClient.NetID);
 
             if (RunningResource != null)
             {
@@ -870,14 +810,13 @@ namespace RageCoop.Server
             }
 
 
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            packet.Pack(outgoingMessage);
             foreach (var c in Clients.Values)
             {
-                if (c.ClientID==client.ClientID) { continue; }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
+                if (c.NetID==client.NetID) { continue; }
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
-
             if (RunningResource != null && packet.ID==client.Player.PedID)
             {
                 RunningResource.InvokePlayerUpdate(client);
@@ -899,7 +838,7 @@ namespace RageCoop.Server
 
             foreach (var c in Clients.Values)
             {
-                if (c.ClientID==client.ClientID) { continue; }
+                if (c.NetID==client.NetID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
@@ -912,13 +851,15 @@ namespace RageCoop.Server
             {
                 return;
             }
-            bool isPlayer = packet.Flag.HasFlag(PedDataFlags.IsPlayer);
+            bool isPlayer = packet.ID==client.Player.PedID;
             if (isPlayer) { client.Player.Position=packet.Position; }
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            packet.Pack(outgoingMessage);
             foreach (var c in Clients.Values)
             {
 
                 // Don't send data back
-                if (c.ClientID==client.ClientID) { continue; }
+                if (c.NetID==client.NetID) { continue; }
 
                 // Check streaming distance
                 if (isPlayer)
@@ -932,12 +873,10 @@ namespace RageCoop.Server
                 {
                     continue;
                 }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
 
-            if (RunningResource != null && packet.ID==client.Player.PedID)
+            if (RunningResource != null && isPlayer)
             {
                 RunningResource.InvokePlayerUpdate(client);
             }
@@ -952,7 +891,7 @@ namespace RageCoop.Server
             bool isPlayer = packet.ID==client.Player.VehicleID;
             foreach (var c in Clients.Values)
             {
-                if (c.ClientID==client.ClientID) { continue; }
+                if (c.NetID==client.NetID) { continue; }
                 if (isPlayer)
                 {
                     // Player's vehicle
@@ -981,7 +920,7 @@ namespace RageCoop.Server
 
             foreach (var c in Clients.Values)
             {
-                if (c.ClientID==client.ClientID) { continue; }
+                if (c.NetID==client.NetID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);

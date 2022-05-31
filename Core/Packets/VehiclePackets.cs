@@ -219,7 +219,7 @@ namespace RageCoop.Core
             public float ThrottlePower { get; set; }
             public float BrakePower { get; set; }
             public float SteeringAngle { get; set; }
-
+            public float DeluxoWingRatio { get; set; } = -1;
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -252,6 +252,10 @@ namespace RageCoop.Core
                 // Write vehicle steering angle
                 byteArray.AddFloat(SteeringAngle);
 
+                if (DeluxoWingRatio!=-1)
+                {
+                    byteArray.AddFloat(DeluxoWingRatio);
+                }
 
                 byte[] result = byteArray.ToArray();
 
@@ -289,6 +293,10 @@ namespace RageCoop.Core
                 // Read steering angle
                 SteeringAngle = reader.ReadFloat();
 
+                if (reader.CanRead(4))
+                {
+                    DeluxoWingRatio= reader.ReadFloat();
+                }
                 #endregion
             }
         }

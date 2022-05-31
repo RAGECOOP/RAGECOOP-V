@@ -83,6 +83,7 @@ namespace RageCoop.Client
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
+            if (v.MainVehicle.Model.Hash==1483171323) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
             Send(packet,ConnectionChannel.VehicleSync);
         }
         public static void SendVehicleState(SyncedVehicle v)
@@ -156,27 +157,6 @@ namespace RageCoop.Client
             }
 #endif
         }
-        public static void SendModData(long target, string modName, byte customID, byte[] bytes)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            new Packets.Mod()
-            {
-                // NetHandle =  Main.LocalNetHandle,
-                Target = target,
-                Name = modName,
-                CustomPacketID =  customID,
-                Bytes = bytes
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-            Client.FlushSendQueue();
-
-#if DEBUG
-            if (ShowNetworkInfo)
-            {
-                BytesSend += outgoingMessage.LengthBytes;
-            }
-#endif
-        }
         public static void SendDownloadFinish(byte id)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
@@ -192,19 +172,6 @@ namespace RageCoop.Client
                 BytesSend += outgoingMessage.LengthBytes;
             }
 #endif
-        }
-        public static void SendTriggerEvent(string eventName, params object[] args)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            new Packets.ServerClientEvent()
-            {
-                EventName = eventName,
-                Args = new List<object>(args)
-            }.Pack(outgoingMessage);
-
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableUnordered, (byte)ConnectionChannel.Event);
-            Client.FlushSendQueue();
         }
         #endregion
     }

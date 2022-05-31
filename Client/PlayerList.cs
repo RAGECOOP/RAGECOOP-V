@@ -30,7 +30,7 @@ namespace RageCoop.Client
 
             if ((Util.GetTickCount64() - Pressed) < 5000 && !Main.MainChat.Focused
 #if !NON_INTERACTIVE
-                && !Main.MainMenu.MenuPool.AreAnyVisible
+                && !Menus.CoopMenu.MenuPool.AreAnyVisible
 #endif
                 )
             {

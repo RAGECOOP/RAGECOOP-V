@@ -45,10 +45,6 @@ namespace RageCoop.Client
         /// ?
         /// </summary>
         public static event ChatMessage OnChatMessage;
-        /// <summary>
-        /// ?
-        /// </summary>
-        public static event ModEvent OnModPacketReceived;
 
         public static void Connected()
         {
@@ -60,19 +56,14 @@ namespace RageCoop.Client
             OnConnection?.Invoke(false, GetPlayerID(), reason);
         }
 
-        public static void Connected(long netHandle)
+        public static void Connected(int playerID)
         {
-            OnConnection?.Invoke(true, netHandle);
+            OnConnection?.Invoke(true, playerID);
         }
 
         public static void Disconnected(long netHandle)
         {
             OnConnection?.Invoke(false, netHandle);
-        }
-
-        public static void ModPacketReceived(long from, string mod, byte customID, byte[] bytes)
-        {
-            OnModPacketReceived?.Invoke(from, mod, customID, bytes);
         }
 
         public static bool ChatMessageReceived(string from, string message)
@@ -127,20 +118,6 @@ namespace RageCoop.Client
             return Main.LocalPlayerID;
         }
 
-        /*
-
-        /// <summary>
-        /// Get a player using their Lidgren Network net handle
-        /// </summary>
-        /// <param name="handle">Lidgren-Network net handle</param>
-        public static CharacterEntity GetPed(int ID)
-        {
-            lock (Main.Characters)
-            {
-                return Main.Characters.ContainsKey(ID) ? Main.Characters[ID] : null;
-            }
-        }
-        */
         /// <summary>
         /// Check if a RAGECOOP menu is visible
         /// </summary>
@@ -149,7 +126,7 @@ namespace RageCoop.Client
 #if NON_INTERACTIVE
             return false;
 #else
-            return Main.MainMenu.MenuPool.AreAnyVisible;
+            return Menus.CoopMenu.MenuPool.AreAnyVisible;
 #endif
         }
 
@@ -178,40 +155,6 @@ namespace RageCoop.Client
         }
 
         /// <summary>
-        /// Send any data (bytes) to the server
-        /// </summary>
-        /// <param name="modName">The name of this modification (script)</param>
-        /// <param name="customID">The ID to know what the data is</param>
-        /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToServer(string modName, byte customID, byte[] bytes)
-        {
-            Networking.SendModData(-1, modName, customID, bytes);
-        }
-
-        /// <summary>
-        /// Send any data (bytes) to the all player
-        /// </summary>
-        /// <param name="modName">The name of this modification (script)</param>
-        /// <param name="customID">The ID to know what the data is</param>
-        /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToAll(string modName, byte customID, byte[] bytes)
-        {
-            Networking.SendModData(0, modName, customID, bytes);
-        }
-
-        /// <summary>
-        /// Send any data (bytes) to a player
-        /// </summary>
-        /// <param name="netHandle">The Lidgren Network net handle that receives the data</param>
-        /// <param name="modName">The name of this modification (script)</param>
-        /// <param name="customID">The ID to know what the data is</param>
-        /// <param name="bytes">Your class, structure or whatever in bytes</param>
-        public static void SendDataToPlayer(long netHandle, string modName, byte customID, byte[] bytes)
-        {
-            Networking.SendModData(netHandle, modName, customID, bytes);
-        }
-
-        /// <summary>
         /// Get that player's local username
         /// </summary>
         public static string GetUsername()
@@ -236,35 +179,13 @@ namespace RageCoop.Client
             return true;
         }
 
-
         /// <summary>
-        /// Enable or disable the local traffic for this player
+        /// Get or set the client's settings.
         /// </summary>
-        /// <param name="enable">true to disable traffic</param>
-        public static void SetLocalTraffic(bool enable)
+        /// <returns>The client's settings, you should NEVER change settings without notifying the player.</returns>
+        public static Settings Settings()
         {
-            Main.Settings.DisableTraffic = !enable;
+            return Main.Settings;
         }
-
-        /// <summary>
-        /// Sets the alignment for the player list, if set to true it will align left, 
-        /// otherwise it will align right
-        /// </summary>
-        /// <param name="leftAlign">true to move the player list to the left</param>
-        public static void SetPlayerListLeftAlign(bool leftAlign)
-        {
-            PlayerList.LeftAlign = leftAlign;
-        }
-
-#if DEBUG
-        /// <summary>
-        /// ?
-        /// </summary>
-        /// <param name="value"></param>
-        public static void SetDebug(bool value)
-        {
-            Main.UseDebug = value;
-        }
-#endif
     }
 }

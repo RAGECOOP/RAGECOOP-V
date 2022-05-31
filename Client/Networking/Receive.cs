@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Lidgren.Network;
 using RageCoop.Core;
 using GTA;
+using RageCoop.Client.Menus;
 using GTA.Math;
 using GTA.Native;
 
@@ -36,7 +37,7 @@ namespace RageCoop.Client
                         {
                             case NetConnectionStatus.InitiatedConnect:
 #if !NON_INTERACTIVE
-                                Main.MainMenu.InitiateConnectionMenuSetting();
+                                CoopMenu.InitiateConnectionMenuSetting();
 #endif
                                 Main.QueueAction(() => { GTA.UI.Notification.Show("~y~Trying to connect..."); return true; });
                                 break;
@@ -53,17 +54,13 @@ namespace RageCoop.Client
                                     Packets.Handshake handshakePacket = new Packets.Handshake();
                                     handshakePacket.Unpack(data);
 
-                                    // Main.LocalNetHandle = handshakePacket.NetHandle;
-                                    Main.NPCsAllowed = handshakePacket.NPCsAllowed;
-
-
 #if !NON_INTERACTIVE
                                     
 #endif
 
                                     COOPAPI.Connected();
                                     Main.QueueAction(() => {
-                                        Main.MainMenu.ConnectedMenuSetting();
+                                        CoopMenu.ConnectedMenuSetting();
                                         Main.MainChat.Init();
                                         PlayerList.Cleanup();
                                         GTA.UI.Notification.Show("~g~Connected!");
@@ -78,9 +75,7 @@ namespace RageCoop.Client
                                 // Reset all values
                                 Latency = 0;
 
-                                Main.QueueAction(() => { Main.CleanUpWorld();});
-
-                                Main.NPCsAllowed = false;
+                                Main.QueueAction(() => Main.CleanUpWorld());
 
                                 if (Main.MainChat.Focused)
                                 {
@@ -90,7 +85,7 @@ namespace RageCoop.Client
                                 Main.QueueAction(() => Main.CleanUp());
 
 #if !NON_INTERACTIVE
-                                Main.MainMenu.DisconnectedMenuSetting();
+                                CoopMenu.DisconnectedMenuSetting();
 #endif
 
                                 COOPAPI.Disconnected(reason);
@@ -227,8 +222,7 @@ namespace RageCoop.Client
                                     {
                                         Packets.Mod packet = new Packets.Mod();
                                         packet.Unpack(data);
-                                        COOPAPI.ModPacketReceived(packet.NetHandle, packet.Name, packet.CustomPacketID, packet.Bytes);
-
+                                        // Need to do some stuff here
                                     }
                                     break;
                                 case PacketTypes.FileTransferTick:
@@ -370,6 +364,7 @@ namespace RageCoop.Client
             v.BrakePower=packet.BrakePower;
             v.Velocity=packet.Velocity;
             v.RotationVelocity=packet.RotationVelocity;
+            v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;
         }
         private static void VehicleStateSync(Packets.VehicleStateSync packet)

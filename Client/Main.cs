@@ -26,13 +26,12 @@ namespace RageCoop.Client
         public static readonly string CurrentVersion = "V0_3";
 
         public static int LocalPlayerID=0;
-        public static bool NPCsAllowed = false;
+
         internal static RelationshipGroup SyncedPedsGroup;
 
         public static new Settings Settings = null;
 
 #if !NON_INTERACTIVE
-        public static RageCoopMenu MainMenu = null;
 #endif
         public static Chat MainChat = null;
         public static Stopwatch Counter = new Stopwatch();
@@ -71,7 +70,6 @@ namespace RageCoop.Client
             Settings = Util.ReadSettings();
             Networking.Start();
 #if !NON_INTERACTIVE
-            MainMenu = new RageCoopMenu();
 #endif
             MainChat = new Chat();
 #if DEBUG
@@ -107,7 +105,7 @@ namespace RageCoop.Client
             }
 
 #if !NON_INTERACTIVE
-            MainMenu.MenuPool.Process();
+            CoopMenu.MenuPool.Process();
 #endif
             
 
@@ -193,14 +191,20 @@ namespace RageCoop.Client
             }
             if (e.KeyCode == Settings.MenuKey)
             {
-                if (MainMenu.MenuPool.AreAnyVisible)
+                if (CoopMenu.MenuPool.AreAnyVisible)
                 {
-                    MainMenu.MainMenu.Visible = false;
-                    MainMenu.SubSettings.Menu.Visible = false;
+                    CoopMenu.MenuPool.ForEach<LemonUI.Menus.NativeMenu>(x =>
+                    {
+                        if (x.Visible)
+                        {
+                            CoopMenu.LastMenu=x;
+                            x.Visible=false;
+                        }
+                    });
                 }
                 else
                 {
-                    MainMenu.MainMenu.Visible = true;
+                    CoopMenu.LastMenu.Visible = true;
                 }
             }
             else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
@@ -234,7 +238,7 @@ namespace RageCoop.Client
 
                         if (V!=null)
                         {
-                            var seat = Util.GetNearestSeat(P, V);
+                            var seat = P.GetNearestSeat(V);
                             P.Task.EnterVehicle(V, seat);
                         }
                     }

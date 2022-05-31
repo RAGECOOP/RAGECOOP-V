@@ -191,7 +191,6 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover=1<< 10,
-        IsPlayer=1<<11,
     }
 
     #region ===== VEHICLE DATA =====
@@ -239,10 +238,6 @@ namespace RageCoop.Core
     {
         public class Mod : Packet
         {
-            public long NetHandle { get; set; }
-
-            public long Target { get; set; }
-
             public string Name { get; set; }
 
             public byte CustomPacketID { get; set; }
@@ -255,12 +250,6 @@ namespace RageCoop.Core
                 message.Write((byte)PacketTypes.Mod);
 
                 List<byte> byteArray = new List<byte>();
-
-                // Write NetHandle
-                byteArray.AddRange(BitConverter.GetBytes(NetHandle));
-
-                // Write Target
-                byteArray.AddRange(BitConverter.GetBytes(Target));
 
                 // Write Name
                 byte[] nameBytes = Encoding.UTF8.GetBytes(Name);
@@ -285,12 +274,6 @@ namespace RageCoop.Core
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
-
-                // Read NetHandle
-                NetHandle = reader.ReadLong();
-
-                // Read Target
-                Target = reader.ReadLong();
 
                 // Read Name
                 int nameLength = reader.ReadInt();
@@ -683,9 +666,6 @@ namespace RageCoop.Core
         #endregion // ===== NATIVECALL =====
     }
 
-    /// <summary>
-    /// ?
-    /// </summary>
     public static class CoopSerializer
     {
         /// <summary>

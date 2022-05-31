@@ -53,7 +53,7 @@ namespace RageCoop.Server
                 return null;
             }
 
-            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.ClientID);
+            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.NetID);
         }
 
         // Return a list of all connections but not the local connection

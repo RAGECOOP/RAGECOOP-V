@@ -31,7 +31,7 @@ namespace RageCoop.Client
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
-                    AutoFlushSendQueue = true
+                    AutoFlushSendQueue = false
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
@@ -62,7 +62,6 @@ namespace RageCoop.Client
                     PedID =  Main.LocalPlayerID,
                     Username = Main.Settings.Username,
                     ModVersion = Main.CurrentVersion,
-                    NPCsAllowed = false
                 }.Pack(outgoingMessage);
 
                 Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
@@ -80,6 +79,7 @@ namespace RageCoop.Client
                 {
                     try
                     {
+                        Client.FlushSendQueue();
                         ReceiveMessages();
                     }
                     catch (Exception ex)

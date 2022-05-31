@@ -8,7 +8,7 @@ using GTA.Math;
 
 namespace RageCoop.Client
 {
-    public abstract class SyncedEntity
+    internal abstract class SyncedEntity
     {
         
         /// <summary>
