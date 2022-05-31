@@ -176,6 +176,7 @@ namespace RageCoop.Client {
             if (p == null) { p=Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
             if (_lastWeaponHash!=weaponHash)
             {
+                _weaponAsset.MarkAsNoLongerNeeded();
                 _weaponAsset=new WeaponAsset(weaponHash);
                 _lastWeaponHash=weaponHash;
             }
