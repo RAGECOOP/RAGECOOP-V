@@ -58,6 +58,10 @@ namespace RageCoop.Client
         public Vector3 Rotation { get; set; }
         public Vector3 Velocity { get; set; }
         public abstract void Update();
+        public void PauseUpdate(ulong frames)
+        {
+            LastUpdated=Main.Ticked+frames;
+        }
 
     }
 }

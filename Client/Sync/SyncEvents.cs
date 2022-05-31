@@ -123,12 +123,13 @@ namespace RageCoop.Client {
 
         private static void HandleLeaveVehicle(Packets.LeaveVehicle p)
         {
-            var ped = EntityPool.GetPedByID(p.ID)?.MainPed;
+            var ped = EntityPool.GetPedByID(p.ID);
             var flag = LeaveVehicleFlags.None;
+            if (ped.MainPed?.CurrentVehicle==null) { return; }
             // Bail out
-            if (ped?.CurrentVehicle==null) { return; }
-            if (ped.CurrentVehicle.Speed>5) { flag|=LeaveVehicleFlags.BailOut;}
-            ped.Task.LeaveVehicle(flag) ;
+            if (ped.MainPed.CurrentVehicle.Speed>5) { flag|=LeaveVehicleFlags.BailOut;}
+            ped.PauseUpdate((ulong)Game.FPS*2);
+            ped.MainPed.Task.LeaveVehicle(flag) ;
         }
         private static void HandlePedKilled(Packets.PedKilled p)
         {
@@ -288,6 +289,8 @@ namespace RageCoop.Client {
         public static void Check(SyncedPed c)
         {
             Ped subject = c.MainPed;
+
+            // Check bullets
             if (subject.IsShooting)
             {
                 if (!subject.IsUsingProjectileWeapon())
