@@ -252,10 +252,8 @@ namespace RageCoop.Client
             MainPed.CanBeDraggedOutOfVehicle = true;
             MainPed.IsOnlyDamagedByPlayer = false;
             MainPed.RelationshipGroup=Main.SyncedPedsGroup;
-            if (IsPlayer)
-            {
-                MainPed.IsInvincible=true;
-            }
+            MainPed.IsFireProof=false;
+            MainPed.IsExplosionProof=false;
             SetClothes();
 
             if (IsPlayer)

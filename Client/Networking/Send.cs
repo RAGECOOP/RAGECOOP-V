@@ -44,6 +44,11 @@ namespace RageCoop.Client
                 Flag = p.GetPedFlags(),
                 Heading=p.Heading,
             };
+            if (packet.Health==1&&packet.ID==Main.LocalPlayerID)
+            {
+                // Fake death
+                packet.Health=0;
+            }
             if (packet.Flag.HasFlag(PedDataFlags.IsAiming))
             {
                 packet.AimCoords = p.GetAimCoord();

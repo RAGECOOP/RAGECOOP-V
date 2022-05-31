@@ -21,8 +21,7 @@ namespace RageCoop.Client
     {
 
         private bool _gameLoaded = false;
-        private static bool _isGoingToCar = false;
-
+        private bool _lastDead = false;
         public static readonly string CurrentVersion = "V0_3";
 
         public static int LocalPlayerID=0;
@@ -108,11 +107,6 @@ namespace RageCoop.Client
             CoopMenu.MenuPool.Process();
 #endif
             
-
-            if (_isGoingToCar && Game.Player.Character.IsInVehicle())
-            {
-                _isGoingToCar = false;
-            }
             DoQueuedActions();
             if (!Networking.IsOnServer)
             {
@@ -162,9 +156,32 @@ namespace RageCoop.Client
 
             MainChat.Tick();
             PlayerList.Tick();
+            if (Settings.DisableAutoRespawn)
+            {
+                Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
+                Function.Call(Hash.FORCE_GAME_STATE_PLAYING);
+                var P = Game.Player.Character;
+                if (P.IsDead)
+                {
+                    Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
+                    Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
+                    
+                    if (P.Health!=1)
+                    {
+                        P.Health=1;
+                        Game.Player.WantedLevel=0;
+                        Main.Logger.Debug("Player died.");
+                    }
+                    GTA.UI.Screen.StopEffects();
+                }
+                else
+                {
 
+                    Function.Call(Hash.DISPLAY_HUD, true);
+                }
+                _lastDead=P.IsDead;
 
-
+            }
 
             Ticked++;
         }

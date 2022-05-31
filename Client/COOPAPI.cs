@@ -11,14 +11,15 @@ namespace RageCoop.Client
     /// </summary>
     public static class COOPAPI
     {
+
         #region DELEGATES
         /// <summary>
         /// ?
         /// </summary>
         /// <param name="connected"></param>
-        /// <param name="from">The Lidgren-Network net handle</param>
+        /// <param name="from">The player's id</param>
         /// <param name="reason"></param>
-        public delegate void ConnectEvent(bool connected, long from, string reason = null);
+        public delegate void ConnectEvent(bool connected, int from, string reason = null);
         /// <summary>
         /// ?
         /// </summary>
@@ -61,9 +62,9 @@ namespace RageCoop.Client
             OnConnection?.Invoke(true, playerID);
         }
 
-        public static void Disconnected(long netHandle)
+        public static void Disconnected(int playerID)
         {
-            OnConnection?.Invoke(false, netHandle);
+            OnConnection?.Invoke(false, playerID);
         }
 
         public static bool ChatMessageReceived(string from, string message)
@@ -113,7 +114,7 @@ namespace RageCoop.Client
         /// Get the local player's ID
         /// </summary>
         /// <returns>PlayerID</returns>
-        public static long GetPlayerID()
+        public static int GetPlayerID()
         {
             return Main.LocalPlayerID;
         }

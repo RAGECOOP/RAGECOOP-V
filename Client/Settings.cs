@@ -54,7 +54,11 @@ namespace RageCoop.Client
         /// The game won't spawn more NPC traffic if the limit is exceeded. -1 for unlimited (not recommended).
         /// </summary>
         public int WorldVehicleSoftLimit { get; set; } = 35;
-
-
+        
+        /// <summary>
+        /// Disable automatic respawn.
+        /// </summary>
+        public bool DisableAutoRespawn { get; set; } = true;
+        public float HpRechargeMultiplier { get; set; } = 1;
     }
 }

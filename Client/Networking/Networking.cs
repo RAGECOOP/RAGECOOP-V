@@ -79,8 +79,11 @@ namespace RageCoop.Client
                 {
                     try
                     {
-                        Client.FlushSendQueue();
-                        ReceiveMessages();
+                        if (Client!=null)
+                        {
+                            Client.FlushSendQueue();
+                            ReceiveMessages();
+                        }
                     }
                     catch (Exception ex)
                     {
