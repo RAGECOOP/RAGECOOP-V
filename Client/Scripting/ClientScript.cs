@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
 {
+    /// <summary>
+    /// Inherit from this class, constructor will be called when the script is loaded.
+    /// </summary>
     public abstract class ClientScript
     {
-        public class Events
-        {
-
-        }
-        public abstract void Main();
     }
 }

@@ -34,10 +34,9 @@ namespace RageCoop.Client
 #endif
         public static Chat MainChat = null;
         public static Stopwatch Counter = new Stopwatch();
+        public static Core.Logging.Logger Logger = null;
 
         public static ulong Ticked = 0;
-        public static Loggger Logger=new Loggger("Scripts\\RageCoop\\RageCoop.Client.log");
-        
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
 
         /// <summary>
@@ -45,7 +44,16 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
-
+            Logger=new Core.Logging.Logger()
+            {
+                LogPath="Scripts\\RageCoop\\RageCoop.Client.log",
+                UseConsole=false,
+#if DEBUG
+                LogLevel = 0,
+#else
+                LogLevel=Settings.LogLevel;
+#endif
+            };
             // Required for some synchronization!
             /*if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
@@ -55,7 +63,7 @@ namespace RageCoop.Client
                     {
                         return;
                     }
-                    
+
                     if (!_gameLoaded)
                     {
                         GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
@@ -71,11 +79,6 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
 #endif
             MainChat = new Chat();
-#if DEBUG
-            Logger.LogLevel = 0;
-#else
-            Logger.LogLevel=Settings.LogLevel;
-#endif
 
             Tick += OnTick;
             KeyDown += OnKeyDown;
@@ -122,7 +125,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Main.Logger.Error(ex);
             }
             
             if (!DownloadManager.DownloadComplete)
@@ -332,7 +335,7 @@ namespace RageCoop.Client
                     catch
                     {
                         GTA.UI.Notification.Show("~r~~h~CleanUpWorld() Error");
-                        Logger.Error($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
+                        Main.Logger.Error($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
                     }
                 }
 
@@ -400,7 +403,7 @@ namespace RageCoop.Client
                     // s+=$"\r\n{c.IsAiming} {c.IsJumping} {c.IsOnFire} {c.IsOnLadder} {c.IsRagdoll} {c.IsReloading} {c.IsShooting} {c.Speed}";
                 }
             }
-            Logger.Trace(s);
+            Main.Logger.Trace(s);
             return s;
         }
         public static string DumpPlayers()
@@ -411,7 +414,7 @@ namespace RageCoop.Client
                 
                 s+=$"\r\nID:{p.PedID} Username:{p.Username}";
             }
-            Logger.Trace(s);
+            Main.Logger.Trace(s);
             return s;
         }
 

@@ -9,8 +9,14 @@ namespace RageCoop.Server
     class Program
     {
         public static bool ReadyToStop = false;
+        public static Core.Logging.Logger Logger;
         static void Main(string[] args)
         {
+            Logger=new Core.Logging.Logger()
+            {
+                LogPath="RageCoop.Server.log",
+                UseConsole=true,
+            };
             try
             {
 #if DEBUG
@@ -45,7 +51,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error(e.InnerException?.Message ?? e.Message);
+                Program.Logger.Error(e.InnerException?.Message ?? e.Message);
                 Console.ReadLine();
             }
         }

@@ -40,11 +40,11 @@ namespace RageCoop.Server
 
         public Server()
         {
-            Logging.Info("================");
-            Logging.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
-            Logging.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
-            Logging.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
-            Logging.Info("================");
+            Program.Logger.Info("================");
+            Program.Logger.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
+            Program.Logger.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
+            Program.Logger.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
+            Program.Logger.Info("================");
 
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
@@ -60,26 +60,26 @@ namespace RageCoop.Server
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
 
-            Logging.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
+            Program.Logger.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
 
             if (MainSettings.UPnP)
             {
-                Logging.Info(string.Format("Attempting to forward port {0}", MainSettings.Port));
+                Program.Logger.Info(string.Format("Attempting to forward port {0}", MainSettings.Port));
 
                 if (MainNetServer.UPnP.ForwardPort(MainSettings.Port, "RAGECOOP server"))
                 {
-                    Logging.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
+                    Program.Logger.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
                 }
                 else
                 {
-                    Logging.Error("Port forwarding failed! Your router may not support UPnP.");
-                    Logging.Warning("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
+                    Program.Logger.Error("Port forwarding failed! Your router may not support UPnP.");
+                    Program.Logger.Warning("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
                 }
             }
 
             if (MainSettings.AnnounceSelf)
             {
-                Logging.Info("Announcing to master server...");
+                Program.Logger.Info("Announcing to master server...");
 
                 #region -- MASTERSERVER --
                 new Thread(async () =>
@@ -107,7 +107,7 @@ namespace RageCoop.Server
                         }
                         catch (Exception ex)
                         {
-                            Logging.Error(ex.InnerException?.Message ?? ex.Message);
+                            Program.Logger.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
 
@@ -131,7 +131,7 @@ namespace RageCoop.Server
                             }
                             catch (Exception ex)
                             {
-                                Logging.Error($"MasterServer: {ex.Message}");
+                                Program.Logger.Error($"MasterServer: {ex.Message}");
 
                                 // Sleep for 5s
                                 Thread.Sleep(5000);
@@ -140,18 +140,18 @@ namespace RageCoop.Server
 
                             if (response == null)
                             {
-                                Logging.Error("MasterServer: Something went wrong!");
+                                Program.Logger.Error("MasterServer: Something went wrong!");
                             }
                             else if (response.StatusCode != HttpStatusCode.OK)
                             {
                                 if (response.StatusCode == HttpStatusCode.BadRequest)
                                 {
                                     string requestContent = await response.Content.ReadAsStringAsync();
-                                    Logging.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
+                                    Program.Logger.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
                                 }
                                 else
                                 {
-                                    Logging.Error($"MasterServer: [{(int)response.StatusCode}]");
+                                    Program.Logger.Error($"MasterServer: [{(int)response.StatusCode}]");
                                 }
                             }
 
@@ -161,11 +161,11 @@ namespace RageCoop.Server
                     }
                     catch (HttpRequestException ex)
                     {
-                        Logging.Error($"MasterServer: {ex.InnerException.Message}");
+                        Program.Logger.Error($"MasterServer: {ex.InnerException.Message}");
                     }
                     catch (Exception ex)
                     {
-                        Logging.Error($"MasterServer: {ex.Message}");
+                        Program.Logger.Error($"MasterServer: {ex.Message}");
                     }
                 }).Start();
                 #endregion
@@ -176,7 +176,7 @@ namespace RageCoop.Server
                 try
                 {
                     string resourcepath = AppDomain.CurrentDomain.BaseDirectory + "resources" + Path.DirectorySeparatorChar + MainSettings.Resource + ".dll";
-                    Logging.Info($"Loading resource \"{MainSettings.Resource}.dll\"...");
+                    Program.Logger.Info($"Loading resource \"{MainSettings.Resource}.dll\"...");
 
                     Assembly asm = Assembly.LoadFrom(resourcepath);
                     Type[] types = asm.GetExportedTypes();
@@ -185,7 +185,7 @@ namespace RageCoop.Server
 
                     if (!enumerable.Any())
                     {
-                        Logging.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
+                        Program.Logger.Error("ERROR: No classes that inherit from ServerScript have been found in the assembly. Starting freeroam.");
                     }
                     else
                     {
@@ -195,17 +195,17 @@ namespace RageCoop.Server
                         }
                         else
                         {
-                            Logging.Warning("Could not create resource: it is null.");
+                            Program.Logger.Warning("Could not create resource: it is null.");
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Logging.Error(e.InnerException.Message);
+                    Program.Logger.Error(e.InnerException.Message);
                 }
             }
 
-            Logging.Info("Searching for client-side files...");
+            Program.Logger.Info("Searching for client-side files...");
             DownloadManager.CheckForDirectoryAndFiles();
 
             Listen();
@@ -216,8 +216,8 @@ namespace RageCoop.Server
 
         private void Listen()
         {
-            Logging.Info("Listening for clients");
-            Logging.Info("Please use CTRL + C if you want to stop the server!");
+            Program.Logger.Info("Listening for clients");
+            Program.Logger.Info("Please use CTRL + C if you want to stop the server!");
 
             while (!Program.ReadyToStop)
             {
@@ -252,10 +252,10 @@ namespace RageCoop.Server
                     {
                         case NetIncomingMessageType.ConnectionApproval:
                             {
-                                Logging.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
+                                Program.Logger.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
                                 if (message.ReadByte() != (byte)PacketTypes.Handshake)
                                 {
-                                    Logging.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
+                                    Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
                                     message.SenderConnection.Deny("Wrong packet!");
                                 }
                                 else
@@ -272,7 +272,7 @@ namespace RageCoop.Server
                                     }
                                     catch (Exception e)
                                     {
-                                        Logging.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
+                                        Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
                                         message.SenderConnection.Deny(e.Message);
                                     }
                                 }
@@ -500,7 +500,7 @@ namespace RageCoop.Server
                                                 }
                                                 else
                                                 {
-                                                    Logging.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
+                                                    Program.Logger.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
                                                 }
                                             }
                                         }
@@ -536,7 +536,7 @@ namespace RageCoop.Server
                                     }
                                     else
                                     {
-                                        Logging.Error("Unhandled Data / Packet type");
+                                        Program.Logger.Error("Unhandled Data / Packet type");
                                     }
                                     break;
                             }
@@ -551,17 +551,17 @@ namespace RageCoop.Server
                             }
                             break;
                         case NetIncomingMessageType.ErrorMessage:
-                            Logging.Error(message.ReadString());
+                            Program.Logger.Error(message.ReadString());
                             break;
                         case NetIncomingMessageType.WarningMessage:
-                            Logging.Warning(message.ReadString());
+                            Program.Logger.Warning(message.ReadString());
                             break;
                         case NetIncomingMessageType.DebugMessage:
                         case NetIncomingMessageType.VerboseDebugMessage:
-                            Logging.Debug(message.ReadString());
+                            Program.Logger.Debug(message.ReadString());
                             break;
                         default:
-                            Logging.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
+                            Program.Logger.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
                             break;
                     }
 
@@ -572,7 +572,7 @@ namespace RageCoop.Server
                 Thread.Sleep(1000 / 60);
             }
 
-            Logging.Warning("Server is shutting down!");
+            Program.Logger.Warning("Server is shutting down!");
             if (RunningResource != null)
             {
                 // Waiting for resource...
@@ -617,9 +617,9 @@ namespace RageCoop.Server
 
         private void DisconnectAndLog(NetConnection senderConnection,PacketTypes type, Exception e)
         {
-            Logging.Error($"Error receiving a packet of type {type}");
-            Logging.Error(e.Message);
-            Logging.Error(e.StackTrace);
+            Program.Logger.Error($"Error receiving a packet of type {type}");
+            Program.Logger.Error(e.Message);
+            Program.Logger.Error(e.StackTrace);
             senderConnection.Disconnect(e.Message);
         }
 
@@ -627,7 +627,7 @@ namespace RageCoop.Server
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection local, Packets.Handshake packet)
         {
-            Logging.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
+            Program.Logger.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + local.RemoteEndPoint.Address.ToString() + "]");
 
             if (!packet.ModVersion.StartsWith(_compatibleVersion))
             {
@@ -685,7 +685,7 @@ namespace RageCoop.Server
                     }
                 );;
             }
-            Logging.Info($"HandShake sucess, Player:{packet.Username} PedID:{packet.PedID}");
+            Program.Logger.Info($"HandShake sucess, Player:{packet.Username} PedID:{packet.PedID}");
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
             // Create a new handshake packet
@@ -755,7 +755,7 @@ namespace RageCoop.Server
             }
             else
             {
-                Logging.Info($"Player {localClient.Player.Username} connected!");
+                Program.Logger.Info($"Player {localClient.Player.Username} connected!");
             }
 
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
@@ -794,7 +794,7 @@ namespace RageCoop.Server
             }
             else
             {
-                Logging.Info($"Player {localClient.Player.Username} disconnected! ID:{playerPedID}");
+                Program.Logger.Info($"Player {localClient.Player.Username} disconnected! ID:{playerPedID}");
             }
         }
 
@@ -987,7 +987,7 @@ namespace RageCoop.Server
 
             SendChatMessage(packet.Username, packet.Message, targets);
 
-            Logging.Info(packet.Username + ": " + packet.Message);
+            Program.Logger.Info(packet.Username + ": " + packet.Message);
         }
 
         public static void SendChatMessage(string username, string message, List<NetConnection> targets = null)

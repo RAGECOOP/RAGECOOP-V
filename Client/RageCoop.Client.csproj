@@ -124,6 +124,7 @@
     <Compile Include="DevTools\DevTool.cs" />
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
     <Compile Include="Scripting\ClientScript.cs" />
+    <Compile Include="Scripting\Engine.cs" />
     <Compile Include="Util\MathExtensions.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VehicleExtensions.cs" />

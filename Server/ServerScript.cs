@@ -258,7 +258,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -279,7 +279,7 @@ namespace RageCoop.Server
 
                 if (args != null && args.Length == 0)
                 {
-                    Logging.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
+                    Program.Logger.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
                     return;
                 }
 
@@ -295,7 +295,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -341,7 +341,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 

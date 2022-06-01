@@ -87,7 +87,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -98,13 +98,13 @@ namespace RageCoop.Server
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetID}\" not found!");
+                    Program.Logger.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetID}\" not found!");
                     return;
                 }
 
                 if (args != null && args.Length == 0)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
+                    Program.Logger.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
                     return;
                 }
 
@@ -120,7 +120,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -131,13 +131,13 @@ namespace RageCoop.Server
                 NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
                 if (userConnection == null)
                 {
-                    Logging.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetID}\" not found!");
+                    Program.Logger.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetID}\" not found!");
                     return;
                 }
 
                 if (args != null && args.Length == 0)
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
+                    Program.Logger.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
                     return;
                 }
 
@@ -167,7 +167,7 @@ namespace RageCoop.Server
                 }
                 else
                 {
-                    Logging.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing return type!");
+                    Program.Logger.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing return type!");
                     return;
                 }
 
@@ -183,7 +183,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -192,7 +192,7 @@ namespace RageCoop.Server
             NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
             if (userConnection == null)
             {
-                Logging.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetID}\" not found!");
+                Program.Logger.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetID}\" not found!");
                 return;
             }
 
@@ -223,7 +223,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
@@ -231,7 +231,7 @@ namespace RageCoop.Server
         {
             if (!FilesReceived)
             {
-                Logging.Warning($"Player \"{Player.Username}\" doesn't have all the files yet!");
+                Program.Logger.Warning($"Player \"{Player.Username}\" doesn't have all the files yet!");
                 return;
             }
 
@@ -254,7 +254,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logging.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
         #endregion

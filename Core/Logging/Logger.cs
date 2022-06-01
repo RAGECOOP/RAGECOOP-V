@@ -5,28 +5,26 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 
-namespace RageCoop.Core
+namespace RageCoop.Core.Logging
 {
-    public class Loggger
+    public class Logger
     {
         
-        public string LogPath;
-        private StreamWriter logWriter;
-        private bool UseConsole=false;
-
         /// <summary>
         /// 0:Trace, 1:Debug, 2:Info, 3:Warning, 4:Error
         /// </summary>
         public int LogLevel = 0;
+        public string LogPath;
+        public bool UseConsole = false;
+        private static StreamWriter logWriter;
+
         private string Buffer="";
+        private Thread LoggerThread;
         
-        public Loggger(string path,bool overwrite=true)
+        public Logger(bool overwrite=true)
         {
-            
-            
-            LogPath=path;
-            if (File.Exists(path)&&overwrite) { File.Delete(path); }
-            Task.Run(() =>
+            if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
+            LoggerThread=new Thread(() =>
             {
                 while (true)
                 {
@@ -34,19 +32,7 @@ namespace RageCoop.Core
                     Thread.Sleep(1000);
                 }
             });
-            
-        }
-        public Loggger()
-        {
-            UseConsole=true;
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    Flush();
-                    Thread.Sleep(1000);
-                }
-            });
+            LoggerThread.Start();
         }
 
         public void Info(string message)

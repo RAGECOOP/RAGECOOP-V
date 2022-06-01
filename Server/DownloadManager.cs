@@ -43,7 +43,7 @@ namespace RageCoop.Server
                 // ONLY JAVASCRIPT AND JSON FILES!
                 if (!new string[] { ".js", ".xml" }.Any(x => x == fileInfo.Extension))
                 {
-                    Logging.Warning("Only files with \"*.js\" and \"*.xml\" can be sent!");
+                    Program.Logger.Warning("Only files with \"*.js\" and \"*.xml\" can be sent!");
                     continue;
                 }
 

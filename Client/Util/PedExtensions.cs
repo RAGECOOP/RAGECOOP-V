@@ -96,7 +96,8 @@ namespace RageCoop.Client
                 flags |= PedDataFlags.IsJumping;
             }
 
-            if (ped.IsRagdoll)
+            // Fake death
+            if (ped.IsRagdoll || (ped.Health==1 && ped.IsPlayer))
             {
                 flags |= PedDataFlags.IsRagdoll;
             }
