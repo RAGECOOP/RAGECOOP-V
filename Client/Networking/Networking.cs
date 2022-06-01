@@ -20,7 +20,7 @@ namespace RageCoop.Client
         public static int BytesSend = 0;
         private static Thread ReceiveThread;
 
-        public static void DisConnectFromServer(string address)
+        public static void DisconnectFromServer(string address)
         {
             if (IsOnServer)
             {

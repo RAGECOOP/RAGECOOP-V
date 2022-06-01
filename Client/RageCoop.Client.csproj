@@ -123,6 +123,7 @@
   <ItemGroup>
     <Compile Include="DevTools\DevTool.cs" />
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
+    <Compile Include="Menus\Sub\ServersMenu.cs" />
     <Compile Include="Scripting\ClientScript.cs" />
     <Compile Include="Scripting\Engine.cs" />
     <Compile Include="Util\MathExtensions.cs" />

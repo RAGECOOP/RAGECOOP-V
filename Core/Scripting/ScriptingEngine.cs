@@ -4,7 +4,6 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using RageCoop.Core.Logging;
 using System.Linq;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
@@ -14,8 +13,8 @@ namespace RageCoop.Core.Scripting
     internal class ScriptingEngine
     {
 		private Type BaseScriptType;
-		public Logger Logger { get; set; }
-        public ScriptingEngine(Type baseScriptType,Logger logger)
+		public Logging.Logger Logger { get; set; }
+        public ScriptingEngine(Type baseScriptType, Logging.Logger logger)
         {
 			BaseScriptType = baseScriptType;
 			Logger = logger;
