@@ -18,7 +18,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://ragecoop.000webhostapp.com/master.php";
+        public string MasterServer { get; set; } = "https://masterserver.ragecoop.online/";
         /// <summary>
         /// Don't use it!
         /// </summary>

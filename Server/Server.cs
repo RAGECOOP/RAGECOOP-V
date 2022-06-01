@@ -77,7 +77,6 @@ namespace RageCoop.Server
 
             if (MainSettings.AnnounceSelf)
             {
-                Program.Logger.Info("Announcing to master server...");
 
                 #region -- MASTERSERVER --
                 new Thread(async () =>
@@ -102,7 +101,7 @@ namespace RageCoop.Server
 
                             string content = await response.Content.ReadAsStringAsync();
                             info = JsonConvert.DeserializeObject<IpInfo>(content);
-                            Program.Logger.Info($"Your public IP is {info.Address}");
+                            Program.Logger.Info($"Your public IP is {info.Address}, announcing to master server...");
                         }
                         catch (Exception ex)
                         {

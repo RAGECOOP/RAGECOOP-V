@@ -10,9 +10,12 @@ namespace RageCoop.Client.Menus
 {
     internal class ServerListClass
     {
-        [JsonProperty("ip")]
-        public string IP { get; set; }
-        
+        [JsonProperty("address")]
+        public string Address { get; set; }
+
+        [JsonProperty("port")]
+        public string Port { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
         
@@ -24,6 +27,9 @@ namespace RageCoop.Client.Menus
         
         [JsonProperty("maxPlayers")]
         public int MaxPlayers { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
     }
 
     /// <summary>
@@ -53,7 +59,6 @@ namespace RageCoop.Client.Menus
                 Menu.Add(ResultItem = new NativeItem("Loading..."));
 
                 // Prevent freezing
-                if (GetServersThread!=null && GetServersThread.IsAlive) { GetServersThread?.Abort(); }
                 GetServersThread=new Thread(()=> GetAllServers());
                 GetServersThread.Start();
             };
@@ -85,32 +90,31 @@ namespace RageCoop.Client.Menus
             }
             catch (Exception ex)
             {
-                ResultItem.Title = "Download failed!";
-                ResultItem.Description = ex.Message;
+                Main.QueueAction(() =>
+                {
+                    ResultItem.Title = "Download failed!";
+                    ResultItem.Description = ex.Message;
+                });
                 return;
             }
-
-            if (serverList == null)
-            {
-                ResultItem.Title = "Something went wrong!";
-                return;
-            }
-            if (serverList.Count == 0)
-            {
-                ResultItem.Title = "No server was found!";
-                return;
-            }
-
-
             // Need to be processed in main thread
             Main.QueueAction(() =>
             {
-
+                if (serverList == null)
+                {
+                    ResultItem.Title = "Something went wrong!";
+                    return;
+                }
+                if (serverList.Count == 0)
+                {
+                    ResultItem.Title = "No server was found!";
+                    return;
+                }
                 CleanUpList();
                 foreach (ServerListClass server in serverList)
                 {
-                    string address = server.IP;
-                    NativeItem tmpItem = new NativeItem($"{server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~") { AltTitle = $"[{server.Players}/{server.MaxPlayers}]" };
+                    string address = $"{server.Address}:{server.Port}";
+                    NativeItem tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~") { AltTitle = $"[{server.Players}/{server.MaxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try

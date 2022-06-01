@@ -10,7 +10,7 @@
         public string Resource { get; set; } = "";
         public bool UPnP { get; set; } = true;
         public bool AnnounceSelf { get; set; } = false;
-        public string MasterServer { get; set; } = "https://ragecoop.000webhostapp.com/master.php";
+        public string MasterServer { get; set; } = "https://masterserver.ragecoop.online/";
         public bool DebugMode { get; set; } = false;
         /// <summary>
         /// NPC data won't be sent to a player if their distance is greater than this value. -1 for unlimited.
