@@ -70,7 +70,8 @@ Please note that this is incompatible with all previous versions of ragecoop, re
 
 # Support us
 
-<a href="https://patreon.com/S"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dsardelka%26type%3Dpatrons&style=for-the-badge" /></a>
+<a href="https://patreon.com/Sardelka"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3DSardelka%26type%3Dpatrons&style=for-the-badge" /></a>
+
 # 🦆 Special thanks to
 - [Makinolo](https://github.com/Makinolo), [oldnapalm](https://github.com/oldnapalm)
 - - For testing, ideas, contributions and the first modification with the API
