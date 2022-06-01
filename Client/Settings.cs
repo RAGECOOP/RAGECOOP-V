@@ -18,7 +18,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://ragecoop.online/gtav/servers";
+        public string MasterServer { get; set; } = "https://ragecoop.000webhostapp.com/master.php";
         /// <summary>
         /// Don't use it!
         /// </summary>

@@ -27,8 +27,6 @@ namespace RageCoop.Server
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
         private readonly Blocklist _mainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
-        private readonly Allowlist _mainAllowlist = Util.Read<Allowlist>("Allowlist.xml");
-
         public static NetServer MainNetServer;
 
         public static Resource RunningResource = null;
@@ -104,6 +102,7 @@ namespace RageCoop.Server
 
                             string content = await response.Content.ReadAsStringAsync();
                             info = JsonConvert.DeserializeObject<IpInfo>(content);
+                            Program.Logger.Info($"Your public IP is {info.Address}");
                         }
                         catch (Exception ex)
                         {
@@ -120,10 +119,8 @@ namespace RageCoop.Server
                                 "\"name\": \"" + MainSettings.Name + "\", " +
                                 "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\", " +
-                                "\"allowlist\": \"" + _mainAllowlist.Username.Any() + "\", " +
+                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\"" +
                                 " }";
-
                             HttpResponseMessage response = null;
                             try
                             {
@@ -152,6 +149,7 @@ namespace RageCoop.Server
                                 else
                                 {
                                     Program.Logger.Error($"MasterServer: [{(int)response.StatusCode}]");
+                                    Program.Logger.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
                                 }
                             }
 
@@ -642,11 +640,6 @@ namespace RageCoop.Server
             if (packet.Username.Any(p => !char.IsLetterOrDigit(p) && !(p == '_') && !(p=='-')))
             {
                 local.Deny("Username contains special chars!");
-                return;
-            }
-            if (_mainAllowlist.Username.Any() && !_mainAllowlist.Username.Contains(packet.Username.ToLower()))
-            {
-                local.Deny("This Username is not on the allow list!");
                 return;
             }
             if (_mainBlocklist.Username.Contains(packet.Username.ToLower()))

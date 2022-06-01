@@ -4,71 +4,72 @@ using System.Drawing;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using LemonUI.Menus;
+using System.Threading;
 
 namespace RageCoop.Client.Menus
 {
     internal class ServerListClass
     {
-        [JsonProperty("address")]
-        public string Address { get; set; }
-        [JsonProperty("port")]
-        public string Port { get; set; }
+        [JsonProperty("ip")]
+        public string IP { get; set; }
+        
         [JsonProperty("name")]
         public string Name { get; set; }
+        
         [JsonProperty("version")]
         public string Version { get; set; }
+        
         [JsonProperty("players")]
         public int Players { get; set; }
+        
         [JsonProperty("maxPlayers")]
         public int MaxPlayers { get; set; }
-        [JsonProperty("allowlist")]
-        public bool AllowList { get; set; }
-        [JsonProperty("mods")]
-        public bool Mods { get; set; }
-        [JsonProperty("npcs")]
-        public bool NPCs { get; set; }
-        [JsonProperty("country")]
-        public string Country { get; set; }
     }
 
     /// <summary>
     /// Don't use it!
     /// </summary>
-    internal class Servers
+    internal static class ServersMenu
     {
-        internal NativeMenu MainMenu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
+        private static Thread GetServersThread;
+        internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        internal NativeItem ResultItem = null;
+        internal static NativeItem ResultItem = null;
 
         /// <summary>
         /// Don't use it!
         /// </summary>
-        public Servers()
+        static ServersMenu()
         {
-            MainMenu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            MainMenu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
+            Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
-            MainMenu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
+            Menu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {
-                MainMenu.Add(ResultItem = new NativeItem("Loading..."));
-                GetAllServer();
+                CleanUpList();
+                Menu.Add(ResultItem = new NativeItem("Loading..."));
+
+                // Prevent freezing
+                if (GetServersThread!=null && GetServersThread.IsAlive) { GetServersThread?.Abort(); }
+                GetServersThread=new Thread(()=> GetAllServers());
+                GetServersThread.Start();
             };
-            MainMenu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
+            Menu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {
                 CleanUpList();
             };
         }
 
-        private void CleanUpList()
+        private static void CleanUpList()
         {
-            MainMenu.Clear();
+            Menu.Clear();
             ResultItem = null;
         }
 
-        private void GetAllServer()
+        private static void GetAllServers()
         {
             List<ServerListClass> serverList = null;
             try
@@ -100,34 +101,39 @@ namespace RageCoop.Client.Menus
                 return;
             }
 
-            CleanUpList();
 
-            foreach (ServerListClass server in serverList)
+            // Need to be processed in main thread
+            Main.QueueAction(() =>
             {
-                string address = $"{server.Address}:{server.Port}";
-                NativeItem tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~~n~Mods = {server.Mods}~n~NPCs = {server.NPCs}") { AltTitle = $"[{server.Players}/{server.MaxPlayers}][{(server.AllowList ? "~r~X~s~" : "~g~O~s~")}]" };
-                tmpItem.Activated += (object sender, EventArgs e) =>
+
+                CleanUpList();
+                foreach (ServerListClass server in serverList)
                 {
-                    try
+                    string address = server.IP;
+                    NativeItem tmpItem = new NativeItem($"{server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~") { AltTitle = $"[{server.Players}/{server.MaxPlayers}]" };
+                    tmpItem.Activated += (object sender, EventArgs e) =>
                     {
-                        MainMenu.Visible = false;
+                        try
+                        {
+                            Menu.Visible = false;
 
-                        Networking.DisconnectFromServer(address);
+                            Networking.ToggleConnection(address);
 #if !NON_INTERACTIVE
-                        CoopMenu.ServerIpItem.AltTitle = address;
+                            CoopMenu.ServerIpItem.AltTitle = address;
 
-                        CoopMenu.Menu.Visible = true;
+                            CoopMenu.Menu.Visible = true;
 #endif
-                        Main.Settings.LastServerAddress = address;
-                        Util.SaveSettings();
-                    }
-                    catch (Exception ex)
-                    {
-                        GTA.UI.Notification.Show($"~r~{ex.Message}");
-                    }
-                };
-                MainMenu.Add(tmpItem);
-            }
+                            Main.Settings.LastServerAddress = address;
+                            Util.SaveSettings();
+                        }
+                        catch (Exception ex)
+                        {
+                            GTA.UI.Notification.Show($"~r~{ex.Message}");
+                        }
+                    };
+                    Menu.Add(tmpItem);
+                }
+            });
         }
     }
 }

@@ -91,7 +91,7 @@ namespace RageCoop.Client
         /// <param name="serverAddress">The server address to connect. Example: 127.0.0.1:4499</param>
         public static void Connect(string serverAddress)
         {
-            Networking.DisconnectFromServer(serverAddress);
+            Networking.ToggleConnection(serverAddress);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace RageCoop.Client
         /// </summary>
         public static void Disconnect()
         {
-            Networking.DisconnectFromServer(null);
+            Networking.ToggleConnection(null);
         }
 
         /// <summary>

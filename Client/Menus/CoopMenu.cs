@@ -41,8 +41,10 @@ namespace RageCoop.Client.Menus
 
             _usernameItem.Activated += UsernameActivated;
             ServerIpItem.Activated += ServerIpActivated;
-            _serverConnectItem.Activated += (sender, item) => { Networking.DisconnectFromServer(Main.Settings.LastServerAddress); };
+            _serverConnectItem.Activated += (sender, item) => { Networking.ToggleConnection(Main.Settings.LastServerAddress); };
 
+
+            Menu.AddSubMenu(ServersMenu.Menu);
 
             Menu.Add(_usernameItem);
             Menu.Add(ServerIpItem);
@@ -58,6 +60,7 @@ namespace RageCoop.Client.Menus
             MenuPool.Add(DevToolMenu.Menu);
             MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
+            MenuPool.Add(ServersMenu.Menu);
 
             Menu.Add(_aboutItem);
         }
