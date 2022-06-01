@@ -29,21 +29,6 @@ _Old name: GTACOOP:R_
 - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 - [ClearScript](https://github.com/microsoft/ClearScript)
 
-# **Help to survive the project**
-
-#### The project is in active development as for now but may get discontinued if user's support is not present!
-
-## if you are a developer...
-
-Please **CONTRIBUTE** to the project and make RAGECOOP better together!
-
-## otherwise...
-
-[Become a patreon](https://www.patreon.com/Sardelka) to support my work and keep the project alive.
-<br><br><br>
-
-
-
 # Features
 
 1. Synchronized bullets
@@ -82,6 +67,10 @@ Download latest release [here](https://github.com/RAGECOOP/RAGECOOP-V/releases/l
 
 Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing.
 
+
+# Support us
+
+<a href="https://patreon.com/Sardelka"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3DSardelka%26type%3Dpatrons&style=for-the-badge" /></a>
 
 # 🦆 Special thanks to
 - [Makinolo](https://github.com/Makinolo), [oldnapalm](https://github.com/oldnapalm)
