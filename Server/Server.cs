@@ -11,6 +11,7 @@ using RageCoop.Core;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Lidgren.Network;
+using System.Timers;
 
 namespace RageCoop.Server
 {
@@ -32,10 +33,9 @@ namespace RageCoop.Server
         public static Resource RunningResource = null;
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
-        private static Thread BackgroundThread;
 
         public static readonly Dictionary<long,Client> Clients = new();
-
+        private static System.Timers.Timer SendLatencyTimer = new System.Timers.Timer(5000);
         public Server()
         {
             Program.Logger.Info("================");
@@ -57,7 +57,9 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-
+            SendLatencyTimer.Elapsed+=((s,e) => { SendLatency(); });
+            SendLatencyTimer.AutoReset=true;
+            SendLatencyTimer.Enabled=true;
             Program.Logger.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
 
             if (MainSettings.UPnP)
@@ -205,10 +207,8 @@ namespace RageCoop.Server
             Program.Logger.Info("Searching for client-side files...");
             DownloadManager.CheckForDirectoryAndFiles();
 
-            Listen();
 
-            BackgroundThread=new Thread(() => Background());
-            BackgroundThread.Start();
+            Listen();
         }
 
         private void Listen()
@@ -587,29 +587,25 @@ namespace RageCoop.Server
                 // Sleep for 1 second
                 Thread.Sleep(1000);
             }
+            Program.Logger.Dispose();
         }
-        private void Background()
+        private void SendLatency()
         {
-            while (true)
+            foreach (Client c in Clients.Values)
             {
-                foreach(Client c in Clients.Values)
+                MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
                 {
-                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
+                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                    new Packets.PlayerInfoUpdate()
                     {
-                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                        new Packets.PlayerInfoUpdate()
-                        {
-                            PedID=c.Player.PedID,
-                            Username=c.Player.Username,
-                            Latency=c.Player.Latency=c.Latency,
-                        }.Pack(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
-                    });
-                }
-
-                // Update Latency every 20 seconds.
-                Thread.Sleep(1000*20);
+                        PedID=c.Player.PedID,
+                        Username=c.Player.Username,
+                        Latency=c.Player.Latency=c.Latency,
+                    }.Pack(outgoingMessage);
+                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
+                });
             }
+
         }
 
         private void DisconnectAndLog(NetConnection senderConnection,PacketTypes type, Exception e)
@@ -677,7 +673,7 @@ namespace RageCoop.Server
                     }
                 );;
             }
-            Program.Logger.Info($"HandShake sucess, Player:{packet.Username} PedID:{packet.PedID}");
+            Program.Logger.Info($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
             // Create a new handshake packet

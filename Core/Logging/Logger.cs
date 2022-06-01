@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace RageCoop.Core.Logging
 {
-    public class Logger
+    public class Logger :IDisposable
     {
         
         /// <summary>
@@ -20,13 +20,14 @@ namespace RageCoop.Core.Logging
 
         private string Buffer="";
         private Thread LoggerThread;
+        private bool Stopping=false;
         
         public Logger(bool overwrite=true)
         {
             if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
             LoggerThread=new Thread(() =>
             {
-                while (true)
+                while (!Stopping)
                 {
                     Flush();
                     Thread.Sleep(1000);
@@ -131,6 +132,11 @@ namespace RageCoop.Core.Logging
                 }
 
             }
+        }
+        public void Dispose()
+        {
+            Stopping=true;
+            LoggerThread?.Join();
         }
     }
 }
