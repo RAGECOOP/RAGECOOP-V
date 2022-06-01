@@ -4,7 +4,7 @@
     {
         public int Port { get; set; } = 4499;
         public int MaxPlayers { get; set; } = 16;
-        public int MaxLatency { get; set; } = 300;
+        public int MaxLatency { get; set; } = 500;
         public string Name { get; set; } = "RAGECOOP server";
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
         public string Resource { get; set; } = "";
