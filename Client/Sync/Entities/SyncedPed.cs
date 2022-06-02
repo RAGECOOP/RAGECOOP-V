@@ -81,6 +81,7 @@ namespace RageCoop.Client
         public Vector3 RotationVelocity { get; set; }
         public Vector3 AimCoords { get; set; }
 
+        private WeaponAsset WeaponAsset { get; set; }
         
 
         public override void Update()
@@ -580,6 +581,9 @@ namespace RageCoop.Client
         {
             if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
             {
+                if (WeaponAsset!=null) { WeaponAsset.MarkAsNoLongerNeeded(); }
+                WeaponAsset=new WeaponAsset(CurrentWeaponHash);
+                if (!WeaponAsset.IsLoaded) { WeaponAsset.Request(); }
                 MainPed.Weapons.RemoveAll();
                 _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
 
