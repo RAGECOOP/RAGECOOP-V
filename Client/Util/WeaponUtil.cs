@@ -219,7 +219,8 @@ namespace RageCoop.Client
             VehicleWeaponHash.PlaneRocket,
             VehicleWeaponHash.SpaceRocket,
             VehicleWeaponHash.Tank,
-            (VehicleWeaponHash)3565779982 // STROMBERG missiles (homing off)
+            (VehicleWeaponHash)3565779982, // STROMBERG missiles
+            (VehicleWeaponHash)3169388763, // SCRAMJET missiles
         };
     }
 }
