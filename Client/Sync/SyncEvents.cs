@@ -61,13 +61,6 @@ namespace RageCoop.Client {
         {
             Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
 
-            // Minigun, not working for some reason
-            if (hash==(uint)WeaponHash.Minigun)
-            {
-                hash=(uint)WeaponHash.HeavyRifle;
-            }
-            // Valkyire, not working for some reason
-            if (hash==2756787765) { hash=(uint)WeaponHash.HeavyRifle; }
 
             var start = owner.MainPed.GetMuzzlePosition();
             if (owner.MainPed.IsOnTurretSeat()) { start=owner.MainPed.Bones[Bone.SkelHead].Position; }
@@ -89,10 +82,6 @@ namespace RageCoop.Client {
 
         public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
         {
-            if (hash==(uint)VehicleWeaponHash.PlayerBuzzard)
-            {
-                hash=(uint)WeaponHash.HeavyRifle;
-            }
             // ANNIHL
             if (veh.Model.Hash==837858166)
             {
@@ -116,7 +105,7 @@ namespace RageCoop.Client {
 
         #region HANDLE
 
-        private static ParticleEffectAsset CorePFXAsset = default;
+        private static ParticleEffectAsset CorePFXAsset = new ParticleEffectAsset("core");
 
         static WeaponAsset _weaponAsset = default;
         static uint _lastWeaponHash;
@@ -168,12 +157,26 @@ namespace RageCoop.Client {
         }
         private static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
         {
-            if (CorePFXAsset==default) { 
-                CorePFXAsset= new ParticleEffectAsset("core");
+            switch (weaponHash)
+            {
+                // Minigun, not working for some reason
+                case (uint)WeaponHash.Minigun:
+                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    break;
+
+                // Valkyire, not working for some reason
+                case 2756787765:
+                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    break;
+
+                case (uint)VehicleWeaponHash.PlayerBuzzard:
+                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    break ;
             }
-            if (!CorePFXAsset.IsLoaded) { CorePFXAsset.Request(); }
+
             var p = EntityPool.GetPedByID(ownerID)?.MainPed;
             if (p == null) { p=Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
+            if (!CorePFXAsset.IsLoaded) { CorePFXAsset.Request(); }
             if (_lastWeaponHash!=weaponHash)
             {
                 _weaponAsset.MarkAsNoLongerNeeded();
@@ -182,8 +185,8 @@ namespace RageCoop.Client {
             }
             if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
             World.ShootBullet(start, end, p, _weaponAsset, p.GetWeaponDamage());
-            var w = p.Weapons.CurrentWeaponObject;
-            if(w != null)
+            Prop w;
+            if(((w = p.Weapons.CurrentWeaponObject) != null)&&(p.VehicleWeapon==VehicleWeaponHash.Invalid))
             {
                 if (p.Weapons.Current.Components.GetSuppressorComponent().Active)
                 {
@@ -266,7 +269,7 @@ namespace RageCoop.Client {
         {
             if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
             {
-                return 30;
+                return 100;
             }
             switch (p.Weapons.Current.Group)
             {
