@@ -12,7 +12,6 @@ using System.Threading;
 namespace RageCoop.Client { 
     internal static class SyncEvents
     {
-
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
@@ -161,16 +160,16 @@ namespace RageCoop.Client {
             {
                 // Minigun, not working for some reason
                 case (uint)WeaponHash.Minigun:
-                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    weaponHash=1176362416;
                     break;
 
                 // Valkyire, not working for some reason
                 case 2756787765:
-                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    weaponHash=1176362416;
                     break;
 
                 case (uint)VehicleWeaponHash.PlayerBuzzard:
-                    weaponHash=(uint)WeaponHash.HeavyRifle;
+                    weaponHash=1176362416;
                     break ;
             }
 

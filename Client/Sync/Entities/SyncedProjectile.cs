@@ -16,7 +16,7 @@ namespace RageCoop.Client
             IsMine=true;
             MainProjectile = p;
             Origin=p.Position;
-            var shooter = EntityPool.GetPedByHandle(p.Owner.Handle);
+            var shooter = EntityPool.GetPedByHandle((p.Owner?.Handle).GetValueOrDefault());
             if(shooter != null)
             {
                 ShooterID=shooter.ID;
@@ -24,14 +24,14 @@ namespace RageCoop.Client
             else
             {
                 // Owner will be the vehicle if projectile is shot with a vehicle
-                var shooterVeh = EntityPool.GetVehicleByHandle(p.Owner.Handle);
+                var shooterVeh = EntityPool.GetVehicleByHandle((p.Owner?.Handle).GetValueOrDefault());
                 if (shooterVeh!=null && shooterVeh.MainVehicle.Driver!=null)
                 {
                     ShooterID=shooterVeh.MainVehicle.Driver.GetSyncEntity().ID;
                 }
                 else
                 {
-                    Main.Logger.Warning($"Could not find owner for projectile, owner handle:{p.Owner.Handle}");
+                    Main.Logger.Warning($"Could not find owner for projectile:{Hash}");
                 }
             }
 
