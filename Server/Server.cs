@@ -23,7 +23,7 @@ namespace RageCoop.Server
 
     public class Server
     {
-        private static readonly string _compatibleVersion = "V0_3";
+        private static readonly string _compatibleVersion = "V0_4";
         private static long _currentTick = 0;
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
@@ -565,8 +565,8 @@ namespace RageCoop.Server
                     MainNetServer.Recycle(message);
                 }
 
-                // 16 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(1000 / 60);
+                // 3 milliseconds to sleep to reduce CPU usage
+                Thread.Sleep(3);
             }
 
             Program.Logger.Warning("Server is shutting down!");

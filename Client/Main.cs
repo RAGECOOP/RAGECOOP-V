@@ -22,7 +22,7 @@ namespace RageCoop.Client
 
         private bool _gameLoaded = false;
         private bool _lastDead = false;
-        public static readonly string CurrentVersion = "V0_3";
+        public static readonly string CurrentVersion = "V0_4";
 
         public static int LocalPlayerID=0;
 
@@ -51,7 +51,7 @@ namespace RageCoop.Client
 #if DEBUG
                 LogLevel = 0,
 #else
-                LogLevel=Settings.LogLevel;
+                LogLevel=Settings.LogLevel,
 #endif
             };
             // Required for some synchronization!
