@@ -31,59 +31,61 @@ namespace RageCoop.Client
             }
             return p.Bones[Bone.SkelRightHand].Position;
         }
+        static long BulletsShot=0;
         public static MuzzleInfo GetMuzzleInfo(this Vehicle v)
         {
+            BulletsShot++;
             int i;
             switch (v.Model.Hash)
             {
                 // SCRAMJET
                 case -638562243:
-                    i=Main.Ticked%2==0 ? 44 : 45;
+                    i=BulletsShot%2==0 ? 44 : 45;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // VIGILANTE
                 case -1242608589:
-                    i=Main.Ticked%2==0 ? 42 : 43;
+                    i=BulletsShot%2==0 ? 42 : 43;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // ZR380
                 case 540101442:
-                    i=Main.Ticked%2==0 ? 57 : 63;
+                    i=BulletsShot%2==0 ? 57 : 63;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // ZR3802
                 case -1106120762:
-                    i=Main.Ticked%2==0 ? 57 : 63;
+                    i=BulletsShot%2==0 ? 57 : 63;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // ZR3803
                 case -1478704292:
-                    i=Main.Ticked%2==0 ? 53 : 59;
+                    i=BulletsShot%2==0 ? 53 : 59;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // STROMBERG
                 case 886810209:
-                    i=Main.Ticked%2==0 ? 85 : 84;
+                    i=BulletsShot%2==0 ? 85 : 84;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // SLAMVAN4
                 case -2061049099:
-                    i=Main.Ticked%2==0 ? 76 : 78;
+                    i=BulletsShot%2==0 ? 76 : 78;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // IMPERATOR
                 case 444994115:
-                    i=Main.Ticked%2==0 ? 88 : 86;
+                    i=BulletsShot%2==0 ? 88 : 86;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // IMPALER2
                 case 1009171724:
-                    i=Main.Ticked%2==0 ? 63 : 64;
+                    i=BulletsShot%2==0 ? 63 : 64;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // DOMINATOR4
                 case -688189648:
-                    i=Main.Ticked%2==0 ? 59 : 60;
+                    i=BulletsShot%2==0 ? 59 : 60;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // SAVAGE
@@ -92,22 +94,22 @@ namespace RageCoop.Client
 
                 // BUZZARD
                 case 788747387:
-                    i=Main.Ticked%2==0 ? 28 : 23;
+                    i=BulletsShot%2==0 ? 28 : 23;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // ANNIHL
                 case 837858166:
-                    i=(int)Main.Ticked%4+35;
+                    i=(int)BulletsShot%4+35;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // HYDRA
                 case 970385471:
-                    i=Main.Ticked%2==0 ? 29 : 28;
+                    i=BulletsShot%2==0 ? 29 : 28;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // STARLING
                 case -1700874274:
-                    i=Main.Ticked%2==0 ? 24 : 12;
+                    i=BulletsShot%2==0 ? 24 : 12;
                     return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
 
                 // RHINO
@@ -132,25 +134,7 @@ namespace RageCoop.Client
                 return w.Group==WeaponGroup.Thrown || ProjectileWeapons.Contains(w.Hash);
             }
         }
-
-        public static int GetDamage(this Weapon w)
-        {
-            int damage = 0;
-            switch (w.Group)
-            {
-                case WeaponGroup.AssaultRifle: damage=30; break;
-                case WeaponGroup.Heavy: damage=30; break;
-                case WeaponGroup.MG: damage=30; break;
-                case WeaponGroup.PetrolCan: damage=0; break;
-                case WeaponGroup.Pistol: damage=30; break;
-                case WeaponGroup.Shotgun: damage=30; break;
-                case WeaponGroup.SMG: damage=20; break;
-                case WeaponGroup.Sniper: damage=100; break;
-                case WeaponGroup.Thrown: damage=0; break;
-                case WeaponGroup.Unarmed: damage=0; break;
-            }
-            return damage;
-        }
+        
         public static readonly Dictionary<WeaponHash, int> MuzzleBoneIndexes = new Dictionary<WeaponHash, int>
         {
             {WeaponHash.HeavySniper,6},

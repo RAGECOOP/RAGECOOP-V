@@ -130,7 +130,7 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            i=Main.Ticked%2==0 ? {Current} : {Secondary};
+                            i=BulletsShot%2==0 ? {Current} : {Secondary};
                             return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].{dir}Vector);
                         ";
                     }
@@ -139,7 +139,7 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            i=Main.Ticked%2==0 ? {Current} : {Secondary};
+                            i=BulletsShot%2==0 ? {Current} : {Secondary};
                             return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].{((MuzzleDir)(dir-3)).ToString()}Vector*-1);
                         ";
                     }

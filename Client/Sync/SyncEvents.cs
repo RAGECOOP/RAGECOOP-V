@@ -188,7 +188,7 @@ namespace RageCoop.Client {
                 _lastWeaponHash=weaponHash;
             }
             if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
-            World.ShootBullet(start, end, p, _weaponAsset, p.GetWeaponDamage());
+            World.ShootBullet(start, end, p, _weaponAsset, p.GetWeaponDamage(weaponHash));
             Prop w;
             if(((w = p.Weapons.CurrentWeaponObject) != null)&&(p.VehicleWeapon==VehicleWeaponHash.Invalid))
             {
@@ -269,10 +269,12 @@ namespace RageCoop.Client {
                     }
             }
         }
-        public static int GetWeaponDamage(this Ped p)
+        public static int GetWeaponDamage(this Ped p,uint hash)
         {
-            if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
+            if(p.IsInVehicle() && (hash!=(uint)p.Weapons.Current.Hash))
             {
+                // This is a vehicle weapon
+                p.VehicleWeapon=(VehicleWeaponHash)hash;
                 return 100;
             }
             switch (p.Weapons.Current.Group)
