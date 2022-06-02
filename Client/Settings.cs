@@ -58,7 +58,6 @@ namespace RageCoop.Client
         /// <summary>
         /// Disable automatic respawn.
         /// </summary>
-        public bool DisableAutoRespawn { get; set; } = true;
-        public float HpRechargeMultiplier { get; set; } = 1;
+        public bool DisableAutoRespawn { get; set; } = false;
     }
 }

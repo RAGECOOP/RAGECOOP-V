@@ -36,6 +36,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                
+                // SAVAGE
+                case -82626025:
+                    return new MuzzleInfo(v.Bones[30].Position, v.Bones[30].ForwardVector);
+
                 // BUZZARD
                 case 788747387:
                     i=Main.Ticked%2==0 ? 28 : 23;
