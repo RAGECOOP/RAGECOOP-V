@@ -36,6 +36,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // STROMBERG
+                case 886810209:
+                    i=Main.Ticked%2==0 ? 85 : 84;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // SLAMVAN4
                 case -2061049099:
                     i=Main.Ticked%2==0 ? 76 : 78;
