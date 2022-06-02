@@ -168,6 +168,11 @@ namespace RageCoop.Client {
                     weaponHash=1176362416;
                     break;
 
+                // SAVAGE
+                case 1638077257:
+                    weaponHash=(uint)VehicleWeaponHash.PlayerLazer;
+                    break;
+
                 case (uint)VehicleWeaponHash.PlayerBuzzard:
                     weaponHash=1176362416;
                     break ;
