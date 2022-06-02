@@ -45,7 +45,7 @@ namespace RageCoop.Client
         public bool Exploded { get; set; } = false;
         public Projectile MainProjectile { get; set; }
         public int ShooterID { get; set; }
-
+        private SyncedPed Shooter { get;set; }
         public Vector3 Origin { get; set; }
 
         /// <summary>
@@ -75,9 +75,17 @@ namespace RageCoop.Client
         {
             Asset=new WeaponAsset(Hash);
             if (!Asset.IsLoaded) { Asset.Request(); }
-            World.ShootBullet(Position,Position+Velocity,EntityPool.GetPedByID(ShooterID)?.MainPed,Asset,0);
+            World.ShootBullet(Position,Position+Velocity,(Shooter=EntityPool.GetPedByID(ShooterID))?.MainPed,Asset,0);
             var ps = World.GetAllProjectiles();
             MainProjectile=ps[ps.Length-1];
+            if (Hash==(WeaponHash)VehicleWeaponHash.Tank)
+            {
+                var v = Shooter?.MainPed?.CurrentVehicle;
+                if (v!=null)
+                {
+                    World.CreateParticleEffectNonLooped(SyncEvents.CorePFXAsset, "muz_tank", v.GetMuzzleInfo().Position, v.Bones[35].ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
+                }
+            }
             EntityPool.Add(this);
         }
     }

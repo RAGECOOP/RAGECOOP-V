@@ -30,6 +30,10 @@ namespace RageCoop.Client
             MainPed=p;
             OwnerID=Main.LocalPlayerID;
 
+            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
+                        MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
+
         }
 
         /// <summary>
@@ -246,6 +250,7 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
             Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
+            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
 
             MainPed.BlockPermanentEvents = true;
             MainPed.CanWrithe=false;
@@ -254,6 +259,16 @@ namespace RageCoop.Client
             MainPed.RelationshipGroup=Main.SyncedPedsGroup;
             MainPed.IsFireProof=false;
             MainPed.IsExplosionProof=false;
+
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater,false);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_AvoidTearGas, false);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableShockingEvents, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
+
+
             SetClothes();
 
             if (IsPlayer)
@@ -263,7 +278,8 @@ namespace RageCoop.Client
                 MainPed.AttachedBlip.Color = BlipColor.White;
                 MainPed.AttachedBlip.Scale = 0.8f;
                 MainPed.AttachedBlip.Name =Username;
-                
+
+                MainPed.IsInvincible=true;
             }
 
             // Add to EntityPool so this Character can be accessed by handle.

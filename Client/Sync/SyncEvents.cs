@@ -104,7 +104,7 @@ namespace RageCoop.Client {
 
         #region HANDLE
 
-        private static ParticleEffectAsset CorePFXAsset = new ParticleEffectAsset("core");
+        public static ParticleEffectAsset CorePFXAsset = new ParticleEffectAsset("core");
 
         static WeaponAsset _weaponAsset = default;
         static uint _lastWeaponHash;
@@ -202,7 +202,6 @@ namespace RageCoop.Client {
                 }
 
             }
-            /*
             else if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
             {
                 if (p.VehicleWeapon==VehicleWeaponHash.Tank)
@@ -210,7 +209,6 @@ namespace RageCoop.Client {
                     World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_tank", p.CurrentVehicle.GetMuzzleInfo().Position, p.CurrentVehicle.Bones[35].ForwardVector.ToEulerRotation(p.CurrentVehicle.Bones[35].UpVector), 1);
                 }
             }
-            */
         }
         public static void HandleEvent(PacketTypes type,byte[] data)
         {

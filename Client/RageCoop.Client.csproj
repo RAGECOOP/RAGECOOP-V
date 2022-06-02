@@ -127,6 +127,7 @@
     <Compile Include="Scripting\ClientScript.cs" />
     <Compile Include="Scripting\Engine.cs" />
     <Compile Include="Util\MathExtensions.cs" />
+    <Compile Include="Util\PedConfigFlags.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VehicleExtensions.cs" />
     <Compile Include="Util\WeaponUtil.cs" />
