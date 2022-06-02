@@ -36,6 +36,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // SCRAMJET
+                case -638562243:
+                    i=Main.Ticked%2==0 ? 44 : 45;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // VIGILANTE
                 case -1242608589:
                     i=Main.Ticked%2==0 ? 42 : 43;
