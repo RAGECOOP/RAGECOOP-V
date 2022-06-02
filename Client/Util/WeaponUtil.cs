@@ -36,7 +36,26 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
-                
+                // SLAMVAN4
+                case -2061049099:
+                    i=Main.Ticked%2==0 ? 76 : 78;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
+                // IMPERATOR
+                case 444994115:
+                    i=Main.Ticked%2==0 ? 88 : 86;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
+                // IMPALER2
+                case 1009171724:
+                    i=Main.Ticked%2==0 ? 63 : 64;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
+                // DOMINATOR4
+                case -688189648:
+                    i=Main.Ticked%2==0 ? 59 : 60;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // SAVAGE
                 case -82626025:
                     return new MuzzleInfo(v.Bones[30].Position, v.Bones[30].ForwardVector);
