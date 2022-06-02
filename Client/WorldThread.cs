@@ -126,6 +126,11 @@ namespace RageCoop.Client
                 foreach (Vehicle veh in World.GetAllVehicles())
                 {
                     SyncedVehicle v = veh.GetSyncEntity();
+                    if (v.MainVehicle==Game.Player.LastVehicle)
+                    {
+                        // Don't delete player's vehicle
+                        continue;
+                    }
                     if((v== null) || (v.IsMine&&veh.PopulationType!=EntityPopulationType.Mission))
                     {
                         Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
