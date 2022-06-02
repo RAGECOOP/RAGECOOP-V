@@ -36,6 +36,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // ZR3802
+                case -1106120762:
+                    i=Main.Ticked%2==0 ? 57 : 63;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // ZR3803
                 case -1478704292:
                     i=Main.Ticked%2==0 ? 53 : 59;
