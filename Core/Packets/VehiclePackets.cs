@@ -217,7 +217,8 @@ namespace RageCoop.Core
 
             public Vector3 Position { get; set; }
 
-            public Vector3 Rotation { get; set; }
+            public Quaternion Quaternion { get; set; }
+            // public Vector3 Rotation { get; set; }
 
             public Vector3 Velocity { get; set; }
 
@@ -242,8 +243,9 @@ namespace RageCoop.Core
                 byteArray.AddVector3(Position);
 
 
-                // Write rotation
-                byteArray.AddVector3(Rotation);
+                // Write quaternion
+                //byteArray.AddVector3(Rotation);
+                byteArray.AddQuaternion(Quaternion);
 
                 // Write velocity
                 byteArray.AddVector3(Velocity);
@@ -283,8 +285,9 @@ namespace RageCoop.Core
                 // Read position
                 Position = reader.ReadVector3();
 
-                // Read rotation
-                Rotation = reader.ReadVector3();
+                // Read quaternion
+                // Rotation = reader.ReadVector3();
+                Quaternion=reader.ReadQuaternion();
 
                 // Read velocity
                 Velocity =reader.ReadVector3();

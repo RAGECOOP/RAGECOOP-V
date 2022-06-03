@@ -52,7 +52,6 @@ namespace RageCoop.Client
         #region LAST STATE STORE
 
 
-        private ulong _vehicleStopTime { get; set; }
         private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
         private byte _lastRadioIndex=255;
@@ -63,6 +62,7 @@ namespace RageCoop.Client
         public float SteeringAngle { get; set; }
         public float ThrottlePower { get; set; }
         public float BrakePower { get; set; }
+        public float DeluxoWingRatio { get; set; } = -1;
         #endregion
 
         #region -- VEHICLE STATE --
@@ -89,7 +89,6 @@ namespace RageCoop.Client
         /// VehicleSeat,PedID
         /// </summary>
         public Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
-        public float DeluxoWingRatio { get; set; } = -1;
         public byte RadioStation = 255;
         private long _lastPositionCalibrated { get; set; }
 
@@ -137,16 +136,9 @@ namespace RageCoop.Client
                 MainVehicle.Position=Position;
                 MainVehicle.Velocity=Velocity;
             }
-            Vector3 r = GetCalibrationRotation();
-            if (r.Length() < 20f)
-            {
-                MainVehicle.RotationVelocity = r * 0.15f + RotationVelocity;
-            }
-            else
-            {
-                MainVehicle.Rotation = Rotation;
-                MainVehicle.RotationVelocity = RotationVelocity;
-            }
+            // Vector3 r = GetCalibrationRotation();
+            MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.35f);
+            MainVehicle.RotationVelocity = RotationVelocity;
             if (DeluxoWingRatio!=-1)
             {
                 MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
@@ -330,6 +322,8 @@ namespace RageCoop.Client
         }
         private Vector3 GetCalibrationRotation()
         {
+            return (Quaternion-MainVehicle.Quaternion).ToEulerAngles().ToDegree();
+            /*
             var r = Rotation-MainVehicle.Rotation;
             if (r.X>180) { r.X=r.X-360; }
             else if(r.X<-180) { r.X=360+r.X; }
@@ -340,6 +334,7 @@ namespace RageCoop.Client
             if (r.Z>180) { r.Z=r.Z-360; }
             else if (r.Z<-180) { r.Z=360+r.Z; }
             return r;
+            */
         }
         private void CreateVehicle()
         {
@@ -355,7 +350,7 @@ namespace RageCoop.Client
             {
                 EntityPool.Add( this);
             }
-            MainVehicle.Rotation = Rotation;
+            MainVehicle.Quaternion = Quaternion;
 
             if (MainVehicle.HasRoof)
             {

@@ -113,7 +113,7 @@ namespace RageCoop.Core
                 Z = ReadFloat()
             };
         }
-        public Quaternion ReadLQuaternion()
+        public Quaternion ReadQuaternion()
         {
             return new Quaternion()
             {

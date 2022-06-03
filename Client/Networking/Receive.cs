@@ -358,7 +358,7 @@ namespace RageCoop.Client
             if (v.IsMine) { return; }
             v.ID= packet.ID;
             v.Position=packet.Position;
-            v.Rotation=packet.Rotation;
+            v.Quaternion=packet.Quaternion;
             v.SteeringAngle=packet.SteeringAngle;
             v.ThrottlePower=packet.ThrottlePower;
             v.BrakePower=packet.BrakePower;
