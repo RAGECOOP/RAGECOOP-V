@@ -129,7 +129,7 @@ namespace RageCoop.Client
             if (MainVehicle.Position.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
-                MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.35f);
+                MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
             }
             else
             {
