@@ -77,26 +77,9 @@ namespace RageCoop.Client.Menus
         private static void GetAllServers()
         {
             List<ServerListClass> serverList = null;
-            try
-            {
-                // TLS only
-                ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                WebClient client = new WebClient();
-                string data = client.DownloadString(Main.Settings.MasterServer);
-                serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(data);
-            }
-            catch (Exception ex)
-            {
-                Main.QueueAction(() =>
-                {
-                    ResultItem.Title = "Download failed!";
-                    ResultItem.Description = ex.Message;
-                });
-                return;
-            }
+            var realUrl = Main.Settings.MasterServer=="[AUTO]" ? DownloadString("https://ragecoop.online/stuff/masterserver") : Main.Settings.MasterServer;
+            serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(DownloadString(realUrl));
+            
             // Need to be processed in main thread
             Main.QueueAction(() =>
             {
@@ -138,6 +121,28 @@ namespace RageCoop.Client.Menus
                     Menu.Add(tmpItem);
                 }
             });
+        }
+        private static string DownloadString(string url)
+        {
+            try
+            {
+                // TLS only
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                WebClient client = new WebClient();
+                return client.DownloadString(url);
+            }
+            catch (Exception ex)
+            {
+                Main.QueueAction(() =>
+                {
+                    ResultItem.Title = "Download failed!";
+                    ResultItem.Description = ex.Message;
+                });
+                return "";
+            }
         }
     }
 }

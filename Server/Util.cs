@@ -6,11 +6,30 @@ using System.Linq;
 using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
+using System.Net;
 
 namespace RageCoop.Server
 {
     static partial class Util
     {
+
+        public static string DownloadString(string url)
+        {
+            try
+            {
+                // TLS only
+                ServicePointManager.Expect100Continue = true;
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                WebClient client = new();
+                return client.DownloadString(url);
+            }
+            catch
+            {
+                return "";
+            }
+        }
         public static (byte, byte[]) GetBytesFromObject(object obj)
         {
             return obj switch

@@ -129,15 +129,15 @@ namespace RageCoop.Client
             if (MainVehicle.Position.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
-                _lastPositionCalibrated=Main.Counter.ElapsedMilliseconds;
+                MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.35f);
             }
             else
             {
                 MainVehicle.Position=Position;
                 MainVehicle.Velocity=Velocity;
+                MainVehicle.Quaternion=Quaternion;
             }
             // Vector3 r = GetCalibrationRotation();
-            MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.35f);
             MainVehicle.RotationVelocity = RotationVelocity;
             if (DeluxoWingRatio!=-1)
             {

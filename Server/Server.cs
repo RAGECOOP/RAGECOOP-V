@@ -110,7 +110,7 @@ namespace RageCoop.Server
                             Program.Logger.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
-
+                        var realMaster  = MainSettings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : MainSettings.MasterServer;
                         while (!Program.ReadyToStop)
                         {
                             string msg =
@@ -125,7 +125,7 @@ namespace RageCoop.Server
                             HttpResponseMessage response = null;
                             try
                             {
-                                response = await httpClient.PostAsync(MainSettings.MasterServer, new StringContent(msg, Encoding.UTF8, "application/json"));
+                                response = await httpClient.PostAsync(realMaster, new StringContent(msg, Encoding.UTF8, "application/json"));
                             }
                             catch (Exception ex)
                             {

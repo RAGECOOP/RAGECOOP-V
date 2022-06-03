@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTA.Math;
+using System.Net;
 namespace RageCoop.Core
 {
     public class CoreUtils
@@ -35,6 +36,7 @@ namespace RageCoop.Core
                     return (0x0, null);
             }
         }
+
     }
     public static class Extensions
     {
