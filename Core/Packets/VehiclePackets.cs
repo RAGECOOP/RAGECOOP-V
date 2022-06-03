@@ -41,6 +41,7 @@ namespace RageCoop.Core
             /// </summary>
             public Dictionary<int, int> Passengers { get; set; }
 
+            public byte RadioStation { get; set; } = 255;
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
@@ -117,6 +118,9 @@ namespace RageCoop.Core
 
                 // Write LockStatus
                 byteArray.Add((byte)LockStatus);
+
+                // Write RadioStation
+                byteArray.Add(RadioStation);
 
                 byte[] result = byteArray.ToArray();
 
@@ -200,6 +204,9 @@ namespace RageCoop.Core
 
                 // Read LockStatus
                 LockStatus=(VehicleLockStatus)reader.ReadByte();
+
+                // Read RadioStation
+                RadioStation=reader.ReadByte();
                 #endregion
             }
         }
@@ -257,6 +264,7 @@ namespace RageCoop.Core
                     byteArray.AddFloat(DeluxoWingRatio);
                 }
 
+
                 byte[] result = byteArray.ToArray();
 
                 message.Write(result.Length);
@@ -292,6 +300,7 @@ namespace RageCoop.Core
 
                 // Read steering angle
                 SteeringAngle = reader.ReadFloat();
+
 
                 if (reader.CanRead(4))
                 {

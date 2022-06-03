@@ -346,7 +346,7 @@ namespace RageCoop.Client
             c.Clothes=packet.Clothes;
             c.WeaponComponents=packet.WeaponComponents;
             c.ModelHash=packet.ModelHash;
-            c.LastSynced=c.LastStateSynced = Main.Ticked;
+            c.LastStateSynced = Main.Ticked;
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {
@@ -390,6 +390,7 @@ namespace RageCoop.Client
             v.Transformed = packet.Flag.HasFlag(VehicleDataFlags.IsTransformed);
             v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
             v.LockStatus=packet.LockStatus;
+            v.RadioStation=packet.RadioStation;
             v.Flags=packet.Flag;
             foreach (KeyValuePair<int, int> pair in packet.Passengers)
             {
@@ -398,7 +399,7 @@ namespace RageCoop.Client
                     v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
                 }
             }
-            v.LastStateSynced=v.LastSynced= Main.Ticked;
+            v.LastStateSynced= Main.Ticked;
             
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)

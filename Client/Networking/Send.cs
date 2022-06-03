@@ -109,6 +109,10 @@ namespace RageCoop.Client
                 Passengers=veh.GetPassengers(),
                 LockStatus=veh.LockStatus,
             };
+            if (v.MainVehicle==Game.Player.LastVehicle)
+            {
+                packet.RadioStation=Util.GetPlayerRadioIndex();
+            }
             Send(packet, ConnectionChannel.VehicleSync);
         }
         public static void SendProjectile(SyncedProjectile sp)

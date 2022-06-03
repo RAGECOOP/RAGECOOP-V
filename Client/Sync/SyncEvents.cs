@@ -148,6 +148,7 @@ namespace RageCoop.Client {
             v.OwnerID=p.NewOwnerID;
 
             v.ModelHash=v.MainVehicle.Model;
+            v.LastSynced=Main.Ticked;
             // So this vehicle doesn's get re-spawned
         }
         private static void HandleNozzleTransform(Packets.NozzleTransform p)

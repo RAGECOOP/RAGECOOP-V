@@ -55,7 +55,7 @@ namespace RageCoop.Client
         private ulong _vehicleStopTime { get; set; }
         private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
-
+        private byte _lastRadioIndex=255;
         #endregion
 
         #region -- CRITICAL STUFF --
@@ -90,6 +90,7 @@ namespace RageCoop.Client
         /// </summary>
         public Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
         public float DeluxoWingRatio { get; set; } = -1;
+        public byte RadioStation = 255;
         private long _lastPositionCalibrated { get; set; }
 
         #endregion
@@ -100,10 +101,8 @@ namespace RageCoop.Client
 
             // Check if all data avalible
             if(!IsReady) { return; }
-
             // Skip update if no new sync message has arrived.
             if (!NeedUpdate) { return; }
-
             #endregion
             #region -- CHECK EXISTENCE --
             if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != ModelHash))
@@ -171,6 +170,10 @@ namespace RageCoop.Client
                         {
 
                             SyncedPed c = Passengers[seat];
+                            if (c?.ID==Main.LocalPlayerID && (RadioStation!=_lastRadioIndex))
+                            {
+                                Util.SetPlayerRadioIndex(RadioStation);
+                            }
                             if (c?.MainPed!=null&&(!currentPassengers.ContainsKey(i))&&(!c.MainPed.IsBeingJacked)&&(!c.MainPed.IsTaskActive(TaskType.CTaskExitVehicleSeat))) {
                                 Passengers[seat].MainPed.SetIntoVehicle(MainVehicle, seat);
                             }

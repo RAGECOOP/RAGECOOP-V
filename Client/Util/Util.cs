@@ -186,5 +186,15 @@ namespace RageCoop.Client
             if (v==null) { EntityPool.Add(v=new SyncedVehicle(veh)); }
             return v;
         }
+
+        public static byte GetPlayerRadioIndex()
+        {
+            return (byte)Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX);
+        }
+        public static void SetPlayerRadioIndex(int index)
+        {
+            Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
+        }
+
     }
 }
