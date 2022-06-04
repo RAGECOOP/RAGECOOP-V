@@ -8,7 +8,7 @@ namespace RageCoop.Resources.Base
             API.RegisterCommand("kick", (ctx) =>
             {
                 if (ctx.Args.Length<1) { return; }
-                var reason = "eat poop";
+                var reason = "EAT POOP!";
                 if(ctx.Args.Length>=2) { reason=ctx.Args[1]; }
                 API.GetClientByUsername(ctx.Args[0]).Kick(reason);
             });
