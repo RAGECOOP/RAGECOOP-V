@@ -72,8 +72,8 @@ namespace RageCoop.Server
                 }
                 else
                 {
-                    Program.Logger.Error("Port forwarding failed! Your router may not support UPnP.");
-                    Program.Logger.Warning("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
+                    Program.Logger.Warning("Port forwarding failed! Your router may not support UPnP.");
+                    Program.Logger.Info("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
                 }
             }
 
@@ -203,7 +203,6 @@ namespace RageCoop.Server
                     Program.Logger.Error(e.InnerException.Message);
                 }
             }
-
             Program.Logger.Info("Searching for client-side files...");
             DownloadManager.CheckForDirectoryAndFiles();
 

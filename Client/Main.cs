@@ -44,6 +44,7 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
+            Settings = Util.ReadSettings();
             Logger=new Core.Logging.Logger()
             {
                 LogPath="Scripts\\RageCoop\\RageCoop.Client.log",
@@ -74,7 +75,6 @@ namespace RageCoop.Client
             }*/
             SyncedPedsGroup=World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral, true);
-            Settings = Util.ReadSettings();
             Networking.Start();
 #if !NON_INTERACTIVE
 #endif
