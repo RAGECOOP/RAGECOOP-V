@@ -22,7 +22,7 @@ namespace RageCoop.Client
 
         private bool _gameLoaded = false;
         private bool _lastDead = false;
-        public static readonly string CurrentVersion = "V0_4";
+        public static readonly string CurrentVersion = "V0_4_1";
 
         public static int LocalPlayerID=0;
 
