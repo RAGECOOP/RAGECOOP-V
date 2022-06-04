@@ -214,7 +214,14 @@ namespace RageCoop.Server
         {
             Program.Logger.Info("Listening for clients");
             Program.Logger.Info("Please use CTRL + C if you want to stop the server!");
-
+            MainNetServer.RegisterReceivedCallback(new SendOrPostCallback((e) =>
+            {
+                NetIncomingMessage message;
+                while ((message =((NetServer)e).ReadMessage()) != null)
+                {
+                    ProcessMessage(message);
+                }
+            }), new SynchronizationContext());
             while (!Program.ReadyToStop)
             {
                 if (RunningResource != null)
@@ -240,329 +247,7 @@ namespace RageCoop.Server
                     DownloadManager.Tick();
                 }
                 
-                NetIncomingMessage message;
-
-                while ((message = MainNetServer.ReadMessage()) != null)
-                {
-                    switch (message.MessageType)
-                    {
-                        case NetIncomingMessageType.ConnectionApproval:
-                            {
-                                Program.Logger.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
-                                if (message.ReadByte() != (byte)PacketTypes.Handshake)
-                                {
-                                    Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
-                                    message.SenderConnection.Deny("Wrong packet!");
-                                }
-                                else
-                                {
-                                    try
-                                    {
-                                        int len = message.ReadInt32();
-                                        byte[] data = message.ReadBytes(len);
-
-                                        Packets.Handshake packet = new();
-                                        packet.Unpack(data);
-
-                                        GetHandshake(message.SenderConnection, packet);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
-                                        message.SenderConnection.Deny(e.Message);
-                                    }
-                                }
-                                break;
-                            }
-                        case NetIncomingMessageType.StatusChanged:
-                            {
-                                NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
-
-                                if (status == NetConnectionStatus.Disconnected)
-                                {
-                                    long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
-
-                                    DownloadManager.RemoveClient(nethandle);
-
-                                    SendPlayerDisconnectPacket(nethandle);
-                                }
-                                else if (status == NetConnectionStatus.Connected)
-                                {
-                                    SendPlayerConnectPacket(message.SenderConnection);
-                                }
-                                break;
-                            }
-                        case NetIncomingMessageType.Data:
-                            // Get packet type
-                            byte btype= message.ReadByte();
-                            var type = (PacketTypes)btype;
-                            
-                            switch (type)
-                            {
-
-                                #region SyncData
-
-                                case PacketTypes.PedStateSync:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.PedStateSync packet = new();
-                                            packet.Unpack(data);
-
-                                            PedStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.VehicleStateSync:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.VehicleStateSync packet = new();
-                                            packet.Unpack(data);
-
-                                            VehicleStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.PedSync:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.PedSync packet = new();
-                                            packet.Unpack(data);
-
-                                            PedSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.VehicleSync:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.VehicleSync packet = new();
-                                            packet.Unpack(data);
-
-                                            VehicleSync(packet,message.SenderConnection.RemoteUniqueIdentifier);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.ProjectileSync:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.ProjectileSync packet = new();
-                                            packet.Unpack(data);
-                                            ProjectileSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-
-
-                                #endregion
-
-                                case PacketTypes.ChatMessage:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.ChatMessage packet = new();
-                                            packet.Unpack(data);
-
-                                            SendChatMessage(packet);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                
-                                case PacketTypes.NativeResponse:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.NativeResponse packet = new();
-                                            packet.Unpack(data);
-
-                                            Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
-                                            if (client != null)
-                                            {
-                                                if (client.Callbacks.ContainsKey(packet.ID))
-                                                {
-                                                    client.Callbacks[packet.ID].Invoke(packet.Args[0]);
-                                                    client.Callbacks.Remove(packet.ID);
-                                                }
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.FileTransferComplete:
-                                    {
-                                        try
-                                        {
-                                            if (DownloadManager.AnyFileExists)
-                                            {
-                                                int len = message.ReadInt32();
-                                                byte[] data = message.ReadBytes(len);
-
-                                                Packets.FileTransferComplete packet = new();
-                                                packet.Unpack(data);
-
-                                                Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier); 
-                                                if (client != null && !client.FilesReceived)
-                                                {
-                                                    DownloadManager.TryToRemoveClient(client.NetID, packet.ID);
-                                                }
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                case PacketTypes.ServerClientEvent:
-                                    {
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-
-                                            Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
-                                            packet.Unpack(data);
-
-                                            long senderNetHandle = message.SenderConnection.RemoteUniqueIdentifier;
-                                            Client client = null;
-                                            lock (Clients)
-                                            {
-                                                client = Util.GetClientByID(senderNetHandle);
-                                            }
-
-                                            if (client != null)
-                                            {
-                                                if (TriggerEvents.Any(x => x.Key.EventName == packet.EventName))
-                                                {
-                                                    EventContext ctx = new()
-                                                    {
-                                                        Client = client,
-                                                        Args = packet.Args.ToArray()
-                                                    };
-
-                                                    TriggerEvents.FirstOrDefault(x => x.Key.EventName == packet.EventName).Value?.Invoke(ctx);
-                                                }
-                                                else
-                                                {
-                                                    Program.Logger.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
-                                                }
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    if (type.IsSyncEvent())
-                                    {
-                                        // Sync Events
-                                        try
-                                        {
-                                            int len = message.ReadInt32();
-                                            byte[] data = message.ReadBytes(len);
-                                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                                            outgoingMessage.Write(btype);
-                                            outgoingMessage.Write(len);
-                                            outgoingMessage.Write(data);
-                                            MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != message.SenderConnection.RemoteUniqueIdentifier).ForEach(x =>
-                                            {
-
-                                                MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-
-                                            });
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Program.Logger.Error("Unhandled Data / Packet type");
-                                    }
-                                    break;
-                            }
-                            break;
-                        case NetIncomingMessageType.ConnectionLatencyUpdated:
-                            {
-                                Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
-                                if (client != null)
-                                {
-                                    client.Latency = message.ReadFloat();
-                                }
-                            }
-                            break;
-                        case NetIncomingMessageType.ErrorMessage:
-                            Program.Logger.Error(message.ReadString());
-                            break;
-                        case NetIncomingMessageType.WarningMessage:
-                            Program.Logger.Warning(message.ReadString());
-                            break;
-                        case NetIncomingMessageType.DebugMessage:
-                        case NetIncomingMessageType.VerboseDebugMessage:
-                            Program.Logger.Debug(message.ReadString());
-                            break;
-                        default:
-                            Program.Logger.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
-                            break;
-                    }
-
-                    MainNetServer.Recycle(message);
-                }
+                
 
                 // 3 milliseconds to sleep to reduce CPU usage
                 Thread.Sleep(3);
@@ -588,6 +273,329 @@ namespace RageCoop.Server
             }
             Program.Logger.Dispose();
         }
+
+        private void ProcessMessage(NetIncomingMessage message)
+        {
+            switch (message.MessageType)
+            {
+                case NetIncomingMessageType.ConnectionApproval:
+                    {
+                        Program.Logger.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
+                        if (message.ReadByte() != (byte)PacketTypes.Handshake)
+                        {
+                            Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
+                            message.SenderConnection.Deny("Wrong packet!");
+                        }
+                        else
+                        {
+                            try
+                            {
+                                int len = message.ReadInt32();
+                                byte[] data = message.ReadBytes(len);
+
+                                Packets.Handshake packet = new();
+                                packet.Unpack(data);
+
+                                GetHandshake(message.SenderConnection, packet);
+                            }
+                            catch (Exception e)
+                            {
+                                Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
+                                message.SenderConnection.Deny(e.Message);
+                            }
+                        }
+                        break;
+                    }
+                case NetIncomingMessageType.StatusChanged:
+                    {
+                        NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
+
+                        if (status == NetConnectionStatus.Disconnected)
+                        {
+                            long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
+
+                            DownloadManager.RemoveClient(nethandle);
+
+                            SendPlayerDisconnectPacket(nethandle);
+                        }
+                        else if (status == NetConnectionStatus.Connected)
+                        {
+                            SendPlayerConnectPacket(message.SenderConnection);
+                        }
+                        break;
+                    }
+                case NetIncomingMessageType.Data:
+                    // Get packet type
+                    byte btype = message.ReadByte();
+                    var type = (PacketTypes)btype;
+
+                    switch (type)
+                    {
+
+                        #region SyncData
+
+                        case PacketTypes.PedStateSync:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.PedStateSync packet = new();
+                                    packet.Unpack(data);
+
+                                    PedStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.VehicleStateSync:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.VehicleStateSync packet = new();
+                                    packet.Unpack(data);
+
+                                    VehicleStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.PedSync:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.PedSync packet = new();
+                                    packet.Unpack(data);
+
+                                    PedSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.VehicleSync:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.VehicleSync packet = new();
+                                    packet.Unpack(data);
+
+                                    VehicleSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.ProjectileSync:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.ProjectileSync packet = new();
+                                    packet.Unpack(data);
+                                    ProjectileSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+
+
+                        #endregion
+
+                        case PacketTypes.ChatMessage:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.ChatMessage packet = new();
+                                    packet.Unpack(data);
+
+                                    SendChatMessage(packet);
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+
+                        case PacketTypes.NativeResponse:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.NativeResponse packet = new();
+                                    packet.Unpack(data);
+
+                                    Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
+                                    if (client != null)
+                                    {
+                                        if (client.Callbacks.ContainsKey(packet.ID))
+                                        {
+                                            client.Callbacks[packet.ID].Invoke(packet.Args[0]);
+                                            client.Callbacks.Remove(packet.ID);
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.FileTransferComplete:
+                            {
+                                try
+                                {
+                                    if (DownloadManager.AnyFileExists)
+                                    {
+                                        int len = message.ReadInt32();
+                                        byte[] data = message.ReadBytes(len);
+
+                                        Packets.FileTransferComplete packet = new();
+                                        packet.Unpack(data);
+
+                                        Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
+                                        if (client != null && !client.FilesReceived)
+                                        {
+                                            DownloadManager.TryToRemoveClient(client.NetID, packet.ID);
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        case PacketTypes.ServerClientEvent:
+                            {
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+
+                                    Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
+                                    packet.Unpack(data);
+
+                                    long senderNetHandle = message.SenderConnection.RemoteUniqueIdentifier;
+                                    Client client = null;
+                                    lock (Clients)
+                                    {
+                                        client = Util.GetClientByID(senderNetHandle);
+                                    }
+
+                                    if (client != null)
+                                    {
+                                        if (TriggerEvents.Any(x => x.Key.EventName == packet.EventName))
+                                        {
+                                            EventContext ctx = new()
+                                            {
+                                                Client = client,
+                                                Args = packet.Args.ToArray()
+                                            };
+
+                                            TriggerEvents.FirstOrDefault(x => x.Key.EventName == packet.EventName).Value?.Invoke(ctx);
+                                        }
+                                        else
+                                        {
+                                            Program.Logger.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            break;
+                        default:
+                            if (type.IsSyncEvent())
+                            {
+                                // Sync Events
+                                try
+                                {
+                                    int len = message.ReadInt32();
+                                    byte[] data = message.ReadBytes(len);
+                                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                                    outgoingMessage.Write(btype);
+                                    outgoingMessage.Write(len);
+                                    outgoingMessage.Write(data);
+                                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != message.SenderConnection.RemoteUniqueIdentifier).ForEach(x =>
+                                    {
+
+                                        MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
+
+                                    });
+                                }
+                                catch (Exception e)
+                                {
+                                    DisconnectAndLog(message.SenderConnection, type, e);
+                                }
+                            }
+                            else
+                            {
+                                Program.Logger.Error("Unhandled Data / Packet type");
+                            }
+                            break;
+                    }
+                    break;
+                case NetIncomingMessageType.ConnectionLatencyUpdated:
+                    {
+                        Client client = Util.GetClientByID(message.SenderConnection.RemoteUniqueIdentifier);
+                        if (client != null)
+                        {
+                            client.Latency = message.ReadFloat();
+                        }
+                    }
+                    break;
+                case NetIncomingMessageType.ErrorMessage:
+                    Program.Logger.Error(message.ReadString());
+                    break;
+                case NetIncomingMessageType.WarningMessage:
+                    Program.Logger.Warning(message.ReadString());
+                    break;
+                case NetIncomingMessageType.DebugMessage:
+                case NetIncomingMessageType.VerboseDebugMessage:
+                    Program.Logger.Debug(message.ReadString());
+                    break;
+                default:
+                    Program.Logger.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
+                    break;
+            }
+
+            MainNetServer.Recycle(message);
+        }
+
         private void SendLatency()
         {
             foreach (Client c in Clients.Values)
