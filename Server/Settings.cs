@@ -7,7 +7,6 @@
         public int MaxLatency { get; set; } = 500;
         public string Name { get; set; } = "RAGECOOP server";
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
-        public string Resource { get; set; } = "";
         public bool UPnP { get; set; } = true;
         public bool AnnounceSelf { get; set; } = false;
         public string MasterServer { get; set; } = "[AUTO]";

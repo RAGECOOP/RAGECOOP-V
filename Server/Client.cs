@@ -9,21 +9,7 @@ namespace RageCoop.Server
     public class Client
     {
         public long NetID = 0;
-        private float _currentLatency = 0f;
-        public NetConnection Connection { get; set; }
-        public float Latency
-        {
-            get => _currentLatency;
-            internal set
-            {
-                _currentLatency = value;
-
-                if ((value * 1000f) > Server.MainSettings.MaxLatency)
-                {
-                    Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID)?.Disconnect($"Too high latency [{value * 1000f}/{(float)Server.MainSettings.MaxLatency}]");
-                }
-            }
-        }
+        internal NetConnection Connection { get; set; }
         public PlayerData Player;
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
@@ -64,13 +50,13 @@ namespace RageCoop.Server
         #endregion
 
         #region FUNCTIONS
-        public void Kick(string reason)
+        public void Kick(string reason="You has been kicked!")
         {
-            Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID)?.Disconnect(reason);
+            Connection?.Disconnect(reason);
         }
-        public void Kick(string[] reason)
+        public void Kick(params string[] reasons)
         {
-            Kick(string.Join(" ", reason));
+            Kick(string.Join(" ", reasons));
         }
 
         public void SendChatMessage(string message, string from = "Server")
@@ -199,32 +185,6 @@ namespace RageCoop.Server
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
             outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
-        }
-
-        public void SendModPacket(string modName, byte customID, byte[] bytes)
-        {
-            try
-            {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-                if (userConnection == null)
-                {
-                    return;
-                }
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.Mod()
-                {
-                    Name = modName,
-                    CustomPacketID = customID,
-                    Bytes = bytes
-                }.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Mod);
-                Server.MainNetServer.FlushSendQueue();
-            }
-            catch (Exception e)
-            {
-                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
-            }
         }
 
         public void SendTriggerEvent(string eventName, params object[] args)

@@ -12,9 +12,16 @@ namespace RageCoop.Core.Scripting
 {
     internal class ScriptingEngine
     {
-		private Type BaseScriptType;
+		protected List<string> ToIgnore = new List<string>
+		{
+			"RageCoop.Client.dll",
+			"RageCoop.Core.dll",
+			"RageCoop.Server.dll",
+			"ScriptHookVDotNet3.dll"
+		};
+		private string BaseScriptType;
 		public Logging.Logger Logger { get; set; }
-        public ScriptingEngine(Type baseScriptType, Logging.Logger logger)
+        public ScriptingEngine(string baseScriptType, Logging.Logger logger)
         {
 			BaseScriptType = baseScriptType;
 			Logger = logger;
@@ -22,29 +29,29 @@ namespace RageCoop.Core.Scripting
 		/// <summary>
 		/// Loads scripts from the specified assembly file.
 		/// </summary>
-		/// <param name="filename">The path to the assembly file to load.</param>
+		/// <param name="path">The path to the assembly file to load.</param>
 		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
-		private bool LoadScriptsFromAssembly(string filename)
+		protected bool LoadScriptsFromAssembly(string path)
 		{
-			if (!IsManagedAssembly(filename))
-				return false;
+			if (!IsManagedAssembly(path)) { return false; }
+			if (ToIgnore.Contains(Path.GetFileName(path))) { return false; }
 
-			Logger?.Debug($"Loading assembly {Path.GetFileName(filename)} ...");
+			Logger?.Debug($"Loading assembly {Path.GetFileName(path)} ...");
 
 			Assembly assembly;
 
 			try
 			{
-				assembly = Assembly.LoadFrom(filename);
+				assembly = Assembly.LoadFrom(path);
 			}
 			catch (Exception ex)
 			{
-				Logger?.Error( "Unable to load "+Path.GetFileName(filename));
+				Logger?.Error( "Unable to load "+Path.GetFileName(path));
 				Logger?.Error(ex);
 				return false;
 			}
 
-			return LoadScriptsFromAssembly(assembly, filename);
+			return LoadScriptsFromAssembly(assembly, path);
 		}
 		/// <summary>
 		/// Loads scripts from the specified assembly object.
@@ -59,7 +66,7 @@ namespace RageCoop.Core.Scripting
 			try
 			{
 				// Find all script types in the assembly
-				foreach (var type in assembly.GetTypes().Where(x => IsSubclassOf(x,nameof(BaseScriptType))))
+				foreach (var type in assembly.GetTypes().Where(x => IsSubclassOf(x,BaseScriptType)))
 				{
 					ConstructorInfo constructor = type.GetConstructor(System.Type.EmptyTypes);
 					if (constructor != null && constructor.IsPublic)
@@ -90,7 +97,7 @@ namespace RageCoop.Core.Scripting
 				return false;
 			}
 
-			Logger?.Info($"Loaded {count.ToString()} script(s) in {Path.GetFileName(filename)}");
+			Logger?.Info($"Loaded {count} script(s) in {Path.GetFileName(filename)}");
 			return count != 0;
 		}
 		private bool IsManagedAssembly(string filename)

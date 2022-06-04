@@ -11,7 +11,7 @@ namespace RageCoop.Client.Scripting
 {
     internal class Engine : Core.Scripting.ScriptingEngine
     {
-        public Engine() : base(typeof(ClientScript), Main.Logger) { }
+        public Engine() : base("RageCoop.Client.Scripting.ClientScript", Main.Logger) { }
 
     }
 }

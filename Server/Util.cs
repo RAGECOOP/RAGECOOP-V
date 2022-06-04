@@ -47,7 +47,7 @@ namespace RageCoop.Server
             };
         }
 
-        public static Client GetClientByID(long id)
+        public static Client GetClientByNetID(long id)
         {
             Client result = null;
             Server.Clients.TryGetValue(id,out result);
