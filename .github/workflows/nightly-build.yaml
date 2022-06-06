@@ -1,4 +1,4 @@
-name: .NET
+name: Nightly-build
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0.x','4.8.x' ]
+        dotnet-version: ['6.0.x']
 
     steps:
     - uses: actions/checkout@v3
