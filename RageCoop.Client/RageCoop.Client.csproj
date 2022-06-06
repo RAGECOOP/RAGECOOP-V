@@ -119,7 +119,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\RageCoop.Core.csproj">
+    <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj">
       <Project>{cc2e8102-e568-4524-aa1f-f8e0f1cfe58a}</Project>
       <Name>RageCoop.Core</Name>
     </ProjectReference>
