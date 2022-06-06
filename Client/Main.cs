@@ -159,7 +159,7 @@ namespace RageCoop.Client
 
             MainChat.Tick();
             PlayerList.Tick();
-            if (Settings.DisableAutoRespawn)
+            if (!API.Config.EnableAutoRespawn)
             {
                 Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
                 Function.Call(Hash.FORCE_GAME_STATE_PLAYING);

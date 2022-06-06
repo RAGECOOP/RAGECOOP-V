@@ -33,11 +33,6 @@ namespace RageCoop.Server
                 Console.Title = "RAGECOOP";
 #endif
 
-                if (File.Exists("log.txt"))
-                {
-                    File.WriteAllText("log.txt", string.Empty);
-                }
-
                 Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
                 {
                     if (e.SpecialKey == ConsoleSpecialKey.ControlC)
@@ -51,8 +46,7 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Program.Logger.Error(e.InnerException?.Message ?? e.Message);
-                Console.ReadLine();
+                Logger.Error($"Fatal error occurred, server shutting down:{e}");
             }
         }
 

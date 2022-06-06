@@ -58,7 +58,6 @@ namespace RageCoop.Client
                                     
 #endif
 
-                                    COOPAPI.Connected();
                                     Main.QueueAction(() => {
                                         CoopMenu.ConnectedMenuSetting();
                                         Main.MainChat.Init();
@@ -88,7 +87,6 @@ namespace RageCoop.Client
                                 CoopMenu.DisconnectedMenuSetting();
 #endif
 
-                                COOPAPI.Disconnected(reason);
                                 Main.QueueAction(() =>
                                     GTA.UI.Notification.Show("~r~Disconnected: " + reason));
 
@@ -191,10 +189,8 @@ namespace RageCoop.Client
                                         Packets.ChatMessage packet = new Packets.ChatMessage();
                                         packet.Unpack(data);
 
-                                        if (!COOPAPI.ChatMessageReceived(packet.Username, packet.Message))
-                                        {
-                                            Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message);return true; });
-                                        }
+                                        Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
+
 
                                     }
                                     break;
@@ -218,16 +214,9 @@ namespace RageCoop.Client
 
                                     }
                                     break;
-                                case PacketTypes.Mod:
+                                case PacketTypes.FileTransferChunk:
                                     {
-                                        Packets.Mod packet = new Packets.Mod();
-                                        packet.Unpack(data);
-                                        // Need to do some stuff here
-                                    }
-                                    break;
-                                case PacketTypes.FileTransferTick:
-                                    {
-                                        Packets.FileTransferTick packet = new Packets.FileTransferTick();
+                                        Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
                                         packet.Unpack(data);
 
                                         DownloadManager.Write(packet.ID, packet.FileChunk);
@@ -239,7 +228,7 @@ namespace RageCoop.Client
                                         Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
                                         packet.Unpack(data);
 
-                                        DownloadManager.AddFile(packet.ID, packet.FileName, packet.FileLength);
+                                        DownloadManager.AddFile(packet.ID, packet.Name, packet.FileLength);
 
                                     }
                                     break;

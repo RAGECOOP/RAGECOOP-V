@@ -86,7 +86,7 @@ namespace RageCoop.Client
 
         public override void Update()
         {
-            if (IsPlayer && PedBlip!=null)
+            if (IsPlayer)
             {
 
                 if (Username=="N/A")
@@ -95,9 +95,17 @@ namespace RageCoop.Client
                     if (p!=null)
                     {
                         Username=p.Username;
-                        PedBlip.Name=Username;
+                        if (PedBlip!=null)
+                        {
+                            PedBlip.Name=Username;
+                        }
                     }
 
+                }
+                if((!API.Config.DisplayBlip) && (PedBlip!=null))
+                {
+                    PedBlip.Delete();
+                    PedBlip=null;
                 }
                 RenderNameTag();
             }
@@ -110,10 +118,6 @@ namespace RageCoop.Client
             {
                 return;
             }
-
-
-
-
 
 
             bool characterExist = (MainPed != null) && MainPed.Exists();
@@ -167,7 +171,6 @@ namespace RageCoop.Client
                 if (Health <= 0 && !MainPed.IsDead)
                 {
                     MainPed.IsInvincible = false;
-                    Main.Logger.Debug($"Killing ped {ID}. Reason:PedDied");
                     MainPed.Kill();
                     return;
                 }
@@ -188,7 +191,7 @@ namespace RageCoop.Client
         
         private void RenderNameTag()
         {
-            if (!IsPlayer || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
+            if (!API.Config.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
             {
                 return;
             }
@@ -269,13 +272,15 @@ namespace RageCoop.Client
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableShockingEvents, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
 
-
             SetClothes();
 
             if (IsPlayer)
             {
-                // Add a new blip for the ped
-                PedBlip=MainPed.AddBlip();
+                if (API.Config.DisplayBlip)
+                {
+                    // Add a new blip for the ped
+                    PedBlip=MainPed.AddBlip();
+                }
                 MainPed.AttachedBlip.Color = BlipColor.White;
                 MainPed.AttachedBlip.Scale = 0.8f;
                 MainPed.AttachedBlip.Name =Username;
@@ -295,7 +300,7 @@ namespace RageCoop.Client
             }
             _lastClothes = Clothes;
         }
-        #region Onfoot
+        #region ONFOOT
         #region -- VARIABLES --
         /// <summary>
         /// The latest character rotation (may not have been applied yet)
@@ -567,14 +572,6 @@ namespace RageCoop.Client
                 WalkTo();
             }
         }
-        private void DisplayInVehicle()
-        {
-            if (MainPed.IsOnTurretSeat())
-            {
-                Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
-                Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
-            }
-        }
 
         #region WEAPON
         private void CheckCurrentWeapon()
@@ -716,5 +713,14 @@ namespace RageCoop.Client
             return anim;
         }
         #endregion
+
+        private void DisplayInVehicle()
+        {
+            if (MainPed.IsOnTurretSeat())
+            {
+                Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
+                Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+            }
+        }
     }
 }

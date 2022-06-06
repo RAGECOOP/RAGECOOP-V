@@ -53,9 +53,10 @@ namespace RageCoop.Client
                 {
                     throw new Exception("Malformed URL");
                 }
-                
-                // Send HandshakePacket
+
                 EntityPool.AddPlayer();
+
+                // Send HandshakePacket
                 NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                 new Packets.Handshake()
                 {
@@ -109,13 +110,11 @@ namespace RageCoop.Client
 
             Main.Logger.Debug($"player connected:{p.Username}");
             Main.DumpCharacters();
-            COOPAPI.Connected(packet.PedID);
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
             var name=PlayerList.GetPlayer(packet.PedID).Username;
             GTA.UI.Notification.Show($"{name} left.");
-            COOPAPI.Disconnected(packet.PedID);
             PlayerList.RemovePlayer(packet.PedID);
             EntityPool.RemoveAllFromPlayer(packet.PedID);
 

@@ -14,9 +14,7 @@ namespace RageCoop.Server
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
         public readonly Dictionary<long, Action<object>> Callbacks = new();
-        public bool FilesReceived { get;internal set; } = false;
-        public bool FilesSent = false;
-
+        public bool IsReady { get; internal set; }=false;
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)
         {
@@ -189,9 +187,9 @@ namespace RageCoop.Server
 
         public void SendTriggerEvent(string eventName, params object[] args)
         {
-            if (!FilesReceived)
+            if (!IsReady)
             {
-                Program.Logger.Warning($"Player \"{Player.Username}\" doesn't have all the files yet!");
+                Program.Logger.Warning($"Player \"{Player.Username}\" is not ready!");
                 return;
             }
 

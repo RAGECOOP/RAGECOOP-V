@@ -123,13 +123,14 @@ namespace RageCoop.Core
         ChatMessage=10,
         NativeCall=11,
         NativeResponse=12,
-        Mod=13,
+        //Mod=13,
         CleanUpWorld=14,
-        FileTransferTick=15,
+       
+        FileTransferChunk=15,
         FileTransferRequest=16,
         FileTransferComplete=17,
-        ServerClientEvent=18,
-
+        
+        ServerClientEvent = 18,
         #region Sync
 
         #region INTERVAL
@@ -236,58 +237,6 @@ namespace RageCoop.Core
 
     public partial class Packets
     {
-        public class Mod : Packet
-        {
-            public string Name { get; set; }
-
-            public byte CustomPacketID { get; set; }
-
-            public byte[] Bytes { get; set; }
-
-            public override void Pack(NetOutgoingMessage message)
-            {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.Mod);
-
-                List<byte> byteArray = new List<byte>();
-
-                // Write Name
-                byte[] nameBytes = Encoding.UTF8.GetBytes(Name);
-                byteArray.AddRange(BitConverter.GetBytes(nameBytes.Length));
-                byteArray.AddRange(nameBytes);
-
-                // Write CustomPacketID
-                byteArray.Add(CustomPacketID);
-
-                // Write Bytes
-                byteArray.AddRange(BitConverter.GetBytes(Bytes.Length));
-                byteArray.AddRange(Bytes);
-
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
-            }
-
-            public override void Unpack(byte[] array)
-            {
-                #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-
-                // Read Name
-                int nameLength = reader.ReadInt();
-                Name = reader.ReadString(nameLength);
-
-                // Read CustomPacketID
-                CustomPacketID = reader.ReadByte();
-
-                // Read Bytes
-                int bytesLength = reader.ReadInt();
-                Bytes = reader.ReadByteArray(bytesLength);
-                #endregion
-            }
-        }
 
         public class ChatMessage : Packet
         {

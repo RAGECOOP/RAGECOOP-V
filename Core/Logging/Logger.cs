@@ -74,7 +74,7 @@ namespace RageCoop.Core.Logging
             if (LogLevel>4) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(),string.Join("\r\n",ex.Message,ex.StackTrace,ex.ToString()), Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(),"\r\n"+ex.ToString(), Process.GetCurrentProcess().Id);
 
                 Buffer+=msg+"\r\n";
             }

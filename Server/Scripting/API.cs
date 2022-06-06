@@ -24,8 +24,6 @@ namespace RageCoop.Server.Scripting
             public static event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
             public static event PlayerConnect OnPlayerConnected;
             public static event PlayerDisconnect OnPlayerDisconnected;
-            // public static event EventHandler OnPlayerUpdate;
-
             #region INVOKE
             internal static void InvokeOnStop() { OnStop?.Invoke(); }
             internal static void InvokeOnChatMessage(Packets.ChatMessage p,NetConnection con) 

@@ -76,9 +76,9 @@ namespace RageCoop.Server
         }
 
         // Return a list of all connections but not the local connection
-        public static List<NetConnection> FilterAllLocal(NetConnection local)
+        public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections,NetConnection toExclude)
         {
-            return new(Server.MainNetServer.Connections.Where(e => e != local));
+            return new(connections.Where(e => e != toExclude));
         }
         public static List<NetConnection> FilterAllLocal(long local)
         {

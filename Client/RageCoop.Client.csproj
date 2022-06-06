@@ -43,6 +43,9 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip, Version=1.16.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.16.0\lib\net40\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="LemonUI.SHVDN3, Version=1.5.1.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libs\Release\scripts\LemonUI.SHVDN3.dll</HintPath>
@@ -88,7 +91,7 @@
     <Compile Include="Util\VehicleExtensions.cs" />
     <Compile Include="Util\WeaponUtil.cs" />
     <Compile Include="Networking\Chat.cs" />
-    <Compile Include="COOPAPI.cs" />
+    <Compile Include="Scripting\API.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
     <Compile Include="Util\TaskType.cs" />
@@ -113,6 +116,7 @@
     <Compile Include="Util\PedExtensions.cs" />
     <Compile Include="WorldThread.cs" />
     <Compile Include="Settings.cs" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\RageCoop.Core.csproj">

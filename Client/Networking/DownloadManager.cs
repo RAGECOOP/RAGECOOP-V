@@ -7,11 +7,11 @@ namespace RageCoop.Client
     internal static class DownloadManager
     {
         private static readonly List<DownloadFile> _downloadFiles = new List<DownloadFile>();
-        private static readonly Dictionary<byte, FileStream> _streams = new Dictionary<byte, FileStream>();
-        private static readonly List<byte> _filesFinished = new List<byte>();
+        private static readonly Dictionary<int, FileStream> _streams = new Dictionary<int, FileStream>();
+        private static readonly List<int> _filesFinished = new List<int>();
         public static bool DownloadComplete = false;
 
-        public static void AddFile(byte id, string name, long length)
+        public static void AddFile(int id, string name, long length)
         {
             string downloadFolder = $"Scripts\\RageCoop\\Resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
 
@@ -29,7 +29,7 @@ namespace RageCoop.Client
                 return;
             }
             
-            if (!new string[] { ".js", ".xml" }.Any(x => x == Path.GetExtension(name)))
+            if (!Path.GetExtension(name).EndsWith(".zip"))
             {
                 Cancel(id);
 
@@ -92,7 +92,7 @@ namespace RageCoop.Client
             }
         }
 
-        public static void Write(byte id, byte[] chunk)
+        public static void Write(int id, byte[] chunk)
         {
             lock (_filesFinished)
             {
@@ -132,7 +132,7 @@ namespace RageCoop.Client
             }
         }
 
-        public static void Cancel(byte id)
+        public static void Cancel(int id)
         {
             lock (_streams) lock (_downloadFiles) lock (_filesFinished)
             {
@@ -158,7 +158,7 @@ namespace RageCoop.Client
         {
             lock (_streams) lock (_downloadFiles) lock (_filesFinished)
             {
-                foreach (KeyValuePair<byte, FileStream> stream in _streams)
+                foreach (var stream in _streams)
                 {
                     stream.Value.Close();
                     stream.Value.Dispose();
@@ -177,7 +177,7 @@ namespace RageCoop.Client
 
     public class DownloadFile
     {
-        public byte FileID { get; set; } = 0;
+        public int FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;
         public long FileLength { get; set; } = 0;
         public long FileWritten { get; set; } = 0;

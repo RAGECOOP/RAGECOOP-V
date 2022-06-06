@@ -6,13 +6,18 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
+    public enum FileType:byte
+    {
+        Resource=0,
+        Custom=1,
+    }
     public partial class Packets
     {
         public class FileTransferRequest : Packet
         {
-            public byte ID { get; set; }
+            public int ID { get; set; }
 
-            public string FileName { get; set; }
+            public string Name { get; set; }
 
             public long FileLength { get; set; }
 
@@ -24,10 +29,11 @@ namespace RageCoop.Core
                 List<byte> byteArray = new List<byte>();
 
                 // The ID from the download
-                byteArray.Add(ID);
+                byteArray.AddInt(ID);
+
 
                 // The name of the file
-                byte[] nameBytes = Encoding.UTF8.GetBytes(FileName);
+                byte[] nameBytes = Encoding.UTF8.GetBytes(Name);
                 byteArray.AddRange(BitConverter.GetBytes(nameBytes.Length));
                 byteArray.AddRange(nameBytes);
 
@@ -46,29 +52,29 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadByte();
+                ID = reader.ReadInt();
                 int nameArrayLength = reader.ReadInt();
-                FileName = reader.ReadString(nameArrayLength);
+                Name = reader.ReadString(nameArrayLength);
                 FileLength = reader.ReadLong();
                 #endregion
             }
         }
 
-        public class FileTransferTick : Packet
+        public class FileTransferChunk : Packet
         {
-            public byte ID { get; set; }
+            public int ID { get; set; }
 
             public byte[] FileChunk { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.FileTransferTick);
+                message.Write((byte)PacketTypes.FileTransferChunk);
 
                 List<byte> byteArray = new List<byte>();
 
                 // The ID from the download
-                byteArray.Add(ID);
+                byteArray.AddInt(ID);
 
                 // The chunk of the file
                 byteArray.AddRange(BitConverter.GetBytes(FileChunk.Length));
@@ -86,7 +92,7 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadByte();
+                ID = reader.ReadInt();
                 int chunkLength = reader.ReadInt();
                 FileChunk = reader.ReadByteArray(chunkLength);
                 #endregion
@@ -95,7 +101,7 @@ namespace RageCoop.Core
 
         public class FileTransferComplete : Packet
         {
-            public byte ID { get; set; }
+            public int ID { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -105,7 +111,7 @@ namespace RageCoop.Core
                 List<byte> byteArray = new List<byte>();
 
                 // The ID from the download
-                byteArray.Add(ID);
+                byteArray.AddInt(ID);
 
                 byte[] result = byteArray.ToArray();
 
@@ -119,7 +125,7 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadByte();
+                ID = reader.ReadInt();
                 #endregion
             }
         }

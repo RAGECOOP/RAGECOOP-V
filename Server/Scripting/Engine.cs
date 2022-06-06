@@ -24,7 +24,7 @@ namespace RageCoop.Server.Scripting
         }
         private void LoadResource(string path)
         {
-            foreach(var assembly in Directory.GetFiles(path,"*.dll"))
+            foreach(var assembly in Directory.GetFiles(path,"*.dll",SearchOption.AllDirectories))
             {
                 LoadScriptsFromAssembly(assembly);
             }

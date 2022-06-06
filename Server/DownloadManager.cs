@@ -3,8 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
-
-namespace RageCoop.Server
+/*
+namespace RageCoop.Server.Obsolete
 {
     public static class DownloadManager
     {
@@ -276,3 +276,4 @@ namespace RageCoop.Server
         public List<byte[]> FileChunks { get; set; } = null;
     }
 }
+*/

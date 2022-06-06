@@ -162,7 +162,7 @@ namespace RageCoop.Client
             }
 #endif
         }
-        public static void SendDownloadFinish(byte id)
+        public static void SendDownloadFinish(int id)
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
