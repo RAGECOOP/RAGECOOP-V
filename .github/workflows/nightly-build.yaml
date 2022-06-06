@@ -26,5 +26,13 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore --configuration Release
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - uses: papeloto/action-zip@v1
+      with:
+        files: RageCoop.Client/bin/Release
+        dest: RageCoop.Client.zip
+    - uses: actions/upload-artifact@v3
+      with:
+        name: RageCoop.Client.zip
+        path: RageCoop.Client.zip
+    - uses: actions/checkout@v2
+      
