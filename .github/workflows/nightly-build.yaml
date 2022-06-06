@@ -20,6 +20,8 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version:  ${{ matrix.dotnet-version }}
+    - name: Restore NuGet Packages
+      run: nuget restore
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
