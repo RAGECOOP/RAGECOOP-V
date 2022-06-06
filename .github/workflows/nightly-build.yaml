@@ -24,15 +24,25 @@ jobs:
       run: nuget restore
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+    - name: Build client
+      run: dotnet build RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release
+    - name: Build server win-x64
+      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:PublishTrimmed=true -r win-x64
+    - uses: papeloto/action-zip@v1
+      with:
+        files: RageCoop.Server/bin/Release/net6.0/publish/win-x64
+        dest: RageCoop.Server-win-x64.zip
     - uses: papeloto/action-zip@v1
       with:
         files: RageCoop.Client/bin/Release
         dest: RageCoop.Client.zip
     - uses: actions/upload-artifact@v3
       with:
-        name: RageCoop.Client.zip
+        name: RageCoop.Client
         path: RageCoop.Client.zip
+    - uses: actions/upload-artifact@v3
+      with:
+        name: RageCoop.Server-win-x64
+        path: RageCoop.Server-win-x64.zip
     - uses: actions/checkout@v2
       
