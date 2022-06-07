@@ -65,6 +65,9 @@ Download latest release for your OS, then extract and run.
 
 Download latest release [here](https://github.com/RAGECOOP/RAGECOOP-V/releases/latest)
 
+You can also download nightly builds [here](https://github.com/RAGECOOP/RAGECOOP-V/actions), which includes latest features and bug-fixes, but has not been thoroughly tested.
+Select latest workflow run, scroll down to bottom then download the artifacts.
+
 Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing.
 
 
