@@ -27,7 +27,7 @@ jobs:
     - name: Build client
       run: dotnet build RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release
     - name: Build server win-x64
-      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:PublishTrimmed=true -r win-x64
+      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:PublishTrimmed=true -r win-x64
     - uses: papeloto/action-zip@v1
       with:
         files: RageCoop.Server/bin/Release/net6.0/publish/win-x64
