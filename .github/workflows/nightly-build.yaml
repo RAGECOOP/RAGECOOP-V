@@ -23,13 +23,13 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build client
-      run: dotnet build RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release
+      run: dotnet build RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release -o RageCoop.Client/bin/RageCoop
     - name: Build server win-x64
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishReadyToRun=true -p:PublishTrimmed=true -r win-x64 -o RageCoop.Server/bin/Release/net6.0/publish/win-x64
     - uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Client
-        path: RageCoop.Client/bin/Release
+        path: RageCoop.Client/bin
     - uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Server-win-x64
