@@ -1,128 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RageCoop.Client</RootNamespace>
-    <AssemblyName>RageCoop.Client</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>D:\Games\Grand Theft Auto V\Scripts\RageCoop\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>
-    </DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>
-    </DocumentationFile>
+    <TargetFramework>net48</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <OutputPath>D:\Games\Grand Theft Auto V\Scripts\RageCoop</OutputPath>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNetZip, Version=1.16.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
-      <HintPath>..\packages\DotNetZip.1.16.0\lib\net40\DotNetZip.dll</HintPath>
-    </Reference>
-    <Reference Include="LemonUI.SHVDN3, Version=1.5.1.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <PackageReference Include="DotNetZip" Version="1.16.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LemonUI.SHVDN3">
       <HintPath>..\Libs\Release\scripts\LemonUI.SHVDN3.dll</HintPath>
     </Reference>
-    <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Libs\Release\scripts\Lidgren.Network.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet3, Version=3.3.2.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ScriptHookVDotNet3">
       <HintPath>..\Libs\Release\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DevTools\DevTool.cs" />
-    <Compile Include="Menus\Sub\DevToolMenu.cs" />
-    <Compile Include="Menus\Sub\ServersMenu.cs" />
-    <Compile Include="Scripting\ClientScript.cs" />
-    <Compile Include="Scripting\Engine.cs" />
-    <Compile Include="Util\MathExtensions.cs" />
-    <Compile Include="Util\PedConfigFlags.cs" />
-    <Compile Include="Util\Util.cs" />
-    <Compile Include="Util\VehicleExtensions.cs" />
-    <Compile Include="Util\WeaponUtil.cs" />
-    <Compile Include="Networking\Chat.cs" />
-    <Compile Include="Scripting\API.cs" />
-    <Compile Include="Debug.cs" />
-    <Compile Include="Networking\DownloadManager.cs" />
-    <Compile Include="Util\TaskType.cs" />
-    <Compile Include="Menus\Sub\DebugMenu.cs" />
-    <Compile Include="Networking\Receive.cs" />
-    <Compile Include="Networking\Send.cs" />
-    <Compile Include="Sync\Entities\SyncedPed.cs" />
-    <None Include="app.config" />
-    <Compile Include="Sync\Entities\SyncedProjectile.cs" />
-    <Compile Include="Sync\EntityPool.cs" />
-    <Compile Include="Sync\SyncEvents.cs" />
-    <Compile Include="Sync\Entities\SyncedEntity.cs" />
-    <Compile Include="Sync\Entities\SyncedVehicle.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="Networking\MapLoader.cs" />
-    <Compile Include="Menus\CoopMenu.cs" />
-    <Compile Include="Menus\Sub\SettingsMenu.cs" />
-    <Compile Include="Networking\Networking.cs" />
-    <Compile Include="PlayerList.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sync\SyncParameters.cs" />
-    <Compile Include="Util\PedExtensions.cs" />
-    <Compile Include="WorldThread.cs" />
-    <Compile Include="Settings.cs" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj">
-      <Project>{cc2e8102-e568-4524-aa1f-f8e0f1cfe58a}</Project>
-      <Name>RageCoop.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

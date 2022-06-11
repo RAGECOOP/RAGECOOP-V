@@ -74,37 +74,15 @@ namespace RageCoop.Core
             bytes.AddRange(BitConverter.GetBytes(i));
         }
 
-        public static byte ToByte(this bool[] source)
+        public static byte[] GetBytes(this string s)
         {
-            byte result = 0;
-            // This assumes the array never contains more than 8 elements!
-            int index = 8 - source.Length;
-
-            // Loop through the array
-            foreach (bool b in source)
-            {
-                // if the element is 'true' set the bit at that position
-                if (b)
-                    result |= (byte)(1 << (7 - index));
-
-                index++;
-            }
-
-            return result;
+            return Encoding.UTF8.GetBytes(s);
         }
-        public static bool[] ToBoolArray(this byte b)
+        public static string GetString(this byte[] data)
         {
-            bool[] result = new bool[8];
-
-            // check each bit in the byte. if 1 set to true, if 0 set to false
-            for (int i = 0; i < 8; i++)
-                result[i] = (b & (1 << i)) != 0;
-
-            // reverse the array
-            Array.Reverse(result);
-
-            return result;
+            return Encoding.UTF8.GetString(data);
         }
+        
 
     }
 }

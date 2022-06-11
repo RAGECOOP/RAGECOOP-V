@@ -10,8 +10,10 @@ using Lidgren.Network;
 
 namespace RageCoop.Server.Scripting
 {
-    public abstract class ServerScript
+    public abstract class ServerScript :Core.Scripting.IScriptable
     {
+        public abstract void OnStart();
+        public abstract void OnStop();
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]

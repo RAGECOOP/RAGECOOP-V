@@ -208,7 +208,7 @@ namespace RageCoop.Server
                     Args = new List<object>(args)
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
-                Server.MainNetServer.FlushSendQueue();
+
             }
             catch (Exception e)
             {

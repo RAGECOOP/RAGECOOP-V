@@ -17,9 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Lidgren.Network">
-      <HintPath>..\Libs\Release\scripts\Lidgren.Network.dll</HintPath>
-    </Reference>
+    <None Include="Lidgren.Network\Lidgren.Network.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Libs\Release\scripts\Newtonsoft.Json.dll</HintPath>
     </Reference>

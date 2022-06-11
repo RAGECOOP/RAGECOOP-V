@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
 using System.Net;
+using System.Net.Sockets;
 
 namespace RageCoop.Server
 {
@@ -21,7 +22,7 @@ namespace RageCoop.Server
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
+                
                 WebClient client = new();
                 return client.DownloadString(url);
             }

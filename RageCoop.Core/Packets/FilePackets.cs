@@ -110,7 +110,7 @@ namespace RageCoop.Core
 
                 List<byte> byteArray = new List<byte>();
 
-                // The ID from the download
+                // The ID for the download
                 byteArray.AddInt(ID);
 
                 byte[] result = byteArray.ToArray();

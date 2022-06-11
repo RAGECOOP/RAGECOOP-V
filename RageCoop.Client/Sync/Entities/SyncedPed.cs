@@ -14,7 +14,7 @@ namespace RageCoop.Client
     /// <summary>
     /// ?
     /// </summary>
-    internal class SyncedPed:SyncedEntity
+    public class SyncedPed:SyncedEntity
     {
         #region CONSTRUCTORS
 
@@ -22,7 +22,7 @@ namespace RageCoop.Client
         /// Create a local entity (outgoing sync)
         /// </summary>
         /// <param name="p"></param>
-        public SyncedPed(Ped p)
+        internal SyncedPed(Ped p)
         {
             ID=EntityPool.RequestNewID();
             p.CanWrithe=false;
@@ -39,7 +39,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Create an empty character with ID
         /// </summary>
-        public SyncedPed(int id)
+        internal SyncedPed(int id)
         {
             ID=id;
             LastSynced=Main.Ticked;
@@ -47,7 +47,9 @@ namespace RageCoop.Client
         #endregion
         #region PLAYER -- ONLY
         public string Username = "N/A";
-        public Blip PedBlip = null;
+        internal Blip PedBlip = null;
+        internal bool DisplayBlip { get; set; } = true;
+        internal bool DisplayNameTag { get; set; } = true;
         #endregion
 
         /// <summary>
@@ -58,33 +60,27 @@ namespace RageCoop.Client
         /// real entity
         /// </summary>
         public Ped MainPed { get; internal set; }
-        /// <summary>
-        /// The latest character health (may not have been applied yet)
-        /// </summary>
-        public int Health { get; internal set; }
-        public bool _lastEnteringVehicle=false;
-        public bool _lastSittingInVehicle=false;
+        internal int Health { get; set; }
+        internal bool _lastEnteringVehicle=false;
+        internal bool _lastSittingInVehicle=false;
         private bool _lastRagdoll=false;
         private ulong _lastRagdollTime=0;
         private bool _lastInCover = false;
-        /// <summary>
-        /// The latest character model hash (may not have been applied yet)
-        /// </summary>
-        public int ModelHash
+        internal int ModelHash
         {
             get;set;
         }
         private Dictionary<byte, short> _lastClothes = null;
-        public Dictionary<byte, short> Clothes { get; set; }
+        internal Dictionary<byte, short> Clothes { get; set; }
 
-        public float Heading { get; set; }
-        public Vector3 RotationVelocity { get; set; }
-        public Vector3 AimCoords { get; set; }
+        internal float Heading { get; set; }
+        internal Vector3 RotationVelocity { get; set; }
+        internal Vector3 AimCoords { get; set; }
 
         private WeaponAsset WeaponAsset { get; set; }
-        
 
-        public override void Update()
+
+        internal override void Update()
         {
             if (IsPlayer)
             {
@@ -102,7 +98,7 @@ namespace RageCoop.Client
                     }
 
                 }
-                if((!API.Config.DisplayBlip) && (PedBlip!=null))
+                if((!DisplayBlip) && (PedBlip!=null))
                 {
                     PedBlip.Delete();
                     PedBlip=null;
@@ -191,7 +187,7 @@ namespace RageCoop.Client
         
         private void RenderNameTag()
         {
-            if (!API.Config.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
+            if (!DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
             {
                 return;
             }
@@ -276,14 +272,14 @@ namespace RageCoop.Client
 
             if (IsPlayer)
             {
-                if (API.Config.DisplayBlip)
+                if (DisplayBlip)
                 {
                     // Add a new blip for the ped
                     PedBlip=MainPed.AddBlip();
+                    MainPed.AttachedBlip.Color = BlipColor.White;
+                    MainPed.AttachedBlip.Scale = 0.8f;
+                    MainPed.AttachedBlip.Name =Username;
                 }
-                MainPed.AttachedBlip.Color = BlipColor.White;
-                MainPed.AttachedBlip.Scale = 0.8f;
-                MainPed.AttachedBlip.Name =Username;
 
                 MainPed.IsInvincible=true;
             }
@@ -307,20 +303,20 @@ namespace RageCoop.Client
         /// </summary>
         public byte Speed { get; set; }
         private bool _lastIsJumping = false;
-        public bool IsJumping { get; set; }
-        public bool IsOnLadder { get; set; }
-        public bool IsVaulting { get; set; }
-        public bool IsInParachuteFreeFall { get; set; }
-        public bool IsParachuteOpen { get; set; }
-        public Prop ParachuteProp { get; set; } = null;
-        public bool IsRagdoll { get; set; }
-        public bool IsOnFire { get; set; }
-        public bool IsAiming { get; set; }
-        public bool IsReloading { get; set; }
-        public bool IsInCover { get; set; }
-        public uint CurrentWeaponHash { get; set; }
+        internal bool IsJumping { get; set; }
+        internal bool IsOnLadder { get; set; }
+        internal bool IsVaulting { get; set; }
+        internal bool IsInParachuteFreeFall { get; set; }
+        internal bool IsParachuteOpen { get; set; }
+        internal Prop ParachuteProp { get; set; } = null;
+        internal bool IsRagdoll { get; set; }
+        internal bool IsOnFire { get; set; }
+        internal bool IsAiming { get; set; }
+        internal bool IsReloading { get; set; }
+        internal bool IsInCover { get; set; }
+        internal uint CurrentWeaponHash { get; set; }
         private Dictionary<uint, bool> _lastWeaponComponents = null;
-        public Dictionary<uint, bool> WeaponComponents { get; set; } = null;
+        internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
         private int _lastWeaponObj = 0;
         #endregion
 

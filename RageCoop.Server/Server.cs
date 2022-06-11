@@ -9,11 +9,12 @@ using System.IO;
 using System.Net.Http;
 using RageCoop.Core;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using Lidgren.Network;
 using System.Timers;
 using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace RageCoop.Server
 {
@@ -28,7 +29,6 @@ namespace RageCoop.Server
         private static readonly string _compatibleVersion = "V0_4";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
-        private readonly Blocklist _mainBlocklist = Util.Read<Blocklist>("Blocklist.xml");
         public static NetServer MainNetServer;
 
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
@@ -51,7 +51,8 @@ namespace RageCoop.Server
             {
                 Port = MainSettings.Port,
                 MaximumConnections = MainSettings.MaxPlayers,
-                EnableUPnP = MainSettings.UPnP
+                EnableUPnP = false,
+                AutoFlushSendQueue = true,
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -63,22 +64,6 @@ namespace RageCoop.Server
             SendLatencyTimer.AutoReset=true;
             SendLatencyTimer.Enabled=true;
             Program.Logger.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
-
-            if (MainSettings.UPnP)
-            {
-                Program.Logger.Info(string.Format("Attempting to forward port {0}", MainSettings.Port));
-
-                if (MainNetServer.UPnP.ForwardPort(MainSettings.Port, "RAGECOOP server"))
-                {
-                    Program.Logger.Info(string.Format("Server available on {0}:{1}", MainNetServer.UPnP.GetExternalIP().ToString(), config.Port));
-                }
-                else
-                {
-                    Program.Logger.Warning("Port forwarding failed! Your router may not support UPnP.");
-                    Program.Logger.Info("If you and your friends can join this server, please ignore this error or set UPnP in Settings.xml to false!");
-                }
-            }
-
             if (MainSettings.AnnounceSelf)
             {
 
@@ -171,8 +156,8 @@ namespace RageCoop.Server
                 }).Start();
                 #endregion
             }
-            Resources.LoadAll();
 
+            Resources.LoadAll();
             Listen();
         }
 
@@ -180,37 +165,26 @@ namespace RageCoop.Server
         {
             Program.Logger.Info("Listening for clients");
             Program.Logger.Info("Please use CTRL + C if you want to stop the server!");
-            MainNetServer.RegisterReceivedCallback(new SendOrPostCallback((e) =>
-            {
-                NetIncomingMessage message;
-                while ((message =((NetServer)e).ReadMessage()) != null)
-                {
-                    ProcessMessage(message);
-                }
-            }), new SynchronizationContext());
+            
+            
             while (!Program.ReadyToStop)
             {
-
-
-                // 15 milliseconds to sleep to reduce CPU usage
-                Thread.Sleep(15);
+                while (true)
+                {
+                    ProcessMessage(MainNetServer.WaitMessage(10));
+                    MainNetServer.FlushSendQueue();
+                }
             }
 
             Program.Logger.Warning("Server is shutting down!");
-
-            if (MainNetServer.Connections.Count > 0)
-            {
-                API.Events.InvokeOnStop();
-                MainNetServer.Connections.ForEach(x => x.Disconnect("Server is shutting down!"));
-                // We have to wait some time for all Disconnect() messages to be sent successfully
-                // Sleep for 1 second
-                Thread.Sleep(1000);
-            }
+            Resources.UnloadAll();
+            MainNetServer.Shutdown("Server is shutting down!");
             Program.Logger.Dispose();
         }
 
         private void ProcessMessage(NetIncomingMessage message)
         {
+            if(message == null) { return; }
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.ConnectionApproval:
@@ -255,6 +229,7 @@ namespace RageCoop.Server
                         else if (status == NetConnectionStatus.Connected)
                         {
                             SendPlayerConnectPacket(message.SenderConnection);
+                            Resources.SendTo(Util.GetClientByNetID(message.SenderConnection.RemoteUniqueIdentifier));
                         }
                         break;
                     }
@@ -398,6 +373,10 @@ namespace RageCoop.Server
                                         if (InProgressFileTransfers.TryGetValue(packet.ID,out toRemove))
                                         {
                                             toRemove.Cancel=true;
+                                            if (toRemove.Name=="Resources.zip")
+                                            {
+                                                Clients[message.SenderConnection.RemoteUniqueIdentifier].IsReady=true;
+                                            }
                                         }
                                     }
                                     break;
@@ -510,23 +489,26 @@ namespace RageCoop.Server
                 connection.Deny("Username contains special chars!");
                 return;
             }
-            if (_mainBlocklist.Username.Contains(packet.Username.ToLower()))
-            {
-                connection.Deny("This Username has been blocked by this server!");
-                return;
-            }
-            if (_mainBlocklist.IP.Contains(connection.RemoteEndPoint.ToString().Split(":")[0]))
-            {
-                connection.Deny("This IP was blocked by this server!");
-                return;
-            }
             if (Clients.Values.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
             {
                 connection.Deny("Username is already taken!");
                 return;
             }
 
-            
+            var args = new HandshakeEventArgs()
+            {
+                EndPoint=connection.RemoteEndPoint,
+                ID=packet.PedID,
+                Username=packet.Username
+            };
+            API.Events.InvokePlayerHandshake(args);
+            if (args.Cancel)
+            {
+                connection.Deny(args.DenyReason);
+                return;
+            }
+
+
 
             Client tmpClient;
 
@@ -545,18 +527,6 @@ namespace RageCoop.Server
                         }
                     }
                 );;
-            }
-            var args = new HandshakeEventArgs()
-            {
-                EndPoint=connection.RemoteEndPoint,
-                ID=packet.PedID,
-                Username=packet.Username
-            };
-            API.Events.InvokePlayerHandshake(args);
-            if (args.Cancel)
-            {
-                connection.Deny(args.DenyReason);
-                return;
             }
             
             Program.Logger.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
@@ -907,36 +877,40 @@ namespace RageCoop.Server
                 RegisterEvent(attribute.EventName, (Action<EventContext>)Delegate.CreateDelegate(typeof(Action<EventContext>), method));
             }
         }
-        public static void SendFile(FileStream fs,string name,Client client,Action<float> updateCallback=null)
+        public static void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
             int id = RequestFileID();
+            var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+            fs.Seek(0, SeekOrigin.Begin);
+            var total = fs.Length;
+            Program.Logger.Debug($"Initiating file transfer:{name}, {total}");
             FileTransfer transfer = new()
             {
                 ID=id,
                 Name = name,
             };
             InProgressFileTransfers.Add(id,transfer);
-            fs.Seek(0, SeekOrigin.Begin);
             Send(
             new Packets.FileTransferRequest()
             {
-                FileLength= fs.Length,
+                FileLength= total,
                 Name=name,
                 ID=id,
             },
             client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered
             );
-            while (fs.CanRead && (!transfer.Cancel))
+            int read = 0;
+            int thisRead = 0;
+            do
             {
                 // 4 KB chunk
                 byte[] chunk = new byte[4096];
-                int read = fs.Read(chunk, 0, chunk.Length);
-                if (read!=chunk.Length)
+                read += thisRead=fs.Read(chunk, 0, 4096);
+                if (thisRead!=chunk.Length)
                 {
-                    // EOF reached
-                    var newchunk = new byte[read];
-                    Array.Copy(chunk, 0, newchunk, 0, read);
-                    chunk=newchunk;
+                    if (thisRead==0) { break; }
+                    Program.Logger.Trace($"Purging chunk:{thisRead}");
+                    Array.Resize(ref chunk, thisRead);
                 }
                 Send(
                 new Packets.FileTransferChunk()
@@ -944,24 +918,24 @@ namespace RageCoop.Server
                     ID=id,
                     FileChunk=chunk,
                 },
-                client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered
-                );
-                transfer.Progress=fs.Position/fs.Length;
+                client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered);
+
+                MainNetServer.FlushSendQueue();
+                transfer.Progress=read/fs.Length;
                 if (updateCallback!=null) { updateCallback(transfer.Progress);}
-            };
+
+            } while (thisRead>0);
             Send(
                 new Packets.FileTransferComplete()
                 {
                     ID= id,
                 }
                 , client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered
-            );
+            ); 
+            fs.Close();
+            fs.Dispose();
+            Program.Logger.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
-        }
-        public static async void SendFileAsync(FileStream fs, string name, Client client,Action<float> updateCallback=null,Action completedCallback=null)
-        {
-            SendFile(fs, name, client,updateCallback);
-            if(completedCallback!=null) { completedCallback(); }
         }
         public static int RequestFileID()
         {

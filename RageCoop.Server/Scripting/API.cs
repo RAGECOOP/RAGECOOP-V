@@ -15,17 +15,34 @@ namespace RageCoop.Server.Scripting
         {
             #region DELEGATES
             public delegate void EmptyEvent();
-            public delegate void PlayerConnect(int id,string name);
-            public delegate void PlayerDisconnect(int id, string name);
+            public delegate void PlayerConnect(Client client);
+            public delegate void PlayerDisconnect(Client client);
 
             #endregion
-            public static event EmptyEvent OnStop;
             public static event EventHandler<ChatEventArgs> OnChatMessage;
             public static event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
             public static event PlayerConnect OnPlayerConnected;
             public static event PlayerDisconnect OnPlayerDisconnected;
+            public static void ClearHandlers()
+            {
+                foreach (Delegate d in OnChatMessage.GetInvocationList())
+                {
+                    OnChatMessage -= (EventHandler<ChatEventArgs>)d;
+                }
+                foreach (Delegate d in OnPlayerHandshake.GetInvocationList())
+                {
+                    OnPlayerHandshake -= (EventHandler<HandshakeEventArgs>)d;
+                }
+                foreach (Delegate d in OnPlayerConnected.GetInvocationList())
+                {
+                    OnPlayerConnected -= (PlayerConnect)d;
+                }
+                foreach (Delegate d in OnPlayerDisconnected.GetInvocationList())
+                {
+                    OnPlayerDisconnected -= (PlayerDisconnect)d;
+                }
+            }
             #region INVOKE
-            internal static void InvokeOnStop() { OnStop?.Invoke(); }
             internal static void InvokeOnChatMessage(Packets.ChatMessage p,NetConnection con) 
             { 
                 OnChatMessage?.Invoke(null,new ChatEventArgs() {
@@ -34,9 +51,9 @@ namespace RageCoop.Server.Scripting
                 }); 
             }
             internal static void InvokePlayerConnected(Client client) 
-            { OnPlayerConnected?.Invoke(client.Player.PedID,client.Player.Username); }
+            { OnPlayerConnected?.Invoke(client); }
             internal static void InvokePlayerDisconnected(Client client) 
-            { OnPlayerDisconnected?.Invoke(client.Player.PedID, client.Player.Username); }
+            { OnPlayerDisconnected?.Invoke(client); }
             internal static void InvokePlayerHandshake(HandshakeEventArgs args)
             {
                 OnPlayerHandshake?.Invoke(null, args);

@@ -54,7 +54,7 @@ namespace RageCoop.Client
         private new int OwnerID{ set { } }
         public WeaponHash Hash { get; set; }
         private WeaponAsset Asset { get; set; }
-        public override void Update()
+        internal override void Update()
         {
 
             // Skip update if no new sync message has arrived.
@@ -65,8 +65,7 @@ namespace RageCoop.Client
                 CreateProjectile();
                 return;
             }
-            MainProjectile.PositionNoOffset=Position+Velocity*Networking.Latency;
-            MainProjectile.Velocity=Velocity;
+            MainProjectile.Velocity=Velocity+0.2f*((Position+Velocity*Networking.Latency)-MainProjectile.Position);
             MainProjectile.Rotation=Rotation;
             LastUpdated=Main.Ticked;
         }
