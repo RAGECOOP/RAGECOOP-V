@@ -169,7 +169,6 @@ namespace RageCoop.Server
             while (!Program.ReadyToStop)
             {
                 ProcessMessage(MainNetServer.WaitMessage(10));
-                MainNetServer.FlushSendQueue();
             }
 
             Program.Logger.Warning("Server is shutting down!");
