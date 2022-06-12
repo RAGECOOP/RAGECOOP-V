@@ -1,43 +1,26 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using RageCoop.Core;
-using Lidgren.Network;
 
 namespace RageCoop.Server.Scripting
 {
+    /// <summary>
+    /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded, you should use <see cref="OnStart"/>. to initiate your script.
+    /// </summary>
     public abstract class ServerScript :Core.Scripting.IScriptable
     {
+        /// <summary>
+        /// This method would be called from main thread after all scripts have been loaded.
+        /// </summary>
         public abstract void OnStart();
+
+        /// <summary>
+        /// This method would be called from main thread when the server is shutting down, you MUST terminate all background jobs/threads in this method.
+        /// </summary>
         public abstract void OnStop();
-    }
-
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    public class TriggerEvent : Attribute
-    {
-        public string EventName { get; set; }
-
-        public TriggerEvent(string eventName)
-        {
-            EventName = eventName;
-        }
-    }
-
-    public class EventContext
-    {
-        /// <summary>
-        /// Gets the client which executed the command
-        /// </summary>
-        public Client Client { get; internal set; }
 
         /// <summary>
-        /// Arguments (all standard but no string!)
+        /// Get the resource directory this script belongs to.
         /// </summary>
-        public object[] Args { get; internal set; }
+        public string CurrentDirectory { get; internal set; }
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]

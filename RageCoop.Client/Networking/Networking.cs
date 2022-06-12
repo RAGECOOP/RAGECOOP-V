@@ -103,7 +103,6 @@ namespace RageCoop.Client
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
             Main.Logger.Debug($"player connected:{p.Username}");
-            Main.DumpCharacters();
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {

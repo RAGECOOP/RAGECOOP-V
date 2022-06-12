@@ -7,20 +7,43 @@ using RageCoop.Core;
 namespace RageCoop.Client.Scripting
 {
     /// <summary>
-    /// ?
+    /// Provides vital functionality to interact with RAGECOOP
     /// </summary>
     public static class API
     {
-        
+        /// <summary>
+        /// Client configuration, this will conflict with server-side config.
+        /// </summary>
         public static class Config
         {
+            /// <summary>
+            /// Get or set local player's username, set won't be effective if already connected to a server.
+            /// </summary>
+            public static string Username
+            {
+                get { return Main.Settings.Username; }
+                set
+                {
+                    if (IsOnServer || string.IsNullOrEmpty(value))
+                    {
+                        return;
+                    }
+                    Main.Settings.Username = value;
+                }
+            }
             /// <summary>
             /// Enable automatic respawn for this player.
             /// </summary>
             public static bool EnableAutoRespawn { get; set; } = true;
         }
+        /// <summary>
+        /// Base events for RageCoop
+        /// </summary>
         public static class Events
         {
+            /// <summary>
+            /// Empty delegate
+            /// </summary>
             public delegate void EmptyEvent();
 
             /// <summary>
@@ -38,15 +61,27 @@ namespace RageCoop.Client.Scripting
             /// </summary>
             public static event EventHandler<SyncedVehicle> OnVehicleDeleted;
 
+            /// <summary>
+            /// A local ped is spawned
+            /// </summary>
             public static event EventHandler<SyncedPed> OnPedSpawned;
 
+            /// <summary>
+            /// A local ped is deleted
+            /// </summary>
             public static event EventHandler<SyncedPed> OnPedDeleted;
+
+            /// <summary>
+            /// This is equivalent of <see cref="GTA.Script.Tick"/>.
+            /// </summary>
+            public static event EmptyEvent OnTick;
             #region INVOKE
-            internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned.Invoke(null,v); }
-            internal static void InvokeVehicleDeleted(SyncedVehicle v) { OnVehicleDeleted.Invoke(null, v); }
-            internal static void InvokePedSpawned(SyncedPed p) { OnPedSpawned.Invoke(null, p); }
-            internal static void InvokePedDeleted(SyncedPed p) { OnPedDeleted.Invoke(null, p); }
-            internal static void InvokePlayerDied() { OnPlayerDied.Invoke(); }
+            internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null,v); }
+            internal static void InvokeVehicleDeleted(SyncedVehicle v) { OnVehicleDeleted?.Invoke(null, v); }
+            internal static void InvokePedSpawned(SyncedPed p) { OnPedSpawned?.Invoke(null, p); }
+            internal static void InvokePedDeleted(SyncedPed p) { OnPedDeleted?.Invoke(null, p); }
+            internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
+            internal static void InvokeTick() { OnTick?.Invoke(); }
             #endregion
         }
         /// <summary>
@@ -59,6 +94,10 @@ namespace RageCoop.Client.Scripting
             Main.MainChat.AddMessage(from, message);
         }
 
+        /// <summary>
+        /// Get a <see cref="Core.Logging.Logger"/> that RAGECOOP is currently using.
+        /// </summary>
+        /// <returns></returns>
         public static Core.Logging.Logger GetLogger()
         {
             return Main.Logger;
@@ -128,20 +167,5 @@ namespace RageCoop.Client.Scripting
             get { return Main.CurrentVersion; }
         }
 
-        /// <summary>
-        /// Get or set local player's username, set won't be effective if already connected to a server.
-        /// </summary>
-        public static string Username
-        {
-            get { return Main.Settings.Username; }
-            set
-            {
-                if (IsOnServer || string.IsNullOrEmpty(value))
-                {
-                    return;
-                }
-                Main.Settings.Username = value;
-            }
-        }
     }
 }

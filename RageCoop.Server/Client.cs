@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
 using GTA.Math;
+using RageCoop.Core.Scripting.Events;
 
 namespace RageCoop.Server
 {
@@ -185,7 +186,7 @@ namespace RageCoop.Server
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
-        public void SendTriggerEvent(string eventName, params object[] args)
+        public void SendCustomEvent(int id,byte[] data)
         {
             if (!IsReady)
             {
@@ -195,24 +196,19 @@ namespace RageCoop.Server
 
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-                if (userConnection == null)
-                {
-                    return;
-                }
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.ServerClientEvent()
+                new Packets.CustomEvent()
                 {
-                    EventName = eventName,
-                    Args = new List<object>(args)
+                    Hash=id,
+                    Data=data
                 }.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
+                Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Program.Logger.Error(ex);
             }
         }
         #endregion

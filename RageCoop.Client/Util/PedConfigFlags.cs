@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace RageCoop.Client
 {
 	// Potential names and hash collisions included as comments
-	public enum PedConfigFlags
+	internal enum PedConfigFlags
 	{
 		_0x67D1A445 = 0,
 		_0xC63DE95E = 1,

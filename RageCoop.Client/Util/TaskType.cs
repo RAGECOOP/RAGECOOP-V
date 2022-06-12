@@ -1,7 +1,7 @@
 ﻿// WARNING: values can change after a game update
 // if R* adds in the middle!
 // This is up-to-date for b2372
-public enum TaskType
+internal enum TaskType
 {
 	CTaskHandsUp = 0,
 	CTaskClimbLadder = 1,

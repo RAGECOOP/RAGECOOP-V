@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using RageCoop.Core.Scripting;
-using System.IO;
 using System.Reflection;
-namespace RageCoop.Server.Scripting
+using System.IO;
+using System.Linq;
+
+namespace RageCoop.Core.Scripting
 {
-	internal class ScriptingEngine
+	internal class Resource
 	{
-		public List<ServerScript> Scripts = new List<ServerScript>();
+		public string Name { get; set; }
+		public string Directory { get; set; }
+		public List<IScriptable> Scripts { get; set; }
+	}
+	internal class ResourceLoader
+    {
 		protected List<string> ToIgnore = new List<string>
 		{
 			"RageCoop.Client.dll",
@@ -18,50 +22,63 @@ namespace RageCoop.Server.Scripting
 			"RageCoop.Server.dll",
 			"ScriptHookVDotNet3.dll"
 		};
+		protected List<Resource> LoadedResources = new List<Resource>();
 		private string BaseScriptType;
-		public Core.Logging.Logger Logger { get; set; }
-		public ScriptingEngine()
+		public Logging.Logger Logger { get; set; }
+		public ResourceLoader(Type basetype,Logging.Logger logger)
 		{
-			BaseScriptType = "RageCoop.Server.Scripting.ServerScript";
-			Logger = Program.Logger;
+			BaseScriptType = basetype.GetType().FullName;
+			Logger = logger;
 		}
 		/// <summary>
-		/// Load all assemblies inside this directory.
+		/// Load all assemblies inside the resource directory.
 		/// </summary>
 		/// <param name="path">Path of the directory.</param>
-		protected void LoadFromDirectory(string path)
+		protected void LoadResource(string path)
 		{
-			foreach (var assembly in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
+			var r = new Resource()
 			{
-				LoadScriptsFromAssembly(assembly);
+				Scripts = new List<IScriptable>(),
+				Name=Path.GetDirectoryName(path),
+				Directory=path,
+			};
+			foreach (var f in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
+			{
+				LoadScriptsFromAssembly(f, r);
 			}
+			LoadedResources.Add(r);
 		}
 		/// <summary>
 		/// Loads scripts from the specified assembly file.
 		/// </summary>
 		/// <param name="path">The path to the assembly file to load.</param>
 		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
-		protected bool LoadScriptsFromAssembly(string path)
+		protected bool LoadScriptsFromAssembly(string path, Resource domain)
 		{
-			if (!IsManagedAssembly(path)) { return false; }
-			if (ToIgnore.Contains(Path.GetFileName(path))) { return false; }
-
-			Logger?.Debug($"Loading assembly {Path.GetFileName(path)} ...");
-
-			Assembly assembly;
-
-			try
+			lock (LoadedResources)
 			{
-				assembly = Assembly.LoadFrom(path);
-			}
-			catch (Exception ex)
-			{
-				Logger?.Error("Unable to load "+Path.GetFileName(path));
-				Logger?.Error(ex);
-				return false;
-			}
+				if (!IsManagedAssembly(path)) { return false; }
+				if (ToIgnore.Contains(Path.GetFileName(path))) { return false; }
 
-			return LoadScriptsFromAssembly(assembly, path);
+				Logger?.Debug($"Loading assembly {Path.GetFileName(path)} ...");
+
+				Assembly assembly;
+
+				try
+				{
+					var temp = Path.GetTempFileName();
+					File.Copy(path, temp, true);
+					assembly = Assembly.LoadFrom(temp);
+				}
+				catch (Exception ex)
+				{
+					Logger?.Error("Unable to load "+Path.GetFileName(path));
+					Logger?.Error(ex);
+					return false;
+				}
+
+				return LoadScriptsFromAssembly(assembly, path, domain);
+			}
 		}
 		/// <summary>
 		/// Loads scripts from the specified assembly object.
@@ -69,7 +86,7 @@ namespace RageCoop.Server.Scripting
 		/// <param name="filename">The path to the file associated with this assembly.</param>
 		/// <param name="assembly">The assembly to load.</param>
 		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
-		private bool LoadScriptsFromAssembly(Assembly assembly, string filename)
+		private bool LoadScriptsFromAssembly(Assembly assembly, string filename, Resource toload)
 		{
 			int count = 0;
 
@@ -84,7 +101,7 @@ namespace RageCoop.Server.Scripting
 						try
 						{
 							// Invoke script constructor
-							Scripts.Add(constructor.Invoke(null) as ServerScript);
+							toload.Scripts.Add(constructor.Invoke(null) as IScriptable);
 							count++;
 						}
 						catch (Exception ex)
@@ -103,7 +120,10 @@ namespace RageCoop.Server.Scripting
 			{
 				Logger?.Error($"Failed to load assembly {Path.GetFileName(filename)}: ");
 				Logger?.Error(ex);
-
+				foreach (var e in ex.LoaderExceptions)
+				{
+					Logger?.Error(e);
+				}
 				return false;
 			}
 
@@ -165,28 +185,6 @@ namespace RageCoop.Server.Scripting
 				if (t.FullName == baseTypeName)
 					return true;
 			return false;
-		}
-		public void LoadAll()
-		{
-			var path = Path.Combine("Resources", "Server");
-			Directory.CreateDirectory(path);
-			foreach (var resource in Directory.GetDirectories(path))
-			{
-				Logger.Info($"Loading resource: {Path.GetFileName(resource)}");
-				LoadFromDirectory(resource);
-			}
-            foreach (var s in Scripts)
-            {
-				s.OnStart();
-            }
-		}
-		public void StopAll()
-        {
-			foreach (var s in Scripts)
-			{
-				s.OnStop();
-			}
-			Scripts.Clear();
 		}
 	}
 }

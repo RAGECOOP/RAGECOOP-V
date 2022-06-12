@@ -24,7 +24,7 @@ namespace RageCoop.Client
                 if (name=="Resources.zip")
                 {
                     Main.Logger.Debug("Loading resources...");
-                    Resources.Load(Path.Combine(downloadFolder));
+                    Main.Resources.Load(Path.Combine(downloadFolder));
                 }
                 return;
             }
@@ -124,7 +124,7 @@ namespace RageCoop.Client
                     if (f.FileName=="Resources.zip")
                     {
                         Main.Logger.Debug("Loading resources...");
-                        Resources.Load(Path.Combine(downloadFolder));
+                        Main.Resources.Load(Path.Combine(downloadFolder));
                     }
                     Networking.SendDownloadFinish(id);
                 }

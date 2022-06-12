@@ -21,23 +21,23 @@ namespace RageCoop.Client
     {
 
         private bool _gameLoaded = false;
-        public static readonly string CurrentVersion = "V0_4_1";
+        internal static readonly string CurrentVersion = "V0_4_1";
 
-        public static int LocalPlayerID=0;
+        internal static int LocalPlayerID=0;
 
         internal static RelationshipGroup SyncedPedsGroup;
 
-        public static new Settings Settings = null;
+        internal static new Settings Settings = null;
 
 #if !NON_INTERACTIVE
 #endif
-        public static Chat MainChat = null;
-        public static Stopwatch Counter = new Stopwatch();
-        public static Core.Logging.Logger Logger = null;
-
-        public static ulong Ticked = 0;
+        internal static Chat MainChat = null;
+        internal static Stopwatch Counter = new Stopwatch();
+        internal static Core.Logging.Logger Logger = null;
+        
+        internal static ulong Ticked = 0;
+        internal static Scripting.Resources Resources = new Scripting.Resources();
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
-
         /// <summary>
         /// Don't use it!
         /// </summary>
@@ -79,6 +79,7 @@ namespace RageCoop.Client
             MainChat = new Chat();
 
             Tick += OnTick;
+            Tick += (s,e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
             Aborted += (object sender, EventArgs e) => CleanUp();
             
@@ -267,7 +268,7 @@ namespace RageCoop.Client
 
         }
 
-        public static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
+        internal static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
         {
             { 0xD49F9B0955C367DE, 1 }, // Entities
             { 0xEF29A16337FACADB, 1 }, //
@@ -284,8 +285,8 @@ namespace RageCoop.Client
             { 0x5A039BB0BCA604B6, 4 }, //
             { 0x0134F0835AB6BFCB, 5 }  // Checkpoints
         };
-        public static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
-        public static void CleanUpWorld()
+        internal static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
+        internal static void CleanUpWorld()
         {
             if (ServerItems.Count == 0)
             {
@@ -362,14 +363,14 @@ namespace RageCoop.Client
         /// Queue an action  to be executed on next tick, allowing you to call scripting API from another thread.
         /// </summary>
         /// <param name="a"> The action to be executed, must return a bool indicating whether the action cane be removed after execution.</param>
-        public static void QueueAction(Func<bool> a)
+        internal static void QueueAction(Func<bool> a)
         {
             lock (QueuedActions)
             {
                 QueuedActions.Add(a);
             }
         }
-        public static void QueueAction(Action a)
+        internal static void QueueAction(Action a)
         {
             lock (QueuedActions)
             {
@@ -379,37 +380,11 @@ namespace RageCoop.Client
         /// <summary>
         /// Clears all queued actions
         /// </summary>
-        public static void ClearQueuedActions()
+        internal static void ClearQueuedActions()
         {
             lock (QueuedActions) { QueuedActions.Clear(); }
         }
 
-        public static string DumpCharacters()
-        {
-            string s = "Characters:";
-            lock (EntityPool.PedsLock)
-            {
-                foreach (int id in EntityPool.GetPedIDs())
-                {
-                    var c = EntityPool.GetPedByID(id);
-                    s+=$"\r\nID:{c.ID} Owner:{c.OwnerID} LastUpdated:{c.LastUpdated} LastSynced:{c.LastSynced} LastStateSynced:{c.LastStateSynced}";
-                    // s+=$"\r\n{c.IsAiming} {c.IsJumping} {c.IsOnFire} {c.IsOnLadder} {c.IsRagdoll} {c.IsReloading} {c.IsShooting} {c.Speed}";
-                }
-            }
-            Main.Logger.Trace(s);
-            return s;
-        }
-        public static string DumpPlayers()
-        {
-            string s = "Players:";
-            foreach (PlayerData p in PlayerList.Players)
-            {
-                
-                s+=$"\r\nID:{p.PedID} Username:{p.Username}";
-            }
-            Main.Logger.Trace(s);
-            return s;
-        }
 
     }
 }

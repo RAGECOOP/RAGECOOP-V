@@ -6,6 +6,9 @@
 	  <OutputPath>D:\Games\Grand Theft Auto V\Scripts\RageCoop</OutputPath>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	  <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	  <GenerateDocumentationFile>False</GenerateDocumentationFile>
+	  <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.16.0" />

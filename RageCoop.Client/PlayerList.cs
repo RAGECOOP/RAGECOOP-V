@@ -6,7 +6,7 @@ using GTA.Native;
 
 namespace RageCoop.Client
 {
-    public static class PlayerList
+    internal static class PlayerList
     {
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;

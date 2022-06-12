@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lidgren.Network;
 using RageCoop.Core;
+using RageCoop.Core.Scripting.Events;
 using System.Net;
 
 namespace RageCoop.Server.Scripting
@@ -55,9 +56,7 @@ namespace RageCoop.Server.Scripting
             internal static void InvokePlayerDisconnected(Client client) 
             { OnPlayerDisconnected?.Invoke(client); }
             internal static void InvokePlayerHandshake(HandshakeEventArgs args)
-            {
-                OnPlayerHandshake?.Invoke(null, args);
-            }
+            { OnPlayerHandshake?.Invoke(null, args); }
             #endregion
         }
 
@@ -194,13 +193,28 @@ namespace RageCoop.Server.Scripting
             Server.RegisterCommands<T>();
         }
 
-        /// <summary>
-        /// Register a class of events
-        /// </summary>
-        /// <typeparam name="T">The name of your class with functions</typeparam>
-        public static void RegisterEvents<T>()
+
+        public static void SendCustomEvent(int eventID, byte[] data, IEnumerable<Client> recepients)
         {
-            Server.RegisterEvents<T>();
+            foreach(var c in recepients)
+            {
+                c.SendCustomEvent(eventID,data);
+            }
+        }
+        public static void SendCustomEvent(CustomEvent e, Client[] recepients)
+        {
+            SendCustomEvent(e.EventID, e.Serialize(), recepients);
+        }
+        public static void SendCustomEvent(int eventID, byte[] data, int[] recepients)
+        {
+            if (recepients.Length==0)
+            {
+                SendCustomEvent(eventID,data,Server.Clients.Values);
+            }
+            else
+            {
+                SendCustomEvent(eventID,data, Server.Clients.Values.Where(x => recepients.Contains(x.Player.PedID)).ToArray());
+            }
         }
         #endregion
     }

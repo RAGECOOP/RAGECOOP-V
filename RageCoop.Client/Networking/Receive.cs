@@ -84,7 +84,7 @@ namespace RageCoop.Client
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason));
 
                             MapLoader.DeleteAll();
-                            Resources.UnloadAll();
+                            Main.Resources.Unload();
 
                             Main.Logger.Info($">> Disconnected << reason: {reason}");
                             break;
@@ -236,9 +236,9 @@ namespace RageCoop.Client
 
                                 }
                                 break;
-                            case PacketTypes.ServerClientEvent:
+                            case PacketTypes.CustomEvent:
                                 {
-                                    Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
+                                    Packets.CustomEvent packet = new Packets.CustomEvent();
                                     packet.Unpack(data);
                                 }
                                 break;

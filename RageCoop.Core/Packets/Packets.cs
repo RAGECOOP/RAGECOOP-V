@@ -130,7 +130,8 @@ namespace RageCoop.Core
         FileTransferRequest=16,
         FileTransferComplete=17,
         
-        ServerClientEvent = 18,
+        CustomEvent = 18,
+        InvokeCustomEvent=19,
         #region Sync
 
         #region INTERVAL
@@ -289,99 +290,86 @@ namespace RageCoop.Core
             }
         }
 
-        public class ServerClientEvent : Packet
+        public class CustomEvent : Packet
         {
-            public string EventName { get; set; }
-
-            public List<object> Args { get; set; }
+            public int Hash { get; set; }
+            public byte[] Data { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.ServerClientEvent);
+                message.Write((byte)PacketTypes.CustomEvent);
 
                 List<byte> byteArray = new List<byte>();
 
-                byte[] eventNameBytes = Encoding.UTF8.GetBytes(EventName);
 
-                // Write event name
-                byteArray.AddRange(BitConverter.GetBytes(eventNameBytes.Length));
-                byteArray.AddRange(eventNameBytes);
+                // Write hash
+                byteArray.AddInt(Hash);
 
-                // Write args
-                byteArray.AddRange(BitConverter.GetBytes(Args.Count));
-                foreach (object arg in Args)
-                {
-                    var test = CoreUtils.GetBytesFromObject(arg);
-                    if (test.Item1 == 0x0)
-                    {
-                        // Logger.Write("Can't get type of an object!", Logger.LogLevel.Server);
-                        byteArray.Add(0x0);
-                    }
-                    else
-                    {
-                        byteArray.Add(test.Item1);
-                        byteArray.AddRange(test.Item2);
-                    }
-                }
+                // Write data
+                byteArray.AddRange(Data);
 
                 byte[] result = byteArray.ToArray();
 
                 message.Write(result.Length);
                 message.Write(result);
-                #endregion
             }
 
             public override void Unpack(byte[] array)
             {
-                #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                // Read event name
-                int eventNameBytes = reader.ReadInt();
-                EventName = reader.ReadString(eventNameBytes);
+                Hash = reader.ReadInt();
 
-                // Read args
-                Args = new List<object>();
-                int argsCount = reader.ReadInt();
-                for (int i = 0; i < argsCount; i++)
-                {
-                    byte argType = reader.ReadByte();
-                    switch (argType)
-                    {
-                        case 0x01:
-                            Args.Add(reader.ReadByte());
-                            break;
-                        case 0x02:
-                            Args.Add(reader.ReadShort());
-                            break;
-                        case 0x03:
-                            Args.Add(reader.ReadUShort());
-                            break;
-                        case 0x04:
-                            Args.Add(reader.ReadInt());
-                            break;
-                        case 0x05:
-                            Args.Add(reader.ReadUInt());
-                            break;
-                        case 0x06:
-                            Args.Add(reader.ReadLong());
-                            break;
-                        case 0x07:
-                            Args.Add(reader.ReadULong());
-                            break;
-                        case 0x08:
-                            Args.Add(reader.ReadFloat());
-                            break;
-                        case 0x09:
-                            Args.Add(reader.ReadBool());
-                            break;
-                    }
-                }
-                #endregion
+                Data=reader.ReadByteArray(array.Length-4);
             }
         }
+        public class InvokeCustomEvent : Packet
+        {
+            public int Hash { get; set; }
+            public int[] Targets { get; set; }
+            public byte[] Data { get; set; }
 
+            public override void Pack(NetOutgoingMessage message)
+            {
+                message.Write((byte)PacketTypes.InvokeCustomEvent);
+
+                List<byte> byteArray = new List<byte>();
+
+
+                // Write hash
+                byteArray.AddInt(Hash);
+
+                // Write targets
+                byteArray.AddInt(Targets.Length);
+                foreach (var target in Targets)
+                {
+                    byteArray.AddInt(target);
+                }
+
+                // Write data
+                byteArray.AddRange(Data);
+
+                byte[] result = byteArray.ToArray();
+
+                message.Write(result.Length);
+                message.Write(result);
+            }
+
+            public override void Unpack(byte[] array)
+            {
+                BitReader reader = new BitReader(array);
+
+                Hash = reader.ReadInt();
+
+                Targets = new int[reader.ReadInt()];
+                for(int i = 0; i < Targets.Length; i++)
+                {
+                    Targets[i]=reader.ReadInt();
+                }
+
+                Data=reader.ReadByteArray(array.Length-4);
+            }
+        }
         #region ===== NATIVECALL =====
         public class NativeCall : Packet
         {

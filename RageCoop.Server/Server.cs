@@ -32,12 +32,11 @@ namespace RageCoop.Server
         public static NetServer MainNetServer;
 
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
-        public static readonly Dictionary<TriggerEvent, Action<EventContext>> TriggerEvents = new();
-
         public static readonly Dictionary<long,Client> Clients = new();
         private static System.Timers.Timer SendLatencyTimer = new System.Timers.Timer(5000);
         
         private static Dictionary<int,FileTransfer> InProgressFileTransfers=new();
+        private static Resources Resources = new Resources();
         public Server()
         {
             Program.Logger.Info("================");
@@ -169,16 +168,14 @@ namespace RageCoop.Server
             
             while (!Program.ReadyToStop)
             {
-                while (true)
-                {
-                    ProcessMessage(MainNetServer.WaitMessage(10));
-                    MainNetServer.FlushSendQueue();
-                }
+                ProcessMessage(MainNetServer.WaitMessage(10));
+                MainNetServer.FlushSendQueue();
             }
 
             Program.Logger.Warning("Server is shutting down!");
-            Resources.UnloadAll();
             MainNetServer.Shutdown("Server is shutting down!");
+            Program.Logger.Info("Waiting for resources to stop...");
+            Resources.StopAll();
             Program.Logger.Dispose();
         }
 
@@ -332,35 +329,11 @@ namespace RageCoop.Server
                                         }
                                     }
                                     break;
-                                case PacketTypes.ServerClientEvent:
+                                case PacketTypes.InvokeCustomEvent:
                                     {
-                                        Packets.ServerClientEvent packet = new Packets.ServerClientEvent();
-                                        packet.Unpack(data);
-
-                                        long senderNetHandle = message.SenderConnection.RemoteUniqueIdentifier;
-                                        Client client = null;
-                                        lock (Clients)
-                                        {
-                                            client = Util.GetClientByNetID(senderNetHandle);
-                                        }
-
-                                        if (client != null)
-                                        {
-                                            if (TriggerEvents.Any(x => x.Key.EventName == packet.EventName))
-                                            {
-                                                EventContext ctx = new()
-                                                {
-                                                    Client = client,
-                                                    Args = packet.Args.ToArray()
-                                                };
-
-                                                TriggerEvents.FirstOrDefault(x => x.Key.EventName == packet.EventName).Value?.Invoke(ctx);
-                                            }
-                                            else
-                                            {
-                                                Program.Logger.Warning($"Player \"{client.Player.Username}\" attempted to trigger an unknown event! [{packet.EventName}]");
-                                            }
-                                        }
+                                        var p = new Packets.InvokeCustomEvent();
+                                        p.Unpack(data);
+                                        API.SendCustomEvent(p.Hash,p.Data,p.Targets);
                                     }
                                     break;
                                 case PacketTypes.FileTransferComplete:
@@ -855,28 +828,6 @@ namespace RageCoop.Server
             }
         }
 
-        public static void RegisterEvent(string eventName, Action<EventContext> callback)
-        {
-            TriggerEvent ev = new(eventName);
-
-            if (TriggerEvents.ContainsKey(ev))
-            {
-                throw new Exception("TriggerEvent \"" + ev.EventName + "\" was already been registered!");
-            }
-
-            TriggerEvents.Add(ev, callback);
-        }
-        public static void RegisterEvents<T>()
-        {
-            IEnumerable<MethodInfo> events = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(TriggerEvent), false).Any());
-
-            foreach (MethodInfo method in events)
-            {
-                TriggerEvent attribute = method.GetCustomAttribute<TriggerEvent>(true);
-
-                RegisterEvent(attribute.EventName, (Action<EventContext>)Delegate.CreateDelegate(typeof(Action<EventContext>), method));
-            }
-        }
         public static void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
             int id = RequestFileID();
@@ -937,7 +888,7 @@ namespace RageCoop.Server
             Program.Logger.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }
-        public static int RequestFileID()
+        private static int RequestFileID()
         {
             int ID = 0;
             while ((ID==0)
