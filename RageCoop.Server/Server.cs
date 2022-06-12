@@ -869,8 +869,6 @@ namespace RageCoop.Server
                     FileChunk=chunk,
                 },
                 client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered);
-
-                MainNetServer.FlushSendQueue();
                 transfer.Progress=read/fs.Length;
                 if (updateCallback!=null) { updateCallback(transfer.Progress);}
 
