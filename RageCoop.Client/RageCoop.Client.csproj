@@ -9,6 +9,11 @@
 	  <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
 	  <GenerateDocumentationFile>False</GenerateDocumentationFile>
 	  <DocumentationFile></DocumentationFile>
+	  <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>True</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DotNetZip" Version="1.16.0" />

@@ -11,7 +11,7 @@ namespace RageCoop.Core.Scripting
 	{
 		public string Name { get; set; }
 		public string Directory { get; set; }
-		public List<IScriptable> Scripts { get; set; }
+		public List<IScriptable> Scripts { get; set; }=new List<IScriptable>();	
 	}
 	internal class ResourceLoader
     {
@@ -25,9 +25,9 @@ namespace RageCoop.Core.Scripting
 		protected List<Resource> LoadedResources = new List<Resource>();
 		private string BaseScriptType;
 		public Logging.Logger Logger { get; set; }
-		public ResourceLoader(Type basetype,Logging.Logger logger)
+		public ResourceLoader(string baseType,Logging.Logger logger)
 		{
-			BaseScriptType = basetype.GetType().FullName;
+			BaseScriptType = baseType;
 			Logger = logger;
 		}
 		/// <summary>

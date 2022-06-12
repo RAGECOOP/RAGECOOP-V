@@ -75,6 +75,7 @@ namespace RageCoop.Core.Logging
             lock (Buffer)
             {
                 string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(),"\r\n"+ex.ToString(), Process.GetCurrentProcess().Id);
+                // msg += string.Format("\r\n[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.StackTrace, Process.GetCurrentProcess().Id);
 
                 Buffer+=msg+"\r\n";
             }

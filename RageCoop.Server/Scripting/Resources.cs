@@ -11,7 +11,7 @@ namespace RageCoop.Server.Scripting
 {
 	internal class Resources : ResourceLoader
 	{
-		public Resources() : base(typeof(ServerScript), Program.Logger) { }
+		public Resources() : base("RageCoop.Server.Scripting.ServerScript", Program.Logger) { }
 
 		public static bool HasClientResources = false;
 		public void LoadAll()

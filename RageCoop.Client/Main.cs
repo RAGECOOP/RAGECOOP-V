@@ -36,7 +36,7 @@ namespace RageCoop.Client
         internal static Core.Logging.Logger Logger = null;
         
         internal static ulong Ticked = 0;
-        internal static Scripting.Resources Resources = new Scripting.Resources();
+        internal static Scripting.Resources Resources=null;
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
         /// <summary>
         /// Don't use it!
@@ -54,6 +54,7 @@ namespace RageCoop.Client
                 LogLevel=Settings.LogLevel,
 #endif
             };
+            Resources = new Scripting.Resources();
             // Required for some synchronization!
             /*if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {

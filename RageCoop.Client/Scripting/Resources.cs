@@ -6,7 +6,7 @@ namespace RageCoop.Client.Scripting
 {
 	internal class Resources:ResourceLoader
 	{
-		public Resources() : base(typeof(ClientScript), Main.Logger) { }
+		public Resources() : base("RageCoop.Client.Scripting.ClientScript", Main.Logger) { }
 		private void StartAll()
 		{
 			lock (LoadedResources)
@@ -15,6 +15,7 @@ namespace RageCoop.Client.Scripting
 				{
 					foreach (var s in d.Scripts)
 					{
+						(s as ClientScript).CurrentDirectory=d.Directory;
 						Main.QueueAction(() => s.OnStart());
 					}
 				}
@@ -51,7 +52,7 @@ namespace RageCoop.Client.Scripting
 			Directory.CreateDirectory(path);
 			foreach (var resource in Directory.GetDirectories(path))
 			{
-				Logger.Info($"Loading resource: {Path.GetFileName(resource)}");
+				Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
 				LoadResource(resource);
 			}
 			StartAll();

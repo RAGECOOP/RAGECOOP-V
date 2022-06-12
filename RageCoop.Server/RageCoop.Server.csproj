@@ -13,6 +13,7 @@
     <PackageId>RAGECOOP-V</PackageId>
     <Authors>RAGECOOP</Authors>
     <Version>0.4</Version>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
