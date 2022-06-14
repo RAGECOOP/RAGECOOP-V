@@ -65,7 +65,7 @@ namespace RageCoop.Client
                 CreateProjectile();
                 return;
             }
-            MainProjectile.PositionNoOffest=Position;
+            MainProjectile.Position=Position;
             MainProjectile.Velocity=Velocity;
             MainProjectile.Rotation=Rotation;
             LastUpdated=Main.Ticked;
