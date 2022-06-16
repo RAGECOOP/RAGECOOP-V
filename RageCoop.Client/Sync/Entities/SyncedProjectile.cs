@@ -13,13 +13,17 @@ namespace RageCoop.Client
         public SyncedProjectile(Projectile p)
         {
             ID=EntityPool.RequestNewID();
-            IsMine=true;
             MainProjectile = p;
             Origin=p.Position;
             var shooter = EntityPool.GetPedByHandle((p.Owner?.Handle).GetValueOrDefault());
             if(shooter != null)
             {
+                if (shooter.MainPed!=null && (p.AttachedEntity==shooter.MainPed.Weapons.CurrentWeaponObject ||  p.AttachedEntity== shooter.MainPed))
+                {
+                    IsValid=false;
+                }
                 ShooterID=shooter.ID;
+                IsMine=shooter.IsMine;
             }
             else
             {
@@ -34,14 +38,15 @@ namespace RageCoop.Client
                     Main.Logger.Warning($"Could not find owner for projectile:{Hash}");
                 }
             }
-
+            
         }
         public SyncedProjectile(int id)
         {
             ID= id;
             IsMine=false;
         }
-        public new bool IsMine { get; private set; }
+        public bool IsValid { get; private set; } = true;
+        public new bool IsMine { get; private set; } = false;
         public bool Exploded { get; set; } = false;
         public Projectile MainProjectile { get; set; }
         public int ShooterID { get; set; }

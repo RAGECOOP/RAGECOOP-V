@@ -226,6 +226,7 @@ namespace RageCoop.Client
         }
         public static void Add(SyncedProjectile p)
         {
+            if (!p.IsValid) { return; }
             if (ID_Projectiles.ContainsKey(p.ID))
             {
                 ID_Projectiles[p.ID]=p;
