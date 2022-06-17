@@ -21,7 +21,7 @@ namespace RageCoop.Client
     {
 
         private bool _gameLoaded = false;
-        internal static readonly string CurrentVersion = "V0_4_1";
+        internal static readonly string CurrentVersion = "V0_5_0";
 
         internal static int LocalPlayerID=0;
 

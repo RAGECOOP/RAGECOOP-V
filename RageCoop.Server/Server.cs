@@ -26,7 +26,7 @@ namespace RageCoop.Server
 
     internal class Server
     {
-        private static readonly string _compatibleVersion = "V0_4";
+        private static readonly string _compatibleVersion = "V0_5";
 
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
         public static NetServer MainNetServer;

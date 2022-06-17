@@ -18,7 +18,7 @@ namespace RageCoop.Core
 
             public int ModelHash { get; set; }
 
-            public Dictionary<byte, short> Clothes { get; set; }
+            public byte[] Clothes { get; set; }
 
             public int OwnerID { get; set; }
 
@@ -40,15 +40,7 @@ namespace RageCoop.Core
                 // Write model hash
                 byteArray.AddInt(ModelHash);
 
-                // Write player clothes
-                // Write the count of clothes
-                byteArray.AddRange(BitConverter.GetBytes((ushort)Clothes.Count));
-                // Loop the dictionary and add the values
-                foreach (KeyValuePair<byte, short> cloth in Clothes)
-                {
-                    byteArray.Add(cloth.Key);
-                    byteArray.AddRange(BitConverter.GetBytes(cloth.Value));
-                }
+                byteArray.AddRange(Clothes);
 
                 //Write OwnerID for this ped
                 byteArray.AddRange(BitConverter.GetBytes(OwnerID));
@@ -89,16 +81,7 @@ namespace RageCoop.Core
                 ModelHash = reader.ReadInt();
 
                 // Read player clothes
-                // Create new Dictionary
-                Clothes = new Dictionary<byte, short>();
-                // Read the count of clothes
-                ushort clothCount = reader.ReadUShort();
-                // For clothCount
-                for (ushort i = 0; i < clothCount; i++)
-                {
-                    // Read cloth value
-                    Clothes.Add(reader.ReadByte(), reader.ReadShort());
-                }
+                Clothes =reader.ReadByteArray(33);
 
                 // Read ped OwnerID
                 OwnerID= reader.ReadInt();

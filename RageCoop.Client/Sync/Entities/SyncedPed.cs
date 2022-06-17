@@ -70,8 +70,8 @@ namespace RageCoop.Client
         {
             get;set;
         }
-        private Dictionary<byte, short> _lastClothes = null;
-        internal Dictionary<byte, short> Clothes { get; set; }
+        private byte[] _lastClothes = null;
+        public byte[] Clothes { get; set; }
 
         internal float Heading { get; set; }
         internal Vector3 RotationVelocity { get; set; }
@@ -136,7 +136,7 @@ namespace RageCoop.Client
                     return;
                 }
 
-                if (!Clothes.Compare(_lastClothes))
+                if (!Clothes.SequenceEqual(_lastClothes))
                 {
                     SetClothes();
                 }
@@ -290,9 +290,9 @@ namespace RageCoop.Client
 
         private void SetClothes()
         {
-            foreach (KeyValuePair<byte, short> cloth in Clothes)
+            for (byte i = 0; i < 11; i++)
             {
-                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, cloth.Key, cloth.Value, 0, 0);
+                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, Clothes[i], Clothes[i+11], Clothes[i+22]);
             }
             _lastClothes = Clothes;
         }
