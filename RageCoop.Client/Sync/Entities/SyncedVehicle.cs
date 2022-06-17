@@ -63,6 +63,13 @@ namespace RageCoop.Client
         internal float ThrottlePower { get; set; }
         internal float BrakePower { get; set; }
         internal float DeluxoWingRatio { get; set; } = -1;
+        internal bool IsFlipped
+        {
+            get
+            {
+                return (Quaternion*Vector3.RelativeTop).Z <(Quaternion*Vector3.RelativeBottom).Z;
+            }
+        }
         #endregion
 
         #region -- VEHICLE STATE --
@@ -128,7 +135,24 @@ namespace RageCoop.Client
             if (MainVehicle.Position.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
-                MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
+                if (IsFlipped)
+                {
+                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
+                    MainVehicle.RotationVelocity=RotationVelocity;
+                }
+                else
+                {
+                    Vector3 cali = GetCalibrationRotation();
+                    if (cali.Length()<50)
+                    {
+                        MainVehicle.RotationVelocity = RotationVelocity+cali*0.2f;
+                    }
+                    else
+                    {
+                        MainVehicle.Quaternion=Quaternion;
+                        MainVehicle.RotationVelocity=RotationVelocity;
+                    }
+                }
             }
             else
             {
@@ -136,8 +160,6 @@ namespace RageCoop.Client
                 MainVehicle.Velocity=Velocity;
                 MainVehicle.Quaternion=Quaternion;
             }
-            // Vector3 r = GetCalibrationRotation();
-            MainVehicle.RotationVelocity = RotationVelocity;
             if (DeluxoWingRatio!=-1)
             {
                 MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
@@ -321,9 +343,10 @@ namespace RageCoop.Client
         }
         private Vector3 GetCalibrationRotation()
         {
-            return (Quaternion-MainVehicle.Quaternion).ToEulerAngles().ToDegree();
-            /*
-            var r = Rotation-MainVehicle.Rotation;
+            var rot=Quaternion.LookRotation(Quaternion*Vector3.RelativeFront, Quaternion*Vector3.RelativeTop).ToEulerAngles();
+            var curRot=Quaternion.LookRotation(MainVehicle.Quaternion*Vector3.RelativeFront, MainVehicle.Quaternion*Vector3.RelativeTop).ToEulerAngles();
+            
+            var r = (rot-curRot).ToDegree();
             if (r.X>180) { r.X=r.X-360; }
             else if(r.X<-180) { r.X=360+r.X; }
 
@@ -333,7 +356,7 @@ namespace RageCoop.Client
             if (r.Z>180) { r.Z=r.Z-360; }
             else if (r.Z<-180) { r.Z=360+r.Z; }
             return r;
-            */
+            
         }
         private void CreateVehicle()
         {
