@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTA;
+using GTA.Native;
 using GTA.Math;
 
 namespace RageCoop.Client
@@ -32,6 +33,33 @@ namespace RageCoop.Client
             return p.Bones[Bone.SkelRightHand].Position;
         }
         static long BulletsShot=0;
+
+        public static float GetWeaponDamage(this Ped P, uint hash)
+        {
+            var comp = P.Weapons.Current.Components.GetSuppressorComponent();
+            return Function.Call<float>(Hash.GET_WEAPON_DAMAGE, hash, comp.Active ? comp.ComponentHash : WeaponComponentHash.Invalid);
+
+            /*
+            if (P.IsInVehicle() && (hash!=(uint)P.Weapons.Current.Hash))
+            {
+                // This is a vehicle weapon
+                P.VehicleWeapon=(VehicleWeaponHash)hash;
+                return 100;
+            }
+            switch (P.Weapons.Current.Group)
+            {
+                case WeaponGroup.Pistol: return 30;
+                case WeaponGroup.AssaultRifle: return 30;
+                case WeaponGroup.SMG: return 20;
+                case WeaponGroup.MG: return 40;
+                case WeaponGroup.Shotgun: return 30;
+                case WeaponGroup.Sniper: return 200;
+                case WeaponGroup.Heavy: return 30;
+            }
+            return 0;
+            */
+        }
+
         public static MuzzleInfo GetMuzzleInfo(this Vehicle v)
         {
             BulletsShot++;

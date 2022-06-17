@@ -189,7 +189,7 @@ namespace RageCoop.Client {
                 _lastWeaponHash=weaponHash;
             }
             if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
-            World.ShootBullet(start, end, p, _weaponAsset, p.GetWeaponDamage(weaponHash));
+            World.ShootBullet(start, end, p, _weaponAsset, (int)p.GetWeaponDamage(weaponHash));
             Prop w;
             if(((w = p.Weapons.CurrentWeaponObject) != null)&&(p.VehicleWeapon==VehicleWeaponHash.Invalid))
             {
@@ -268,27 +268,6 @@ namespace RageCoop.Client {
                     }
             }
         }
-        public static int GetWeaponDamage(this Ped p,uint hash)
-        {
-            if(p.IsInVehicle() && (hash!=(uint)p.Weapons.Current.Hash))
-            {
-                // This is a vehicle weapon
-                p.VehicleWeapon=(VehicleWeaponHash)hash;
-                return 100;
-            }
-            switch (p.Weapons.Current.Group)
-            {
-                case WeaponGroup.Pistol: return 30;
-                case WeaponGroup.AssaultRifle: return 30;
-                case WeaponGroup.SMG: return 20;
-                case WeaponGroup.MG: return 40;
-                case WeaponGroup.Shotgun: return 30;
-                case WeaponGroup.Sniper: return 200;
-                case WeaponGroup.Heavy: return 30;
-            }
-            return 0;
-        }
-
 
         #endregion
 
