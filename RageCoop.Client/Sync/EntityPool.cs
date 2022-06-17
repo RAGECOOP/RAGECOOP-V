@@ -277,6 +277,14 @@ namespace RageCoop.Client
             return ID_Projectiles.ContainsKey(id);
         }
         #endregion
+        static int vehStateIndex;
+        static int pedStateIndex;
+        static int vehStatesPerFrame;
+        static int pedStatesPerFrame;
+        static int i;
+        public static Ped[] allPeds=new Ped[0];
+        public static Vehicle[] allVehicles=new Vehicle[0];
+        public static Projectile[] allProjectiles=new Projectile[0];
 
         public static void DoSync()
         {
@@ -284,9 +292,12 @@ namespace RageCoop.Client
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles]=PerfCounter.ElapsedTicks;
 #endif
-            var allPeds = World.GetAllPeds();
-            var allVehicles=World.GetAllVehicles();
-            var allProjectiles=World.GetAllProjectiles();
+            allPeds = World.GetAllPeds();
+            allVehicles=World.GetAllVehicles();
+            allProjectiles=World.GetAllProjectiles();
+            vehStatesPerFrame=allVehicles.Length*5/(int)Game.FPS+1;
+            pedStatesPerFrame=allPeds.Length*5/(int)Game.FPS+1;
+
             if (Main.Settings.WorldVehicleSoftLimit>-1)
             {
                 if (Main.Ticked%100==0) { if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit) { SetBudget(0); } else { SetBudget(1); } }
@@ -347,6 +358,7 @@ namespace RageCoop.Client
 
             }
             
+            i=-1;
 
             lock (PedsLock)
             {
@@ -369,9 +381,15 @@ namespace RageCoop.Client
 
                 Debug.TimeStamps[TimeStamp.AddPeds]=PerfCounter.ElapsedTicks;
 #endif
-
-                foreach (SyncedPed c in ID_Peds.Values.ToArray())
+                var ps = ID_Peds.Values.ToArray();
+                pedStateIndex+=pedStatesPerFrame;
+                if (pedStateIndex>=ps.Length)
                 {
+                    pedStateIndex=0;
+                }
+                foreach (SyncedPed c in ps)
+                {
+                    i++;
                     if ((c.MainPed!=null)&&(!c.MainPed.Exists()))
                     {
                         EntityPool.RemovePed(c.ID, "non-existent");
@@ -387,14 +405,12 @@ namespace RageCoop.Client
                         // event check
                         SyncEvents.Check(c);
 
-                        if (Main.Ticked%20==0)
+                        Networking.SendPed(c);
+
+                        // Send state
+                        if ((i-pedStateIndex)<pedStatesPerFrame)
                         {
-                            Networking.SendPed(c);
                             Networking.SendPedState(c);
-                        }
-                        else
-                        {
-                            Networking.SendPed(c);
                         }
 #if BENCHMARK
 
@@ -422,6 +438,9 @@ namespace RageCoop.Client
                 Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
+
+            i=-1;
+
             lock (VehiclesLock)
             {
 
@@ -440,8 +459,15 @@ namespace RageCoop.Client
 
                 Debug.TimeStamps[TimeStamp.AddVehicles]=PerfCounter.ElapsedTicks;
 #endif
-                foreach (SyncedVehicle v in ID_Vehicles.Values.ToArray())
+                var vs = ID_Vehicles.Values.ToArray();
+                vehStateIndex+=vehStatesPerFrame;
+                if (vehStateIndex>=vs.Length)
                 {
+                    vehStateIndex=0;
+                }
+                foreach (SyncedVehicle v in vs)
+                {
+                    i++;
                     if ((v.MainVehicle!=null)&&(!v.MainVehicle.Exists()))
                     {
                         EntityPool.RemoveVehicle(v.ID,"non-existent");
@@ -452,14 +478,13 @@ namespace RageCoop.Client
                     if (v.IsMine)
                     {
                         SyncEvents.Check(v);
-                        if (Main.Ticked%20==0)
+
+                        Networking.SendVehicle(v);
+
+                        // Send state
+                        if ((i-vehStateIndex)<vehStatesPerFrame)
                         {
-                            Networking.SendVehicle(v);
                             Networking.SendVehicleState(v);
-                        }
-                        else
-                        {
-                            Networking.SendVehicle(v);
                         }
 
                     }
@@ -532,6 +557,10 @@ namespace RageCoop.Client
             s+="\nHandle_Peds: "+Handle_Peds.Count;
             s+="\nID_Vehicles: "+ID_Vehicles.Count;
             s+="\nHandle_Vehicles: "+Handle_Vehicles.Count;
+            s+="\nID_Projectiles: "+ID_Projectiles.Count;
+            s+="\nHandle_Projectiles: "+Handle_Projectiles.Count;
+            s+="\npedStatesPerFrame:"+pedStatesPerFrame;
+            s+="\nvehStatesPerFrame:"+vehStatesPerFrame;
             return s;
         }
         public static class ThreadSafe

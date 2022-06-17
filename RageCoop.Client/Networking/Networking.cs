@@ -16,8 +16,6 @@ namespace RageCoop.Client
         public static NetClient Client;
         public static float Latency = 0;
         public static bool ShowNetworkInfo = false;
-        public static int BytesReceived = 0;
-        public static int BytesSend = 0;
 
         static Networking()
         {

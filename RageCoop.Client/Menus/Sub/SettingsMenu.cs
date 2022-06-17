@@ -118,11 +118,6 @@ namespace RageCoop.Client.Menus
         {
             Networking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
 
-            if (!Networking.ShowNetworkInfo)
-            {
-                Networking.BytesReceived = 0;
-                Networking.BytesSend = 0;
-            }
         }
     }
 }

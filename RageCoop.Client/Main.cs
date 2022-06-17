@@ -139,10 +139,9 @@ namespace RageCoop.Client
                 {
                     _lastDebugData = time;
 
-                    _debugBytesReceived = Networking.BytesReceived;
-                    Networking.BytesReceived = 0;
-                    _debugBytesSend = Networking.BytesSend;
-                    Networking.BytesSend = 0;
+                    _debugBytesReceived = Networking.Client.Statistics.ReceivedBytes;
+                    _debugBytesSend = Networking.Client.Statistics.SentBytes;
+                    Networking.Client.Statistics.Reset();
                 }
 
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();

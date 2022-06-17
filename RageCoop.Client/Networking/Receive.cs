@@ -17,8 +17,6 @@ namespace RageCoop.Client
         {
             if(message == null) { return; }
 
-            BytesReceived += message.LengthBytes;
-
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.StatusChanged:

@@ -156,10 +156,6 @@ namespace RageCoop.Client
             Client.FlushSendQueue();
 
 #if DEBUG
-            if (ShowNetworkInfo)
-            {
-                BytesSend += outgoingMessage.LengthBytes;
-            }
 #endif
         }
         public static void SendDownloadFinish(int id)
@@ -172,10 +168,6 @@ namespace RageCoop.Client
             Client.FlushSendQueue();
 
 #if DEBUG
-            if (ShowNetworkInfo)
-            {
-                BytesSend += outgoingMessage.LengthBytes;
-            }
 #endif
         }
         #endregion
