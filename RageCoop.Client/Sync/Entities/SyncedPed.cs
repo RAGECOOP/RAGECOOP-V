@@ -292,7 +292,7 @@ namespace RageCoop.Client
         {
             for (byte i = 0; i < 11; i++)
             {
-                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, Clothes[i], Clothes[i+11], Clothes[i+22]);
+                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, (int)Clothes[i], (int)Clothes[i+11], (int)Clothes[i+22]);
             }
             _lastClothes = Clothes;
         }
