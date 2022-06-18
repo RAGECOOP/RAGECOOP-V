@@ -352,7 +352,7 @@ namespace RageCoop.Client
                     }
                     catch(Exception ex)
                     {
-                        GTA.UI.Screen.ShowSubtitle(ex.ToString());
+                        Logger.Error(ex);
                         QueuedActions.Remove(action);
                     }
                 }
