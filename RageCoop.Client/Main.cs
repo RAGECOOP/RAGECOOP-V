@@ -332,7 +332,6 @@ namespace RageCoop.Client
                         Main.Logger.Error($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
                     }
                 }
-
                 ServerItems.Clear();
             }
         }

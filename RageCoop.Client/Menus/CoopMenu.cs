@@ -4,6 +4,7 @@ using System.Drawing;
 
 using LemonUI;
 using LemonUI.Menus;
+using LemonUI.Scaleform;
 
 namespace RageCoop.Client.Menus
 {
@@ -17,6 +18,15 @@ namespace RageCoop.Client.Menus
         {
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+        };
+        public static PopUp PopUp=new PopUp()
+        {
+            Title="",
+            Prompt="",
+            Subtitle = "",
+            Error="",
+            ShowBackground = true,
+            Visible=false,
         };
         public static NativeMenu LastMenu { get; set; } = Menu;
         #region ITEMS
@@ -36,6 +46,7 @@ namespace RageCoop.Client.Menus
         /// </summary>
         static CoopMenu()
         {
+
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
@@ -61,10 +72,35 @@ namespace RageCoop.Client.Menus
             MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
             MenuPool.Add(ServersMenu.Menu);
+            MenuPool.Add(PopUp);
 
             Menu.Add(_aboutItem);
         }
-
+        public static bool ShowPopUp(string prompt, string title,string subtitle,string error,bool showbackground)
+        {
+            PopUp.Prompt=prompt;
+            PopUp.Title=title;
+            PopUp.Subtitle=subtitle;
+            PopUp.Error=error;
+            PopUp.ShowBackground=showbackground;
+            PopUp.Visible=true;
+            while (true)
+            {
+                Game.DisableAllControlsThisFrame();
+                MenuPool.Process();
+                if (Game.IsControlJustPressed(Control.FrontendAccept))
+                {
+                    PopUp.Visible=false;
+                    return true;
+                }
+                else if (Game.IsControlJustPressed(Control.FrontendCancel))
+                {
+                    PopUp.Visible = false;
+                    return false;
+                }
+                Script.Yield();
+            }
+        }
         public static void UsernameActivated(object a, System.EventArgs b)
         {
             string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
