@@ -183,7 +183,7 @@ namespace RageCoop.Client
                         {
 
                             SyncedPed c = Passengers[seat];
-                            if (c?.ID==Main.LocalPlayerID && (RadioStation!=_lastRadioIndex))
+                            if (c?.ID==Main.LocalPlayerID && (RadioStation!=Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX)))
                             {
                                 Util.SetPlayerRadioIndex(RadioStation);
                             }
