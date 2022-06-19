@@ -24,7 +24,7 @@ namespace RageCoop.Core
 
             public Dictionary<uint, bool> WeaponComponents { get; set; }
             
-
+            public byte WeaponTint { get;set; }
 
 
             public override void Pack(NetOutgoingMessage message)
@@ -62,6 +62,7 @@ namespace RageCoop.Core
                     byteArray.Add(0x00);
                 }
 
+                byteArray.Add(WeaponTint);
 
                 byte[] result = byteArray.ToArray();
                 message.Write(result.Length);
@@ -96,7 +97,7 @@ namespace RageCoop.Core
                         WeaponComponents.Add(reader.ReadUInt(), reader.ReadBool());
                     }
                 }
-
+                WeaponTint=reader.ReadByte();
                 #endregion
             }
         }

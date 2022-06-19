@@ -65,6 +65,7 @@ namespace RageCoop.Client
                 Clothes=p.GetPedClothes(),
                 ModelHash=p.Model.Hash,
                 WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
+                WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash)
             };
 
             Send(packet, ConnectionChannel.PedSync);

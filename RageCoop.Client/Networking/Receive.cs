@@ -322,6 +322,7 @@ namespace RageCoop.Client
             c.OwnerID=packet.OwnerID;
             c.Clothes=packet.Clothes;
             c.WeaponComponents=packet.WeaponComponents;
+            c.WeaponTint=packet.WeaponTint;
             c.ModelHash=packet.ModelHash;
             c.LastStateSynced = Main.Ticked;
         }

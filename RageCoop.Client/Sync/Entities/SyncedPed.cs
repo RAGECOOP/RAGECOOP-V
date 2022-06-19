@@ -61,6 +61,7 @@ namespace RageCoop.Client
         /// </summary>
         public Ped MainPed { get; internal set; }
         internal int Health { get; set; }
+        internal byte WeaponTint { get; set; }
         internal bool _lastEnteringVehicle=false;
         internal bool _lastSittingInVehicle=false;
         private bool _lastRagdoll=false;
@@ -599,6 +600,10 @@ namespace RageCoop.Client
                 }
 
                 _lastWeaponComponents = WeaponComponents;
+            }
+            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX,MainPed,CurrentWeaponHash)!=WeaponTint)
+            {
+                Function.Call<int>(Hash.SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeaponHash, WeaponTint);
             }
         }
 
