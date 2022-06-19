@@ -358,6 +358,7 @@ namespace RageCoop.Client
             v.ModelHash=packet.ModelHash;
             v.Colors=packet.Colors;
             v.LandingGear=packet.LandingGear;
+            v.RoofState=(VehicleRoofState)packet.RoofState;
             v.EngineRunning = packet.Flag.HasFlag(VehicleDataFlags.IsEngineRunning);
             v.LightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreLightsOn);
             v.BrakeLightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreBrakeLightsOn);

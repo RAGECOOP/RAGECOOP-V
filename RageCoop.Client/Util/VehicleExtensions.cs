@@ -72,7 +72,10 @@ namespace RageCoop.Client
             {
                 flags|= VehicleDataFlags.IsDeluxoHovering;
             }
-
+            if (veh.HasRoof)
+            {
+                flags|=VehicleDataFlags.HasRoof;
+            }
 
 
             return flags;

@@ -83,7 +83,7 @@ namespace RageCoop.Client
         internal bool BrakeLightsOn { get; set; } = false;
         internal bool HighBeamsOn { get; set; }
         internal byte LandingGear { get; set; }
-        internal bool RoofOpened { get; set; }
+        internal VehicleRoofState RoofState { get; set; }
         internal bool SireneActive { get; set; }
         internal VehicleDamageModel DamageModel { get; set; }
         internal int ModelHash { get; set; }
@@ -308,13 +308,9 @@ namespace RageCoop.Client
                         MainVehicle.SoundHorn(1);
                     }
 
-                    if (MainVehicle.HasRoof)
+                    if (MainVehicle.HasRoof && MainVehicle.RoofState!=RoofState)
                     {
-                        bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
-                        if (roofOpened != RoofOpened)
-                        {
-                            MainVehicle.RoofState = RoofOpened ? VehicleRoofState.Opening : VehicleRoofState.Closing;
-                        }
+                        MainVehicle.RoofState=RoofState;
                     }
 
                     Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
@@ -373,14 +369,9 @@ namespace RageCoop.Client
                 EntityPool.Add( this);
             }
             MainVehicle.Quaternion = Quaternion;
-
             if (MainVehicle.HasRoof)
             {
-                bool roofOpened = MainVehicle.RoofState == VehicleRoofState.Opened || MainVehicle.RoofState == VehicleRoofState.Opening;
-                if (roofOpened != RoofOpened)
-                {
-                    MainVehicle.RoofState = RoofOpened ? VehicleRoofState.Opened : VehicleRoofState.Closed;
-                }
+                MainVehicle.RoofState=RoofState;
             }
             vehicleModel.MarkAsNoLongerNeeded();
         }

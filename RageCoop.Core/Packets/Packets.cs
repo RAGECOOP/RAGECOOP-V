@@ -103,6 +103,7 @@ namespace RageCoop.Core
         OnTurretSeat = 1 << 9,
         IsAircraft = 1 << 10,
         IsDeluxoHovering=1 << 11, 
+        HasRoof=1 << 12,
     }
     
     

@@ -598,7 +598,6 @@ namespace RageCoop.Client
                     Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, MainPed.Handle);
 
                 }
-
                 _lastWeaponComponents = WeaponComponents;
             }
             if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX,MainPed,CurrentWeaponHash)!=WeaponTint)

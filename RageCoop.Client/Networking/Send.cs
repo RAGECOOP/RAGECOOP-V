@@ -105,6 +105,7 @@ namespace RageCoop.Client
                 Colors=new byte[] { primaryColor, secondaryColor },
                 DamageModel=veh.GetVehicleDamageModel(),
                 LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0,
+                RoofState=(byte)veh.RoofState,
                 Mods = veh.Mods.GetVehicleMods(),
                 ModelHash=veh.Model.Hash,
                 EngineHealth=veh.EngineHealth,

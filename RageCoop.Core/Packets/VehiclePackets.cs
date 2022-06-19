@@ -30,6 +30,7 @@ namespace RageCoop.Core
             public VehicleDamageModel DamageModel { get; set; }
 
             public byte LandingGear { get; set; }
+            public byte RoofState { get; set; }
 
             public VehicleDataFlags Flag { get; set; }
 
@@ -66,7 +67,11 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(VehicleDataFlags.IsAircraft))
                 {
                     // Write the vehicle landing gear
-                    byteArray.AddRange(BitConverter.GetBytes(LandingGear));
+                    byteArray.Add(LandingGear);
+                }
+                if (Flag.HasFlag(VehicleDataFlags.HasRoof))
+                {
+                    byteArray.Add(RoofState);
                 }
 
                 // Write vehicle colors
@@ -151,7 +156,11 @@ namespace RageCoop.Core
                 if (Flag.HasFlag(VehicleDataFlags.IsAircraft))
                 {
                     // Read vehicle landing gear
-                    LandingGear = (byte)reader.ReadShort();
+                    LandingGear = reader.ReadByte();
+                }
+                if (Flag.HasFlag(VehicleDataFlags.HasRoof))
+                {
+                    RoofState=reader.ReadByte();
                 }
 
                 // Read vehicle colors
