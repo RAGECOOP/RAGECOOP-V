@@ -81,7 +81,7 @@ namespace RageCoop.Core
                 ModelHash = reader.ReadInt();
 
                 // Read player clothes
-                Clothes =reader.ReadByteArray(33);
+                Clothes =reader.ReadByteArray(36);
 
                 // Read ped OwnerID
                 OwnerID= reader.ReadInt();

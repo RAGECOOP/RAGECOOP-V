@@ -24,9 +24,16 @@ namespace RageCoop.Core.Logging
         
         public Logger(bool overwrite=true)
         {
-            if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
             LoggerThread=new Thread(() =>
             {
+                if (!UseConsole)
+                {
+                    while (LogPath==default)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
+                }
                 while (!Stopping)
                 {
                     Flush();

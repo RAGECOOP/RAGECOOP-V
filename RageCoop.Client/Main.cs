@@ -182,7 +182,7 @@ namespace RageCoop.Client
 
             Ticked++;
         }
-
+        
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)

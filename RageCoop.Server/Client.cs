@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
 using GTA.Math;
-using RageCoop.Core.Scripting.Events;
+using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server
 {
@@ -186,7 +186,7 @@ namespace RageCoop.Server
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
-        public void SendCustomEvent(int id,byte[] data)
+        public void SendCustomEvent(int id,List<object> args)
         {
             if (!IsReady)
             {
@@ -201,7 +201,7 @@ namespace RageCoop.Server
                 new Packets.CustomEvent()
                 {
                     Hash=id,
-                    Data=data
+                    Args=args
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
 

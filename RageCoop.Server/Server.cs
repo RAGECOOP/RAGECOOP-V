@@ -328,13 +328,6 @@ namespace RageCoop.Server
                                         }
                                     }
                                     break;
-                                case PacketTypes.InvokeCustomEvent:
-                                    {
-                                        var p = new Packets.InvokeCustomEvent();
-                                        p.Unpack(data);
-                                        API.SendCustomEvent(p.Hash,p.Data,p.Targets);
-                                    }
-                                    break;
                                 case PacketTypes.FileTransferComplete:
                                     {
                                         Packets.FileTransferComplete packet = new Packets.FileTransferComplete();

@@ -84,7 +84,6 @@ namespace RageCoop.Client
         {
             if (IsPlayer)
             {
-
                 if (Username=="N/A")
                 {
                     var p = PlayerList.GetPlayer(ID);
@@ -290,9 +289,9 @@ namespace RageCoop.Client
 
         private void SetClothes()
         {
-            for (byte i = 0; i < 11; i++)
+            for (byte i = 0; i < 12; i++)
             {
-                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, (int)Clothes[i], (int)Clothes[i+11], (int)Clothes[i+22]);
+                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, (int)Clothes[i], (int)Clothes[i+12], (int)Clothes[i+24]);
             }
             _lastClothes = Clothes;
         }

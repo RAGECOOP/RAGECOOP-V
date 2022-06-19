@@ -5,13 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Lidgren.Network;
 using RageCoop.Core;
-using RageCoop.Core.Scripting.Events;
 using System.Net;
 
 namespace RageCoop.Server.Scripting
 {
     public static class API
     {
+        #region INTERNAL
+        internal static void InvokeCustomEvent(int hash,List<object> args)
+        {
+
+        }
+        #endregion
         public static class Events
         {
             #region DELEGATES
@@ -194,26 +199,17 @@ namespace RageCoop.Server.Scripting
         }
 
 
-        public static void SendCustomEvent(int eventID, byte[] data, IEnumerable<Client> recepients)
+        public static void TriggerCustomEvent(int eventHash,List<object> args,List<Client> targets=null)
         {
-            foreach(var c in recepients)
+            targets ??= new(Server.Clients.Values);
+            var p = new Packets.CustomEvent()
             {
-                c.SendCustomEvent(eventID,data);
-            }
-        }
-        public static void SendCustomEvent(CustomEvent e, Client[] recepients)
-        {
-            SendCustomEvent(e.EventID, e.Serialize(), recepients);
-        }
-        public static void SendCustomEvent(int eventID, byte[] data, int[] recepients)
-        {
-            if (recepients.Length==0)
+                Args=args,
+                Hash=eventHash
+            };
+            foreach(var c in targets)
             {
-                SendCustomEvent(eventID,data,Server.Clients.Values);
-            }
-            else
-            {
-                SendCustomEvent(eventID,data, Server.Clients.Values.Where(x => recepients.Contains(x.Player.PedID)).ToArray());
+                Server.Send(p,c,ConnectionChannel.Event,NetDeliveryMethod.ReliableOrdered);
             }
         }
         #endregion

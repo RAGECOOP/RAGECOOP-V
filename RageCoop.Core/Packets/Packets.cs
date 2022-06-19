@@ -7,112 +7,6 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    /*
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct LVector3
-    {
-        #region CLIENT-ONLY
-        /// <summary>
-        /// 
-        /// </summary>
-        public Vector3 ToVector()
-        {
-            return new Vector3(X, Y, Z);
-        }
-        #endregion
-        #region SERVER-ONLY
-        public float Length() => (float)Math.Sqrt((X * X) + (Y * Y) + (Z * Z));
-        public static LVector3 Subtract(LVector3 pos1, LVector3 pos2) { return new LVector3(pos1.X - pos2.X, pos1.Y - pos2.Y, pos1.Z - pos2.Z); }
-        public static bool Equals(LVector3 value1, LVector3 value2) => value1.X == value2.X && value1.Y == value2.Y && value1.Z == value2.Z;
-        public static LVector3 operator /(LVector3 value1, float value2)
-        {
-            float num = 1f / value2;
-            return new LVector3(value1.X * num, value1.Y * num, value1.Z * num);
-        }
-        public static LVector3 operator -(LVector3 left, LVector3 right)
-        {
-            return new LVector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
-        }
-        public static LVector3 operator -(LVector3 value)
-        {
-            return default(LVector3) - value;
-        }
-        #endregion
-        /// <summary>
-        /// 
-        /// </summary>
-        public LVector3(float X, float Y, float Z)
-        {
-            this.X = X;
-            this.Y = Y;
-            this.Z = Z;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float Y { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float Z { get; set; }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct LQuaternion
-    {
-        #region CLIENT-ONLY
-        /// <summary>
-        /// 
-        /// </summary>
-        public Quaternion ToQuaternion()
-        {
-            return new Quaternion(X, Y, Z, W);
-        }
-        #endregion
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public LQuaternion(float X, float Y, float Z, float W)
-        {
-            this.X = X;
-            this.Y = Y;
-            this.Z = Z;
-            this.W = W;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float X { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float Y { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float Z { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public float W { get; set; }
-    }
-    */
     public enum PacketTypes:byte
     {
         Handshake=0,
@@ -131,7 +25,6 @@ namespace RageCoop.Core
         FileTransferComplete=17,
         
         CustomEvent = 18,
-        InvokeCustomEvent=19,
         #region Sync
 
         #region INTERVAL
@@ -290,86 +183,6 @@ namespace RageCoop.Core
             }
         }
 
-        public class CustomEvent : Packet
-        {
-            public int Hash { get; set; }
-            public byte[] Data { get; set; }
-
-            public override void Pack(NetOutgoingMessage message)
-            {
-                message.Write((byte)PacketTypes.CustomEvent);
-
-                List<byte> byteArray = new List<byte>();
-
-
-                // Write hash
-                byteArray.AddInt(Hash);
-
-                // Write data
-                byteArray.AddRange(Data);
-
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-            }
-
-            public override void Unpack(byte[] array)
-            {
-                BitReader reader = new BitReader(array);
-
-                Hash = reader.ReadInt();
-
-                Data=reader.ReadByteArray(array.Length-4);
-            }
-        }
-        public class InvokeCustomEvent : Packet
-        {
-            public int Hash { get; set; }
-            public int[] Targets { get; set; }
-            public byte[] Data { get; set; }
-
-            public override void Pack(NetOutgoingMessage message)
-            {
-                message.Write((byte)PacketTypes.InvokeCustomEvent);
-
-                List<byte> byteArray = new List<byte>();
-
-
-                // Write hash
-                byteArray.AddInt(Hash);
-
-                // Write targets
-                byteArray.AddInt(Targets.Length);
-                foreach (var target in Targets)
-                {
-                    byteArray.AddInt(target);
-                }
-
-                // Write data
-                byteArray.AddRange(Data);
-
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-            }
-
-            public override void Unpack(byte[] array)
-            {
-                BitReader reader = new BitReader(array);
-
-                Hash = reader.ReadInt();
-
-                Targets = new int[reader.ReadInt()];
-                for(int i = 0; i < Targets.Length; i++)
-                {
-                    Targets[i]=reader.ReadInt();
-                }
-
-                Data=reader.ReadByteArray(array.Length-4);
-            }
-        }
         #region ===== NATIVECALL =====
         public class NativeCall : Packet
         {

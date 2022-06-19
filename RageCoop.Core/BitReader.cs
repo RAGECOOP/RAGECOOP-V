@@ -103,6 +103,13 @@ namespace RageCoop.Core
             CurrentIndex += index;
             return value;
         }
+        public string ReadString()
+        {
+            var len = ReadInt();
+            string value = Encoding.UTF8.GetString(ResultArray.Skip(CurrentIndex).Take(len).ToArray());
+            CurrentIndex += len;
+            return value;
+        }
 
         public Vector3 ReadVector3()
         {

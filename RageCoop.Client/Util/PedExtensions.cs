@@ -68,12 +68,12 @@ namespace RageCoop.Client
         // Not sure whether component will always be lesser than 255, whatever...
         public static byte[] GetPedClothes(this Ped ped)
         {
-            var result = new byte[33];
-            for (byte i = 0; i < 11; i++)
+            var result = new byte[36];
+            for (byte i = 0; i < 12; i++)
             {
                 result[i]=(byte)Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
-                result[i+11]=(byte)Function.Call<short>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
-                result[i+22]=(byte)Function.Call<short>(Hash.GET_PED_PALETTE_VARIATION, ped.Handle, i);
+                result[i+12]=(byte)Function.Call<short>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
+                result[i+24]=(byte)Function.Call<short>(Hash.GET_PED_PALETTE_VARIATION, ped.Handle, i);
             }
             return result;
         }
