@@ -20,7 +20,7 @@ namespace RageCoop.Client
         public static unsafe void NativeMemory()
         {
             IntPtr address;
-
+            
             address = Game.FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
             if (address != IntPtr.Zero)
             {

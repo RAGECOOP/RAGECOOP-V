@@ -4,6 +4,7 @@ using System.Text;
 using GTA;
 using GTA.Math;
 using Lidgren.Network;
+using System.Linq;
 
 namespace RageCoop.Core
 {
@@ -43,6 +44,7 @@ namespace RageCoop.Core
             public Dictionary<int, int> Passengers { get; set; }
 
             public byte RadioStation { get; set; } = 255;
+            public string LicensePlate { get; set; }
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
@@ -126,6 +128,17 @@ namespace RageCoop.Core
 
                 // Write RadioStation
                 byteArray.Add(RadioStation);
+
+                //　Write LicensePlate
+                while (LicensePlate.Length<8)
+                {
+                    LicensePlate+=" ";
+                }
+                if (LicensePlate.Length>8)
+                {
+                    LicensePlate=new string(LicensePlate.Take(8).ToArray());
+                }
+                byteArray.AddRange(Encoding.ASCII.GetBytes(LicensePlate));
 
                 byte[] result = byteArray.ToArray();
 
@@ -216,6 +229,8 @@ namespace RageCoop.Core
 
                 // Read RadioStation
                 RadioStation=reader.ReadByte();
+
+                LicensePlate=Encoding.ASCII.GetString(reader.ReadByteArray(8));
                 #endregion
             }
         }

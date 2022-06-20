@@ -370,6 +370,7 @@ namespace RageCoop.Client
             v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
             v.LockStatus=packet.LockStatus;
             v.RadioStation=packet.RadioStation;
+            v.LicensePlate=packet.LicensePlate;
             v.Flags=packet.Flag;
             foreach (KeyValuePair<int, int> pair in packet.Passengers)
             {

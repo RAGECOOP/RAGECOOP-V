@@ -97,6 +97,7 @@ namespace RageCoop.Client
         /// </summary>
         internal Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
         internal byte RadioStation = 255;
+        internal string LicensePlate { get; set; }
 
         #endregion
         internal override void Update()
@@ -116,10 +117,7 @@ namespace RageCoop.Client
                 return;
             }
             #endregion
-            
             #region -- SYNC CRITICAL --
-
-
             if (SteeringAngle != MainVehicle.SteeringAngle)
             {
                 MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * SteeringAngle);
@@ -333,6 +331,10 @@ namespace RageCoop.Client
                     }
                 }
 
+                if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle)!=LicensePlate)
+                {
+                    Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT,MainVehicle,LicensePlate);
+                }
                 #endregion
             }
             LastUpdated=Main.Ticked;

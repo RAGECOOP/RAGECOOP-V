@@ -111,6 +111,7 @@ namespace RageCoop.Client
                 EngineHealth=veh.EngineHealth,
                 Passengers=veh.GetPassengers(),
                 LockStatus=veh.LockStatus,
+                LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh)
             };
             if (v.MainVehicle==Game.Player.LastVehicle)
             {

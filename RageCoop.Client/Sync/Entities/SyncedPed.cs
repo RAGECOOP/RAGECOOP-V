@@ -720,6 +720,11 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
                 Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
             }
+            /*
+            Function.Call(Hash.TASK_SWEEP_AIM_ENTITY,P, "random@paparazzi@pap_anims", "sweep_low", "sweep_med", "sweep_high", -1,V, 1.57f, 0.25f);
+            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, P,true, 0);
+            return Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, P);
+            */
         }
     }
 }
