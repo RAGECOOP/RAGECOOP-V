@@ -303,6 +303,7 @@ namespace RageCoop.Client
             c.IsOnLadder = flags.HasFlag(PedDataFlags.IsOnLadder);
             c.IsVaulting = flags.HasFlag(PedDataFlags.IsVaulting);
             c.IsInCover = flags.HasFlag(PedDataFlags.IsInCover);
+            c.IsInStealthMode = flags.HasFlag(PedDataFlags.IsInStealthMode);
             c.Heading=packet.Heading;
             c.LastSynced =  Main.Ticked;
             if (c.IsAiming)

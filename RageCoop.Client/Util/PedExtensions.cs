@@ -134,6 +134,11 @@ namespace RageCoop.Client
             {
                 flags |=PedDataFlags.IsInCover;
             }
+
+            if(Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped))
+            {
+                flags |= PedDataFlags.IsInStealthMode;
+            }
             return flags;
         }
 

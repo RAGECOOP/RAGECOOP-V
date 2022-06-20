@@ -61,6 +61,7 @@ namespace RageCoop.Client
         /// </summary>
         public Ped MainPed { get; internal set; }
         internal int Health { get; set; }
+        internal bool IsInStealthMode { get; set; }
         internal byte WeaponTint { get; set; }
         internal bool _lastEnteringVehicle=false;
         internal bool _lastSittingInVehicle=false;
@@ -466,6 +467,8 @@ namespace RageCoop.Client
                 return;
             }
             _lastIsJumping = false;
+
+            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
 
             if (IsRagdoll || Health==0)
             {
