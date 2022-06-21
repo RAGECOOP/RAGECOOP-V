@@ -80,7 +80,7 @@ namespace RageCoop.Server.Scripting
             }
             internal static void InvokePlayerUpdate(Client client)
             {
-                OnPlayerUpdate.Invoke(null,client);
+                OnPlayerUpdate?.Invoke(null,client);
             }
             #endregion
         }
