@@ -80,15 +80,6 @@ namespace RageCoop.Client
 
             return flags;
         }
-        public static bool HasFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
-        {
-            return (flagToCheck & flag)!=0;
-        }
-
-        public static bool HasFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
-        {
-            return (flagToCheck & flag)!=0;
-        }
 
 
         public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)

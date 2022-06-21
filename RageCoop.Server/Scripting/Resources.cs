@@ -92,9 +92,9 @@ namespace RageCoop.Server.Scripting
 			{
 				Task.Run(() =>
 				{
-					Logger.Info($"Sending resources to client:{client.Player.Username}");
+					Logger.Info($"Sending resources to client:{client.Username}");
 					Server.SendFile(path, "Resources.zip", client);
-					Logger.Info($"Resources sent to:{client.Player.Username}");
+					Logger.Info($"Resources sent to:{client.Username}");
 
 				});
 			}

@@ -468,8 +468,6 @@ namespace RageCoop.Client
             }
             _lastIsJumping = false;
 
-            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
-
             if (IsRagdoll || Health==0)
             {
                 if (!MainPed.IsRagdoll)

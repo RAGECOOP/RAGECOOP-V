@@ -44,11 +44,11 @@ namespace RageCoop.Client
                 Flag = p.GetPedFlags(),
                 Heading=p.Heading,
             };
-            if (packet.Flag.HasFlag(PedDataFlags.IsAiming))
+            if (packet.Flag.HasPedFlag(PedDataFlags.IsAiming))
             {
                 packet.AimCoords = p.GetAimCoord();
             }
-            if (packet.Flag.HasFlag(PedDataFlags.IsRagdoll))
+            if (packet.Flag.HasPedFlag(PedDataFlags.IsRagdoll))
             {
                 packet.RotationVelocity=p.RotationVelocity;
             }

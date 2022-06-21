@@ -41,11 +41,10 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         public static class Events
         {
-            /// <summary>
-            /// Empty delegate
-            /// </summary>
+            #region DELEGATES
             public delegate void EmptyEvent();
-
+            public delegate void CustomEvent(int hash, List<object> args);
+            #endregion
             /// <summary>
             /// The local player is dead
             /// </summary>
@@ -75,15 +74,38 @@ namespace RageCoop.Client.Scripting
             /// This is equivalent of <see cref="GTA.Script.Tick"/>.
             /// </summary>
             public static event EmptyEvent OnTick;
+
+            /// <summary>
+            /// This will be invoked when a CustomEvent is received from the server.
+            /// </summary>
+            public static event CustomEvent OnCustomEventReceived;
+
             #region INVOKE
-            internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null,v); }
+            internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null, v); }
             internal static void InvokeVehicleDeleted(SyncedVehicle v) { OnVehicleDeleted?.Invoke(null, v); }
             internal static void InvokePedSpawned(SyncedPed p) { OnPedSpawned?.Invoke(null, p); }
             internal static void InvokePedDeleted(SyncedPed p) { OnPedDeleted?.Invoke(null, p); }
             internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
             internal static void InvokeTick() { OnTick?.Invoke(); }
+
+            internal static void InvokeCustomEventReceived(int hash, List<object> args)
+            {
+                OnCustomEventReceived?.Invoke(hash, args);
+            }
             #endregion
+            internal static void ClearHandlers()
+            {
+                OnPlayerDied=null;
+                OnTick=null;
+                OnPedDeleted=null;
+                OnPedSpawned=null;
+                OnVehicleDeleted=null;
+                OnVehicleSpawned=null;
+                OnCustomEventReceived=null;
+            }
         }
+
+        #region FUNCTIONS
         /// <summary>
         /// Send a local chat message to this player
         /// </summary>
@@ -166,6 +188,22 @@ namespace RageCoop.Client.Scripting
         {
             get { return Main.CurrentVersion; }
         }
+        /// <summary>
+        /// Send an event and data to the specified clients.
+        /// </summary>
+        /// <param name="eventHash">An unique identifier of the event</param>
+        /// <param name="args">The objects conataing your data, supported types: 
+        /// byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
+        public static void SendCustomEvent(int eventHash, List<object> args)
+        {
+            var p = new Packets.CustomEvent()
+            {
+                Args=args,
+                Hash=eventHash
+            };
+            Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
 
+        }
+        #endregion
     }
 }

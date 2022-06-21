@@ -67,7 +67,7 @@ namespace RageCoop.Server
 
         public static NetConnection GetConnectionByUsername(string username)
         {
-            Client client = Server.Clients.Values.ToList().Find(x => x.Player.Username.ToLower() == username.ToLower());
+            Client client = Server.Clients.Values.ToList().Find(x => x.Username.ToLower() == username.ToLower());
             if (client == null)
             {
                 return null;

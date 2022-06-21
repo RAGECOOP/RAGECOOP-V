@@ -178,6 +178,7 @@ namespace RageCoop.Server
             Program.Logger.Dispose();
         }
 
+        Client sender;
         private void ProcessMessage(NetIncomingMessage message)
         {
             if(message == null) { return; }
@@ -230,16 +231,20 @@ namespace RageCoop.Server
                         break;
                     }
                 case NetIncomingMessageType.Data:
-
                     {
                         // Get packet type
                         byte btype = message.ReadByte();
                         var type = (PacketTypes)btype;
                         int len = message.ReadInt32();
                         byte[] data = message.ReadBytes(len);
+
                         try
                         {
-
+                            // Get sender client
+                            if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
+                            {
+                                throw new UnauthorizedAccessException("No client data found:"+message.SenderEndPoint);
+                            }
                             switch (type)
                             {
 
@@ -296,19 +301,19 @@ namespace RageCoop.Server
 
                                 case PacketTypes.ChatMessage:
                                     {
-                                        try
-                                        {
 
-                                            Packets.ChatMessage packet = new();
-                                            packet.Unpack(data);
+                                        Packets.ChatMessage packet = new();
+                                        packet.Unpack(data);
 
-                                            API.Events.InvokeOnChatMessage(packet, message.SenderConnection);
-                                            SendChatMessage(packet);
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
-                                        }
+                                        API.Events.InvokeOnChatMessage(packet, sender);
+                                        SendChatMessage(packet,sender);
+                                    }
+                                    break;
+                                case PacketTypes.CustomEvent:
+                                    {
+                                        Packets.CustomEvent packet = new Packets.CustomEvent();
+                                        packet.Unpack(data);
+                                        API.Events.InvokeCustomEventReceived(packet, sender);
                                     }
                                     break;
 
@@ -384,7 +389,7 @@ namespace RageCoop.Server
                         Client client = Util.GetClientByNetID(message.SenderConnection.RemoteUniqueIdentifier);
                         if (client != null)
                         {
-                            client.Player.Latency = message.ReadFloat();
+                            client.Latency = message.ReadFloat();
                         }
                     }
                     break;
@@ -415,9 +420,9 @@ namespace RageCoop.Server
                     NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                     new Packets.PlayerInfoUpdate()
                     {
-                        PedID=c.Player.PedID,
-                        Username=c.Player.Username,
-                        Latency=c.Player.Latency,
+                        PedID=c.ID,
+                        Username=c.Username,
+                        Latency=c.Latency,
                     }.Pack(outgoingMessage);
                     MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
                 });
@@ -454,7 +459,7 @@ namespace RageCoop.Server
                 connection.Deny("Username contains special chars!");
                 return;
             }
-            if (Clients.Values.Any(x => x.Player.Username.ToLower() == packet.Username.ToLower()))
+            if (Clients.Values.Any(x => x.Username.ToLower() == packet.Username.ToLower()))
             {
                 connection.Deny("Username is already taken!");
                 return;
@@ -485,10 +490,9 @@ namespace RageCoop.Server
                     {
                         NetID = connection.RemoteUniqueIdentifier,
                         Connection=connection,
+                        Username=packet.Username,
                         Player = new()
                         {
-                            Username = packet.Username,
-                            PedID=packet.PedID,
                         }
                     }
                 );;
@@ -535,8 +539,8 @@ namespace RageCoop.Server
                         new Packets.PlayerConnect()
                         {
                             // NetHandle = targetNetHandle,
-                            Username = targetClient.Player.Username,
-                            PedID=targetClient.Player.PedID,
+                            Username = targetClient.Username,
+                            PedID=targetClient.ID,
                             
                         }.Pack(outgoingMessage);
                         MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
@@ -547,8 +551,8 @@ namespace RageCoop.Server
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerConnect()
                 {
-                    PedID=localClient.Player.PedID,
-                    Username = localClient.Player.Username
+                    PedID=localClient.ID,
+                    Username = localClient.Username
                 }.Pack(outgoingMessage);
                 if(clients.Count > 0)
                 {
@@ -557,11 +561,11 @@ namespace RageCoop.Server
             }
             API.Events.InvokePlayerConnected(localClient);
             
-            Program.Logger.Info($"Player {localClient.Player.Username} connected!");
+            Program.Logger.Info($"Player {localClient.Username} connected!");
 
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
-                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, new List<NetConnection>() { local });
+                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, null,new List<NetConnection>() { local });
             }
         }
 
@@ -569,7 +573,7 @@ namespace RageCoop.Server
         private static void SendPlayerDisconnectPacket(long nethandle)
         {
             List<NetConnection> clients = MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != nethandle);
-            int playerPedID = Clients[nethandle].Player.PedID;
+            int playerPedID = Clients[nethandle].ID;
             if (clients.Count > 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -590,7 +594,7 @@ namespace RageCoop.Server
             Clients.Remove(localClient.NetID);
 
             API.Events.InvokePlayerDisconnected(localClient);
-            Program.Logger.Info($"Player {localClient.Player.Username} disconnected! ID:{playerPedID}");
+            Program.Logger.Info($"Player {localClient.Username} disconnected! ID:{playerPedID}");
 
         }
 
@@ -624,7 +628,7 @@ namespace RageCoop.Server
             }
 
             // Save the new data
-            if (packet.Passengers.ContainsValue(client.Player.PedID))
+            if (packet.Passengers.ContainsValue(client.ID))
             {
                 client.Player.VehicleID = packet.ID;
             }
@@ -644,7 +648,7 @@ namespace RageCoop.Server
             {
                 return;
             }
-            bool isPlayer = packet.ID==client.Player.PedID;
+            bool isPlayer = packet.ID==client.ID;
             if (isPlayer) { client.Player.Position=packet.Position; }
             
             foreach (var c in Clients.Values)
@@ -719,22 +723,27 @@ namespace RageCoop.Server
 
         #endregion
         // Send a message to targets or all players
-        private static void SendChatMessage(Packets.ChatMessage packet, List<NetConnection> targets = null)
+        private static void SendChatMessage(Packets.ChatMessage packet,Client sender=null, List<NetConnection> targets = null)
         {
             if (packet.Message.StartsWith('/'))
             {
                 string[] cmdArgs = packet.Message.Split(" ");
-                string cmdName = cmdArgs[0].Remove(0, 1);
+                string cmdName = cmdArgs[0].Remove(0, 1); 
+
+                if (API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender))
+                {
+                    return;
+                }
                 if (Commands.Any(x => x.Key.Name == cmdName))
                 {
                     string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
 
                     CommandContext ctx = new()
                     {
-                        Client = Clients.Values.Where(x => x.Player.Username == packet.Username).FirstOrDefault(),
+                        Client = Clients.Values.Where(x => x.Username == packet.Username).FirstOrDefault(),
                         Args = argsWithoutCmd
                     };
-
+                    
                     KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
 
                     if (command.Key.Usage != null && command.Key.ArgsLength != argsWithoutCmd.Length)

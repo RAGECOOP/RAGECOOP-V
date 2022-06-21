@@ -105,7 +105,16 @@ namespace RageCoop.Core
         {
             return Encoding.UTF8.GetString(data);
         }
-        
 
+
+        public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
+        {
+            return (flagToCheck & flag)!=0;
+        }
+
+        public static bool HasVehFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
+        {
+            return (flagToCheck & flag)!=0;
+        }
     }
 }

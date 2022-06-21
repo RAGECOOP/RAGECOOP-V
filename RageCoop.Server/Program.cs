@@ -46,7 +46,8 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                Logger.Error($"Fatal error occurred, server shutting down:{e}");
+                Logger.Error(e);
+                Logger.Error($"Fatal error occurred, server shutting down.");
             }
         }
 

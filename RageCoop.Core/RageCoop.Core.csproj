@@ -7,6 +7,7 @@
     <FileVersion>0.1</FileVersion>
     <Version>0.1</Version>
     <DebugType>embedded</DebugType>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">

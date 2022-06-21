@@ -316,7 +316,7 @@ namespace RageCoop.Client
 
                 }
                 MainVehicle.LockStatus=LockStatus;
-                if (Flags.HasFlag(VehicleDataFlags.IsDeluxoHovering))
+                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
                     if (!MainVehicle.IsDeluxoHovering())
                     {

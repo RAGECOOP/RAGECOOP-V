@@ -206,6 +206,13 @@ namespace RageCoop.Client
 
                                 }
                                 break;
+                            case PacketTypes.CustomEvent:
+                                {
+                                    Packets.CustomEvent packet = new Packets.CustomEvent();
+                                    packet.Unpack(data);
+                                    Scripting.API.Events.InvokeCustomEventReceived(packet.Hash, packet.Args);
+                                }
+                                break;
                             case PacketTypes.FileTransferChunk:
                                 {
                                     Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
@@ -232,12 +239,6 @@ namespace RageCoop.Client
                                     Main.Logger.Debug($"Finalizing download:{packet.ID}");
                                     DownloadManager.Complete(packet.ID);
 
-                                }
-                                break;
-                            case PacketTypes.CustomEvent:
-                                {
-                                    Packets.CustomEvent packet = new Packets.CustomEvent();
-                                    packet.Unpack(data);
                                 }
                                 break;
                             default:
@@ -293,17 +294,17 @@ namespace RageCoop.Client
             c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
             c.CurrentWeaponHash = packet.CurrentWeaponHash;
-            c.IsAiming = flags.HasFlag(PedDataFlags.IsAiming);
-            c.IsReloading = flags.HasFlag(PedDataFlags.IsReloading);
-            c.IsJumping = flags.HasFlag(PedDataFlags.IsJumping);
-            c.IsRagdoll = flags.HasFlag(PedDataFlags.IsRagdoll);
-            c.IsOnFire = flags.HasFlag(PedDataFlags.IsOnFire);
-            c.IsInParachuteFreeFall = flags.HasFlag(PedDataFlags.IsInParachuteFreeFall);
-            c.IsParachuteOpen = flags.HasFlag(PedDataFlags.IsParachuteOpen);
-            c.IsOnLadder = flags.HasFlag(PedDataFlags.IsOnLadder);
-            c.IsVaulting = flags.HasFlag(PedDataFlags.IsVaulting);
-            c.IsInCover = flags.HasFlag(PedDataFlags.IsInCover);
-            c.IsInStealthMode = flags.HasFlag(PedDataFlags.IsInStealthMode);
+            c.IsAiming = flags.HasPedFlag(PedDataFlags.IsAiming);
+            c.IsReloading = flags.HasPedFlag(PedDataFlags.IsReloading);
+            c.IsJumping = flags.HasPedFlag(PedDataFlags.IsJumping);
+            c.IsRagdoll = flags.HasPedFlag(PedDataFlags.IsRagdoll);
+            c.IsOnFire = flags.HasPedFlag(PedDataFlags.IsOnFire);
+            c.IsInParachuteFreeFall = flags.HasPedFlag(PedDataFlags.IsInParachuteFreeFall);
+            c.IsParachuteOpen = flags.HasPedFlag(PedDataFlags.IsParachuteOpen);
+            c.IsOnLadder = flags.HasPedFlag(PedDataFlags.IsOnLadder);
+            c.IsVaulting = flags.HasPedFlag(PedDataFlags.IsVaulting);
+            c.IsInCover = flags.HasPedFlag(PedDataFlags.IsInCover);
+            c.IsInStealthMode = flags.HasPedFlag(PedDataFlags.IsInStealthMode);
             c.Heading=packet.Heading;
             c.LastSynced =  Main.Ticked;
             if (c.IsAiming)
@@ -360,14 +361,14 @@ namespace RageCoop.Client
             v.Colors=packet.Colors;
             v.LandingGear=packet.LandingGear;
             v.RoofState=(VehicleRoofState)packet.RoofState;
-            v.EngineRunning = packet.Flag.HasFlag(VehicleDataFlags.IsEngineRunning);
-            v.LightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreLightsOn);
-            v.BrakeLightsOn = packet.Flag.HasFlag(VehicleDataFlags.AreBrakeLightsOn);
-            v.HighBeamsOn = packet.Flag.HasFlag(VehicleDataFlags.AreHighBeamsOn);
-            v.SireneActive = packet.Flag.HasFlag(VehicleDataFlags.IsSirenActive);
-            v.IsDead = packet.Flag.HasFlag(VehicleDataFlags.IsDead);
-            v.HornActive = packet.Flag.HasFlag(VehicleDataFlags.IsHornActive);
-            v.Transformed = packet.Flag.HasFlag(VehicleDataFlags.IsTransformed);
+            v.EngineRunning = packet.Flag.HasVehFlag(VehicleDataFlags.IsEngineRunning);
+            v.LightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreLightsOn);
+            v.BrakeLightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
+            v.HighBeamsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
+            v.SireneActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsSirenActive);
+            v.IsDead = packet.Flag.HasVehFlag(VehicleDataFlags.IsDead);
+            v.HornActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsHornActive);
+            v.Transformed = packet.Flag.HasVehFlag(VehicleDataFlags.IsTransformed);
             v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
             v.LockStatus=packet.LockStatus;
             v.RadioStation=packet.RadioStation;

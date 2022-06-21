@@ -66,12 +66,12 @@ namespace RageCoop.Core
                 byteArray.AddRange(BitConverter.GetBytes(EngineHealth));
 
                 // Check
-                if (Flag.HasFlag(VehicleDataFlags.IsAircraft))
+                if (Flag.HasVehFlag(VehicleDataFlags.IsAircraft))
                 {
                     // Write the vehicle landing gear
                     byteArray.Add(LandingGear);
                 }
-                if (Flag.HasFlag(VehicleDataFlags.HasRoof))
+                if (Flag.HasVehFlag(VehicleDataFlags.HasRoof))
                 {
                     byteArray.Add(RoofState);
                 }
@@ -166,12 +166,12 @@ namespace RageCoop.Core
 
 
                 // Check
-                if (Flag.HasFlag(VehicleDataFlags.IsAircraft))
+                if (Flag.HasVehFlag(VehicleDataFlags.IsAircraft))
                 {
                     // Read vehicle landing gear
                     LandingGear = reader.ReadByte();
                 }
-                if (Flag.HasFlag(VehicleDataFlags.HasRoof))
+                if (Flag.HasVehFlag(VehicleDataFlags.HasRoof))
                 {
                     RoofState=reader.ReadByte();
                 }

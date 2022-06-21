@@ -7,15 +7,28 @@ using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server
 {
+    public class Player
+    {
+        /// <summary>
+        /// The ID of player's last vehicle.
+        /// </summary>
+        public int VehicleID { get; internal set; }
+        public Vector3 Position { get; internal set; }
+
+        public int Health { get; internal set; }
+    }
     public class Client
     {
-        public long NetID = 0;
-        internal NetConnection Connection { get; set; }
-        public PlayerData Player;
+        internal long NetID = 0;
+        public NetConnection Connection { get;internal set; }
+        public Player Player { get; internal set; }
+        public float Latency { get; internal set; }
+        public int ID { get; internal set; }
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
         public readonly Dictionary<long, Action<object>> Callbacks = new();
         public bool IsReady { get; internal set; }=false;
+        public string Username { get;internal set; } = "N/A";
         #region CUSTOMDATA FUNCTIONS
         public void SetData<T>(string name, T data)
         {
@@ -190,7 +203,7 @@ namespace RageCoop.Server
         {
             if (!IsReady)
             {
-                Program.Logger.Warning($"Player \"{Player.Username}\" is not ready!");
+                Program.Logger.Warning($"Player \"{Username}\" is not ready!");
                 return;
             }
 
