@@ -255,7 +255,7 @@ namespace RageCoop.Server
                                         Packets.PedStateSync packet = new();
                                         packet.Unpack(data);
 
-                                        PedStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                        PedStateSync(packet, sender);
                                         break;
                                     }
                                 case PacketTypes.VehicleStateSync:
@@ -263,7 +263,7 @@ namespace RageCoop.Server
                                         Packets.VehicleStateSync packet = new();
                                         packet.Unpack(data);
 
-                                        VehicleStateSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                        VehicleStateSync(packet, sender);
 
                                         break;
                                     }
@@ -273,7 +273,7 @@ namespace RageCoop.Server
                                         Packets.PedSync packet = new();
                                         packet.Unpack(data);
 
-                                        PedSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                        PedSync(packet, sender);
 
                                     }
                                     break;
@@ -282,7 +282,7 @@ namespace RageCoop.Server
                                         Packets.VehicleSync packet = new();
                                         packet.Unpack(data);
 
-                                        VehicleSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                        VehicleSync(packet, sender);
 
                                     }
                                     break;
@@ -599,15 +599,9 @@ namespace RageCoop.Server
         }
 
         #region SyncEntities
-        private static void PedStateSync(Packets.PedStateSync packet,long ClientID)
+        private static void PedStateSync(Packets.PedStateSync packet, Client client)
         {
             
-
-            Client client = Util.GetClientByNetID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
 
 
             
@@ -619,14 +613,8 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void VehicleStateSync(Packets.VehicleStateSync packet, long ClientID)
+        private static void VehicleStateSync(Packets.VehicleStateSync packet, Client client)
         {
-            Client client = Util.GetClientByNetID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
-
             // Save the new data
             if (packet.Passengers.ContainsValue(client.ID))
             {
@@ -641,15 +629,10 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void PedSync(Packets.PedSync packet, long ClientID)
+        private static void PedSync(Packets.PedSync packet, Client client)
         {
-            Client client = Util.GetClientByNetID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
             bool isPlayer = packet.ID==client.ID;
-            if (isPlayer) { client.Player.Position=packet.Position; }
+            if (isPlayer) { client.Player.Position=packet.Position; API.Events.InvokePlayerUpdate(client); }
             
             foreach (var c in Clients.Values)
             {
@@ -675,13 +658,8 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void VehicleSync(Packets.VehicleSync packet, long ClientID)
+        private static void VehicleSync(Packets.VehicleSync packet, Client client)
         {
-            Client client = Util.GetClientByNetID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
             bool isPlayer = packet.ID==client.Player.VehicleID;
             foreach (var c in Clients.Values)
             {

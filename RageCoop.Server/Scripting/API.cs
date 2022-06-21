@@ -26,7 +26,14 @@ namespace RageCoop.Server.Scripting
             public static event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
             public static event PlayerConnect OnPlayerConnected;
             public static event PlayerDisconnect OnPlayerDisconnected;
+            /// <summary>
+            /// Will be invoked before registered handlers
+            /// </summary>
             public static event EventHandler<OnCommandEventArgs> OnCommandReceived;
+            /// <summary>
+            /// Invoked everytime a player's main ped has been updated
+            /// </summary>
+            public static event EventHandler<Client> OnPlayerUpdate;
 
             /// <summary>
             /// This will be invoked when a CustomEvent is received from one client.
@@ -70,6 +77,10 @@ namespace RageCoop.Server.Scripting
                 };
                 OnCommandReceived?.Invoke(null,args);
                 return args.Cancel;
+            }
+            internal static void InvokePlayerUpdate(Client client)
+            {
+                OnPlayerUpdate.Invoke(null,client);
             }
             #endregion
         }
