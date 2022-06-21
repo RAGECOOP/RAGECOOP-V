@@ -491,6 +491,7 @@ namespace RageCoop.Server
                         NetID = connection.RemoteUniqueIdentifier,
                         Connection=connection,
                         Username=packet.Username,
+                        ID=packet.PedID,
                         Player = new()
                         {
                         }
