@@ -16,11 +16,10 @@ namespace RageCoop.Server.Scripting
         /// This method would be called from main thread when the server is shutting down, you MUST terminate all background jobs/threads in this method.
         /// </summary>
         public abstract void OnStop();
-
         /// <summary>
-        /// Get the resource directory this script belongs to.
+        /// Get the <see cref="Core.Scripting.Resource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
         /// </summary>
-        public string CurrentDirectory { get; internal set; }
+        public Core.Scripting.Resource CurrentResource { get;internal set; }
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]

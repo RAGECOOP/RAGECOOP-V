@@ -10,11 +10,17 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 namespace RageCoop.Core.Scripting
 {
-	internal class Resource
+	public class Resource
 	{
-		public string Name { get; set; }
-		public string Directory { get; set; }
-		public List<IScriptable> Scripts { get; set; }=new List<IScriptable>();	
+		/// <summary>
+		/// Name of the resource
+		/// </summary>
+		public string Name { get;internal set; }
+		/// <summary>
+		/// The directory of current resource
+		/// </summary>
+		public string Directory { get;internal set; }
+		public List<IScriptable> Scripts { get; internal set; }=new List<IScriptable>();	
 	}
 	internal class ResourceLoader
     {
@@ -45,7 +51,7 @@ namespace RageCoop.Core.Scripting
 				Name=Path.GetDirectoryName(path),
 				Directory=path,
 			};
-			foreach (var f in Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories))
+			foreach (var f in Directory.GetFiles(path, "*.dll"))
 			{
 				LoadScriptsFromAssembly(f, r);
 			}

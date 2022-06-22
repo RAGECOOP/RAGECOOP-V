@@ -32,7 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logging\" />
     <Folder Include="Scripting\Events\" />
   </ItemGroup>
 

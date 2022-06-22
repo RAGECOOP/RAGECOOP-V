@@ -63,8 +63,12 @@ namespace RageCoop.Server.Scripting
 				{
 					foreach (var s in d.Scripts)
 					{
-						(s as ServerScript).CurrentDirectory = d.Directory;
-						s.OnStart();
+						(s as ServerScript).CurrentResource = d;
+                        try
+						{
+							s.OnStart();
+						}
+						catch(Exception ex) {Logger.Error($"Failed to start resource: {d.Name}"); Logger.Error(ex); }
 					}
 				}
 			}

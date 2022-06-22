@@ -15,7 +15,7 @@ namespace RageCoop.Client.Scripting
 				{
 					foreach (var s in d.Scripts)
 					{
-						(s as ClientScript).CurrentDirectory=d.Directory;
+						(s as ClientScript).CurrentResource=d;
 						Main.QueueAction(() => s.OnStart());
 					}
 				}

@@ -16,8 +16,8 @@
         public abstract void OnStop();
 
         /// <summary>
-        /// Get the resource directory this script belongs to, beware that this directory should not be used to store any client-specific information since it'll get deleted every time the resource is loaded.
+        /// Get the <see cref="Core.Scripting.Resource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
         /// </summary>
-        public string CurrentDirectory { get;internal set; }
+        public Core.Scripting.Resource CurrentResource { get; internal set; }
     }
 }
