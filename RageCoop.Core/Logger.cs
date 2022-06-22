@@ -1,46 +1,55 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Diagnostics;
+using System.IO;
+using System.Threading;
 
 namespace RageCoop.Core
 {
-    public class Logger :IDisposable
+
+    public class Logger : IDisposable
     {
-        
+
         /// <summary>
         /// 0:Trace, 1:Debug, 2:Info, 3:Warning, 4:Error
         /// </summary>
         public int LogLevel = 0;
+        public string Name { get; set; }
         public string LogPath;
         public bool UseConsole = false;
-        private static StreamWriter logWriter;
+        private StreamWriter logWriter;
 
-        private string Buffer="";
+        private string Buffer = "";
         private Thread LoggerThread;
-        private bool Stopping=false;
-        
-        public Logger(bool overwrite=true)
+        private bool Stopping = false;
+        private bool FlushImmediately;
+
+        public Logger(bool flushImmediately = false, bool overwrite = true)
         {
-            LoggerThread=new Thread(() =>
+            FlushImmediately = flushImmediately;
+            if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
+            Name=Process.GetCurrentProcess().Id.ToString();
+            if (!flushImmediately)
             {
-                if (!UseConsole)
+                LoggerThread=new Thread(() =>
                 {
-                    while (LogPath==default)
+                    if (!UseConsole)
                     {
-                        Thread.Sleep(100);
+                        while (LogPath==default)
+                        {
+                            Thread.Sleep(100);
+                        }
+                        if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
                     }
-                    if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
-                }
-                while (!Stopping)
-                {
-                    Flush();
-                    Thread.Sleep(1000);
-                }
-            });
-            LoggerThread.Start();
+                    while (!Stopping)
+                    {
+                        Flush();
+                        Thread.Sleep(1000);
+                    }
+                });
+                LoggerThread.Start();
+            }
         }
 
         public void Info(string message)
@@ -48,9 +57,13 @@ namespace RageCoop.Core
             if (LogLevel>2) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [INF] {1}", Date(), message, Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [INF] {1}", Date(), message, Name);
 
                 Buffer+=msg+"\r\n";
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
 
@@ -59,10 +72,14 @@ namespace RageCoop.Core
             if (LogLevel>3) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [WRN] {1}", Date(), message, Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [WRN] {1}", Date(), message, Name);
 
                 Buffer+=msg+"\r\n";
 
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
 
@@ -71,9 +88,13 @@ namespace RageCoop.Core
             if (LogLevel>4) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(), message, Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(), message, Name);
 
                 Buffer+=msg+"\r\n";
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
         public void Error(Exception ex)
@@ -81,10 +102,14 @@ namespace RageCoop.Core
             if (LogLevel>4) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(),"\r\n"+ex.ToString(), Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.ToString(), Name);
                 // msg += string.Format("\r\n[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.StackTrace, Process.GetCurrentProcess().Id);
 
                 Buffer+=msg+"\r\n";
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
 
@@ -94,9 +119,13 @@ namespace RageCoop.Core
             if (LogLevel>1) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [DBG] {1}", Date(), message,Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [DBG] {1}", Date(), message, Name);
 
                 Buffer+=msg+"\r\n";
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
 
@@ -105,9 +134,13 @@ namespace RageCoop.Core
             if (LogLevel>0) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [TRC] {1}", Date(), message, Process.GetCurrentProcess().Id);
+                string msg = string.Format("[{0}][{2}] [TRC] {1}", Date(), message, Name);
 
                 Buffer+=msg+"\r\n";
+            }
+            if (FlushImmediately)
+            {
+                Flush();
             }
         }
 
