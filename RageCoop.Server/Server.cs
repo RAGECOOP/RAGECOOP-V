@@ -173,7 +173,7 @@ namespace RageCoop.Server
 
             Program.Logger.Warning("Server is shutting down!");
             MainNetServer.Shutdown("Server is shutting down!");
-            Program.Logger.Info("Waiting for resources to stop...");
+            Program.Logger.Info("Waiting for resources to stop...Press Ctrl+C again to forcibly terminate the program.");
             Resources.StopAll();
             Program.Logger.Dispose();
         }

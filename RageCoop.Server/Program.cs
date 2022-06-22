@@ -37,8 +37,15 @@ namespace RageCoop.Server
                 {
                     if (e.SpecialKey == ConsoleSpecialKey.ControlC)
                     {
-                        e.Cancel = true;
-                        ReadyToStop = true;
+                        if (!ReadyToStop)
+                        {
+                            e.Cancel = true;
+                            ReadyToStop = true;
+                        }
+                        else
+                        {
+                            Environment.Exit(1);
+                        }
                     }
                 };
 
