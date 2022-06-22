@@ -67,7 +67,7 @@ namespace RageCoop.Core.Scripting
 			lock (LoadedResources)
 			{
 				if (!IsManagedAssembly(path)) { return false; }
-				if (ToIgnore.Contains(Path.GetFileName(path))) { return false; }
+				if (ToIgnore.Contains(Path.GetFileName(path))) { try { File.Delete(path); } catch { }; return false; }
 
 				Logger?.Debug($"Loading assembly {Path.GetFileName(path)} ...");
 
