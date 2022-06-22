@@ -9,10 +9,10 @@ namespace RageCoop.Server
     class Program
     {
         public static bool ReadyToStop = false;
-        public static Core.Logging.Logger Logger;
+        public static Core.Logger Logger;
         static void Main(string[] args)
         {
-            Logger=new Core.Logging.Logger()
+            Logger=new Core.Logger()
             {
                 LogPath="RageCoop.Server.log",
                 UseConsole=true,

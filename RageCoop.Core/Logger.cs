@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 
-namespace RageCoop.Core.Logging
+namespace RageCoop.Core
 {
     public class Logger :IDisposable
     {

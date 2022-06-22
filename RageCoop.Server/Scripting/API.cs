@@ -259,7 +259,7 @@ namespace RageCoop.Server.Scripting
                 handlers.Add(handler);
             }
         }
-        public static Core.Logging.Logger GetLogger()
+        public static Logger GetLogger()
         {
             return Program.Logger;
         }

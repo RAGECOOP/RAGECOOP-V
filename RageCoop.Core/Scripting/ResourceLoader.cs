@@ -4,7 +4,10 @@ using System.Text;
 using System.Reflection;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("RageCoop.Server")]
+[assembly: InternalsVisibleTo("RageCoop.Client")]
 namespace RageCoop.Core.Scripting
 {
 	internal class Resource
@@ -24,8 +27,8 @@ namespace RageCoop.Core.Scripting
 		};
 		protected List<Resource> LoadedResources = new List<Resource>();
 		private string BaseScriptType;
-		public Logging.Logger Logger { get; set; }
-		public ResourceLoader(string baseType,Logging.Logger logger)
+		public Logger Logger { get; set; }
+		public ResourceLoader(string baseType,Logger logger)
 		{
 			BaseScriptType = baseType;
 			Logger = logger;

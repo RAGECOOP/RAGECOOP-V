@@ -33,7 +33,7 @@ namespace RageCoop.Client
 #endif
         internal static Chat MainChat = null;
         internal static Stopwatch Counter = new Stopwatch();
-        internal static Core.Logging.Logger Logger = null;
+        internal static Logger Logger = null;
         
         internal static ulong Ticked = 0;
         internal static Scripting.Resources Resources=null;
@@ -44,7 +44,7 @@ namespace RageCoop.Client
         public Main()
         {
             Settings = Util.ReadSettings();
-            Logger=new Core.Logging.Logger()
+            Logger=new Logger()
             {
                 LogPath=$"RageCoop\\RageCoop.Client.log",
                 UseConsole=false,

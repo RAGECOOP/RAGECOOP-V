@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using RageCoop.Core;
 using GTA;
+using GTA.Math;
 using GTA.Native;
 
 namespace RageCoop.Client
@@ -92,5 +92,30 @@ namespace RageCoop.Client
             Players=new List<PlayerData> { };
         }
 
+    }
+
+    public class PlayerData
+    {
+        public string Username { get; internal set; }
+
+        /// <summary>
+        /// Universal character ID.
+        /// </summary>
+        public int PedID
+        {
+            get; internal set;
+        }
+
+        /// <summary>
+        /// The ID of player's last vehicle.
+        /// </summary>
+        public int VehicleID { get; internal set; }
+        public Vector3 Position { get; internal set; }
+
+        /// <summary>
+        /// Player Latency in second.
+        /// </summary>
+        public float Latency { get; internal set; }
+        public int Health { get; internal set; }
     }
 }
