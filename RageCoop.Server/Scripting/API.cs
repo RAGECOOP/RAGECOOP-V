@@ -47,6 +47,7 @@ namespace RageCoop.Server.Scripting
                 OnPlayerDisconnected=null;
                 OnCustomEventReceived=null;
                 OnCommandReceived=null;
+                OnPlayerUpdate=null;
             }
             #region INVOKE
             internal static void InvokeOnChatMessage(Packets.ChatMessage p,Client sender) 
