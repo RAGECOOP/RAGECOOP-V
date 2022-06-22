@@ -173,7 +173,7 @@ namespace RageCoop.Client
             }
         }
 
-        private static void DecodeNativeResponse(Packets.NativeResponse packet)
+        private static void DecodeNativeCallWithResponse(Packets.NativeResponse packet)
         {
             object result = DecodeNativeCall(packet.Hash, packet.Args, true, packet.ResultType);
 

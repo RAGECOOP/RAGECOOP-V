@@ -192,7 +192,7 @@ namespace RageCoop.Client
                                     Packets.NativeCall packet = new Packets.NativeCall();
                                     packet.Unpack(data);
 
-                                    DecodeNativeCall(packet.Hash, packet.Args, false);
+                                    Main.QueueAction(() => { DecodeNativeCall(packet.Hash, packet.Args, false); });
 
                                 }
                                 break;
@@ -202,7 +202,7 @@ namespace RageCoop.Client
                                     Packets.NativeResponse packet = new Packets.NativeResponse();
                                     packet.Unpack(data);
 
-                                    DecodeNativeResponse(packet);
+                                    DecodeNativeCallWithResponse(packet);
 
                                 }
                                 break;

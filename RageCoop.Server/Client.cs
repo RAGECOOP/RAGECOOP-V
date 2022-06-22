@@ -89,6 +89,11 @@ namespace RageCoop.Server
             }
         }
 
+        /// <summary>
+        /// Send a native call to client and ignore its return value.
+        /// </summary>
+        /// <param name="hash">The function's hash</param>
+        /// <param name="args">Arguments</param>
         public void SendNativeCall(ulong hash, params object[] args)
         {
             try
@@ -121,8 +126,14 @@ namespace RageCoop.Server
                 Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-
-        public void SendNativeResponse(Action<object> callback, ulong hash, Type returnType, params object[] args)
+        /// <summary>
+        /// Send a native call to client and do a callback when the response is received.
+        /// </summary>
+        /// <param name="callback">The callback to be invoked when the response is received.</param>
+        /// <param name="hash">The function's hash</param>
+        /// <param name="returnType">The return type of the response</param>
+        /// <param name="args">Arguments</param>
+        public void SendNativeCallWithResponse(Action<object> callback, GTA.Native.Hash hash, Type returnType, params object[] args)
         {
             try
             {
@@ -172,7 +183,7 @@ namespace RageCoop.Server
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new Packets.NativeResponse()
                 {
-                    Hash = hash,
+                    Hash = (ulong)hash,
                     Args = new List<object>(args) ?? new List<object>(),
                     ResultType = returnTypeValue,
                     ID = id
