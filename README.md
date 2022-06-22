@@ -36,7 +36,7 @@ _Old name: GTACOOP:R_
 3. Synchronized projectiles
 4. Simple ragdoll sync
 5. Smoother vehicle/ped movement.
-6. Ownership based sync logic, carjacking is now working properly.
+6. Ownership based sync logic, carjacking is now working (sort of).
 7. Introduced SyncEvents.
 8. Code refactoring and namespace cleanup
 9. Synchronized vehicle doors, brake and throttle.
@@ -52,14 +52,7 @@ _Old name: GTACOOP:R_
 
 
 ## Installation
-
-### Client
-
-Download latest release, remove old version of the mod. Extract the zip and put `RageCoop` in `Grand Theft Auto V/Scripts`.
-
-### Server
-
-Download latest release for your OS, then extract and run.
+Refer to the [wiki](https://github.com/RAGECOOP/RAGECOOP-V/wiki)
 
 # Downloads
 
