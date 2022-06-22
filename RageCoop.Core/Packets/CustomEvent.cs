@@ -10,7 +10,7 @@ namespace RageCoop.Core
         public class CustomEvent : Packet
         {
             public int Hash { get; set; }
-            public List<object> Args { get; set; }
+            public List<object> Args { get; set; }=new List<object>();
 
             public override void Pack(NetOutgoingMessage message)
             {

@@ -2,6 +2,7 @@
 using System.Linq;
 using GTA;
 using GTA.Math;
+using RageCoop.Core;
 using GTA.Native;
 
 namespace RageCoop.Client
@@ -15,7 +16,7 @@ namespace RageCoop.Client
         public static ulong Pressed { get; set; }
 
         public static bool LeftAlign = true;
-        public static List<PlayerData> Players=new List<PlayerData> { };
+        public static Dictionary<int,PlayerData> Players=new Dictionary<int, PlayerData> { };
         public static void Tick()
         {
             if (!Networking.IsOnServer)
@@ -52,7 +53,7 @@ namespace RageCoop.Client
             
             foreach (var player in Players)
             {
-                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Latency * 1000:N0}ms", player.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
+                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
             _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count+1} players");
@@ -61,43 +62,67 @@ namespace RageCoop.Client
         public static void SetPlayer(int id, string username,float latency=0)
         {
             
-            var toset = Players.Where(x => x.PedID==id);
-            if (toset.Any())
+            PlayerData p;
+            if (Players.TryGetValue(id,out p))
             {
-                var p=toset.First();
                 p.Username=username;
                 p.PedID=id;
                 p.Latency=latency;
             }
             else
             {
-                PlayerData p = new PlayerData { PedID=id, Username=username,Latency=latency };
-                Players.Add(p);
+                p = new PlayerData { PedID=id, Username=username,Latency=latency };
+                Players.Add(id,p);
+            }
+        }
+        public static void UpdatePlayer(Packets.PlayerInfoUpdate packet)
+        {
+            var p = GetPlayer(packet.PedID);
+            if(p?.Character != null)
+            {
+                p.Character.DisplayNameTag=packet.Flags.HasConfigFlag(PlayerConfigFlags.ShowNameTag);
+                p.Character.DisplayBlip=packet.Flags.HasConfigFlag(PlayerConfigFlags.ShowBlip);
+                Main.Logger.Info($"blip color:{packet.BlipColor}");
+                // Need to be dispatched to script thread.
+                Main.QueueAction(() => {
+                    if (p.Character.PedBlip!=null && p.Character.PedBlip.Exists() && p.Character.PedBlip.Color!=packet.BlipColor)
+                    {
+                        p.Character.PedBlip.Color=packet.BlipColor;
+                    }
+                }); 
+                
             }
         }
         public static PlayerData GetPlayer(int id)
         {
-            return Players.Find(x => x.PedID==id);
+            PlayerData p; 
+            Players.TryGetValue(id, out p);
+            return p;
+        }
+        public static PlayerData GetPlayer(SyncedPed p)
+        {
+            var player = GetPlayer(p.ID);
+            player.Character=p;
+            return player;
         }
         public static void RemovePlayer(int id)
         {
-            var p = Players.Where(x => x.PedID==id);
-            if (p.Any())
+            if (Players.ContainsKey(id))
             {
-                Players.Remove(p.First());
+                Players.Remove(id);
             }
         }
         public static void Cleanup()
         {
-            Players=new List<PlayerData> { };
+            Players=new Dictionary<int, PlayerData>{ };
         }
 
     }
 
-    public class PlayerData
+    
+    internal class PlayerData
     {
         public string Username { get; internal set; }
-
         /// <summary>
         /// Universal character ID.
         /// </summary>
@@ -105,17 +130,11 @@ namespace RageCoop.Client
         {
             get; internal set;
         }
-
-        /// <summary>
-        /// The ID of player's last vehicle.
-        /// </summary>
-        public int VehicleID { get; internal set; }
-        public Vector3 Position { get; internal set; }
-
+        public SyncedPed Character { get; set; }
         /// <summary>
         /// Player Latency in second.
         /// </summary>
         public float Latency { get; internal set; }
-        public int Health { get; internal set; }
+
     }
 }

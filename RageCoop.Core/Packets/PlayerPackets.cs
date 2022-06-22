@@ -138,7 +138,6 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-
         public class PlayerInfoUpdate : Packet
         {
             /// <summary>
@@ -147,6 +146,8 @@ namespace RageCoop.Core
             public int PedID { get; set; }
             public string Username { get; set; }
             public float Latency { get; set; }
+            public PlayerConfigFlags Flags { get; set; }
+            public GTA.BlipColor BlipColor { get; set; }
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
@@ -170,6 +171,12 @@ namespace RageCoop.Core
                 // Write Latency
                 byteArray.AddFloat(Latency);
 
+                // Write Flags
+                byteArray.Add((byte)Flags);
+
+                // Write BlipColor
+                byteArray.Add((byte)BlipColor);
+
                 byte[] result = byteArray.ToArray();
 
                 message.Write(result.Length);
@@ -189,6 +196,10 @@ namespace RageCoop.Core
                 Username = reader.ReadString(usernameLength);
 
                 Latency=reader.ReadFloat();
+
+                Flags=(PlayerConfigFlags)reader.ReadByte();
+
+                BlipColor=(GTA.BlipColor)reader.ReadByte();
             }
         }
     }

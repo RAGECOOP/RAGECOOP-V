@@ -27,13 +27,13 @@ namespace RageCoop.Server
     internal class Server
     {
         private static readonly string _compatibleVersion = "V0_5";
-
+        private static BaseScript BaseScript { get; set; }=new BaseScript();
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
         public static NetServer MainNetServer;
 
         public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         public static readonly Dictionary<long,Client> Clients = new();
-        private static System.Timers.Timer SendLatencyTimer = new System.Timers.Timer(5000);
+        private static System.Timers.Timer SendPlayerTimer = new System.Timers.Timer(5000);
         
         private static Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private static Resources Resources = new Resources();
@@ -59,9 +59,9 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            SendLatencyTimer.Elapsed+=((s,e) => { SendLatency(); });
-            SendLatencyTimer.AutoReset=true;
-            SendLatencyTimer.Enabled=true;
+            SendPlayerTimer.Elapsed+=(s,e) => { SendPlayerInfos(); };
+            SendPlayerTimer.AutoReset=true;
+            SendPlayerTimer.Enabled=true;
             Program.Logger.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
             if (MainSettings.AnnounceSelf)
             {
@@ -155,7 +155,7 @@ namespace RageCoop.Server
                 }).Start();
                 #endregion
             }
-
+            BaseScript.OnStart();
             Resources.LoadAll();
             Listen();
         }
@@ -170,10 +170,10 @@ namespace RageCoop.Server
             {
                 ProcessMessage(MainNetServer.WaitMessage(10));
             }
-
             Program.Logger.Warning("Server is shutting down!");
             MainNetServer.Shutdown("Server is shutting down!");
             Program.Logger.Info("Waiting for resources to stop...Press Ctrl+C again to forcibly terminate the program.");
+            BaseScript.OnStop(); 
             Resources.StopAll();
             Program.Logger.Dispose();
         }
@@ -410,24 +410,30 @@ namespace RageCoop.Server
 
             MainNetServer.Recycle(message);
         }
-
-        private void SendLatency()
+        static object _sendPlayersLock=new object();
+        public static void SendPlayerInfos()
         {
-            foreach (Client c in Clients.Values)
+            lock (_sendPlayersLock)
             {
-                MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
+                foreach (Client c in Clients.Values)
                 {
-                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                    new Packets.PlayerInfoUpdate()
+                    BaseScript.SetAutoRespawn(c,c.Config.EnableAutoRespawn);
+                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
                     {
-                        PedID=c.ID,
-                        Username=c.Username,
-                        Latency=c.Latency,
-                    }.Pack(outgoingMessage);
-                    MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
-                });
-            }
+                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                        new Packets.PlayerInfoUpdate()
+                        {
+                            PedID=c.ID,
+                            Username=c.Username,
+                            Latency=c.Latency,
+                            Flags=c.Config.GetFlags(),
+                            BlipColor=c.Config.BlipColor,
+                        }.Pack(outgoingMessage);
+                        MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
+                    });
+                }
 
+            }
         }
 
         private void DisconnectAndLog(NetConnection senderConnection,PacketTypes type, Exception e)
@@ -633,7 +639,12 @@ namespace RageCoop.Server
         private static void PedSync(Packets.PedSync packet, Client client)
         {
             bool isPlayer = packet.ID==client.ID;
-            if (isPlayer) { client.Player.Position=packet.Position; API.Events.InvokePlayerUpdate(client); }
+            if (isPlayer) 
+            { 
+                client.Player.Position=packet.Position;
+                client.Player.Health=packet.Health ; 
+                API.Events.InvokePlayerUpdate(client); 
+            }
             
             foreach (var c in Clients.Values)
             {

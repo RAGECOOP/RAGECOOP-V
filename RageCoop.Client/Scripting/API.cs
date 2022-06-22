@@ -6,11 +6,19 @@ using RageCoop.Core;
 
 namespace RageCoop.Client.Scripting
 {
+    public class CustomEventReceivedArgs : EventArgs
+    {
+        public int Hash { get; set; }
+        public List<object> Args { get; set; }
+    }
     /// <summary>
     /// Provides vital functionality to interact with RAGECOOP
     /// </summary>
     public static class API
     {
+        #region INTERNAL
+        internal static Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new Dictionary<int, List<Action<CustomEventReceivedArgs>>>();
+        #endregion
         /// <summary>
         /// Client configuration, this will conflict with server-side config.
         /// </summary>
@@ -75,10 +83,6 @@ namespace RageCoop.Client.Scripting
             /// </summary>
             public static event EmptyEvent OnTick;
 
-            /// <summary>
-            /// This will be invoked when a CustomEvent is received from the server.
-            /// </summary>
-            public static event CustomEvent OnCustomEventReceived;
 
             #region INVOKE
             internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null, v); }
@@ -88,9 +92,14 @@ namespace RageCoop.Client.Scripting
             internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
             internal static void InvokeTick() { OnTick?.Invoke(); }
 
-            internal static void InvokeCustomEventReceived(int hash, List<object> args)
+            internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
-                OnCustomEventReceived?.Invoke(hash, args);
+                var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args};
+                List<Action<CustomEventReceivedArgs>> handlers;
+                if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
+                {
+                    handlers.ForEach((x) => { x.Invoke(args); });
+                }
             }
             #endregion
             internal static void ClearHandlers()
@@ -101,7 +110,6 @@ namespace RageCoop.Client.Scripting
                 OnPedSpawned=null;
                 OnVehicleDeleted=null;
                 OnVehicleSpawned=null;
-                OnCustomEventReceived=null;
             }
         }
 
@@ -203,6 +211,24 @@ namespace RageCoop.Client.Scripting
             };
             Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
 
+        }
+
+        /// <summary>
+        /// Register an handler to the specifed event hash, one event can have multiple handlers. This will be invoked from backgound thread, use <see cref="QueueAction(Action)"/> in the handler to dispatch code to script thread.
+        /// </summary>
+        /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
+        /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
+        public static void RegisterCustomEventHandler(int hash, Action<CustomEventReceivedArgs> handler)
+        {
+            List<Action<CustomEventReceivedArgs>> handlers;
+            lock (CustomEventHandlers)
+            {
+                if (!CustomEventHandlers.TryGetValue(hash, out handlers))
+                {
+                    CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
+                }
+                handlers.Add(handler);
+            }
         }
         #endregion
     }

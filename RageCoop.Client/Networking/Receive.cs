@@ -126,7 +126,7 @@ namespace RageCoop.Client
                                 {
                                     var packet = new Packets.PlayerInfoUpdate();
                                     packet.Unpack(data);
-                                    PlayerList.SetPlayer(packet.PedID, packet.Username, packet.Latency);
+                                    PlayerList.UpdatePlayer(packet);
                                     break;
                                 }
                             #region ENTITY SYNC
@@ -210,7 +210,7 @@ namespace RageCoop.Client
                                 {
                                     Packets.CustomEvent packet = new Packets.CustomEvent();
                                     packet.Unpack(data);
-                                    Scripting.API.Events.InvokeCustomEventReceived(packet.Hash, packet.Args);
+                                    Scripting.API.Events.InvokeCustomEventReceived(packet);
                                 }
                                 break;
                             case PacketTypes.FileTransferChunk:

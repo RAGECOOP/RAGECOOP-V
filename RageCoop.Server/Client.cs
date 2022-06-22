@@ -7,23 +7,48 @@ using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server
 {
-    public class Player
+    public class ServerPed
     {
         /// <summary>
-        /// The ID of player's last vehicle.
+        /// The ID of the ped's last vehicle.
         /// </summary>
         public int VehicleID { get; internal set; }
         public Vector3 Position { get; internal set; }
 
         public int Health { get; internal set; }
     }
+    public class PlayerConfig
+    {
+        #region CLIENT
+        public bool EnableAutoRespawn { get; set; }=true;
+        #endregion
+        public bool ShowBlip { get; set; } = true;
+        public bool ShowNameTag { get; set; } = true;
+        public GTA.BlipColor BlipColor { get; set; } = GTA.BlipColor.White;
+        public PlayerConfigFlags GetFlags()
+        {
+            var flag=PlayerConfigFlags.None;
+            if (ShowBlip)
+            {
+                flag|= PlayerConfigFlags.ShowBlip;
+            }
+            if (ShowNameTag)
+            {
+                flag |= PlayerConfigFlags.ShowNameTag;
+            }
+            return flag;
+        }
+    }
     public class Client
     {
         internal long NetID = 0;
         public NetConnection Connection { get;internal set; }
-        public Player Player { get; internal set; }
+        public ServerPed Player { get; internal set; }
         public float Latency { get; internal set; }
         public int ID { get; internal set; }
+        private PlayerConfig _config { get; set; }=new PlayerConfig();
+        public PlayerConfig Config { get { return _config; }set { _config=value;Server.SendPlayerInfos(); } }
+
         private readonly Dictionary<string, object> _customData = new();
         private long _callbacksCount = 0;
         public readonly Dictionary<long, Action<object>> Callbacks = new();
@@ -62,7 +87,7 @@ namespace RageCoop.Server
         #endregion
 
         #region FUNCTIONS
-        public void Kick(string reason="You has been kicked!")
+        public void Kick(string reason="You have been kicked!")
         {
             Connection?.Disconnect(reason);
         }
@@ -204,7 +229,6 @@ namespace RageCoop.Server
                 Program.Logger.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetID}\" not found!");
                 return;
             }
-
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
             outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
             Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);

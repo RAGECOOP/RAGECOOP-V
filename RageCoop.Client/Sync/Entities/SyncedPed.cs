@@ -88,7 +88,7 @@ namespace RageCoop.Client
             {
                 if (Username=="N/A")
                 {
-                    var p = PlayerList.GetPlayer(ID);
+                    var p = PlayerList.GetPlayer(this);
                     if (p!=null)
                     {
                         Username=p.Username;

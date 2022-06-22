@@ -77,6 +77,7 @@ namespace RageCoop.Core
     {
         None=0,
         IsAiming = 1 << 0,
+        IsInStealthMode = 1 << 1,
         IsReloading = 1 << 2,
         IsJumping = 1 << 3,
         IsRagdoll = 1 << 4,
@@ -86,12 +87,12 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover = 1<< 10,
-        IsInStealthMode = 1 << 11,
     }
 
     #region ===== VEHICLE DATA =====
     public enum VehicleDataFlags:ushort
     {
+        None=0,
         IsEngineRunning = 1 << 0,
         AreLightsOn = 1 << 1,
         AreBrakeLightsOn = 1 << 2,
@@ -106,8 +107,14 @@ namespace RageCoop.Core
         IsDeluxoHovering=1 << 11, 
         HasRoof=1 << 12,
     }
-    
-    
+
+    public enum PlayerConfigFlags : byte
+    {
+        None = 0,
+        ShowBlip= 1 << 0,
+        ShowNameTag= 1 << 1
+    }
+
     public struct VehicleDamageModel
     {
         public byte BrokenDoors { get; set; }

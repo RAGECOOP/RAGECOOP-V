@@ -116,5 +116,9 @@ namespace RageCoop.Core
         {
             return (flagToCheck & flag)!=0;
         }
+        public static bool HasConfigFlag(this PlayerConfigFlags flagToCheck, PlayerConfigFlags flag)
+        {
+            return (flagToCheck & flag)!=0;
+        }
     }
 }

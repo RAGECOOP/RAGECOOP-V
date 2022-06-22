@@ -28,6 +28,7 @@ namespace RageCoop.Client
         internal static RelationshipGroup SyncedPedsGroup;
 
         internal static new Settings Settings = null;
+        internal static Scripting.BaseScript BaseScript=new Scripting.BaseScript();
 
 #if !NON_INTERACTIVE
 #endif
@@ -55,8 +56,7 @@ namespace RageCoop.Client
 #endif
             };
             Resources = new Scripting.Resources();
-            // Required for some synchronization!
-            /*if (Game.Version < GameVersion.v1_0_1290_1_Steam)
+            if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
                 Tick += (object sender, EventArgs e) =>
                 {
@@ -72,7 +72,8 @@ namespace RageCoop.Client
                     }
                 };
                 return;
-            }*/
+            }
+            BaseScript.OnStart();
             SyncedPedsGroup=World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral, true);
 #if !NON_INTERACTIVE
@@ -157,11 +158,13 @@ namespace RageCoop.Client
             if (!Scripting.API.Config.EnableAutoRespawn)
             {
                 Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
-                Function.Call(Hash.FORCE_GAME_STATE_PLAYING);
+                Function.Call(Hash.IGNORE_NEXT_RESTART, true);
+                Function.Call(Hash.FORCE_GAME_STATE_PLAYING); 
+                Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
+
                 var P = Game.Player.Character;
                 if (P.IsDead)
                 {
-                    Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
                     Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
                     
                     if (P.Health!=1)

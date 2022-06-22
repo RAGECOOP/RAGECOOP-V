@@ -102,6 +102,10 @@ namespace RageCoop.Server.Scripting
 
 				});
 			}
+            else
+            {
+				client.IsReady=true;
+            }
 		}
 	}
 }
