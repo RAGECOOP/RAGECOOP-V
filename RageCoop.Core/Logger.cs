@@ -47,6 +47,7 @@ namespace RageCoop.Core
                         Flush();
                         Thread.Sleep(1000);
                     }
+                    Flush();
                 });
                 LoggerThread.Start();
             }
