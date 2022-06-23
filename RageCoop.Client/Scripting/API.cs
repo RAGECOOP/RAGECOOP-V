@@ -95,6 +95,9 @@ namespace RageCoop.Client.Scripting
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
                 var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args};
+
+                // Main.Logger.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
+                
                 List<Action<CustomEventReceivedArgs>> handlers;
                 if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
                 {
@@ -210,7 +213,6 @@ namespace RageCoop.Client.Scripting
                 Hash=eventHash
             };
             Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
-
         }
 
         /// <summary>

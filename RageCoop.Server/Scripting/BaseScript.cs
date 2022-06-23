@@ -11,6 +11,7 @@ namespace RageCoop.Server.Scripting
     {
         public override void OnStart()
         {
+            API.RegisterCustomEventHandler(CustomEvents.NativeResponse, NativeResponse);
         }
         public override void OnStop()
         {
@@ -18,6 +19,27 @@ namespace RageCoop.Server.Scripting
         public void SetAutoRespawn(Client c,bool toggle)
         {
             c.SendCustomEvent(CustomEvents.SetAutoRespawn, new() { toggle });
+        }
+        void NativeResponse(CustomEventReceivedArgs e)
+        {
+            try
+            {
+                int id = (int)e.Args[0];
+                Action<object> callback;
+                lock (e.Sender.Callbacks)
+                {
+                    if (e.Sender.Callbacks.TryGetValue(id, out callback))
+                    {
+                        callback(e.Args[1]);
+                        e.Sender.Callbacks.Remove(id);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                API.GetLogger().Error("Failed to parse NativeResponse");
+                API.GetLogger().Error(ex);
+            }
         }
     }
 }

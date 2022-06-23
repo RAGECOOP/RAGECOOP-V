@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lidgren.Network;
 using RageCoop.Core;
+using RageCoop.Core.Scripting;
 using System.Net;
 
 namespace RageCoop.Server.Scripting
@@ -93,6 +94,7 @@ namespace RageCoop.Server.Scripting
         }
 
         #region FUNCTIONS
+        /*
         /// <summary>
         /// Send a native call (Function.Call) to all players.
         /// Keys = int, float, bool, string and lvector3
@@ -129,14 +131,14 @@ namespace RageCoop.Server.Scripting
                 Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-
+        */
         /// <summary>
         /// Get a list of all Clients
         /// </summary>
         /// <returns>All clients as a dictionary indexed by NetID</returns>
         public static Dictionary<long, Client> GetAllClients()
         {
-            return Server.Clients;
+            return new(Server.Clients);
         }
 
         /// <summary>
@@ -194,7 +196,7 @@ namespace RageCoop.Server.Scripting
             {
                 return;
             }
-
+            
             List<NetConnection> connections = netHandleList == null
                     ? Server.MainNetServer.Connections
                     : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
@@ -269,6 +271,10 @@ namespace RageCoop.Server.Scripting
                 }
                 handlers.Add(handler);
             }
+        }
+        public static void RegisterCustomEventHandler(string name, Action<CustomEventReceivedArgs> handler)
+        {
+            RegisterCustomEventHandler(CustomEvents.Hash(name), handler);
         }
         public static Logger GetLogger()
         {

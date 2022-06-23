@@ -4,6 +4,7 @@ using RageCoop.Core;
 using Lidgren.Network;
 using GTA.Math;
 using RageCoop.Core.Scripting;
+using System.Security.Cryptography;
 
 namespace RageCoop.Server
 {
@@ -49,12 +50,11 @@ namespace RageCoop.Server
         private PlayerConfig _config { get; set; }=new PlayerConfig();
         public PlayerConfig Config { get { return _config; }set { _config=value;Server.SendPlayerInfos(); } }
 
-        private readonly Dictionary<string, object> _customData = new();
-        private long _callbacksCount = 0;
-        public readonly Dictionary<long, Action<object>> Callbacks = new();
+        internal readonly Dictionary<int, Action<object>> Callbacks = new();
         public bool IsReady { get; internal set; }=false;
         public string Username { get;internal set; } = "N/A";
         #region CUSTOMDATA FUNCTIONS
+        /*
         public void SetData<T>(string name, T data)
         {
             if (HasData(name))
@@ -84,8 +84,9 @@ namespace RageCoop.Server
                 _customData.Remove(name);
             }
         }
-        #endregion
+        */
 
+        #endregion
         #region FUNCTIONS
         public void Kick(string reason="You have been kicked!")
         {
@@ -113,7 +114,7 @@ namespace RageCoop.Server
                 Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-
+        /*
         /// <summary>
         /// Send a native call to client and ignore its return value.
         /// </summary>
@@ -220,7 +221,53 @@ namespace RageCoop.Server
                 Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
+        */
 
+        /// <summary>
+        /// Send a native call to client and do a callback when the response received.
+        /// </summary>
+        /// <typeparam name="T">Type of the response</typeparam>
+        /// <param name="callBack"></param>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        public void SendNativeCall<T>(Action<object> callBack, GTA.Native.Hash hash, params object[] args)
+        {
+            var argsList= new List<object>(args);
+            argsList.InsertRange(0, new object[] { (byte)Type.GetTypeCode(typeof(T)), RequestNativeCallID<T>(callBack), (ulong)hash });
+
+            SendCustomEvent(CustomEvents.NativeCall, argsList);
+        }
+        /// <summary>
+        /// Send a native call to client and ignore it's response.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        public void SendNativeCall(GTA.Native.Hash hash, params object[] args)
+        {
+            var argsList = new List<object>(args);
+            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty,(ulong)hash});
+            // Program.Logger.Debug(argsList.DumpWithType());
+            SendCustomEvent(CustomEvents.NativeCall, argsList);
+        }
+        private int RequestNativeCallID<T>(Action<object> callback)
+        {
+            int ID = 0;
+            lock (Callbacks)
+            {
+                while ((ID==0)
+                    || Callbacks.ContainsKey(ID))
+                {
+                    byte[] rngBytes = new byte[4];
+
+                    RandomNumberGenerator.Create().GetBytes(rngBytes);
+
+                    // Convert the bytes into an integer
+                    ID = BitConverter.ToInt32(rngBytes, 0);
+                }
+                Callbacks.Add(ID, callback);
+            }
+            return ID;
+        }
         public void SendCleanUpWorld()
         {
             NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
@@ -239,7 +286,6 @@ namespace RageCoop.Server
             if (!IsReady)
             {
                 Program.Logger.Warning($"Player \"{Username}\" is not ready!");
-                return;
             }
 
             try

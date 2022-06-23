@@ -111,68 +111,7 @@ namespace RageCoop.Client
 
 
         }
-        private static object DecodeNativeCall(ulong hash, List<object> args, bool returnValue, byte? returnType = null)
-        {
-            List<InputArgument> arguments = new List<InputArgument>();
-
-            if (args == null || args.Count == 0)
-            {
-                return null;
-            }
-
-            for (ushort i = 0; i < args.Count; i++)
-            {
-                object x = args.ElementAt(i);
-                switch (x)
-                {
-                    case int _:
-                        arguments.Add((int)x);
-                        break;
-                    case bool _:
-                        arguments.Add((bool)x);
-                        break;
-                    case float _:
-                        arguments.Add((float)x);
-                        break;
-                    case string _:
-                        arguments.Add((string)x);
-                        break;
-                    case Vector3 _:
-                        Vector3 vector = (Vector3)x;
-                        arguments.Add((float)vector.X);
-                        arguments.Add((float)vector.Y);
-                        arguments.Add((float)vector.Z);
-                        break;
-                    default:
-                        GTA.UI.Notification.Show("[DecodeNativeCall][" + hash + "]: Type of argument not found!");
-                        return null;
-                }
-            }
-
-            if (!returnValue)
-            {
-                Function.Call((Hash)hash, arguments.ToArray());
-                return null;
-            }
-
-            switch (returnType.Value)
-            {
-                case 0x00: // int
-                    return Function.Call<int>((Hash)hash, arguments.ToArray());
-                case 0x01: // bool
-                    return Function.Call<bool>((Hash)hash, arguments.ToArray());
-                case 0x02: // float
-                    return Function.Call<float>((Hash)hash, arguments.ToArray());
-                case 0x03: // string
-                    return Function.Call<string>((Hash)hash, arguments.ToArray());
-                case 0x04: // vector3
-                    return Function.Call<Vector3>((Hash)hash, arguments.ToArray());
-                default:
-                    GTA.UI.Notification.Show("[DecodeNativeCall][" + hash + "]: Type of return not found!");
-                    return null;
-            }
-        }
-
+        /*
         private static void DecodeNativeCallWithResponse(Packets.NativeResponse packet)
         {
             object result = DecodeNativeCall(packet.Hash, packet.Args, true, packet.ResultType);
@@ -202,6 +141,7 @@ namespace RageCoop.Client
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
             Client.FlushSendQueue();
         }
+        */
         #endregion // -- PLAYER --
 
         #endregion

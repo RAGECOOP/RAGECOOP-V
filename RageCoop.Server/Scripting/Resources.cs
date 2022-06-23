@@ -83,7 +83,15 @@ namespace RageCoop.Server.Scripting
 				{
 					foreach (var s in d.Scripts)
 					{
-						s.OnStop();
+                        try
+                        {
+
+							s.OnStop();
+						}
+						catch(Exception ex)
+                        {
+							Logger?.Error(ex);
+                        }
 					}
 				}
 			}

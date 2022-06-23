@@ -15,8 +15,8 @@ namespace RageCoop.Core
         PlayerInfoUpdate=3,
         
         ChatMessage=10,
-        NativeCall=11,
-        NativeResponse=12,
+        // NativeCall=11,
+        // NativeResponse=12,
         //Mod=13,
         CleanUpWorld=14,
        
@@ -191,7 +191,7 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-
+        /*
         #region ===== NATIVECALL =====
         public class NativeCall : Packet
         {
@@ -423,6 +423,7 @@ namespace RageCoop.Core
             }
         }
         #endregion // ===== NATIVECALL =====
+        */
     }
 
     public static class CoopSerializer

@@ -27,7 +27,7 @@ namespace RageCoop.Server
     internal class Server
     {
         private static readonly string _compatibleVersion = "V0_5";
-        private static BaseScript BaseScript { get; set; }=new BaseScript();
+        public static BaseScript BaseScript { get; set; }=new BaseScript();
         public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
         public static NetServer MainNetServer;
 
@@ -317,22 +317,6 @@ namespace RageCoop.Server
                                     }
                                     break;
 
-                                case PacketTypes.NativeResponse:
-                                    {
-                                        Packets.NativeResponse packet = new();
-                                        packet.Unpack(data);
-
-                                        Client client = Util.GetClientByNetID(message.SenderConnection.RemoteUniqueIdentifier);
-                                        if (client != null)
-                                        {
-                                            if (client.Callbacks.ContainsKey(packet.ID))
-                                            {
-                                                client.Callbacks[packet.ID].Invoke(packet.Args[0]);
-                                                client.Callbacks.Remove(packet.ID);
-                                            }
-                                        }
-                                    }
-                                    break;
                                 case PacketTypes.FileTransferComplete:
                                     {
                                         Packets.FileTransferComplete packet = new Packets.FileTransferComplete();

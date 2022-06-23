@@ -186,26 +186,6 @@ namespace RageCoop.Client
 
                                 }
                                 break;
-                            case PacketTypes.NativeCall:
-                                {
-
-                                    Packets.NativeCall packet = new Packets.NativeCall();
-                                    packet.Unpack(data);
-
-                                    Main.QueueAction(() => { DecodeNativeCall(packet.Hash, packet.Args, false); });
-
-                                }
-                                break;
-                            case PacketTypes.NativeResponse:
-                                {
-
-                                    Packets.NativeResponse packet = new Packets.NativeResponse();
-                                    packet.Unpack(data);
-
-                                    DecodeNativeCallWithResponse(packet);
-
-                                }
-                                break;
                             case PacketTypes.CustomEvent:
                                 {
                                     Packets.CustomEvent packet = new Packets.CustomEvent();

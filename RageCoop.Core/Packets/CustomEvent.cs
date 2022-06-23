@@ -10,7 +10,7 @@ namespace RageCoop.Core
         public class CustomEvent : Packet
         {
             public int Hash { get; set; }
-            public List<object> Args { get; set; }=new List<object>();
+            public List<object> Args { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -23,7 +23,7 @@ namespace RageCoop.Core
                 foreach (var arg in Args)
                 {
                     tup=CoreUtils.GetBytesFromObject(arg);
-                    if (tup.Item2==null)
+                    if (tup.Item1==0||tup.Item2==null)
                     {
                         throw new ArgumentException($"Object of type {arg.GetType()} is not supported");
                     }
@@ -41,10 +41,11 @@ namespace RageCoop.Core
 
                 Hash = reader.ReadInt();
                 var len=reader.ReadInt();
+                Args=new List<object>(len);
                 for (int i = 0; i < len; i++)
                 {
-                    byte argType = reader.ReadByte();
-                    switch (argType)
+                    byte type = reader.ReadByte();
+                    switch (type)
                     {
                         case 0x01:
                             Args.Add(reader.ReadByte());
@@ -76,6 +77,9 @@ namespace RageCoop.Core
                         case 0x10:
                             Args.Add(reader.ReadString());
                             break;
+                        default:
+                            throw new InvalidOperationException($"Unexpected type:{type}\r\n{array.Dump()}");
+
                     }
                 }
             }
