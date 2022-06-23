@@ -47,7 +47,7 @@ namespace RageCoop.Server
                 _ => (0x0, null),
             };
         }
-
+        /*
         public static Client GetClientByNetID(long id)
         {
             Client result = null;
@@ -75,17 +75,18 @@ namespace RageCoop.Server
 
             return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.NetID);
         }
-
+        */
         // Return a list of all connections but not the local connection
         public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections,NetConnection toExclude)
         {
             return new(connections.Where(e => e != toExclude));
         }
+        /*
         public static List<NetConnection> FilterAllLocal(long local)
         {
             return new(Server.MainNetServer.Connections.Where(e => e.RemoteUniqueIdentifier != local));
         }
-
+        */
         public static T Read<T>(string file) where T : new()
         {
             XmlSerializer ser = new(typeof(T));

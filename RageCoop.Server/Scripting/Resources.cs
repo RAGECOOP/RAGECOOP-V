@@ -11,9 +11,13 @@ namespace RageCoop.Server.Scripting
 {
 	internal class Resources : ResourceLoader
 	{
-		public Resources() : base("RageCoop.Server.Scripting.ServerScript", Program.Logger) { }
+		private readonly Server Server;
+		public Resources(Server server) : base("RageCoop.Server.Scripting.ServerScript", server.Logger)
+		{
+			Server = server;
+		}
 
-		public static bool HasClientResources = false;
+		public bool HasClientResources = false;
 		public void LoadAll()
 		{
             #region CLIENT
@@ -23,7 +27,7 @@ namespace RageCoop.Server.Scripting
 			if (clientResources.Length!=0)
 			{
 				// Pack client side resources as a zip file
-				Logger.Info("Packing client-side resources");
+				Logger?.Info("Packing client-side resources");
 
 				try
 				{
@@ -41,8 +45,8 @@ namespace RageCoop.Server.Scripting
 				}
 				catch (Exception ex)
 				{
-					Logger.Error("Failed to pack client resources");
-					Logger.Error(ex);
+					Logger?.Error("Failed to pack client resources");
+					Logger?.Error(ex);
 				}
 			}
             #endregion
@@ -52,7 +56,7 @@ namespace RageCoop.Server.Scripting
 			Directory.CreateDirectory(path);
 			foreach (var resource in Directory.GetDirectories(path))
 			{
-				Logger.Info($"Loading resource: {Path.GetFileName(resource)}");
+				Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
 				LoadResource(resource);
 			}
 
@@ -61,14 +65,15 @@ namespace RageCoop.Server.Scripting
             {
 				foreach (var d in LoadedResources)
 				{
-					foreach (var s in d.Scripts)
+					foreach (ServerScript s in d.Scripts)
 					{
-						(s as ServerScript).CurrentResource = d;
+						s.CurrentResource = d;
+						s.API=Server.API;
                         try
 						{
 							s.OnStart();
 						}
-						catch(Exception ex) {Logger.Error($"Failed to start resource: {d.Name}"); Logger.Error(ex); }
+						catch(Exception ex) {Logger?.Error($"Failed to start resource: {d.Name}"); Logger?.Error(ex); }
 					}
 				}
 			}
@@ -104,9 +109,9 @@ namespace RageCoop.Server.Scripting
 			{
 				Task.Run(() =>
 				{
-					Logger.Info($"Sending resources to client:{client.Username}");
+					Logger?.Info($"Sending resources to client:{client.Username}");
 					Server.SendFile(path, "Resources.zip", client);
-					Logger.Info($"Resources sent to:{client.Username}");
+					Logger?.Info($"Resources sent to:{client.Username}");
 
 				});
 			}

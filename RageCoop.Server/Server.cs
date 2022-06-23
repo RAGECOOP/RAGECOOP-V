@@ -26,24 +26,29 @@ namespace RageCoop.Server
 
     internal class Server
     {
-        private static readonly string _compatibleVersion = "V0_5";
-        public static BaseScript BaseScript { get; set; }=new BaseScript();
-        public static readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
-        public static NetServer MainNetServer;
+        private readonly string _compatibleVersion = "V0_5";
+        public BaseScript BaseScript { get; set; }=new BaseScript();
+        public readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
+        public NetServer MainNetServer;
 
-        public static readonly Dictionary<Command, Action<CommandContext>> Commands = new();
-        public static readonly Dictionary<long,Client> Clients = new();
-        private static System.Timers.Timer SendPlayerTimer = new System.Timers.Timer(5000);
+        public readonly Dictionary<Command, Action<CommandContext>> Commands = new();
+        public readonly Dictionary<long,Client> Clients = new();
+        private System.Timers.Timer SendPlayerTimer = new System.Timers.Timer(5000);
         
-        private static Dictionary<int,FileTransfer> InProgressFileTransfers=new();
-        private static Resources Resources = new Resources();
-        public Server()
+        private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
+        private Resources Resources;
+        public API API;
+        public Logger Logger;
+        public Server(Logger logger=null)
         {
-            Program.Logger.Info("================");
-            Program.Logger.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
-            Program.Logger.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
-            Program.Logger.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
-            Program.Logger.Info("================");
+            Logger=logger;
+            API=new API(this);
+            Resources=new Resources(this);
+            Logger?.Info("================");
+            Logger?.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
+            Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
+            Logger?.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
+            Logger?.Info("================");
 
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
@@ -62,7 +67,7 @@ namespace RageCoop.Server
             SendPlayerTimer.Elapsed+=(s,e) => { SendPlayerInfos(); };
             SendPlayerTimer.AutoReset=true;
             SendPlayerTimer.Enabled=true;
-            Program.Logger.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
+            Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
             if (MainSettings.AnnounceSelf)
             {
 
@@ -89,11 +94,11 @@ namespace RageCoop.Server
 
                             string content = await response.Content.ReadAsStringAsync();
                             info = JsonConvert.DeserializeObject<IpInfo>(content);
-                            Program.Logger.Info($"Your public IP is {info.Address}, announcing to master server...");
+                            Logger?.Info($"Your public IP is {info.Address}, announcing to master server...");
                         }
                         catch (Exception ex)
                         {
-                            Program.Logger.Error(ex.InnerException?.Message ?? ex.Message);
+                            Logger?.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
                         var realMaster  = MainSettings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : MainSettings.MasterServer;
@@ -115,7 +120,7 @@ namespace RageCoop.Server
                             }
                             catch (Exception ex)
                             {
-                                Program.Logger.Error($"MasterServer: {ex.Message}");
+                                Logger?.Error($"MasterServer: {ex.Message}");
 
                                 // Sleep for 5s
                                 Thread.Sleep(5000);
@@ -124,19 +129,19 @@ namespace RageCoop.Server
 
                             if (response == null)
                             {
-                                Program.Logger.Error("MasterServer: Something went wrong!");
+                                Logger?.Error("MasterServer: Something went wrong!");
                             }
                             else if (response.StatusCode != HttpStatusCode.OK)
                             {
                                 if (response.StatusCode == HttpStatusCode.BadRequest)
                                 {
                                     string requestContent = await response.Content.ReadAsStringAsync();
-                                    Program.Logger.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
+                                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
                                 }
                                 else
                                 {
-                                    Program.Logger.Error($"MasterServer: [{(int)response.StatusCode}]");
-                                    Program.Logger.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
+                                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}]");
+                                    Logger?.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
                                 }
                             }
 
@@ -146,15 +151,16 @@ namespace RageCoop.Server
                     }
                     catch (HttpRequestException ex)
                     {
-                        Program.Logger.Error($"MasterServer: {ex.InnerException.Message}");
+                        Logger?.Error($"MasterServer: {ex.InnerException.Message}");
                     }
                     catch (Exception ex)
                     {
-                        Program.Logger.Error($"MasterServer: {ex.Message}");
+                        Logger?.Error($"MasterServer: {ex.Message}");
                     }
                 }).Start();
                 #endregion
             }
+            BaseScript.API=API;
             BaseScript.OnStart();
             Resources.LoadAll();
             Listen();
@@ -162,20 +168,27 @@ namespace RageCoop.Server
 
         private void Listen()
         {
-            Program.Logger.Info("Listening for clients");
-            Program.Logger.Info("Please use CTRL + C if you want to stop the server!");
+            Logger?.Info("Listening for clients");
+            Logger?.Info("Please use CTRL + C if you want to stop the server!");
             
             
             while (!Program.ReadyToStop)
             {
-                ProcessMessage(MainNetServer.WaitMessage(10));
+                try
+                {
+                    ProcessMessage(MainNetServer.WaitMessage(200));
+                }
+                catch(Exception ex)
+                {
+                    Logger?.Error("Error processing message");
+                    Logger?.Error(ex);
+                }
             }
-            Program.Logger.Warning("Server is shutting down!");
+            Logger?.Warning("Server is shutting down!");
             MainNetServer.Shutdown("Server is shutting down!");
-            Program.Logger.Info("Waiting for resources to stop...Press Ctrl+C again to forcibly terminate the program.");
+            Logger?.Info("Waiting for resources to stop...Press Ctrl+C again to forcibly terminate the program.");
             BaseScript.OnStop(); 
             Resources.StopAll();
-            Program.Logger.Dispose();
         }
 
         Client sender;
@@ -186,10 +199,10 @@ namespace RageCoop.Server
             {
                 case NetIncomingMessageType.ConnectionApproval:
                     {
-                        Program.Logger.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
+                        Logger?.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
                         if (message.ReadByte() != (byte)PacketTypes.Handshake)
                         {
-                            Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
+                            Logger?.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
                             message.SenderConnection.Deny("Wrong packet!");
                         }
                         else
@@ -206,7 +219,7 @@ namespace RageCoop.Server
                             }
                             catch (Exception e)
                             {
-                                Program.Logger.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
+                                Logger?.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
                                 message.SenderConnection.Deny(e.Message);
                             }
                         }
@@ -214,19 +227,27 @@ namespace RageCoop.Server
                     }
                 case NetIncomingMessageType.StatusChanged:
                     {
+                        // Get sender client
+                        if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
+                        {
+                            break;
+                        }
                         NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
 
                         if (status == NetConnectionStatus.Disconnected)
                         {
-                            long nethandle = message.SenderConnection.RemoteUniqueIdentifier;
 
-
-                            SendPlayerDisconnectPacket(nethandle);
+                            SendPlayerDisconnectPacket(sender);
                         }
                         else if (status == NetConnectionStatus.Connected)
                         {
-                            SendPlayerConnectPacket(message.SenderConnection);
-                            Resources.SendTo(Util.GetClientByNetID(message.SenderConnection.RemoteUniqueIdentifier));
+                            SendPlayerConnectPacket(sender);
+                            Resources.SendTo(sender);
+                            API.Events.InvokePlayerConnected(sender);
+                            if (sender.IsReady)
+                            {
+                                API.Events.InvokePlayerReady(sender);
+                            }
                         }
                         break;
                     }
@@ -291,7 +312,7 @@ namespace RageCoop.Server
 
                                         Packets.ProjectileSync packet = new();
                                         packet.Unpack(data);
-                                        ProjectileSync(packet, message.SenderConnection.RemoteUniqueIdentifier);
+                                        ProjectileSync(packet, sender);
 
                                     }
                                     break;
@@ -329,7 +350,8 @@ namespace RageCoop.Server
                                             toRemove.Cancel=true;
                                             if (toRemove.Name=="Resources.zip")
                                             {
-                                                Clients[message.SenderConnection.RemoteUniqueIdentifier].IsReady=true;
+                                                sender.IsReady=true;
+                                                API.Events.InvokePlayerReady(sender);
                                             }
                                         }
                                     }
@@ -340,13 +362,13 @@ namespace RageCoop.Server
                                         // Sync Events
                                         try
                                         {
-                                            var outgoingMessage = MainNetServer.CreateMessage();
-                                            outgoingMessage.Write(btype);
-                                            outgoingMessage.Write(len);
-                                            outgoingMessage.Write(data);
                                             var toSend = MainNetServer.Connections.Exclude(message.SenderConnection);
                                             if (toSend.Count!=0)
                                             {
+                                                var outgoingMessage = MainNetServer.CreateMessage();
+                                                outgoingMessage.Write(btype);
+                                                outgoingMessage.Write(len);
+                                                outgoingMessage.Write(data);
                                                 MainNetServer.SendMessage(outgoingMessage, toSend, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.SyncEvents);
                                             }
                                         }
@@ -357,7 +379,7 @@ namespace RageCoop.Server
                                     }
                                     else
                                     {
-                                        Program.Logger.Error("Unhandled Data / Packet type");
+                                        Logger?.Error("Unhandled Data / Packet type");
                                     }
                                     break;
                             }
@@ -370,32 +392,36 @@ namespace RageCoop.Server
                     }
                 case NetIncomingMessageType.ConnectionLatencyUpdated:
                     {
-                        Client client = Util.GetClientByNetID(message.SenderConnection.RemoteUniqueIdentifier);
-                        if (client != null)
+                        // Get sender client
+                        if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
                         {
-                            client.Latency = message.ReadFloat();
+                            break;
+                        }
+                        if (sender != null)
+                        {
+                            sender.Latency = message.ReadFloat();
                         }
                     }
                     break;
                 case NetIncomingMessageType.ErrorMessage:
-                    Program.Logger.Error(message.ReadString());
+                    Logger?.Error(message.ReadString());
                     break;
                 case NetIncomingMessageType.WarningMessage:
-                    Program.Logger.Warning(message.ReadString());
+                    Logger?.Warning(message.ReadString());
                     break;
                 case NetIncomingMessageType.DebugMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
-                    Program.Logger.Debug(message.ReadString());
+                    Logger?.Debug(message.ReadString());
                     break;
                 default:
-                    Program.Logger.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
+                    Logger?.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
                     break;
             }
 
             MainNetServer.Recycle(message);
         }
-        static object _sendPlayersLock=new object();
-        public static void SendPlayerInfos()
+        object _sendPlayersLock=new object();
+        public void SendPlayerInfos()
         {
             lock (_sendPlayersLock)
             {
@@ -422,9 +448,9 @@ namespace RageCoop.Server
 
         private void DisconnectAndLog(NetConnection senderConnection,PacketTypes type, Exception e)
         {
-            Program.Logger.Error($"Error receiving a packet of type {type}");
-            Program.Logger.Error(e.Message);
-            Program.Logger.Error(e.StackTrace);
+            Logger?.Error($"Error receiving a packet of type {type}");
+            Logger?.Error(e.Message);
+            Logger?.Error(e.StackTrace);
             senderConnection.Disconnect(e.Message);
         }
 
@@ -432,7 +458,7 @@ namespace RageCoop.Server
         // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection connection, Packets.Handshake packet)
         {
-            Program.Logger.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + connection.RemoteEndPoint.Address.ToString() + "]");
+            Logger?.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + connection.RemoteEndPoint.Address.ToString() + "]");
 
             if (!packet.ModVersion.StartsWith(_compatibleVersion))
             {
@@ -476,7 +502,7 @@ namespace RageCoop.Server
             lock (Clients)
             {
                 Clients.Add(connection.RemoteUniqueIdentifier,
-                    tmpClient = new Client()
+                    tmpClient = new Client(this)
                     {
                         NetID = connection.RemoteUniqueIdentifier,
                         Connection=connection,
@@ -489,7 +515,7 @@ namespace RageCoop.Server
                 );;
             }
             
-            Program.Logger.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
+            Logger?.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
             // Create a new handshake packet
@@ -504,93 +530,68 @@ namespace RageCoop.Server
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
-        private static void SendPlayerConnectPacket(NetConnection local)
+        private void SendPlayerConnectPacket(Client newClient)
         {
-            Client localClient = Util.GetClientByNetID(local.RemoteUniqueIdentifier);
-            if (localClient == null)
+
+            // Send other players to this client
+            Clients.Values.ForEach(target =>
             {
-                local.Disconnect("No data found!");
-                return;
-            }
-
-            List<NetConnection> clients=MainNetServer.Connections.Exclude(local);
-            // Send all players to local
-            
-
-            if (clients.Count > 0)
-            {
-               clients.ForEach(targetPlayer =>
-                {
-                    long targetNetHandle = targetPlayer.RemoteUniqueIdentifier;
-                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-                    Client targetClient = Util.GetClientByNetID(targetNetHandle);
-                    if (targetClient != null)
-                    {
-                        new Packets.PlayerConnect()
-                        {
-                            // NetHandle = targetNetHandle,
-                            Username = targetClient.Username,
-                            PedID=targetClient.ID,
-                            
-                        }.Pack(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, local, NetDeliveryMethod.ReliableOrdered, 0);
-                    }
-                });
-
-                // Send local to all players
+                if (target==newClient) { return; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerConnect()
                 {
-                    PedID=localClient.ID,
-                    Username = localClient.Username
+                    // NetHandle = targetNetHandle,
+                    Username = target.Username,
+                    PedID=target.ID,
+
                 }.Pack(outgoingMessage);
-                if(clients.Count > 0)
+                MainNetServer.SendMessage(outgoingMessage, newClient.Connection, NetDeliveryMethod.ReliableOrdered, 0);
+            });
+            // Send new client to all players
+            var cons = MainNetServer.Connections.Exclude(newClient.Connection);
+            if (cons.Count!=0)
+            {
+                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                new Packets.PlayerConnect()
                 {
-                    MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
-                }
+                    PedID=newClient.ID,
+                    Username = newClient.Username
+                }.Pack(outgoingMessage);
+
+                MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
+
             }
-            API.Events.InvokePlayerConnected(localClient);
             
-            Program.Logger.Info($"Player {localClient.Username} connected!");
+            Logger?.Info($"Player {newClient.Username} connected!");
 
             if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
             {
-                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, null,new List<NetConnection>() { local });
+                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, null,new List<NetConnection>() { newClient.Connection });
             }
         }
 
         // Send all players a message that someone has left the server
-        private static void SendPlayerDisconnectPacket(long nethandle)
+        private void SendPlayerDisconnectPacket(Client localClient)
         {
-            List<NetConnection> clients = MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != nethandle);
-            int playerPedID = Clients[nethandle].ID;
-            if (clients.Count > 0)
+            var cons = MainNetServer.Connections.Exclude(localClient.Connection);
+            if (cons.Count!=0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerDisconnect()
                 {
-                    PedID=playerPedID,
-                    
+                    PedID=localClient.ID,
+
                 }.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, clients, NetDeliveryMethod.ReliableOrdered, 0);
+                MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
             }
-
-            Client localClient = Util.GetClientByNetID( nethandle);
-            if (localClient == null)
-            {
-                return;
-            }
-
-            Clients.Remove(localClient.NetID);
-
             API.Events.InvokePlayerDisconnected(localClient);
-            Program.Logger.Info($"Player {localClient.Username} disconnected! ID:{playerPedID}");
-
+            Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.ID}");
+            Clients.Remove(localClient.NetID);
+            
         }
 
         #region SyncEntities
-        private static void PedStateSync(Packets.PedStateSync packet, Client client)
+        private void PedStateSync(Packets.PedStateSync packet, Client client)
         {
             
 
@@ -604,7 +605,7 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void VehicleStateSync(Packets.VehicleStateSync packet, Client client)
+        private void VehicleStateSync(Packets.VehicleStateSync packet, Client client)
         {
             // Save the new data
             if (packet.Passengers.ContainsValue(client.ID))
@@ -620,7 +621,7 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void PedSync(Packets.PedSync packet, Client client)
+        private void PedSync(Packets.PedSync packet, Client client)
         {
             bool isPlayer = packet.ID==client.ID;
             if (isPlayer) 
@@ -654,7 +655,7 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void VehicleSync(Packets.VehicleSync packet, Client client)
+        private void VehicleSync(Packets.VehicleSync packet, Client client)
         {
             bool isPlayer = packet.ID==client.Player.VehicleID;
             foreach (var c in Clients.Values)
@@ -678,13 +679,8 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
             }
         }
-        private static void ProjectileSync(Packets.ProjectileSync packet, long ClientID)
+        private void ProjectileSync(Packets.ProjectileSync packet, Client client)
         {
-            Client client = Util.GetClientByNetID(ClientID);
-            if (client == null)
-            {
-                return;
-            }
 
             foreach (var c in Clients.Values)
             {
@@ -697,7 +693,7 @@ namespace RageCoop.Server
 
         #endregion
         // Send a message to targets or all players
-        private static void SendChatMessage(Packets.ChatMessage packet,Client sender=null, List<NetConnection> targets = null)
+        private void SendChatMessage(Packets.ChatMessage packet,Client sender=null, List<NetConnection> targets = null)
         {
             if (packet.Message.StartsWith('/'))
             {
@@ -722,13 +718,8 @@ namespace RageCoop.Server
 
                     if (command.Key.Usage != null && command.Key.ArgsLength != argsWithoutCmd.Length)
                     {
-                        NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
-                        if (userConnection == default)
-                        {
-                            return;
-                        }
 
-                        SendChatMessage("Server", command.Key.Usage, userConnection);
+                        SendChatMessage("Server", command.Key.Usage,sender.Connection);
                         return;
                     }
 
@@ -736,13 +727,8 @@ namespace RageCoop.Server
                 }
                 else
                 {
-                    NetConnection userConnection = Util.GetConnectionByUsername(packet.Username);
-                    if (userConnection == default)
-                    {
-                        return;
-                    }
 
-                    SendChatMessage("Server", "Command not found!", userConnection);
+                    SendChatMessage("Server", "Command not found!", sender.Connection);
                 }
 
                 return;
@@ -750,25 +736,26 @@ namespace RageCoop.Server
             packet.Message = packet.Message.Replace("~", "");
             SendChatMessage(packet.Username, packet.Message, targets);
 
-            Program.Logger.Info(packet.Username + ": " + packet.Message);
+            Logger?.Info(packet.Username + ": " + packet.Message);
         }
 
-        public static void SendChatMessage(string username, string message, List<NetConnection> targets = null)
+        public void SendChatMessage(string username, string message, List<NetConnection> targets = null)
         {
+            if (MainNetServer.Connections.Count==0) { return; }
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
 
             new Packets.ChatMessage() { Username = username, Message = message }.Pack(outgoingMessage);
-
+            
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
         }
-        public static void SendChatMessage(string username, string message, NetConnection target)
+        public void SendChatMessage(string username, string message, NetConnection target)
         {
             SendChatMessage(username, message, new List<NetConnection>() { target });
         }
         #endregion
 
 
-        public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        public void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {
             Command command = new(name) { Usage = usage, ArgsLength = argsLength };
 
@@ -779,7 +766,7 @@ namespace RageCoop.Server
 
             Commands.Add(command, callback);
         }
-        public static void RegisterCommand(string name, Action<CommandContext> callback)
+        public void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Command command = new(name);
 
@@ -791,7 +778,7 @@ namespace RageCoop.Server
             Commands.Add(command, callback);
         }
 
-        public static void RegisterCommands<T>()
+        public void RegisterCommands<T>()
         {
             IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(Command), false).Any());
 
@@ -803,13 +790,13 @@ namespace RageCoop.Server
             }
         }
 
-        public static void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
+        public void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
             int id = RequestFileID();
             var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             fs.Seek(0, SeekOrigin.Begin);
             var total = fs.Length;
-            Program.Logger.Debug($"Initiating file transfer:{name}, {total}");
+            Logger?.Debug($"Initiating file transfer:{name}, {total}");
             FileTransfer transfer = new()
             {
                 ID=id,
@@ -835,7 +822,7 @@ namespace RageCoop.Server
                 if (thisRead!=chunk.Length)
                 {
                     if (thisRead==0) { break; }
-                    Program.Logger.Trace($"Purging chunk:{thisRead}");
+                    Logger?.Trace($"Purging chunk:{thisRead}");
                     Array.Resize(ref chunk, thisRead);
                 }
                 Send(
@@ -858,10 +845,10 @@ namespace RageCoop.Server
             ); 
             fs.Close();
             fs.Dispose();
-            Program.Logger.Debug($"All file chunks sent:{name}");
+            Logger?.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }
-        private static int RequestFileID()
+        private int RequestFileID()
         {
             int ID = 0;
             while ((ID==0)
@@ -883,7 +870,7 @@ namespace RageCoop.Server
         /// <param name="p"></param>
         /// <param name="channel"></param>
         /// <param name="method"></param>
-        public static void Send(Packet p,Client client, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        public void Send(Packet p,Client client, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             p.Pack(outgoingMessage);

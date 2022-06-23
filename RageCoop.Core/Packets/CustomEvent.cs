@@ -14,6 +14,7 @@ namespace RageCoop.Core
 
             public override void Pack(NetOutgoingMessage message)
             {
+                Args= Args ?? new List<object>(0);
                 message.Write((byte)PacketTypes.CustomEvent);
 
                 List<byte> result = new List<byte>();

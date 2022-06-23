@@ -3,7 +3,7 @@
 namespace RageCoop.Server.Scripting
 {
     /// <summary>
-    /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded, you should use <see cref="OnStart"/>. to initiate your script.
+    /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded and <see cref="API"/> will be null, you should use <see cref="OnStart"/>. to initiate your script.
     /// </summary>
     public abstract class ServerScript :Core.Scripting.IScriptable
     {
@@ -20,6 +20,8 @@ namespace RageCoop.Server.Scripting
         /// Get the <see cref="Core.Scripting.Resource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
         /// </summary>
         public Core.Scripting.Resource CurrentResource { get;internal set; }
+
+        public API API { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]

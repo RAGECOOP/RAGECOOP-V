@@ -128,7 +128,7 @@ namespace RageCoop.Client.Scripting
         }
 
         /// <summary>
-        /// Get a <see cref="Core.Logging.Logger"/> that RAGECOOP is currently using.
+        /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
         /// </summary>
         /// <returns></returns>
         public static Logger GetLogger()

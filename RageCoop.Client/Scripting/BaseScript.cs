@@ -21,7 +21,7 @@ namespace RageCoop.Client.Scripting
         public override void OnStop()
         {
         }
-        void SetAutoRespawn(CustomEventReceivedArgs args)
+        private void SetAutoRespawn(CustomEventReceivedArgs args)
         {
             API.Config.EnableAutoRespawn=(bool)args.Args[0];
         }

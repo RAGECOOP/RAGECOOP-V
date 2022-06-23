@@ -48,7 +48,7 @@ namespace RageCoop.Core.Scripting
 			var r = new Resource()
 			{
 				Scripts = new List<IScriptable>(),
-				Name=Path.GetDirectoryName(path),
+				Name=Path.GetFileName(path),
 				Directory=path,
 			};
 			foreach (var f in Directory.GetFiles(path, "*.dll"))

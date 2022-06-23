@@ -9,10 +9,9 @@ namespace RageCoop.Server
     class Program
     {
         public static bool ReadyToStop = false;
-        public static Core.Logger Logger;
         static void Main(string[] args)
         {
-            Logger=new Core.Logger()
+            var mainLogger= new Core.Logger()
             {
                 LogPath="RageCoop.Server.log",
                 UseConsole=true,
@@ -49,13 +48,15 @@ namespace RageCoop.Server
                     }
                 };
 
-                _ = new Server();
+                _ = new Server(mainLogger);
             }
             catch (Exception e)
             {
-                Logger.Error(e);
-                Logger.Error($"Fatal error occurred, server shutting down.");
+                mainLogger.Error(e);
+                mainLogger.Error($"Fatal error occurred, server shutting down.");
+                Thread.Sleep(3000);
             }
+            mainLogger.Dispose();
         }
 
 #if DEBUG

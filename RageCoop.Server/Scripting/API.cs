@@ -10,89 +10,93 @@ using System.Net;
 
 namespace RageCoop.Server.Scripting
 {
-    public static class API
+    public class APIEvents
     {
         #region INTERNAL
-        internal static Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new();
+        internal Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new();
         #endregion
-        public static class Events
+        public event EventHandler<ChatEventArgs> OnChatMessage;
+        public event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
+        /// <summary>
+        /// Will be invoked when a player is connected, but this player might not be ready yet(client resources not loaded), using <see cref="OnPlayerReady"/> is recommended.
+        /// </summary>
+        public event EventHandler<Client> OnPlayerConnected;
+        /// <summary>
+        /// Will be invoked after the client connected and all resources(if any) have been loaded.
+        /// </summary>
+        public event EventHandler<Client> OnPlayerReady;
+        public event EventHandler<Client> OnPlayerDisconnected;
+        /// <summary>
+        /// Will be invoked before registered handlers
+        /// </summary>
+        public event EventHandler<OnCommandEventArgs> OnCommandReceived;
+        /// <summary>
+        /// Invoked everytime a player's main ped has been updated
+        /// </summary>
+        public event EventHandler<Client> OnPlayerUpdate;
+        internal void ClearHandlers()
         {
-            #region DELEGATES
-            public delegate void EmptyEvent();
-            public delegate void PlayerConnect(Client client);
-            public delegate void PlayerDisconnect(Client client);
-
-            #endregion
-            public static event EventHandler<ChatEventArgs> OnChatMessage;
-            public static event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
-            public static event PlayerConnect OnPlayerConnected;
-            public static event PlayerDisconnect OnPlayerDisconnected;
-            /// <summary>
-            /// Will be invoked before registered handlers
-            /// </summary>
-            public static event EventHandler<OnCommandEventArgs> OnCommandReceived;
-            /// <summary>
-            /// Invoked everytime a player's main ped has been updated
-            /// </summary>
-            public static event EventHandler<Client> OnPlayerUpdate;
-            /*
-            /// <summary>
-            /// This will be invoked when a CustomEvent is received from one client.
-            /// </summary>
-            public static event EventHandler<CustomEventReceivedArgs> OnCustomEventReceived;
-            */
-            internal static void ClearHandlers()
+            OnChatMessage=null;
+            OnPlayerHandshake=null;
+            OnPlayerConnected=null;
+            OnPlayerReady=null;
+            OnPlayerDisconnected=null;
+            // OnCustomEventReceived=null;
+            OnCommandReceived=null;
+            OnPlayerUpdate=null;
+        }
+        #region INVOKE
+        internal void InvokeOnChatMessage(Packets.ChatMessage p, Client sender)
+        {
+            OnChatMessage?.Invoke(this, new ChatEventArgs()
             {
-                OnChatMessage=null;
-                OnPlayerHandshake=null;
-                OnPlayerConnected=null;
-                OnPlayerDisconnected=null;
-                // OnCustomEventReceived=null;
-                OnCommandReceived=null;
-                OnPlayerUpdate=null;
-            }
-            #region INVOKE
-            internal static void InvokeOnChatMessage(Packets.ChatMessage p,Client sender) 
-            { 
-                OnChatMessage?.Invoke(null,new ChatEventArgs() {
                 Sender=sender,
                 Message=p.Message
-                }); 
-            }
-            internal static void InvokePlayerConnected(Client client) 
-            { OnPlayerConnected?.Invoke(client); }
-            internal static void InvokePlayerDisconnected(Client client) 
-            { OnPlayerDisconnected?.Invoke(client); }
-            internal static void InvokePlayerHandshake(HandshakeEventArgs args)
-            { OnPlayerHandshake?.Invoke(null, args); }
-
-            internal static void InvokeCustomEventReceived(Packets.CustomEvent p,Client sender)
-            {
-                var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args, Sender=sender };
-                List<Action<CustomEventReceivedArgs>> handlers;
-                if (CustomEventHandlers.TryGetValue(p.Hash,out handlers))
-                {
-                    handlers.ForEach((x) => { x.Invoke(args); });
-                }
-            }
-            internal static bool InvokeOnCommandReceived(string cname,string[] cargs,Client sender)
-            {
-                var args = new OnCommandEventArgs()
-                {
-                    Name=cname,
-                    Args=cargs,
-                    Sender=sender
-                };
-                OnCommandReceived?.Invoke(null,args);
-                return args.Cancel;
-            }
-            internal static void InvokePlayerUpdate(Client client)
-            {
-                OnPlayerUpdate?.Invoke(null,client);
-            }
-            #endregion
+            });
         }
+        internal void InvokePlayerConnected(Client client)
+        { OnPlayerConnected?.Invoke(this,client); }
+        internal void InvokePlayerReady(Client client)
+        { OnPlayerReady?.Invoke(this, client); }
+        internal void InvokePlayerDisconnected(Client client)
+        { OnPlayerDisconnected?.Invoke(this,client); }
+        internal void InvokePlayerHandshake(HandshakeEventArgs args)
+        { OnPlayerHandshake?.Invoke(this, args); }
 
+        internal void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
+        {
+            var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args, Sender=sender };
+            List<Action<CustomEventReceivedArgs>> handlers;
+            if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
+            {
+                handlers.ForEach((x) => { x.Invoke(args); });
+            }
+        }
+        internal bool InvokeOnCommandReceived(string cname, string[] cargs, Client sender)
+        {
+            var args = new OnCommandEventArgs()
+            {
+                Name=cname,
+                Args=cargs,
+                Sender=sender
+            };
+            OnCommandReceived?.Invoke(this, args);
+            return args.Cancel;
+        }
+        internal void InvokePlayerUpdate(Client client)
+        {
+            OnPlayerUpdate?.Invoke(this, client);
+        }
+        #endregion
+    }
+    public class API
+    {
+        private readonly Server Server;
+        internal API(Server server)
+        {
+            Server=server;
+        }
+        public APIEvents Events { get; set; }=new APIEvents();
         #region FUNCTIONS
         /*
         /// <summary>
@@ -101,7 +105,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="hash">The hash (Example: 0x25223CA6B4D20B7F = GET_CLOCK_HOURS)</param>
         /// <param name="args">The arguments (Example: string = int, object = 5)</param>
-        public static void SendNativeCallToAll(GTA.Native.Hash hash, params object[] args)
+        public void SendNativeCallToAll(GTA.Native.Hash hash, params object[] args)
         {
             try
             {
@@ -112,7 +116,7 @@ namespace RageCoop.Server.Scripting
 
                 if (args != null && args.Length == 0)
                 {
-                    Program.Logger.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
+                    Server.Logger?.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
                     return;
                 }
 
@@ -128,7 +132,7 @@ namespace RageCoop.Server.Scripting
             }
             catch (Exception e)
             {
-                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
         */
@@ -136,7 +140,7 @@ namespace RageCoop.Server.Scripting
         /// Get a list of all Clients
         /// </summary>
         /// <returns>All clients as a dictionary indexed by NetID</returns>
-        public static Dictionary<long, Client> GetAllClients()
+        public Dictionary<long, Client> GetAllClients()
         {
             return new(Server.Clients);
         }
@@ -146,7 +150,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="username">The username to search for (non case-sensitive)</param>
         /// <returns>The Client from this user or null</returns>
-        public static Client GetClientByUsername(string username)
+        public Client GetClientByUsername(string username)
         {
             return Server.Clients.Values.FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
         }
@@ -156,7 +160,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="message">The chat message</param>
         /// <param name="username">The username which send this message (default = "Server")</param>
-        public static void SendChatMessage(string message, List<Client> targets = null, string username = "Server")
+        public void SendChatMessage(string message, List<Client> targets = null, string username = "Server")
         {
             try
             {
@@ -172,10 +176,10 @@ namespace RageCoop.Server.Scripting
             }
             catch (Exception e)
             {
-                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-        public static void SendChatMessage(string message, Client target, string username = "Server")
+        public void SendChatMessage(string message, Client target, string username = "Server")
         {
             try
             {
@@ -183,27 +187,29 @@ namespace RageCoop.Server.Scripting
             }
             catch (Exception e)
             {
-                Program.Logger.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
 
         /// <summary>
         /// Send CleanUpWorld to all players to delete all objects created by the server
         /// </summary>
-        public static void SendCleanUpWorldToAll(List<long> netHandleList = null)
+        public void SendCleanUpWorldToAll(List<Client> clients = null)
         {
             if (Server.MainNetServer.ConnectionsCount == 0)
             {
                 return;
             }
-            
-            List<NetConnection> connections = netHandleList == null
-                    ? Server.MainNetServer.Connections
-                    : Server.MainNetServer.Connections.FindAll(c => netHandleList.Contains(c.RemoteUniqueIdentifier));
-
             NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
             outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
-            Server.MainNetServer.SendMessage(outgoingMessage, connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
+            if (clients == null)
+            {
+                Server.MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
+            }
+            else
+            {
+                clients.ForEach(client => { Server.MainNetServer.SendMessage(outgoingMessage,client.Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default); });
+            }    
         }
 
         /// <summary>
@@ -213,7 +219,7 @@ namespace RageCoop.Server.Scripting
         /// <param name="usage">How to use this message (argsLength required!)</param>
         /// <param name="argsLength">The length of args (Example: "/message USERNAME MESSAGE" = 2) (usage required!)</param>
         /// <param name="callback">Create a new function!</param>
-        public static void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        public void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, usage, argsLength, callback);
         }
@@ -222,7 +228,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="name">The name of the command (Example: "test" for "/test")</param>
         /// <param name="callback">Create a new function!</param>
-        public static void RegisterCommand(string name, Action<CommandContext> callback)
+        public void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, callback);
         }
@@ -231,18 +237,18 @@ namespace RageCoop.Server.Scripting
         /// Register a class of commands
         /// </summary>
         /// <typeparam name="T">The name of your class with functions</typeparam>
-        public static void RegisterCommands<T>()
+        public void RegisterCommands<T>()
         {
             Server.RegisterCommands<T>();
         }
 
         /// <summary>
-        /// Send an event and data to the specified clients.
+        /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event</param>
         /// <param name="args">The objects conataing your data, supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
-        /// <param name="targets">The target clients to send.</param>
-        public static void SendCustomEvent(int eventHash,List<object> args,List<Client> targets=null)
+        /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
+        public void SendCustomEvent(int eventHash,List<object> args,List<Client> targets=null)
         {
             targets ??= new(Server.Clients.Values);
             var p = new Packets.CustomEvent()
@@ -260,25 +266,25 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
         /// <param name="handler">An handler to be invoked when the event is received from the server. This will be invoked from main thread.
-        public static void RegisterCustomEventHandler(int hash,Action<CustomEventReceivedArgs> handler)
+        public void RegisterCustomEventHandler(int hash,Action<CustomEventReceivedArgs> handler)
         {
             List<Action<CustomEventReceivedArgs>> handlers;
-            lock (CustomEventHandlers)
+            lock (Events.CustomEventHandlers)
             {
-                if (!CustomEventHandlers.TryGetValue(hash,out handlers))
+                if (!Events.CustomEventHandlers.TryGetValue(hash,out handlers))
                 {
-                    CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
+                    Events.CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
                 }
                 handlers.Add(handler);
             }
         }
-        public static void RegisterCustomEventHandler(string name, Action<CustomEventReceivedArgs> handler)
+        public void RegisterCustomEventHandler(string name, Action<CustomEventReceivedArgs> handler)
         {
             RegisterCustomEventHandler(CustomEvents.Hash(name), handler);
         }
-        public static Logger GetLogger()
+        public Logger GetLogger()
         {
-            return Program.Logger;
+            return Server.Logger;
         }
         #endregion
     }
