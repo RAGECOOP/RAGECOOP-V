@@ -17,7 +17,7 @@
 	  <Description>An API reference for developing client-side resource for RAGECOOP</Description>
 	  <PackageProjectUrl>https://ragecoop.online/</PackageProjectUrl>
 	  <RepositoryUrl>https://github.com/RAGECOOP/RAGECOOP-V</RepositoryUrl>
-	  <ApplicationIcon>favicon.ico</ApplicationIcon>
+	  <ApplicationIcon>icon.ico</ApplicationIcon>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="favicon.ico" />
+    <Content Include="icon.ico" />
   </ItemGroup>
 
   <ItemGroup>

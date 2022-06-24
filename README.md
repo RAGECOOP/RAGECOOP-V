@@ -7,9 +7,10 @@
 [![Issues][issues-shield]][issues-url]
 
 
-# Disclaimer
+# ⚠ Notice
 The original author of this project is [EntenKoeniq](https://github.com/EntenKoeniq).
 The project has been reworked and is currently maintained by [Sardelka9515](https://github.com/Sardelka9515).
+To download the legacy versions, go to [this repository](https://github.com/RAGECOOP/RAGECOOP-V.OLD)
 
 # 🧠 That's it
 RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP or just drive around with your buddy.
@@ -28,6 +29,7 @@ _Old name: GTACOOP:R_
 - - No new features (only improvements)
 - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 - [ClearScript](https://github.com/microsoft/ClearScript)
+- [SharpZipLib](https://github.com/icsharpcode/SharpZipLib)
 
 # Features
 

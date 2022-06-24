@@ -28,7 +28,7 @@ namespace RageCoop.Server
     {
         private readonly string _compatibleVersion = "V0_5";
         internal BaseScript BaseScript { get; set; }=new BaseScript();
-        internal readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
+        internal readonly ServerSettings Settings;
         internal NetServer MainNetServer;
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
@@ -40,14 +40,17 @@ namespace RageCoop.Server
         public API API { get; private set; }
         internal Logger Logger;
         private Security Security;
-        public Server(Logger logger=null)
+        public Server(ServerSettings settings,Logger logger=null)
         {
+            Settings = settings;
+            if (settings==null) { throw new ArgumentNullException("Server settings cannot be null!"); }
             Logger=logger;
+            if (Logger!=null) { Logger.LogLevel=Settings.LogLevel;}
             API=new API(this);
             Resources=new Resources(this);
             Security=new Security(Logger);
             Logger?.Info("================");
-            Logger?.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
+            Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
             Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
             Logger?.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
             Logger?.Info("================");
@@ -55,8 +58,8 @@ namespace RageCoop.Server
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")
             {
-                Port = MainSettings.Port,
-                MaximumConnections = MainSettings.MaxPlayers,
+                Port = Settings.Port,
+                MaximumConnections = Settings.MaxPlayers,
                 EnableUPnP = false,
                 AutoFlushSendQueue = true
             };
@@ -71,7 +74,7 @@ namespace RageCoop.Server
             SendPlayerTimer.AutoReset=true;
             SendPlayerTimer.Enabled=true;
             Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
-            if (MainSettings.AnnounceSelf)
+            if (Settings.AnnounceSelf)
             {
 
                 #region -- MASTERSERVER --
@@ -104,17 +107,17 @@ namespace RageCoop.Server
                             Logger?.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
-                        var realMaster  = MainSettings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : MainSettings.MasterServer;
+                        var realMaster  = Settings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : Settings.MasterServer;
                         while (!Program.ReadyToStop)
                         {
                             string msg =
                                 "{ " +
                                 "\"address\": \"" + info.Address + "\", " +
-                                "\"port\": \"" + MainSettings.Port + "\", " +
-                                "\"name\": \"" + MainSettings.Name + "\", " +
+                                "\"port\": \"" + Settings.Port + "\", " +
+                                "\"name\": \"" + Settings.Name + "\", " +
                                 "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                                "\"maxPlayers\": \"" + MainSettings.MaxPlayers + "\"" +
+                                "\"maxPlayers\": \"" + Settings.MaxPlayers + "\"" +
                                 " }";
                             HttpResponseMessage response = null;
                             try
@@ -583,9 +586,9 @@ namespace RageCoop.Server
             
             Logger?.Info($"Player {newClient.Username} connected!");
 
-            if (!string.IsNullOrEmpty(MainSettings.WelcomeMessage))
+            if (!string.IsNullOrEmpty(Settings.WelcomeMessage))
             {
-                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = MainSettings.WelcomeMessage }, null,new List<NetConnection>() { newClient.Connection });
+                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = Settings.WelcomeMessage }, null,new List<NetConnection>() { newClient.Connection });
             }
         }
 
@@ -659,12 +662,12 @@ namespace RageCoop.Server
                 // Check streaming distance
                 if (isPlayer)
                 {
-                    if ((MainSettings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.PlayerStreamingDistance))
+                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
                     {
                         continue;
                     }
                 }
-                else if ((MainSettings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.NpcStreamingDistance))
+                else if ((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
                 {
                     continue;
                 }
@@ -683,13 +686,13 @@ namespace RageCoop.Server
                 if (isPlayer)
                 {
                     // Player's vehicle
-                    if ((MainSettings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.PlayerStreamingDistance))
+                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
                     {
                         continue;
                     }
 
                 }
-                else if((MainSettings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>MainSettings.NpcStreamingDistance))
+                else if((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
                 {
                     continue;
                 }

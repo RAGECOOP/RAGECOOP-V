@@ -48,7 +48,7 @@ namespace RageCoop.Server
                     }
                 };
 
-                _ = new Server(mainLogger);
+                _ = new Server(Util.Read<ServerSettings>("Settings.xml"), mainLogger);
             }
             catch (Exception e)
             {
