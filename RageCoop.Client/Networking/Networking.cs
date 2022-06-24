@@ -39,7 +39,7 @@ namespace RageCoop.Client
             });
         }
 
-        public static void ToggleConnection(string address,string password=null)
+        public static void ToggleConnection(string address,string username=null,string password=null)
         {
             if (IsOnServer)
             {
@@ -48,6 +48,7 @@ namespace RageCoop.Client
             else
             {
                 password = password ?? Main.Settings.Password;
+                username=username ?? Main.Settings.Username;
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
@@ -85,7 +86,7 @@ namespace RageCoop.Client
                     var handshake=new Packets.Handshake()
                     {
                         PedID =  Main.LocalPlayerID,
-                        Username = Main.Settings.Username,
+                        Username =username,
                         ModVersion = Main.CurrentVersion,
                         PassHashEncrypted=Security.Encrypt(password.GetHash())
                     };

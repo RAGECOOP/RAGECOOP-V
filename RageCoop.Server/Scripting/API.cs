@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Lidgren.Network;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System.Reflection;
 using System.Net;
 
 namespace RageCoop.Server.Scripting
@@ -221,12 +222,28 @@ namespace RageCoop.Server.Scripting
         }
 
         /// <summary>
-        /// Register a class of commands
+        /// Register all commands in a static class
         /// </summary>
-        /// <typeparam name="T">The name of your class with functions</typeparam>
+        /// <typeparam name="T">Your static class with commands</typeparam>
         public void RegisterCommands<T>()
         {
             Server.RegisterCommands<T>();
+        }
+
+        /// <summary>
+        /// Register all commands inside an class instance
+        /// </summary>
+        /// <param name="obj">The instance of type containing the commands</param>
+        public void RegisterCommands(object obj)
+        {
+            IEnumerable<MethodInfo> commands = obj.GetType().GetMethods().Where(method => method.GetCustomAttributes(typeof(Command), false).Any());
+
+            foreach (MethodInfo method in commands)
+            {
+                Command attribute = method.GetCustomAttribute<Command>(true);
+                RegisterCommand(attribute.Name, attribute.Usage, attribute.ArgsLength,
+                    (ctx) => { method.Invoke(obj, new object[] { ctx }); });
+            }
         }
 
         /// <summary>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RageCoop.Core.Scripting;
 using System.IO;
-using Ionic.Zip;
+using ICSharpCode.SharpZipLib.Zip;
 using System.Reflection;
 namespace RageCoop.Server.Scripting
 {
@@ -16,64 +16,95 @@ namespace RageCoop.Server.Scripting
 		{
 			Server = server;
 		}
-
-		public bool HasClientResources = false;
+		private List<string> ClientResourceZips=new List<string>();
+		public bool HasClientResources { get; private set; }
 		public void LoadAll()
 		{
             #region CLIENT
             var path = Path.Combine("Resources", "Client");
+			var tmp = Path.Combine("Resources", "ClientTemp");
 			Directory.CreateDirectory(path);
-			var clientResources = Directory.GetDirectories(path);
-			if (clientResources.Length!=0)
+			if (Directory.Exists(tmp))
+            {
+				foreach(var dir in Directory.GetDirectories(tmp))
+                {
+					Directory.Delete(dir, true);
+                }
+            }
+            else
+            {
+				Directory.CreateDirectory(tmp);
+            }
+			var resourceFolders = Directory.GetDirectories(path,"*",SearchOption.TopDirectoryOnly);
+			if (resourceFolders.Length!=0)
 			{
-				// Pack client side resources as a zip file
-				Logger?.Info("Packing client-side resources");
-
-				try
-				{
-					var zippath = Path.Combine(path, "Resources.zip");
-					if (File.Exists(zippath))
+				HasClientResources=true;
+				foreach (var resourceFolder in resourceFolders)
+                {
+					// Pack client side resource as a zip file
+					Logger?.Info("Packing client-side resource:"+resourceFolder);
+					var zipPath = Path.Combine(tmp, Path.GetFileName(resourceFolder));
+					try
 					{
-						File.Delete(zippath);
+						using (ZipFile zip = ZipFile.Create(zipPath))
+						{
+							foreach (var dir in Directory.GetDirectories(resourceFolder, "*", SearchOption.AllDirectories))
+							{
+								zip.AddDirectory(dir.Substring(resourceFolder.Length+1));
+							}
+							foreach (var file in Directory.GetFiles(resourceFolder, "*", SearchOption.AllDirectories))
+                            {
+								zip.Add(file,file.Substring(resourceFolder.Length+1));
+                            }
+							zip.Close();
+							ClientResourceZips.Add(zipPath);
+						}
 					}
-					using (ZipFile zip = new ZipFile())
+					catch (Exception ex)
 					{
-						zip.AddDirectory(path);
-						zip.Save(zippath);
+						Logger?.Error($"Failed to pack client resource:{resourceFolder}");
+						Logger?.Error(ex);
 					}
-					HasClientResources=true;
-				}
-				catch (Exception ex)
-				{
-					Logger?.Error("Failed to pack client resources");
-					Logger?.Error(ex);
 				}
 			}
-            #endregion
+			var packed = Directory.GetFiles(path, "*.zip", SearchOption.TopDirectoryOnly);
+            if (packed.Length>0)
+            {
+				HasClientResources =true;
+				ClientResourceZips.AddRange(packed);
+			}
+			#endregion
 
-            #region SERVER
-            path = Path.Combine("Resources", "Server");
+			#region SERVER
+			path = Path.Combine("Resources", "Server");
+			var dataFolder = Path.Combine(path, "data");
 			Directory.CreateDirectory(path);
 			foreach (var resource in Directory.GetDirectories(path))
 			{
+                if (Path.GetFileName(resource).ToLower()=="data") { continue; }
 				Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
-				LoadResource(resource);
+				LoadResource(resource,dataFolder);
 			}
+			foreach(var resource in Directory.GetFiles(path, "*.zip", SearchOption.TopDirectoryOnly))
+            {
+				Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
+				LoadResource(new ZipFile(resource), dataFolder);
+            }
 
 			// Start scripts
             lock (LoadedResources)
             {
-				foreach (var d in LoadedResources)
+				foreach (var r in LoadedResources)
 				{
-					foreach (ServerScript s in d.Scripts)
+					foreach (ServerScript s in r.Scripts)
 					{
-						s.CurrentResource = d;
 						s.API=Server.API;
                         try
 						{
+							Logger?.Debug("Starting script:"+s.CurrentFile.Name);
 							s.OnStart();
 						}
-						catch(Exception ex) {Logger?.Error($"Failed to start resource: {d.Name}"); Logger?.Error(ex); }
+						catch(Exception ex) {Logger?.Error($"Failed to start resource: {r.Name}"); Logger?.Error(ex); }
 					}
 				}
 			}

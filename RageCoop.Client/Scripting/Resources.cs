@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using RageCoop.Core.Scripting;
-using Ionic.Zip;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace RageCoop.Client.Scripting
 {
@@ -15,7 +15,6 @@ namespace RageCoop.Client.Scripting
 				{
 					foreach (var s in d.Scripts)
 					{
-						(s as ClientScript).CurrentResource=d;
 						Main.QueueAction(() => s.OnStart());
 					}
 				}
@@ -37,23 +36,23 @@ namespace RageCoop.Client.Scripting
 		/// <summary>
 		/// Load all resources from the server
 		/// </summary>
-		/// <param name="path">The path to the directory containing the resources.</param>
+		/// <param name="path">The path to the directory containing all resources to load.</param>
 		public void Load(string path)
 		{
 			Unload();
 			foreach (var d in Directory.GetDirectories(path))
 			{
-				Directory.Delete(d, true);
-			}
-			using (var zip = ZipFile.Read(Path.Combine(path, "Resources.zip")))
-			{
-				zip.ExtractAll(path, ExtractExistingFileAction.OverwriteSilently);
+				if(Path.GetFileName(d).ToLower() != "data")
+				{
+					Directory.Delete(d, true);
+				}
 			}
 			Directory.CreateDirectory(path);
 			foreach (var resource in Directory.GetDirectories(path))
 			{
+                if (Path.GetFileName(resource).ToLower()!="data") { continue; }
 				Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
-				LoadResource(resource);
+				LoadResource(resource,Path.Combine(path,"data"));
 			}
 			StartAll();
 		}

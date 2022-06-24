@@ -31,11 +31,7 @@ namespace RageCoop.Client.Scripting
             List<InputArgument> arguments = new List<InputArgument>();
             int i;
             var ty = (byte)e.Args[0];
-            Main.Logger.Debug($"gettype");
-            Main.Logger.Flush();
             TypeCode returnType=(TypeCode)ty;
-            Main.Logger.Debug($"typeok");
-            Main.Logger.Flush();
             i = returnType==TypeCode.Empty ? 1 : 2;
             var hash = (Hash)e.Args[i++];
             for(; i<e.Args.Count;i++)

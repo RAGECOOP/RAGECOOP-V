@@ -9,11 +9,14 @@
     <PackageProjectUrl>https://ragecoop.online/</PackageProjectUrl>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Product>$(AssemblyName)-V</Product>
-    <PackageId>RAGECOOP-V</PackageId>
+    <Product>$(AssemblyName)</Product>
+    <PackageId>RageCoop.Server</PackageId>
     <Authors>RAGECOOP</Authors>
     <Version>0.5</Version>
     <DebugType>embedded</DebugType>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>An library for hosting a RAGECOOP server or API reference for developing a resource.</Description>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,7 +26,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-	  <OutputPath>D:\Games\Grand Theft Auto V\Scripts\RageCoop</OutputPath>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
@@ -13,13 +12,26 @@
 	  <AssemblyVersion>0.5.0</AssemblyVersion>
 	  <FileVersion>0.5.0</FileVersion>
 	  <Version>0.5.0</Version>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <Authors>RAGECOOP</Authors>
+	  <Description>An API reference for developing client-side resource for RAGECOOP</Description>
+	  <PackageProjectUrl>https://ragecoop.online/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/RAGECOOP/RAGECOOP-V</RepositoryUrl>
+	  <ApplicationIcon>favicon.ico</ApplicationIcon>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Optimize>True</Optimize>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="DotNetZip" Version="1.16.0" />
+    <Content Include="favicon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj" />

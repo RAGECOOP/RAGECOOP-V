@@ -24,21 +24,21 @@ namespace RageCoop.Server
         public string Address { get; set; }
     }
 
-    internal class Server
+    public class Server
     {
         private readonly string _compatibleVersion = "V0_5";
-        public BaseScript BaseScript { get; set; }=new BaseScript();
-        public readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
-        public NetServer MainNetServer;
+        internal BaseScript BaseScript { get; set; }=new BaseScript();
+        internal readonly Settings MainSettings = Util.Read<Settings>("Settings.xml");
+        internal NetServer MainNetServer;
 
-        public readonly Dictionary<Command, Action<CommandContext>> Commands = new();
-        public readonly Dictionary<long,Client> Clients = new();
+        internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
+        internal readonly Dictionary<long,Client> Clients = new();
         private System.Timers.Timer SendPlayerTimer = new System.Timers.Timer(5000);
         
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private Resources Resources;
-        public API API;
-        public Logger Logger;
+        public API API { get; private set; }
+        internal Logger Logger;
         private Security Security;
         public Server(Logger logger=null)
         {
@@ -58,8 +58,7 @@ namespace RageCoop.Server
                 Port = MainSettings.Port,
                 MaximumConnections = MainSettings.MaxPlayers,
                 EnableUPnP = false,
-                AutoFlushSendQueue = true,
-                MaximumTransmissionUnit=2000, // PublicKeyResponse
+                AutoFlushSendQueue = true
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -436,7 +435,7 @@ namespace RageCoop.Server
             MainNetServer.Recycle(message);
         }
         object _sendPlayersLock=new object();
-        public void SendPlayerInfos()
+        internal void SendPlayerInfos()
         {
             lock (_sendPlayersLock)
             {
@@ -499,7 +498,7 @@ namespace RageCoop.Server
             try
             {
                 Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted,packet.AesIVCrypted);
-                passhash=Security.Decrypt(packet.PassHashEncrypted,connection.RemoteEndPoint).GetString();
+                passhash=BitConverter.ToString(Security.Decrypt(packet.PassHashEncrypted, connection.RemoteEndPoint)).Replace("-", String.Empty);
             }
             catch (Exception ex)
             {
@@ -759,7 +758,7 @@ namespace RageCoop.Server
             Logger?.Info(packet.Username + ": " + packet.Message);
         }
 
-        public void SendChatMessage(string username, string message, List<NetConnection> targets = null)
+        internal void SendChatMessage(string username, string message, List<NetConnection> targets = null)
         {
             if (MainNetServer.Connections.Count==0) { return; }
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -768,14 +767,14 @@ namespace RageCoop.Server
             
             MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
         }
-        public void SendChatMessage(string username, string message, NetConnection target)
+        internal void SendChatMessage(string username, string message, NetConnection target)
         {
             SendChatMessage(username, message, new List<NetConnection>() { target });
         }
         #endregion
 
 
-        public void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
+        internal void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {
             Command command = new(name) { Usage = usage, ArgsLength = argsLength };
 
@@ -786,7 +785,7 @@ namespace RageCoop.Server
 
             Commands.Add(command, callback);
         }
-        public void RegisterCommand(string name, Action<CommandContext> callback)
+        internal void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Command command = new(name);
 
@@ -798,7 +797,7 @@ namespace RageCoop.Server
             Commands.Add(command, callback);
         }
 
-        public void RegisterCommands<T>()
+        internal void RegisterCommands<T>()
         {
             IEnumerable<MethodInfo> commands = typeof(T).GetMethods().Where(method => method.GetCustomAttributes(typeof(Command), false).Any());
 
@@ -810,7 +809,7 @@ namespace RageCoop.Server
             }
         }
 
-        public void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
+        internal void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
             int id = RequestFileID();
             var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -890,7 +889,7 @@ namespace RageCoop.Server
         /// <param name="p"></param>
         /// <param name="channel"></param>
         /// <param name="method"></param>
-        public void Send(Packet p,Client client, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        internal void Send(Packet p,Client client, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             p.Pack(outgoingMessage);

@@ -31,6 +31,8 @@ namespace RageCoop.Client.Menus
         public static NativeMenu LastMenu { get; set; } = Menu;
         #region ITEMS
         private static readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.Settings.Username };
+        private static readonly NativeItem _passwordItem = new NativeItem("Password") { AltTitle = new string('*',Main.Settings.Password.Length) };
+
         public static readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.Settings.LastServerAddress };
         private static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
         private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
@@ -51,6 +53,7 @@ namespace RageCoop.Client.Menus
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _usernameItem.Activated += UsernameActivated;
+            _passwordItem.Activated+=_passwordActivated;
             ServerIpItem.Activated += ServerIpActivated;
             _serverConnectItem.Activated += (sender, item) => { Networking.ToggleConnection(Main.Settings.LastServerAddress); };
 
@@ -58,6 +61,7 @@ namespace RageCoop.Client.Menus
             Menu.AddSubMenu(ServersMenu.Menu);
 
             Menu.Add(_usernameItem);
+            Menu.Add(_passwordItem);
             Menu.Add(ServerIpItem);
             Menu.Add(_serverConnectItem);
 
@@ -76,6 +80,8 @@ namespace RageCoop.Client.Menus
 
             Menu.Add(_aboutItem);
         }
+
+
         public static bool ShowPopUp(string prompt, string title,string subtitle,string error,bool showbackground)
         {
             PopUp.Prompt=prompt;
@@ -113,6 +119,16 @@ namespace RageCoop.Client.Menus
             }
         }
 
+        private static void _passwordActivated(object sender, System.EventArgs e)
+        {
+            string newPass = Game.GetUserInput(WindowTitle.EnterMessage20, "", 20);
+            if (!string.IsNullOrWhiteSpace(newPass))
+            {
+                Main.Settings.Password = newPass;
+                Util.SaveSettings();
+                _passwordItem.AltTitle = new string('*', newPass.Length);
+            }
+        }
         public static void ServerIpActivated(object a, System.EventArgs b)
         {
             string newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, ServerIpItem.AltTitle, 60);

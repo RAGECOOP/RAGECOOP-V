@@ -34,7 +34,7 @@ namespace RageCoop.Server.Scripting
         public string Username { get; set; }
 
         /// <summary>
-        /// The hashed value of client password, sent with RSA asymmetric encryption.
+        /// The client password hashed with SHA256 algorithm.
         /// </summary>
         public string PasswordHash { get; set; }
         public IPEndPoint EndPoint { get; set; }

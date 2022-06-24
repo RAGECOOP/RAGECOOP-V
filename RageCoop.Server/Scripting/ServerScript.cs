@@ -1,25 +1,22 @@
 ﻿using System;
+using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server.Scripting
 {
     /// <summary>
     /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded and <see cref="API"/> will be null, you should use <see cref="OnStart"/>. to initiate your script.
     /// </summary>
-    public abstract class ServerScript :Core.Scripting.IScriptable
+    public abstract class ServerScript : Scriptable
     {
         /// <summary>
         /// This method would be called from main thread after all scripts have been loaded.
         /// </summary>
-        public abstract void OnStart();
+        public override abstract void OnStart();
 
         /// <summary>
         /// This method would be called from main thread when the server is shutting down, you MUST terminate all background jobs/threads in this method.
         /// </summary>
-        public abstract void OnStop();
-        /// <summary>
-        /// Get the <see cref="Core.Scripting.Resource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
-        /// </summary>
-        public Core.Scripting.Resource CurrentResource { get;internal set; }
+        public override abstract void OnStop();
 
         public API API { get; set; }
     }
