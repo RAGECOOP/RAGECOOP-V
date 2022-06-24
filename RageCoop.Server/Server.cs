@@ -39,11 +39,13 @@ namespace RageCoop.Server
         private Resources Resources;
         public API API;
         public Logger Logger;
+        private Security Security;
         public Server(Logger logger=null)
         {
             Logger=logger;
             API=new API(this);
             Resources=new Resources(this);
+            Security=new Security(Logger);
             Logger?.Info("================");
             Logger?.Info($"Server bound to: 0.0.0.0:{MainSettings.Port}");
             Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
@@ -57,10 +59,12 @@ namespace RageCoop.Server
                 MaximumConnections = MainSettings.MaxPlayers,
                 EnableUPnP = false,
                 AutoFlushSendQueue = true,
+                MaximumTransmissionUnit=2000, // PublicKeyResponse
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
             config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
+            config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
@@ -170,8 +174,6 @@ namespace RageCoop.Server
         {
             Logger?.Info("Listening for clients");
             Logger?.Info("Please use CTRL + C if you want to stop the server!");
-            
-            
             while (!Program.ReadyToStop)
             {
                 try
@@ -191,10 +193,10 @@ namespace RageCoop.Server
             Resources.StopAll();
         }
 
-        Client sender;
         private void ProcessMessage(NetIncomingMessage message)
         {
-            if(message == null) { return; }
+            Client sender;
+            if (message == null) { return; }
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.ConnectionApproval:
@@ -214,12 +216,12 @@ namespace RageCoop.Server
 
                                 Packets.Handshake packet = new();
                                 packet.Unpack(data);
-
                                 GetHandshake(message.SenderConnection, packet);
                             }
                             catch (Exception e)
                             {
                                 Logger?.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: {e.Message}");
+                                Logger?.Error(e);
                                 message.SenderConnection.Deny(e.Message);
                             }
                         }
@@ -413,6 +415,19 @@ namespace RageCoop.Server
                 case NetIncomingMessageType.VerboseDebugMessage:
                     Logger?.Debug(message.ReadString());
                     break;
+                case NetIncomingMessageType.UnconnectedData:
+                    {
+                        if (message.ReadByte()==(byte)PacketTypes.PublicKeyRequest)
+                        {
+                            var msg = MainNetServer.CreateMessage();
+                            var p=new Packets.PublicKeyResponse();
+                            Security.GetPublicKey(out p.Modulus,out p.Exponent);
+                            p.Pack(msg);
+                            Logger?.Debug($"Sending public key to {message.SenderEndPoint}, length:{msg.LengthBytes}");
+                            MainNetServer.SendUnconnectedMessage(msg, message.SenderEndPoint);
+                        }
+                    }
+                    break;
                 default:
                     Logger?.Error(string.Format("Unhandled type: {0} {1} bytes {2} | {3}", message.MessageType, message.LengthBytes, message.DeliveryMethod, message.SequenceChannel));
                     break;
@@ -480,12 +495,25 @@ namespace RageCoop.Server
                 connection.Deny("Username is already taken!");
                 return;
             }
-
+            string passhash;
+            try
+            {
+                Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted,packet.AesIVCrypted);
+                passhash=Security.Decrypt(packet.PassHashEncrypted,connection.RemoteEndPoint).GetString();
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"Cannot process handshake packet from {connection.RemoteEndPoint}");
+                Logger?.Error(ex);
+                connection.Deny("Malformed handshak packet!");
+                return;
+            }
             var args = new HandshakeEventArgs()
             {
                 EndPoint=connection.RemoteEndPoint,
                 ID=packet.PedID,
-                Username=packet.Username
+                Username=packet.Username,
+                PasswordHash=passhash,
             };
             API.Events.InvokePlayerHandshake(args);
             if (args.Cancel)
@@ -495,6 +523,7 @@ namespace RageCoop.Server
             }
 
 
+            connection.Approve();
 
             Client tmpClient;
 
@@ -510,23 +539,14 @@ namespace RageCoop.Server
                         ID=packet.PedID,
                         Player = new()
                         {
+                            ID= packet.PedID,
                         }
                     }
                 );;
             }
             
             Logger?.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
-            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-            // Create a new handshake packet
-            new Packets.Handshake()
-            {
-                PedID = packet.PedID,
-                Username = string.Empty,
-                ModVersion = string.Empty,
-            }.Pack(outgoingMessage);
-            // Accept the connection and send back a new handshake packet with the connection ID
-            connection.Approve(outgoingMessage);
+            
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players

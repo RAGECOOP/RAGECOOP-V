@@ -9,6 +9,7 @@ using GTA.Native;
 using System.IO;
 using System.Xml.Serialization;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace RageCoop.Client
 {
@@ -196,6 +197,11 @@ namespace RageCoop.Client
         public static void SetPlayerRadioIndex(int index)
         {
             Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
+        }
+        public static byte[] GetHash(this string inputString)
+        {
+            using (HashAlgorithm algorithm = SHA256.Create())
+                return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
     }

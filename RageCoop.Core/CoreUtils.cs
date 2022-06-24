@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTA.Math;
 using System.Security.Cryptography;
 using System.Net;
+using System.IO;
 namespace RageCoop.Core
 {
     public class CoreUtils
@@ -81,6 +82,11 @@ namespace RageCoop.Core
             var sb = Encoding.UTF8.GetBytes(s);
             bytes.AddInt(sb.Length);
             bytes.AddRange(sb);
+        }
+        public static void AddArray(this List<byte> bytes, byte[] toadd)
+        {
+            bytes.AddInt(toadd.Length);
+            bytes.AddRange(toadd);
         }
 
         public static int GetHash(string s)
@@ -201,6 +207,29 @@ namespace RageCoop.Core
             {
                 action(obj);
             }
+        }
+        public static byte[] ReadToEnd(this Stream stream)
+        {
+            if (stream is MemoryStream)
+                return ((MemoryStream)stream).ToArray();
+
+            using (var memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+        public static byte[] Join(this List<byte[]> arrays)
+        {
+            if (arrays.Count==1) { return arrays[0]; }
+            var output = new byte[arrays.Sum(arr => arr.Length)];
+            int writeIdx = 0;
+            foreach (var byteArr in arrays)
+            {
+                byteArr.CopyTo(output, writeIdx);
+                writeIdx += byteArr.Length;
+            }
+            return output;
         }
     }
 }

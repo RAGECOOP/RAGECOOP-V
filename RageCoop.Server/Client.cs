@@ -10,6 +10,7 @@ namespace RageCoop.Server
 {
     public class ServerPed
     {
+        public int ID { get;internal set; }
         /// <summary>
         /// The ID of the ped's last vehicle.
         /// </summary>
@@ -56,6 +57,7 @@ namespace RageCoop.Server
         public PlayerConfig Config { get { return _config; }set { _config=value;Server.SendPlayerInfos(); } }
 
         internal readonly Dictionary<int, Action<object>> Callbacks = new();
+        internal byte[] PublicKey { get; set; }
         public bool IsReady { get; internal set; }=false;
         public string Username { get;internal set; } = "N/A";
         #region CUSTOMDATA FUNCTIONS
@@ -119,114 +121,14 @@ namespace RageCoop.Server
                 Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-        /*
         /// <summary>
-        /// Send a native call to client and ignore its return value.
+        /// Send a CleanUpWorld message to this client.
         /// </summary>
-        /// <param name="hash">The function's hash</param>
-        /// <param name="args">Arguments</param>
-        public void SendNativeCall(ulong hash, params object[] args)
+        /// <param name="clients"></param>
+        public void SendCleanUpWorld(List<Client> clients = null)
         {
-            try
-            {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-                if (userConnection == null)
-                {
-                    Server.Logger?.Error($"[Client->SendNativeCall(ulong hash, params object[] args)]: Connection \"{NetID}\" not found!");
-                    return;
-                }
-
-                if (args != null && args.Length == 0)
-                {
-                    Server.Logger?.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
-                    return;
-                }
-
-                Packets.NativeCall packet = new()
-                {
-                    Hash = hash,
-                    Args = new List<object>(args) ?? new List<object>(),
-                };
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
-            }
-            catch (Exception e)
-            {
-                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
-            }
+            SendCustomEvent(CustomEvents.CleanUpWorld, null);
         }
-        /// <summary>
-        /// Send a native call to client and do a callback when the response is received.
-        /// </summary>
-        /// <param name="callback">The callback to be invoked when the response is received.</param>
-        /// <param name="hash">The function's hash</param>
-        /// <param name="returnType">The return type of the response</param>
-        /// <param name="args">Arguments</param>
-        public void SendNativeCallWithResponse(Action<object> callback, GTA.Native.Hash hash, Type returnType, params object[] args)
-        {
-            try
-            {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-                if (userConnection == null)
-                {
-                    Server.Logger?.Error($"[Client->SendNativeResponse(Action<object> callback, ulong hash, Type type, params object[] args)]: Connection \"{NetID}\" not found!");
-                    return;
-                }
-
-                if (args != null && args.Length == 0)
-                {
-                    Server.Logger?.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing arguments!");
-                    return;
-                }
-
-                long id = ++_callbacksCount;
-                Callbacks.Add(id, callback);
-
-                byte returnTypeValue = 0x00;
-                if (returnType == typeof(int))
-                {
-                    // NOTHING BECAUSE VALUE IS 0x00
-                }
-                else if (returnType == typeof(bool))
-                {
-                    returnTypeValue = 0x01;
-                }
-                else if (returnType == typeof(float))
-                {
-                    returnTypeValue = 0x02;
-                }
-                else if (returnType == typeof(string))
-                {
-                    returnTypeValue = 0x03;
-                }
-                else if (returnType == typeof(Vector3))
-                {
-                    returnTypeValue = 0x04;
-                }
-                else
-                {
-                    Server.Logger?.Error($"[Client->SendNativeCall(ulong hash, Dictionary<string, object> args)]: Missing return type!");
-                    return;
-                }
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.NativeResponse()
-                {
-                    Hash = (ulong)hash,
-                    Args = new List<object>(args) ?? new List<object>(),
-                    ResultType = returnTypeValue,
-                    ID = id
-                }.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
-            }
-            catch (Exception e)
-            {
-                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
-            }
-        }
-        */
 
         /// <summary>
         /// Send a native call to client and do a callback when the response received.
@@ -272,18 +174,6 @@ namespace RageCoop.Server
                 Callbacks.Add(ID, callback);
             }
             return ID;
-        }
-        public void SendCleanUpWorld()
-        {
-            NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-            if (userConnection == null)
-            {
-                Server.Logger?.Error($"[Client->SendCleanUpWorld()]: Connection \"{NetID}\" not found!");
-                return;
-            }
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
-            Server.MainNetServer.SendMessage(outgoingMessage, userConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
         }
 
         public void SendCustomEvent(int id,List<object> args)

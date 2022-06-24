@@ -196,20 +196,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public void SendCleanUpWorldToAll(List<Client> clients = null)
         {
-            if (Server.MainNetServer.ConnectionsCount == 0)
-            {
-                return;
-            }
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            outgoingMessage.Write((byte)PacketTypes.CleanUpWorld);
-            if (clients == null)
-            {
-                Server.MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default);
-            }
-            else
-            {
-                clients.ForEach(client => { Server.MainNetServer.SendMessage(outgoingMessage,client.Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Default); });
-            }    
+            SendCustomEvent(CustomEvents.CleanUpWorld,null,clients);
         }
 
         /// <summary>
@@ -248,7 +235,7 @@ namespace RageCoop.Server.Scripting
         /// <param name="eventHash">An unique identifier of the event</param>
         /// <param name="args">The objects conataing your data, supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
-        public void SendCustomEvent(int eventHash,List<object> args,List<Client> targets=null)
+        public void SendCustomEvent(int eventHash,List<object> args=null,List<Client> targets=null)
         {
             targets ??= new(Server.Clients.Values);
             var p = new Packets.CustomEvent()

@@ -16,8 +16,8 @@ namespace RageCoop.Core.Scripting
         public static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
         public static readonly int SetAutoRespawn = Hash("RageCoop.SetAutoRespawn");
         public static readonly int NativeCall = Hash("RageCoop.NativeCall");
-        // public static readonly int NativeCallNoResponse = Hash("RageCoop.NativeCallNoResponse");
         public static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
+        public static readonly int CleanUpWorld = Hash("RageCoop.CleanUpWorld");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

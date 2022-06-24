@@ -6,8 +6,10 @@ using Lidgren.Network;
 using RageCoop.Core;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Security.Cryptography;
 using GTA.Math;
 using GTA.Native;
+using System.Net;
 
 namespace RageCoop.Client
 {
@@ -16,9 +18,10 @@ namespace RageCoop.Client
         public static NetClient Client;
         public static float Latency = 0;
         public static bool ShowNetworkInfo = false;
-
+        public static Security Security;
         static Networking()
         {
+            Security=new Security(Main.Logger);
             Task.Run(() =>
             {
                 while (true)
@@ -36,7 +39,7 @@ namespace RageCoop.Client
             });
         }
 
-        public static void ToggleConnection(string address)
+        public static void ToggleConnection(string address,string password=null)
         {
             if (IsOnServer)
             {
@@ -44,6 +47,7 @@ namespace RageCoop.Client
             }
             else
             {
+                password = password ?? Main.Settings.Password;
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
@@ -51,6 +55,7 @@ namespace RageCoop.Client
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
+                config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
                 Client = new NetClient(config);
                 Client.Start();
@@ -70,17 +75,27 @@ namespace RageCoop.Client
                 }
 
                 EntityPool.AddPlayer();
-
-                // Send HandshakePacket
-                NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-                new Packets.Handshake()
+                Task.Run(() =>
                 {
-                    PedID =  Main.LocalPlayerID,
-                    Username = Main.Settings.Username,
-                    ModVersion = Main.CurrentVersion,
-                }.Pack(outgoingMessage);
+                    GetServerPublicKey(address);
 
-                Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
+
+                    // Send HandshakePacket
+                    NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+                    var handshake=new Packets.Handshake()
+                    {
+                        PedID =  Main.LocalPlayerID,
+                        Username = Main.Settings.Username,
+                        ModVersion = Main.CurrentVersion,
+                        PassHashEncrypted=Security.Encrypt(password.GetHash())
+                    };
+                    Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted,out handshake.AesIVCrypted);
+                    handshake.Pack(outgoingMessage);
+                    Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
+                    Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
+
+
+                });
             }
         }
         public static bool IsOnServer
@@ -111,39 +126,18 @@ namespace RageCoop.Client
 
 
         }
-        /*
-        private static void DecodeNativeCallWithResponse(Packets.NativeResponse packet)
-        {
-            object result = DecodeNativeCall(packet.Hash, packet.Args, true, packet.ResultType);
 
-            if (Main.CheckNativeHash.ContainsKey(packet.Hash))
-            {
-                foreach (KeyValuePair<ulong, byte> hash in Main.CheckNativeHash)
-                {
-                    if (hash.Key == packet.Hash)
-                    {
-                        lock (Main.ServerItems)
-                        {
-                            Main.ServerItems.Add((int)result, hash.Value);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-            new Packets.NativeResponse()
-            {
-                Hash = 0,
-                Args = new List<object>() { result },
-                ID =  packet.ID
-            }.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
-            Client.FlushSendQueue();
-        }
-        */
         #endregion // -- PLAYER --
 
+        private static void GetServerPublicKey(string address,int timeout=10000)
+        {
+            var msg=Client.CreateMessage();
+            new Packets.PublicKeyRequest().Pack(msg); 
+            
+            var adds =address.Split(':');
+            Client.SendUnconnectedMessage(msg,adds[0],int.Parse(adds[1]));
+            PublicKeyReceived.WaitOne(timeout); 
+        }
         #endregion
 
     }

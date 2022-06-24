@@ -16,6 +16,7 @@ namespace RageCoop.Client.Scripting
         {
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
+            API.RegisterCustomEventHandler(CustomEvents.CleanUpWorld, (s) => Main.QueueAction(() => Main.CleanUpWorld()));
         }
 
         public override void OnStop()

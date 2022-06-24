@@ -32,6 +32,11 @@ namespace RageCoop.Server.Scripting
     {
         public int ID { get; set; }
         public string Username { get; set; }
+
+        /// <summary>
+        /// The hashed value of client password, sent with RSA asymmetric encryption.
+        /// </summary>
+        public string PasswordHash { get; set; }
         public IPEndPoint EndPoint { get; set; }
         public void Deny(string reason)
         {

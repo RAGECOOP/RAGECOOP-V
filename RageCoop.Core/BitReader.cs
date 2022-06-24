@@ -54,7 +54,10 @@ namespace RageCoop.Core
             CurrentIndex += length;
             return value;
         }
-
+        public byte[] ReadByteArray()
+        {
+            return ReadByteArray(ReadInt());
+        }
         public short ReadShort()
         {
             short value = BitConverter.ToInt16(ResultArray, CurrentIndex);

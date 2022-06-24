@@ -6,13 +6,16 @@ using Lidgren.Network;
 using RageCoop.Core;
 using GTA;
 using RageCoop.Client.Menus;
+using System.Threading;
 using GTA.Math;
 using GTA.Native;
+using System.Net;
 
 namespace RageCoop.Client
 {
     internal static partial class Networking
     {
+        private static AutoResetEvent PublicKeyReceived=new AutoResetEvent(false);
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if(message == null) { return; }
@@ -30,34 +33,16 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
                             CoopMenu.InitiateConnectionMenuSetting();
 #endif
-                            Main.QueueAction(() => { GTA.UI.Notification.Show("~y~Trying to connect..."); return true; });
                             break;
                         case NetConnectionStatus.Connected:
-                            if (message.SenderConnection.RemoteHailMessage.ReadByte() != (byte)PacketTypes.Handshake)
-                            {
-                                Client.Disconnect("Wrong packet!");
-                            }
-                            else
-                            {
-                                int len = message.SenderConnection.RemoteHailMessage.ReadInt32();
-                                byte[] data = message.SenderConnection.RemoteHailMessage.ReadBytes(len);
+                            Main.QueueAction(() => {
+                                CoopMenu.ConnectedMenuSetting();
+                                Main.MainChat.Init();
+                                PlayerList.Cleanup();
+                                GTA.UI.Notification.Show("~g~Connected!");
+                            });
 
-                                Packets.Handshake handshakePacket = new Packets.Handshake();
-                                handshakePacket.Unpack(data);
-
-#if !NON_INTERACTIVE
-
-#endif
-
-                                Main.QueueAction(() => {
-                                    CoopMenu.ConnectedMenuSetting();
-                                    Main.MainChat.Init();
-                                    PlayerList.Cleanup();
-                                    GTA.UI.Notification.Show("~g~Connected!");
-                                });
-
-                                Main.Logger.Info(">> Connected <<");
-                            }
+                            Main.Logger.Info(">> Connected <<");
                             break;
                         case NetConnectionStatus.Disconnected:
                             DownloadManager.Cleanup();
@@ -89,161 +74,173 @@ namespace RageCoop.Client
                     }
                     break;
                 case NetIncomingMessageType.Data:
-                    if (message.LengthBytes==0) { break; }
-
-                    var packetType = (PacketTypes)message.ReadByte();
-                    try
                     {
 
-                        int len = message.ReadInt32();
-                        byte[] data = message.ReadBytes(len);
-                        switch (packetType)
+                        if (message.LengthBytes==0) { break; }
+                        var packetType = PacketTypes.Unknown;
+                        try
                         {
-                            case PacketTypes.CleanUpWorld:
-                                {
-                                    Main.QueueAction(() => { Main.CleanUpWorld(); return true; });
-                                }
-                                break;
-                            case PacketTypes.PlayerConnect:
-                                {
+                            packetType = (PacketTypes)message.ReadByte();
+                            int len = message.ReadInt32();
+                            byte[] data = message.ReadBytes(len);
+                            switch (packetType)
+                            {
+                                case PacketTypes.PlayerConnect:
+                                    {
 
-                                    Packets.PlayerConnect packet = new Packets.PlayerConnect();
-                                    packet.Unpack(data);
+                                        Packets.PlayerConnect packet = new Packets.PlayerConnect();
+                                        packet.Unpack(data);
 
-                                    Main.QueueAction(() => PlayerConnect(packet));
-                                }
-                                break;
-                            case PacketTypes.PlayerDisconnect:
-                                {
-
-                                    Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
-                                    packet.Unpack(data);
-                                    Main.QueueAction(() => PlayerDisconnect(packet));
-
-                                }
-                                break;
-                            case PacketTypes.PlayerInfoUpdate:
-                                {
-                                    var packet = new Packets.PlayerInfoUpdate();
-                                    packet.Unpack(data);
-                                    PlayerList.UpdatePlayer(packet);
+                                        Main.QueueAction(() => PlayerConnect(packet));
+                                    }
                                     break;
-                                }
-                            #region ENTITY SYNC
-                            case PacketTypes.VehicleSync:
-                                {
+                                case PacketTypes.PlayerDisconnect:
+                                    {
 
-                                    Packets.VehicleSync packet = new Packets.VehicleSync();
-                                    packet.Unpack(data);
-                                    VehicleSync(packet);
+                                        Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
+                                        packet.Unpack(data);
+                                        Main.QueueAction(() => PlayerDisconnect(packet));
 
-                                }
-                                break;
-                            case PacketTypes.PedSync:
-                                {
-
-                                    Packets.PedSync packet = new Packets.PedSync();
-                                    packet.Unpack(data);
-                                    PedSync(packet);
-
-                                }
-                                break;
-                            case PacketTypes.VehicleStateSync:
-                                {
-
-                                    Packets.VehicleStateSync packet = new Packets.VehicleStateSync();
-                                    packet.Unpack(data);
-                                    VehicleStateSync(packet);
-
-                                }
-                                break;
-                            case PacketTypes.PedStateSync:
-                                {
-
-
-                                    Packets.PedStateSync packet = new Packets.PedStateSync();
-                                    packet.Unpack(data);
-                                    PedStateSync(packet);
-
-                                }
-                                break;
-                            case PacketTypes.ProjectileSync:
-                                {
-                                    Packets.ProjectileSync packet = new Packets.ProjectileSync();
-                                    packet.Unpack(data);
-                                    ProjectileSync(packet);
+                                    }
                                     break;
-                                }
-                            #endregion
-                            case PacketTypes.ChatMessage:
-                                {
+                                case PacketTypes.PlayerInfoUpdate:
+                                    {
+                                        var packet = new Packets.PlayerInfoUpdate();
+                                        packet.Unpack(data);
+                                        PlayerList.UpdatePlayer(packet);
+                                        break;
+                                    }
+                                #region ENTITY SYNC
+                                case PacketTypes.VehicleSync:
+                                    {
 
-                                    Packets.ChatMessage packet = new Packets.ChatMessage();
-                                    packet.Unpack(data);
+                                        Packets.VehicleSync packet = new Packets.VehicleSync();
+                                        packet.Unpack(data);
+                                        VehicleSync(packet);
 
-                                    Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
+                                    }
+                                    break;
+                                case PacketTypes.PedSync:
+                                    {
+
+                                        Packets.PedSync packet = new Packets.PedSync();
+                                        packet.Unpack(data);
+                                        PedSync(packet);
+
+                                    }
+                                    break;
+                                case PacketTypes.VehicleStateSync:
+                                    {
+
+                                        Packets.VehicleStateSync packet = new Packets.VehicleStateSync();
+                                        packet.Unpack(data);
+                                        VehicleStateSync(packet);
+
+                                    }
+                                    break;
+                                case PacketTypes.PedStateSync:
+                                    {
 
 
-                                }
-                                break;
-                            case PacketTypes.CustomEvent:
-                                {
-                                    Packets.CustomEvent packet = new Packets.CustomEvent();
-                                    packet.Unpack(data);
-                                    Scripting.API.Events.InvokeCustomEventReceived(packet);
-                                }
-                                break;
-                            case PacketTypes.FileTransferChunk:
-                                {
-                                    Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
-                                    packet.Unpack(data);
+                                        Packets.PedStateSync packet = new Packets.PedStateSync();
+                                        packet.Unpack(data);
+                                        PedStateSync(packet);
 
-                                    DownloadManager.Write(packet.ID, packet.FileChunk);
+                                    }
+                                    break;
+                                case PacketTypes.ProjectileSync:
+                                    {
+                                        Packets.ProjectileSync packet = new Packets.ProjectileSync();
+                                        packet.Unpack(data);
+                                        ProjectileSync(packet);
+                                        break;
+                                    }
+                                #endregion
+                                case PacketTypes.ChatMessage:
+                                    {
 
-                                }
-                                break;
-                            case PacketTypes.FileTransferRequest:
-                                {
-                                    Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
-                                    packet.Unpack(data);
+                                        Packets.ChatMessage packet = new Packets.ChatMessage();
+                                        packet.Unpack(data);
 
-                                    DownloadManager.AddFile(packet.ID, packet.Name, packet.FileLength);
+                                        Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
 
-                                }
-                                break;
-                            case PacketTypes.FileTransferComplete:
-                                {
-                                    Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
-                                    packet.Unpack(data);
 
-                                    Main.Logger.Debug($"Finalizing download:{packet.ID}");
-                                    DownloadManager.Complete(packet.ID);
+                                    }
+                                    break;
+                                case PacketTypes.CustomEvent:
+                                    {
+                                        Packets.CustomEvent packet = new Packets.CustomEvent();
+                                        packet.Unpack(data);
+                                        Scripting.API.Events.InvokeCustomEventReceived(packet);
+                                    }
+                                    break;
+                                case PacketTypes.FileTransferChunk:
+                                    {
+                                        Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
+                                        packet.Unpack(data);
 
-                                }
-                                break;
-                            default:
-                                if (packetType.IsSyncEvent())
-                                {
-                                    // Dispatch to main thread
-                                    Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
-                                }
-                                break;
+                                        DownloadManager.Write(packet.ID, packet.FileChunk);
+
+                                    }
+                                    break;
+                                case PacketTypes.FileTransferRequest:
+                                    {
+                                        Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
+                                        packet.Unpack(data);
+
+                                        DownloadManager.AddFile(packet.ID, packet.Name, packet.FileLength);
+
+                                    }
+                                    break;
+                                case PacketTypes.FileTransferComplete:
+                                    {
+                                        Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
+                                        packet.Unpack(data);
+
+                                        Main.Logger.Debug($"Finalizing download:{packet.ID}");
+                                        DownloadManager.Complete(packet.ID);
+
+                                    }
+                                    break;
+                                default:
+                                    if (packetType.IsSyncEvent())
+                                    {
+                                        // Dispatch to main thread
+                                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
+                                    }
+                                    break;
+                            }
                         }
+                        catch (Exception ex)
+                        {
+                            Main.QueueAction(() => {
+                                GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                return true;
+                            });
+                            Main.Logger.Error($"[{packetType}] {ex.Message}");
+                            Main.Logger.Error(ex);
+                            Client.Disconnect($"Packet Error [{packetType}]");
+                        }
+                        break;
                     }
-                    catch (Exception ex)
-                    {
-                        Main.QueueAction(() => {
-                            GTA.UI.Notification.Show("~r~~h~Packet Error");
-                            return true;
-                        });
-                        Main.Logger.Error($"[{packetType}] {ex.Message}");
-                        Main.Logger.Error(ex);
-                        Client.Disconnect($"Packet Error [{packetType}]");
-                    }
-                    break;
                 case NetIncomingMessageType.ConnectionLatencyUpdated:
                     Latency = message.ReadFloat();
                     break;
+                case NetIncomingMessageType.UnconnectedData:
+                    {
+                        var packetType = (PacketTypes)message.ReadByte();
+                        int len = message.ReadInt32();
+                        byte[] data = message.ReadBytes(len);
+                        if (packetType==PacketTypes.PublicKeyResponse)
+                        {
+                            var packet=new Packets.PublicKeyResponse();
+                            packet.Unpack(data);
+                            Security.SetServerPublicKey(packet.Modulus,packet.Exponent);
+                            PublicKeyReceived.Set();
+                        }
+                        
+                        break;
+                    }
                 case NetIncomingMessageType.DebugMessage:
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:

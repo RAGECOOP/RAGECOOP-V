@@ -13,12 +13,14 @@ namespace RageCoop.Core
         PlayerConnect=1,
         PlayerDisconnect=2,
         PlayerInfoUpdate=3,
+        PublicKeyRequest=4,
+        PublicKeyResponse=5,
         
         ChatMessage=10,
         // NativeCall=11,
         // NativeResponse=12,
-        //Mod=13,
-        CleanUpWorld=14,
+        // Mod=13,
+        // CleanUpWorld=14,
        
         FileTransferChunk=15,
         FileTransferRequest=16,
@@ -49,6 +51,7 @@ namespace RageCoop.Core
         #endregion
 
         #endregion
+        Unknown=255
     }
     public static class PacketExtensions
     {

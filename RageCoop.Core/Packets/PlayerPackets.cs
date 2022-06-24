@@ -16,6 +16,21 @@ namespace RageCoop.Core
 
             public string ModVersion { get; set; }
 
+            /// <summary>
+            /// The asymetrically crypted Aes key
+            /// </summary>
+            public byte[] AesKeyCrypted;
+
+            /// <summary>
+            /// The asymetrically crypted Aes IV
+            /// </summary>
+            public byte[] AesIVCrypted;
+
+            /// <summary>
+            /// The password hash with client Aes
+            /// </summary>
+            public byte[] PassHashEncrypted { get; set; }
+
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
@@ -36,6 +51,16 @@ namespace RageCoop.Core
                 byteArray.AddRange(BitConverter.GetBytes(modVersionBytes.Length));
                 byteArray.AddRange(modVersionBytes);
 
+                // Write AesKeyCrypted
+                byteArray.AddArray(AesKeyCrypted);
+
+                // Write AesIVCrypted
+                byteArray.AddArray(AesIVCrypted);
+
+
+                // Write PassHash
+                byteArray.AddArray(PassHashEncrypted);
+
                 byte[] result = byteArray.ToArray();
 
                 message.Write(result.Length);
@@ -52,12 +77,17 @@ namespace RageCoop.Core
                 PedID = reader.ReadInt();
 
                 // Read Username
-                int usernameLength = reader.ReadInt();
-                Username = reader.ReadString(usernameLength);
+                Username = reader.ReadString(reader.ReadInt());
 
                 // Read ModVersion
-                int modVersionLength = reader.ReadInt();
-                ModVersion = reader.ReadString(modVersionLength);
+                ModVersion = reader.ReadString(reader.ReadInt());
+
+                AesKeyCrypted=reader.ReadByteArray();
+
+                AesIVCrypted=reader.ReadByteArray();
+
+
+                PassHashEncrypted=reader.ReadByteArray();
                 #endregion
             }
         }
@@ -200,6 +230,53 @@ namespace RageCoop.Core
                 Flags=(PlayerConfigFlags)reader.ReadByte();
 
                 BlipColor=(GTA.BlipColor)reader.ReadByte();
+            }
+        }
+
+        public class PublicKeyResponse : Packet
+        {
+            public byte[] Modulus;
+            public byte[] Exponent;
+
+            public override void Pack(NetOutgoingMessage message)
+            {
+                #region PacketToNetOutGoingMessage
+                message.Write((byte)PacketTypes.PublicKeyResponse);
+
+                List<byte> byteArray = new List<byte>();
+
+                byteArray.AddArray(Modulus);
+
+                byteArray.AddArray(Exponent);
+
+
+                byte[] result = byteArray.ToArray();
+
+                message.Write(result.Length);
+                message.Write(result);
+                #endregion
+            }
+            public override void Unpack(byte[] array)
+            {
+                #region NetIncomingMessageToPacket
+                var reader=new BitReader(array);
+                Modulus=reader.ReadByteArray();
+                Exponent=reader.ReadByteArray();
+
+                #endregion
+            }
+        }
+
+        public class PublicKeyRequest : Packet
+        {
+            public override void Pack(NetOutgoingMessage message)
+            {
+                #region PacketToNetOutGoingMessage
+                message.Write((byte)PacketTypes.PublicKeyRequest);
+                #endregion
+            }
+            public override void Unpack(byte[] array)
+            {
             }
         }
     }
