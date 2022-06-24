@@ -8,8 +8,8 @@
 
 
 # Disclaimer
-The original author of this project is @EntenKoeniq.
-The project has been reworked and is currently maintained by @Sardelka9515.
+The original author of this project is [EntenKoeniq](https://github.com/EntenKoeniq).
+The project has been reworked and is currently maintained by [Sardelka9515](https://github.com/Sardelka9515).
 
 # 🧠 That's it
 RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP or just drive around with your buddy.
