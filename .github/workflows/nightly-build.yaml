@@ -46,5 +46,16 @@ jobs:
       with:
         name: RageCoop.Server-linux-arm
         path: RageCoop.Server/bin/linux-arm
+
+    - uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
+        release_id: 70603992 
+        asset_path: RageCoop.Client/bin
+        asset_name: RageCoop.Client-nightly.zip
+        asset_content_type: application/zip
+        max_releases: 7
     - uses: actions/checkout@v2
       
