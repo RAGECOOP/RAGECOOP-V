@@ -58,22 +58,5 @@ namespace RageCoop.Server
             }
             mainLogger.Dispose();
         }
-
-#if DEBUG
-        private static async Task<double> GetCpuUsageForProcess()
-        {
-            DateTime startTime = DateTime.UtcNow;
-
-            TimeSpan startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-            await Task.Delay(500);
-
-            DateTime endTime = DateTime.UtcNow;
-            TimeSpan endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-            double cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-            double totalMsPassed = (endTime - startTime).TotalMilliseconds;
-            double cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-            return cpuUsageTotal * 100;
-        }
-#endif
     }
 }

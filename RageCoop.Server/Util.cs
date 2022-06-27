@@ -103,14 +103,24 @@ namespace RageCoop.Server
 
             if (File.Exists(path))
             {
-                using (XmlReader stream = XmlReader.Create(path))
+                try
                 {
-                    data = (T)ser.Deserialize(stream);
-                }
+                    using (XmlReader stream = XmlReader.Create(path))
+                    {
+                        data = (T)ser.Deserialize(stream);
+                    }
 
-                using (XmlWriter stream = XmlWriter.Create(path, settings))
+                    using (XmlWriter stream = XmlWriter.Create(path, settings))
+                    {
+                        ser.Serialize(stream, data);
+                    }
+                }
+                catch
                 {
-                    ser.Serialize(stream, data);
+                    using (XmlWriter stream = XmlWriter.Create(path, settings))
+                    {
+                        ser.Serialize(stream, data = new T());
+                    }
                 }
             }
             else

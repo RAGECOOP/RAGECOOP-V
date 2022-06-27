@@ -38,6 +38,7 @@ namespace RageCoop.Client
         }
         public void Regen()
         {
+            ClientAes=Aes.Create();
             ClientAes.GenerateKey();
             ClientAes.GenerateIV();
         }
