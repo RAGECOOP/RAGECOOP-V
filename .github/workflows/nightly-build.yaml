@@ -58,7 +58,7 @@ jobs:
         upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
         release_id: 70603992 
         asset_path: RageCoop.Client.zip
-        asset_name: RageCoop.Client-nightly.zip
+        asset_name: RageCoop.Client.zip
         asset_content_type: application/zip
         max_releases: 7
 
@@ -69,7 +69,7 @@ jobs:
         upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
         release_id: 70603992 
         asset_path: RageCoop.Server-win-x64.zip
-        asset_name: RageCoop.Server-win-x64-nightly.zip
+        asset_name: RageCoop.Server-win-x64.zip
         asset_content_type: application/zip
         max_releases: 7
 
@@ -80,7 +80,7 @@ jobs:
         upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
         release_id: 70603992 
         asset_path: RageCoop.Server-linux-x64.zip
-        asset_name: RageCoop.Server-linux-x64-nightly.zip
+        asset_name: RageCoop.Server-linux-x64.zip
         asset_content_type: application/zip
         max_releases: 7
 
@@ -92,7 +92,7 @@ jobs:
         upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
         release_id: 70603992 
         asset_path: RageCoop.Server-linux-arm.zip
-        asset_name: RageCoop.Server-linux-arm-nightly.zip
+        asset_name: RageCoop.Server-linux-arm.zip
         asset_content_type: application/zip
         max_releases: 7
     - uses: actions/checkout@v2
