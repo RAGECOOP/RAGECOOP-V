@@ -30,10 +30,10 @@ jobs:
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -r linux-x64 -o RageCoop.Server/bin/linux-x64 -c Release
     - name: Build server linux-arm
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -r linux-arm -o RageCoop.Server/bin/linux-arm -c Release
-    - uses: actions/upload-artifact@v3
+    - uses: vimtor/action-zip@v1
       with:
-        name: RageCoop.Client
-        path: RageCoop.Client/bin
+        files: RageCoop.Client/bin
+        dest: RageCoop.Client.zip
     - uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Server-win-x64
@@ -53,7 +53,7 @@ jobs:
       with:
         upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
         release_id: 70603992 
-        asset_path: RageCoop.Client/bin
+        asset_path: RageCoop.Client.zip
         asset_name: RageCoop.Client-nightly.zip
         asset_content_type: application/zip
         max_releases: 7
