@@ -58,8 +58,6 @@ namespace RageCoop.Client
                 config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
-                Client = new NetClient(config);
-                Client.Start();
 
                 string[] ip = new string[2];
 
@@ -78,8 +76,11 @@ namespace RageCoop.Client
                 EntityPool.AddPlayer();
                 Task.Run(() =>
                 {
-                    GetServerPublicKey(address);
+                    Client = new NetClient(config);
+                    Client.Start();
 
+                    Security.Regen();
+                    GetServerPublicKey(address);
 
                     // Send HandshakePacket
                     NetOutgoingMessage outgoingMessage = Client.CreateMessage();
@@ -134,7 +135,6 @@ namespace RageCoop.Client
         {
             var msg=Client.CreateMessage();
             new Packets.PublicKeyRequest().Pack(msg); 
-            
             var adds =address.Split(':');
             Client.SendUnconnectedMessage(msg,adds[0],int.Parse(adds[1]));
             PublicKeyReceived.WaitOne(timeout); 

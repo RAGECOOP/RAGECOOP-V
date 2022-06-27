@@ -36,5 +36,10 @@ namespace RageCoop.Client
             para.Exponent = exponent;
             ServerRSA=RSA.Create(para);
         }
+        public void Regen()
+        {
+            ClientAes.GenerateKey();
+            ClientAes.GenerateIV();
+        }
     }
 }

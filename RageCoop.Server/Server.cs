@@ -609,7 +609,7 @@ namespace RageCoop.Server
             API.Events.InvokePlayerDisconnected(localClient);
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.ID}");
             Clients.Remove(localClient.NetID);
-            
+            Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
         }
 
         #region SyncEntities

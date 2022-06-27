@@ -19,7 +19,7 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
-
+        
         private bool _gameLoaded = false;
         internal static readonly string CurrentVersion = "V0_5_0";
 
@@ -79,7 +79,6 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
 #endif
             MainChat = new Chat();
-
             Tick += OnTick;
             Tick += (s,e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
