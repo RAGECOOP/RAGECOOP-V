@@ -30,22 +30,26 @@ jobs:
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -r linux-x64 -o RageCoop.Server/bin/linux-x64 -c Release
     - name: Build server linux-arm
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true -r linux-arm -o RageCoop.Server/bin/linux-arm -c Release
+    
     - uses: vimtor/action-zip@v1
       with:
         files: RageCoop.Client/bin
         dest: RageCoop.Client.zip
-    - uses: actions/upload-artifact@v3
+
+    - uses: vimtor/action-zip@v1
       with:
-        name: RageCoop.Server-win-x64
-        path: RageCoop.Server/bin/win-x64
-    - uses: actions/upload-artifact@v3
+        files: RageCoop.Server/bin/win-x64
+        dest: RageCoop.Server-win-x64.zip
+
+    - uses: vimtor/action-zip@v1
       with:
-        name: RageCoop.Server-linux-x64
-        path: RageCoop.Server/bin/linux-x64
-    - uses: actions/upload-artifact@v3
+        files: RageCoop.Server/bin/linux-x64
+        dest: RageCoop.Server-linux-x64.zip
+
+    - uses: vimtor/action-zip@v1
       with:
-        name: RageCoop.Server-linux-arm
-        path: RageCoop.Server/bin/linux-arm
+        files: RageCoop.Server/bin/linux-arm
+        dest: RageCoop.Server-linux-arm.zip
 
     - uses: WebFreak001/deploy-nightly@v1.1.0
       env:
@@ -55,6 +59,40 @@ jobs:
         release_id: 70603992 
         asset_path: RageCoop.Client.zip
         asset_name: RageCoop.Client-nightly.zip
+        asset_content_type: application/zip
+        max_releases: 7
+
+    - uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
+        release_id: 70603992 
+        asset_path: RageCoop.Server-win-x64.zip
+        asset_name: RageCoop.Server-win-x64-nightly.zip
+        asset_content_type: application/zip
+        max_releases: 7
+
+    - uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
+        release_id: 70603992 
+        asset_path: RageCoop.Server-linux-x64.zip
+        asset_name: RageCoop.Server-linux-x64-nightly.zip
+        asset_content_type: application/zip
+        max_releases: 7
+
+
+    - uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
+      with:
+        upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
+        release_id: 70603992 
+        asset_path: RageCoop.Server-linux-arm.zip
+        asset_name: RageCoop.Server-linux-arm-nightly.zip
         asset_content_type: application/zip
         max_releases: 7
     - uses: actions/checkout@v2
