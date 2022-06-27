@@ -50,7 +50,7 @@
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="ScriptHookVDotNet3">
-      <HintPath>..\..\RageCoop.SHVDN\bin\Release\ScriptHookVDotNet3.dll</HintPath>
+      <HintPath>..\libs\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
   </ItemGroup>
 
