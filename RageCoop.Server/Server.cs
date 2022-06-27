@@ -30,6 +30,7 @@ namespace RageCoop.Server
         internal BaseScript BaseScript { get; set; }=new BaseScript();
         internal readonly ServerSettings Settings;
         internal NetServer MainNetServer;
+        private bool _stopping=false;
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> Clients = new();
@@ -40,6 +41,8 @@ namespace RageCoop.Server
         public API API { get; private set; }
         internal Logger Logger;
         private Security Security;
+        private Thread _listenerThread;
+        private Thread _announceThread;
         public Server(ServerSettings settings,Logger logger=null)
         {
             Settings = settings;
@@ -49,6 +52,10 @@ namespace RageCoop.Server
             API=new API(this);
             Resources=new Resources(this);
             Security=new Security(Logger);
+            
+        }
+        public void Start()
+        {
             Logger?.Info("================");
             Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
             Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
@@ -70,7 +77,7 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            SendPlayerTimer.Elapsed+=(s,e) => { SendPlayerInfos(); };
+            SendPlayerTimer.Elapsed+=(s, e) => { SendPlayerInfos(); };
             SendPlayerTimer.AutoReset=true;
             SendPlayerTimer.Enabled=true;
             Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
@@ -78,7 +85,7 @@ namespace RageCoop.Server
             {
 
                 #region -- MASTERSERVER --
-                new Thread(async () =>
+                _announceThread=new Thread(async () =>
                 {
                     try
                     {
@@ -107,8 +114,8 @@ namespace RageCoop.Server
                             Logger?.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
-                        var realMaster  = Settings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : Settings.MasterServer;
-                        while (!Program.ReadyToStop)
+                        var realMaster = Settings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : Settings.MasterServer;
+                        while (!_stopping)
                         {
                             string msg =
                                 "{ " +
@@ -152,7 +159,17 @@ namespace RageCoop.Server
                             }
 
                             // Sleep for 10s
-                            Thread.Sleep(10000);
+                            for(int i = 0; i<10; i++)
+                            {
+                                if (_stopping)
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    Thread.Sleep(1000);
+                                }
+                            }
                         }
                     }
                     catch (HttpRequestException ex)
@@ -163,20 +180,30 @@ namespace RageCoop.Server
                     {
                         Logger?.Error($"MasterServer: {ex.Message}");
                     }
-                }).Start();
+                });
+                _announceThread.Start();
                 #endregion
             }
             BaseScript.API=API;
             BaseScript.OnStart();
             Resources.LoadAll();
-            Listen();
+            _listenerThread=new Thread(() => Listen());
+            _listenerThread.Start();
         }
-
+        public void Stop()
+        {
+            _stopping = true;
+            SendPlayerTimer.Stop();
+            SendPlayerTimer.Enabled=false;
+            SendPlayerTimer.Dispose();
+            Logger?.Flush();
+            _listenerThread?.Join();
+            _announceThread?.Join();
+        }
         private void Listen()
         {
             Logger?.Info("Listening for clients");
-            Logger?.Info("Please use CTRL + C if you want to stop the server!");
-            while (!Program.ReadyToStop)
+            while (!_stopping)
             {
                 try
                 {
@@ -188,9 +215,8 @@ namespace RageCoop.Server
                     Logger?.Error(ex);
                 }
             }
-            Logger?.Warning("Server is shutting down!");
+            Logger?.Info("Server is shutting down!");
             MainNetServer.Shutdown("Server is shutting down!");
-            Logger?.Info("Waiting for resources to stop...Press Ctrl+C again to forcibly terminate the program.");
             BaseScript.OnStop(); 
             Resources.StopAll();
         }
