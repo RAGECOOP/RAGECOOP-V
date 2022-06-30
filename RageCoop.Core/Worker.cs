@@ -13,10 +13,10 @@ namespace RageCoop.Core
         private bool _stopping=false;
         public string Name { get; set; }
         public bool IsBusy { get;private set; }
-        internal Worker(int maxJobs = Int32.MaxValue,string name="Worker")
+        internal Worker(string name,Logger logger,int maxJobs = Int32.MaxValue)
         {
             Name = name;
-            _semaphoreSlim = new SemaphoreSlim(maxJobs);
+            _semaphoreSlim = new SemaphoreSlim(0,maxJobs);
             _workerThread=new Thread(() =>
             {
                 while (!_stopping)
@@ -26,7 +26,15 @@ namespace RageCoop.Core
                     if(Jobs.TryDequeue(out var job))
                     {
                         IsBusy=true;
-                        job.Invoke();
+                        try
+                        {
+                            job.Invoke();
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error("Error occurred when executing queued job:");
+                            logger.Error(ex);
+                        }
                     }
                     else
                     {
@@ -37,7 +45,7 @@ namespace RageCoop.Core
             });
             _workerThread.Start();
         }
-        public void QueueWork(Action work)
+        public void QueueJob(Action work)
         {
             Jobs.Enqueue(work);
             _semaphoreSlim.Release();
@@ -45,6 +53,7 @@ namespace RageCoop.Core
         public void Stop()
         {
             _stopping=true;
+            QueueJob(() => { });
             if (_workerThread.IsAlive)
             {
                 _workerThread.Join();

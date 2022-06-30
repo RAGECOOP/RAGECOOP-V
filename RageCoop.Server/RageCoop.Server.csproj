@@ -46,6 +46,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="McMaster.NETCore.Plugins">
+      <HintPath>..\libs\McMaster.NETCore.Plugins.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>

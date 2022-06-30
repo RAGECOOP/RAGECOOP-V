@@ -17,6 +17,13 @@ namespace RageCoop.Server.Scripting
         internal Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new();
         #endregion
         public event EventHandler<ChatEventArgs> OnChatMessage;
+        /// <summary>
+        /// Will be invoked from main thread before registered handlers
+        /// </summary>
+        public event EventHandler<OnCommandEventArgs> OnCommandReceived;
+        /// <summary>
+        /// Will be invoked from main thread when a client is attempting to connect, use <see cref="HandshakeEventArgs.Deny(string)"/> to deny the connection request.
+        /// </summary>
         public event EventHandler<HandshakeEventArgs> OnPlayerHandshake;
         /// <summary>
         /// Will be invoked when a player is connected, but this player might not be ready yet(client resources not loaded), using <see cref="OnPlayerReady"/> is recommended.
@@ -27,10 +34,6 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public event EventHandler<Client> OnPlayerReady;
         public event EventHandler<Client> OnPlayerDisconnected;
-        /// <summary>
-        /// Will be invoked before registered handlers
-        /// </summary>
-        public event EventHandler<OnCommandEventArgs> OnCommandReceived;
         /// <summary>
         /// Invoked everytime a player's main ped has been updated
         /// </summary>
@@ -47,6 +50,41 @@ namespace RageCoop.Server.Scripting
             OnPlayerUpdate=null;
         }
         #region INVOKE
+        internal void InvokePlayerHandshake(HandshakeEventArgs args)
+        { OnPlayerHandshake?.Invoke(this, args); }
+        internal void InvokeOnCommandReceived(string cname, string[] cargs, Client sender)
+        {
+            var args = new OnCommandEventArgs()
+            {
+                Name=cname,
+                Args=cargs,
+                Sender=sender
+            };
+            OnCommandReceived?.Invoke(this, args);
+            if (args.Cancel)
+            {
+                return;
+            }
+            if (Commands.Any(x => x.Key.Name == cmdName))
+            {
+                string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
+
+                CommandContext ctx = new()
+                {
+                    Client = sender,
+                    Args = argsWithoutCmd
+                };
+
+                KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
+                command.Value.Invoke(ctx);
+            }
+            else
+            {
+
+                SendChatMessage("Server", "Command not found!", sender.Connection);
+            }
+        }
+
         internal void InvokeOnChatMessage(Packets.ChatMessage p, Client sender)
         {
             OnChatMessage?.Invoke(this, new ChatEventArgs()
@@ -61,8 +99,6 @@ namespace RageCoop.Server.Scripting
         { OnPlayerReady?.Invoke(this, client); }
         internal void InvokePlayerDisconnected(Client client)
         { OnPlayerDisconnected?.Invoke(this,client); }
-        internal void InvokePlayerHandshake(HandshakeEventArgs args)
-        { OnPlayerHandshake?.Invoke(this, args); }
 
         internal void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
         {
@@ -72,17 +108,6 @@ namespace RageCoop.Server.Scripting
             {
                 handlers.ForEach((x) => { x.Invoke(args); });
             }
-        }
-        internal bool InvokeOnCommandReceived(string cname, string[] cargs, Client sender)
-        {
-            var args = new OnCommandEventArgs()
-            {
-                Name=cname,
-                Args=cargs,
-                Sender=sender
-            };
-            OnCommandReceived?.Invoke(this, args);
-            return args.Cancel;
         }
         internal void InvokePlayerUpdate(Client client)
         {

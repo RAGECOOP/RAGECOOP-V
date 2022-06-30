@@ -116,7 +116,6 @@ namespace RageCoop.Server.Scripting
 					{
                         try
                         {
-
 							s.OnStop();
 						}
 						catch(Exception ex)

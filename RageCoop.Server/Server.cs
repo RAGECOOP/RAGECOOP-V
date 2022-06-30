@@ -26,23 +26,24 @@ namespace RageCoop.Server
 
     public class Server
     {
-        private readonly string _compatibleVersion = "V0_5";
+        public API API { get; private set; }
         internal BaseScript BaseScript { get; set; }=new BaseScript();
         internal readonly ServerSettings Settings;
         internal NetServer MainNetServer;
-        private bool _stopping=false;
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> Clients = new();
-        private System.Timers.Timer SendPlayerTimer = new System.Timers.Timer(5000);
         
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private Resources Resources;
-        public API API { get; private set; }
         internal Logger Logger;
         private Security Security;
+        private System.Timers.Timer _sendInfoTimer = new System.Timers.Timer(5000);
+        private bool _stopping = false;
         private Thread _listenerThread;
         private Thread _announceThread;
+        private Worker _worker;
+        private readonly string _compatibleVersion = "V0_5";
         public Server(ServerSettings settings,Logger logger=null)
         {
             Settings = settings;
@@ -77,9 +78,10 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            SendPlayerTimer.Elapsed+=(s, e) => { SendPlayerInfos(); };
-            SendPlayerTimer.AutoReset=true;
-            SendPlayerTimer.Enabled=true;
+            _worker=new Worker("ServerWorker");
+            _sendInfoTimer.Elapsed+=(s, e) => { SendPlayerInfos(); };
+            _sendInfoTimer.AutoReset=true;
+            _sendInfoTimer.Enabled=true;
             Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
             if (Settings.AnnounceSelf)
             {
@@ -193,12 +195,13 @@ namespace RageCoop.Server
         public void Stop()
         {
             _stopping = true;
-            SendPlayerTimer.Stop();
-            SendPlayerTimer.Enabled=false;
-            SendPlayerTimer.Dispose();
+            _sendInfoTimer.Stop();
+            _sendInfoTimer.Enabled=false;
+            _sendInfoTimer.Dispose();
             Logger?.Flush();
             _listenerThread?.Join();
             _announceThread?.Join();
+            _worker.Dispose();
         }
         private void Listen()
         {
@@ -273,10 +276,10 @@ namespace RageCoop.Server
                         {
                             SendPlayerConnectPacket(sender);
                             Resources.SendTo(sender);
-                            API.Events.InvokePlayerConnected(sender);
+                            _worker.QueueJob(()=> API.Events.InvokePlayerConnected(sender));
                             if (sender.IsReady)
                             {
-                                API.Events.InvokePlayerReady(sender);
+                                _worker.QueueJob(()=>API.Events.InvokePlayerReady(sender));
                             }
                         }
                         break;
@@ -356,7 +359,7 @@ namespace RageCoop.Server
                                         Packets.ChatMessage packet = new();
                                         packet.Unpack(data);
 
-                                        API.Events.InvokeOnChatMessage(packet, sender);
+                                        _worker.QueueJob(()=>API.Events.InvokeOnChatMessage(packet, sender));
                                         SendChatMessage(packet,sender);
                                     }
                                     break;
@@ -364,7 +367,7 @@ namespace RageCoop.Server
                                     {
                                         Packets.CustomEvent packet = new Packets.CustomEvent();
                                         packet.Unpack(data);
-                                        API.Events.InvokeCustomEventReceived(packet, sender);
+                                        _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                                     }
                                     break;
 
@@ -381,7 +384,7 @@ namespace RageCoop.Server
                                             if (toRemove.Name=="Resources.zip")
                                             {
                                                 sender.IsReady=true;
-                                                API.Events.InvokePlayerReady(sender);
+                                                _worker.QueueJob(() => API.Events.InvokePlayerReady(sender));
                                             }
                                         }
                                     }
@@ -632,7 +635,7 @@ namespace RageCoop.Server
                 }.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
             }
-            API.Events.InvokePlayerDisconnected(localClient);
+            _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.ID}");
             Clients.Remove(localClient.NetID);
             Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
@@ -675,8 +678,8 @@ namespace RageCoop.Server
             if (isPlayer) 
             { 
                 client.Player.Position=packet.Position;
-                client.Player.Health=packet.Health ; 
-                API.Events.InvokePlayerUpdate(client); 
+                client.Player.Health=packet.Health ;
+                _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client)); 
             }
             
             foreach (var c in Clients.Values)
@@ -746,38 +749,9 @@ namespace RageCoop.Server
             if (packet.Message.StartsWith('/'))
             {
                 string[] cmdArgs = packet.Message.Split(" ");
-                string cmdName = cmdArgs[0].Remove(0, 1); 
-
-                if (API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender))
-                {
-                    return;
-                }
-                if (Commands.Any(x => x.Key.Name == cmdName))
-                {
-                    string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
-
-                    CommandContext ctx = new()
-                    {
-                        Client = Clients.Values.Where(x => x.Username == packet.Username).FirstOrDefault(),
-                        Args = argsWithoutCmd
-                    };
-                    
-                    KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
-
-                    if (command.Key.Usage != null && command.Key.ArgsLength != argsWithoutCmd.Length)
-                    {
-
-                        SendChatMessage("Server", command.Key.Usage,sender.Connection);
-                        return;
-                    }
-
-                    command.Value.Invoke(ctx);
-                }
-                else
-                {
-
-                    SendChatMessage("Server", "Command not found!", sender.Connection);
-                }
+                string cmdName = cmdArgs[0].Remove(0, 1);
+                _worker.QueueJob(()=>API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender));
+                
 
                 return;
             }
