@@ -10,7 +10,9 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace RageCoop.Server.Scripting
 {
-
+	/// <summary>
+	/// A class representing a server side resource, each resource is isolated from another and will be started alongside the server.
+	/// </summary>
 	public class ServerResource : PluginLoader
 	{
 		private static readonly HashSet<string> ToIgnore = new()
@@ -21,7 +23,6 @@ namespace RageCoop.Server.Scripting
 			"ScriptHookVDotNet3.dll",
 			"ScriptHookVDotNet.dll"
 		};
-		public Logger Logger;
 		internal ServerResource(PluginConfig config) : base(config) { }
 		internal static ServerResource LoadFrom(string resDir, string dataFolder, Logger logger = null, bool isTemp = false)
 		{
@@ -85,15 +86,18 @@ namespace RageCoop.Server.Scripting
 		/// A resource-specific folder that can be used to store your files.
 		/// </summary>
 		public string DataFolder { get; internal set; }
-		public List<ServerScript> Scripts { get; internal set; } = new List<ServerScript>();
-		public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
-
 		/// <summary>
-		/// Loads scripts from the specified assembly object.
+		/// Get all <see cref="ServerScript"/> instance in this resource
 		/// </summary>
-		/// <param name="filename">The path to the file associated with this assembly.</param>
-		/// <param name="assembly">The assembly to load.</param>
-		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
+		public List<ServerScript> Scripts { get; internal set; } = new List<ServerScript>();
+		/// <summary>
+		/// Get all <see cref="ResourceFile"/> that can be used to acces files in this resource
+		/// </summary>
+		public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
+		/// <summary>
+		/// Get a <see cref="Logger"/> instance that can be used to show information in console.
+		/// </summary>
+		public Logger Logger;
 		private bool LoadScriptsFromAssembly(ResourceFile rfile, Assembly assembly)
 		{
 			int count = 0;
@@ -141,7 +145,8 @@ namespace RageCoop.Server.Scripting
 			Logger?.Info($"Loaded {count} script(s) in {rfile.Name}");
 			return count != 0;
 		}
-		public new void Dispose()
+		
+		internal new void Dispose()
 		{
 			base.Dispose();
 		}

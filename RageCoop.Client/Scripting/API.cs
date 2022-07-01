@@ -6,9 +6,18 @@ using RageCoop.Core;
 
 namespace RageCoop.Client.Scripting
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class CustomEventReceivedArgs : EventArgs
     {
+        /// <summary>
+        /// The event hash
+        /// </summary>
         public int Hash { get; set; }
+        /// <summary>
+        /// Arguments
+        /// </summary>
         public List<object> Args { get; set; }
     }
     /// <summary>
@@ -50,7 +59,15 @@ namespace RageCoop.Client.Scripting
         public static class Events
         {
             #region DELEGATES
+            /// <summary>
+            /// 
+            /// </summary>
             public delegate void EmptyEvent();
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="hash"></param>
+            /// <param name="args"></param>
             public delegate void CustomEvent(int hash, List<object> args);
             #endregion
             /// <summary>

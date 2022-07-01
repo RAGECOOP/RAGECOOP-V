@@ -172,7 +172,7 @@ namespace RageCoop.Client
         }
         
     }
-    public enum MuzzleDir:byte
+    internal enum MuzzleDir:byte
     {
         Forward=0,
         Right = 1,

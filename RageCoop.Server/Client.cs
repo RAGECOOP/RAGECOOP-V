@@ -8,26 +8,56 @@ using System.Security.Cryptography;
 
 namespace RageCoop.Server
 {
+    /// <summary>
+    /// Represents a ped from a client
+    /// </summary>
     public class ServerPed
     {
+        /// <summary>
+        /// The <see cref="Client"/> that is responsible synchronizing for this ped.
+        /// </summary>
+        public Client Owner { get; internal set; }
+        /// <summary>
+        /// The ped's ID (not handle!).
+        /// </summary>
         public int ID { get;internal set; }
         /// <summary>
         /// The ID of the ped's last vehicle.
         /// </summary>
         public int VehicleID { get; internal set; }
+        /// <summary>
+        /// Position of this ped
+        /// </summary>
         public Vector3 Position { get; internal set; }
-
+        /// <summary>
+        /// Health
+        /// </summary>
         public int Health { get; internal set; }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class PlayerConfig
     {
         #region CLIENT
+        /// <summary>
+        /// Whether to enable automatic respawn for this player. if set to false, player will just lay on the ground when it's dead
+        /// </summary>
         public bool EnableAutoRespawn { get; set; }=true;
         #endregion
+        /// <summary>
+        /// Whether to show the player's blip on map.
+        /// </summary>
         public bool ShowBlip { get; set; } = true;
+        /// <summary>
+        /// Whether the player's nametag is visible to other players.
+        /// </summary>
         public bool ShowNameTag { get; set; } = true;
+        /// <summary>
+        /// The blip's color.
+        /// </summary>
         public GTA.BlipColor BlipColor { get; set; } = GTA.BlipColor.White;
-        public PlayerConfigFlags GetFlags()
+        internal PlayerConfigFlags GetFlags()
         {
             var flag=PlayerConfigFlags.None;
             if (ShowBlip)
@@ -41,6 +71,9 @@ namespace RageCoop.Server
             return flag;
         }
     }
+    /// <summary>
+    /// Represent a player connected to this server.
+    /// </summary>
     public class Client
     {
         private readonly Server Server;
@@ -49,16 +82,30 @@ namespace RageCoop.Server
             Server=server;
         }
         internal long NetID = 0;
-        public NetConnection Connection { get;internal set; }
+        internal NetConnection Connection { get;set; }
+        /// <summary>
+        /// The <see cref="ServerPed"/> instance representing the client's main character.
+        /// </summary>
         public ServerPed Player { get; internal set; }
+        /// <summary>
+        /// The client's latncy in seconds.
+        /// </summary>
         public float Latency { get; internal set; }
-        public int ID { get; internal set; }
         private PlayerConfig _config { get; set; }=new PlayerConfig();
+        /// <summary>
+        /// The client's configuration
+        /// </summary>
         public PlayerConfig Config { get { return _config; }set { _config=value;Server.SendPlayerInfos(); } }
 
         internal readonly Dictionary<int, Action<object>> Callbacks = new();
         internal byte[] PublicKey { get; set; }
+        /// <summary>
+        /// Indicates whether the client has succefully loaded all resources.
+        /// </summary>
         public bool IsReady { get; internal set; }=false;
+        /// <summary>
+        /// 
+        /// </summary>
         public string Username { get;internal set; } = "N/A";
         #region CUSTOMDATA FUNCTIONS
         /*
@@ -95,15 +142,28 @@ namespace RageCoop.Server
 
         #endregion
         #region FUNCTIONS
+        /// <summary>
+        /// Kick this client
+        /// </summary>
+        /// <param name="reason"></param>
         public void Kick(string reason="You have been kicked!")
         {
             Connection?.Disconnect(reason);
         }
+        /// <summary>
+        /// Kick this client
+        /// </summary>
+        /// <param name="reasons">Reasons to kick</param>
         public void Kick(params string[] reasons)
         {
             Kick(string.Join(" ", reasons));
         }
 
+        /// <summary>
+        /// Send a chat messsage to this client, not visible to others.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="from"></param>
         public void SendChatMessage(string message, string from = "Server")
         {
             try
@@ -167,8 +227,12 @@ namespace RageCoop.Server
             }
             return ID;
         }
-
-        public void SendCustomEvent(int id,List<object> args)
+        /// <summary>
+        /// Trigger a CustomEvent for this client
+        /// </summary>
+        /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
+        /// <param name="args"></param>
+        public void SendCustomEvent(int hash,List<object> args)
         {
             if (!IsReady)
             {
@@ -181,7 +245,7 @@ namespace RageCoop.Server
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new Packets.CustomEvent()
                 {
-                    Hash=id,
+                    Hash=hash,
                     Args=args
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);

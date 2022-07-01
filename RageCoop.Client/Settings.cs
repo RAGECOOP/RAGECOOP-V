@@ -11,7 +11,9 @@ namespace RageCoop.Client
         /// Don't use it!
         /// </summary>
         public string Username { get; set; } = "Player";
-
+        /// <summary>
+        /// The password used to authenticate when connecting to a server.
+        /// </summary>
         public string Password { get; set; } = "";
         /// <summary>
         /// Don't use it!

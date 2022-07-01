@@ -9,7 +9,9 @@ using System.Collections.Generic;
 
 namespace RageCoop.Client.Scripting
 {
-
+	/// <summary>
+	/// 
+	/// </summary>
 	public class ClientResource
 	{
 		/// <summary>
@@ -20,7 +22,13 @@ namespace RageCoop.Client.Scripting
 		/// A resource-specific folder that can be used to store your files.
 		/// </summary>
 		public string DataFolder { get; internal set; }
+		/// <summary>
+		/// Get all <see cref="ClientScript"/> instance in this resource.
+		/// </summary>
 		public List<ClientScript> Scripts { get; internal set; } = new List<ClientScript>();
+		/// <summary>
+		/// Get the <see cref="ResourceFile"/> where this script is loaded from.
+		/// </summary>
 		public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
 	}
 	internal class Resources
@@ -108,11 +116,7 @@ namespace RageCoop.Client.Scripting
 		private List<ClientResource> LoadedResources = new List<ClientResource>();
 		private string BaseScriptType;
 		public Logger Logger { get; set; }
-		
-		/// <summary>
-		/// Load a resource from a zip
-		/// </summary>
-		/// <param name="file"></param>
+
 		private void LoadResource(ZipFile file, string dataFolderRoot)
 		{
 			var r = new ClientResource()
@@ -146,11 +150,6 @@ namespace RageCoop.Client.Scripting
 			}
 			LoadedResources.Add(r);
 		}
-		/// <summary>
-		/// Loads scripts from the specified assembly file.
-		/// </summary>
-		/// <param name="path">The path to the assembly file to load.</param>
-		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
 		private bool LoadScriptsFromAssembly(ResourceFile file, string path, ClientResource resource, bool shadowCopy = true)
 		{
 			lock (LoadedResources)
@@ -185,12 +184,6 @@ namespace RageCoop.Client.Scripting
 				return LoadScriptsFromAssembly(file, assembly, path, resource);
 			}
 		}
-		/// <summary>
-		/// Loads scripts from the specified assembly object.
-		/// </summary>
-		/// <param name="filename">The path to the file associated with this assembly.</param>
-		/// <param name="assembly">The assembly to load.</param>
-		/// <returns><see langword="true" /> on success, <see langword="false" /> otherwise</returns>
 		private bool LoadScriptsFromAssembly(ResourceFile rfile, Assembly assembly, string filename, ClientResource toload)
 		{
 			int count = 0;

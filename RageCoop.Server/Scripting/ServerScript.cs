@@ -9,24 +9,32 @@ namespace RageCoop.Server.Scripting
     public abstract class ServerScript
     {
         /// <summary>
-        /// This method would be called from main thread after all scripts have been loaded.
+        /// This method would be called from listener thread after all scripts have been loaded.
         /// </summary>
         public abstract void OnStart();
 
         /// <summary>
-        /// This method would be called from main thread when the server is shutting down, you MUST terminate all background jobs/threads in this method.
+        /// This method would be called from listener thread when the server is shutting down, you MUST terminate all background jobs/threads in this method.
         /// </summary>
         public abstract void OnStop();
 
+        /// <summary>
+        /// Get the <see cref="API"/> instance that can be used to control the server.
+        /// </summary>
         public API API { get; set; }
 
         /// <summary>
-        /// Get the <see cref="ClientResource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
+        /// Get the <see cref="ServerResource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
         /// </summary>
         public ServerResource CurrentResource { get; internal set; }
+        /// <summary>
+        /// Get the <see cref="ResourceFile"/> that the script belongs to.
+        /// </summary>
         public ResourceFile CurrentFile { get; internal set; } 
     }
-
+    /// <summary>
+    /// Decorate your method with this attribute and use <see cref="API.RegisterCommands{T}"/> or <see cref="API.RegisterCommands(object)"/> to register commands.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class Command : Attribute
     {
@@ -45,12 +53,15 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public short ArgsLength { get; set; }
 
-        public Command(string name)
+        internal Command(string name)
         {
             Name = name;
         }
     }
 
+    /// <summary>
+    /// The context containg command information. 
+    /// </summary>
     public class CommandContext
     {
         /// <summary>

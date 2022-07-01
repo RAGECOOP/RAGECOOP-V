@@ -37,8 +37,8 @@ namespace RageCoop.Server.Scripting
             }
             catch (Exception ex)
             {
-                API.GetLogger().Error("Failed to parse NativeResponse");
-                API.GetLogger().Error(ex);
+                API.Logger.Error("Failed to parse NativeResponse");
+                API.Logger.Error(ex);
             }
         }
     }

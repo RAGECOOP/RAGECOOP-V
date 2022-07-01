@@ -11,6 +11,9 @@ using RageCoop.Core;
 
 namespace RageCoop.Client
 {
+    /// <summary>
+    /// A synchronized vehicle instance
+    /// </summary>
     public class SyncedVehicle : SyncedEntity
     {
 
@@ -19,7 +22,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Create a local entity (outgoing sync)
         /// </summary>
-        /// <param name="p"></param>
+        /// <param name="v"></param>
         internal SyncedVehicle(Vehicle v)
         {
 
@@ -54,7 +57,7 @@ namespace RageCoop.Client
 
         private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
-        private byte _lastRadioIndex=255;
+
         #endregion
 
         #region -- CRITICAL STUFF --

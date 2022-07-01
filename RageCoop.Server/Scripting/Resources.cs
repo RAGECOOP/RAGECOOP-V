@@ -200,44 +200,5 @@ namespace RageCoop.Server.Scripting
                 }
 			});
 		}
-		/// <summary>
-		/// Load a resource from a zip
-		/// </summary>
-		/// <param name="file"></param>
-		/*
-		private void LoadResource(ZipFile file, string dataFolderRoot)
-		{
-			var r = new Resource()
-			{
-				Scripts = new List<Scriptable>(),
-				Name=Path.GetFileNameWithoutExtension(file.Name),
-				DataFolder=Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(file.Name))
-			};
-			Directory.CreateDirectory(r.DataFolder);
-
-			foreach (ZipEntry entry in file)
-			{
-				ResourceFile rFile;
-				r.Files.Add(entry.Name, rFile=new ResourceFile()
-				{
-					Name=entry.Name,
-					IsDirectory=entry.IsDirectory,
-				});
-				if (!entry.IsDirectory)
-				{
-					rFile.GetStream=() => { return file.GetInputStream(entry); };
-					if (entry.Name.EndsWith(".dll"))
-					{
-						var tmp = Path.GetTempFileName();
-						var f = File.OpenWrite(tmp);
-						rFile.GetStream().CopyTo(f);
-						f.Close();
-						LoadScriptsFromAssembly(rFile, tmp, r, false);
-					}
-				}
-			}
-			LoadedResources.Add(r.Name,r);
-		}
-		*/
 	}
 }

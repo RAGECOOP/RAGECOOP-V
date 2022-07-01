@@ -335,7 +335,7 @@ namespace RageCoop.Client
                         if (p.MainProjectile.AttachedEntity==null)
                         {
 
-                            /// Prevent projectiles from exploding next to vehicle
+                            // Prevent projectiles from exploding next to vehicle
                             if (WeaponUtil.VehicleProjectileWeapons.Contains((VehicleWeaponHash)p.MainProjectile.WeaponHash))
                             {
                                 if (p.MainProjectile.WeaponHash!=(WeaponHash)VehicleWeaponHash.Tank && p.Origin.DistanceTo(p.MainProjectile.Position)<2)
