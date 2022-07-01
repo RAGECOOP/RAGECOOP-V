@@ -16,6 +16,9 @@ namespace RageCoop.Client
     internal static partial class Networking
     {
         private static AutoResetEvent PublicKeyReceived=new AutoResetEvent(false);
+
+        private static Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
+        internal static Dictionary<PacketType, Func< byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func< byte[], Packet>>();
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if(message == null) { return; }
@@ -77,138 +80,47 @@ namespace RageCoop.Client
                     {
 
                         if (message.LengthBytes==0) { break; }
-                        var packetType = PacketTypes.Unknown;
+                        var packetType = PacketType.Unknown;
                         try
                         {
-                            packetType = (PacketTypes)message.ReadByte();
-                            int len = message.ReadInt32();
-                            byte[] data = message.ReadBytes(len);
+
+                            // Get packet type
+                            packetType = (PacketType)message.ReadByte();
                             switch (packetType)
                             {
-                                case PacketTypes.PlayerConnect:
+                                case PacketType.Response:
                                     {
-
-                                        Packets.PlayerConnect packet = new Packets.PlayerConnect();
-                                        packet.Unpack(data);
-
-                                        Main.QueueAction(() => PlayerConnect(packet));
-                                    }
-                                    break;
-                                case PacketTypes.PlayerDisconnect:
-                                    {
-
-                                        Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
-                                        packet.Unpack(data);
-                                        Main.QueueAction(() => PlayerDisconnect(packet));
-
-                                    }
-                                    break;
-                                case PacketTypes.PlayerInfoUpdate:
-                                    {
-                                        var packet = new Packets.PlayerInfoUpdate();
-                                        packet.Unpack(data);
-                                        PlayerList.UpdatePlayer(packet);
+                                        int id = message.ReadInt32();
+                                        if (PendingResponses.TryGetValue(id, out var callback))
+                                        {
+                                            callback((PacketType)message.ReadByte(), message.ReadBytes(message.ReadInt32()));
+                                            PendingResponses.Remove(id);
+                                        }
                                         break;
                                     }
-                                #region ENTITY SYNC
-                                case PacketTypes.VehicleSync:
+                                case PacketType.Request:
                                     {
-
-                                        Packets.VehicleSync packet = new Packets.VehicleSync();
-                                        packet.Unpack(data);
-                                        VehicleSync(packet);
-
-                                    }
-                                    break;
-                                case PacketTypes.PedSync:
-                                    {
-
-                                        Packets.PedSync packet = new Packets.PedSync();
-                                        packet.Unpack(data);
-                                        PedSync(packet);
-
-                                    }
-                                    break;
-                                case PacketTypes.VehicleStateSync:
-                                    {
-
-                                        Packets.VehicleStateSync packet = new Packets.VehicleStateSync();
-                                        packet.Unpack(data);
-                                        VehicleStateSync(packet);
-
-                                    }
-                                    break;
-                                case PacketTypes.PedStateSync:
-                                    {
-
-
-                                        Packets.PedStateSync packet = new Packets.PedStateSync();
-                                        packet.Unpack(data);
-                                        PedStateSync(packet);
-
-                                    }
-                                    break;
-                                case PacketTypes.ProjectileSync:
-                                    {
-                                        Packets.ProjectileSync packet = new Packets.ProjectileSync();
-                                        packet.Unpack(data);
-                                        ProjectileSync(packet);
+                                        int id = message.ReadInt32();
+                                        var realType = (PacketType)message.ReadByte();
+                                        int len = message.ReadInt32();
+                                        Main.Logger.Debug($"{id},{realType},{len}");
+                                        if (RequestHandlers.TryGetValue(realType, out var handler))
+                                        {
+                                            var response = Client.CreateMessage();
+                                            response.Write((byte)PacketType.Response);
+                                            response.Write(id);
+                                            handler(message.ReadBytes(len)).Pack(response);
+                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered);
+                                        }
                                         break;
                                     }
-                                #endregion
-                                case PacketTypes.ChatMessage:
-                                    {
-
-                                        Packets.ChatMessage packet = new Packets.ChatMessage();
-                                        packet.Unpack(data);
-
-                                        Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
-
-
-                                    }
-                                    break;
-                                case PacketTypes.CustomEvent:
-                                    {
-                                        Packets.CustomEvent packet = new Packets.CustomEvent();
-                                        packet.Unpack(data);
-                                        Scripting.API.Events.InvokeCustomEventReceived(packet);
-                                    }
-                                    break;
-                                case PacketTypes.FileTransferChunk:
-                                    {
-                                        Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
-                                        packet.Unpack(data);
-
-                                        DownloadManager.Write(packet.ID, packet.FileChunk);
-
-                                    }
-                                    break;
-                                case PacketTypes.FileTransferRequest:
-                                    {
-                                        Packets.FileTransferRequest packet = new Packets.FileTransferRequest();
-                                        packet.Unpack(data);
-
-                                        DownloadManager.AddFile(packet.ID, packet.Name, packet.FileLength);
-
-                                    }
-                                    break;
-                                case PacketTypes.FileTransferComplete:
-                                    {
-                                        Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
-                                        packet.Unpack(data);
-
-                                        Main.Logger.Debug($"Finalizing download:{packet.ID}");
-                                        DownloadManager.Complete(packet.ID);
-
-                                    }
-                                    break;
                                 default:
-                                    if (packetType.IsSyncEvent())
                                     {
-                                        // Dispatch to main thread
-                                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
+                                        byte[] data = message.ReadBytes(message.ReadInt32());
+
+                                        HandlePacket(packetType, data);
+                                        break;
                                     }
-                                    break;
                             }
                         }
                         catch (Exception ex)
@@ -228,10 +140,10 @@ namespace RageCoop.Client
                     break;
                 case NetIncomingMessageType.UnconnectedData:
                     {
-                        var packetType = (PacketTypes)message.ReadByte();
+                        var packetType = (PacketType)message.ReadByte();
                         int len = message.ReadInt32();
                         byte[] data = message.ReadBytes(len);
-                        if (packetType==PacketTypes.PublicKeyResponse)
+                        if (packetType==PacketType.PublicKeyResponse)
                         {
                             var packet=new Packets.PublicKeyResponse();
                             packet.Unpack(data);
@@ -252,7 +164,116 @@ namespace RageCoop.Client
 
             Client.Recycle(message);
         }
+        private static void HandlePacket(PacketType packetType, byte[] data)
+        {
 
+            switch (packetType)
+            {
+                case PacketType.PlayerConnect:
+                    {
+
+                        Packets.PlayerConnect packet = new Packets.PlayerConnect();
+                        packet.Unpack(data);
+
+                        Main.QueueAction(() => PlayerConnect(packet));
+                    }
+                    break;
+                case PacketType.PlayerDisconnect:
+                    {
+
+                        Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
+                        packet.Unpack(data);
+                        Main.QueueAction(() => PlayerDisconnect(packet));
+
+                    }
+                    break;
+                case PacketType.PlayerInfoUpdate:
+                    {
+                        var packet = new Packets.PlayerInfoUpdate();
+                        packet.Unpack(data);
+                        PlayerList.UpdatePlayer(packet);
+                        break;
+                    }
+                #region ENTITY SYNC
+                case PacketType.VehicleSync:
+                    {
+
+                        Packets.VehicleSync packet = new Packets.VehicleSync();
+                        packet.Unpack(data);
+                        VehicleSync(packet);
+
+                    }
+                    break;
+                case PacketType.PedSync:
+                    {
+
+                        Packets.PedSync packet = new Packets.PedSync();
+                        packet.Unpack(data);
+                        PedSync(packet);
+
+                    }
+                    break;
+                case PacketType.VehicleStateSync:
+                    {
+
+                        Packets.VehicleStateSync packet = new Packets.VehicleStateSync();
+                        packet.Unpack(data);
+                        VehicleStateSync(packet);
+
+                    }
+                    break;
+                case PacketType.PedStateSync:
+                    {
+
+
+                        Packets.PedStateSync packet = new Packets.PedStateSync();
+                        packet.Unpack(data);
+                        PedStateSync(packet);
+
+                    }
+                    break;
+                case PacketType.ProjectileSync:
+                    {
+                        Packets.ProjectileSync packet = new Packets.ProjectileSync();
+                        packet.Unpack(data);
+                        ProjectileSync(packet);
+                        break;
+                    }
+                #endregion
+                case PacketType.ChatMessage:
+                    {
+
+                        Packets.ChatMessage packet = new Packets.ChatMessage();
+                        packet.Unpack(data);
+
+                        Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
+
+
+                    }
+                    break;
+                case PacketType.CustomEvent:
+                    {
+                        Packets.CustomEvent packet = new Packets.CustomEvent();
+                        packet.Unpack(data);
+                        Scripting.API.Events.InvokeCustomEventReceived(packet);
+                    }
+                    break;
+                case PacketType.FileTransferChunk:
+                    {
+                        Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
+                        packet.Unpack(data);
+                        DownloadManager.Write(packet.ID, packet.FileChunk);
+                    }
+                    break;
+                default:
+                    if (packetType.IsSyncEvent())
+                    {
+                        // Dispatch to main thread
+                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
+                    }
+                    break;
+            }
+        }
 
         private static void PedSync(Packets.PedSync packet)
         {

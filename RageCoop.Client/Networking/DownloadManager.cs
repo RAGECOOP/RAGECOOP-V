@@ -1,15 +1,61 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using RageCoop.Core;
+using System;
 
 namespace RageCoop.Client
 {
     internal static class DownloadManager
     {
+        static DownloadManager()
+        {
+
+            Networking.RequestHandlers.Add(PacketType.FileTransferRequest, (data) =>
+            {
+                var fr = new Packets.FileTransferRequest();
+                fr.Unpack(data);
+                return new Packets.FileTransferResponse()
+                {
+                    ID= fr.ID,
+                    Response=AddFile(fr.ID,fr.Name,fr.FileLength) ? FileResponse.NeedToDownload : FileResponse.AlreadyExists
+                };
+            });
+            Networking.RequestHandlers.Add(PacketType.FileTransferComplete, (data) =>
+            {
+                Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
+                packet.Unpack(data);
+
+                Main.Logger.Debug($"Finalizing download:{packet.ID}");
+                Complete(packet.ID);
+
+                // Inform the server that the download is completed
+                return new Packets.FileTransferResponse()
+                {
+                    ID= packet.ID,
+                    Response=FileResponse.Completed
+                };
+            });
+            Networking.RequestHandlers.Add(PacketType.AllResourcesSent, (data) =>
+            {
+                try
+                {
+                    Main.Resources.Load(downloadFolder);
+                    return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
+                }
+                catch(Exception ex)
+                {
+
+                    Main.Logger.Error("Error occurred when loading server resource:");
+                    Main.Logger.Error(ex);
+                    return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.LoadFailed };
+                }
+            });
+        }
         static string downloadFolder = $"RageCoop\\Resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
 
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
-        public static void AddFile(int id, string name, long length)
+        public static bool AddFile(int id, string name, long length)
         {
             Main.Logger.Debug($"Downloading file to {downloadFolder}\\{name} , id:{id}");
             if (!Directory.Exists(downloadFolder))
@@ -20,22 +66,13 @@ namespace RageCoop.Client
             if (FileAlreadyExists(downloadFolder, name, length))
             {
                 Main.Logger.Debug($"File already exists! canceling download:{name}");
-                Cancel(id); 
-                if (name=="Resources.zip")
-                {
-                    Main.Logger.Debug("Loading resources...");
-                    Main.Resources.Load(Path.Combine(downloadFolder));
-                }
-                return;
+                return false;
             }
             
             if (!name.EndsWith(".zip"))
             {
-                Cancel(id);
-
-                GTA.UI.Notification.Show($"The download of a file from the server was blocked! [{name}]", true);
-                Main.Logger.Error($"The download of a file from the server was blocked! [{name}]");
-                return;
+                Main.Logger.Error($"File download blocked! [{name}]");
+                return false;
             }
             lock (InProgressDownloads)
             {
@@ -47,6 +84,7 @@ namespace RageCoop.Client
                     Stream = new FileStream($"{downloadFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
                 });
             }
+            return true;
         }
 
         /// <summary>
@@ -87,47 +125,20 @@ namespace RageCoop.Client
                 else
                 {
                     Main.Logger.Trace($"Received unhandled file chunk:{id}");
-                    return;
                 }
             }
 
         }
 
-        public static void Cancel(int id)
-        {
-            Main.Logger.Debug($"Canceling download:{id}");
-
-            // Tell the server to stop sending chunks
-            Networking.SendDownloadFinish(id);
-
-            DownloadFile file;
-            lock (InProgressDownloads)
-            {
-                if (InProgressDownloads.TryGetValue(id, out file))
-                {
-                    InProgressDownloads.Remove(id);
-                    file.Dispose();
-                }
-            }
-        }
         public static void Complete(int id)
         {
             DownloadFile f;
 
             if (InProgressDownloads.TryGetValue(id, out f))
             {
-                lock (InProgressDownloads)
-                {
-                    InProgressDownloads.Remove(id);
-                    f.Dispose();
-                    Main.Logger.Info($"Download finished:{f.FileName}");
-                    if (f.FileName=="Resources.zip")
-                    {
-                        Main.Logger.Debug("Loading resources...");
-                        Main.Resources.Load(Path.Combine(downloadFolder));
-                    }
-                    Networking.SendDownloadFinish(id);
-                }
+                InProgressDownloads.Remove(id);
+                f.Dispose();
+                Main.Logger.Info($"Download finished:{f.FileName}");
             }
             else
             {

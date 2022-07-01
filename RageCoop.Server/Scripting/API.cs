@@ -13,6 +13,11 @@ namespace RageCoop.Server.Scripting
 {
     public class APIEvents
     {
+        private readonly Server Server;
+        internal APIEvents(Server server)
+        {
+            Server = server;
+        }
         #region INTERNAL
         internal Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new();
         #endregion
@@ -52,12 +57,12 @@ namespace RageCoop.Server.Scripting
         #region INVOKE
         internal void InvokePlayerHandshake(HandshakeEventArgs args)
         { OnPlayerHandshake?.Invoke(this, args); }
-        internal void InvokeOnCommandReceived(string cname, string[] cargs, Client sender)
+        internal void InvokeOnCommandReceived(string cmdName, string[] cmdArgs, Client sender)
         {
             var args = new OnCommandEventArgs()
             {
-                Name=cname,
-                Args=cargs,
+                Name=cmdName,
+                Args=cmdArgs,
                 Sender=sender
             };
             OnCommandReceived?.Invoke(this, args);
@@ -65,7 +70,7 @@ namespace RageCoop.Server.Scripting
             {
                 return;
             }
-            if (Commands.Any(x => x.Key.Name == cmdName))
+            if (Server.Commands.Any(x => x.Key.Name == cmdName))
             {
                 string[] argsWithoutCmd = cmdArgs.Skip(1).ToArray();
 
@@ -75,13 +80,13 @@ namespace RageCoop.Server.Scripting
                     Args = argsWithoutCmd
                 };
 
-                KeyValuePair<Command, Action<CommandContext>> command = Commands.First(x => x.Key.Name == cmdName);
+                KeyValuePair<Command, Action<CommandContext>> command = Server.Commands.First(x => x.Key.Name == cmdName);
                 command.Value.Invoke(ctx);
             }
             else
             {
 
-                SendChatMessage("Server", "Command not found!", sender.Connection);
+                Server.SendChatMessage("Server", "Command not found!", sender.Connection);
             }
         }
 
@@ -121,8 +126,9 @@ namespace RageCoop.Server.Scripting
         internal API(Server server)
         {
             Server=server;
+            Events=new(server);
         }
-        public APIEvents Events { get; set; }=new APIEvents();
+        public readonly APIEvents Events;
         #region FUNCTIONS
         /*
         /// <summary>
@@ -220,10 +226,6 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Send CleanUpWorld to all players to delete all objects created by the server
         /// </summary>
-        public void SendCleanUpWorldToAll(List<Client> clients = null)
-        {
-            SendCustomEvent(CustomEvents.CleanUpWorld,null,clients);
-        }
 
         /// <summary>
         /// Register a new command chat command (Example: "/test")

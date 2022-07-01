@@ -78,7 +78,8 @@ namespace RageCoop.Client
                 {
                     Client = new NetClient(config);
                     Client.Start();
-
+                    Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
+                    DownloadManager.Cleanup();
                     Security.Regen();
                     GetServerPublicKey(address);
 
@@ -90,12 +91,12 @@ namespace RageCoop.Client
                         Username =username,
                         ModVersion = Main.CurrentVersion,
                         PassHashEncrypted=Security.Encrypt(password.GetHash())
-                    };
+                    }; 
+                    
                     Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted,out handshake.AesIVCrypted);
                     handshake.Pack(outgoingMessage);
                     Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
-                    Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
-
+                    
 
                 });
             }

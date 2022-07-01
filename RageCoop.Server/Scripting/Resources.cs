@@ -4,17 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RageCoop.Core.Scripting;
+using RageCoop.Core;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 using System.Reflection;
+using McMaster.NETCore.Plugins;
 namespace RageCoop.Server.Scripting
 {
-	internal class Resources : ResourceLoader
+	internal class Resources
 	{
+		private Dictionary<string,ServerResource> LoadedResources=new();
 		private readonly Server Server;
-		public Resources(Server server) : base("RageCoop.Server.Scripting.ServerScript", server.Logger)
+		private readonly Logger Logger;
+		public Resources(Server server)
 		{
 			Server = server;
+			Logger=server.Logger;
 		}
 		private List<string> ClientResourceZips=new List<string>();
 		public void LoadAll()
@@ -22,7 +27,7 @@ namespace RageCoop.Server.Scripting
 			// Client
             {
 				var path = Path.Combine("Resources", "Client");
-				var tmpDir = Path.Combine("Resources", "Temp");
+				var tmpDir = Path.Combine("Resources", "Temp","Client");
 				Directory.CreateDirectory(path);
 				if (Directory.Exists(tmpDir))
 				{
@@ -76,20 +81,50 @@ namespace RageCoop.Server.Scripting
 				Directory.CreateDirectory(path);
 				foreach (var resource in Directory.GetDirectories(path))
 				{
-					if (Path.GetFileName(resource).ToLower()=="data") { continue; }
-					Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
-					LoadResource(resource, dataFolder);
+                    try
+                    {
+						var name = Path.GetFileName(resource);
+						if (LoadedResources.ContainsKey(name))
+                        {
+							Logger?.Warning($"Resource \"{name}\" has already been loaded, ignoring...");
+							continue;
+						}
+						if (name.ToLower()=="data") { continue; }
+						Logger?.Info($"Loading resource: {name}");
+						var r = ServerResource.LoadFrom(resource, dataFolder, Logger);
+						LoadedResources.Add(r.Name, r);
+					}
+                    catch(Exception ex)
+                    {
+						Logger?.Error($"Failed to load resource: {Path.GetFileName(resource)}");
+						Logger?.Error(ex);
+					}
 				}
 				foreach (var resource in Directory.GetFiles(path, "*.zip", SearchOption.TopDirectoryOnly))
 				{
-					Logger?.Info($"Loading resource: {Path.GetFileName(resource)}");
-					LoadResource(new ZipFile(resource), dataFolder);
+                    try
+                    {
+						var name = Path.GetFileNameWithoutExtension(resource);
+						if (LoadedResources.ContainsKey(name))
+						{
+							Logger?.Warning($"Resource \"{name}\" has already been loaded, ignoring...");
+							continue;
+						}
+						Logger?.Info($"Loading resource: name");
+						var r = ServerResource.LoadFromZip(resource, Path.Combine("Resources", "Temp", "Server"), dataFolder, Logger);
+						LoadedResources.Add(r.Name, r);
+					}
+					catch(Exception ex)
+                    {
+						Logger?.Error($"Failed to load resource: {Path.GetFileNameWithoutExtension(resource)}");
+						Logger?.Error(ex);
+                    }
 				}
 
 				// Start scripts
 				lock (LoadedResources)
 				{
-					foreach (var r in LoadedResources)
+					foreach (var r in LoadedResources.Values)
 					{
 						foreach (ServerScript s in r.Scripts)
 						{
@@ -106,11 +141,11 @@ namespace RageCoop.Server.Scripting
 			}
 		}
 
-        public void StopAll()
+        public void UnloadAll()
 		{
 			lock (LoadedResources)
 			{
-				foreach (var d in LoadedResources)
+				foreach (var d in LoadedResources.Values)
 				{
 					foreach (var s in d.Scripts)
 					{
@@ -122,28 +157,87 @@ namespace RageCoop.Server.Scripting
                         {
 							Logger?.Error(ex);
                         }
+                    }
+                    try
+                    {
+						d.Dispose();
 					}
+					catch(Exception ex)
+                    {
+						Logger.Error($"Resource \"{d.Name}\" cannot be unloaded.");
+						Logger.Error(ex);
+                    }
 				}
+				LoadedResources.Clear();
 			}
 		}
 		public void SendTo(Client client)
 		{
-
-			if (ClientResourceZips.Count!=0)
+			Task.Run(() =>
 			{
-				Task.Run(() =>
+
+				if (ClientResourceZips.Count!=0)
 				{
 					Logger?.Info($"Sending resources to client:{client.Username}");
-					
-					
-					Logger?.Info($"Resources sent to:{client.Username}");
+					foreach (var rs in ClientResourceZips)
+					{
+						using (var fs = File.OpenRead(rs))
+						{
+							Server.SendFile(rs, Path.GetFileName(rs), client);
+						}
+					}
 
-				});
-			}
-            else
-            {
-				client.IsReady=true;
-            }
+					Logger?.Info($"Resources sent to:{client.Username}");
+				}
+				if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent())?.Response==FileResponse.Loaded)
+				{
+					client.IsReady=true;
+					Server.API.Events.InvokePlayerReady(client);
+				}
+                else
+                {
+					Logger?.Warning($"Client {client.Username} failed to load resource.");
+                }
+			});
 		}
+		/// <summary>
+		/// Load a resource from a zip
+		/// </summary>
+		/// <param name="file"></param>
+		/*
+		private void LoadResource(ZipFile file, string dataFolderRoot)
+		{
+			var r = new Resource()
+			{
+				Scripts = new List<Scriptable>(),
+				Name=Path.GetFileNameWithoutExtension(file.Name),
+				DataFolder=Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(file.Name))
+			};
+			Directory.CreateDirectory(r.DataFolder);
+
+			foreach (ZipEntry entry in file)
+			{
+				ResourceFile rFile;
+				r.Files.Add(entry.Name, rFile=new ResourceFile()
+				{
+					Name=entry.Name,
+					IsDirectory=entry.IsDirectory,
+				});
+				if (!entry.IsDirectory)
+				{
+					rFile.GetStream=() => { return file.GetInputStream(entry); };
+					if (entry.Name.EndsWith(".dll"))
+					{
+						var tmp = Path.GetTempFileName();
+						var f = File.OpenWrite(tmp);
+						rFile.GetStream().CopyTo(f);
+						f.Close();
+						LoadScriptsFromAssembly(rFile, tmp, r, false);
+					}
+				}
+			}
+			LoadedResources.Add(r.Name,r);
+		}
+		*/
 	}
 }

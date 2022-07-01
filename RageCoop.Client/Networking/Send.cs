@@ -161,18 +161,6 @@ namespace RageCoop.Client
 #if DEBUG
 #endif
         }
-        public static void SendDownloadFinish(int id)
-        {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-
-            new Packets.FileTransferComplete() { ID = id }.Pack(outgoingMessage);
-
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.File);
-            Client.FlushSendQueue();
-
-#if DEBUG
-#endif
-        }
         #endregion
     }
 }

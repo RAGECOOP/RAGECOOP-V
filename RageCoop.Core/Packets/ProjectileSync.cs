@@ -29,7 +29,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.ProjectileSync);
+                message.Write((byte)PacketType.ProjectileSync);
 
                 List<byte> byteArray = new List<byte>();
 

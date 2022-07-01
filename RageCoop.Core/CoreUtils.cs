@@ -7,6 +7,10 @@ using GTA.Math;
 using System.Security.Cryptography;
 using System.Net;
 using System.IO;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("RageCoop.Server")]
+[assembly: InternalsVisibleTo("RageCoop.Client")]
 namespace RageCoop.Core
 {
     public class CoreUtils
@@ -230,6 +234,14 @@ namespace RageCoop.Core
                 writeIdx += byteArr.Length;
             }
             return output;
+        }
+
+        public static bool IsSubclassOf(this Type type, string baseTypeName)
+        {
+            for (Type t = type.BaseType; t != null; t = t.BaseType)
+                if (t.FullName == baseTypeName)
+                    return true;
+            return false;
         }
     }
 }

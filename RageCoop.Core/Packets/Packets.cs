@@ -7,7 +7,7 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    public enum PacketTypes:byte
+    public enum PacketType:byte
     {
         Handshake=0,
         PlayerConnect=1,
@@ -15,6 +15,8 @@ namespace RageCoop.Core
         PlayerInfoUpdate=3,
         PublicKeyRequest=4,
         PublicKeyResponse=5,
+        Request=6,
+        Response=7,
         
         ChatMessage=10,
         // NativeCall=11,
@@ -22,11 +24,13 @@ namespace RageCoop.Core
         // Mod=13,
         // CleanUpWorld=14,
        
-        FileTransferChunk=15,
-        FileTransferRequest=16,
-        FileTransferComplete=17,
+        FileTransferChunk=11,
+        FileTransferRequest=12,
+        FileTransferResponse = 13,
+        FileTransferComplete =14,
+        AllResourcesSent=15,
         
-        CustomEvent = 18,
+        CustomEvent = 16,
         #region Sync
 
         #region INTERVAL
@@ -55,7 +59,7 @@ namespace RageCoop.Core
     }
     public static class PacketExtensions
     {
-        public static bool IsSyncEvent(this PacketTypes p)
+        public static bool IsSyncEvent(this PacketType p)
         {
             return (30<=(byte)p)&&((byte)p<=40);
         }
@@ -69,6 +73,7 @@ namespace RageCoop.Core
         Mod = 7,
         File = 8,
         Event = 9,
+        RequestResponse=10,
         VehicleSync=20,
         PedSync=21,
         ProjectileSync = 22,
@@ -153,7 +158,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.ChatMessage);
+                message.Write((byte)PacketType.ChatMessage);
 
                 List<byte> byteArray = new List<byte>();
 

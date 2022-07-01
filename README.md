@@ -30,6 +30,7 @@ _Old name: GTACOOP:R_
 - [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
 - [ClearScript](https://github.com/microsoft/ClearScript)
 - [SharpZipLib](https://github.com/icsharpcode/SharpZipLib)
+- [DotNetCorePlugins](https://github.com/natemcmaster/DotNetCorePlugins)
 
 # Features
 

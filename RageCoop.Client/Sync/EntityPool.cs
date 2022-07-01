@@ -14,6 +14,7 @@ namespace RageCoop.Client
 {
     internal class EntityPool
     {
+        private static bool _trafficSpawning=true;
         public static object PedsLock = new object();
         private static Dictionary<int, SyncedPed> ID_Peds = new Dictionary<int, SyncedPed>();
         public static int CharactersCount { get { return ID_Peds.Count; } }
@@ -150,7 +151,7 @@ namespace RageCoop.Client
                     {
                         Handle_Peds.Remove(p.Handle);
                     }
-                    Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
+                    // Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
                     p.AttachedBlip?.Delete();
                     p.Kill();
                     p.MarkAsNoLongerNeeded();
@@ -208,7 +209,7 @@ namespace RageCoop.Client
                     {
                         Handle_Vehicles.Remove(veh.Handle);
                     }
-                    Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
+                    // Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
                     veh.AttachedBlip?.Delete();
                     veh.MarkAsNoLongerNeeded();
                     veh.Delete();
@@ -298,16 +299,21 @@ namespace RageCoop.Client
             vehStatesPerFrame=allVehicles.Length*5/(int)Game.FPS+1;
             pedStatesPerFrame=allPeds.Length*5/(int)Game.FPS+1;
 
-            if (Main.Settings.WorldVehicleSoftLimit>-1)
+            if (Main.Ticked%50==0)
             {
-                if (Main.Ticked%100==0) { if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit) { SetBudget(0); } else { SetBudget(1); } }
+                bool flag1 = allVehicles.Length>Main.Settings.WorldVehicleSoftLimit && Main.Settings.WorldVehicleSoftLimit>-1;
+                bool flag2 = allPeds.Length>Main.Settings.WorldPedSoftLimit && Main.Settings.WorldPedSoftLimit>-1;
+                if ((flag1||flag2) && _trafficSpawning)
+                { SetBudget(0); _trafficSpawning=false; }
+                else if(!_trafficSpawning)
+                { SetBudget(1); _trafficSpawning=true; }
             }
 
 #if BENCHMARK
 
             Debug.TimeStamps[TimeStamp.GetAllEntities]=PerfCounter.ElapsedTicks;
-#endif        
-            
+#endif
+
             lock (ProjectilesLock)
             {
 
@@ -369,7 +375,7 @@ namespace RageCoop.Client
                     SyncedPed c = EntityPool.GetPedByHandle(p.Handle);
                     if (c==null && (p!=Game.Player.Character))
                     {
-                        Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
+                        // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
                         c=new SyncedPed(p);
 
                         EntityPool.Add(c);
@@ -448,7 +454,7 @@ namespace RageCoop.Client
                 {
                     if (!Handle_Vehicles.ContainsKey(veh.Handle))
                     {
-                        Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
+                        // Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
                         EntityPool.Add(new SyncedVehicle(veh));
 

@@ -43,6 +43,8 @@ namespace RageCoop.Server
         private Thread _listenerThread;
         private Thread _announceThread;
         private Worker _worker;
+        private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
+        private Dictionary<PacketType, Func<byte[],Packet>> RequestHandlers=new();
         private readonly string _compatibleVersion = "V0_5";
         public Server(ServerSettings settings,Logger logger=null)
         {
@@ -78,7 +80,7 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            _worker=new Worker("ServerWorker");
+            _worker=new Worker("ServerWorker",Logger);
             _sendInfoTimer.Elapsed+=(s, e) => { SendPlayerInfos(); };
             _sendInfoTimer.AutoReset=true;
             _sendInfoTimer.Enabled=true;
@@ -221,7 +223,7 @@ namespace RageCoop.Server
             Logger?.Info("Server is shutting down!");
             MainNetServer.Shutdown("Server is shutting down!");
             BaseScript.OnStop(); 
-            Resources.StopAll();
+            Resources.UnloadAll();
         }
 
         private void ProcessMessage(NetIncomingMessage message)
@@ -233,7 +235,7 @@ namespace RageCoop.Server
                 case NetIncomingMessageType.ConnectionApproval:
                     {
                         Logger?.Info($"New incoming connection from: [{message.SenderConnection.RemoteEndPoint}]");
-                        if (message.ReadByte() != (byte)PacketTypes.Handshake)
+                        if (message.ReadByte() != (byte)PacketType.Handshake)
                         {
                             Logger?.Info($"IP [{message.SenderConnection.RemoteEndPoint.Address}] was blocked, reason: Wrong packet!");
                             message.SenderConnection.Deny("Wrong packet!");
@@ -275,151 +277,75 @@ namespace RageCoop.Server
                         else if (status == NetConnectionStatus.Connected)
                         {
                             SendPlayerConnectPacket(sender);
+                            _worker.QueueJob(() => API.Events.InvokePlayerConnected(sender));
                             Resources.SendTo(sender);
-                            _worker.QueueJob(()=> API.Events.InvokePlayerConnected(sender));
-                            if (sender.IsReady)
-                            {
-                                _worker.QueueJob(()=>API.Events.InvokePlayerReady(sender));
-                            }
                         }
                         break;
                     }
                 case NetIncomingMessageType.Data:
                     {
-                        // Get packet type
-                        byte btype = message.ReadByte();
-                        var type = (PacketTypes)btype;
-                        int len = message.ReadInt32();
-                        byte[] data = message.ReadBytes(len);
-
-                        try
+                        
+                        // Get sender client
+                        if (Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
                         {
-                            // Get sender client
-                            if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
-                            {
-                                throw new UnauthorizedAccessException("No client data found:"+message.SenderEndPoint);
-                            }
+                            // Get packet type
+                            var type = (PacketType)message.ReadByte();
                             switch (type)
                             {
-
-                                #region SyncData
-
-                                case PacketTypes.PedStateSync:
+                                case PacketType.Response:
                                     {
-                                        Packets.PedStateSync packet = new();
-                                        packet.Unpack(data);
-
-                                        PedStateSync(packet, sender);
-                                        break;
-                                    }
-                                case PacketTypes.VehicleStateSync:
-                                    {
-                                        Packets.VehicleStateSync packet = new();
-                                        packet.Unpack(data);
-
-                                        VehicleStateSync(packet, sender);
-
-                                        break;
-                                    }
-                                case PacketTypes.PedSync:
-                                    {
-
-                                        Packets.PedSync packet = new();
-                                        packet.Unpack(data);
-
-                                        PedSync(packet, sender);
-
-                                    }
-                                    break;
-                                case PacketTypes.VehicleSync:
-                                    {
-                                        Packets.VehicleSync packet = new();
-                                        packet.Unpack(data);
-
-                                        VehicleSync(packet, sender);
-
-                                    }
-                                    break;
-                                case PacketTypes.ProjectileSync:
-                                    {
-
-                                        Packets.ProjectileSync packet = new();
-                                        packet.Unpack(data);
-                                        ProjectileSync(packet, sender);
-
-                                    }
-                                    break;
-
-
-                                #endregion
-
-                                case PacketTypes.ChatMessage:
-                                    {
-
-                                        Packets.ChatMessage packet = new();
-                                        packet.Unpack(data);
-
-                                        _worker.QueueJob(()=>API.Events.InvokeOnChatMessage(packet, sender));
-                                        SendChatMessage(packet,sender);
-                                    }
-                                    break;
-                                case PacketTypes.CustomEvent:
-                                    {
-                                        Packets.CustomEvent packet = new Packets.CustomEvent();
-                                        packet.Unpack(data);
-                                        _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
-                                    }
-                                    break;
-
-                                case PacketTypes.FileTransferComplete:
-                                    {
-                                        Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
-                                        packet.Unpack(data);
-                                        FileTransfer toRemove;
-                                        
-                                        // Cancel the download if it's in progress
-                                        if (InProgressFileTransfers.TryGetValue(packet.ID,out toRemove))
+                                        int id = message.ReadInt32();
+                                        if (PendingResponses.TryGetValue(id, out var callback))
                                         {
-                                            toRemove.Cancel=true;
-                                            if (toRemove.Name=="Resources.zip")
-                                            {
-                                                sender.IsReady=true;
-                                                _worker.QueueJob(() => API.Events.InvokePlayerReady(sender));
-                                            }
+                                            callback((PacketType)message.ReadByte(), message.ReadBytes(message.ReadInt32()));
+                                            PendingResponses.Remove(id);
                                         }
+                                        break;
                                     }
-                                    break;
+                                case PacketType.Request:
+                                    {
+                                        int id = message.ReadInt32();
+                                        if (RequestHandlers.TryGetValue((PacketType)message.ReadByte(), out var handler))
+                                        {
+                                            var response=MainNetServer.CreateMessage();
+                                            response.Write((byte)PacketType.Response);
+                                            response.Write(id);
+                                            handler(message.ReadBytes(message.ReadInt32())).Pack(response);
+                                            MainNetServer.SendMessage(response,message.SenderConnection,NetDeliveryMethod.ReliableOrdered);
+                                        }
+                                        break;
+                                    }
                                 default:
-                                    if (type.IsSyncEvent())
                                     {
-                                        // Sync Events
-                                        try
+                                        byte[] data = message.ReadBytes(message.ReadInt32());
+                                        if (type.IsSyncEvent())
                                         {
-                                            var toSend = MainNetServer.Connections.Exclude(message.SenderConnection);
-                                            if (toSend.Count!=0)
+                                            // Sync Events
+                                            try
                                             {
-                                                var outgoingMessage = MainNetServer.CreateMessage();
-                                                outgoingMessage.Write(btype);
-                                                outgoingMessage.Write(len);
-                                                outgoingMessage.Write(data);
-                                                MainNetServer.SendMessage(outgoingMessage, toSend, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.SyncEvents);
+                                                var toSend = MainNetServer.Connections.Exclude(message.SenderConnection);
+                                                if (toSend.Count!=0)
+                                                {
+                                                    var outgoingMessage = MainNetServer.CreateMessage();
+                                                    outgoingMessage.Write((byte)type);
+                                                    outgoingMessage.Write(data.Length);
+                                                    outgoingMessage.Write(data);
+                                                    MainNetServer.SendMessage(outgoingMessage, toSend, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.SyncEvents);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                DisconnectAndLog(message.SenderConnection, type, e);
                                             }
                                         }
-                                        catch (Exception e)
+                                        else
                                         {
-                                            DisconnectAndLog(message.SenderConnection, type, e);
+                                            HandlePacket(type, data, sender);
                                         }
+                                        break;
                                     }
-                                    else
-                                    {
-                                        Logger?.Error("Unhandled Data / Packet type");
-                                    }
-                                    break;
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            DisconnectAndLog(message.SenderConnection, type, e);
+                            
                         }
                         break;
                     }
@@ -448,7 +374,7 @@ namespace RageCoop.Server
                     break;
                 case NetIncomingMessageType.UnconnectedData:
                     {
-                        if (message.ReadByte()==(byte)PacketTypes.PublicKeyRequest)
+                        if (message.ReadByte()==(byte)PacketType.PublicKeyRequest)
                         {
                             var msg = MainNetServer.CreateMessage();
                             var p=new Packets.PublicKeyResponse();
@@ -465,6 +391,98 @@ namespace RageCoop.Server
             }
 
             MainNetServer.Recycle(message);
+        }
+        internal void QueueJob(Action job)
+        {
+            _worker.QueueJob(job);
+        }
+        private void HandlePacket(PacketType type,byte[] data,Client sender)
+        {
+
+            try
+            {
+                
+                switch (type)
+                {
+
+                    #region SyncData
+
+                    case PacketType.PedStateSync:
+                        {
+                            Packets.PedStateSync packet = new();
+                            packet.Unpack(data);
+
+                            PedStateSync(packet, sender);
+                            break;
+                        }
+                    case PacketType.VehicleStateSync:
+                        {
+                            Packets.VehicleStateSync packet = new();
+                            packet.Unpack(data);
+
+                            VehicleStateSync(packet, sender);
+
+                            break;
+                        }
+                    case PacketType.PedSync:
+                        {
+
+                            Packets.PedSync packet = new();
+                            packet.Unpack(data);
+
+                            PedSync(packet, sender);
+
+                        }
+                        break;
+                    case PacketType.VehicleSync:
+                        {
+                            Packets.VehicleSync packet = new();
+                            packet.Unpack(data);
+
+                            VehicleSync(packet, sender);
+
+                        }
+                        break;
+                    case PacketType.ProjectileSync:
+                        {
+
+                            Packets.ProjectileSync packet = new();
+                            packet.Unpack(data);
+                            ProjectileSync(packet, sender);
+
+                        }
+                        break;
+
+
+                    #endregion
+
+                    case PacketType.ChatMessage:
+                        {
+
+                            Packets.ChatMessage packet = new();
+                            packet.Unpack(data);
+
+                            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(packet, sender));
+                            SendChatMessage(packet, sender);
+                        }
+                        break;
+                    case PacketType.CustomEvent:
+                        {
+                            Packets.CustomEvent packet = new Packets.CustomEvent();
+                            packet.Unpack(data);
+                            _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
+                        }
+                        break;
+
+                    default:
+                        Logger?.Error("Unhandled Data / Packet type");
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                DisconnectAndLog(sender.Connection, type, e);
+            }
         }
         object _sendPlayersLock=new object();
         internal void SendPlayerInfos()
@@ -492,7 +510,7 @@ namespace RageCoop.Server
             }
         }
 
-        private void DisconnectAndLog(NetConnection senderConnection,PacketTypes type, Exception e)
+        private void DisconnectAndLog(NetConnection senderConnection,PacketType type, Exception e)
         {
             Logger?.Error($"Error receiving a packet of type {type}");
             Logger?.Error(e.Message);
@@ -811,31 +829,64 @@ namespace RageCoop.Server
                 RegisterCommand(attribute.Name, attribute.Usage, attribute.ArgsLength, (Action<CommandContext>)Delegate.CreateDelegate(typeof(Action<CommandContext>), method));
             }
         }
-
+        internal T GetResponse<T>(Client client,Packet request, ConnectionChannel channel = ConnectionChannel.RequestResponse,int timeout=5000) where T:Packet, new()
+        {
+            if (Thread.CurrentThread==_listenerThread)
+            {
+                throw new InvalidOperationException("Cannot wait for response from the listener thread!");
+            }
+            var received=new AutoResetEvent(false);
+            byte[] response=null;
+            var id = NewRequestID();
+            PendingResponses.Add(id, (type,p) =>
+            {
+                response=p;
+                received.Set();
+            });
+            var msg = MainNetServer.CreateMessage();
+            msg.Write((byte)PacketType.Request);
+            msg.Write(id);
+            request.Pack(msg);
+            MainNetServer.SendMessage(msg,client.Connection,NetDeliveryMethod.ReliableOrdered,(int)channel);
+            if (received.WaitOne(timeout))
+            {
+                var p = new T();
+                p.Unpack(response);
+                return p;
+            }
+            else
+            {
+                return null;
+            }
+        }
         internal void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
-            int id = RequestFileID();
+
+            int id = NewFileID();
             var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             fs.Seek(0, SeekOrigin.Begin);
             var total = fs.Length;
+            if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferRequest()
+            {
+                FileLength= total,
+                Name=name,
+                ID=id,
+            },ConnectionChannel.File)?.Response!=FileResponse.NeedToDownload)
+            {
+                Logger?.Info($"Skipping file transfer \"{name}\" to {client.Username}");
+                fs.Close();
+                fs.Dispose();
+                return;
+            }
             Logger?.Debug($"Initiating file transfer:{name}, {total}");
             FileTransfer transfer = new()
             {
                 ID=id,
                 Name = name,
             };
-            InProgressFileTransfers.Add(id,transfer);
-            Send(
-            new Packets.FileTransferRequest()
-            {
-                FileLength= total,
-                Name=name,
-                ID=id,
-            },
-            client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered
-            );
+            InProgressFileTransfers.Add(id, transfer);
             int read = 0;
-            int thisRead = 0;
+            int thisRead;
             do
             {
                 // 4 KB chunk
@@ -858,23 +909,38 @@ namespace RageCoop.Server
                 if (updateCallback!=null) { updateCallback(transfer.Progress);}
 
             } while (thisRead>0);
-            Send(
-                new Packets.FileTransferComplete()
-                {
-                    ID= id,
-                }
-                , client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered
-            ); 
+            if(GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferComplete()
+            {
+                ID= id,
+            },ConnectionChannel.File)?.Response!=FileResponse.Completed)
+            {
+                Logger.Warning($"File trasfer to {client.Username} failed: "+name);
+            } 
             fs.Close();
             fs.Dispose();
             Logger?.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }
-        private int RequestFileID()
+        private int NewFileID()
         {
             int ID = 0;
             while ((ID==0)
                 || InProgressFileTransfers.ContainsKey(ID))
+            {
+                byte[] rngBytes = new byte[4];
+
+                RandomNumberGenerator.Create().GetBytes(rngBytes);
+
+                // Convert the bytes into an integer
+                ID = BitConverter.ToInt32(rngBytes, 0);
+            }
+            return ID;
+        }
+        private int NewRequestID()
+        {
+            int ID = 0;
+            while ((ID==0)
+                || PendingResponses.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
 

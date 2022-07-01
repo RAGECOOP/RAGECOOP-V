@@ -34,7 +34,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.Handshake);
+                message.Write((byte)PacketType.Handshake);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -101,7 +101,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PlayerConnect);
+                message.Write((byte)PacketType.PlayerConnect);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -146,7 +146,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PlayerDisconnect);
+                message.Write((byte)PacketType.PlayerDisconnect);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -181,7 +181,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PlayerInfoUpdate);
+                message.Write((byte)PacketType.PlayerInfoUpdate);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -241,7 +241,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PublicKeyResponse);
+                message.Write((byte)PacketType.PublicKeyResponse);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -272,7 +272,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PublicKeyRequest);
+                message.Write((byte)PacketType.PublicKeyRequest);
                 #endregion
             }
             public override void Unpack(byte[] array)

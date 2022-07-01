@@ -16,7 +16,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.PedKilled);
+                message.Write((byte)PacketType.PedKilled);
 
                 List<byte> byteArray = new List<byte>();
 

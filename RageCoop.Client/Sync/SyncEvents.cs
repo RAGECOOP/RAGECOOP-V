@@ -58,7 +58,7 @@ namespace RageCoop.Client {
 
         public static void TriggerBulletShot(uint hash,SyncedPed owner,Vector3 impactPosition)
         {
-            Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
+            // Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
 
 
             var start = owner.MainPed.GetMuzzlePosition();
@@ -211,18 +211,18 @@ namespace RageCoop.Client {
                 }
             }
         }
-        public static void HandleEvent(PacketTypes type,byte[] data)
+        public static void HandleEvent(PacketType type,byte[] data)
         {
             switch (type)
             {
-                case PacketTypes.BulletShot:
+                case PacketType.BulletShot:
                     {
                         Packets.BulletShot p = new Packets.BulletShot();
                         p.Unpack(data);
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }
-                case PacketTypes.EnteringVehicle:
+                case PacketType.EnteringVehicle:
                     {
                         Packets.EnteringVehicle p = new Packets.EnteringVehicle();
                         p.Unpack(data);
@@ -231,35 +231,35 @@ namespace RageCoop.Client {
 
                     }
                     break;
-                case PacketTypes.LeaveVehicle:
+                case PacketType.LeaveVehicle:
                     {
                         Packets.LeaveVehicle packet = new Packets.LeaveVehicle();
                         packet.Unpack(data);
                         HandleLeaveVehicle(packet);
                     }
                     break;
-                case PacketTypes.OwnerChanged:
+                case PacketType.OwnerChanged:
                     {
                         Packets.OwnerChanged packet = new Packets.OwnerChanged();
                         packet.Unpack(data);
                         HandleOwnerChanged(packet);
                     }
                     break;
-                case PacketTypes.PedKilled:
+                case PacketType.PedKilled:
                     {
                         var packet = new Packets.PedKilled();
                         packet.Unpack(data);
                         HandlePedKilled(packet);
                     }
                     break;
-                case PacketTypes.EnteredVehicle:
+                case PacketType.EnteredVehicle:
                     {
                         var packet = new Packets.EnteredVehicle();
                         packet.Unpack(data);
                         HandleEnteredVehicle(packet.PedID,packet.VehicleID,(VehicleSeat)packet.VehicleSeat);
                         break;
                     }
-                case PacketTypes.NozzleTransform:
+                case PacketType.NozzleTransform:
                     {
                         var packet = new Packets.NozzleTransform();
                         packet.Unpack(data);

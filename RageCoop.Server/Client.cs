@@ -121,14 +121,6 @@ namespace RageCoop.Server
                 Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
             }
         }
-        /// <summary>
-        /// Send a CleanUpWorld message to this client.
-        /// </summary>
-        /// <param name="clients"></param>
-        public void SendCleanUpWorld(List<Client> clients = null)
-        {
-            SendCustomEvent(CustomEvents.CleanUpWorld, null);
-        }
 
         /// <summary>
         /// Send a native call to client and do a callback when the response received.

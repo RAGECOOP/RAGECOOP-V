@@ -21,7 +21,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.BulletShot);
+                message.Write((byte)PacketType.BulletShot);
 
                 List<byte> byteArray = new List<byte>();
 

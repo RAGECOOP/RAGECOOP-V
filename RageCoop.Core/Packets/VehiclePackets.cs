@@ -48,7 +48,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.VehicleStateSync);
+                message.Write((byte)PacketType.VehicleStateSync);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -256,7 +256,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.VehicleSync);
+                message.Write((byte)PacketType.VehicleSync);
 
                 List<byte> byteArray = new List<byte>();
 
