@@ -12,12 +12,12 @@ namespace RageCoop.Core.Scripting
     {
         static MD5 Hasher = MD5.Create();
         static Dictionary<int,string> Hashed=new Dictionary<int,string>();
-        public static readonly int SetWeather = Hash("RageCoop.SetWeather");
-        public static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
-        public static readonly int SetAutoRespawn = Hash("RageCoop.SetAutoRespawn");
-        public static readonly int NativeCall = Hash("RageCoop.NativeCall");
-        public static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
-        public static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
+        internal static readonly int SetWeather = Hash("RageCoop.SetWeather");
+        internal static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
+        internal static readonly int SetAutoRespawn = Hash("RageCoop.SetAutoRespawn");
+        internal static readonly int NativeCall = Hash("RageCoop.NativeCall");
+        internal static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
+        internal static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

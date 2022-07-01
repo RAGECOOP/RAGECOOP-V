@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 namespace RageCoop.Core
 {
-    public class CoreUtils
+    internal class CoreUtils
     {
 
         public static (byte, byte[]) GetBytesFromObject(object obj)
@@ -46,7 +46,7 @@ namespace RageCoop.Core
         }
 
     }
-    public static class Extensions
+    internal static class Extensions
     {
         public static void AddVector3(this List<byte> bytes, Vector3 vec3)
         {

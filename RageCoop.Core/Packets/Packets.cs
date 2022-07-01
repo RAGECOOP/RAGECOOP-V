@@ -7,7 +7,7 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    public enum PacketType:byte
+    internal enum PacketType:byte
     {
         Handshake=0,
         PlayerConnect=1,
@@ -57,15 +57,15 @@ namespace RageCoop.Core
         #endregion
         Unknown=255
     }
-    public static class PacketExtensions
+    internal static class PacketExtensions
     {
-        public static bool IsSyncEvent(this PacketType p)
+        internal static bool IsSyncEvent(this PacketType p)
         {
             return (30<=(byte)p)&&((byte)p<=40);
         }
     }
 
-    public enum ConnectionChannel
+    internal enum ConnectionChannel
     {
         Default = 0,
         Chat = 5,
@@ -81,7 +81,7 @@ namespace RageCoop.Core
     }
 
     [Flags]
-    public enum PedDataFlags:ushort
+    internal enum PedDataFlags:ushort
     {
         None=0,
         IsAiming = 1 << 0,
@@ -98,7 +98,7 @@ namespace RageCoop.Core
     }
 
     #region ===== VEHICLE DATA =====
-    public enum VehicleDataFlags:ushort
+    internal enum VehicleDataFlags:ushort
     {
         None=0,
         IsEngineRunning = 1 << 0,
@@ -116,14 +116,14 @@ namespace RageCoop.Core
         HasRoof=1 << 12,
     }
 
-    public enum PlayerConfigFlags : byte
+    internal enum PlayerConfigFlags : byte
     {
         None = 0,
         ShowBlip= 1 << 0,
         ShowNameTag= 1 << 1
     }
 
-    public struct VehicleDamageModel
+    internal struct VehicleDamageModel
     {
         public byte BrokenDoors { get; set; }
         public byte OpenedDoors { get; set; }
@@ -140,16 +140,16 @@ namespace RageCoop.Core
         void Unpack(byte[] array);
     }
 
-    public abstract class Packet : IPacket
+    internal abstract class Packet : IPacket
     {
         public abstract void Pack(NetOutgoingMessage message);
         public abstract void Unpack(byte[] array);
     }
 
-    public partial class Packets
+    internal partial class Packets
     {
 
-        public class ChatMessage : Packet
+        internal class ChatMessage : Packet
         {
             public string Username { get; set; }
 
@@ -199,242 +199,9 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-        /*
-        #region ===== NATIVECALL =====
-        public class NativeCall : Packet
-        {
-            public ulong Hash { get; set; }
-
-            public List<object> Args { get; set; }
-
-            public override void Pack(NetOutgoingMessage message)
-            {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.NativeCall);
-
-                List<byte> byteArray = new List<byte>();
-
-                // Write Hash
-                byteArray.AddRange(BitConverter.GetBytes(Hash));
-
-                // Write Args
-                byteArray.AddRange(BitConverter.GetBytes(Args.Count));
-                Args.ForEach(x =>
-                {
-                    Type type = x.GetType();
-
-                    if (type == typeof(int))
-                    {
-                        byteArray.Add(0x00);
-                        byteArray.AddRange(BitConverter.GetBytes((int)x));
-                    }
-                    else if (type == typeof(bool))
-                    {
-                        byteArray.Add(0x01);
-                        byteArray.AddRange(BitConverter.GetBytes((bool)x));
-                    }
-                    else if (type == typeof(float))
-                    {
-                        byteArray.Add(0x02);
-                        byteArray.AddRange(BitConverter.GetBytes((float)x));
-                    }
-                    else if (type == typeof(string))
-                    {
-                        byteArray.Add(0x03);
-                        byte[] stringBytes = Encoding.UTF8.GetBytes((string)x);
-                        byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
-                        byteArray.AddRange(stringBytes);
-                    }
-                    else if (type == typeof(Vector3))
-                    {
-                        byteArray.Add(0x04);
-                        Vector3 vector = (Vector3)x;
-                        byteArray.AddRange(BitConverter.GetBytes(vector.X));
-                        byteArray.AddRange(BitConverter.GetBytes(vector.Y));
-                        byteArray.AddRange(BitConverter.GetBytes(vector.Z));
-                    }
-                });
-
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
-            }
-
-            public override void Unpack(byte[] array)
-            {
-                #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-
-                // Read Hash
-                Hash = reader.ReadULong();
-
-                // Read Args
-                Args = new List<object>();
-                int argsLength = reader.ReadInt();
-                for (int i = 0; i < argsLength; i++)
-                {
-                    byte argType = reader.ReadByte();
-                    switch (argType)
-                    {
-                        case 0x00:
-                            Args.Add(reader.ReadInt());
-                            break;
-                        case 0x01:
-                            Args.Add(reader.ReadBool());
-                            break;
-                        case 0x02:
-                            Args.Add(reader.ReadFloat());
-                            break;
-                        case 0x03:
-                            int stringLength = reader.ReadInt();
-                            Args.Add(reader.ReadString(stringLength));
-                            break;
-                        case 0x04:
-                            Args.Add(new Vector3()
-                            {
-                                X = reader.ReadFloat(),
-                                Y = reader.ReadFloat(),
-                                Z = reader.ReadFloat()
-                            });
-                            break;
-                    }
-                }
-                #endregion
-            }
-        }
-
-        public class NativeResponse : Packet
-        {
-            public ulong Hash { get; set; }
-
-            public List<object> Args { get; set; }
-
-            public byte? ResultType { get; set; }
-
-            public long ID { get; set; }
-
-            public override void Pack(NetOutgoingMessage message)
-            {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketTypes.NativeResponse);
-
-                List<byte> byteArray = new List<byte>();
-
-                // Write Hash
-                byteArray.AddRange(BitConverter.GetBytes(Hash));
-
-                Type type;
-
-                // Write Args
-                byteArray.AddRange(BitConverter.GetBytes(Args.Count));
-                Args.ForEach(x =>
-                {
-                    type = x.GetType();
-
-                    if (type == typeof(int))
-                    {
-                        byteArray.Add(0x00);
-                        byteArray.AddRange(BitConverter.GetBytes((int)x));
-                    }
-                    else if (type == typeof(bool))
-                    {
-                        byteArray.Add(0x01);
-                        byteArray.AddRange(BitConverter.GetBytes((bool)x));
-                    }
-                    else if (type == typeof(float))
-                    {
-                        byteArray.Add(0x02);
-                        byteArray.AddRange(BitConverter.GetBytes((float)x));
-                    }
-                    else if (type == typeof(string))
-                    {
-                        byteArray.Add(0x03);
-                        byte[] stringBytes = Encoding.UTF8.GetBytes((string)x);
-                        byteArray.AddRange(BitConverter.GetBytes(stringBytes.Length));
-                        byteArray.AddRange(stringBytes);
-                    }
-                    else if (type == typeof(Vector3))
-                    {
-                        byteArray.Add(0x04);
-                        Vector3 vector = (Vector3)x;
-                        byteArray.AddRange(BitConverter.GetBytes(vector.X));
-                        byteArray.AddRange(BitConverter.GetBytes(vector.Y));
-                        byteArray.AddRange(BitConverter.GetBytes(vector.Z));
-                    }
-                });
-
-                byteArray.AddRange(BitConverter.GetBytes(ID));
-
-                // Write type of result
-                if (ResultType.HasValue)
-                {
-                    byteArray.Add(ResultType.Value);
-                }
-
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
-            }
-
-            public override void Unpack(byte[] array)
-            {
-                #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-
-                // Read Hash
-                Hash = reader.ReadULong();
-
-                // Read Args
-                Args = new List<object>();
-                int argsLength = reader.ReadInt();
-                for (int i = 0; i < argsLength; i++)
-                {
-                    byte argType = reader.ReadByte();
-                    switch (argType)
-                    {
-                        case 0x00:
-                            Args.Add(reader.ReadInt());
-                            break;
-                        case 0x01:
-                            Args.Add(reader.ReadBool());
-                            break;
-                        case 0x02:
-                            Args.Add(reader.ReadFloat());
-                            break;
-                        case 0x03:
-                            int stringLength = reader.ReadInt();
-                            Args.Add(reader.ReadString(stringLength));
-                            break;
-                        case 0x04:
-                            Args.Add(new Vector3()
-                            {
-                                X = reader.ReadFloat(),
-                                Y = reader.ReadFloat(),
-                                Z = reader.ReadFloat()
-                            });
-                            break;
-                    }
-                }
-
-                ID = reader.ReadLong();
-
-                // Read type of result
-                if (reader.CanRead(1))
-                {
-                    ResultType = reader.ReadByte();
-                }
-                #endregion
-            }
-        }
-        #endregion // ===== NATIVECALL =====
-        */
     }
 
-    public static class CoopSerializer
+    internal static class CoopSerializer
     {
         /// <summary>
         /// ?

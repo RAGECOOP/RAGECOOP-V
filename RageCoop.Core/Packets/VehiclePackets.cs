@@ -8,12 +8,12 @@ using System.Linq;
 
 namespace RageCoop.Core
 {
-    public partial class Packets
+    internal partial class Packets
     {
         /// <summary>
         /// Non-critical stuff, such as damage model, landing gear, health, etc..
         /// </summary>
-        public class VehicleStateSync : Packet
+        internal class VehicleStateSync : Packet
         {
             public int ID { get; set; }
 

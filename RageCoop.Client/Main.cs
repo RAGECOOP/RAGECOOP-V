@@ -90,8 +90,10 @@ namespace RageCoop.Client
         
 #if DEBUG
         private ulong _lastDebugData;
-        private int _debugBytesSend;
+        private int _debugBytesSent;
         private int _debugBytesReceived;
+        private int _lastBytesSent;
+        public int _lastBytesReceived;
 #endif
         private void OnTick(object sender, EventArgs e)
         {
@@ -139,14 +141,16 @@ namespace RageCoop.Client
                 {
                     _lastDebugData = time;
 
-                    _debugBytesReceived = Networking.Client.Statistics.ReceivedBytes;
-                    _debugBytesSend = Networking.Client.Statistics.SentBytes;
-                    Networking.Client.Statistics.Reset();
+                    _debugBytesReceived = Networking.Client.Statistics.ReceivedBytes-_lastBytesReceived;
+                    _lastBytesReceived=Networking.Client.Statistics.ReceivedBytes;
+
+                    _debugBytesSent = Networking.Client.Statistics.SentBytes-_lastBytesSent;
+                    _lastBytesSent=Networking.Client.Statistics.SentBytes;
                 }
 
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesSend)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesSent)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 

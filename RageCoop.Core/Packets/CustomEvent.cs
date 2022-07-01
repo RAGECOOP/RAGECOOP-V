@@ -4,10 +4,10 @@ using System.Text;
 using Lidgren.Network;
 namespace RageCoop.Core
 {
-    public partial class Packets
+    internal partial class Packets
     {
 
-        public class CustomEvent : Packet
+        internal class CustomEvent : Packet
         {
             public int Hash { get; set; }
             public List<object> Args { get; set; }

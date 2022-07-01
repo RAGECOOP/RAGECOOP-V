@@ -46,7 +46,7 @@ namespace RageCoop.Client
         }
         #endregion
         #region PLAYER -- ONLY
-        public string Username = "N/A";
+        internal string Username = "N/A";
         internal Blip PedBlip = null;
         internal bool DisplayBlip { get; set; } = true;
         internal bool DisplayNameTag { get; set; } = true;
@@ -73,7 +73,7 @@ namespace RageCoop.Client
             get;set;
         }
         private byte[] _lastClothes = null;
-        public byte[] Clothes { get; set; }
+        internal byte[] Clothes { get; set; }
 
         internal float Heading { get; set; }
         internal Vector3 RotationVelocity { get; set; }

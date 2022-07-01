@@ -6,7 +6,7 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    public enum FileResponse:byte
+    internal enum FileResponse:byte
     {
         NeedToDownload=0,
         AlreadyExists=1,
@@ -14,9 +14,9 @@ namespace RageCoop.Core
         Loaded=3,
         LoadFailed=4,
     }
-    public partial class Packets
+    internal partial class Packets
     {
-        public class FileTransferRequest : Packet
+        internal class FileTransferRequest : Packet
         {
             public int ID { get; set; }
 
@@ -63,7 +63,7 @@ namespace RageCoop.Core
             }
         }
 
-        public class FileTransferResponse : Packet
+        internal class FileTransferResponse : Packet
         {
             public int ID { get; set; }
             public FileResponse Response { get; set; }
@@ -93,7 +93,7 @@ namespace RageCoop.Core
             }
         }
 
-        public class FileTransferChunk : Packet
+        internal class FileTransferChunk : Packet
         {
             public int ID { get; set; }
 
@@ -132,7 +132,7 @@ namespace RageCoop.Core
             }
         }
 
-        public class FileTransferComplete : Packet
+        internal class FileTransferComplete : Packet
         {
             public int ID { get; set; }
 
@@ -162,7 +162,7 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-        public class AllResourcesSent : Packet
+        internal class AllResourcesSent : Packet
         {
 
             public override void Pack(NetOutgoingMessage message)

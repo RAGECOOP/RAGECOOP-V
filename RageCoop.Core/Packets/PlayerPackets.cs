@@ -6,9 +6,9 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    public partial class Packets
+    internal partial class Packets
     {
-        public class Handshake : Packet
+        internal class Handshake : Packet
         {
             public int PedID { get; set; }
 

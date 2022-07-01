@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
 using GTA;
 using GTA.Native;

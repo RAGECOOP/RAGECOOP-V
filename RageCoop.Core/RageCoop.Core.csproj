@@ -8,6 +8,7 @@
     <Version>0.1</Version>
     <DebugType>embedded</DebugType>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
@@ -19,7 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Lidgren.Network\Lidgren.Network.csproj" />
+    <Compile Remove="Lidgren.Network\**" />
+    <EmbeddedResource Remove="Lidgren.Network\**" />
+    <None Remove="Lidgren.Network\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +31,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>

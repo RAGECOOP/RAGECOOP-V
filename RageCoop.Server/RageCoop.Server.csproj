@@ -47,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
+    </Reference>
     <Reference Include="McMaster.NETCore.Plugins">
       <HintPath>..\libs\McMaster.NETCore.Plugins.dll</HintPath>
     </Reference>

@@ -51,7 +51,7 @@ namespace RageCoop.Client
         public int Texture { get; set; }
     }
 
-    public static class MapLoader
+    internal static class MapLoader
     {
         // string = file name
         private static readonly Dictionary<string, CoopMap> _maps = new Dictionary<string, CoopMap>();

@@ -7,7 +7,9 @@ using System.Threading;
 
 namespace RageCoop.Core
 {
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class Logger : IDisposable
     {
 
@@ -15,8 +17,17 @@ namespace RageCoop.Core
         /// 0:Trace, 1:Debug, 2:Info, 3:Warning, 4:Error
         /// </summary>
         public int LogLevel = 0;
+        /// <summary>
+        /// Name of this logger
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Path to log file.
+        /// </summary>
         public string LogPath;
+        /// <summary>
+        /// Whether to flush messages to console instead of log file
+        /// </summary>
         public bool UseConsole = false;
         private StreamWriter logWriter;
 
@@ -25,7 +36,7 @@ namespace RageCoop.Core
         private bool Stopping = false;
         private bool FlushImmediately;
 
-        public Logger(bool flushImmediately = false, bool overwrite = true)
+        internal Logger(bool flushImmediately = false, bool overwrite = true)
         {
             FlushImmediately = flushImmediately;
             if (File.Exists(LogPath)&&overwrite) { File.Delete(LogPath); }
@@ -52,7 +63,10 @@ namespace RageCoop.Core
                 LoggerThread.Start();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void Info(string message)
         {
             if (LogLevel>2) { return; }
@@ -67,7 +81,10 @@ namespace RageCoop.Core
                 Flush();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void Warning(string message)
         {
             if (LogLevel>3) { return; }
@@ -83,7 +100,10 @@ namespace RageCoop.Core
                 Flush();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void Error(string message)
         {
             if (LogLevel>4) { return; }
@@ -98,6 +118,10 @@ namespace RageCoop.Core
                 Flush();
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ex"></param>
         public void Error(Exception ex)
         {
             if (LogLevel>4) { return; }
@@ -113,7 +137,10 @@ namespace RageCoop.Core
                 Flush();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void Debug(string message)
         {
 
@@ -129,7 +156,10 @@ namespace RageCoop.Core
                 Flush();
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
         public void Trace(string message)
         {
             if (LogLevel>0) { return; }
@@ -149,6 +179,9 @@ namespace RageCoop.Core
         {
             return DateTime.Now.ToString();
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public void Flush()
         {
             lock (Buffer)
@@ -175,6 +208,9 @@ namespace RageCoop.Core
 
             }
         }
+        /// <summary>
+        /// Stop backdround thread and flush all pending messages.
+        /// </summary>
         public void Dispose()
         {
             Stopping=true;

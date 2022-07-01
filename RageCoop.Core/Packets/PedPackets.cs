@@ -6,13 +6,13 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    public partial class Packets
+    internal partial class Packets
     {
 
         /// <summary>
         /// For non-critical properties, synced every 20 frames.
         /// </summary>
-        public class PedStateSync : Packet
+        internal class PedStateSync : Packet
         {
             public int ID { get; set; }
 
@@ -103,7 +103,7 @@ namespace RageCoop.Core
         }
 
 
-        public class PedSync : Packet
+        internal class PedSync : Packet
         {
             public int ID { get; set; }
             public PedDataFlags Flag { get; set; }

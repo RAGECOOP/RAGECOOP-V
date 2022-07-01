@@ -5,7 +5,7 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    public class BitReader
+    internal class BitReader
     {
         public int CurrentIndex { get; set; }
 

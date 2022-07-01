@@ -8,6 +8,9 @@ using GTA.Math;
 
 namespace RageCoop.Client
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public abstract class SyncedEntity
     {
         
@@ -21,9 +24,17 @@ namespace RageCoop.Client
                 return OwnerID==Main.LocalPlayerID;
             }
         }
-
+        /// <summary>
+        /// Network ID for this entity
+        /// </summary>
         public int ID { get;internal set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public int OwnerID { get; internal set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsOutOfSync
         {
             get

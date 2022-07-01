@@ -6,10 +6,10 @@ using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    public partial class Packets
+    internal partial class Packets
     {
 
-        public class LeaveVehicle : Packet
+        internal class LeaveVehicle : Packet
         {
             public int ID { get; set; }
 

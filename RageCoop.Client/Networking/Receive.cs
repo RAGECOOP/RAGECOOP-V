@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Lidgren.Network;
 using RageCoop.Core;
 using GTA;
 using RageCoop.Client.Menus;
 using System.Threading;
-using GTA.Math;
-using GTA.Native;
-using System.Net;
 
 namespace RageCoop.Client
 {
