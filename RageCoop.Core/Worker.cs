@@ -76,7 +76,7 @@ namespace RageCoop.Core
             }
         }
         /// <summary>
-        /// Finish current job and stopvthe worker.
+        /// Finish current job and stop the worker.
         /// </summary>
         public void Dispose()
         {

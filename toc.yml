@@ -1,0 +1,6 @@
+- name: Getting started
+  href: index.md
+- name: About
+  href: README.md
+- name: API Documentation
+  href: api/RageCoop.Client.html

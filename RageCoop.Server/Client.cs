@@ -81,6 +81,10 @@ namespace RageCoop.Server
         {
             Server=server;
         }
+        /// <summary>
+        /// Th client's IP address and port.
+        /// </summary>
+        public System.Net.IPEndPoint EndPoint { get { return Connection.RemoteEndPoint; } }
         internal long NetID = 0;
         internal NetConnection Connection { get;set; }
         /// <summary>

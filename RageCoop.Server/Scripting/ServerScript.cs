@@ -53,7 +53,11 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public short ArgsLength { get; set; }
 
-        internal Command(string name)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name">Name of the command</param>
+        public Command(string name)
         {
             Name = name;
         }

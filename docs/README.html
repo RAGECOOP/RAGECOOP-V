@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#127760; RAGECOOP | RageCoop resource documentation </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#127760; RAGECOOP | RageCoop resource documentation ">
+    <meta name="generator" content="docfx 2.59.2.0">
+    
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    <meta property="docfx:rel" content="">
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="index.html">
+                <img id="logo" class="svg" src="logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div class="container body-content">
+        
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first="First" data-prev="Previous" data-next="Next" data-last="Last"></ul>
+        </div>
+      </div>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="-ragecoop">🌐 RAGECOOP</h1>
+
+<p><a href="https://github.com/RAGECOOP/RAGECOOP-V/graphs/contributors"><img src="https://img.shields.io/github/contributors/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge" alt="Contributors"></a>
+<a href="https://github.com/RAGECOOP/RAGECOOP-V/network/members"><img src="https://img.shields.io/github/forks/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge" alt="Forks"></a>
+<a href="https://github.com/RAGECOOP/RAGECOOP-V/stargazers"><img src="https://img.shields.io/github/stars/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge" alt="Stargazers"></a>
+<a href="https://github.com/RAGECOOP/RAGECOOP-V/issues"><img src="https://img.shields.io/github/issues/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge" alt="Issues"></a></p>
+<h1 id="-notice">⚠ Notice</h1>
+<p>The original author of this project is <a href="https://github.com/EntenKoeniq">EntenKoeniq</a>.
+The project has been reworked and is currently maintained by <a href="https://github.com/Sardelka9515">Sardelka9515</a>.
+To download the legacy versions, go to <a href="https://github.com/RAGECOOP/RAGECOOP-V.OLD">this repository</a></p>
+<h1 id="-thats-it">🧠 That's it</h1>
+<p>RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP or just drive around with your buddy.</p>
+<p><em>Old name: GTACOOP:R</em></p>
+<h1 id="-requirements">📋 Requirements</h1>
+<ul>
+<li>Visual Studio 2022</li>
+<li>.NET 6.0</li>
+<li>.NET Framework 4.8</li>
+</ul>
+<h1 id="-libraries">📚 Libraries</h1>
+<ul>
+<li><a href="https://github.com/crosire/scripthookvdotnet/releases/tag/v3.4.0">ScriptHookVDotNet3</a></li>
+<li><a href="https://github.com/justalemon/LemonUI/releases/tag/v1.6">LemonUI.SHVDN3</a></li>
+<li>Lidgren Network Custom (<em><strong>PRIVATE</strong></em>)</li>
+<li>
+<ul>
+<li>No new features (only improvements)</li>
+</ul>
+</li>
+<li><a href="https://www.nuget.org/packages/Newtonsoft.Json/13.0.1">Newtonsoft.Json</a></li>
+<li><a href="https://github.com/microsoft/ClearScript">ClearScript</a></li>
+<li><a href="https://github.com/icsharpcode/SharpZipLib">SharpZipLib</a></li>
+<li><a href="https://github.com/natemcmaster/DotNetCorePlugins">DotNetCorePlugins</a></li>
+</ul>
+<h1 id="features">Features</h1>
+<ol>
+<li>Synchronized bullets</li>
+<li>Synchronized vehicle/player/NPC</li>
+<li>Synchronized projectiles</li>
+<li>Simple ragdoll sync</li>
+<li>Smoother vehicle/ped movement.</li>
+<li>Ownership based sync logic, carjacking is now working (sort of).</li>
+<li>Introduced SyncEvents.</li>
+<li>Code refactoring and namespace cleanup</li>
+<li>Synchronized vehicle doors, brake and throttle.</li>
+<li>Weaponized vehicle sync(WIP).</li>
+<li>Other improvements</li>
+</ol>
+<h1 id="known-issues">Known issues</h1>
+<ol>
+<li>Weapon sounds are missing.</li>
+<li>Cover sync is still buggy.</li>
+<li>Framerate drop with high number of synchronized entities.</li>
+<li>Scripting API is screwed.(will be rewritten in the future)</li>
+</ol>
+<h2 id="installation">Installation</h2>
+<p>Refer to the <a href="https://github.com/RAGECOOP/RAGECOOP-V/wiki">wiki</a></p>
+<h1 id="downloads">Downloads</h1>
+<p>Download latest release <a href="https://github.com/RAGECOOP/RAGECOOP-V/releases/latest">here</a></p>
+<p>You can also download nightly builds <a href="https://github.com/RAGECOOP/RAGECOOP-V/releases/nightly">here</a>, which includes latest features and bug-fixes, but has not been thoroughly tested.</p>
+<p>Please note that this is incompatible with all previous versions of ragecoop, remove old files before installing.</p>
+<h1 id="support-us">Support us</h1>
+<p><a href="https://patreon.com/Sardelka"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3DSardelka%26type%3Dpatrons&style=for-the-badge"></a></p>
+<h1 id="-special-thanks-to">🦆 Special thanks to</h1>
+<ul>
+<li><a href="https://github.com/Makinolo">Makinolo</a>, <a href="https://github.com/oldnapalm">oldnapalm</a></li>
+<li>
+<ul>
+<li>For testing, ideas, contributions and the first modification with the API</li>
+</ul>
+</li>
+<li><a href="https://github.com/crosire">crosire</a></li>
+<li>
+<ul>
+<li>For the extensive work in ScriptHookVDotNet</li>
+</ul>
+</li>
+<li><a href="https://github.com/justalemon">justalemon</a></li>
+<li>
+<ul>
+<li>For the extensive work in LemonUI</li>
+</ul>
+</li>
+</ul>
+<h1 id="-license">📝 License</h1>
+<p>This project is licensed under <a href="https://github.com/RAGECOOP/RAGECOOP-V/blob/main/LICENSE">MIT license</a></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
