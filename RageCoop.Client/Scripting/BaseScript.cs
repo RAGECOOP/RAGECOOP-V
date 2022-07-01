@@ -11,7 +11,9 @@ namespace RageCoop.Client.Scripting
         {
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
-            
+            API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
+            API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+
         }
 
         public override void OnStop()

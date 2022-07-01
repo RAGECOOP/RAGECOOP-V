@@ -12,13 +12,21 @@ namespace RageCoop.Server.Scripting
         public override void OnStart()
         {
             API.RegisterCustomEventHandler(CustomEvents.NativeResponse, NativeResponse);
+            API.RegisterCustomEventHandler(CustomEvents.OnVehicleDeleted, (e) =>
+            {
+                API.Entities.RemoveVehicle((int)e.Args[0]);
+            });
+            API.RegisterCustomEventHandler(CustomEvents.OnPedDeleted, (e) =>
+            {
+                API.Entities.RemovePed((int)e.Args[0]);
+            });
         }
         public override void OnStop()
         {
         }
         public void SetAutoRespawn(Client c,bool toggle)
         {
-            c.SendCustomEvent(CustomEvents.SetAutoRespawn, new() { toggle });
+            c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle );
         }
         void NativeResponse(CustomEventReceivedArgs e)
         {

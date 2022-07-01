@@ -2,38 +2,12 @@
 using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
-using GTA.Math;
+using System.Linq;
 using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
 
 namespace RageCoop.Server
 {
-    /// <summary>
-    /// Represents a ped from a client
-    /// </summary>
-    public class ServerPed
-    {
-        /// <summary>
-        /// The <see cref="Client"/> that is responsible synchronizing for this ped.
-        /// </summary>
-        public Client Owner { get; internal set; }
-        /// <summary>
-        /// The ped's ID (not handle!).
-        /// </summary>
-        public int ID { get;internal set; }
-        /// <summary>
-        /// The ID of the ped's last vehicle.
-        /// </summary>
-        public int VehicleID { get; internal set; }
-        /// <summary>
-        /// Position of this ped
-        /// </summary>
-        public Vector3 Position { get; internal set; }
-        /// <summary>
-        /// Health
-        /// </summary>
-        public int Health { get; internal set; }
-    }
     /// <summary>
     /// 
     /// </summary>
@@ -84,7 +58,7 @@ namespace RageCoop.Server
         /// <summary>
         /// Th client's IP address and port.
         /// </summary>
-        public System.Net.IPEndPoint EndPoint { get { return Connection.RemoteEndPoint; } }
+        public System.Net.IPEndPoint EndPoint { get { return Connection?.RemoteEndPoint; } }
         internal long NetID = 0;
         internal NetConnection Connection { get;set; }
         /// <summary>
@@ -260,6 +234,31 @@ namespace RageCoop.Server
                 Server.Logger?.Error(ex);
             }
         }
+        public void SendCustomEvent(int hash,params object[] args)
+        {
+            if (!IsReady)
+            {
+                Server.Logger?.Warning($"Player \"{Username}\" is not ready!");
+            }
+
+            try
+            {
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                new Packets.CustomEvent()
+                {
+                    Hash=hash,
+                    Args=new(args)
+                }.Pack(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
+
+            }
+            catch (Exception ex)
+            {
+                Server.Logger?.Error(ex);
+            }
+        }
+
         #endregion
     }
 }

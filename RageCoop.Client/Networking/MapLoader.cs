@@ -14,7 +14,7 @@ namespace RageCoop.Client
     /// 
     /// </summary>
     [XmlRoot(ElementName = "Map")]
-    public class CoopMap
+    public class Map
     {
         /// <summary>
         /// 
@@ -54,7 +54,7 @@ namespace RageCoop.Client
     internal static class MapLoader
     {
         // string = file name
-        private static readonly Dictionary<string, CoopMap> _maps = new Dictionary<string, CoopMap>();
+        private static readonly Dictionary<string, Map> _maps = new Dictionary<string, Map>();
         private static readonly List<int> _createdObjects = new List<int>();
 
         public static void LoadAll()
@@ -84,14 +84,14 @@ namespace RageCoop.Client
                     string filePath = files[i];
                     string fileName = Path.GetFileName(filePath);
 
-                    XmlSerializer serializer = new XmlSerializer(typeof(CoopMap));
-                    CoopMap map;
+                    XmlSerializer serializer = new XmlSerializer(typeof(Map));
+                    Map map;
 
                     using (var stream = new FileStream(filePath, FileMode.Open))
                     {
                         try
                         {
-                            map = (CoopMap)serializer.Deserialize(stream);
+                            map = (Map)serializer.Deserialize(stream);
                         }
                         catch (Exception ex)
                         {
@@ -117,7 +117,7 @@ namespace RageCoop.Client
                     return;
                 }
         
-                CoopMap map = _maps[name];
+                Map map = _maps[name];
         
                 foreach (CoopProp prop in map.Props)
                 {

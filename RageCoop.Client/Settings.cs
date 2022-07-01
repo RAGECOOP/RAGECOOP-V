@@ -63,5 +63,9 @@ namespace RageCoop.Client
         /// The game won't spawn more NPC traffic if the limit is exceeded. -1 for unlimited (not recommended).
         /// </summary>
         public int WorldPedSoftLimit { get; set; } = 50;
+        /// <summary>
+        /// The directory where resources downloaded from server will be placed.
+        /// </summary>
+        public string ResourceDirectory { get; set; } = "RageCoop\\Resources";
     }
 }

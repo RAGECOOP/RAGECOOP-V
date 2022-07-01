@@ -52,7 +52,7 @@ namespace RageCoop.Client
                 }
             });
         }
-        static string downloadFolder = $"RageCoop\\Resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
+        static string downloadFolder = Path.Combine(Main.Settings.ResourceDirectory, Main.Settings.LastServerAddress.Replace(":", "."));
 
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
         public static bool AddFile(int id, string name, long length)

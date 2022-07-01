@@ -5,6 +5,7 @@ using GTA.Native;
 using RageCoop.Core;
 using System.Collections.Generic;
 using System.Linq;
+using RageCoop.Client.Scripting;
 using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -138,6 +139,10 @@ namespace RageCoop.Client
             {
                 Handle_Peds.Add(c.MainPed.Handle, c);
             }
+            if (c.IsMine)
+            {
+                API.Events.InvokePedSpawned(c);
+            }
         }
         public static void RemovePed(int id,string reason="Cleanup")
         {
@@ -160,6 +165,10 @@ namespace RageCoop.Client
                 c.PedBlip?.Delete();
                 c.ParachuteProp?.Delete();
                 ID_Peds.Remove(id);
+                if (c.IsMine)
+                {
+                    API.Events.InvokePedDeleted(c);
+                }
             }
         }
         #endregion
@@ -196,6 +205,10 @@ namespace RageCoop.Client
             {
                 Handle_Vehicles.Add(v.MainVehicle.Handle, v);
             }
+            if (v.IsMine)
+            {
+                API.Events.InvokeVehicleSpawned(v);
+            }
         }
         public static void RemoveVehicle(int id,string reason = "Cleanup")
         {
@@ -215,6 +228,7 @@ namespace RageCoop.Client
                     veh.Delete();
                 }
                 ID_Vehicles.Remove(id);
+                if (v.IsMine) { API.Events.InvokeVehicleDeleted(v); }
             }
         }
 

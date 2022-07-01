@@ -217,7 +217,7 @@ namespace RageCoop.Client.Scripting
             get { return Main.CurrentVersion; }
         }
         /// <summary>
-        /// Send an event and data to the specified clients.
+        /// Send an event and data to the server.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event</param>
         /// <param name="args">The objects conataing your data, supported types: 
@@ -227,6 +227,20 @@ namespace RageCoop.Client.Scripting
             var p = new Packets.CustomEvent()
             {
                 Args=args,
+                Hash=eventHash
+            };
+            Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
+        }
+        /// <summary>
+        /// Send an event and data to the server.
+        /// </summary>
+        /// <param name="eventHash"></param>
+        /// <param name="args"></param>
+        public static void SendCustomEvent(int eventHash,params object[] args)
+        {
+            var p = new Packets.CustomEvent()
+            {
+                Args=new List<object>(args),
                 Hash=eventHash
             };
             Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);

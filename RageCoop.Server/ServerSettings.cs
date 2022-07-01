@@ -27,18 +27,18 @@
         public string WelcomeMessage { get; set; } = "Welcome on this server :)";
         // public bool HolePunch { get; set; } = true;
         /// <summary>
-        /// Whether or not to announce this server so that it'll appear on server list.
+        /// Whether or not to announce this server so it'll appear on server list.
         /// </summary>
         public bool AnnounceSelf { get; set; } = false;
         /// <summary>
-        /// Master server address, mostly doesn't to be changed.
+        /// Master server address, mostly doesn't need to be changed.
         /// </summary>
         public string MasterServer { get; set; } = "[AUTO]";
 
         /// <summary>
         /// See <see cref="Core.Logger.LogLevel"/>.
         /// </summary>
-        public int LogLevel=2;
+        public int LogLevel { get; set; }=2;
         /// <summary>
         /// NPC data won't be sent to a player if their distance is greater than this value. -1 for unlimited.
         /// </summary>

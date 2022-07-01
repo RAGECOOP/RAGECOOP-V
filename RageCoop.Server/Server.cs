@@ -36,6 +36,7 @@ namespace RageCoop.Server
         internal BaseScript BaseScript { get; set; }=new BaseScript();
         internal readonly ServerSettings Settings;
         internal NetServer MainNetServer;
+        internal ServerEntities Entities;
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> Clients = new();
@@ -67,6 +68,7 @@ namespace RageCoop.Server
             API=new API(this);
             Resources=new Resources(this);
             Security=new Security(Logger);
+            Entities=new ServerEntities(this);
             
         }
         /// <summary>
@@ -670,6 +672,7 @@ namespace RageCoop.Server
                 }.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
             }
+            Entities.CleanUp(localClient);
             _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
             Clients.Remove(localClient.NetID);
@@ -693,14 +696,8 @@ namespace RageCoop.Server
         }
         private void VehicleStateSync(Packets.VehicleStateSync packet, Client client)
         {
-            // Save the new data
-            _worker.QueueJob(() =>
-            {
-                if (packet.Passengers.ContainsValue(client.Player.ID))
-                {
-                    client.Player.VehicleID = packet.ID;
-                }
-            });
+            _worker.QueueJob(() => Entities.Update(packet, client));
+
 
             foreach (var c in Clients.Values)
             {
@@ -712,12 +709,11 @@ namespace RageCoop.Server
         }
         private void PedSync(Packets.PedSync packet, Client client)
         {
+            _worker.QueueJob(() => Entities.Update(packet, client));
+
             bool isPlayer = packet.ID==client.Player.ID;
             if (isPlayer) 
             { 
-                client.Player.Position=packet.Position;
-                client.Player.Health=packet.Health ;
-                client.Player.Owner=client;
                 _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client)); 
             }
             
@@ -747,7 +743,8 @@ namespace RageCoop.Server
         }
         private void VehicleSync(Packets.VehicleSync packet, Client client)
         {
-            bool isPlayer = packet.ID==client.Player.VehicleID;
+            _worker.QueueJob(() => Entities.Update(packet, client));
+            bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
             foreach (var c in Clients.Values)
             {
                 if (c.NetID==client.NetID) { continue; }

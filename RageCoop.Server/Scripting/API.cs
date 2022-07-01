@@ -144,45 +144,12 @@ namespace RageCoop.Server.Scripting
         /// Server side events
         /// </summary>
         public readonly APIEvents Events;
-        #region FUNCTIONS
-        /*
+
         /// <summary>
-        /// Send a native call (Function.Call) to all players.
-        /// Keys = int, float, bool, string and lvector3
+        /// All synchronized entities on this server.
         /// </summary>
-        /// <param name="hash">The hash (Example: 0x25223CA6B4D20B7F = GET_CLOCK_HOURS)</param>
-        /// <param name="args">The arguments (Example: string = int, object = 5)</param>
-        public void SendNativeCallToAll(GTA.Native.Hash hash, params object[] args)
-        {
-            try
-            {
-                if (Server.MainNetServer.ConnectionsCount == 0)
-                {
-                    return;
-                }
-
-                if (args != null && args.Length == 0)
-                {
-                    Server.Logger?.Error($"[ServerScript->SendNativeCallToAll(ulong hash, params object[] args)]: args is not null!");
-                    return;
-                }
-
-                Packets.NativeCall packet = new()
-                {
-                    Hash = (ulong)hash,
-                    Args = new List<object>(args) ?? new List<object>()
-                };
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Server.MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Native);
-            }
-            catch (Exception e)
-            {
-                Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
-            }
-        }
-        */
+        public ServerEntities Entities { get { return Server.Entities; } }
+        #region FUNCTIONS
         /// <summary>
         /// Get a list of all Clients
         /// </summary>
