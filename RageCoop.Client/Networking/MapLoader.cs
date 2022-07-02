@@ -59,7 +59,7 @@ namespace RageCoop.Client
 
         public static void LoadAll()
         {
-            string downloadFolder = $"RageCoop\\Resources\\{Main.Settings.LastServerAddress.Replace(":", ".")}";
+            string downloadFolder = DownloadManager.DownloadFolder;
 
             if (!Directory.Exists(downloadFolder))
             {

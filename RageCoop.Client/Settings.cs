@@ -64,8 +64,8 @@ namespace RageCoop.Client
         /// </summary>
         public int WorldPedSoftLimit { get; set; } = 50;
         /// <summary>
-        /// The directory where resources downloaded from server will be placed.
+        /// The directory where log and resources downloaded from server will be placed.
         /// </summary>
-        public string ResourceDirectory { get; set; } = "RageCoop\\Resources";
+        public string DataDirectory { get; set; } = "Scripts\\RageCoop\\Data";
     }
 }

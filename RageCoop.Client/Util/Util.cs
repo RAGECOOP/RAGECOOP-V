@@ -89,11 +89,12 @@ namespace RageCoop.Client
 
 
         #endregion
+        public static string SettingsPath= "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
         public static Settings ReadSettings()
         {
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
 
-            string path = $"RageCoop\\RageCoop.Client.Settings.xml";
+            string path = SettingsPath;
             Directory.CreateDirectory(Directory.GetParent(path).FullName);
             Settings settings = null;
 
@@ -123,7 +124,7 @@ namespace RageCoop.Client
         {
             try
             {
-                string path = $"RageCoop\\RageCoop.Client.Settings.xml";
+                string path = SettingsPath ;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
                 using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))

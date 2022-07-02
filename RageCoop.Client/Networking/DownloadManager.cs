@@ -40,7 +40,7 @@ namespace RageCoop.Client
             {
                 try
                 {
-                    Main.Resources.Load(downloadFolder);
+                    Main.Resources.Load(DownloadFolder);
                     return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
                 }
                 catch(Exception ex)
@@ -52,18 +52,21 @@ namespace RageCoop.Client
                 }
             });
         }
-        static string downloadFolder = Path.Combine(Main.Settings.ResourceDirectory, Main.Settings.LastServerAddress.Replace(":", "."));
-
+        public static string DownloadFolder { 
+            get {
+                return Path.Combine(Main.Settings.DataDirectory,"Resources", Main.Settings.LastServerAddress.Replace(":", "."));
+            }
+        } 
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
         public static bool AddFile(int id, string name, long length)
         {
-            Main.Logger.Debug($"Downloading file to {downloadFolder}\\{name} , id:{id}");
-            if (!Directory.Exists(downloadFolder))
+            Main.Logger.Debug($"Downloading file to {DownloadFolder}\\{name} , id:{id}");
+            if (!Directory.Exists(DownloadFolder))
             {
-                Directory.CreateDirectory(downloadFolder);
+                Directory.CreateDirectory(DownloadFolder);
             }
 
-            if (FileAlreadyExists(downloadFolder, name, length))
+            if (FileAlreadyExists(DownloadFolder, name, length))
             {
                 Main.Logger.Debug($"File already exists! canceling download:{name}");
                 return false;
@@ -81,7 +84,7 @@ namespace RageCoop.Client
                     FileID = id,
                     FileName = name,
                     FileLength = length,
-                    Stream = new FileStream($"{downloadFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
+                    Stream = new FileStream($"{DownloadFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
                 });
             }
             return true;

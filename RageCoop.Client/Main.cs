@@ -45,9 +45,10 @@ namespace RageCoop.Client
         public Main()
         {
             Settings = Util.ReadSettings();
+            Directory.CreateDirectory(Settings.DataDirectory);
             Logger=new Logger()
             {
-                LogPath=$"RageCoop\\RageCoop.Client.log",
+                LogPath=$"{Settings.DataDirectory}\\RageCoop.Client.log",
                 UseConsole=false,
 #if DEBUG
                 LogLevel = 0,
