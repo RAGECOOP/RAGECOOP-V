@@ -111,7 +111,7 @@ namespace RageCoop.Client
                 foreach (Ped ped in World.GetAllPeds())
                 {
                     SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
-                    if ((c==null) || (c.IsMine && (ped.Handle!=Game.Player.Character.Handle)&&ped.PopulationType!=EntityPopulationType.Mission))
+                    if ((c==null) || (c.IsLocal && (ped.Handle!=Game.Player.Character.Handle)&&ped.PopulationType!=EntityPopulationType.Mission))
                     {
                         if (ped.Handle==Game.Player.Character.Handle) { continue; }
 
@@ -131,7 +131,7 @@ namespace RageCoop.Client
                         // Don't delete player's vehicle
                         continue;
                     }
-                    if((v== null) || (v.IsMine&&veh.PopulationType!=EntityPopulationType.Mission))
+                    if((v== null) || (v.IsLocal&&veh.PopulationType!=EntityPopulationType.Mission))
                     {
                         Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 

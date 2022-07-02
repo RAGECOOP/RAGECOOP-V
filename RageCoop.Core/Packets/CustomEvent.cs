@@ -49,35 +49,31 @@ namespace RageCoop.Core
                     switch (type)
                     {
                         case 0x01:
-                            Args.Add(reader.ReadByte());
-                            break;
+                            Args.Add(reader.ReadByte()); break;
                         case 0x02:
-                            Args.Add(reader.ReadShort());
-                            break;
+                            Args.Add(reader.ReadShort()); break;
                         case 0x03:
-                            Args.Add(reader.ReadUShort());
-                            break;
+                            Args.Add(reader.ReadUShort()); break;
                         case 0x04:
-                            Args.Add(reader.ReadInt());
-                            break;
+                            Args.Add(reader.ReadInt()); break;
                         case 0x05:
-                            Args.Add(reader.ReadUInt());
-                            break;
+                            Args.Add(reader.ReadUInt()); break;
                         case 0x06:
-                            Args.Add(reader.ReadLong());
-                            break;
+                            Args.Add(reader.ReadLong()); break;
                         case 0x07:
-                            Args.Add(reader.ReadULong());
-                            break;
+                            Args.Add(reader.ReadULong()); break;
                         case 0x08:
-                            Args.Add(reader.ReadFloat());
-                            break;
+                            Args.Add(reader.ReadFloat()); break;
                         case 0x09:
-                            Args.Add(reader.ReadBool());
-                            break;
+                            Args.Add(reader.ReadBool()); break;
                         case 0x10:
-                            Args.Add(reader.ReadString());
-                            break;
+                            Args.Add(reader.ReadString()); break;
+                        case 0x11: 
+                            Args.Add(reader.ReadVector3()); break;
+                        case 0x12:
+                            Args.Add(reader.ReadQuaternion()); break;
+                        case 0x13:
+                            Args.Add((GTA.Model)reader.ReadInt()); break;
                         default:
                             throw new InvalidOperationException($"Unexpected type:{type}\r\n{array.Dump()}");
 

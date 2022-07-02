@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using GTA.Native;
+using GTA.Math;
+using GTA;
+using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System.Linq;
 
 namespace RageCoop.Client.Scripting
 {
@@ -11,6 +15,8 @@ namespace RageCoop.Client.Scripting
         {
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
+            API.RegisterCustomEventHandler(CustomEvents.ServerPropSync, ServerObjectSync);
+            API.RegisterCustomEventHandler(CustomEvents.DeleteServerProp, DeleteServerProp);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
 
@@ -22,6 +28,29 @@ namespace RageCoop.Client.Scripting
         private void SetAutoRespawn(CustomEventReceivedArgs args)
         {
             API.Config.EnableAutoRespawn=(bool)args.Args[0];
+        }
+        private void DeleteServerProp(CustomEventReceivedArgs e)
+        {
+            var id = (int)e.Args[0];
+            if (EntityPool.ServerProps.TryGetValue(id, out var prop))
+            {
+                EntityPool.ServerProps.Remove(id);
+                API.QueueAction(() => { prop?.MainProp?.Delete(); });
+            }
+        }
+        private void ServerObjectSync(CustomEventReceivedArgs e)
+        {
+            SyncedProp prop;
+            var id = (int)e.Args[0];
+            if (!EntityPool.ServerProps.TryGetValue(id,out prop))
+            {
+                EntityPool.ServerProps.Add(id,prop=new SyncedProp(id));
+            }
+            prop.LastSynced=Main.Ticked+1;
+            prop.ModelHash= (Model)e.Args[1];
+            prop.Position=(Vector3)e.Args[2];
+            prop.Rotation=(Vector3)e.Args[3];
+            Main.Logger.Trace($"{Main.Ticked},{(VehicleHash)prop.ModelHash},{prop.Position},{prop.Rotation}");
         }
         private void NativeCall(CustomEventReceivedArgs e)
         {

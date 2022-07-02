@@ -39,7 +39,16 @@ namespace RageCoop.Core
                 case bool _:
                     return (0x09, BitConverter.GetBytes((bool)obj));
                 case string _:
-                    return (0x10, (obj as string).GetBytesWithLength());
+                    return (0x10, ((string)obj).GetBytesWithLength());
+                case Vector3 _:
+                    return (0x11,((Vector3)obj).GetBytes());
+                case Quaternion _:
+                    return (0x12, ((Quaternion)obj).GetBytes());
+                case GTA.Model _:
+                    return (0x13, BitConverter.GetBytes((GTA.Model)obj));
+                case Tuple<byte, byte[]> _:
+                    var tup = (Tuple<byte, byte[]>)obj;
+                    return (tup.Item1, tup.Item2);
                 default:
                     return (0x0, null);
             }
@@ -115,7 +124,21 @@ namespace RageCoop.Core
         {
             return Encoding.UTF8.GetString(data);
         }
-
+        public static byte[] GetBytes(this Vector3 vec)
+        {
+            // 12 bytes
+            return new List<byte[]>() { BitConverter.GetBytes(vec.X), BitConverter.GetBytes(vec.Y), BitConverter.GetBytes(vec.Z) }.Join(4);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="qua"></param>
+        /// <returns>An array of bytes with length 16</returns>
+        public static byte[] GetBytes(this Quaternion qua)
+        {
+            // 16 bytes
+            return new List<byte[]>() { BitConverter.GetBytes(qua.X), BitConverter.GetBytes(qua.Y), BitConverter.GetBytes(qua.Z), BitConverter.GetBytes(qua.W) }.Join(4);
+        }
 
         public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
         {
@@ -223,10 +246,10 @@ namespace RageCoop.Core
                 return memoryStream.ToArray();
             }
         }
-        public static byte[] Join(this List<byte[]> arrays)
+        public static byte[] Join(this List<byte[]> arrays,int lengthPerArray=-1)
         {
             if (arrays.Count==1) { return arrays[0]; }
-            var output = new byte[arrays.Sum(arr => arr.Length)];
+            var output = lengthPerArray== -1 ? new byte[arrays.Sum(arr => arr.Length)] : new byte[arrays.Count*lengthPerArray];
             int writeIdx = 0;
             foreach (var byteArr in arrays)
             {

@@ -65,7 +65,6 @@ namespace RageCoop.Client
                     {
                         return;
                     }
-
                     if (!_gameLoaded)
                     {
                         GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);

@@ -149,6 +149,7 @@ namespace RageCoop.Client.Scripting
 				}
 			}
 			LoadedResources.Add(r);
+			file.Close();
 		}
 		private bool LoadScriptsFromAssembly(ResourceFile file, string path, ClientResource resource, bool shadowCopy = true)
 		{

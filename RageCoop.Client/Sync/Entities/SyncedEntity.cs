@@ -13,17 +13,18 @@ namespace RageCoop.Client
     /// </summary>
     public abstract class SyncedEntity
     {
-        
+
         /// <summary>
         /// Indicates whether the current player is responsible for syncing this entity.
         /// </summary>
-        public bool IsMine
+        public bool IsLocal
         {
             get
             {
                 return OwnerID==Main.LocalPlayerID;
             }
         }
+
         /// <summary>
         /// Network ID for this entity
         /// </summary>
@@ -39,13 +40,14 @@ namespace RageCoop.Client
         {
             get
             {
-                return Main.Ticked-LastSynced>200;
+                return Main.Ticked-LastSynced>200 && ID!=0;
             }
         }
         internal bool IsReady
         {
-            get {return !(LastSynced==0||LastStateSynced==0);}
+            get {return (LastSynced>0||LastStateSynced==0);}
         }
+        internal bool IsInvincible { get; set; } = false;
         internal bool NeedUpdate
         {
             get { return LastSynced>LastUpdated; }
@@ -65,6 +67,12 @@ namespace RageCoop.Client
         public ulong LastUpdated { get; set; } = 0;
         #endregion
 
+        /// <summary>
+        /// 
+        /// </summary>
+        internal protected bool _lastFrozen=false;
+        internal bool IsFrozen { get; set; } = false;
+        internal int ModelHash { get; set; }
         internal Vector3 Position { get; set; }
         internal Vector3 Rotation { get; set; }
         internal Quaternion Quaternion { get; set; }

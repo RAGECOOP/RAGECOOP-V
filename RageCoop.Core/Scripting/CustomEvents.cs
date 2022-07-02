@@ -19,6 +19,9 @@ namespace RageCoop.Core.Scripting
         internal static readonly int NativeCall = Hash("RageCoop.NativeCall");
         internal static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
         internal static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
+        internal static readonly int ServerPropSync = Hash("RageCoop.ServerPropSync");
+        internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
+
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

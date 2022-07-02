@@ -68,10 +68,6 @@ namespace RageCoop.Client
         private bool _lastRagdoll=false;
         private ulong _lastRagdollTime=0;
         private bool _lastInCover = false;
-        internal int ModelHash
-        {
-            get;set;
-        }
         private byte[] _lastClothes = null;
         internal byte[] Clothes { get; set; }
 
@@ -284,6 +280,7 @@ namespace RageCoop.Client
 
                 MainPed.IsInvincible=true;
             }
+            if (IsInvincible) { MainPed.IsInvincible=true; }
 
             // Add to EntityPool so this Character can be accessed by handle.
             EntityPool.Add(this);
@@ -325,6 +322,11 @@ namespace RageCoop.Client
 
         private void DisplayOnFoot()
         {
+            if (IsFrozen != _lastFrozen)
+            {
+                MainPed.SetFrozen(IsFrozen);
+                _lastFrozen=IsFrozen;
+            }
             if (IsInParachuteFreeFall)
             {
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.Position, Position + Velocity, 0.5f);

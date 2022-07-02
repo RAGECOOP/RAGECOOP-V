@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RageCoop.Core.Scripting;
+using RageCoop.Core;
 
 namespace RageCoop.Server.Scripting
 {
@@ -27,6 +28,13 @@ namespace RageCoop.Server.Scripting
         public void SetAutoRespawn(Client c,bool toggle)
         {
             c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle );
+        }
+        public void SendServerObjectsTo(List<ServerProp> objects,List<Client> clients=null)
+        {
+            foreach(var obj in objects)
+            {
+                API.SendCustomEvent(CustomEvents.ServerPropSync, new() { obj.ID,  obj.Model ,obj.Position,obj.Rotation },clients);
+            }
         }
         void NativeResponse(CustomEventReceivedArgs e)
         {

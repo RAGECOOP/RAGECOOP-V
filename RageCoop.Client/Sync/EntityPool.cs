@@ -37,6 +37,8 @@ namespace RageCoop.Client
         private static Dictionary<int, SyncedProjectile> ID_Projectiles = new Dictionary<int, SyncedProjectile>();
         private static Dictionary<int, SyncedProjectile> Handle_Projectiles = new Dictionary<int, SyncedProjectile>();
 
+        public static object PropsLock=new object();
+        public static Dictionary<int,SyncedProp> ServerProps=new Dictionary<int,SyncedProp>();
 
         public static void Cleanup(bool keepPlayer=true,bool keepMine=true)
         {
@@ -66,6 +68,12 @@ namespace RageCoop.Client
             }
             ID_Projectiles.Clear();
             Handle_Projectiles.Clear();
+
+            foreach(var p in ServerProps.Values)
+            {
+                p?.MainProp?.Delete();
+            }
+            ServerProps.Clear();
         }
 
         #region PEDS
@@ -139,7 +147,7 @@ namespace RageCoop.Client
             {
                 Handle_Peds.Add(c.MainPed.Handle, c);
             }
-            if (c.IsMine)
+            if (c.IsLocal)
             {
                 API.Events.InvokePedSpawned(c);
             }
@@ -165,7 +173,7 @@ namespace RageCoop.Client
                 c.PedBlip?.Delete();
                 c.ParachuteProp?.Delete();
                 ID_Peds.Remove(id);
-                if (c.IsMine)
+                if (c.IsLocal)
                 {
                     API.Events.InvokePedDeleted(c);
                 }
@@ -205,7 +213,7 @@ namespace RageCoop.Client
             {
                 Handle_Vehicles.Add(v.MainVehicle.Handle, v);
             }
-            if (v.IsMine)
+            if (v.IsLocal)
             {
                 API.Events.InvokeVehicleSpawned(v);
             }
@@ -228,7 +236,7 @@ namespace RageCoop.Client
                     veh.Delete();
                 }
                 ID_Vehicles.Remove(id);
-                if (v.IsMine) { API.Events.InvokeVehicleDeleted(v); }
+                if (v.IsLocal) { API.Events.InvokeVehicleDeleted(v); }
             }
         }
 
@@ -417,7 +425,7 @@ namespace RageCoop.Client
                     }
 
                     // Outgoing sync
-                    if (c.IsMine)
+                    if (c.IsLocal)
                     {
 #if BENCHMARK
                         var start = PerfCounter2.ElapsedTicks;
@@ -495,7 +503,7 @@ namespace RageCoop.Client
                     }
 
                     // Outgoing sync
-                    if (v.IsMine)
+                    if (v.IsLocal)
                     {
                         SyncEvents.Check(v);
 
@@ -520,6 +528,14 @@ namespace RageCoop.Client
 
                     }
 
+                }
+
+                lock (PropsLock)
+                {
+                    foreach (var p in ServerProps.Values)
+                    {
+                        p.Update();
+                    }
                 }
 #if BENCHMARK
                 Debug.TimeStamps[TimeStamp.VehicleTotal]=PerfCounter.ElapsedTicks;

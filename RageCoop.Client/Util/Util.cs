@@ -174,6 +174,10 @@ namespace RageCoop.Client
                 Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
             }
         }
+        public static void SetFrozen(this Entity e,bool toggle)
+        {
+            Function.Call(Hash.FREEZE_ENTITY_POSITION, e, toggle);
+        }
 
         public static SyncedPed GetSyncEntity(this Ped p)
         {

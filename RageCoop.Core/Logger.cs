@@ -121,16 +121,35 @@ namespace RageCoop.Core
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="message"></param>
+        /// <param name="error"></param>
+        public void Error(string message, Exception error)
+        {
+            if (LogLevel>4) { return; }
+            lock (Buffer)
+            {
+                string msg = string.Format("[{0}][{2}] [ERR] {1}:{3}", Date(), message, Name,error.Message);
+                Buffer+=msg+"\r\n";
+                Trace(error.ToString());
+
+            }
+            if (FlushImmediately)
+            {
+                Flush();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="ex"></param>
         public void Error(Exception ex)
         {
             if (LogLevel>4) { return; }
             lock (Buffer)
             {
-                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.ToString(), Name);
-                // msg += string.Format("\r\n[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.StackTrace, Process.GetCurrentProcess().Id);
-
+                string msg = string.Format("[{0}][{2}] [ERR] {1}", Date(), "\r\n"+ex.Message, Name);
                 Buffer+=msg+"\r\n";
+                Trace(ex.ToString());
             }
             if (FlushImmediately)
             {

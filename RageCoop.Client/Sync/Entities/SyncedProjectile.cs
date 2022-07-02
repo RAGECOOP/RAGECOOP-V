@@ -37,7 +37,7 @@ namespace RageCoop.Client
                     IsValid=false;
                 }
                 ShooterID=shooter.ID;
-                IsMine=shooter.IsMine;
+                IsMine=shooter.IsLocal;
             }
             
         }

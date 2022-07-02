@@ -89,7 +89,6 @@ namespace RageCoop.Client
         internal VehicleRoofState RoofState { get; set; }
         internal bool SireneActive { get; set; }
         internal VehicleDamageModel DamageModel { get; set; }
-        internal int ModelHash { get; set; }
         internal byte[] Colors { get; set; }
         internal Dictionary<int, int> Mods { get; set; }
         internal bool IsDead { get; set; }
@@ -133,7 +132,12 @@ namespace RageCoop.Client
             {
                 MainVehicle.BrakePower=BrakePower;
             }
-            if (MainVehicle.Position.DistanceTo(Position)<5)
+            if (IsFrozen != _lastFrozen)
+            {
+                MainVehicle.SetFrozen(IsFrozen);
+                _lastFrozen=IsFrozen;
+            }
+            else if (MainVehicle.Position.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
                 if (IsFlipped)
@@ -378,6 +382,7 @@ namespace RageCoop.Client
             {
                 MainVehicle.RoofState=RoofState;
             }
+            if (IsInvincible) { MainVehicle.IsInvincible=true; }
             vehicleModel.MarkAsNoLongerNeeded();
         }
         #region -- PEDALING --

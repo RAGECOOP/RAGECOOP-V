@@ -59,7 +59,7 @@ namespace RageCoop.Client
 
         public static void LoadAll()
         {
-            string downloadFolder = DownloadManager.DownloadFolder;
+            string downloadFolder = DownloadManager.ResourceFolder;
 
             if (!Directory.Exists(downloadFolder))
             {

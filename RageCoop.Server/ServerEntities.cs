@@ -4,12 +4,62 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RageCoop.Core;
+using RageCoop.Core.Scripting;
+using System.Security.Cryptography;
 using GTA.Math;
 using GTA;
 
 namespace RageCoop.Server
 {
+    /// <summary>
+    /// Represents an prop owned by server.
+    /// </summary>
+    public class ServerProp
+    {
+        private Server Server;
+        internal ServerProp(Server server)
+        {
+            Server= server;
+        }
 
+        /// <summary>
+        /// Delete this prop
+        /// </summary>
+        public void Delete()
+        {
+            Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, new() { ID });
+        }
+
+        /// <summary>
+        /// Network ID of this object.
+        /// </summary>
+        public int ID { get; internal set; }
+
+        /// <summary>
+        /// The object's model
+        /// </summary>
+        public Model Model { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets this object's position
+        /// </summary>
+        public Vector3 Position 
+        { 
+            get { return _pos; } 
+            set { _pos=value; Server.BaseScript.SendServerObjectsTo(new() { this }); } 
+        }
+        private Vector3 _pos;
+
+        /// <summary>
+        /// Gets or sets this object's rotation
+        /// </summary>
+        public Vector3 Rotation
+        {
+            get { return _rot; }
+            set { _rot=value; Server.BaseScript.SendServerObjectsTo(new() { this }); }
+        }
+        private Vector3 _rot;
+    }
     /// <summary>
     /// Represents a ped from a client
     /// </summary>
@@ -76,36 +126,6 @@ namespace RageCoop.Server
         /// </summary>
         public Quaternion Quaternion { get; internal set; }
     }
-    
-    /// <summary>
-    /// Represents an object owned by server.
-    /// </summary>
-    public class ServerObject
-    {
-        internal ServerObject()
-        {
-
-        }
-        /// <summary>
-        /// The object's model
-        /// </summary>
-        public Model Model { get; internal set; }
-
-        /// <summary>
-        /// Gets or sets this object's position
-        /// </summary>
-        public Vector3 Position { get;set; }
-        
-        /// <summary>
-        /// Gets or sets this object's quaternion
-        /// </summary>
-        public Quaternion Quaternion { get; set; }
-
-        /// <summary>
-        /// Whether this object is invincible
-        /// </summary>
-        public bool IsInvincible { get; set; }
-    }
 
     /// <summary>
     /// Manipulate entities from the server
@@ -119,8 +139,79 @@ namespace RageCoop.Server
         }
         internal Dictionary<int, ServerPed> Peds { get; set; } = new();
         internal Dictionary<int, ServerVehicle> Vehicles { get; set; } = new();
-        internal Dictionary<int,ServerObject> ServerObjects { get; set; }=new();
+        internal Dictionary<int,ServerProp> ServerProps { get; set; }=new();
         
+        /// <summary>
+        /// Get a <see cref="ServerPed"/> by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ServerPed GetPedByID(int id)
+        {
+            if(Peds.TryGetValue(id,out var ped))
+            {
+                return ped;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get a <see cref="ServerVehicle"/> by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ServerVehicle GetVehicleByID(int id)
+        {
+            if (Vehicles.TryGetValue(id, out var veh))
+            {
+                return veh;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Get a <see cref="ServerProp"/> owned by server from it's ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ServerProp GetPropByID(int id)
+        {
+            if (ServerProps.TryGetValue(id, out var obj))
+            {
+                return obj;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// Create a static prop owned by server.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="pos"></param>
+        /// <param name="rot"></param>
+        /// <returns></returns>
+        public ServerProp CreateProp(Model model,Vector3 pos,Vector3 rot)
+        {
+            int id = RequestID();
+            ServerProp prop;
+            ServerProps.Add(id,prop=new ServerProp(Server)
+            {
+                ID=id,
+                Model=model,
+                Position=pos,
+                Rotation=rot
+            });
+            return prop;
+        }
+
         /// <summary>
         /// Get all peds on this server
         /// </summary>
@@ -143,9 +234,9 @@ namespace RageCoop.Server
         /// Get all static objects owned by server
         /// </summary>
         /// <returns></returns>
-        public ServerObject[] GetAllObjects()
+        public ServerProp[] GetAllObjects()
         {
-            return ServerObjects.Values.ToArray();
+            return ServerProps.Values.ToArray();
         } 
 
         /// <summary>
@@ -212,7 +303,7 @@ namespace RageCoop.Server
                 }
             }
             Server.QueueJob(() =>
-            Server.Logger?.Trace("Remaining entities: "+(Peds.Count+Vehicles.Count)));
+            Server.Logger?.Trace("Remaining entities: "+(Peds.Count+Vehicles.Count+ServerProps.Count)));
         }
         internal void RemoveVehicle(int id)
         {
@@ -235,6 +326,23 @@ namespace RageCoop.Server
             {
                 Peds.Add(ped.ID, ped);
             }
+        }
+        internal int RequestID()
+        {
+            int ID = 0;
+            while ((ID==0)
+                || ServerProps.ContainsKey(ID)
+                || Peds.ContainsKey(ID)
+                || Vehicles.ContainsKey(ID))
+            {
+                byte[] rngBytes = new byte[4];
+
+                RandomNumberGenerator.Create().GetBytes(rngBytes);
+
+                // Convert the bytes into an integer
+                ID = BitConverter.ToInt32(rngBytes, 0);
+            }
+            return ID;
         }
     }
 }

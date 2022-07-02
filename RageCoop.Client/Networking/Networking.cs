@@ -3,6 +3,7 @@ using Lidgren.Network;
 using RageCoop.Core;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO;
 
 namespace RageCoop.Client
 {
@@ -69,27 +70,34 @@ namespace RageCoop.Client
                 EntityPool.AddPlayer();
                 Task.Run(() =>
                 {
-                    Client = new NetClient(config);
-                    Client.Start();
-                    Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
-                    DownloadManager.Cleanup();
-                    Security.Regen();
-                    GetServerPublicKey(address);
-
-                    // Send HandshakePacket
-                    NetOutgoingMessage outgoingMessage = Client.CreateMessage();
-                    var handshake=new Packets.Handshake()
+                    try
                     {
-                        PedID =  Main.LocalPlayerID,
-                        Username =username,
-                        ModVersion = Main.CurrentVersion,
-                        PassHashEncrypted=Security.Encrypt(password.GetHash())
-                    }; 
-                    
-                    Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted,out handshake.AesIVCrypted);
-                    handshake.Pack(outgoingMessage);
-                    Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
-                    
+                        DownloadManager.Cleanup();
+                        Client = new NetClient(config);
+                        Client.Start();
+                        Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
+                        Security.Regen();
+                        GetServerPublicKey(address);
+
+                        // Send HandshakePacket
+                        NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+                        var handshake = new Packets.Handshake()
+                        {
+                            PedID =  Main.LocalPlayerID,
+                            Username =username,
+                            ModVersion = Main.CurrentVersion,
+                            PassHashEncrypted=Security.Encrypt(password.GetHash())
+                        };
+
+                        Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted, out handshake.AesIVCrypted);
+                        handshake.Pack(outgoingMessage);
+                        Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
+
+                    }
+                    catch(Exception ex)
+                    {
+                        Main.Logger.Error("Cannot connect to server", ex);
+                    }
 
                 });
             }

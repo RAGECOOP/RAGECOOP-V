@@ -637,6 +637,10 @@ namespace RageCoop.Server
                 }.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, newClient.Connection, NetDeliveryMethod.ReliableOrdered, 0);
             });
+
+            // Send all props to this player
+            BaseScript.SendServerObjectsTo( new(Entities.ServerProps.Values), new() { newClient});
+            
             // Send new client to all players
             var cons = MainNetServer.Connections.Exclude(newClient.Connection);
             if (cons.Count!=0)

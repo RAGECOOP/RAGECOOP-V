@@ -10,7 +10,6 @@ namespace RageCoop.Client
     {
         static DownloadManager()
         {
-
             Networking.RequestHandlers.Add(PacketType.FileTransferRequest, (data) =>
             {
                 var fr = new Packets.FileTransferRequest();
@@ -40,7 +39,7 @@ namespace RageCoop.Client
             {
                 try
                 {
-                    Main.Resources.Load(DownloadFolder);
+                    Main.Resources.Load(ResourceFolder);
                     return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
                 }
                 catch(Exception ex)
@@ -52,7 +51,7 @@ namespace RageCoop.Client
                 }
             });
         }
-        public static string DownloadFolder { 
+        public static string ResourceFolder { 
             get {
                 return Path.Combine(Main.Settings.DataDirectory,"Resources", Main.Settings.LastServerAddress.Replace(":", "."));
             }
@@ -60,13 +59,13 @@ namespace RageCoop.Client
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
         public static bool AddFile(int id, string name, long length)
         {
-            Main.Logger.Debug($"Downloading file to {DownloadFolder}\\{name} , id:{id}");
-            if (!Directory.Exists(DownloadFolder))
+            Main.Logger.Debug($"Downloading file to {ResourceFolder}\\{name} , id:{id}");
+            if (!Directory.Exists(ResourceFolder))
             {
-                Directory.CreateDirectory(DownloadFolder);
+                Directory.CreateDirectory(ResourceFolder);
             }
 
-            if (FileAlreadyExists(DownloadFolder, name, length))
+            if (FileAlreadyExists(ResourceFolder, name, length))
             {
                 Main.Logger.Debug($"File already exists! canceling download:{name}");
                 return false;
@@ -84,7 +83,7 @@ namespace RageCoop.Client
                     FileID = id,
                     FileName = name,
                     FileLength = length,
-                    Stream = new FileStream($"{DownloadFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
+                    Stream = new FileStream($"{ResourceFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
                 });
             }
             return true;
@@ -158,6 +157,10 @@ namespace RageCoop.Client
                     file.Dispose();
                 }
                 InProgressDownloads.Clear();
+            }
+            foreach (var zip in Directory.GetDirectories(ResourceFolder, "*.zip"))
+            {
+                File.Delete(zip);
             }
 
         }
