@@ -66,6 +66,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // RUINER2
+                case 941494461:
+                    i=BulletsShot%2==0 ? 65 : 66;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // TAMPA3
                 case -1210451983:
                     return new MuzzleInfo(v.Bones[87].Position, v.Bones[87].ForwardVector);

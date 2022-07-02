@@ -174,6 +174,11 @@ namespace RageCoop.Client {
                     weaponHash=1176362416;
                     break;
 
+                // Ruiner2, not working for some reason
+                case 50118905:
+                    weaponHash=1176362416;
+                    break;
+
                 // SAVAGE
                 case 1638077257:
                     weaponHash=(uint)VehicleWeaponHash.PlayerLazer;
