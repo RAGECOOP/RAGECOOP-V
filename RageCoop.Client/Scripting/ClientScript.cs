@@ -22,5 +22,10 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         public ResourceFile CurrentFile { get; internal set; }
 
+        /// <summary>
+        /// Get the <see cref="ClientResource"/> that this script belongs to.
+        /// </summary>
+        public ClientResource CurrentResource { get; internal set; }
+
     }
 }

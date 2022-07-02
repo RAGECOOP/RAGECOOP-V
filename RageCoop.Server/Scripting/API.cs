@@ -14,10 +14,10 @@ namespace RageCoop.Server.Scripting
     /// <summary>
     /// 
     /// </summary>
-    public class APIEvents
+    public class ServerEvents
     {
         private readonly Server Server;
-        internal APIEvents(Server server)
+        internal ServerEvents(Server server)
         {
             Server = server;
         }
@@ -143,12 +143,13 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Server side events
         /// </summary>
-        public readonly APIEvents Events;
+        public readonly ServerEvents Events;
 
         /// <summary>
         /// All synchronized entities on this server.
         /// </summary>
         public ServerEntities Entities { get { return Server.Entities; } }
+
         #region FUNCTIONS
         /// <summary>
         /// Get a list of all Clients
@@ -310,7 +311,7 @@ namespace RageCoop.Server.Scripting
             RegisterCustomEventHandler(CustomEvents.Hash(name), handler);
         }
         /// <summary>
-        /// Get a <see cref="Logger"/> that the server is currently using, you should use <see cref="ServerResource.Logger"/> to display resource-specific information.
+        /// Get a <see cref="Core.Logger"/> that the server is currently using, you should use <see cref="ServerResource.Logger"/> to display resource-specific information.
         /// </summary>
         public Logger Logger { get { return Server.Logger; } }
         #endregion

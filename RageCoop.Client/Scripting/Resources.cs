@@ -202,6 +202,7 @@ namespace RageCoop.Client.Scripting
 							var script = constructor.Invoke(null) as ClientScript;
 							// script.CurrentResource = toload;
 							script.CurrentFile=rfile;
+							script.CurrentResource=toload;
 							toload.Scripts.Add(script);
 							count++;
 						}
@@ -287,46 +288,6 @@ namespace RageCoop.Client.Scripting
 					return true;
 			return false;
 		}
-		/*
-		/// <summary>
-		/// Load a resource from a directory.
-		/// </summary>
-		/// <param name="path">Path of the directory.</param>
-		private void LoadResource(string path, string dataFolderRoot)
-		{
-			var r = new ClientResource()
-			{
-				Scripts = new List<ClientScript>(),
-				Name=Path.GetFileName(path),
-				DataFolder=Path.Combine(dataFolderRoot, Path.GetFileName(path))
-			};
-			Directory.CreateDirectory(r.DataFolder);
-			foreach (var dir in Directory.GetDirectories(path, "*", SearchOption.AllDirectories))
-			{
-				r.Files.Add(dir, new ResourceFile()
-				{
-					IsDirectory=true,
-					Name=dir.Substring(path.Length+1)
-				});
-			}
-			foreach (var file in Directory.GetFiles(path, "*", SearchOption.AllDirectories))
-			{
-				var relativeName = file.Substring(path.Length+1);
-				var rfile = new ResourceFile()
-				{
-					GetStream=() => { return new FileStream(file, FileMode.Open, FileAccess.Read); },
-					IsDirectory=false,
-					Name=relativeName
-				};
-				if (file.EndsWith(".dll"))
-				{
-					LoadScriptsFromAssembly(rfile, file, r);
-				}
-				r.Files.Add(relativeName, rfile);
-			}
-			LoadedResources.Add(r);
-		}
-		*/
 	}
 
 }

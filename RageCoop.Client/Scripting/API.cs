@@ -148,9 +148,12 @@ namespace RageCoop.Client.Scripting
         /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
         /// </summary>
         /// <returns></returns>
-        public static Logger GetLogger()
+        public static Logger Logger
         {
-            return Main.Logger;
+            get
+            {
+                return Main.Logger;
+            }
         }
         /// <summary>
         /// Queue an action to be executed on next tick.

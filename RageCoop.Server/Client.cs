@@ -66,7 +66,7 @@ namespace RageCoop.Server
         /// </summary>
         public ServerPed Player { get; internal set; }
         /// <summary>
-        /// The client's latncy in seconds.
+        /// The client's latency in seconds.
         /// </summary>
         public float Latency { get; internal set; }
         private PlayerConfig _config { get; set; }=new PlayerConfig();

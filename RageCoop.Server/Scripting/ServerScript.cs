@@ -19,12 +19,12 @@ namespace RageCoop.Server.Scripting
         public abstract void OnStop();
 
         /// <summary>
-        /// Get the <see cref="API"/> instance that can be used to control the server.
+        /// Get the <see cref="Scripting.API"/> instance that can be used to control the server.
         /// </summary>
         public API API { get; set; }
 
         /// <summary>
-        /// Get the <see cref="ServerResource"/> object this script belongs to, this property will be initiated before <see cref="OnStart"/> (will be null if you access it in the constructor).
+        /// Get the <see cref="ServerResource"/> this script belongs to, this property won't be initiated before <see cref="OnStart"/>.
         /// </summary>
         public ServerResource CurrentResource { get; internal set; }
         /// <summary>

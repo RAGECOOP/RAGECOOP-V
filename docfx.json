@@ -21,7 +21,6 @@
         "files": [ "*.md", "toc.yml" ]
       }
     ],
-    "overwrite": "specs/*.md",
     "globalMetadata": {
       "_appTitle": "RageCoop resource documentation",
       "_enableSearch": true

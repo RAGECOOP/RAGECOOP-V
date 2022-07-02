@@ -3,4 +3,4 @@
 - name: About
   href: README.md
 - name: API Documentation
-  href: api/RageCoop.Client.html
+  href: api/RageCoop.Client.Scripting.html
