@@ -66,6 +66,11 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // JB7002
+                case 394110044:
+                    i=BulletsShot%2==0 ? 54 : 53;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+
                 // DOMINATOR5
                 case -1375060657:
                     i=BulletsShot%2==0 ? 35 : 36;
