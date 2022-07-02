@@ -9,6 +9,11 @@ namespace RageCoop.Core
 
         internal class CustomEvent : Packet
         {
+            public CustomEvent(Func<byte,BitReader,object> onResolve = null)
+            {
+                _resolve= onResolve;
+            }
+            private Func<byte, BitReader, object> _resolve { get; set; }
             public int Hash { get; set; }
             public List<object> Args { get; set; }
 
@@ -75,8 +80,14 @@ namespace RageCoop.Core
                         case 0x13:
                             Args.Add((GTA.Model)reader.ReadInt()); break;
                         default:
-                            throw new InvalidOperationException($"Unexpected type:{type}\r\n{array.Dump()}");
-
+                            if (_resolve==null)
+                            {
+                                throw new InvalidOperationException($"Unexpected type:{type}\r\n{array.Dump()}");
+                            }
+                            else
+                            {
+                                Args.Add(_resolve(type, reader)); break;
+                            }
                     }
                 }
             }

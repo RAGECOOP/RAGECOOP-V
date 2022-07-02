@@ -248,7 +248,20 @@ namespace RageCoop.Client
                     break;
                 case PacketType.CustomEvent:
                     {
-                        Packets.CustomEvent packet = new Packets.CustomEvent();
+                        Packets.CustomEvent packet = new Packets.CustomEvent((t, reader) =>
+                        {
+                            switch (t)
+                            {
+                                case 50:
+                                    return EntityPool.ServerProps[reader.ReadInt()].MainProp?.Handle;
+                                case 51:
+                                    return EntityPool.GetPedByID(reader.ReadInt())?.MainPed?.Handle;
+                                case 52:
+                                    return EntityPool.GetVehicleByID(reader.ReadInt())?.MainVehicle?.Handle;
+                                default:
+                                    throw new ArgumentException("Cannot resolve server side argument: "+t);
+                            }
+                        });
                         packet.Unpack(data);
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }

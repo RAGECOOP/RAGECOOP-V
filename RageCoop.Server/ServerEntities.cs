@@ -22,6 +22,18 @@ namespace RageCoop.Server
             Server= server;
         }
 
+
+        /// <summary>
+        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// </summary>
+        public Tuple<byte,byte[]> Handle
+        {
+            get
+            {
+                return new(50, BitConverter.GetBytes(ID));
+            }
+        }
+
         /// <summary>
         /// Delete this prop
         /// </summary>
@@ -65,6 +77,23 @@ namespace RageCoop.Server
     /// </summary>
     public class ServerPed
     {
+        internal ServerPed()
+        {
+
+        }
+
+        /// <summary>
+        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// </summary>
+        /// <returns></returns>
+        public Tuple<byte, byte[]> Handle
+        {
+            get
+            {
+                return new(51, BitConverter.GetBytes(ID));
+            }
+        }
+
         /// <summary>
         /// The <see cref="Client"/> that is responsible synchronizing for this ped.
         /// </summary>
@@ -106,6 +135,22 @@ namespace RageCoop.Server
     /// </summary>
     public class ServerVehicle
     {
+        internal ServerVehicle()
+        {
+
+        }
+
+        /// <summary>
+        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// </summary>
+        /// <returns></returns>
+        public Tuple<byte, byte[]> Handle
+        {
+            get{
+                return new(52, BitConverter.GetBytes(ID));
+            }
+        }
+
         /// <summary>
         /// The <see cref="Client"/> that is responsible synchronizing for this vehicle.
         /// </summary>
@@ -234,7 +279,7 @@ namespace RageCoop.Server
         /// Get all static objects owned by server
         /// </summary>
         /// <returns></returns>
-        public ServerProp[] GetAllObjects()
+        public ServerProp[] GetAllProps()
         {
             return ServerProps.Values.ToArray();
         } 
