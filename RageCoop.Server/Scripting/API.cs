@@ -206,7 +206,7 @@ namespace RageCoop.Server.Scripting
         /// <param name="name">The name of the command (Example: "test" for "/test")</param>
         /// <param name="usage">How to use this message (argsLength required!)</param>
         /// <param name="argsLength">The length of args (Example: "/message USERNAME MESSAGE" = 2) (usage required!)</param>
-        /// <param name="callback">Create a new function!</param>
+        /// <param name="callback">A callback to invoke when the command received.</param>
         public void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, usage, argsLength, callback);
@@ -215,7 +215,7 @@ namespace RageCoop.Server.Scripting
         /// Register a new command chat command (Example: "/test")
         /// </summary>
         /// <param name="name">The name of the command (Example: "test" for "/test")</param>
-        /// <param name="callback">Create a new function!</param>
+        /// <param name="callback">A callback to invoke when the command received.</param>
         public void RegisterCommand(string name, Action<CommandContext> callback)
         {
             Server.RegisterCommand(name, callback);
@@ -249,7 +249,7 @@ namespace RageCoop.Server.Scripting
         /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
         /// </summary>
         /// <param name="name">The name of the event, will be hashed to an int. For optimal performence, you should hash it in a static contructor inside the shared library, then call <see cref="SendCustomEvent(int, List{object}, List{Client})"/>.</param>
-        /// <param name="args">The objects conataing your data, supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
+        /// <param name="args">See <see cref="CustomEventReceivedArgs"/> for a list of supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
         public void SendCustomEvent(string name, List<object> args = null, List<Client> targets = null)
         {
@@ -269,7 +269,7 @@ namespace RageCoop.Server.Scripting
         /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
-        /// <param name="args">The objects conataing your data, supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
+        /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
         public void SendCustomEvent(int eventHash,List<object> args=null,List<Client> targets=null)
         {
@@ -288,7 +288,7 @@ namespace RageCoop.Server.Scripting
         /// Register an handler to the specifed event hash, one event can have multiple handlers.
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
-        /// <param name="handler">An handler to be invoked when the event is received from the server. This will be invoked from main thread.</param>
+        /// <param name="handler">An handler to be invoked when the event is received from the server.</param>
         public void RegisterCustomEventHandler(int hash,Action<CustomEventReceivedArgs> handler)
         {
             List<Action<CustomEventReceivedArgs>> handlers;

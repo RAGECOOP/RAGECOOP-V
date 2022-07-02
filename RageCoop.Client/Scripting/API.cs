@@ -16,7 +16,7 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         public int Hash { get; set; }
         /// <summary>
-        /// Arguments
+        /// Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion
         /// </summary>
         public List<object> Args { get; set; }
     }
@@ -223,8 +223,7 @@ namespace RageCoop.Client.Scripting
         /// Send an event and data to the server.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event</param>
-        /// <param name="args">The objects conataing your data, supported types: 
-        /// byte, short, ushort, int, uint, long, ulong, float, bool, string.</param>
+        /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
         public static void SendCustomEvent(int eventHash, List<object> args)
         {
             var p = new Packets.CustomEvent()

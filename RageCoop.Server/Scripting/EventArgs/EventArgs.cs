@@ -30,12 +30,14 @@ namespace RageCoop.Server.Scripting
         /// The <see cref="Client"/> that triggered this event
         /// </summary>
         public Client Sender { get; set; }
+
         /// <summary>
         /// The event hash
         /// </summary>
         public int Hash { get; set; }
+
         /// <summary>
-        /// The arguments of this event
+        /// Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion, ServerPed, ServerVehicle, ServerProp
         /// </summary>
         public List<object> Args { get; set; }
     }

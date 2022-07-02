@@ -8,12 +8,12 @@ namespace RageCoop.Client.Scripting
     public abstract class ClientScript
     {
         /// <summary>
-        /// This method would be called from main thread shortly after all scripts have been loaded.
+        /// This method would be called from background thread, call <see cref="API.QueueAction(System.Action)"/> to dispatch it to main thread.
         /// </summary>
         public abstract void OnStart();
 
         /// <summary>
-        /// This method would be called from main thread when the client disconnected from the server, you MUST terminate all background jobs/threads in this method.
+        /// This method would be called from background thread when the client disconnected from the server, you MUST terminate all background jobs/threads in this method.
         /// </summary>
         public abstract void OnStop();
 

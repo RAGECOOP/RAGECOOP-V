@@ -24,7 +24,7 @@ namespace RageCoop.Server
 
 
         /// <summary>
-        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
         /// </summary>
         public Tuple<byte,byte[]> Handle
         {
@@ -83,9 +83,8 @@ namespace RageCoop.Server
         }
 
         /// <summary>
-        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
         /// </summary>
-        /// <returns></returns>
         public Tuple<byte, byte[]> Handle
         {
             get
@@ -141,9 +140,8 @@ namespace RageCoop.Server
         }
 
         /// <summary>
-        /// Pass the value as an argument in <see cref="Scripting.API.SendCustomEvent(int, List{object}, List{Client})"/> or <see cref="Client.SendCustomEvent(int, object[])"/> to convert this object to handle at client side.
+        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
         /// </summary>
-        /// <returns></returns>
         public Tuple<byte, byte[]> Handle
         {
             get{
