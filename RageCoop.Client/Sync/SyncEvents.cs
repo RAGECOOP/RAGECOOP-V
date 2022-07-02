@@ -169,6 +169,11 @@ namespace RageCoop.Client {
                     weaponHash=1176362416;
                     break;
 
+                // Tampa3, not working for some reason
+                case 3670375085:
+                    weaponHash=1176362416;
+                    break;
+
                 // SAVAGE
                 case 1638077257:
                     weaponHash=(uint)VehicleWeaponHash.PlayerLazer;

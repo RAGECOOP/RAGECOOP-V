@@ -66,6 +66,10 @@ namespace RageCoop.Client
             int i;
             switch (v.Model.Hash)
             {
+                // TAMPA3
+                case -1210451983:
+                    return new MuzzleInfo(v.Bones[87].Position, v.Bones[87].ForwardVector);
+
                 // SCRAMJET
                 case -638562243:
                     i=BulletsShot%2==0 ? 44 : 45;
