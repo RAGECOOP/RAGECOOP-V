@@ -362,7 +362,8 @@ namespace RageCoop.Client
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus2
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus3;
                 case 0:
-                    return (VehicleHash)veh.Model.Hash == VehicleHash.Apc;
+                    return (VehicleHash)veh.Model.Hash == VehicleHash.Apc
+                        || (VehicleHash)veh.Model.Hash==VehicleHash.Dune3;
                 case 1:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2
