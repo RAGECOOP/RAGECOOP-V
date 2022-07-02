@@ -146,7 +146,7 @@ namespace RageCoop.Server
         public ServerObject[] GetAllObjects()
         {
             return ServerObjects.Values.ToArray();
-        }
+        } 
 
         /// <summary>
         /// Not thread safe
@@ -223,6 +223,18 @@ namespace RageCoop.Server
         {
             // Server.Logger?.Trace($"Removing ped:{id}");
             if (Peds.ContainsKey(id)) { Peds.Remove(id); }
+        }
+
+        internal void Add(ServerPed ped)
+        {
+            if (Peds.ContainsKey(ped.ID))
+            {
+                Peds[ped.ID]=ped;
+            }
+            else
+            {
+                Peds.Add(ped.ID, ped);
+            }
         }
     }
 }

@@ -599,16 +599,18 @@ namespace RageCoop.Server
             // Add the player to Players
             lock (Clients)
             {
+                var player = new ServerPed
+                {
+                    ID= packet.PedID,
+                };
+                Entities.Add(player);
                 Clients.Add(connection.RemoteUniqueIdentifier,
                     tmpClient = new Client(this)
                     {
                         NetID = connection.RemoteUniqueIdentifier,
                         Connection=connection,
                         Username=packet.Username,
-                        Player = new()
-                        {
-                            ID= packet.PedID,
-                        }
+                        Player = player
                     }
                 );;
             }

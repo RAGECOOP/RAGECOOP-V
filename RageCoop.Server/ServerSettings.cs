@@ -42,7 +42,7 @@
         /// <summary>
         /// NPC data won't be sent to a player if their distance is greater than this value. -1 for unlimited.
         /// </summary>
-        public float NpcStreamingDistance { get; set; } = 500;
+        public float NpcStreamingDistance { get; set; } = 500 ;
         /// <summary>
         /// Player's data won't be sent to another player if their distance is greater than this value. -1 for unlimited.
         /// </summary>

@@ -209,7 +209,7 @@ namespace RageCoop.Server
         /// Trigger a CustomEvent for this client
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
-        /// <param name="args"></param>
+        /// <param name="args">Arguments</param>
         public void SendCustomEvent(int hash,List<object> args)
         {
             if (!IsReady)
@@ -234,6 +234,11 @@ namespace RageCoop.Server
                 Server.Logger?.Error(ex);
             }
         }
+        /// <summary>
+        /// Trigger a CustomEvent for this client
+        /// </summary>
+        /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
+        /// <param name="args">Arguments</param>
         public void SendCustomEvent(int hash,params object[] args)
         {
             if (!IsReady)
