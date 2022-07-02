@@ -125,15 +125,42 @@
   </h3>
   
   
-  <a id="RageCoop_Server_ServerEntities_GetAllObjects_" data-uid="RageCoop.Server.ServerEntities.GetAllObjects*"></a>
-  <h4 id="RageCoop_Server_ServerEntities_GetAllObjects" data-uid="RageCoop.Server.ServerEntities.GetAllObjects">GetAllObjects()</h4>
-  <div class="markdown level1 summary"><p>Get all static objects owned by server</p>
+  <a id="RageCoop_Server_ServerEntities_CreateProp_" data-uid="RageCoop.Server.ServerEntities.CreateProp*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_CreateProp_GTA_Model_GTA_Math_Vector3_GTA_Math_Vector3_" data-uid="RageCoop.Server.ServerEntities.CreateProp(GTA.Model,GTA.Math.Vector3,GTA.Math.Vector3)">CreateProp(Model, Vector3, Vector3)</h4>
+  <div class="markdown level1 summary"><p>Create a static prop owned by server.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ServerObject[] GetAllObjects()</code></pre>
+    <pre><code class="lang-csharp hljs">public ServerProp CreateProp(Model model, Vector3 pos, Vector3 rot)</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Model</span></td>
+        <td><span class="parametername">model</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td><span class="parametername">pos</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td><span class="parametername">rot</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -144,7 +171,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="RageCoop.Server.ServerObject.html">ServerObject</a>[]</td>
+        <td><a class="xref" href="RageCoop.Server.ServerProp.html">ServerProp</a></td>
         <td></td>
       </tr>
     </tbody>
@@ -177,6 +204,32 @@
   </table>
   
   
+  <a id="RageCoop_Server_ServerEntities_GetAllProps_" data-uid="RageCoop.Server.ServerEntities.GetAllProps*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetAllProps" data-uid="RageCoop.Server.ServerEntities.GetAllProps">GetAllProps()</h4>
+  <div class="markdown level1 summary"><p>Get all static objects owned by server</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerProp[] GetAllProps()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerProp.html">ServerProp</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="RageCoop_Server_ServerEntities_GetAllVehicle_" data-uid="RageCoop.Server.ServerEntities.GetAllVehicle*"></a>
   <h4 id="RageCoop_Server_ServerEntities_GetAllVehicle" data-uid="RageCoop.Server.ServerEntities.GetAllVehicle">GetAllVehicle()</h4>
   <div class="markdown level1 summary"><p>Get all vehicles on this server</p>
@@ -197,6 +250,135 @@
     <tbody>
       <tr>
         <td><a class="xref" href="RageCoop.Server.ServerVehicle.html">ServerVehicle</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerEntities_GetPedByID_" data-uid="RageCoop.Server.ServerEntities.GetPedByID*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetPedByID_System_Int32_" data-uid="RageCoop.Server.ServerEntities.GetPedByID(System.Int32)">GetPedByID(Int32)</h4>
+  <div class="markdown level1 summary"><p>Get a <a class="xref" href="RageCoop.Server.ServerPed.html">ServerPed</a> by it's id</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerPed GetPedByID(int id)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerPed.html">ServerPed</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerEntities_GetPropByID_" data-uid="RageCoop.Server.ServerEntities.GetPropByID*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetPropByID_System_Int32_" data-uid="RageCoop.Server.ServerEntities.GetPropByID(System.Int32)">GetPropByID(Int32)</h4>
+  <div class="markdown level1 summary"><p>Get a <a class="xref" href="RageCoop.Server.ServerProp.html">ServerProp</a> owned by server from it's ID.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerProp GetPropByID(int id)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerProp.html">ServerProp</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerEntities_GetVehicleByID_" data-uid="RageCoop.Server.ServerEntities.GetVehicleByID*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetVehicleByID_System_Int32_" data-uid="RageCoop.Server.ServerEntities.GetVehicleByID(System.Int32)">GetVehicleByID(Int32)</h4>
+  <div class="markdown level1 summary"><p>Get a <a class="xref" href="RageCoop.Server.ServerVehicle.html">ServerVehicle</a> by it's id</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerVehicle GetVehicleByID(int id)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerVehicle.html">ServerVehicle</a></td>
         <td></td>
       </tr>
     </tbody>

@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class SyncedEntity
+    <title>Class ServerProp
    | RageCoop resource documentation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class SyncedEntity
+    <meta name="title" content="Class ServerProp
    | RageCoop resource documentation ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -78,34 +78,26 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="RageCoop.Client.SyncedEntity">
+            <article class="content wrap" id="_content" data-uid="RageCoop.Server.ServerProp">
   
   
-  <h1 id="RageCoop_Client_SyncedEntity" data-uid="RageCoop.Client.SyncedEntity" class="text-break">Class SyncedEntity
+  <h1 id="RageCoop_Server_ServerProp" data-uid="RageCoop.Server.ServerProp" class="text-break">Class ServerProp
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Represents an prop owned by server.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">SyncedEntity</span></div>
-      <div class="level2"><a class="xref" href="RageCoop.Client.SyncedPed.html">SyncedPed</a></div>
-      <div class="level2"><a class="xref" href="RageCoop.Client.SyncedProp.html">SyncedProp</a></div>
-      <div class="level2"><a class="xref" href="RageCoop.Client.SyncedVehicle.html">SyncedVehicle</a></div>
+    <div class="level1"><span class="xref">ServerProp</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
-    </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
     </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">Object.Equals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#system-object-referenceequals(system-object-system-object)">Object.ReferenceEquals(Object, Object)</a>
     </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a>
@@ -116,25 +108,33 @@
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.memberwiseclone#system-object-memberwiseclone">Object.MemberwiseClone()</a>
     </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#system-object-referenceequals(system-object-system-object)">Object.ReferenceEquals(Object, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
+    </div>
   </div>
-  <h6><strong>Namespace</strong>: <a class="xref" href="RageCoop.Client.html">RageCoop.Client</a></h6>
-  <h6><strong>Assembly</strong>: RageCoop.Client.dll</h6>
-  <h5 id="RageCoop_Client_SyncedEntity_syntax">Syntax</h5>
+  <h6><strong>Namespace</strong>: <a class="xref" href="RageCoop.Server.html">RageCoop.Server</a></h6>
+  <h6><strong>Assembly</strong>: RageCoop.Server.dll</h6>
+  <h5 id="RageCoop_Server_ServerProp_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class SyncedEntity</code></pre>
+    <pre><code class="lang-csharp hljs">public class ServerProp</code></pre>
   </div>
-  <h3 id="fields">Fields
+  <h3 id="properties">Properties
   </h3>
   
   
-  <h4 id="RageCoop_Client_SyncedEntity__lastFrozen" data-uid="RageCoop.Client.SyncedEntity._lastFrozen">_lastFrozen</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="RageCoop_Server_ServerProp_Handle_" data-uid="RageCoop.Server.ServerProp.Handle*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Handle" data-uid="RageCoop.Server.ServerProp.Handle">Handle</h4>
+  <div class="markdown level1 summary"><p>Pass the value as an argument in <a class="xref" href="RageCoop.Server.Scripting.API.html#RageCoop_Server_Scripting_API_SendCustomEvent_System_Int32_System_Collections_Generic_List_System_Object__System_Collections_Generic_List_RageCoop_Server_Client__">SendCustomEvent(Int32, List&lt;Object&gt;, List&lt;Client&gt;)</a> or <a class="xref" href="RageCoop.Server.Client.html#RageCoop_Server_Client_SendCustomEvent_System_Int32_System_Object___">SendCustomEvent(Int32, Object[])</a> to convert this object to handle at client side.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected bool _lastFrozen</code></pre>
+    <pre><code class="lang-csharp hljs">public Tuple&lt;byte, byte[]&gt; Handle { get; }</code></pre>
   </div>
-  <h5 class="fieldValue">Field Value</h5>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
@@ -144,18 +144,16 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple-2">Tuple</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>[]&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="properties">Properties
-  </h3>
   
   
-  <a id="RageCoop_Client_SyncedEntity_ID_" data-uid="RageCoop.Client.SyncedEntity.ID*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_ID" data-uid="RageCoop.Client.SyncedEntity.ID">ID</h4>
-  <div class="markdown level1 summary"><p>Network ID for this entity</p>
+  <a id="RageCoop_Server_ServerProp_ID_" data-uid="RageCoop.Server.ServerProp.ID*"></a>
+  <h4 id="RageCoop_Server_ServerProp_ID" data-uid="RageCoop.Server.ServerProp.ID">ID</h4>
+  <div class="markdown level1 summary"><p>Network ID of this object.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -179,14 +177,14 @@
   </table>
   
   
-  <a id="RageCoop_Client_SyncedEntity_IsLocal_" data-uid="RageCoop.Client.SyncedEntity.IsLocal*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_IsLocal" data-uid="RageCoop.Client.SyncedEntity.IsLocal">IsLocal</h4>
-  <div class="markdown level1 summary"><p>Indicates whether the current player is responsible for syncing this entity.</p>
+  <a id="RageCoop_Server_ServerProp_Model_" data-uid="RageCoop.Server.ServerProp.Model*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Model" data-uid="RageCoop.Server.ServerProp.Model">Model</h4>
+  <div class="markdown level1 summary"><p>The object's model</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsLocal { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Model Model { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -198,46 +196,21 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="xref">GTA.Model</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="RageCoop_Client_SyncedEntity_IsOutOfSync_" data-uid="RageCoop.Client.SyncedEntity.IsOutOfSync*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_IsOutOfSync" data-uid="RageCoop.Client.SyncedEntity.IsOutOfSync">IsOutOfSync</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public bool IsOutOfSync { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Client_SyncedEntity_LastStateSynced_" data-uid="RageCoop.Client.SyncedEntity.LastStateSynced*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_LastStateSynced" data-uid="RageCoop.Client.SyncedEntity.LastStateSynced">LastStateSynced</h4>
-  <div class="markdown level1 summary"><p>Last time a new sync message arrived.</p>
+  <a id="RageCoop_Server_ServerProp_Position_" data-uid="RageCoop.Server.ServerProp.Position*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Position" data-uid="RageCoop.Server.ServerProp.Position">Position</h4>
+  <div class="markdown level1 summary"><p>Gets or sets this object's position</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ulong LastStateSynced { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Vector3 Position { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -249,21 +222,21 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.uint64">UInt64</a></td>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="RageCoop_Client_SyncedEntity_LastSynced_" data-uid="RageCoop.Client.SyncedEntity.LastSynced*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_LastSynced" data-uid="RageCoop.Client.SyncedEntity.LastSynced">LastSynced</h4>
-  <div class="markdown level1 summary"><p>Last time a new sync message arrived.</p>
+  <a id="RageCoop_Server_ServerProp_Rotation_" data-uid="RageCoop.Server.ServerProp.Rotation*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Rotation" data-uid="RageCoop.Server.ServerProp.Rotation">Rotation</h4>
+  <div class="markdown level1 summary"><p>Gets or sets this object's rotation</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ulong LastSynced { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Vector3 Rotation { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -275,62 +248,24 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.uint64">UInt64</a></td>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
+  <h3 id="methods">Methods
+  </h3>
   
   
-  <a id="RageCoop_Client_SyncedEntity_LastUpdated_" data-uid="RageCoop.Client.SyncedEntity.LastUpdated*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_LastUpdated" data-uid="RageCoop.Client.SyncedEntity.LastUpdated">LastUpdated</h4>
-  <div class="markdown level1 summary"><p>Last time the local entity has been updated,</p>
+  <a id="RageCoop_Server_ServerProp_Delete_" data-uid="RageCoop.Server.ServerProp.Delete*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Delete" data-uid="RageCoop.Server.ServerProp.Delete">Delete()</h4>
+  <div class="markdown level1 summary"><p>Delete this prop</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ulong LastUpdated { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public void Delete()</code></pre>
   </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.uint64">UInt64</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Client_SyncedEntity_OwnerID_" data-uid="RageCoop.Client.SyncedEntity.OwnerID*"></a>
-  <h4 id="RageCoop_Client_SyncedEntity_OwnerID" data-uid="RageCoop.Client.SyncedEntity.OwnerID">OwnerID</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int OwnerID { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
 </article>
           </div>
           

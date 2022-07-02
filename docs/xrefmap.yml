@@ -520,6 +520,19 @@ references:
   commentId: T:RageCoop.Client.Settings
   fullName: RageCoop.Client.Settings
   nameWithType: Settings
+- uid: RageCoop.Client.Settings.DataDirectory
+  name: DataDirectory
+  href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_DataDirectory
+  commentId: P:RageCoop.Client.Settings.DataDirectory
+  fullName: RageCoop.Client.Settings.DataDirectory
+  nameWithType: Settings.DataDirectory
+- uid: RageCoop.Client.Settings.DataDirectory*
+  name: DataDirectory
+  href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_DataDirectory_
+  commentId: Overload:RageCoop.Client.Settings.DataDirectory
+  isSpec: "True"
+  fullName: RageCoop.Client.Settings.DataDirectory
+  nameWithType: Settings.DataDirectory
 - uid: RageCoop.Client.Settings.DisableAlternatePause
   name: DisableAlternatePause
   href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_DisableAlternatePause
@@ -630,19 +643,6 @@ references:
   isSpec: "True"
   fullName: RageCoop.Client.Settings.Password
   nameWithType: Settings.Password
-- uid: RageCoop.Client.Settings.ResourceDirectory
-  name: ResourceDirectory
-  href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_ResourceDirectory
-  commentId: P:RageCoop.Client.Settings.ResourceDirectory
-  fullName: RageCoop.Client.Settings.ResourceDirectory
-  nameWithType: Settings.ResourceDirectory
-- uid: RageCoop.Client.Settings.ResourceDirectory*
-  name: ResourceDirectory
-  href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_ResourceDirectory_
-  commentId: Overload:RageCoop.Client.Settings.ResourceDirectory
-  isSpec: "True"
-  fullName: RageCoop.Client.Settings.ResourceDirectory
-  nameWithType: Settings.ResourceDirectory
 - uid: RageCoop.Client.Settings.Username
   name: Username
   href: api/RageCoop.Client.Settings.html#RageCoop_Client_Settings_Username
@@ -688,6 +688,12 @@ references:
   commentId: T:RageCoop.Client.SyncedEntity
   fullName: RageCoop.Client.SyncedEntity
   nameWithType: SyncedEntity
+- uid: RageCoop.Client.SyncedEntity._lastFrozen
+  name: _lastFrozen
+  href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity__lastFrozen
+  commentId: F:RageCoop.Client.SyncedEntity._lastFrozen
+  fullName: RageCoop.Client.SyncedEntity._lastFrozen
+  nameWithType: SyncedEntity._lastFrozen
 - uid: RageCoop.Client.SyncedEntity.ID
   name: ID
   href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_ID
@@ -701,19 +707,19 @@ references:
   isSpec: "True"
   fullName: RageCoop.Client.SyncedEntity.ID
   nameWithType: SyncedEntity.ID
-- uid: RageCoop.Client.SyncedEntity.IsMine
-  name: IsMine
-  href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_IsMine
-  commentId: P:RageCoop.Client.SyncedEntity.IsMine
-  fullName: RageCoop.Client.SyncedEntity.IsMine
-  nameWithType: SyncedEntity.IsMine
-- uid: RageCoop.Client.SyncedEntity.IsMine*
-  name: IsMine
-  href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_IsMine_
-  commentId: Overload:RageCoop.Client.SyncedEntity.IsMine
+- uid: RageCoop.Client.SyncedEntity.IsLocal
+  name: IsLocal
+  href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_IsLocal
+  commentId: P:RageCoop.Client.SyncedEntity.IsLocal
+  fullName: RageCoop.Client.SyncedEntity.IsLocal
+  nameWithType: SyncedEntity.IsLocal
+- uid: RageCoop.Client.SyncedEntity.IsLocal*
+  name: IsLocal
+  href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_IsLocal_
+  commentId: Overload:RageCoop.Client.SyncedEntity.IsLocal
   isSpec: "True"
-  fullName: RageCoop.Client.SyncedEntity.IsMine
-  nameWithType: SyncedEntity.IsMine
+  fullName: RageCoop.Client.SyncedEntity.IsLocal
+  nameWithType: SyncedEntity.IsLocal
 - uid: RageCoop.Client.SyncedEntity.IsOutOfSync
   name: IsOutOfSync
   href: api/RageCoop.Client.SyncedEntity.html#RageCoop_Client_SyncedEntity_IsOutOfSync
@@ -824,6 +830,25 @@ references:
   isSpec: "True"
   fullName: RageCoop.Client.SyncedPed.Speed
   nameWithType: SyncedPed.Speed
+- uid: RageCoop.Client.SyncedProp
+  name: SyncedProp
+  href: api/RageCoop.Client.SyncedProp.html
+  commentId: T:RageCoop.Client.SyncedProp
+  fullName: RageCoop.Client.SyncedProp
+  nameWithType: SyncedProp
+- uid: RageCoop.Client.SyncedProp.MainProp
+  name: MainProp
+  href: api/RageCoop.Client.SyncedProp.html#RageCoop_Client_SyncedProp_MainProp
+  commentId: P:RageCoop.Client.SyncedProp.MainProp
+  fullName: RageCoop.Client.SyncedProp.MainProp
+  nameWithType: SyncedProp.MainProp
+- uid: RageCoop.Client.SyncedProp.MainProp*
+  name: MainProp
+  href: api/RageCoop.Client.SyncedProp.html#RageCoop_Client_SyncedProp_MainProp_
+  commentId: Overload:RageCoop.Client.SyncedProp.MainProp
+  isSpec: "True"
+  fullName: RageCoop.Client.SyncedProp.MainProp
+  nameWithType: SyncedProp.MainProp
 - uid: RageCoop.Client.SyncedVehicle
   name: SyncedVehicle
   href: api/RageCoop.Client.SyncedVehicle.html
@@ -912,6 +937,12 @@ references:
   commentId: M:RageCoop.Core.Logger.Error(System.String)
   fullName: RageCoop.Core.Logger.Error(System.String)
   nameWithType: Logger.Error(String)
+- uid: RageCoop.Core.Logger.Error(System.String,System.Exception)
+  name: Error(String, Exception)
+  href: api/RageCoop.Core.Logger.html#RageCoop_Core_Logger_Error_System_String_System_Exception_
+  commentId: M:RageCoop.Core.Logger.Error(System.String,System.Exception)
+  fullName: RageCoop.Core.Logger.Error(System.String, System.Exception)
+  nameWithType: Logger.Error(String, Exception)
 - uid: RageCoop.Core.Logger.Error*
   name: Error
   href: api/RageCoop.Core.Logger.html#RageCoop_Core_Logger_Error_
@@ -2102,19 +2133,19 @@ references:
   commentId: T:RageCoop.Server.ServerEntities
   fullName: RageCoop.Server.ServerEntities
   nameWithType: ServerEntities
-- uid: RageCoop.Server.ServerEntities.GetAllObjects
-  name: GetAllObjects()
-  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllObjects
-  commentId: M:RageCoop.Server.ServerEntities.GetAllObjects
-  fullName: RageCoop.Server.ServerEntities.GetAllObjects()
-  nameWithType: ServerEntities.GetAllObjects()
-- uid: RageCoop.Server.ServerEntities.GetAllObjects*
-  name: GetAllObjects
-  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllObjects_
-  commentId: Overload:RageCoop.Server.ServerEntities.GetAllObjects
+- uid: RageCoop.Server.ServerEntities.CreateProp(GTA.Model,GTA.Math.Vector3,GTA.Math.Vector3)
+  name: CreateProp(Model, Vector3, Vector3)
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_CreateProp_GTA_Model_GTA_Math_Vector3_GTA_Math_Vector3_
+  commentId: M:RageCoop.Server.ServerEntities.CreateProp(GTA.Model,GTA.Math.Vector3,GTA.Math.Vector3)
+  fullName: RageCoop.Server.ServerEntities.CreateProp(GTA.Model, GTA.Math.Vector3, GTA.Math.Vector3)
+  nameWithType: ServerEntities.CreateProp(Model, Vector3, Vector3)
+- uid: RageCoop.Server.ServerEntities.CreateProp*
+  name: CreateProp
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_CreateProp_
+  commentId: Overload:RageCoop.Server.ServerEntities.CreateProp
   isSpec: "True"
-  fullName: RageCoop.Server.ServerEntities.GetAllObjects
-  nameWithType: ServerEntities.GetAllObjects
+  fullName: RageCoop.Server.ServerEntities.CreateProp
+  nameWithType: ServerEntities.CreateProp
 - uid: RageCoop.Server.ServerEntities.GetAllPeds
   name: GetAllPeds()
   href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllPeds
@@ -2128,6 +2159,19 @@ references:
   isSpec: "True"
   fullName: RageCoop.Server.ServerEntities.GetAllPeds
   nameWithType: ServerEntities.GetAllPeds
+- uid: RageCoop.Server.ServerEntities.GetAllProps
+  name: GetAllProps()
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllProps
+  commentId: M:RageCoop.Server.ServerEntities.GetAllProps
+  fullName: RageCoop.Server.ServerEntities.GetAllProps()
+  nameWithType: ServerEntities.GetAllProps()
+- uid: RageCoop.Server.ServerEntities.GetAllProps*
+  name: GetAllProps
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllProps_
+  commentId: Overload:RageCoop.Server.ServerEntities.GetAllProps
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerEntities.GetAllProps
+  nameWithType: ServerEntities.GetAllProps
 - uid: RageCoop.Server.ServerEntities.GetAllVehicle
   name: GetAllVehicle()
   href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetAllVehicle
@@ -2141,70 +2185,64 @@ references:
   isSpec: "True"
   fullName: RageCoop.Server.ServerEntities.GetAllVehicle
   nameWithType: ServerEntities.GetAllVehicle
-- uid: RageCoop.Server.ServerObject
-  name: ServerObject
-  href: api/RageCoop.Server.ServerObject.html
-  commentId: T:RageCoop.Server.ServerObject
-  fullName: RageCoop.Server.ServerObject
-  nameWithType: ServerObject
-- uid: RageCoop.Server.ServerObject.IsInvincible
-  name: IsInvincible
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_IsInvincible
-  commentId: P:RageCoop.Server.ServerObject.IsInvincible
-  fullName: RageCoop.Server.ServerObject.IsInvincible
-  nameWithType: ServerObject.IsInvincible
-- uid: RageCoop.Server.ServerObject.IsInvincible*
-  name: IsInvincible
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_IsInvincible_
-  commentId: Overload:RageCoop.Server.ServerObject.IsInvincible
+- uid: RageCoop.Server.ServerEntities.GetPedByID(System.Int32)
+  name: GetPedByID(Int32)
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetPedByID_System_Int32_
+  commentId: M:RageCoop.Server.ServerEntities.GetPedByID(System.Int32)
+  fullName: RageCoop.Server.ServerEntities.GetPedByID(System.Int32)
+  nameWithType: ServerEntities.GetPedByID(Int32)
+- uid: RageCoop.Server.ServerEntities.GetPedByID*
+  name: GetPedByID
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetPedByID_
+  commentId: Overload:RageCoop.Server.ServerEntities.GetPedByID
   isSpec: "True"
-  fullName: RageCoop.Server.ServerObject.IsInvincible
-  nameWithType: ServerObject.IsInvincible
-- uid: RageCoop.Server.ServerObject.Model
-  name: Model
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Model
-  commentId: P:RageCoop.Server.ServerObject.Model
-  fullName: RageCoop.Server.ServerObject.Model
-  nameWithType: ServerObject.Model
-- uid: RageCoop.Server.ServerObject.Model*
-  name: Model
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Model_
-  commentId: Overload:RageCoop.Server.ServerObject.Model
+  fullName: RageCoop.Server.ServerEntities.GetPedByID
+  nameWithType: ServerEntities.GetPedByID
+- uid: RageCoop.Server.ServerEntities.GetPropByID(System.Int32)
+  name: GetPropByID(Int32)
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetPropByID_System_Int32_
+  commentId: M:RageCoop.Server.ServerEntities.GetPropByID(System.Int32)
+  fullName: RageCoop.Server.ServerEntities.GetPropByID(System.Int32)
+  nameWithType: ServerEntities.GetPropByID(Int32)
+- uid: RageCoop.Server.ServerEntities.GetPropByID*
+  name: GetPropByID
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetPropByID_
+  commentId: Overload:RageCoop.Server.ServerEntities.GetPropByID
   isSpec: "True"
-  fullName: RageCoop.Server.ServerObject.Model
-  nameWithType: ServerObject.Model
-- uid: RageCoop.Server.ServerObject.Position
-  name: Position
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Position
-  commentId: P:RageCoop.Server.ServerObject.Position
-  fullName: RageCoop.Server.ServerObject.Position
-  nameWithType: ServerObject.Position
-- uid: RageCoop.Server.ServerObject.Position*
-  name: Position
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Position_
-  commentId: Overload:RageCoop.Server.ServerObject.Position
+  fullName: RageCoop.Server.ServerEntities.GetPropByID
+  nameWithType: ServerEntities.GetPropByID
+- uid: RageCoop.Server.ServerEntities.GetVehicleByID(System.Int32)
+  name: GetVehicleByID(Int32)
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetVehicleByID_System_Int32_
+  commentId: M:RageCoop.Server.ServerEntities.GetVehicleByID(System.Int32)
+  fullName: RageCoop.Server.ServerEntities.GetVehicleByID(System.Int32)
+  nameWithType: ServerEntities.GetVehicleByID(Int32)
+- uid: RageCoop.Server.ServerEntities.GetVehicleByID*
+  name: GetVehicleByID
+  href: api/RageCoop.Server.ServerEntities.html#RageCoop_Server_ServerEntities_GetVehicleByID_
+  commentId: Overload:RageCoop.Server.ServerEntities.GetVehicleByID
   isSpec: "True"
-  fullName: RageCoop.Server.ServerObject.Position
-  nameWithType: ServerObject.Position
-- uid: RageCoop.Server.ServerObject.Quaternion
-  name: Quaternion
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Quaternion
-  commentId: P:RageCoop.Server.ServerObject.Quaternion
-  fullName: RageCoop.Server.ServerObject.Quaternion
-  nameWithType: ServerObject.Quaternion
-- uid: RageCoop.Server.ServerObject.Quaternion*
-  name: Quaternion
-  href: api/RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Quaternion_
-  commentId: Overload:RageCoop.Server.ServerObject.Quaternion
-  isSpec: "True"
-  fullName: RageCoop.Server.ServerObject.Quaternion
-  nameWithType: ServerObject.Quaternion
+  fullName: RageCoop.Server.ServerEntities.GetVehicleByID
+  nameWithType: ServerEntities.GetVehicleByID
 - uid: RageCoop.Server.ServerPed
   name: ServerPed
   href: api/RageCoop.Server.ServerPed.html
   commentId: T:RageCoop.Server.ServerPed
   fullName: RageCoop.Server.ServerPed
   nameWithType: ServerPed
+- uid: RageCoop.Server.ServerPed.Handle
+  name: Handle
+  href: api/RageCoop.Server.ServerPed.html#RageCoop_Server_ServerPed_Handle
+  commentId: P:RageCoop.Server.ServerPed.Handle
+  fullName: RageCoop.Server.ServerPed.Handle
+  nameWithType: ServerPed.Handle
+- uid: RageCoop.Server.ServerPed.Handle*
+  name: Handle
+  href: api/RageCoop.Server.ServerPed.html#RageCoop_Server_ServerPed_Handle_
+  commentId: Overload:RageCoop.Server.ServerPed.Handle
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerPed.Handle
+  nameWithType: ServerPed.Handle
 - uid: RageCoop.Server.ServerPed.Health
   name: Health
   href: api/RageCoop.Server.ServerPed.html#RageCoop_Server_ServerPed_Health
@@ -2296,6 +2334,90 @@ references:
   isSpec: "True"
   fullName: RageCoop.Server.ServerPed.Rotation
   nameWithType: ServerPed.Rotation
+- uid: RageCoop.Server.ServerProp
+  name: ServerProp
+  href: api/RageCoop.Server.ServerProp.html
+  commentId: T:RageCoop.Server.ServerProp
+  fullName: RageCoop.Server.ServerProp
+  nameWithType: ServerProp
+- uid: RageCoop.Server.ServerProp.Delete
+  name: Delete()
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Delete
+  commentId: M:RageCoop.Server.ServerProp.Delete
+  fullName: RageCoop.Server.ServerProp.Delete()
+  nameWithType: ServerProp.Delete()
+- uid: RageCoop.Server.ServerProp.Delete*
+  name: Delete
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Delete_
+  commentId: Overload:RageCoop.Server.ServerProp.Delete
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.Delete
+  nameWithType: ServerProp.Delete
+- uid: RageCoop.Server.ServerProp.Handle
+  name: Handle
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Handle
+  commentId: P:RageCoop.Server.ServerProp.Handle
+  fullName: RageCoop.Server.ServerProp.Handle
+  nameWithType: ServerProp.Handle
+- uid: RageCoop.Server.ServerProp.Handle*
+  name: Handle
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Handle_
+  commentId: Overload:RageCoop.Server.ServerProp.Handle
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.Handle
+  nameWithType: ServerProp.Handle
+- uid: RageCoop.Server.ServerProp.ID
+  name: ID
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_ID
+  commentId: P:RageCoop.Server.ServerProp.ID
+  fullName: RageCoop.Server.ServerProp.ID
+  nameWithType: ServerProp.ID
+- uid: RageCoop.Server.ServerProp.ID*
+  name: ID
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_ID_
+  commentId: Overload:RageCoop.Server.ServerProp.ID
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.ID
+  nameWithType: ServerProp.ID
+- uid: RageCoop.Server.ServerProp.Model
+  name: Model
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Model
+  commentId: P:RageCoop.Server.ServerProp.Model
+  fullName: RageCoop.Server.ServerProp.Model
+  nameWithType: ServerProp.Model
+- uid: RageCoop.Server.ServerProp.Model*
+  name: Model
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Model_
+  commentId: Overload:RageCoop.Server.ServerProp.Model
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.Model
+  nameWithType: ServerProp.Model
+- uid: RageCoop.Server.ServerProp.Position
+  name: Position
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Position
+  commentId: P:RageCoop.Server.ServerProp.Position
+  fullName: RageCoop.Server.ServerProp.Position
+  nameWithType: ServerProp.Position
+- uid: RageCoop.Server.ServerProp.Position*
+  name: Position
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Position_
+  commentId: Overload:RageCoop.Server.ServerProp.Position
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.Position
+  nameWithType: ServerProp.Position
+- uid: RageCoop.Server.ServerProp.Rotation
+  name: Rotation
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Rotation
+  commentId: P:RageCoop.Server.ServerProp.Rotation
+  fullName: RageCoop.Server.ServerProp.Rotation
+  nameWithType: ServerProp.Rotation
+- uid: RageCoop.Server.ServerProp.Rotation*
+  name: Rotation
+  href: api/RageCoop.Server.ServerProp.html#RageCoop_Server_ServerProp_Rotation_
+  commentId: Overload:RageCoop.Server.ServerProp.Rotation
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerProp.Rotation
+  nameWithType: ServerProp.Rotation
 - uid: RageCoop.Server.ServerSettings
   name: ServerSettings
   href: api/RageCoop.Server.ServerSettings.html
@@ -2438,6 +2560,19 @@ references:
   commentId: T:RageCoop.Server.ServerVehicle
   fullName: RageCoop.Server.ServerVehicle
   nameWithType: ServerVehicle
+- uid: RageCoop.Server.ServerVehicle.Handle
+  name: Handle
+  href: api/RageCoop.Server.ServerVehicle.html#RageCoop_Server_ServerVehicle_Handle
+  commentId: P:RageCoop.Server.ServerVehicle.Handle
+  fullName: RageCoop.Server.ServerVehicle.Handle
+  nameWithType: ServerVehicle.Handle
+- uid: RageCoop.Server.ServerVehicle.Handle*
+  name: Handle
+  href: api/RageCoop.Server.ServerVehicle.html#RageCoop_Server_ServerVehicle_Handle_
+  commentId: Overload:RageCoop.Server.ServerVehicle.Handle
+  isSpec: "True"
+  fullName: RageCoop.Server.ServerVehicle.Handle
+  nameWithType: ServerVehicle.Handle
 - uid: RageCoop.Server.ServerVehicle.ID
   name: ID
   href: api/RageCoop.Server.ServerVehicle.html#RageCoop_Server_ServerVehicle_ID

@@ -177,7 +177,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Client.Settings.html",
-          "hash": "3znLfYhDtMnMnZtwPrZycmfJVDL6PlVBhAfiTgwPFBs="
+          "hash": "akIBiz4u7VVvtZlszKyu+5CHnpMs358aYOoo2EZLUfE="
         }
       },
       "is_incremental": false,
@@ -189,7 +189,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Client.SyncedEntity.html",
-          "hash": "Ep15y7787P+t5CD0sQ+Wyn+HqG8EE/t1r/AdGt8ZrdM="
+          "hash": "YSBL7yl2h2WmhKu+2L2f3bEzvqEUnMBvvP8c18JgGzI="
         }
       },
       "is_incremental": false,
@@ -201,7 +201,19 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Client.SyncedPed.html",
-          "hash": "LBp552V0i/ax3Bry/isr2gZofE+O7ntvOL/lGrjGcYs="
+          "hash": "Q2le0/42XOaLZIbAkxlFo5fyvp8X+BGwxruWv6BnxTk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/RageCoop.Client.SyncedProp.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RageCoop.Client.SyncedProp.html",
+          "hash": "t1CXaj8fxKE44r46uA6+3ktc8TffnpFBjX4njC8ii+I="
         }
       },
       "is_incremental": false,
@@ -213,7 +225,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Client.SyncedVehicle.html",
-          "hash": "0D5HufYP0XwRoCTGVP0rmwTS8mCiY6dIyxhfkdp+9L8="
+          "hash": "dhZIv2mC9dGkfEdzC5AKSRqGtDzm41D3ewMml9PtRvI="
         }
       },
       "is_incremental": false,
@@ -237,7 +249,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Client.html",
-          "hash": "AMbF0zXRFnYwdn7WO+/SVe8eooUeMTjR7ozZOxHWzGY="
+          "hash": "J6fttN0Fj2fhEuRVoP/Bpy/dhkSo8zn/bYFPXBkPgOM="
         }
       },
       "is_incremental": false,
@@ -249,7 +261,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Core.Logger.html",
-          "hash": "iA+sXE14vPcMalrpPg5QPXiiOf14blJ/y6TkkDnIKG8="
+          "hash": "YanbXGDHE1goamhsD7R8Bletk37ezNJXNCtNdZ72NnI="
         }
       },
       "is_incremental": false,
@@ -321,7 +333,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Server.Client.html",
-          "hash": "69W19KalHDH5dGJ/uCGVW3nIdmJxPVejA1JQaH5S65A="
+          "hash": "0xsYNVcXtgHUBU+8ybCrfRY1a4dafHsjZjbL/cW9ugs="
         }
       },
       "is_incremental": false,
@@ -489,19 +501,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Server.ServerEntities.html",
-          "hash": "Y0OE2h706GJqCO4MWB1ZSpXNbng2uwUQ8n2pOwz1Hac="
-        }
-      },
-      "is_incremental": false,
-      "version": ""
-    },
-    {
-      "type": "ManagedReference",
-      "source_relative_path": "obj/api/RageCoop.Server.ServerObject.yml",
-      "output": {
-        ".html": {
-          "relative_path": "api/RageCoop.Server.ServerObject.html",
-          "hash": "e2YLbgW8WsDPmuFRhZFOX2W2E972c5oy8okqkXf0uMI="
+          "hash": "WTXFF2OkOTXhDyf3D0nRc8lBtFQMzaISIpxrgK1bOvI="
         }
       },
       "is_incremental": false,
@@ -513,7 +513,19 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Server.ServerPed.html",
-          "hash": "Nj4jArT3JTMihW4fsosizupSemIk3p3U806nMWfUQKE="
+          "hash": "PQCf8t9TCPc1tEWai7OQxm98cwLHNa9Zl654KG0Gu4c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "obj/api/RageCoop.Server.ServerProp.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/RageCoop.Server.ServerProp.html",
+          "hash": "0UJO4Oyjocb1AmzGFELQ9EjrW+F1iPH5o5xFlX7cJpU="
         }
       },
       "is_incremental": false,
@@ -537,7 +549,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Server.ServerVehicle.html",
-          "hash": "v+94Bus0VzLvu3LXRRUx3HSt21BQcJolGX9nm8FNmyw="
+          "hash": "bySWfd4MWrMOM5QEncfd3fCCOieNPpIbLoXiGsKWtp8="
         }
       },
       "is_incremental": false,
@@ -549,7 +561,7 @@
       "output": {
         ".html": {
           "relative_path": "api/RageCoop.Server.html",
-          "hash": "mj01hIwqBkW53XAh3EZsurEbCjFajYL1wYvdrdH0nEY="
+          "hash": "3oJLBh2imyFC+Cj+FgTb3DV3of/YbA00JftUyDYXoJg="
         }
       },
       "is_incremental": false,
@@ -561,7 +573,7 @@
       "output": {
         ".html": {
           "relative_path": "api/toc.html",
-          "hash": "1JzSLOBQvWb4NM8OEoZv8OWAEzpFNGdYv+HJaX0XXBI="
+          "hash": "fxts41eOVaAR3v6NOWGUU0OYotEA7CffyPU7T1EqN18="
         }
       },
       "is_incremental": false,
@@ -603,7 +615,7 @@
         "ManagedReferenceDocumentProcessor": {
           "can_incremental": false,
           "incrementalPhase": "build",
-          "total_file_count": 43,
+          "total_file_count": 44,
           "skipped_file_count": 0
         },
         "TocDocumentProcessor": {
