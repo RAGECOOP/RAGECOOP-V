@@ -89,10 +89,32 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">ServerProp</span></div>
+    <div class="level1"><a class="xref" href="RageCoop.Server.ServerObject.html">ServerObject</a></div>
+    <div class="level2"><span class="xref">ServerProp</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Handle">ServerObject.Handle</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Owner">ServerObject.Owner</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_ID">ServerObject.ID</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Model">ServerObject.Model</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Position">ServerObject.Position</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Rotation">ServerObject.Rotation</a>
+    </div>
+    <div>
+      <a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Freeze_System_Boolean_">ServerObject.Freeze(Boolean)</a>
+    </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
     </div>
@@ -119,140 +141,8 @@
   <h6><strong>Assembly</strong>: RageCoop.Server.dll</h6>
   <h5 id="RageCoop_Server_ServerProp_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class ServerProp</code></pre>
+    <pre><code class="lang-csharp hljs">public class ServerProp : ServerObject</code></pre>
   </div>
-  <h3 id="properties">Properties
-  </h3>
-  
-  
-  <a id="RageCoop_Server_ServerProp_Handle_" data-uid="RageCoop.Server.ServerProp.Handle*"></a>
-  <h4 id="RageCoop_Server_ServerProp_Handle" data-uid="RageCoop.Server.ServerProp.Handle">Handle</h4>
-  <div class="markdown level1 summary"><p>Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Tuple&lt;byte, byte[]&gt; Handle { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple-2">Tuple</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>[]&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerProp_ID_" data-uid="RageCoop.Server.ServerProp.ID*"></a>
-  <h4 id="RageCoop_Server_ServerProp_ID" data-uid="RageCoop.Server.ServerProp.ID">ID</h4>
-  <div class="markdown level1 summary"><p>Network ID of this object.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int ID { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerProp_Model_" data-uid="RageCoop.Server.ServerProp.Model*"></a>
-  <h4 id="RageCoop_Server_ServerProp_Model" data-uid="RageCoop.Server.ServerProp.Model">Model</h4>
-  <div class="markdown level1 summary"><p>The object's model</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Model Model { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">GTA.Model</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerProp_Position_" data-uid="RageCoop.Server.ServerProp.Position*"></a>
-  <h4 id="RageCoop_Server_ServerProp_Position" data-uid="RageCoop.Server.ServerProp.Position">Position</h4>
-  <div class="markdown level1 summary"><p>Gets or sets this object's position</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Vector3 Position { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">GTA.Math.Vector3</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerProp_Rotation_" data-uid="RageCoop.Server.ServerProp.Rotation*"></a>
-  <h4 id="RageCoop_Server_ServerProp_Rotation" data-uid="RageCoop.Server.ServerProp.Rotation">Rotation</h4>
-  <div class="markdown level1 summary"><p>Gets or sets this object's rotation</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Vector3 Rotation { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">GTA.Math.Vector3</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="methods">Methods
   </h3>
   
@@ -264,8 +154,23 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public void Delete()</code></pre>
+    <pre><code class="lang-csharp hljs">public override void Delete()</code></pre>
   </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Delete">ServerObject.Delete()</a></div>
+  
+  
+  <a id="RageCoop_Server_ServerProp_Update_" data-uid="RageCoop.Server.ServerProp.Update*"></a>
+  <h4 id="RageCoop_Server_ServerProp_Update" data-uid="RageCoop.Server.ServerProp.Update">Update()</h4>
+  <div class="markdown level1 summary"><p>Send updated information to clients, would be called automatically.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override void Update()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="RageCoop.Server.ServerObject.html#RageCoop_Server_ServerObject_Update">ServerObject.Update()</a></div>
 </article>
           </div>
           

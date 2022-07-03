@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class ServerObject
+    <title>Class ServerBlip
    | RageCoop resource documentation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class ServerObject
+    <meta name="title" content="Class ServerBlip
    | RageCoop resource documentation ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -78,21 +78,18 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="RageCoop.Server.ServerObject">
+            <article class="content wrap" id="_content" data-uid="RageCoop.Server.ServerBlip">
   
   
-  <h1 id="RageCoop_Server_ServerObject" data-uid="RageCoop.Server.ServerObject" class="text-break">Class ServerObject
+  <h1 id="RageCoop_Server_ServerBlip" data-uid="RageCoop.Server.ServerBlip" class="text-break">Class ServerBlip
   </h1>
-  <div class="markdown level0 summary"><p>Server-side object controller</p>
+  <div class="markdown level0 summary"><p>A static blip owned by server.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">ServerObject</span></div>
-      <div class="level2"><a class="xref" href="RageCoop.Server.ServerPed.html">ServerPed</a></div>
-      <div class="level2"><a class="xref" href="RageCoop.Server.ServerProp.html">ServerProp</a></div>
-      <div class="level2"><a class="xref" href="RageCoop.Server.ServerVehicle.html">ServerVehicle</a></div>
+    <div class="level1"><span class="xref">ServerBlip</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -120,22 +117,22 @@
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="RageCoop.Server.html">RageCoop.Server</a></h6>
   <h6><strong>Assembly</strong>: RageCoop.Server.dll</h6>
-  <h5 id="RageCoop_Server_ServerObject_syntax">Syntax</h5>
+  <h5 id="RageCoop_Server_ServerBlip_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class ServerObject</code></pre>
+    <pre><code class="lang-csharp hljs">public class ServerBlip</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="RageCoop_Server_ServerObject_Handle_" data-uid="RageCoop.Server.ServerObject.Handle*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Handle" data-uid="RageCoop.Server.ServerObject.Handle">Handle</h4>
-  <div class="markdown level1 summary"><p>Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.</p>
+  <a id="RageCoop_Server_ServerBlip_Color_" data-uid="RageCoop.Server.ServerBlip.Color*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Color" data-uid="RageCoop.Server.ServerBlip.Color">Color</h4>
+  <div class="markdown level1 summary"><p>Color of this blip</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Tuple&lt;byte, byte[]&gt; Handle { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public BlipColor Color { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -147,16 +144,16 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple-2">Tuple</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>[]&gt;</td>
+        <td><span class="xref">GTA.BlipColor</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="RageCoop_Server_ServerObject_ID_" data-uid="RageCoop.Server.ServerObject.ID*"></a>
-  <h4 id="RageCoop_Server_ServerObject_ID" data-uid="RageCoop.Server.ServerObject.ID">ID</h4>
-  <div class="markdown level1 summary"><p>Network ID of this object.</p>
+  <a id="RageCoop_Server_ServerBlip_ID_" data-uid="RageCoop.Server.ServerBlip.ID*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_ID" data-uid="RageCoop.Server.ServerBlip.ID">ID</h4>
+  <div class="markdown level1 summary"><p>Network ID (not handle!)</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -180,66 +177,14 @@
   </table>
   
   
-  <a id="RageCoop_Server_ServerObject_Model_" data-uid="RageCoop.Server.ServerObject.Model*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Model" data-uid="RageCoop.Server.ServerObject.Model">Model</h4>
-  <div class="markdown level1 summary"><p>The object's model</p>
+  <a id="RageCoop_Server_ServerBlip_Position_" data-uid="RageCoop.Server.ServerBlip.Position*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Position" data-uid="RageCoop.Server.ServerBlip.Position">Position</h4>
+  <div class="markdown level1 summary"><p>Position of this blip</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Model Model { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">GTA.Model</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerObject_Owner_" data-uid="RageCoop.Server.ServerObject.Owner*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Owner" data-uid="RageCoop.Server.ServerObject.Owner">Owner</h4>
-  <div class="markdown level1 summary"><p>The client that owns this object, null if it's owned by server.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Client Owner { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="RageCoop.Server.Client.html">Client</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerObject_Position_" data-uid="RageCoop.Server.ServerObject.Position*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Position" data-uid="RageCoop.Server.ServerObject.Position">Position</h4>
-  <div class="markdown level1 summary"><p>Gets or sets this object's position</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual Vector3 Position { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Vector3 Position { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -258,14 +203,14 @@
   </table>
   
   
-  <a id="RageCoop_Server_ServerObject_Rotation_" data-uid="RageCoop.Server.ServerObject.Rotation*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Rotation" data-uid="RageCoop.Server.ServerObject.Rotation">Rotation</h4>
-  <div class="markdown level1 summary"><p>Gets or sets this object's rotation</p>
+  <a id="RageCoop_Server_ServerBlip_Rotation_" data-uid="RageCoop.Server.ServerBlip.Rotation*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Rotation" data-uid="RageCoop.Server.ServerBlip.Rotation">Rotation</h4>
+  <div class="markdown level1 summary"><p>Scale of this blip</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual Vector3 Rotation { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int Rotation { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -277,7 +222,59 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerBlip_Scale_" data-uid="RageCoop.Server.ServerBlip.Scale*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Scale" data-uid="RageCoop.Server.ServerBlip.Scale">Scale</h4>
+  <div class="markdown level1 summary"><p>Scale of this blip</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Vector2 Scale { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector2</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerBlip_Sprite_" data-uid="RageCoop.Server.ServerBlip.Sprite*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Sprite" data-uid="RageCoop.Server.ServerBlip.Sprite">Sprite</h4>
+  <div class="markdown level1 summary"><p>Sprite of this blip</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public BlipSprite Sprite { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.BlipSprite</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -286,68 +283,14 @@
   </h3>
   
   
-  <a id="RageCoop_Server_ServerObject_Delete_" data-uid="RageCoop.Server.ServerObject.Delete*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Delete" data-uid="RageCoop.Server.ServerObject.Delete">Delete()</h4>
-  <div class="markdown level1 summary"><p>Delete this object</p>
+  <a id="RageCoop_Server_ServerBlip_Delete_" data-uid="RageCoop.Server.ServerBlip.Delete*"></a>
+  <h4 id="RageCoop_Server_ServerBlip_Delete" data-uid="RageCoop.Server.ServerBlip.Delete">Delete()</h4>
+  <div class="markdown level1 summary"><p>Delete this blip</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void Delete()</code></pre>
-  </div>
-  
-  
-  <a id="RageCoop_Server_ServerObject_Freeze_" data-uid="RageCoop.Server.ServerObject.Freeze*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Freeze_System_Boolean_" data-uid="RageCoop.Server.ServerObject.Freeze(System.Boolean)">Freeze(Boolean)</h4>
-  <div class="markdown level1 summary"><p>Freeze this object, will throw an exception if it's a ServerProp.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void Freeze(bool toggle)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
-        <td><span class="parametername">toggle</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="exceptions">Exceptions</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Condition</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Server_ServerObject_Update_" data-uid="RageCoop.Server.ServerObject.Update*"></a>
-  <h4 id="RageCoop_Server_ServerObject_Update" data-uid="RageCoop.Server.ServerObject.Update">Update()</h4>
-  <div class="markdown level1 summary"><p>Send updated information to clients, would be called automatically.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual void Update()</code></pre>
+    <pre><code class="lang-csharp hljs">public void Delete()</code></pre>
   </div>
 </article>
           </div>

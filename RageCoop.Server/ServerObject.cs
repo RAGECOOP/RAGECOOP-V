@@ -284,7 +284,7 @@ namespace RageCoop.Server
         }
         private void DoUpdate()
         {
-            Server.Logger?.Debug("bee");
+            // Server.Logger?.Debug("bee");
             // Serve-side blip
             Server.BaseScript.SendServerBlipsTo(new() { this });
 

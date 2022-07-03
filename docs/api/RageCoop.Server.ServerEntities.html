@@ -125,6 +125,54 @@
   </h3>
   
   
+  <a id="RageCoop_Server_ServerEntities_CreateBlip_" data-uid="RageCoop.Server.ServerEntities.CreateBlip*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_CreateBlip_GTA_Math_Vector3_System_Int32_" data-uid="RageCoop.Server.ServerEntities.CreateBlip(GTA.Math.Vector3,System.Int32)">CreateBlip(Vector3, Int32)</h4>
+  <div class="markdown level1 summary"><p>Create a static <a class="xref" href="RageCoop.Server.ServerBlip.html">ServerBlip</a> owned by server.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerBlip CreateBlip(Vector3 pos, int rotation)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td><span class="parametername">pos</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">rotation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerBlip.html">ServerBlip</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="RageCoop_Server_ServerEntities_CreateProp_" data-uid="RageCoop.Server.ServerEntities.CreateProp*"></a>
   <h4 id="RageCoop_Server_ServerEntities_CreateProp_GTA_Model_GTA_Math_Vector3_GTA_Math_Vector3_" data-uid="RageCoop.Server.ServerEntities.CreateProp(GTA.Model,GTA.Math.Vector3,GTA.Math.Vector3)">CreateProp(Model, Vector3, Vector3)</h4>
   <div class="markdown level1 summary"><p>Create a static prop owned by server.</p>
@@ -178,6 +226,32 @@
   </table>
   
   
+  <a id="RageCoop_Server_ServerEntities_GetAllBlips_" data-uid="RageCoop.Server.ServerEntities.GetAllBlips*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetAllBlips" data-uid="RageCoop.Server.ServerEntities.GetAllBlips">GetAllBlips()</h4>
+  <div class="markdown level1 summary"><p>Get all static objects owned by server</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerBlip[] GetAllBlips()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerBlip.html">ServerBlip</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
   <a id="RageCoop_Server_ServerEntities_GetAllPeds_" data-uid="RageCoop.Server.ServerEntities.GetAllPeds*"></a>
   <h4 id="RageCoop_Server_ServerEntities_GetAllPeds" data-uid="RageCoop.Server.ServerEntities.GetAllPeds">GetAllPeds()</h4>
   <div class="markdown level1 summary"><p>Get all peds on this server</p>
@@ -206,7 +280,7 @@
   
   <a id="RageCoop_Server_ServerEntities_GetAllProps_" data-uid="RageCoop.Server.ServerEntities.GetAllProps*"></a>
   <h4 id="RageCoop_Server_ServerEntities_GetAllProps" data-uid="RageCoop.Server.ServerEntities.GetAllProps">GetAllProps()</h4>
-  <div class="markdown level1 summary"><p>Get all static objects owned by server</p>
+  <div class="markdown level1 summary"><p>Get all static prop objects owned by server</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -230,14 +304,14 @@
   </table>
   
   
-  <a id="RageCoop_Server_ServerEntities_GetAllVehicle_" data-uid="RageCoop.Server.ServerEntities.GetAllVehicle*"></a>
-  <h4 id="RageCoop_Server_ServerEntities_GetAllVehicle" data-uid="RageCoop.Server.ServerEntities.GetAllVehicle">GetAllVehicle()</h4>
+  <a id="RageCoop_Server_ServerEntities_GetAllVehicles_" data-uid="RageCoop.Server.ServerEntities.GetAllVehicles*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetAllVehicles" data-uid="RageCoop.Server.ServerEntities.GetAllVehicles">GetAllVehicles()</h4>
   <div class="markdown level1 summary"><p>Get all vehicles on this server</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public ServerVehicle[] GetAllVehicle()</code></pre>
+    <pre><code class="lang-csharp hljs">public ServerVehicle[] GetAllVehicles()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -250,6 +324,49 @@
     <tbody>
       <tr>
         <td><a class="xref" href="RageCoop.Server.ServerVehicle.html">ServerVehicle</a>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_ServerEntities_GetBlipByID_" data-uid="RageCoop.Server.ServerEntities.GetBlipByID*"></a>
+  <h4 id="RageCoop_Server_ServerEntities_GetBlipByID_System_Int32_" data-uid="RageCoop.Server.ServerEntities.GetBlipByID(System.Int32)">GetBlipByID(Int32)</h4>
+  <div class="markdown level1 summary"><p>Get a <a class="xref" href="RageCoop.Server.ServerBlip.html">ServerBlip</a> by it's id.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public ServerBlip GetBlipByID(int id)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">id</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="RageCoop.Server.ServerBlip.html">ServerBlip</a></td>
         <td></td>
       </tr>
     </tbody>

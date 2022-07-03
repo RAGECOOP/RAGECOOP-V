@@ -48,7 +48,7 @@ namespace RageCoop.Client.Scripting
             Blip blip;
             API.QueueAction(() =>
             {
-                Main.Logger.Debug($"{sprite},{color},{scale},{pos},{rot}");
+                // Main.Logger.Debug($"{sprite},{color},{scale},{pos},{rot}");
                 if (!EntityPool.ServerBlips.TryGetValue(id, out blip))
                 {
                     EntityPool.ServerBlips.Add(id, blip=World.CreateBlip(pos));
