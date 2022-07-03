@@ -79,6 +79,8 @@ namespace RageCoop.Core
                             Args.Add(reader.ReadQuaternion()); break;
                         case 0x13:
                             Args.Add((GTA.Model)reader.ReadInt()); break;
+                        case 0x14:
+                            Args.Add(reader.ReadVector2()); break;
                         default:
                             if (_resolve==null)
                             {

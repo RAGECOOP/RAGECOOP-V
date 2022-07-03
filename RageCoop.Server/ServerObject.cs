@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using GTA;
 using GTA.Native;
@@ -17,6 +18,8 @@ namespace RageCoop.Server
     /// </summary>
     public abstract class ServerObject
     {
+        internal ServerObject() { }
+        
         /// <summary>
         /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
         /// </summary>
@@ -79,7 +82,7 @@ namespace RageCoop.Server
         internal Vector3 _rot;
 
         /// <summary>
-        /// Send updated information to clients
+        /// Send updated information to clients, would be called automatically.
         /// </summary>
         public virtual void Update() {
             Owner.SendCustomEvent(CustomEvents.SetEntity, Handle, Position, Rotation);
@@ -130,13 +133,14 @@ namespace RageCoop.Server
         public override void Delete()
         {
             Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, new() { ID });
+            Server.Entities.RemoveProp(ID);
         }
 
         
 
 
         /// <summary>
-        /// Send updated information to clients
+        /// Send updated information to clients, would be called automatically.
         /// </summary>
         public override void Update()
         {
@@ -188,12 +192,102 @@ namespace RageCoop.Server
         /// </summary>
         public Quaternion Quaternion { get; internal set; }
     }
-    internal class ServerBlip
-    {
-        internal ServerBlip()
-        {
 
+    /// <summary>
+    /// A static blip owned by server.
+    /// </summary>
+    public class ServerBlip
+    {
+        private readonly Server Server;
+        internal ServerBlip(Server server)
+        {
+            Server = server;
         }
 
+        /// <summary>
+        /// Network ID (not handle!)
+        /// </summary>
+        public int ID { get; internal set; }
+
+
+        internal BlipColor _color;
+        /// <summary>
+        /// Color of this blip
+        /// </summary>
+        public BlipColor Color { 
+            get { return _color; } 
+            set { _color=value; Update(); } 
+        }
+
+        internal BlipSprite _sprite;
+        /// <summary>
+        /// Sprite of this blip
+        /// </summary>
+        public BlipSprite Sprite {
+            get { return _sprite; }
+            set { _sprite=value; Update();}
+        }
+
+        internal Vector2 _scale=new(1f,1f);
+        /// <summary>
+        /// Scale of this blip
+        /// </summary>
+        public Vector2 Scale
+        {
+            get { return _scale; }
+            set { _scale=value;Update(); }
+        }
+
+        internal Vector3 _pos = new();
+        /// <summary>
+        /// Position of this blip
+        /// </summary>
+        public Vector3 Position
+        {
+            get { return _pos; }
+            set { _pos=value; Update(); }
+        }
+
+        internal int _rot;
+        /// <summary>
+        /// Scale of this blip
+        /// </summary>
+        public int Rotation
+        {
+            get { return _rot; }
+            set { _rot=value; Update(); }
+        }
+
+        /// <summary>
+        /// Delete this blip
+        /// </summary>
+        public void Delete()
+        {
+            Server.API.SendCustomEvent(CustomEvents.DeleteServerBlip, new() { ID });
+            Server.Entities.RemoveServerBlip(ID);
+        }
+
+        private bool _bouncing=false;
+        internal void Update()
+        {
+            // 5ms debounce
+            if (!_bouncing)
+            {
+                _bouncing=true;
+                Task.Run(() =>
+                {
+                    Thread.Sleep(5);
+                    DoUpdate();
+                    _bouncing=false;
+                });
+            }
+        }
+        private void DoUpdate()
+        {
+            Server.Logger?.Debug("bee");
+            // Serve-side blip
+            Server.BaseScript.SendServerBlipsTo(new() { this });
+
+        }
     }
 }

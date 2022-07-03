@@ -123,6 +123,14 @@ namespace RageCoop.Core
                 Z = ReadFloat()
             };
         }
+        public Vector2 ReadVector2()
+        {
+            return new Vector2()
+            {
+                X = ReadFloat(),
+                Y = ReadFloat()
+            };
+        }
         public Quaternion ReadQuaternion()
         {
             return new Quaternion()

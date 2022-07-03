@@ -637,7 +637,10 @@ namespace RageCoop.Server
 
             // Send all props to this player
             BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
-            
+
+            // Send all blips to this player
+            BaseScript.SendServerBlipsTo(new(Entities.Blips.Values), new() { newClient});
+
             // Send new client to all players
             var cons = MainNetServer.Connections.Exclude(newClient.Connection);
             if (cons.Count!=0)

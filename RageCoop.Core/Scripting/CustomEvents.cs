@@ -21,9 +21,11 @@ namespace RageCoop.Core.Scripting
         internal static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
         internal static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
         internal static readonly int ServerPropSync = Hash("RageCoop.ServerPropSync");
+        internal static readonly int ServerBlipSync = Hash("RageCoop.ServerBlipSync");
         internal static readonly int SetEntity = Hash("RageCoop.SetEntity");
         internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
         internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
+        internal static readonly int DeleteServerBlip = Hash("RageCoop.DeleteServerBlip");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

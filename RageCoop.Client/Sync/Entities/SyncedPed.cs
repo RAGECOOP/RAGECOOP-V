@@ -93,12 +93,32 @@ namespace RageCoop.Client
                 }
                 RenderNameTag();
             }
+
+            // Check if all data avalible
+            if (!IsReady) { return; }
+
+            // Skip update if no new sync message has arrived.
+            if (!NeedUpdate)
+            {
+                return;
+            }
+
+
+            bool characterExist = (MainPed != null) && MainPed.Exists();
+
+            if (!characterExist)
+            {
+                CreateCharacter();
+                return;
+            }
+
+
             if (((byte)BlipColor==255) && (PedBlip!=null))
             {
                 PedBlip.Delete();
                 PedBlip=null;
             }
-            else if(PedBlip==null)
+            else if (PedBlip==null)
             {
                 PedBlip=MainPed.AddBlip();
                 if (IsPlayer)
@@ -119,24 +139,6 @@ namespace RageCoop.Client
                 PedBlip.Color=BlipColor;
             }
 
-            // Check if all data avalible
-            if (!IsReady) { return; }
-
-            // Skip update if no new sync message has arrived.
-            if (!NeedUpdate)
-            {
-                return;
-            }
-
-
-            bool characterExist = (MainPed != null) && MainPed.Exists();
-
-            if (!characterExist)
-            {
-                CreateCharacter();
-                return;
-            }
-            
 
 
             // Need to update state

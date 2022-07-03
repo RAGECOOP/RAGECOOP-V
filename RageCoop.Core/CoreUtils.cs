@@ -46,6 +46,8 @@ namespace RageCoop.Core
                     return (0x12, ((Quaternion)obj).GetBytes());
                 case GTA.Model _:
                     return (0x13, BitConverter.GetBytes((GTA.Model)obj));
+                case Vector2 _:
+                    return (0x14, ((Vector2)obj).GetBytes());
                 case Tuple<byte, byte[]> _:
                     var tup = (Tuple<byte, byte[]>)obj;
                     return (tup.Item1, tup.Item2);
@@ -129,6 +131,13 @@ namespace RageCoop.Core
             // 12 bytes
             return new List<byte[]>() { BitConverter.GetBytes(vec.X), BitConverter.GetBytes(vec.Y), BitConverter.GetBytes(vec.Z) }.Join(4);
         }
+
+        public static byte[] GetBytes(this Vector2 vec)
+        {
+            // 8 bytes
+            return new List<byte[]>() { BitConverter.GetBytes(vec.X), BitConverter.GetBytes(vec.Y) }.Join(4);
+        }
+
         /// <summary>
         /// 
         /// </summary>

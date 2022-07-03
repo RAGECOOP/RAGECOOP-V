@@ -40,6 +40,10 @@ namespace RageCoop.Client
         public static object PropsLock=new object();
         public static Dictionary<int,SyncedProp> ServerProps=new Dictionary<int,SyncedProp>();
 
+        public static object BlipsLock = new object();
+        public static Dictionary<int, Blip> ServerBlips = new Dictionary<int, Blip>();
+
+
         public static void Cleanup(bool keepPlayer=true,bool keepMine=true)
         {
             foreach(int id in new List<int>(ID_Peds.Keys))
@@ -74,6 +78,15 @@ namespace RageCoop.Client
                 p?.MainProp?.Delete();
             }
             ServerProps.Clear();
+
+            foreach(var b in ServerBlips.Values)
+            {
+                if (b.Exists())
+                {
+                    b.Delete();
+                }
+            }
+            ServerBlips.Clear();
         }
 
         #region PEDS

@@ -20,9 +20,46 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.DeleteEntity, DeleteEntity);
             API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag, SetNameTag);
             API.RegisterCustomEventHandler(CustomEvents.SetEntity, SetEntity);
+            API.RegisterCustomEventHandler(CustomEvents.ServerBlipSync, ServerBlipSync);
+            API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+        }
 
+        private void DeleteServerBlip(CustomEventReceivedArgs e)
+        {
+            if (EntityPool.ServerBlips.TryGetValue((int)e.Args[0], out var blip))
+            {
+                EntityPool.ServerBlips.Remove((int)e.Args[0]);
+                API.QueueAction(()=>{
+                    blip?.Delete();
+                });
+            }
+        }
+
+        private void ServerBlipSync(CustomEventReceivedArgs obj)
+        {
+            int id= (int)obj.Args[0];
+            var sprite=(BlipSprite)(short)obj.Args[1];
+            var color = (BlipColor)(byte)obj.Args[2];
+            var scale=(Vector2)obj.Args[3];
+            var pos=(Vector3)obj.Args[4];
+            int rot= (int)obj.Args[5];
+            Blip blip;
+            API.QueueAction(() =>
+            {
+                Main.Logger.Debug($"{sprite},{color},{scale},{pos},{rot}");
+                if (!EntityPool.ServerBlips.TryGetValue(id, out blip))
+                {
+                    EntityPool.ServerBlips.Add(id, blip=World.CreateBlip(pos));
+                }
+                blip.Sprite = sprite;
+                blip.Color = color;
+                blip.ScaleX = scale.X;
+                blip.ScaleY = scale.Y;
+                blip.Position = pos;
+                blip.Rotation = rot;
+            });
         }
 
         private void SetEntity(CustomEventReceivedArgs obj)

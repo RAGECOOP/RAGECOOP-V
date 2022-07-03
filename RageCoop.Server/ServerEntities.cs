@@ -25,6 +25,7 @@ namespace RageCoop.Server
         internal Dictionary<int, ServerPed> Peds { get; set; } = new();
         internal Dictionary<int, ServerVehicle> Vehicles { get; set; } = new();
         internal Dictionary<int,ServerProp> ServerProps { get; set; }=new();
+        internal Dictionary<int,ServerBlip> Blips { get; set; } = new();
         
         /// <summary>
         /// Get a <see cref="ServerPed"/> by it's id
@@ -76,6 +77,24 @@ namespace RageCoop.Server
                 return null;
             }
         }
+
+        /// <summary>
+        /// Get a <see cref="ServerBlip"/> by it's id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ServerBlip GetBlipByID(int id)
+        {
+            if (Blips.TryGetValue(id, out var obj))
+            {
+                return obj;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// Create a static prop owned by server.
         /// </summary>
@@ -85,16 +104,36 @@ namespace RageCoop.Server
         /// <returns></returns>
         public ServerProp CreateProp(Model model,Vector3 pos,Vector3 rot)
         {
-            int id = RequestID();
+            int id = RequestNetworkID();
             ServerProp prop;
             ServerProps.Add(id,prop=new ServerProp(Server)
             {
                 ID=id,
                 Model=model,
-                Position=pos,
-                Rotation=rot
+                _pos=pos,
+                _rot=rot
             });
+            prop.Update();
             return prop;
+        }
+
+        /// <summary>
+        /// Create a static <see cref="ServerBlip"/> owned by server.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        public ServerBlip CreateBlip(Vector3 pos,int rotation)
+        {
+            var b = new ServerBlip(Server)
+            {
+                ID=RequestNetworkID(),
+                Position=pos,
+                Rotation=rotation
+            };
+            Blips.Add(b.ID,b);
+            b.Update();
+            return b;
         }
 
         /// <summary>
@@ -116,13 +155,22 @@ namespace RageCoop.Server
         }
 
         /// <summary>
-        /// Get all static objects owned by server
+        /// Get all static prop objects owned by server
         /// </summary>
         /// <returns></returns>
         public ServerProp[] GetAllProps()
         {
             return ServerProps.Values.ToArray();
-        } 
+        }
+
+        /// <summary>
+        /// Get all static objects owned by server
+        /// </summary>
+        /// <returns></returns>
+        public ServerBlip[] GetAllBlips()
+        {
+            return Blips.Values.ToArray();
+        }
 
         /// <summary>
         /// Not thread safe
@@ -196,6 +244,17 @@ namespace RageCoop.Server
             // Server.Logger?.Trace($"Removing vehicle:{id}");
             if (Vehicles.ContainsKey(id)) { Vehicles.Remove(id); }
         }
+
+        internal void RemoveProp(int id)
+        {
+            // Server.Logger?.Trace($"Removing vehicle:{id}");
+            if (ServerProps.ContainsKey(id)) { ServerProps.Remove(id); }
+        }
+        internal void RemoveServerBlip(int id)
+        {
+            // Server.Logger?.Trace($"Removing vehicle:{id}");
+            if (Blips.ContainsKey(id)) { Blips.Remove(id); }
+        }
         internal void RemovePed(int id)
         {
             // Server.Logger?.Trace($"Removing ped:{id}");
@@ -213,13 +272,14 @@ namespace RageCoop.Server
                 Peds.Add(ped.ID, ped);
             }
         }
-        internal int RequestID()
+        internal int RequestNetworkID()
         {
             int ID = 0;
             while ((ID==0)
                 || ServerProps.ContainsKey(ID)
                 || Peds.ContainsKey(ID)
-                || Vehicles.ContainsKey(ID))
+                || Vehicles.ContainsKey(ID)
+                || Blips.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
 
