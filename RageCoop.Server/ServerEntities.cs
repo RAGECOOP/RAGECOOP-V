@@ -164,7 +164,7 @@ namespace RageCoop.Server
         }
 
         /// <summary>
-        /// Get all static objects owned by server
+        /// Get all blips owned by server
         /// </summary>
         /// <returns></returns>
         public ServerBlip[] GetAllBlips()

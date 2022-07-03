@@ -42,9 +42,10 @@ namespace RageCoop.Client.Scripting
             int id= (int)obj.Args[0];
             var sprite=(BlipSprite)(short)obj.Args[1];
             var color = (BlipColor)(byte)obj.Args[2];
-            var scale=(Vector2)obj.Args[3];
+            var scale=(float)obj.Args[3];
             var pos=(Vector3)obj.Args[4];
             int rot= (int)obj.Args[5];
+            var name=(string)obj.Args[6];
             Blip blip;
             API.QueueAction(() =>
             {
@@ -55,10 +56,10 @@ namespace RageCoop.Client.Scripting
                 }
                 blip.Sprite = sprite;
                 blip.Color = color;
-                blip.ScaleX = scale.X;
-                blip.ScaleY = scale.Y;
+                blip.Scale = scale;
                 blip.Position = pos;
                 blip.Rotation = rot;
+                blip.Name = name;
             });
         }
 

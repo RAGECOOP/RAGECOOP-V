@@ -228,11 +228,11 @@ namespace RageCoop.Server
             set { _sprite=value; Update();}
         }
 
-        internal Vector2 _scale=new(1f,1f);
+        internal float _scale =1;
         /// <summary>
         /// Scale of this blip
         /// </summary>
-        public Vector2 Scale
+        public float Scale
         {
             get { return _scale; }
             set { _scale=value;Update(); }
@@ -250,12 +250,22 @@ namespace RageCoop.Server
 
         internal int _rot;
         /// <summary>
-        /// Scale of this blip
+        /// Rotation of this blip
         /// </summary>
         public int Rotation
         {
             get { return _rot; }
             set { _rot=value; Update(); }
+        }
+
+        internal string _name="Beeeeeee";
+        /// <summary>
+        /// Name of this blip
+        /// </summary>
+        public string Name
+        {
+            get { return _name;}
+            set { _name=value; Update(); }
         }
 
         /// <summary>
