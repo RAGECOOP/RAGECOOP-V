@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GTA;
+using GTA.Native;
 using GTA.Math;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
@@ -91,6 +92,23 @@ namespace RageCoop.Server
         {
             Owner?.SendCustomEvent(CustomEvents.DeleteEntity, Handle);
         }
+
+        /// <summary>
+        /// Freeze this object, will throw an exception if it's a ServerProp.
+        /// </summary>
+        /// <param name="toggle"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public virtual void Freeze(bool toggle)
+        {
+            if (GetTypeByte()==50)
+            {
+                throw new InvalidOperationException("Can't freeze or unfreeze static server object");
+            }
+            else
+            {
+                Owner.SendNativeCall(Hash.FREEZE_ENTITY_POSITION, Handle, toggle);
+            }
+        }
     }
     /// <summary>
     /// Represents an prop owned by server.
@@ -124,6 +142,7 @@ namespace RageCoop.Server
         {
              Server.BaseScript.SendServerPropsTo(new() { this });
         }
+
     }
     /// <summary>
     /// Represents a ped from a client
@@ -132,7 +151,7 @@ namespace RageCoop.Server
     {
         internal ServerPed()
         {
-
+            
         }
 
         /// <summary>
@@ -169,38 +188,12 @@ namespace RageCoop.Server
         /// </summary>
         public Quaternion Quaternion { get; internal set; }
     }
-    internal class ServerBlip : ServerObject
+    internal class ServerBlip
     {
         internal ServerBlip()
         {
 
         }
 
-        /// <summary>
-        /// Invalid
-        /// </summary>
-        private new Vector3 Rotation { get; set; }
-
-        BlipColor _color;
-        public BlipColor Color {
-            get {
-                return _color; 
-            } 
-            set { 
-                if(Owner != null)
-                {
-
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
-                _color = value;
-            } 
-        }
-        private new Vector2 Position
-        {
-            get; set;
-        }
     }
 }
