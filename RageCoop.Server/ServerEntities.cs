@@ -11,165 +11,7 @@ using GTA;
 
 namespace RageCoop.Server
 {
-    /// <summary>
-    /// Represents an prop owned by server.
-    /// </summary>
-    public class ServerProp
-    {
-        private Server Server;
-        internal ServerProp(Server server)
-        {
-            Server= server;
-        }
-
-
-        /// <summary>
-        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
-        /// </summary>
-        public Tuple<byte,byte[]> Handle
-        {
-            get
-            {
-                return new(50, BitConverter.GetBytes(ID));
-            }
-        }
-
-        /// <summary>
-        /// Delete this prop
-        /// </summary>
-        public void Delete()
-        {
-            Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, new() { ID });
-        }
-
-        /// <summary>
-        /// Network ID of this object.
-        /// </summary>
-        public int ID { get; internal set; }
-
-        /// <summary>
-        /// The object's model
-        /// </summary>
-        public Model Model { get; internal set; }
-
-        /// <summary>
-        /// Gets or sets this object's position
-        /// </summary>
-        public Vector3 Position 
-        { 
-            get { return _pos; } 
-            set { _pos=value; Server.BaseScript.SendServerObjectsTo(new() { this }); } 
-        }
-        private Vector3 _pos;
-
-        /// <summary>
-        /// Gets or sets this object's rotation
-        /// </summary>
-        public Vector3 Rotation
-        {
-            get { return _rot; }
-            set { _rot=value; Server.BaseScript.SendServerObjectsTo(new() { this }); }
-        }
-        private Vector3 _rot;
-    }
-    /// <summary>
-    /// Represents a ped from a client
-    /// </summary>
-    public class ServerPed
-    {
-        internal ServerPed()
-        {
-
-        }
-
-        /// <summary>
-        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
-        /// </summary>
-        public Tuple<byte, byte[]> Handle
-        {
-            get
-            {
-                return new(51, BitConverter.GetBytes(ID));
-            }
-        }
-
-        /// <summary>
-        /// The <see cref="Client"/> that is responsible synchronizing for this ped.
-        /// </summary>
-        public Client Owner { get; internal set; }
-
-        /// <summary>
-        /// The ped's network ID (not handle!).
-        /// </summary>
-        public int ID { get; internal set; }
-
-        /// <summary>
-        /// Whether this ped is a player.
-        /// </summary>
-        public bool IsPlayer { get { return Owner?.Player==this; } }
-
-        /// <summary>
-        /// The ped's last vehicle.
-        /// </summary>
-        public ServerVehicle LastVehicle { get; internal set; }
-
-        /// <summary>
-        /// Position of this ped
-        /// </summary>
-        public Vector3 Position { get; internal set; }
-
-
-        /// <summary>
-        /// Gets or sets this ped's rotation
-        /// </summary>
-        public Vector3 Rotation { get; internal set; }
-
-        /// <summary>
-        /// Health
-        /// </summary>
-        public int Health { get; internal set; }
-    }
-    /// <summary>
-    /// Represents a vehicle from a client
-    /// </summary>
-    public class ServerVehicle
-    {
-        internal ServerVehicle()
-        {
-
-        }
-
-        /// <summary>
-        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
-        /// </summary>
-        public Tuple<byte, byte[]> Handle
-        {
-            get{
-                return new(52, BitConverter.GetBytes(ID));
-            }
-        }
-
-        /// <summary>
-        /// The <see cref="Client"/> that is responsible synchronizing for this vehicle.
-        /// </summary>
-        public Client Owner { get; internal set; }
-
-        /// <summary>
-        /// The vehicle's network ID (not handle!).
-        /// </summary>
-        public int ID { get; internal set; }
-
-        /// <summary>
-        /// Position of this vehicle
-        /// </summary>
-        public Vector3 Position { get; internal set; }
-
-        /// <summary>
-        /// Gets or sets this vehicle's quaternion
-        /// </summary>
-        public Quaternion Quaternion { get; internal set; }
-    }
-
+    
     /// <summary>
     /// Manipulate entities from the server
     /// </summary>
@@ -268,7 +110,7 @@ namespace RageCoop.Server
         /// Get all vehicles on this server
         /// </summary>
         /// <returns></returns>
-        public ServerVehicle[] GetAllVehicle()
+        public ServerVehicle[] GetAllVehicles()
         {
             return Vehicles.Values.ToArray();
         }
@@ -293,10 +135,10 @@ namespace RageCoop.Server
                 Peds.Add(p.ID,ped=new ServerPed());
                 ped.ID=p.ID;
             }
-            ped.Position = p.Position;
+            ped._pos = p.Position;
             ped.Owner=sender;
             ped.Health=p.Health;
-            ped.Rotation=p.Rotation;
+            ped._rot=p.Rotation;
             ped.Owner=sender;
         }
         internal void Update(Packets.VehicleSync p, Client sender)
@@ -307,7 +149,7 @@ namespace RageCoop.Server
                 Vehicles.Add(p.ID, veh=new ServerVehicle());
                 veh.ID=p.ID;
             }
-            veh.Position = p.Position;
+            veh._pos = p.Position;
             veh.Owner=sender;
             veh.Quaternion=p.Quaternion;
         }
@@ -317,9 +159,10 @@ namespace RageCoop.Server
             if (!Vehicles.TryGetValue(p.ID, out veh))
             {
                 Vehicles.Add(p.ID, veh=new ServerVehicle());
-                veh.ID=p.ID;
             }
-            foreach(var pair in p.Passengers)
+            veh.ID=p.ID;
+            veh.Owner=sender;
+            foreach (var pair in p.Passengers)
             {
                 if(Peds.TryGetValue(pair.Value,out var ped))
                 {

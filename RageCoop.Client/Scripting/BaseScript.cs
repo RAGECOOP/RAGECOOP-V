@@ -17,13 +17,39 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
             API.RegisterCustomEventHandler(CustomEvents.ServerPropSync, ServerObjectSync);
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerProp, DeleteServerProp);
+            API.RegisterCustomEventHandler(CustomEvents.DeleteEntity, DeleteEntity);
+            API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag, SetNameTag);
+            API.RegisterCustomEventHandler(CustomEvents.SetEntity, SetEntity);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
 
         }
 
+        private void SetEntity(CustomEventReceivedArgs obj)
+        {
+            Main.QueueAction(() =>
+            {
+                var e=Entity.FromHandle((int)obj.Args[0]);
+                e.Position = (Vector3)obj.Args[1];
+                e.Rotation = (Vector3)obj.Args[2];
+            });
+        }
+
+        private void DeleteEntity(CustomEventReceivedArgs e)
+        {
+            Entity.FromHandle((int)e.Args[0]).Delete();
+        }
+
         public override void OnStop()
         {
+        }
+        private void SetNameTag(CustomEventReceivedArgs e)
+        {
+            var p = EntityPool.GetPedByID((int)e.Args[0]);
+            if(p!= null)
+            {
+                p.DisplayNameTag=(bool)e.Args[1];
+            }
         }
         private void SetAutoRespawn(CustomEventReceivedArgs args)
         {
@@ -42,15 +68,18 @@ namespace RageCoop.Client.Scripting
         {
             SyncedProp prop;
             var id = (int)e.Args[0];
-            if (!EntityPool.ServerProps.TryGetValue(id,out prop))
+            lock (EntityPool.PropsLock)
             {
-                EntityPool.ServerProps.Add(id,prop=new SyncedProp(id));
+                if (!EntityPool.ServerProps.TryGetValue(id, out prop))
+                {
+                    EntityPool.ServerProps.Add(id, prop=new SyncedProp(id));
+                }
             }
             prop.LastSynced=Main.Ticked+1;
             prop.ModelHash= (Model)e.Args[1];
             prop.Position=(Vector3)e.Args[2];
             prop.Rotation=(Vector3)e.Args[3];
-            Main.Logger.Trace($"{Main.Ticked},{(VehicleHash)prop.ModelHash},{prop.Position},{prop.Rotation}");
+            Main.QueueAction(() => { prop.Update(); });
         }
         private void NativeCall(CustomEventReceivedArgs e)
         {

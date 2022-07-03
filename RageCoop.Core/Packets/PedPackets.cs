@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GTA.Math;
+using GTA;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -23,8 +24,9 @@ namespace RageCoop.Core
             public int OwnerID { get; set; }
 
             public Dictionary<uint, bool> WeaponComponents { get; set; }
-            
+
             public byte WeaponTint { get;set; }
+            public BlipColor BlipColor { get; set; } = (BlipColor)255;
 
 
             public override void Pack(NetOutgoingMessage message)
@@ -64,6 +66,8 @@ namespace RageCoop.Core
 
                 byteArray.Add(WeaponTint);
 
+                byteArray.Add((byte)BlipColor);
+
                 byte[] result = byteArray.ToArray();
                 message.Write(result.Length);
                 message.Write(result);
@@ -98,6 +102,8 @@ namespace RageCoop.Core
                     }
                 }
                 WeaponTint=reader.ReadByte();
+
+                BlipColor=(BlipColor)reader.ReadByte();
                 #endregion
             }
         }

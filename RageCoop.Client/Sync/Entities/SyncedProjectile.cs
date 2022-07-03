@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GTA;
 using GTA.Math;
+using RageCoop.Core;
 
 namespace RageCoop.Client
 {
@@ -37,17 +38,17 @@ namespace RageCoop.Client
                     IsValid=false;
                 }
                 ShooterID=shooter.ID;
-                IsMine=shooter.IsLocal;
+                IsLocal=shooter.IsLocal;
             }
             
         }
         public SyncedProjectile(int id)
         {
             ID= id;
-            IsMine=false;
+            IsLocal=false;
         }
         public bool IsValid { get; private set; } = true;
-        public new bool IsMine { get; private set; } = false;
+        public new bool IsLocal { get; private set; } = false;
         public bool Exploded { get; set; } = false;
         public Projectile MainProjectile { get; set; }
         public int ShooterID { get; set; }

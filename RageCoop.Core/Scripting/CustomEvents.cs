@@ -16,12 +16,14 @@ namespace RageCoop.Core.Scripting
         internal static readonly int OnPedDeleted = Hash("RageCoop.OnPedDeleted");
         internal static readonly int OnVehicleDeleted = Hash("RageCoop.OnVehicleDeleted");
         internal static readonly int SetAutoRespawn = Hash("RageCoop.SetAutoRespawn");
+        internal static readonly int SetDisplayNameTag = Hash("RageCoop.SetDisplayNameTag");
         internal static readonly int NativeCall = Hash("RageCoop.NativeCall");
         internal static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
         internal static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
         internal static readonly int ServerPropSync = Hash("RageCoop.ServerPropSync");
+        internal static readonly int SetEntity = Hash("RageCoop.SetEntity");
         internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
-
+        internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

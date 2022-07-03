@@ -333,6 +333,7 @@ namespace RageCoop.Client
             c.WeaponTint=packet.WeaponTint;
             c.ModelHash=packet.ModelHash;
             c.LastStateSynced = Main.Ticked;
+            c.BlipColor=packet.BlipColor;
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {

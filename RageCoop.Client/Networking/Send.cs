@@ -53,16 +53,24 @@ namespace RageCoop.Client
         {
             Ped p = c.MainPed;
 
-            var packet=new Packets.PedStateSync()
+            var packet = new Packets.PedStateSync()
             {
                 ID = c.ID,
                 OwnerID=c.OwnerID,
                 Clothes=p.GetPedClothes(),
                 ModelHash=p.Model.Hash,
                 WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
-                WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash)
+                WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash),
             };
-
+            Blip b;
+            if (c.IsPlayer)
+            {
+                packet.BlipColor=Scripting.API.Config.BlipColor;
+            }
+            else if ((b = p.AttachedBlip) !=null)
+            {
+                packet.BlipColor=b.Color;
+            }
             Send(packet, ConnectionChannel.PedSync);
         }
         public static void SendVehicle(SyncedVehicle v)

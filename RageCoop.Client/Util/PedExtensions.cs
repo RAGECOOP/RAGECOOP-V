@@ -139,6 +139,7 @@ namespace RageCoop.Client
             {
                 flags |= PedDataFlags.IsInStealthMode;
             }
+
             return flags;
         }
 

@@ -158,9 +158,13 @@ namespace RageCoop.Client
                 }
                 InProgressDownloads.Clear();
             }
-            foreach (var zip in Directory.GetDirectories(ResourceFolder, "*.zip"))
+            if (Directory.Exists(ResourceFolder))
             {
-                File.Delete(zip);
+
+                foreach (var zip in Directory.GetDirectories(ResourceFolder, "*.zip"))
+                {
+                    File.Delete(zip);
+                }
             }
 
         }

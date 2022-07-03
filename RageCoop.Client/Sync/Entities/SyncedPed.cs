@@ -48,7 +48,7 @@ namespace RageCoop.Client
         #region PLAYER -- ONLY
         internal string Username = "N/A";
         internal Blip PedBlip = null;
-        internal bool DisplayBlip { get; set; } = true;
+        internal BlipColor BlipColor = (BlipColor)255;
         internal bool DisplayNameTag { get; set; } = true;
         #endregion
 
@@ -88,19 +88,35 @@ namespace RageCoop.Client
                     if (p!=null)
                     {
                         Username=p.Username;
-                        if (PedBlip!=null)
-                        {
-                            PedBlip.Name=Username;
-                        }
                     }
 
                 }
-                if((!DisplayBlip) && (PedBlip!=null))
-                {
-                    PedBlip.Delete();
-                    PedBlip=null;
-                }
                 RenderNameTag();
+            }
+            if (((byte)BlipColor==255) && (PedBlip!=null))
+            {
+                PedBlip.Delete();
+                PedBlip=null;
+            }
+            else if(PedBlip==null)
+            {
+                PedBlip=MainPed.AddBlip();
+                if (IsPlayer)
+                {
+                    Main.QueueAction(() =>
+                    {
+                        if (Username=="N/A")
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            PedBlip.Name=Username;
+                            return true;
+                        }
+                    });
+                }
+                PedBlip.Color=BlipColor;
             }
 
             // Check if all data avalible
@@ -269,15 +285,6 @@ namespace RageCoop.Client
 
             if (IsPlayer)
             {
-                if (DisplayBlip)
-                {
-                    // Add a new blip for the ped
-                    PedBlip=MainPed.AddBlip();
-                    MainPed.AttachedBlip.Color = BlipColor.White;
-                    MainPed.AttachedBlip.Scale = 0.8f;
-                    MainPed.AttachedBlip.Name =Username;
-                }
-
                 MainPed.IsInvincible=true;
             }
             if (IsInvincible) { MainPed.IsInvincible=true; }

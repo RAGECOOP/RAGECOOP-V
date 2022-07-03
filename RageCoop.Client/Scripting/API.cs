@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using RageCoop.Core;
+using GTA;
 
 namespace RageCoop.Client.Scripting
 {
@@ -52,6 +53,11 @@ namespace RageCoop.Client.Scripting
             /// Enable automatic respawn for this player.
             /// </summary>
             public static bool EnableAutoRespawn { get; set; } = true;
+
+            /// <summary>
+            /// Get or set player's blip color
+            /// </summary>
+            public static BlipColor BlipColor { get; set; } = BlipColor.White;
         }
         /// <summary>
         /// Base events for RageCoop

@@ -29,7 +29,15 @@ namespace RageCoop.Server.Scripting
         {
             c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle );
         }
-        public void SendServerObjectsTo(List<ServerProp> objects,List<Client> clients=null)
+        public void SetNameTag(Client c, bool toggle)
+        {
+            foreach(var other in API.GetAllClients().Values)
+            {
+                if (c==other) { continue; }
+                other.SendCustomEvent(CustomEvents.SetDisplayNameTag,c.Player.ID, toggle);
+            }
+        }
+        public void SendServerPropsTo(List<ServerProp> objects,List<Client> clients=null)
         {
             foreach(var obj in objects)
             {

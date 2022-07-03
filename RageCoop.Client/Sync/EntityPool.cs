@@ -352,7 +352,7 @@ namespace RageCoop.Client
                 {
 
                     // Outgoing sync
-                    if (p.IsMine)
+                    if (p.IsLocal)
                     {
                         if (p.MainProjectile.AttachedEntity==null)
                         {
@@ -530,13 +530,6 @@ namespace RageCoop.Client
 
                 }
 
-                lock (PropsLock)
-                {
-                    foreach (var p in ServerProps.Values)
-                    {
-                        p.Update();
-                    }
-                }
 #if BENCHMARK
                 Debug.TimeStamps[TimeStamp.VehicleTotal]=PerfCounter.ElapsedTicks;
 #endif

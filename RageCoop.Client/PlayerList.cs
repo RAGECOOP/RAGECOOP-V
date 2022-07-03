@@ -80,17 +80,7 @@ namespace RageCoop.Client
             var p = GetPlayer(packet.PedID);
             if(p?.Character != null)
             {
-                p.Character.DisplayNameTag=packet.Flags.HasConfigFlag(PlayerConfigFlags.ShowNameTag);
-                p.Character.DisplayBlip=packet.Flags.HasConfigFlag(PlayerConfigFlags.ShowBlip);
-                Main.Logger.Info($"blip color:{packet.BlipColor}");
-                // Need to be dispatched to script thread.
-                Main.QueueAction(() => {
-                    if (p.Character.PedBlip!=null && p.Character.PedBlip.Exists() && p.Character.PedBlip.Color!=packet.BlipColor)
-                    {
-                        p.Character.PedBlip.Color=packet.BlipColor;
-                    }
-                }); 
-                
+                p.Latency= packet.Latency;
             }
         }
         public static PlayerData GetPlayer(int id)

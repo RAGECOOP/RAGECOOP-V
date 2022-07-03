@@ -94,7 +94,7 @@ namespace RageCoop.Core
         IsParachuteOpen = 1 << 7,
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
-        IsInCover = 1<< 10,
+        IsInCover = 1 << 10,
     }
 
     #region ===== VEHICLE DATA =====

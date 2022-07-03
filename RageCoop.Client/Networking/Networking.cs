@@ -97,6 +97,7 @@ namespace RageCoop.Client
                     catch(Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server", ex);
+                        Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server"+ex.Message));
                     }
 
                 });

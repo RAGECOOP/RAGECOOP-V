@@ -1,11 +1,13 @@
 ﻿using System;
 using GTA.Math;
 
-namespace RageCoop.Client
+namespace RageCoop.Core
 {
 
     internal static class MathExtensions
     {
+        public const float Deg2Rad=(float)(Math.PI* 2) / 360;
+        public const float Rad2Deg = 360 / (float)(Math.PI * 2);
         /// <summary>
         /// 
         /// </summary>
@@ -145,5 +147,6 @@ namespace RageCoop.Client
 
             return Vector3.Dot(v1, v2)/(v1.Length()*v2.Length());
         }
+
     }
 }

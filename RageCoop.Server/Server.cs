@@ -511,7 +511,6 @@ namespace RageCoop.Server
             {
                 foreach (Client c in Clients.Values)
                 {
-                    BaseScript.SetAutoRespawn(c,c.Config.EnableAutoRespawn);
                     MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
                     {
                         NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -520,8 +519,6 @@ namespace RageCoop.Server
                             PedID=c.Player.ID,
                             Username=c.Username,
                             Latency=c.Latency,
-                            Flags=c.Config.GetFlags(),
-                            BlipColor=c.Config.BlipColor,
                         }.Pack(outgoingMessage);
                         MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
                     });
@@ -639,7 +636,7 @@ namespace RageCoop.Server
             });
 
             // Send all props to this player
-            BaseScript.SendServerObjectsTo( new(Entities.ServerProps.Values), new() { newClient});
+            BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
             
             // Send new client to all players
             var cons = MainNetServer.Connections.Exclude(newClient.Connection);

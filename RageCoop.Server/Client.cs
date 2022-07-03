@@ -3,48 +3,12 @@ using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
 using System.Linq;
+using GTA;
 using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
 
 namespace RageCoop.Server
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class PlayerConfig
-    {
-        #region CLIENT
-        /// <summary>
-        /// Whether to enable automatic respawn for this player. if set to false, player will just lay on the ground when it's dead
-        /// </summary>
-        public bool EnableAutoRespawn { get; set; }=true;
-        #endregion
-        /// <summary>
-        /// Whether to show the player's blip on map.
-        /// </summary>
-        public bool ShowBlip { get; set; } = true;
-        /// <summary>
-        /// Whether the player's nametag is visible to other players.
-        /// </summary>
-        public bool ShowNameTag { get; set; } = true;
-        /// <summary>
-        /// The blip's color.
-        /// </summary>
-        public GTA.BlipColor BlipColor { get; set; } = GTA.BlipColor.White;
-        internal PlayerConfigFlags GetFlags()
-        {
-            var flag=PlayerConfigFlags.None;
-            if (ShowBlip)
-            {
-                flag|= PlayerConfigFlags.ShowBlip;
-            }
-            if (ShowNameTag)
-            {
-                flag |= PlayerConfigFlags.ShowNameTag;
-            }
-            return flag;
-        }
-    }
     /// <summary>
     /// Represent a player connected to this server.
     /// </summary>
@@ -69,12 +33,6 @@ namespace RageCoop.Server
         /// The client's latency in seconds.
         /// </summary>
         public float Latency { get; internal set; }
-        private PlayerConfig _config { get; set; }=new PlayerConfig();
-        /// <summary>
-        /// The client's configuration
-        /// </summary>
-        public PlayerConfig Config { get { return _config; }set { _config=value;Server.SendPlayerInfos(); } }
-
         internal readonly Dictionary<int, Action<object>> Callbacks = new();
         internal byte[] PublicKey { get; set; }
         /// <summary>
@@ -82,9 +40,38 @@ namespace RageCoop.Server
         /// </summary>
         public bool IsReady { get; internal set; }=false;
         /// <summary>
-        /// 
+        /// The client's username.
         /// </summary>
         public string Username { get;internal set; } = "N/A";
+
+
+        private bool _autoRespawn=true;
+
+        /// <summary>
+        /// Gets or sets whether to enable automatic respawn for this client's main ped.
+        /// </summary>
+        public bool EnableAutoRespawn { 
+            get { return _autoRespawn; } 
+            set {
+                Server.BaseScript.SetAutoRespawn(this,value);
+                _autoRespawn=value;
+            }
+        }
+
+        private bool _displayNameTag=true;
+
+        /// <summary>
+        /// Gets or sets whether to enable automatic respawn for this client's main ped.
+        /// </summary>
+        public bool DisplayNameTag
+        {
+            get { return _displayNameTag; }
+            set
+            {
+                Server.BaseScript.SetNameTag(this,value);
+                _displayNameTag=value;
+            }
+        }
         #region CUSTOMDATA FUNCTIONS
         /*
         public void SetData<T>(string name, T data)
