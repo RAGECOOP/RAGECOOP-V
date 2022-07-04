@@ -126,7 +126,6 @@ namespace RageCoop.Server
 
         internal ServerProp(Server server) : base(server) { }
 
-
         /// <summary>
         /// Delete this prop
         /// </summary>
@@ -219,6 +218,18 @@ namespace RageCoop.Server
             Server = server;
         }
 
+
+        /// <summary>
+        /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
+        /// </summary>
+        public Tuple<byte, byte[]> Handle
+        {
+            get
+            {
+                return new(60, BitConverter.GetBytes(ID));
+            }
+        }
+
         /// <summary>
         /// Network ID (not handle!)
         /// </summary>
@@ -291,6 +302,7 @@ namespace RageCoop.Server
             Server.API.SendCustomEvent(CustomEvents.DeleteServerBlip, null,ID);
             Server.Entities.RemoveServerBlip(ID);
         }
+
 
         private bool _bouncing=false;
         internal void Update()

@@ -10,6 +10,23 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
+        private static Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
+           {
+               switch (t)
+               {
+                   case 50:
+                       return EntityPool.ServerProps[reader.ReadInt()].MainProp?.Handle;
+                   case 51:
+                       return EntityPool.GetPedByID(reader.ReadInt())?.MainPed?.Handle;
+                   case 52:
+                       return EntityPool.GetVehicleByID(reader.ReadInt())?.MainVehicle?.Handle;
+                   case 60:
+                       return EntityPool.ServerBlips[reader.ReadInt()].Handle;
+                   default:
+                       throw new ArgumentException("Cannot resolve server side argument: "+t);
+               
+               }
+           };
         private static AutoResetEvent PublicKeyReceived=new AutoResetEvent(false);
 
         private static Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
@@ -248,20 +265,7 @@ namespace RageCoop.Client
                     break;
                 case PacketType.CustomEvent:
                     {
-                        Packets.CustomEvent packet = new Packets.CustomEvent((t, reader) =>
-                        {
-                            switch (t)
-                            {
-                                case 50:
-                                    return EntityPool.ServerProps[reader.ReadInt()].MainProp?.Handle;
-                                case 51:
-                                    return EntityPool.GetPedByID(reader.ReadInt())?.MainPed?.Handle;
-                                case 52:
-                                    return EntityPool.GetVehicleByID(reader.ReadInt())?.MainVehicle?.Handle;
-                                default:
-                                    throw new ArgumentException("Cannot resolve server side argument: "+t);
-                            }
-                        });
+                        Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
                         packet.Unpack(data);
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }
