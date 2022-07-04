@@ -596,7 +596,7 @@ namespace RageCoop.Server
             // Add the player to Players
             lock (Clients)
             {
-                var player = new ServerPed
+                var player = new ServerPed(this)
                 {
                     ID= packet.PedID,
                 };

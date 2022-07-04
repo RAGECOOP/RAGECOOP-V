@@ -134,7 +134,7 @@ namespace RageCoop.Server.Scripting
     /// </summary>
     public class API
     {
-        private readonly Server Server;
+        internal readonly Server Server;
         internal API(Server server)
         {
             Server=server;
@@ -251,7 +251,7 @@ namespace RageCoop.Server.Scripting
         /// <param name="name">The name of the event, will be hashed to an int. For optimal performence, you should hash it in a static contructor inside the shared library, then call <see cref="SendCustomEvent(int, List{object}, List{Client})"/>.</param>
         /// <param name="args">See <see cref="CustomEventReceivedArgs"/> for a list of supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
-        public void SendCustomEvent(string name, List<object> args = null, List<Client> targets = null)
+        public void SendCustomEvent(string name, List<Client> targets = null, List<object> args = null)
         {
             targets ??= new(Server.Clients.Values);
             var p = new Packets.CustomEvent()
@@ -266,12 +266,38 @@ namespace RageCoop.Server.Scripting
         }
 
         /// <summary>
+        /// Send native call specified clients.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        /// /// <param name="clients">Clients to send, null for all clients</param>
+        public void SendNativeCall(GTA.Native.Hash hash, List<Client> clients, List<object> args)
+        {
+            var argsList = new List<object>(args);
+            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
+            SendCustomEvent(CustomEvents.NativeCall,clients, argsList);
+        }
+
+        /// <summary>
+        /// Send native call specified clients.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        /// /// <param name="clients">Clients to send, null for all clients</param>
+        public void SendNativeCall(GTA.Native.Hash hash, List<Client> clients = null, params object[] args)
+        {
+            var argsList = new List<object>(args);
+            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
+            SendCustomEvent(CustomEvents.NativeCall, clients, argsList);
+        }
+
+        /// <summary>
         /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
         /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
-        public void SendCustomEvent(int eventHash,List<object> args=null,List<Client> targets=null)
+        public void SendCustomEvent(int eventHash, List<Client> targets = null, List<object> args=null)
         {
             targets ??= new(Server.Clients.Values);
             var p = new Packets.CustomEvent()
@@ -283,6 +309,17 @@ namespace RageCoop.Server.Scripting
             {
                 Server.Send(p,c,ConnectionChannel.Event,NetDeliveryMethod.ReliableOrdered);
             }
+        }
+
+        /// <summary>
+        /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
+        /// </summary>
+        /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
+        /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>
+        /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
+        public void SendCustomEvent(int eventHash, List<Client> targets, params object[] args)
+        {
+            SendCustomEvent(eventHash,targets,new List<object>(args));
         }
         /// <summary>
         /// Register an handler to the specifed event hash, one event can have multiple handlers.

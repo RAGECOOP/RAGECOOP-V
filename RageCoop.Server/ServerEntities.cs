@@ -180,7 +180,7 @@ namespace RageCoop.Server
             ServerPed ped;
             if(!Peds.TryGetValue(p.ID,out ped))
             {
-                Peds.Add(p.ID,ped=new ServerPed());
+                Peds.Add(p.ID,ped=new ServerPed(Server));
                 ped.ID=p.ID;
             }
             ped._pos = p.Position;
@@ -194,19 +194,19 @@ namespace RageCoop.Server
             ServerVehicle veh;
             if (!Vehicles.TryGetValue(p.ID, out veh))
             {
-                Vehicles.Add(p.ID, veh=new ServerVehicle());
+                Vehicles.Add(p.ID, veh=new ServerVehicle(Server));
                 veh.ID=p.ID;
             }
             veh._pos = p.Position;
             veh.Owner=sender;
-            veh.Quaternion=p.Quaternion;
+            veh._quat=p.Quaternion;
         }
         internal void Update(Packets.VehicleStateSync p, Client sender)
         {
             ServerVehicle veh;
             if (!Vehicles.TryGetValue(p.ID, out veh))
             {
-                Vehicles.Add(p.ID, veh=new ServerVehicle());
+                Vehicles.Add(p.ID, veh=new ServerVehicle(Server));
             }
             veh.ID=p.ID;
             veh.Owner=sender;

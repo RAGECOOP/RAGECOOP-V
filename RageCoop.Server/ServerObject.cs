@@ -9,6 +9,7 @@ using GTA.Native;
 using GTA.Math;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using RageCoop.Server.Scripting;
 
 namespace RageCoop.Server
 {
@@ -18,7 +19,11 @@ namespace RageCoop.Server
     /// </summary>
     public abstract class ServerObject
     {
-        internal ServerObject() { }
+        /// <summary>
+        /// Server that this object belongs to
+        /// </summary>
+        protected readonly Server Server;
+        internal ServerObject(Server server) { Server=server; }
         
         /// <summary>
         /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
@@ -67,7 +72,7 @@ namespace RageCoop.Server
         public virtual Vector3 Position
         {
             get { return _pos; }
-            set { _pos=value; Update(); }
+            set { _pos=value; Owner.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z,1, 1,1 ); }
         }
         internal Vector3 _pos;
 
@@ -77,15 +82,15 @@ namespace RageCoop.Server
         public virtual Vector3 Rotation
         {
             get { return _rot; }
-            set { _rot=value; Update(); }
+            set { _rot=value; Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z ,2,1); }
         }
         internal Vector3 _rot;
 
         /// <summary>
         /// Send updated information to clients, would be called automatically.
         /// </summary>
-        public virtual void Update() {
-            Owner.SendCustomEvent(CustomEvents.SetEntity, Handle, Position, Rotation);
+        internal virtual void Update() {
+            Owner?.SendCustomEvent(CustomEvents.SetEntity, Handle, Position, Rotation);
         }
 
         /// <summary>
@@ -118,33 +123,44 @@ namespace RageCoop.Server
     /// </summary>
     public class ServerProp : ServerObject
     {
-        private Server Server;
-        internal ServerProp(Server server)
-        {
-            Server= server;
-        }
 
+        internal ServerProp(Server server) : base(server) { }
 
-        
 
         /// <summary>
         /// Delete this prop
         /// </summary>
         public override void Delete()
         {
-            Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, new() { ID });
-            Server.Entities.RemoveProp(ID);
+            Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, null,ID);
+            Server.API.Entities.RemoveProp(ID);
         }
 
-        
+        /// <summary>
+        /// Gets or sets this object's position
+        /// </summary>
+        public override Vector3 Position
+        {
+            get { return _pos; }
+            set { _pos=value; Server.API.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, clients:null ,Handle, value.X, value.Y, value.Z, 1, 1, 1); }
+        }
+
+        /// <summary>
+        /// Gets or sets this object's rotation
+        /// </summary>
+        public override Vector3 Rotation
+        {
+            get { return _rot; }
+            set { _rot=value; Server.API.SendNativeCall(Hash.SET_ENTITY_ROTATION,null, Handle, value.X, value.Y, value.Z, 2, 1); }
+        }
 
 
         /// <summary>
         /// Send updated information to clients, would be called automatically.
         /// </summary>
-        public override void Update()
+        internal override void Update()
         {
-             Server.BaseScript.SendServerPropsTo(new() { this });
+             Server.API.Server.BaseScript.SendServerPropsTo(new() { this });
         }
 
     }
@@ -153,10 +169,7 @@ namespace RageCoop.Server
     /// </summary>
     public class ServerPed : ServerObject
     {
-        internal ServerPed()
-        {
-            
-        }
+        internal ServerPed(Server server) : base(server) { }
 
         /// <summary>
         /// Get the ped's last vehicle
@@ -173,24 +186,26 @@ namespace RageCoop.Server
     /// </summary>
     public class ServerVehicle : ServerObject
     {
-        internal ServerVehicle()
-        {
-
-        }
+        internal ServerVehicle(Server server) : base(server) { }
 
         /// <summary>
         /// Gets or sets vehicle rotation
         /// </summary>
         public override Vector3 Rotation
         {
-            get { return Quaternion.ToEulerAngles().ToDegree(); }
-            set { Quaternion=value.ToQuaternion(); Update(); }
+            get { return _quat.ToEulerAngles().ToDegree(); }
+            set { Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION,  Handle ,value.X, value.Y ,value.Z); }
         }
 
+        internal Quaternion _quat;
         /// <summary>
         /// Get this vehicle's quaternion
         /// </summary>
-        public Quaternion Quaternion { get; internal set; }
+        public Quaternion Quaternion
+        {
+            get { return _quat; }
+            set { _quat = value ;Owner.SendNativeCall(Hash.SET_ENTITY_QUATERNION, Handle, value.X, value.Y, value.Z, value.W); }
+        }
     }
 
     /// <summary>
@@ -273,7 +288,7 @@ namespace RageCoop.Server
         /// </summary>
         public void Delete()
         {
-            Server.API.SendCustomEvent(CustomEvents.DeleteServerBlip, new() { ID });
+            Server.API.SendCustomEvent(CustomEvents.DeleteServerBlip, null,ID);
             Server.Entities.RemoveServerBlip(ID);
         }
 
