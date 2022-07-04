@@ -131,7 +131,7 @@ namespace RageCoop.Server
         /// </summary>
         public override void Delete()
         {
-            Server.API.SendCustomEvent(CustomEvents.DeleteServerProp, null,ID);
+            Server.API.SendCustomEvent(null,CustomEvents.DeleteServerProp,ID);
             Server.API.Entities.RemoveProp(ID);
         }
 
@@ -141,7 +141,7 @@ namespace RageCoop.Server
         public override Vector3 Position
         {
             get { return _pos; }
-            set { _pos=value; Server.API.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, clients:null ,Handle, value.X, value.Y, value.Z, 1, 1, 1); }
+            set { _pos=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z, 1, 1, 1); }
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace RageCoop.Server
         public override Vector3 Rotation
         {
             get { return _rot; }
-            set { _rot=value; Server.API.SendNativeCall(Hash.SET_ENTITY_ROTATION,null, Handle, value.X, value.Y, value.Z, 2, 1); }
+            set { _rot=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z, 2, 1); }
         }
 
 
@@ -299,7 +299,7 @@ namespace RageCoop.Server
         /// </summary>
         public void Delete()
         {
-            Server.API.SendCustomEvent(CustomEvents.DeleteServerBlip, null,ID);
+            Server.API.SendCustomEvent(null, CustomEvents.DeleteServerBlip,ID);
             Server.Entities.RemoveServerBlip(ID);
         }
 
