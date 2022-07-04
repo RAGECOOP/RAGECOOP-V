@@ -26,6 +26,7 @@ namespace RageCoop.Core.Scripting
         internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
         internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
         internal static readonly int DeleteServerBlip = Hash("RageCoop.DeleteServerBlip");
+        internal static readonly int CreateVehicle = Hash("RageCoop.CreateVehicle");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

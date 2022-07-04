@@ -22,8 +22,25 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.SetEntity, SetEntity);
             API.RegisterCustomEventHandler(CustomEvents.ServerBlipSync, ServerBlipSync);
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
+            API.RegisterCustomEventHandler(CustomEvents.CreateVehicle, CreateVehicle);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+        }
+
+        private void CreateVehicle(CustomEventReceivedArgs e)
+        {
+            API.QueueAction(() =>
+            {
+                var veh = World.CreateVehicle((Model)e.Args[1],(Vector3)e.Args[2],(float)e.Args[3]);
+                veh.CanPretendOccupants=false;
+                var v = new SyncedVehicle()
+                {
+                    ID=(int)e.Args[0],
+                    MainVehicle=veh,
+                    OwnerID=Main.LocalPlayerID,
+                };
+                EntityPool.Add(v);
+            });
         }
 
         private void DeleteServerBlip(CustomEventReceivedArgs e)

@@ -118,6 +118,28 @@ namespace RageCoop.Server
         }
 
         /// <summary>
+        /// Create a vehicle
+        /// </summary>
+        /// <param name="owner">Owner of this vehicle</param>
+        /// <param name="model">model</param>
+        /// <param name="pos">position</param>
+        /// <param name="heading">heading of this vehicle</param>
+        /// <returns></returns>
+        public ServerVehicle CreateVehicle(Client owner,Model model,Vector3 pos,float heading)
+        {
+            if(owner == null) { throw new ArgumentNullException("Owner cannot be null"); }
+            ServerVehicle veh = new(Server)
+            {
+                ID=RequestNetworkID(),
+                Model=model,
+                _pos= pos,
+            };
+            owner.SendCustomEvent(CustomEvents.CreateVehicle,veh.ID, model, pos, heading);
+            Vehicles.Add(veh.ID, veh);
+            return veh;
+        }
+
+        /// <summary>
         /// Create a static <see cref="ServerBlip"/> owned by server.
         /// </summary>
         /// <param name="pos"></param>
