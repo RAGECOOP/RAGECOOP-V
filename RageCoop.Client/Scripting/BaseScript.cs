@@ -65,7 +65,7 @@ namespace RageCoop.Client.Scripting
 
         private void SetEntity(CustomEventReceivedArgs obj)
         {
-            Main.QueueAction(() =>
+            API.QueueAction(() =>
             {
                 var e=Entity.FromHandle((int)obj.Args[0]);
                 e.Position = (Vector3)obj.Args[1];
@@ -75,7 +75,7 @@ namespace RageCoop.Client.Scripting
 
         private void DeleteEntity(CustomEventReceivedArgs e)
         {
-            Entity.FromHandle((int)e.Args[0]).Delete();
+            API.QueueAction(() => Entity.FromHandle((int)e.Args[0])?.Delete());
         }
 
         public override void OnStop()
