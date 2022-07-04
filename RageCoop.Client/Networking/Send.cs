@@ -66,10 +66,18 @@ namespace RageCoop.Client
             if (c.IsPlayer)
             {
                 packet.BlipColor=Scripting.API.Config.BlipColor;
+                packet.BlipSprite=Scripting.API.Config.BlipSprite;
+                packet.BlipScale=Scripting.API.Config.BlipScale;
             }
             else if ((b = p.AttachedBlip) !=null)
             {
                 packet.BlipColor=b.Color;
+                packet.BlipSprite=b.Sprite;
+
+                if (packet.BlipSprite==BlipSprite.PoliceOfficer || packet.BlipSprite==BlipSprite.PoliceOfficer2)
+                {
+                    packet.BlipScale=0.5f;
+                }
             }
             Send(packet, ConnectionChannel.PedSync);
         }

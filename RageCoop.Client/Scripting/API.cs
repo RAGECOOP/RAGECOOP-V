@@ -58,6 +58,17 @@ namespace RageCoop.Client.Scripting
             /// Get or set player's blip color
             /// </summary>
             public static BlipColor BlipColor { get; set; } = BlipColor.White;
+
+            /// <summary>
+            /// Get or set player's blip sprite
+            /// </summary>
+            public static BlipSprite BlipSprite { get; set; } = BlipSprite.Standard;
+            
+            /// <summary>
+            /// Get or set scale of player's blip
+            /// </summary>
+            public static float BlipScale { get; set; } = 1;
+
         }
         /// <summary>
         /// Base events for RageCoop

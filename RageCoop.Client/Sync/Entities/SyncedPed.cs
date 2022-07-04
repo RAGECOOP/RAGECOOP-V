@@ -49,6 +49,8 @@ namespace RageCoop.Client
         internal string Username = "N/A";
         internal Blip PedBlip = null;
         internal BlipColor BlipColor = (BlipColor)255;
+        internal BlipSprite BlipSprite = (BlipSprite)0;
+        internal float BlipScale=1;
         internal bool DisplayNameTag { get; set; } = true;
         #endregion
 
@@ -118,7 +120,7 @@ namespace RageCoop.Client
                 PedBlip.Delete();
                 PedBlip=null;
             }
-            else if (PedBlip==null)
+            else if (((byte)BlipColor != 255) && PedBlip==null)
             {
                 PedBlip=MainPed.AddBlip();
                 if (IsPlayer)
@@ -137,6 +139,8 @@ namespace RageCoop.Client
                     });
                 }
                 PedBlip.Color=BlipColor;
+                PedBlip.Sprite=BlipSprite;
+                PedBlip.Scale=BlipScale;
             }
 
 

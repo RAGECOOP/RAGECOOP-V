@@ -80,6 +80,14 @@ namespace RageCoop.Core
         {
             bytes.AddRange(BitConverter.GetBytes(i));
         }
+        public static void AddShort(this List<byte> bytes, short i)
+        {
+            bytes.AddRange(BitConverter.GetBytes(i));
+        }
+        public static void AddUshort(this List<byte> bytes, ushort i)
+        {
+            bytes.AddRange(BitConverter.GetBytes(i));
+        }
         public static void AddLong(this List<byte> bytes, long i)
         {
             bytes.AddRange(BitConverter.GetBytes(i));

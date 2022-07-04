@@ -28,6 +28,8 @@ namespace RageCoop.Core
             public byte WeaponTint { get;set; }
             public BlipColor BlipColor { get; set; } = (BlipColor)255;
 
+            public BlipSprite BlipSprite { get; set; }= 0;
+            public float BlipScale { get; set; } = 1;
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -67,6 +69,11 @@ namespace RageCoop.Core
                 byteArray.Add(WeaponTint);
 
                 byteArray.Add((byte)BlipColor);
+                if ((byte)BlipColor!=255)
+                {
+                    byteArray.AddUshort((ushort)BlipSprite);
+                    byteArray.AddFloat(BlipScale);
+                }
 
                 byte[] result = byteArray.ToArray();
                 message.Write(result.Length);
@@ -104,6 +111,12 @@ namespace RageCoop.Core
                 WeaponTint=reader.ReadByte();
 
                 BlipColor=(BlipColor)reader.ReadByte();
+
+                if ((byte)BlipColor!=255)
+                {
+                    BlipSprite=(BlipSprite)reader.ReadUShort();
+                    BlipScale=reader.ReadFloat();
+                }
                 #endregion
             }
         }

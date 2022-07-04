@@ -338,6 +338,8 @@ namespace RageCoop.Client
             c.ModelHash=packet.ModelHash;
             c.LastStateSynced = Main.Ticked;
             c.BlipColor=packet.BlipColor;
+            c.BlipSprite=packet.BlipSprite;
+            c.BlipScale=packet.BlipScale;
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {
