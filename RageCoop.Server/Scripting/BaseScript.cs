@@ -48,7 +48,7 @@ namespace RageCoop.Server.Scripting
         {
             foreach (var obj in objects)
             {
-                API.SendCustomEvent(clients, CustomEvents.ServerBlipSync,   obj.ID, (short)obj.Sprite, (byte)obj.Color, obj.Scale,obj.Position,obj.Rotation,obj.Name  );
+                API.SendCustomEvent(clients, CustomEvents.ServerBlipSync,   obj.ID, (ushort)obj.Sprite, (byte)obj.Color, obj.Scale,obj.Position,obj.Rotation,obj.Name  );
             }
         }
         void NativeResponse(CustomEventReceivedArgs e)
