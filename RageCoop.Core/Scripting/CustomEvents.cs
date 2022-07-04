@@ -24,6 +24,7 @@ namespace RageCoop.Core.Scripting
         internal static readonly int ServerBlipSync = Hash("RageCoop.ServerBlipSync");
         internal static readonly int SetEntity = Hash("RageCoop.SetEntity");
         internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
+        internal static readonly int UpdatePedBlip = Hash("RageCoop.UpdatePedBlip");
         internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
         internal static readonly int DeleteServerBlip = Hash("RageCoop.DeleteServerBlip");
         internal static readonly int CreateVehicle = Hash("RageCoop.CreateVehicle");

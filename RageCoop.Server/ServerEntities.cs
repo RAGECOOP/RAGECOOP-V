@@ -211,6 +211,23 @@ namespace RageCoop.Server
             ped._rot=p.Rotation;
             ped.Owner=sender;
         }
+        internal void Update(Packets.PedStateSync p, Client sender)
+        {
+            ServerPed ped;
+            if (!Peds.TryGetValue(p.ID, out ped))
+            {
+                Peds.Add(p.ID, ped=new ServerPed(Server));
+                ped.ID=p.ID;
+            }
+            if ((byte)p.BlipColor!=255)
+            {
+                if (ped.AttachedBlip==null) { ped.AttachedBlip=new(ped); }
+                ped.AttachedBlip.Color=p.BlipColor;
+                ped.AttachedBlip.Sprite=p.BlipSprite;
+                ped.AttachedBlip.Scale=p.BlipScale;
+            }
+            ped.Owner=sender;
+        }
         internal void Update(Packets.VehicleSync p, Client sender)
         {
             ServerVehicle veh;

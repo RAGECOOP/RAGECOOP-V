@@ -23,8 +23,32 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.ServerBlipSync, ServerBlipSync);
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
             API.RegisterCustomEventHandler(CustomEvents.CreateVehicle, CreateVehicle);
+            API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+        }
+
+        private void UpdatePedBlip(CustomEventReceivedArgs e)
+        {
+            API.QueueAction(() =>
+            {
+                var p = Ped.FromHandle((int)e.Args[0]);
+                if(p == null) { return; }
+                if (p.Handle==Game.Player.Character.Handle)
+                {
+                    API.Config.BlipColor=(BlipColor)(byte)e.Args[1];
+                    API.Config.BlipSprite=(BlipSprite)(ushort)e.Args[2];
+                    API.Config.BlipScale=(float)e.Args[3];
+                }
+                else
+                {
+                    var b = p.AttachedBlip;
+                    if(b == null) { b=p.AddBlip(); }
+                    b.Color=(BlipColor)(byte)e.Args[1];
+                    b.Sprite=(BlipSprite)(ushort)e.Args[2];
+                    b.Scale=(float)e.Args[3];
+                }
+            });
         }
 
         private void CreateVehicle(CustomEventReceivedArgs e)
@@ -57,8 +81,8 @@ namespace RageCoop.Client.Scripting
         private void ServerBlipSync(CustomEventReceivedArgs obj)
         {
             int id= (int)obj.Args[0];
-            var sprite=(BlipSprite)(short)obj.Args[1];
-            var color = (BlipColor)(byte)obj.Args[2];
+            var sprite=(BlipSprite)obj.Args[1];
+            var color = (BlipColor)obj.Args[2];
             var scale=(float)obj.Args[3];
             var pos=(Vector3)obj.Args[4];
             int rot= (int)obj.Args[5];

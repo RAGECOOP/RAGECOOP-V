@@ -22,7 +22,7 @@ namespace RageCoop.Server
         /// <summary>
         /// Server that this object belongs to
         /// </summary>
-        protected readonly Server Server;
+        internal readonly Server Server;
         internal ServerObject(Server server) { Server=server; }
         
         /// <summary>
@@ -176,6 +176,22 @@ namespace RageCoop.Server
         public ServerVehicle LastVehicle { get; internal set; }
 
         /// <summary>
+        /// Get the <see cref="PedBlip"/> attached to this ped.
+        /// </summary>
+        public PedBlip AttachedBlip { get; internal set; }
+
+        /// <summary>
+        /// Attach a blip to this ped.
+        /// </summary>
+        /// <returns></returns>
+        public PedBlip AddBlip()
+        {
+            AttachedBlip = new PedBlip(this);
+            AttachedBlip.Update();
+            return AttachedBlip;
+        }
+
+        /// <summary>
         /// Health
         /// </summary>
         public int Health { get; internal set; }
@@ -245,7 +261,7 @@ namespace RageCoop.Server
             set { _color=value; Update(); } 
         }
 
-        internal BlipSprite _sprite;
+        internal BlipSprite _sprite=BlipSprite.Standard;
         /// <summary>
         /// Sprite of this blip
         /// </summary>
@@ -325,6 +341,73 @@ namespace RageCoop.Server
             // Serve-side blip
             Server.BaseScript.SendServerBlipsTo(new() { this });
 
+        }
+    }
+    
+    /// <summary>
+    /// Represent a blip attached to ped.
+    /// </summary>
+    public class PedBlip
+    {
+        /// <summary>
+        /// Get the <see cref="ServerPed"/> that this blip attached to.
+        /// </summary>
+        public ServerPed Ped { get;internal set; }
+        internal PedBlip(ServerPed ped)
+        {
+            Ped = ped;
+        }
+
+
+        internal BlipColor _color;
+        /// <summary>
+        /// Color of this blip
+        /// </summary>
+        public BlipColor Color
+        {
+            get { return _color; }
+            set { _color=value; Update(); }
+        }
+
+        internal BlipSprite _sprite=BlipSprite.Standard;
+        /// <summary>
+        /// Sprite of this blip
+        /// </summary>
+        public BlipSprite Sprite
+        {
+            get { return _sprite; }
+            set { _sprite=value; Update(); }
+        }
+
+        internal float _scale = 1;
+        /// <summary>
+        /// Scale of this blip
+        /// </summary>
+        public float Scale
+        {
+            get { return _scale; }
+            set { _scale=value; Update(); }
+        }
+
+        private bool _bouncing = false;
+        internal void Update()
+        {
+            // 5ms debounce
+            if (!_bouncing)
+            {
+                _bouncing=true;
+                Task.Run(() =>
+                {
+                    Thread.Sleep(5);
+                    DoUpdate();
+                    _bouncing=false;
+                });
+            }
+        }
+        private void DoUpdate()
+        {
+            Ped.Owner.SendCustomEvent(CustomEvents.UpdatePedBlip,Ped.Handle,(byte)Color,(ushort)Sprite,Scale);
+            
         }
     }
 }
