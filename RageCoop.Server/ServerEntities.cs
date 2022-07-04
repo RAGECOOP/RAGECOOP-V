@@ -130,6 +130,7 @@ namespace RageCoop.Server
             if(owner == null) { throw new ArgumentNullException("Owner cannot be null"); }
             ServerVehicle veh = new(Server)
             {
+                Owner=owner,
                 ID=RequestNetworkID(),
                 Model=model,
                 _pos= pos,
