@@ -81,8 +81,8 @@ namespace RageCoop.Client.Scripting
         private void ServerBlipSync(CustomEventReceivedArgs obj)
         {
             int id= (int)obj.Args[0];
-            var sprite=(BlipSprite)obj.Args[1];
-            var color = (BlipColor)obj.Args[2];
+            var sprite=(BlipSprite)(ushort)obj.Args[1];
+            var color = (BlipColor)(byte)obj.Args[2];
             var scale=(float)obj.Args[3];
             var pos=(Vector3)obj.Args[4];
             int rot= (int)obj.Args[5];
