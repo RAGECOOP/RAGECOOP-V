@@ -135,7 +135,7 @@ namespace RageCoop.Server
                 Model=model,
                 _pos= pos,
             };
-            owner.SendCustomEvent(CustomEvents.CreateVehicle,veh.ID, model, pos, heading);
+            owner.SendCustomEventQueued(CustomEvents.CreateVehicle,veh.ID, model, pos, heading);
             Vehicles.Add(veh.ID, veh);
             return veh;
         }

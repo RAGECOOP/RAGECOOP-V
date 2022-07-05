@@ -159,7 +159,7 @@ namespace RageCoop.Server
             var argsList= new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)Type.GetTypeCode(typeof(T)), RequestNativeCallID<T>(callBack), (ulong)hash });
 
-            SendCustomEvent(CustomEvents.NativeCall, argsList.ToArray());
+            SendCustomEventQueued(CustomEvents.NativeCall, argsList.ToArray());
         }
         /// <summary>
         /// Send a native call to client and ignore it's response.
@@ -171,7 +171,7 @@ namespace RageCoop.Server
             var argsList = new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty,(ulong)hash });
             // Server.Logger?.Debug(argsList.DumpWithType());
-            SendCustomEvent(CustomEvents.NativeCall, argsList.ToArray());
+            SendCustomEventQueued(CustomEvents.NativeCall, argsList.ToArray());
         }
         private int RequestNativeCallID<T>(Action<object> callback)
         {
@@ -209,6 +209,36 @@ namespace RageCoop.Server
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new Packets.CustomEvent()
+                {
+                    Hash=hash,
+                    Args=args
+                }.Pack(outgoingMessage);
+                Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
+
+            }
+            catch (Exception ex)
+            {
+                Server.Logger?.Error(ex);
+            }
+        }
+
+        /// <summary>
+        /// Send a CustomEvent that'll be queued at client side and invoked from script thread
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="args"></param>
+        public void SendCustomEventQueued(int hash, params object[] args)
+        {
+            if (!IsReady)
+            {
+                Server.Logger?.Warning($"Player \"{Username}\" is not ready!");
+            }
+
+            try
+            {
+
+                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+                new Packets.CustomEvent(null,true)
                 {
                     Hash=hash,
                     Args=args

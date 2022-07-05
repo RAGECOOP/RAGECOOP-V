@@ -31,6 +31,7 @@ namespace RageCoop.Core
         AllResourcesSent=15,
         
         CustomEvent = 16,
+        CustomEventQueued = 17,
         #region Sync
 
         #region INTERVAL

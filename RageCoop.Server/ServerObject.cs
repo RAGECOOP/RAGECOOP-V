@@ -89,16 +89,14 @@ namespace RageCoop.Server
         /// <summary>
         /// Send updated information to clients, would be called automatically.
         /// </summary>
-        internal virtual void Update() {
-            Owner?.SendCustomEvent(CustomEvents.SetEntity, Handle, Position, Rotation);
-        }
+        
 
         /// <summary>
         /// Delete this object
         /// </summary>
         public virtual void Delete()
         {
-            Owner?.SendCustomEvent(CustomEvents.DeleteEntity, Handle);
+            Owner?.SendCustomEventQueued(CustomEvents.DeleteEntity, Handle);
         }
 
         /// <summary>
@@ -131,7 +129,7 @@ namespace RageCoop.Server
         /// </summary>
         public override void Delete()
         {
-            Server.API.SendCustomEvent(null,CustomEvents.DeleteServerProp,ID);
+            Server.API.SendCustomEventQueued(null,CustomEvents.DeleteServerProp,ID);
             Server.API.Entities.RemoveProp(ID);
         }
 
@@ -157,7 +155,7 @@ namespace RageCoop.Server
         /// <summary>
         /// Send updated information to clients, would be called automatically.
         /// </summary>
-        internal override void Update()
+        internal void Update()
         {
              Server.API.Server.BaseScript.SendServerPropsTo(new() { this });
         }
@@ -315,7 +313,7 @@ namespace RageCoop.Server
         /// </summary>
         public void Delete()
         {
-            Server.API.SendCustomEvent(null, CustomEvents.DeleteServerBlip,ID);
+            Server.API.SendCustomEventQueued(null, CustomEvents.DeleteServerBlip,ID);
             Server.Entities.RemoveServerBlip(ID);
         }
 
@@ -406,7 +404,7 @@ namespace RageCoop.Server
         }
         private void DoUpdate()
         {
-            Ped.Owner.SendCustomEvent(CustomEvents.UpdatePedBlip,Ped.Handle,(byte)Color,(ushort)Sprite,Scale);
+            Ped.Owner.SendCustomEventQueued(CustomEvents.UpdatePedBlip,Ped.Handle,(byte)Color,(ushort)Sprite,Scale);
             
         }
     }

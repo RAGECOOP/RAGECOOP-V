@@ -41,14 +41,14 @@ namespace RageCoop.Server.Scripting
         {
             foreach(var obj in objects)
             {
-                API.SendCustomEvent(clients, CustomEvents.ServerPropSync,obj.ID,  obj.Model ,obj.Position,obj.Rotation );
+                API.SendCustomEventQueued(clients, CustomEvents.ServerPropSync,obj.ID,  obj.Model ,obj.Position,obj.Rotation );
             }
         }
         public void SendServerBlipsTo(List<ServerBlip> objects, List<Client> clients = null)
         {
             foreach (var obj in objects)
             {
-                API.SendCustomEvent(clients, CustomEvents.ServerBlipSync,   obj.ID, (ushort)obj.Sprite, (byte)obj.Color, obj.Scale,obj.Position,obj.Rotation,obj.Name  );
+                API.SendCustomEventQueued(clients, CustomEvents.ServerBlipSync,   obj.ID, (ushort)obj.Sprite, (byte)obj.Color, obj.Scale,obj.Position,obj.Rotation,obj.Name  );
             }
         }
         void NativeResponse(CustomEventReceivedArgs e)

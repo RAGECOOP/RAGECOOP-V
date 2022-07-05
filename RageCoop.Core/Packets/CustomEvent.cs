@@ -9,10 +9,12 @@ namespace RageCoop.Core
 
         internal class CustomEvent : Packet
         {
-            public CustomEvent(Func<byte,BitReader,object> onResolve = null)
+            public CustomEvent(Func<byte,BitReader,object> onResolve = null,bool queued=false)
             {
                 _resolve= onResolve;
+                _queued= queued;
             }
+            private bool _queued;
             private Func<byte, BitReader, object> _resolve { get; set; }
             public int Hash { get; set; }
             public bool IsStaged { get; set; }=false;
@@ -21,7 +23,7 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 Args= Args ?? new object[] { };
-                message.Write((byte)PacketType.CustomEvent);
+                message.Write(_queued ? (byte)PacketType.CustomEventQueued: (byte)PacketType.CustomEvent);
 
                 List<byte> result = new List<byte>();
                 result.AddInt(Hash);

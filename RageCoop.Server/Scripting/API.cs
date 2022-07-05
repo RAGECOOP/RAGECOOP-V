@@ -256,7 +256,7 @@ namespace RageCoop.Server.Scripting
         {
             var argsList = new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
-            SendCustomEvent(clients, CustomEvents.NativeCall, argsList.ToArray());
+            SendCustomEventQueued(clients, CustomEvents.NativeCall, argsList.ToArray());
         }
 
 
@@ -271,6 +271,27 @@ namespace RageCoop.Server.Scripting
 
             targets ??= new(Server.Clients.Values);
             var p = new Packets.CustomEvent()
+            {
+                Args=args,
+                Hash=eventHash
+            };
+            foreach (var c in targets)
+            {
+                Server.Send(p, c, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
+            }
+        }
+
+        /// <summary>
+        /// Send a CustomEvent that'll be queued at client side and invoked from script thread
+        /// </summary>
+        /// <param name="targets"></param>
+        /// <param name="eventHash"></param>
+        /// <param name="args"></param>
+        public void SendCustomEventQueued(List<Client> targets, int eventHash, params object[] args)
+        {
+
+            targets ??= new(Server.Clients.Values);
+            var p = new Packets.CustomEvent(null,true)
             {
                 Args=args,
                 Hash=eventHash
