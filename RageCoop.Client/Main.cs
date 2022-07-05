@@ -89,11 +89,6 @@ namespace RageCoop.Client
         }
         
 #if DEBUG
-        private ulong _lastDebugData;
-        private int _debugBytesSent;
-        private int _debugBytesReceived;
-        private int _lastBytesSent;
-        public int _lastBytesReceived;
 #endif
         private void OnTick(object sender, EventArgs e)
         {
@@ -136,21 +131,10 @@ namespace RageCoop.Client
 #if DEBUG
             if (Networking.ShowNetworkInfo)
             {
-                ulong time = Util.GetTickCount64();
-                if (time - _lastDebugData > 1000)
-                {
-                    _lastDebugData = time;
-
-                    _debugBytesReceived = Networking.Client.Statistics.ReceivedBytes-_lastBytesReceived;
-                    _lastBytesReceived=Networking.Client.Statistics.ReceivedBytes;
-
-                    _debugBytesSent = Networking.Client.Statistics.SentBytes-_lastBytesSent;
-                    _lastBytesSent=Networking.Client.Statistics.SentBytes;
-                }
-
+                
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesReceived)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
-                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(_debugBytesSent)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
+                new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
 #endif
 

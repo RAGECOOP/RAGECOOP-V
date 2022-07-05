@@ -261,7 +261,7 @@ namespace RageCoop.Server.Scripting
 
 
         /// <summary>
-        /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int, List{object})"/> if you want to send event to individual client.
+        /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int,object[])"/> if you want to send event to individual client.
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
         /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>

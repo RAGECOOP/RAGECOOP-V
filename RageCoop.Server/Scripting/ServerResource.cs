@@ -29,8 +29,8 @@ namespace RageCoop.Server.Scripting
 			var conf = new PluginConfig(Path.GetFullPath(Path.Combine(resDir, Path.GetFileName(resDir)+".dll")))
 			{
 				PreferSharedTypes = true,
-				EnableHotReload=!isTemp,
-				IsUnloadable=true,
+				EnableHotReload=false,
+				IsUnloadable=false,
 				LoadInMemory=true,
 			};
 			ServerResource r = new(conf);
