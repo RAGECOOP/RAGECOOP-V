@@ -15,16 +15,17 @@ namespace RageCoop.Core
             }
             private Func<byte, BitReader, object> _resolve { get; set; }
             public int Hash { get; set; }
-            public List<object> Args { get; set; }
+            public bool IsStaged { get; set; }=false;
+            public object[] Args { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
-                Args= Args ?? new List<object>(0);
+                Args= Args ?? new object[] { };
                 message.Write((byte)PacketType.CustomEvent);
 
                 List<byte> result = new List<byte>();
                 result.AddInt(Hash);
-                result.AddInt(Args.Count);
+                result.AddInt(Args.Length);
                 (byte, byte[]) tup;
                 foreach (var arg in Args)
                 {
@@ -47,40 +48,40 @@ namespace RageCoop.Core
 
                 Hash = reader.ReadInt();
                 var len=reader.ReadInt();
-                Args=new List<object>(len);
+                Args=new object[len];
                 for (int i = 0; i < len; i++)
                 {
                     byte type = reader.ReadByte();
                     switch (type)
                     {
                         case 0x01:
-                            Args.Add(reader.ReadByte()); break;
+                            Args[i]=reader.ReadByte(); break;
                         case 0x02:
-                            Args.Add(reader.ReadShort()); break;
+                            Args[i]=reader.ReadShort(); break;
                         case 0x03:
-                            Args.Add(reader.ReadUShort()); break;
+                            Args[i]=reader.ReadUShort(); break;
                         case 0x04:
-                            Args.Add(reader.ReadInt()); break;
+                            Args[i]=reader.ReadInt(); break;
                         case 0x05:
-                            Args.Add(reader.ReadUInt()); break;
+                            Args[i]=reader.ReadUInt(); break;
                         case 0x06:
-                            Args.Add(reader.ReadLong()); break;
+                            Args[i]=reader.ReadLong(); break;
                         case 0x07:
-                            Args.Add(reader.ReadULong()); break;
+                            Args[i]=reader.ReadULong(); break;
                         case 0x08:
-                            Args.Add(reader.ReadFloat()); break;
+                            Args[i]=reader.ReadFloat(); break;
                         case 0x09:
-                            Args.Add(reader.ReadBool()); break;
+                            Args[i]=reader.ReadBool(); break;
                         case 0x10:
-                            Args.Add(reader.ReadString()); break;
+                            Args[i]=reader.ReadString(); break;
                         case 0x11: 
-                            Args.Add(reader.ReadVector3()); break;
+                            Args[i]=reader.ReadVector3(); break;
                         case 0x12:
-                            Args.Add(reader.ReadQuaternion()); break;
+                            Args[i]=reader.ReadQuaternion(); break;
                         case 0x13:
-                            Args.Add((GTA.Model)reader.ReadInt()); break;
+                            Args[i]=(GTA.Model)reader.ReadInt(); break;
                         case 0x14:
-                            Args.Add(reader.ReadVector2()); break;
+                            Args[i]=reader.ReadVector2(); break;
                         default:
                             if (_resolve==null)
                             {
@@ -88,7 +89,7 @@ namespace RageCoop.Core
                             }
                             else
                             {
-                                Args.Add(_resolve(type, reader)); break;
+                                Args[i]=_resolve(type, reader); break;
                             }
                     }
                 }

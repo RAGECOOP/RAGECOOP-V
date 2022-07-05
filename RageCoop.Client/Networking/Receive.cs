@@ -267,6 +267,7 @@ namespace RageCoop.Client
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
                         packet.Unpack(data);
+                        Main.Logger.Debug(packet.Args.DumpWithType());
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }
                     break;

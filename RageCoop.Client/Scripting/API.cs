@@ -19,7 +19,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion
         /// </summary>
-        public List<object> Args { get; set; }
+        public object[] Args { get; set; }
     }
     /// <summary>
     /// Provides vital functionality to interact with RAGECOOP
@@ -241,25 +241,11 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event</param>
         /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
-        public static void SendCustomEvent(int eventHash, List<object> args)
+        public static void SendCustomEvent(int eventHash, params object[] args)
         {
             var p = new Packets.CustomEvent()
             {
                 Args=args,
-                Hash=eventHash
-            };
-            Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
-        }
-        /// <summary>
-        /// Send an event and data to the server.
-        /// </summary>
-        /// <param name="eventHash"></param>
-        /// <param name="args"></param>
-        public static void SendCustomEvent(int eventHash,params object[] args)
-        {
-            var p = new Packets.CustomEvent()
-            {
-                Args=new List<object>(args),
                 Hash=eventHash
             };
             Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);

@@ -168,7 +168,7 @@ namespace RageCoop.Client.Scripting
             TypeCode returnType=(TypeCode)ty;
             i = returnType==TypeCode.Empty ? 1 : 2;
             var hash = (Hash)e.Args[i++];
-            for(; i<e.Args.Count;i++)
+            for(; i<e.Args.Length;i++)
             {
                 arguments.Add(GetInputArgument(e.Args[i]));
             }

@@ -39,7 +39,7 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion, Vector2 <see cref="ServerObject.Handle"/>
         /// </summary>
-        public List<object> Args { get; set; }
+        public object[] Args { get; set; }
     }
     /// <summary>
     /// 

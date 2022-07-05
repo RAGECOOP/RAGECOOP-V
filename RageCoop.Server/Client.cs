@@ -159,7 +159,7 @@ namespace RageCoop.Server
             var argsList= new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)Type.GetTypeCode(typeof(T)), RequestNativeCallID<T>(callBack), (ulong)hash });
 
-            SendCustomEvent(CustomEvents.NativeCall, argsList);
+            SendCustomEvent(CustomEvents.NativeCall, argsList.ToArray());
         }
         /// <summary>
         /// Send a native call to client and ignore it's response.
@@ -169,9 +169,9 @@ namespace RageCoop.Server
         public void SendNativeCall(GTA.Native.Hash hash, params object[] args)
         {
             var argsList = new List<object>(args);
-            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty,(ulong)hash});
+            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty,(ulong)hash });
             // Server.Logger?.Debug(argsList.DumpWithType());
-            SendCustomEvent(CustomEvents.NativeCall, argsList);
+            SendCustomEvent(CustomEvents.NativeCall, argsList.ToArray());
         }
         private int RequestNativeCallID<T>(Action<object> callback)
         {
@@ -197,35 +197,6 @@ namespace RageCoop.Server
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
         /// <param name="args">Arguments</param>
-        public void SendCustomEvent(int hash,List<object> args)
-        {
-            if (!IsReady)
-            {
-                Server.Logger?.Warning($"Player \"{Username}\" is not ready!");
-            }
-
-            try
-            {
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.CustomEvent()
-                {
-                    Hash=hash,
-                    Args=args
-                }.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
-
-            }
-            catch (Exception ex)
-            {
-                Server.Logger?.Error(ex);
-            }
-        }
-        /// <summary>
-        /// Trigger a CustomEvent for this client
-        /// </summary>
-        /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
-        /// <param name="args">Arguments</param>
         public void SendCustomEvent(int hash,params object[] args)
         {
             if (!IsReady)
@@ -240,7 +211,7 @@ namespace RageCoop.Server
                 new Packets.CustomEvent()
                 {
                     Hash=hash,
-                    Args=new(args)
+                    Args=args
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
 
