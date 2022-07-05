@@ -165,60 +165,60 @@ namespace RageCoop.Client.Scripting
             {
                 case TypeCode.Boolean:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<bool>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<bool>(hash, arguments.ToArray()) });
                     break;
                 case TypeCode.Byte:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<byte>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<byte>(hash, arguments.ToArray()) });
                     break;
                 case TypeCode.Char:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<char>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<char>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.Single:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<float>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<float>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.Double:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<double>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<double>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.Int16:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<short>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<short>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.Int32:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<int>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<int>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.Int64:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<long>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<long>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.String:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<string>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<string>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.UInt16:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<ushort>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<ushort>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.UInt32:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<uint>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<uint>(hash, arguments.ToArray()) });
                     break;
 
                 case TypeCode.UInt64:
                     API.SendCustomEvent(CustomEvents.NativeResponse,
-         new List<object> { id, Function.Call<ulong>(hash, arguments.ToArray()) });
+         new object[] { id, Function.Call<ulong>(hash, arguments.ToArray()) });
                     break;
             }
 
