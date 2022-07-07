@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using GTA.Math;
 using GTA;
 
-namespace RageCoop.Server
+namespace RageCoop.Server.Scripting
 {
     
     /// <summary>

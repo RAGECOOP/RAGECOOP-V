@@ -6,6 +6,7 @@ using System.Linq;
 using GTA;
 using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
+using RageCoop.Server.Scripting;
 
 namespace RageCoop.Server
 {

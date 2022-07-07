@@ -9,9 +9,8 @@ using GTA.Native;
 using GTA.Math;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
-using RageCoop.Server.Scripting;
 
-namespace RageCoop.Server
+namespace RageCoop.Server.Scripting
 {
 
     /// <summary>
