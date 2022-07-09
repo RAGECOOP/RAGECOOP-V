@@ -145,7 +145,11 @@ namespace RageCoop.Server
                                 "\"name\": \"" + Settings.Name + "\", " +
                                 "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                                "\"maxPlayers\": \"" + Settings.MaxPlayers + "\"" +
+                                "\"maxPlayers\": \"" + Settings.MaxPlayers + "\", " +
+                                "\"description\": \"" + Settings.Description + "\", " +
+                                "\"website\": \"" + Settings.Website + "\", " +
+                                "\"gameMode\": \"" + Settings.GameMode + "\", " +
+                                "\"language\": \"" + Settings.Language + "\"" +
                                 " }";
                             HttpResponseMessage response = null;
                             try
