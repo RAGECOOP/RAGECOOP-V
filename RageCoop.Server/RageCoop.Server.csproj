@@ -21,12 +21,12 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Obsolete\**" />
-    <EmbeddedResource Remove="Obsolete\**" />
-    <None Remove="Obsolete\**" />
-  </ItemGroup>
-
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<OutDir>..\bin\Debug\Server</OutDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<OutDir>..\bin\Release\Server</OutDir>
+	</PropertyGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
   </ItemGroup>
