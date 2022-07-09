@@ -22,6 +22,9 @@ namespace RageCoop.Server
     {
         [JsonProperty("ip")]
         public string Address { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
     }
 
     /// <summary>
@@ -142,6 +145,7 @@ namespace RageCoop.Server
                                 "{ " +
                                 "\"address\": \"" + info.Address + "\", " +
                                 "\"port\": \"" + Settings.Port + "\", " +
+                                "\"country\": \"" + info.Country + "\", " +
                                 "\"name\": \"" + Settings.Name + "\", " +
                                 "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
                                 "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
