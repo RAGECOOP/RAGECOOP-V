@@ -49,7 +49,9 @@ namespace RageCoop.Client.Scripting
 
         private void CreateVehicle(CustomEventReceivedArgs e)
         {
-            var veh = World.CreateVehicle((Model)e.Args[1], (Vector3)e.Args[2], (float)e.Args[3]);
+            var vehicleModel = (Model)e.Args[1];
+            vehicleModel.Request(1000);
+            var veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
             veh.CanPretendOccupants=false;
             var v = new SyncedVehicle()
             {
