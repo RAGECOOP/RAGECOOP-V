@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 using GTA.Math;
 using GTA;
 using RageCoop.Core;
@@ -140,8 +140,6 @@ namespace RageCoop.Client
             }
         }
 
-        [DllImport("kernel32.dll")]
-        public static extern ulong GetTickCount64();
         public static Vector3 PredictPosition(this Entity e, bool applyDefault = true)
         {
             return e.Position+e.Velocity*((applyDefault ? SyncParameters.PositioinPredictionDefault : 0)+Networking.Latency);
@@ -210,5 +208,44 @@ namespace RageCoop.Client
                 return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
+
+        const UInt32 WM_KEYDOWN = 0x0100;
+        public static void Reload()
+        {
+            string reloadKey="None";
+            var lines = File.ReadAllLines("ScriptHookVDotNet.ini");
+            foreach (var l in lines)
+            {
+                var ss = l.Split('=');
+                if(ss.Length > 0 && ss[0]=="ReloadKey")
+                {
+                    reloadKey = ss[1];
+                }
+            }
+            var lineList = lines.ToList();
+            if (reloadKey=="None")
+            {
+                foreach (var l in lines)
+                {
+                    var ss = l.Split('=');
+                    if (ss.Length > 0 && ss[0]=="ReloadKey")
+                    {
+                        reloadKey = ss[1];
+                        lineList.Remove(l);
+                    }
+                }
+                lineList.Add("ReloadKey=Insert");
+                File.WriteAllLines("ScriptHookVDotNet.ini",lineList.ToArray());
+            }
+            Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
+            PostMessage(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, WM_KEYDOWN, (int)key, 0);
+        }
+        
+        [DllImport("user32.dll")]
+        static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
+
+
+        [DllImport("kernel32.dll")]
+        public static extern ulong GetTickCount64();
     }
 }

@@ -82,9 +82,10 @@ namespace RageCoop.Client
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason));
 
                             MapLoader.DeleteAll();
-                            Main.Resources.Unload();
-
+                            Main.Resources.Unload(); 
                             Main.Logger.Info($">> Disconnected << reason: {reason}");
+
+                            
                             break;
                     }
                     break;

@@ -104,6 +104,10 @@ namespace RageCoop.Client.Scripting
 		public void Unload()
         {
 			StopAll();
+			if (LoadedResources.Count > 0)
+            {
+				Util.Reload();
+			}
 			LoadedResources.Clear();
         }
 		private List<string> ToIgnore = new List<string>
