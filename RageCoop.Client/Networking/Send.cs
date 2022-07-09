@@ -108,7 +108,7 @@ namespace RageCoop.Client
             {
                 Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
             }
-            var packet=new Packets.VehicleStateSync()
+            var packet = new Packets.VehicleStateSync()
             {
                 ID =v.ID,
                 OwnerID = v.OwnerID,
@@ -122,7 +122,8 @@ namespace RageCoop.Client
                 EngineHealth=veh.EngineHealth,
                 Passengers=veh.GetPassengers(),
                 LockStatus=veh.LockStatus,
-                LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh)
+                LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh),
+                Livery=Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh)
             };
             if (v.MainVehicle==Game.Player.LastVehicle)
             {

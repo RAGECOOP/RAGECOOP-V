@@ -100,12 +100,14 @@ namespace RageCoop.Client
         internal Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
         internal byte RadioStation = 255;
         internal string LicensePlate { get; set; }
+        internal int _lastLivery = -1;
+        internal int Livery { get; set; } = -1;
         internal bool _checkSeat { get; set; } = true;
 
         #endregion
         internal override void Update()
         {
-
+            
             #region -- INITIAL CHECK --
 
             // Check if all data avalible
@@ -339,6 +341,12 @@ namespace RageCoop.Client
                 if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle)!=LicensePlate)
                 {
                     Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT,MainVehicle,LicensePlate);
+                }
+
+                if (_lastLivery!=Livery)
+                {
+                    Function.Call(Hash.SET_VEHICLE_LIVERY, MainVehicle, Livery);
+                    _lastLivery=Livery;
                 }
                 #endregion
             }

@@ -397,6 +397,7 @@ namespace RageCoop.Client
             v.LockStatus=packet.LockStatus;
             v.RadioStation=packet.RadioStation;
             v.LicensePlate=packet.LicensePlate;
+            v.Livery=packet.Livery;
             v.Flags=packet.Flag;
             foreach (KeyValuePair<int, int> pair in packet.Passengers)
             {

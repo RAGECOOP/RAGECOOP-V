@@ -38,6 +38,8 @@ namespace RageCoop.Core
 
             public VehicleLockStatus LockStatus { get; set; }
 
+            public int Livery { get; set; } = -1;
+
             /// <summary>
             /// VehicleSeat,PedID
             /// </summary>
@@ -140,6 +142,8 @@ namespace RageCoop.Core
                 }
                 byteArray.AddRange(Encoding.ASCII.GetBytes(LicensePlate));
 
+                byteArray.Add((byte)(Livery+1));
+
                 byte[] result = byteArray.ToArray();
 
                 message.Write(result.Length);
@@ -231,6 +235,8 @@ namespace RageCoop.Core
                 RadioStation=reader.ReadByte();
 
                 LicensePlate=Encoding.ASCII.GetString(reader.ReadByteArray(8));
+
+                Livery=(int)(reader.ReadByte()-1);
                 #endregion
             }
         }
