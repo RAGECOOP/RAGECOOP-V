@@ -50,7 +50,8 @@ namespace RageCoop.Core
 
         public byte[] ReadByteArray(int length)
         {
-            byte[] value = ResultArray.Skip(CurrentIndex).Take(length).ToArray();
+            byte[] value = new byte[length];
+            Array.Copy(ResultArray, CurrentIndex,value,0,length);
             CurrentIndex += length;
             return value;
         }
