@@ -152,8 +152,10 @@ namespace RageCoop.Server.Scripting
 				}
 				return false;
 			}
-
-			Logger?.Info($"Loaded {count} script(s) in {rfile.Name}");
+			if(count != 0)
+            {
+				Logger?.Info($"Loaded {count} script(s) in {rfile.Name}");
+			}
 			return count != 0;
 		}
 		
