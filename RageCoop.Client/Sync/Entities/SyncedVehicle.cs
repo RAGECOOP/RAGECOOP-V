@@ -100,6 +100,7 @@ namespace RageCoop.Client
         internal Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
         internal byte RadioStation = 255;
         internal string LicensePlate { get; set; }
+        internal bool _checkSeat { get; set; } = true;
 
         #endregion
         internal override void Update()
@@ -176,36 +177,33 @@ namespace RageCoop.Client
                 #region -- PASSENGER SYNC --
 
                 // check passengers (and driver).
-
-                var currentPassengers = MainVehicle.GetPassengers();
-
-                lock (Passengers)
+                if (_checkSeat)
                 {
-                    for (int i = -1; i<MainVehicle.PassengerCapacity; i++)
-                    {
-                        VehicleSeat seat = (VehicleSeat)i;
-                        if (Passengers.ContainsKey(seat))
-                        {
 
-                            SyncedPed c = Passengers[seat];
-                            if (c?.ID==Main.LocalPlayerID && (RadioStation!=Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX)))
-                            {
-                                Util.SetPlayerRadioIndex(RadioStation);
-                            }
-                            if (c?.MainPed!=null&&(!currentPassengers.ContainsKey(i))&&(!c.MainPed.IsBeingJacked)&&(!c.MainPed.IsTaskActive(TaskType.CTaskExitVehicleSeat))) {
-                                Passengers[seat].MainPed.SetIntoVehicle(MainVehicle, seat);
-                            }
-                        }
-                        else if (!MainVehicle.IsSeatFree(seat))
+                    var currentPassengers = MainVehicle.GetPassengers();
+
+                    lock (Passengers)
+                    {
+                        for (int i = -1; i<MainVehicle.PassengerCapacity; i++)
                         {
-                            if (seat==VehicleSeat.Driver &&MainVehicle.Driver.IsSittingInVehicle())
+                            VehicleSeat seat = (VehicleSeat)i;
+                            if (Passengers.ContainsKey(seat))
                             {
-                                MainVehicle.Driver.Task.WarpOutOfVehicle(MainVehicle);
+
+                                SyncedPed c = Passengers[seat];
+                                if (c?.ID==Main.LocalPlayerID && (RadioStation!=Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX)))
+                                {
+                                    Util.SetPlayerRadioIndex(RadioStation);
+                                }
+                                if (c?.MainPed!=null&&(!currentPassengers.ContainsKey(i))&&(!c.MainPed.IsBeingJacked)&&(!c.MainPed.IsTaskActive(TaskType.CTaskExitVehicleSeat)))
+                                {
+                                    Passengers[seat].MainPed.SetIntoVehicle(MainVehicle, seat);
+                                }
                             }
-                            else
+                            else if (!MainVehicle.IsSeatFree(seat))
                             {
-                                var p = MainVehicle.Passengers.Where(x => x.SeatIndex==seat).FirstOrDefault();
-                                if ((p!=null)&&p.IsSittingInVehicle())
+                                var p = MainVehicle.Occupants.Where(x => x.SeatIndex==seat).FirstOrDefault();
+                                if ((p!=null)&& !p.IsTaskActive(TaskType.CTaskLeaveAnyCar))
                                 {
                                     p.Task.WarpOutOfVehicle(MainVehicle);
                                 }

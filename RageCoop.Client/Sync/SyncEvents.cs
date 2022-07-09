@@ -112,12 +112,19 @@ namespace RageCoop.Client {
         private static void HandleLeaveVehicle(Packets.LeaveVehicle p)
         {
             var ped = EntityPool.GetPedByID(p.ID);
+            var veh = ped.MainPed.CurrentVehicle.GetSyncEntity();
+            veh._checkSeat=false;
             var flag = LeaveVehicleFlags.None;
             if (ped.MainPed?.CurrentVehicle==null) { return; }
             // Bail out
             if (ped.MainPed.CurrentVehicle.Speed>5) { flag|=LeaveVehicleFlags.BailOut;}
-            ped.PauseUpdate((ulong)Game.FPS*2);
+            // ped.PauseUpdate((ulong)Game.FPS*2);
             ped.MainPed.Task.LeaveVehicle(flag) ;
+            Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                veh._checkSeat=true;
+            });
         }
         private static void HandlePedKilled(Packets.PedKilled p)
         {
