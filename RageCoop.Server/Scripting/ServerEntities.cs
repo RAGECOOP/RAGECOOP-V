@@ -260,7 +260,7 @@ namespace RageCoop.Server.Scripting
         }
         internal void CleanUp(Client left)
         {
-            Server.Logger?.Trace("Removing all entities from: "+left.Username);
+            // Server.Logger?.Trace("Removing all entities from: "+left.Username);
 
             foreach (var pair in Peds)
             {
@@ -276,8 +276,8 @@ namespace RageCoop.Server.Scripting
                     Server.QueueJob(() => Vehicles.Remove(pair.Key));
                 }
             }
-            Server.QueueJob(() =>
-            Server.Logger?.Trace("Remaining entities: "+(Peds.Count+Vehicles.Count+ServerProps.Count)));
+            // Server.QueueJob(() =>
+           //  Server.Logger?.Trace("Remaining entities: "+(Peds.Count+Vehicles.Count+ServerProps.Count)));
         }
         internal void RemoveVehicle(int id)
         {
