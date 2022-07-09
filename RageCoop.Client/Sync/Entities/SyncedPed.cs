@@ -32,7 +32,7 @@ namespace RageCoop.Client
 
             Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
-                        MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
+            // MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
 
         }
 
@@ -46,12 +46,11 @@ namespace RageCoop.Client
         }
         #endregion
         #region PLAYER -- ONLY
-        internal string Username = "N/A";
         internal Blip PedBlip = null;
         internal BlipColor BlipColor = (BlipColor)255;
         internal BlipSprite BlipSprite = (BlipSprite)0;
         internal float BlipScale=1;
-        internal bool DisplayNameTag { get; set; } = true;
+        internal PlayerData Player;
         #endregion
 
         /// <summary>
@@ -84,14 +83,10 @@ namespace RageCoop.Client
         {
             if (IsPlayer)
             {
-                if (Username=="N/A")
+                if (Player==null)
                 {
-                    var p = PlayerList.GetPlayer(this);
-                    if (p!=null)
-                    {
-                        Username=p.Username;
-                    }
-
+                    Player = PlayerList.GetPlayer(this);
+                    return;
                 }
                 RenderNameTag();
             }
@@ -123,20 +118,10 @@ namespace RageCoop.Client
             else if (((byte)BlipColor != 255) && PedBlip==null)
             {
                 PedBlip=MainPed.AddBlip();
+                
                 if (IsPlayer)
                 {
-                    Main.QueueAction(() =>
-                    {
-                        if (Username=="N/A")
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            PedBlip.Name=Username;
-                            return true;
-                        }
-                    });
+                    PedBlip.Name=Player.Username;
                 }
                 PedBlip.Color=BlipColor;
                 PedBlip.Sprite=BlipSprite;
@@ -158,6 +143,17 @@ namespace RageCoop.Client
                 if (!Clothes.SequenceEqual(_lastClothes))
                 {
                     SetClothes();
+                }
+                var b = MainPed.AttachedBlip;
+                if (b==null || b.Color!=BlipColor || b.Sprite!=BlipSprite)
+                {
+                    PedBlip=MainPed.AddBlip();
+                    PedBlip.Color=BlipColor;
+                    PedBlip.Sprite =BlipSprite;
+                    if (IsPlayer)
+                    {
+                        b.Name=Player.Username;
+                    }
                 }
 
                 CheckCurrentWeapon();
@@ -206,12 +202,12 @@ namespace RageCoop.Client
         
         private void RenderNameTag()
         {
-            if (!DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
+            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
             {
                 return;
             }
 
-            string renderText = IsOutOfSync ? "~r~AFK" : Username;
+            string renderText = IsOutOfSync ? "~r~AFK" : Player.Username;
             Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f);
 
             Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
@@ -263,14 +259,7 @@ namespace RageCoop.Client
             }
             
 
-            Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
-            Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, MainPed.Handle, false);
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, MainPed.Handle, true);
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
-            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
-            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
-            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
-
+            
             MainPed.BlockPermanentEvents = true;
             MainPed.CanWrithe=false;
             MainPed.CanBeDraggedOutOfVehicle = true;
@@ -279,8 +268,16 @@ namespace RageCoop.Client
             MainPed.IsFireProof=false;
             MainPed.IsExplosionProof=false;
 
+            Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, MainPed.Handle, false);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, MainPed.Handle, true);
+            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
+            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
+            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
+            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
+
+
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater,false);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_AvoidTearGas, false);

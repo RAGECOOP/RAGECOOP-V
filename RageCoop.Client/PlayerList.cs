@@ -124,7 +124,8 @@ namespace RageCoop.Client
         /// <summary>
         /// Player Latency in second.
         /// </summary>
-        public float Latency { get; internal set; }
+        public float Latency { get; set; }
 
+        public bool DisplayNameTag { get; set; } = true;
     }
 }

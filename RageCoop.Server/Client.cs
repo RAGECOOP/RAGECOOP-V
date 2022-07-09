@@ -54,7 +54,7 @@ namespace RageCoop.Server
         public bool EnableAutoRespawn { 
             get { return _autoRespawn; } 
             set {
-                Server.BaseScript.SetAutoRespawn(this,value);
+                BaseScript.SetAutoRespawn(this,value);
                 _autoRespawn=value;
             }
         }

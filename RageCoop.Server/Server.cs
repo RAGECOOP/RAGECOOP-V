@@ -43,7 +43,8 @@ namespace RageCoop.Server
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> Clients = new();
-        
+        internal readonly Dictionary<string, Client> ClientsByName = new();
+
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private Resources Resources;
         internal Logger Logger;
@@ -617,7 +618,8 @@ namespace RageCoop.Server
                         Username=packet.Username,
                         Player = player
                     }
-                );;
+                );
+                ClientsByName.Add(packet.Username, tmpClient);
             }
             
             Logger?.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
@@ -690,6 +692,7 @@ namespace RageCoop.Server
             _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
             Clients.Remove(localClient.NetID);
+            ClientsByName.Remove(localClient.Username);
             Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
         }
 

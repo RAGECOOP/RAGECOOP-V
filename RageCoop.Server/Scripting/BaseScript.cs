@@ -25,7 +25,7 @@ namespace RageCoop.Server.Scripting
         public override void OnStop()
         {
         }
-        public void SetAutoRespawn(Client c,bool toggle)
+        public static void SetAutoRespawn(Client c,bool toggle)
         {
             c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle );
         }

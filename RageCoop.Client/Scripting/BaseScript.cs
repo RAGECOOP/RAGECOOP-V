@@ -14,6 +14,7 @@ namespace RageCoop.Client.Scripting
         public override void OnStart()
         {
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
+            API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag,SetDisplayNameTag);
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
             API.RegisterCustomEventHandler(CustomEvents.ServerPropSync, ServerObjectSync);
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerProp, DeleteServerProp);
@@ -25,6 +26,12 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
             API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+        }
+
+        private void SetDisplayNameTag(CustomEventReceivedArgs e)
+        {
+            var p = PlayerList.GetPlayer((int)e.Args[0]);
+            if(p != null) { p.DisplayNameTag=(bool)e.Args[1]; }
         }
 
         private void UpdatePedBlip(CustomEventReceivedArgs e)
@@ -51,7 +58,12 @@ namespace RageCoop.Client.Scripting
         {
             var vehicleModel = (Model)e.Args[1];
             vehicleModel.Request(1000);
-            var veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
+            Vehicle veh= World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
+            while (veh==null)
+            {
+                veh  = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
+                System.Threading.Thread.Sleep(10);
+            }
             veh.CanPretendOccupants=false;
             var v = new SyncedVehicle()
             {
@@ -104,7 +116,7 @@ namespace RageCoop.Client.Scripting
         }
         private void SetNameTag(CustomEventReceivedArgs e)
         {
-            var p = EntityPool.GetPedByID((int)e.Args[0]);
+            var p =PlayerList.GetPlayer((int)e.Args[0]);
             if(p!= null)
             {
                 p.DisplayNameTag=(bool)e.Args[1];
