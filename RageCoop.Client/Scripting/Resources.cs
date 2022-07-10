@@ -85,7 +85,7 @@ namespace RageCoop.Client.Scripting
 		/// <param name="path">The path to the directory containing all resources to load.</param>
 		public void Load(string path)
 		{
-			Unload();
+			
 			foreach (var d in Directory.GetDirectories(path))
 			{
 				if(Path.GetFileName(d).ToLower() != "data")
@@ -106,7 +106,7 @@ namespace RageCoop.Client.Scripting
 			StopAll();
 			if (LoadedResources.Count > 0)
             {
-				Util.Reload();
+				API.QueueAction(()=>Util.Reload());
 			}
 			LoadedResources.Clear();
         }
