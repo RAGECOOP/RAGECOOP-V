@@ -19,11 +19,11 @@ ServerRoot
 └───Resources
     └───Server
     │   │   RageCoop.Resources.Management.zip
-    │   │   RageCoop.Resources.FreeRoam.Server.zip
+    │   │   RageCoop.Resources.Race.zip
     │   │   
     │
     │───Client
-    │   │   RageCoop.Resources.FreeRoam.Client.zip
+    │   │   RageCoop.Resources.Race.Client.zip
     │   │
     │
     └───Temp
