@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class CustomEventReceivedArgs
+    <title>Class ServerObject
    | RageCoop resource documentation </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class CustomEventReceivedArgs
+    <meta name="title" content="Class ServerObject
    | RageCoop resource documentation ">
     <meta name="generator" content="docfx 2.59.2.0">
     
@@ -78,24 +78,24 @@
         </div>
         <div class="article row grid-right">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs">
+            <article class="content wrap" id="_content" data-uid="RageCoop.Server.Scripting.ServerObject">
   
   
-  <h1 id="RageCoop_Server_Scripting_CustomEventReceivedArgs" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs" class="text-break">Class CustomEventReceivedArgs
+  <h1 id="RageCoop_Server_Scripting_ServerObject" data-uid="RageCoop.Server.Scripting.ServerObject" class="text-break">Class ServerObject
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Server-side object controller</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.eventargs">EventArgs</a></div>
-    <div class="level2"><span class="xref">CustomEventReceivedArgs</span></div>
+    <div class="level1"><span class="xref">ServerObject</span></div>
+      <div class="level2"><a class="xref" href="RageCoop.Server.Scripting.ServerPed.html">ServerPed</a></div>
+      <div class="level2"><a class="xref" href="RageCoop.Server.Scripting.ServerProp.html">ServerProp</a></div>
+      <div class="level2"><a class="xref" href="RageCoop.Server.Scripting.ServerVehicle.html">ServerVehicle</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.eventargs.empty">EventArgs.Empty</a>
-    </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
     </div>
@@ -120,22 +120,22 @@
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="RageCoop.Server.Scripting.html">RageCoop.Server.Scripting</a></h6>
   <h6><strong>Assembly</strong>: RageCoop.Server.dll</h6>
-  <h5 id="RageCoop_Server_Scripting_CustomEventReceivedArgs_syntax">Syntax</h5>
+  <h5 id="RageCoop_Server_Scripting_ServerObject_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class CustomEventReceivedArgs : EventArgs</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class ServerObject</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
   
   
-  <a id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Args_" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Args*"></a>
-  <h4 id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Args" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Args">Args</h4>
-  <div class="markdown level1 summary"><p>Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion, Vector2 <a class="xref" href="RageCoop.Server.Scripting.ServerObject.html#RageCoop_Server_Scripting_ServerObject_Handle">Handle</a></p>
+  <a id="RageCoop_Server_Scripting_ServerObject_Handle_" data-uid="RageCoop.Server.Scripting.ServerObject.Handle*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Handle" data-uid="RageCoop.Server.Scripting.ServerObject.Handle">Handle</h4>
+  <div class="markdown level1 summary"><p>Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public object[] Args { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Tuple&lt;byte, byte[]&gt; Handle { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -147,21 +147,21 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>[]</td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple-2">Tuple</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.byte">Byte</a>[]&gt;</td>
         <td></td>
       </tr>
     </tbody>
   </table>
   
   
-  <a id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Hash_" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Hash*"></a>
-  <h4 id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Hash" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Hash">Hash</h4>
-  <div class="markdown level1 summary"><p>The event hash</p>
+  <a id="RageCoop_Server_Scripting_ServerObject_ID_" data-uid="RageCoop.Server.Scripting.ServerObject.ID*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_ID" data-uid="RageCoop.Server.Scripting.ServerObject.ID">ID</h4>
+  <div class="markdown level1 summary"><p>Network ID of this object.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public int Hash { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public int ID { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -180,14 +180,40 @@
   </table>
   
   
-  <a id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Sender_" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Sender*"></a>
-  <h4 id="RageCoop_Server_Scripting_CustomEventReceivedArgs_Sender" data-uid="RageCoop.Server.Scripting.CustomEventReceivedArgs.Sender">Sender</h4>
-  <div class="markdown level1 summary"><p>The <a class="xref" href="RageCoop.Server.Client.html">Client</a> that triggered this event</p>
+  <a id="RageCoop_Server_Scripting_ServerObject_Model_" data-uid="RageCoop.Server.Scripting.ServerObject.Model*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Model" data-uid="RageCoop.Server.Scripting.ServerObject.Model">Model</h4>
+  <div class="markdown level1 summary"><p>The object's model</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Client Sender { get; set; }</code></pre>
+    <pre><code class="lang-csharp hljs">public Model Model { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Model</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_Scripting_ServerObject_Owner_" data-uid="RageCoop.Server.Scripting.ServerObject.Owner*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Owner" data-uid="RageCoop.Server.Scripting.ServerObject.Owner">Owner</h4>
+  <div class="markdown level1 summary"><p>The client that owns this object, null if it's owned by server.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public Client Owner { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -200,6 +226,114 @@
     <tbody>
       <tr>
         <td><a class="xref" href="RageCoop.Server.Client.html">Client</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_Scripting_ServerObject_Position_" data-uid="RageCoop.Server.Scripting.ServerObject.Position*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Position" data-uid="RageCoop.Server.Scripting.ServerObject.Position">Position</h4>
+  <div class="markdown level1 summary"><p>Gets or sets this object's position</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Vector3 Position { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="RageCoop_Server_Scripting_ServerObject_Rotation_" data-uid="RageCoop.Server.Scripting.ServerObject.Rotation*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Rotation" data-uid="RageCoop.Server.Scripting.ServerObject.Rotation">Rotation</h4>
+  <div class="markdown level1 summary"><p>Gets or sets this object's rotation</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual Vector3 Rotation { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">GTA.Math.Vector3</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="RageCoop_Server_Scripting_ServerObject_Delete_" data-uid="RageCoop.Server.Scripting.ServerObject.Delete*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Delete" data-uid="RageCoop.Server.Scripting.ServerObject.Delete">Delete()</h4>
+  <div class="markdown level1 summary"><p>Send updated information to clients, would be called automatically.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void Delete()</code></pre>
+  </div>
+  
+  
+  <a id="RageCoop_Server_Scripting_ServerObject_Freeze_" data-uid="RageCoop.Server.Scripting.ServerObject.Freeze*"></a>
+  <h4 id="RageCoop_Server_Scripting_ServerObject_Freeze_System_Boolean_" data-uid="RageCoop.Server.Scripting.ServerObject.Freeze(System.Boolean)">Freeze(Boolean)</h4>
+  <div class="markdown level1 summary"><p>Freeze this object, will throw an exception if it's a ServerProp.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual void Freeze(bool toggle)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td><span class="parametername">toggle</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></td>
         <td></td>
       </tr>
     </tbody>

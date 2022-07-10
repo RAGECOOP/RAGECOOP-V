@@ -84,19 +84,18 @@
 └───Resources
     └───Server
     │   │   RageCoop.Resources.Management.zip
-    │   │   RageCoop.Resources.FreeRoam.Server.zip
+    │   │   RageCoop.Resources.Race.zip
     │   │   
     │
     │───Client
-    │   │   RageCoop.Resources.FreeRoam.Client.zip
+    │   │   RageCoop.Resources.Race.Client.zip
     │   │
     │
     └───Temp
 </code></pre>
 <h3 id="settingsxml">Settings.xml</h3>
 <p>This file will be generated first time you started the server, you can then change the server's configuration option by editing it, refer to <a href="api/RageCoop.Server.ServerSettings.html">ServerSettings</a> for detailed description.</p>
-<h2 id="server-reource">Server Reource</h2>
-<p>To create a server resource:</p>
+<h2 id="server-resource">Server Resource</h2>
 <ol>
 <li>Create a C# class library project targeting .NET 6.0.</li>
 <li>Add reference to <strong>RageCoop.Server.dll</strong> and <strong>RageCoop.Core.dll</strong>.</li>
@@ -110,7 +109,7 @@ using RageCoop.Core;
 
 </code></pre>
 </li>
-<li>Inherit a class from <a href="api/RageCoop.Server.Scripting.ServerScript.html">ServerScript</a>.</li>
+<li>Inherit from <a href="api/RageCoop.Server.Scripting.ServerScript.html">ServerScript</a>.</li>
 <li>Implement <code>OnStart()</code> and <code>OnStop()</code>, your cs file should look like this:
 <pre><code>using RageCoop.Server.Scripting;
 
@@ -136,6 +135,46 @@ namespace NiceGuy.MyFirstResource
 </code></pre>
 </li>
 <li>That's it! Start your server and you should see your resource loading.</li>
+</ol>
+<h2 id="client-resource">Client Resource</h2>
+<ol>
+<li>Create a C# class library project targeting .NET Framework 4.8.</li>
+<li>Add reference to <strong>RageCoop.Client.dll</strong> and <strong>RageCoop.Core.dll</strong>.</li>
+<li>Add following namespace(s):
+<pre><code>using RageCoop.Client.Scripting;
+
+// Optional
+using RageCoop.Core.Scripting;
+using RageCoop.Core;
+
+</code></pre>
+</li>
+<li>Inherit from <a href="api/RageCoop.Client.Scripting.ClientScript.html">ClientScript</a>.</li>
+<li>Implement <code>OnStart()</code> and <code>OnStop()</code>, your cs file should look like this:
+<pre><code>using RageCoop.Server.Scripting;
+
+namespace NiceGuy.MyFirstClientResource
+{
+    public class Main : ClientScript
+    {
+         public override void OnStart()
+         {
+             // Initiate your script here
+         }
+         public override void OnStop()
+         {
+             // Free all resources and perform cleanup
+         }
+    }
+}
+</code></pre>
+</li>
+<li>Now you can use anything from SHVDN to control client behaviour by adding a reference to <strong>ScriptHookVDotNet3.dll</strong></li>
+<li>For convenience, you can create a symlink in <code>ServerRoot/Resources/Client/NiceGuy.MyFirstResource</code> targeting your output folder:
+<pre><code>mklink /d ServerRoot/Resources/Client/NiceGuy.MyFirstClientResource C:/MyRepos/NiceGuy.MyFirstClientResource/bin/Debug
+</code></pre>
+</li>
+<li>That's it! When a client connects the resource will be sent and loaded at client side.</li>
 </ol>
 </article>
           </div>

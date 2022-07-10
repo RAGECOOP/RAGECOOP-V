@@ -420,41 +420,6 @@
   
   
   <a id="RageCoop_Client_Scripting_API_SendCustomEvent_" data-uid="RageCoop.Client.Scripting.API.SendCustomEvent*"></a>
-  <h4 id="RageCoop_Client_Scripting_API_SendCustomEvent_System_Int32_System_Collections_Generic_List_System_Object__" data-uid="RageCoop.Client.Scripting.API.SendCustomEvent(System.Int32,System.Collections.Generic.List{System.Object})">SendCustomEvent(Int32, List&lt;Object&gt;)</h4>
-  <div class="markdown level1 summary"><p>Send an event and data to the server.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static void SendCustomEvent(int eventHash, List&lt;object&gt; args)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td><span class="parametername">eventHash</span></td>
-        <td><p>An unique identifier of the event</p>
-</td>
-      </tr>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>&gt;</td>
-        <td><span class="parametername">args</span></td>
-        <td><p>The objects conataing your data, see <a class="xref" href="RageCoop.Client.Scripting.CustomEventReceivedArgs.html">CustomEventReceivedArgs</a> for a list of supported types</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  
-  
-  <a id="RageCoop_Client_Scripting_API_SendCustomEvent_" data-uid="RageCoop.Client.Scripting.API.SendCustomEvent*"></a>
   <h4 id="RageCoop_Client_Scripting_API_SendCustomEvent_System_Int32_System_Object___" data-uid="RageCoop.Client.Scripting.API.SendCustomEvent(System.Int32,System.Object[])">SendCustomEvent(Int32, Object[])</h4>
   <div class="markdown level1 summary"><p>Send an event and data to the server.</p>
 </div>
@@ -476,12 +441,14 @@
       <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
         <td><span class="parametername">eventHash</span></td>
-        <td></td>
+        <td><p>An unique identifier of the event</p>
+</td>
       </tr>
       <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>[]</td>
         <td><span class="parametername">args</span></td>
-        <td></td>
+        <td><p>The objects conataing your data, see <a class="xref" href="RageCoop.Client.Scripting.CustomEventReceivedArgs.html">CustomEventReceivedArgs</a> for a list of supported types</p>
+</td>
       </tr>
     </tbody>
   </table>
