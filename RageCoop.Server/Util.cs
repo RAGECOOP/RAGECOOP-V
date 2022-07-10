@@ -47,46 +47,11 @@ namespace RageCoop.Server
                 _ => (0x0, null),
             };
         }
-        /*
-        public static Client GetClientByNetID(long id)
-        {
-            Client result = null;
-            Server.Clients.TryGetValue(id,out result);
-            if (result == null)
-            {
-                NetConnection localConn = Server.MainNetServer.Connections.Find(x => id == x.RemoteUniqueIdentifier);
-                if (localConn != null)
-                {
-                    localConn.Disconnect("No data found!");
-                }
-                return null;
-            }
-
-            return result;
-        }
-
-        public static NetConnection GetConnectionByUsername(string username)
-        {
-            Client client = Server.Clients.Values.ToList().Find(x => x.Username.ToLower() == username.ToLower());
-            if (client == null)
-            {
-                return null;
-            }
-
-            return Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == client.NetID);
-        }
-        */
-        // Return a list of all connections but not the local connection
         public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections,NetConnection toExclude)
         {
             return new(connections.Where(e => e != toExclude));
         }
-        /*
-        public static List<NetConnection> FilterAllLocal(long local)
-        {
-            return new(Server.MainNetServer.Connections.Where(e => e.RemoteUniqueIdentifier != local));
-        }
-        */
+        
         public static T Read<T>(string file) where T : new()
         {
             XmlSerializer ser = new(typeof(T));
@@ -132,6 +97,11 @@ namespace RageCoop.Server
             }
 
             return data;
+        }
+
+        public static T Next<T>(this T[] values)
+        {
+            return values[new Random().Next(values.Length-1)];
         }
     }
 }

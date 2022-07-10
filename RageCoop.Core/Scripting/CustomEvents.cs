@@ -28,6 +28,8 @@ namespace RageCoop.Core.Scripting
         internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
         internal static readonly int DeleteServerBlip = Hash("RageCoop.DeleteServerBlip");
         internal static readonly int CreateVehicle = Hash("RageCoop.CreateVehicle");
+        internal static readonly int WeatherTimeSync = Hash("RageCoop.WeatherTimeSync");
+        internal static readonly int IsHost = Hash("RageCoop.IsHost");
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>

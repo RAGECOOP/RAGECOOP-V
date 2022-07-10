@@ -74,5 +74,15 @@
         /// Player's data won't be sent to another player if their distance is greater than this value. -1 for unlimited.
         /// </summary>
         public float PlayerStreamingDistance { get; set; } = -1;
+
+        /// <summary>
+        /// If enabled, all clients will have same weather as host
+        /// </summary>
+        public bool WeatherSync { get; set; } = true;
+
+        /// <summary>
+        /// If enabled, all clients will have same time as host
+        /// </summary>
+        public bool TimeSync { get; set; } = true;
     }
 }

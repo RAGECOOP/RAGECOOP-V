@@ -6,13 +6,19 @@ using GTA;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace RageCoop.Client.Scripting
 {
     internal class BaseScript : ClientScript
     {
+        private bool _isHost=false;
         public override void OnStart()
         {
+            API.Events.OnPedDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
+            API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag,SetDisplayNameTag);
             API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
@@ -24,8 +30,42 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
             API.RegisterCustomEventHandler(CustomEvents.CreateVehicle, CreateVehicle);
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
-            API.Events.OnPedDeleted+=(s,p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted,p.ID); };
-            API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+            API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost=(bool)e.Args[0]; Main.Logger.Debug("Host:"+_isHost); });
+            API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_isHost)
+                    {
+                        API.QueueAction(() =>
+                        {
+                            unsafe
+                            {
+                                var time = World.CurrentTimeOfDay;
+                                int weather1 = default(int);
+                                int weather2 = default(int);
+                                float percent2 = default(float);
+                                Function.Call(Hash._GET_WEATHER_TYPE_TRANSITION, &weather1, &weather2, &percent2);
+                                Main.Logger.Debug("Sending: "+ string.Format("{0},{1},{2},{3},{4},{5}", time.Hours, time.Minutes, time.Seconds, weather1, weather2, percent2));
+                                API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes, time.Seconds, weather1, weather2, percent2);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        Main.Logger.Debug("not host");
+                    }
+
+                    Thread.Sleep(1000);
+                }
+            });
+        }
+
+        private void WeatherTimeSync(CustomEventReceivedArgs e)
+        {
+            World.CurrentTimeOfDay=new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
+            Function.Call(Hash._SET_WEATHER_TYPE_TRANSITION, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 
         private void SetDisplayNameTag(CustomEventReceivedArgs e)

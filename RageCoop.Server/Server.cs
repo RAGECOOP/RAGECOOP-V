@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server
 {
@@ -44,6 +45,8 @@ namespace RageCoop.Server
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> Clients = new();
         internal readonly Dictionary<string, Client> ClientsByName = new();
+        internal Client _hostClient;
+        internal string CurrentWeather;
 
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private Resources Resources;
@@ -73,7 +76,6 @@ namespace RageCoop.Server
             Resources=new Resources(this);
             Security=new Security(Logger);
             Entities=new ServerEntities(this);
-            
         }
         /// <summary>
         /// Spawn threads and start the server
@@ -620,6 +622,9 @@ namespace RageCoop.Server
                     }
                 );
                 ClientsByName.Add(packet.Username, tmpClient);
+                if (Clients.Count==1) { 
+                    _hostClient=tmpClient;
+                }
             }
             
             Logger?.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
@@ -629,6 +634,10 @@ namespace RageCoop.Server
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private void SendPlayerConnectPacket(Client newClient)
         {
+            if (newClient==_hostClient)
+            {
+                _hostClient.SendCustomEvent(CustomEvents.IsHost, true);
+            }
 
             // Send other players to this client
             Clients.Values.ForEach(target =>
@@ -693,6 +702,12 @@ namespace RageCoop.Server
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
             Clients.Remove(localClient.NetID);
             ClientsByName.Remove(localClient.Username);
+            if (localClient==_hostClient)
+            {
+
+                _hostClient = Clients.Values.FirstOrDefault();
+                _hostClient?.SendCustomEvent(CustomEvents.IsHost, true);
+            }
             Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
         }
 

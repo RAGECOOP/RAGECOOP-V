@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
+using RageCoop.Core;
 namespace RageCoop.Server
 {
     class Program
@@ -11,10 +11,11 @@ namespace RageCoop.Server
         private static bool Stopping = false;
         static void Main(string[] args)
         {
-            var mainLogger= new Core.Logger()
+            var mainLogger= new Logger()
             {
                 LogPath="RageCoop.Server.log",
                 UseConsole=true,
+                Name="Server"
             };
             try
             {

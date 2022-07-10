@@ -331,6 +331,23 @@ namespace RageCoop.Server.Scripting
         /// Get a <see cref="Core.Logger"/> that the server is currently using, you should use <see cref="ServerResource.Logger"/> to display resource-specific information.
         /// </summary>
         public Logger Logger { get { return Server.Logger; } }
+
+
+        /// <summary>
+        /// Gets or sets the client that is resposible for synchronizing time and weather
+        /// </summary>
+        public Client Host
+        {
+            get { return Server._hostClient; }
+            set { 
+                if (Server._hostClient != value) 
+                {
+                    Server._hostClient?.SendCustomEvent(CustomEvents.IsHost, false);
+                    value.SendCustomEvent(CustomEvents.IsHost, true);
+                    Server._hostClient = value; 
+                } 
+            }
+        }
         #endregion
     }
 }

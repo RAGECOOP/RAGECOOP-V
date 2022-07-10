@@ -21,6 +21,17 @@ namespace RageCoop.Server.Scripting
             {
                 API.Entities.RemovePed((int)e.Args[0]);
             });
+            API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, (e) =>
+            {
+                foreach(var c in API.GetAllClients().Values)
+                {
+                    if (c==e.Sender)
+                    {
+                        continue;
+                    }
+                    c.SendCustomEventQueued(CustomEvents.WeatherTimeSync,e.Args);
+                }
+            });
         }
         public override void OnStop()
         {
