@@ -23,7 +23,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build client
-      run: dotnet build RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release -o RageCoop.Client/bin/RageCoop
+      run: dotnet publish RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release -o RageCoop.Client/bin/RageCoop
     - name: Build server win-x64
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r win-x64 -o RageCoop.Server/bin/win-x64 -c Release
     - name: Build server linux-x64
