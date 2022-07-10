@@ -32,9 +32,8 @@ ServerRoot
 
 This file will be generated first time you started the server, you can then change the server's configuration option by editing it, refer to [ServerSettings](api/RageCoop.Server.ServerSettings.html) for detailed description. 
 
-## Server Reource
+## Server Resource
 
-To create a server resource:
 1. Create a C# class library project targeting .NET 6.0.
 2. Add reference to **RageCoop.Server.dll** and **RageCoop.Core.dll**.
 3. Add following namespace(s):
@@ -47,7 +46,7 @@ To create a server resource:
     using RageCoop.Core;
     
     ```
-4. Inherit a class from [ServerScript](api/RageCoop.Server.Scripting.ServerScript.html).
+4. Inherit from [ServerScript](api/RageCoop.Server.Scripting.ServerScript.html).
 5. Implement `OnStart()` and `OnStop()`, your cs file should look like this:
     ```
     using RageCoop.Server.Scripting;
@@ -73,3 +72,44 @@ To create a server resource:
     mklink /d ServerRoot/Resources/Server/NiceGuy.MyFirstResource C:/MyRepos/NiceGuy.MyFirstResource/bin/Debug
     ```
 8. That's it! Start your server and you should see your resource loading.
+
+
+## Client Resource
+
+1. Create a C# class library project targeting .NET Framework 4.8.
+2. Add reference to **RageCoop.Client.dll** and **RageCoop.Core.dll**.
+3. Add following namespace(s):
+    ```
+    using RageCoop.Client.Scripting;
+    
+    // Optional
+    using RageCoop.Core.Scripting;
+    using RageCoop.Core;
+    
+    ```
+4. Inherit from [ClientScript](api/RageCoop.Client.Scripting.ClientScript.html).
+5. Implement `OnStart()` and `OnStop()`, your cs file should look like this:
+    ```
+    using RageCoop.Server.Scripting;
+    
+    namespace NiceGuy.MyFirstClientResource
+    {
+        public class Main : ClientScript
+        {
+             public override void OnStart()
+             {
+                 // Initiate your script here
+             }
+             public override void OnStop()
+             {
+                 // Free all resources and perform cleanup
+             }
+        }
+    }
+    ```
+6. Now you can use anything from SHVDN to control client behaviour by adding a reference to **ScriptHookVDotNet3.dll**
+7. For convenience, you can create a symlink in `ServerRoot/Resources/Client/NiceGuy.MyFirstResource` targeting your output folder:
+    ```
+    mklink /d ServerRoot/Resources/Client/NiceGuy.MyFirstClientResource C:/MyRepos/NiceGuy.MyFirstClientResource/bin/Debug
+    ```
+8. That's it! When a client connects the resource will be sent and loaded at client side.
