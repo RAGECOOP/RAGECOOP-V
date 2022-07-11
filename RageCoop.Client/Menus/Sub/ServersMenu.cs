@@ -77,7 +77,7 @@ namespace RageCoop.Client.Menus
         private static void GetAllServers()
         {
             List<ServerListClass> serverList = null;
-            var realUrl = Main.Settings.MasterServer=="[AUTO]" ? DownloadString("https://ragecoop.online/stuff/masterserver") : Main.Settings.MasterServer;
+            var realUrl = Main.Settings.MasterServer;
             serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(DownloadString(realUrl));
             
             // Need to be processed in main thread

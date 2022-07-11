@@ -141,7 +141,7 @@ namespace RageCoop.Server
                             Logger?.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
-                        var realMaster = Settings.MasterServer=="[AUTO]" ? Util.DownloadString("https://ragecoop.online/stuff/masterserver") : Settings.MasterServer;
+                        var realMaster = Settings.MasterServer;
                         while (!_stopping)
                         {
                             string msg =
