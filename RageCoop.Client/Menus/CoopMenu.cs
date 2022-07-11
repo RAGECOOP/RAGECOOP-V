@@ -34,7 +34,7 @@ namespace RageCoop.Client.Menus
         private static readonly NativeItem _passwordItem = new NativeItem("Password") { AltTitle = new string('*',Main.Settings.Password.Length) };
 
         public static readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.Settings.LastServerAddress };
-        private static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
+        internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
         private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +

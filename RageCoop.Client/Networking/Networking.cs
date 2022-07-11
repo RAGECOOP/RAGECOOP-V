@@ -76,9 +76,14 @@ namespace RageCoop.Client
                         Client = new NetClient(config);
                         Client.Start();
                         Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
+                        Menus.CoopMenu._serverConnectItem.Enabled=false;
                         Security.Regen();
-                        GetServerPublicKey(address);
-
+                        if(!GetServerPublicKey(address))
+                        {
+                            Menus.CoopMenu._serverConnectItem.Enabled=true;
+                            throw new TimeoutException("Failed to retrive server's public key");
+                        }
+                        
                         // Send HandshakePacket
                         NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                         var handshake = new Packets.Handshake()
@@ -96,8 +101,8 @@ namespace RageCoop.Client
                     }
                     catch(Exception ex)
                     {
-                        Main.Logger.Error("Cannot connect to server", ex);
-                        Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server"+ex.Message));
+                        Main.Logger.Error("Cannot connect to server: ", ex);
+                        Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server: "+ex.Message));
                     }
 
                 });
@@ -134,13 +139,13 @@ namespace RageCoop.Client
 
         #endregion // -- PLAYER --
 
-        private static void GetServerPublicKey(string address,int timeout=10000)
+        private static bool GetServerPublicKey(string address,int timeout=10000)
         {
             var msg=Client.CreateMessage();
             new Packets.PublicKeyRequest().Pack(msg); 
             var adds =address.Split(':');
             Client.SendUnconnectedMessage(msg,adds[0],int.Parse(adds[1]));
-            PublicKeyReceived.WaitOne(timeout); 
+            return PublicKeyReceived.WaitOne(timeout); 
         }
         #endregion
 
