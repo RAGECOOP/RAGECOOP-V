@@ -79,11 +79,7 @@ namespace RageCoop.Client.Scripting
 				}
 			}
 		}
-		/// <summary>
-		/// Load all resources from the server
-		/// </summary>
-		/// <param name="path">The path to the directory containing all resources to load.</param>
-		public void Load(string path)
+		public void Load(string path,string[] zips)
 		{
 			foreach (var zip in zips)
 			{
