@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using RageCoop.Core;
+using System.Windows.Forms;
 using GTA;
 
 namespace RageCoop.Client.Scripting
@@ -117,6 +118,15 @@ namespace RageCoop.Client.Scripting
             /// </summary>
             public static event EmptyEvent OnTick;
 
+            /// <summary>
+            /// This is equivalent of <see cref="Script.KeyDown"/>
+            /// </summary>
+            public static KeyEventHandler OnKeyDown;
+
+            /// <summary>
+            /// This is equivalent of <see cref="Script.KeyUp"/>
+            /// </summary>
+            public static KeyEventHandler OnKeyUp;
 
             #region INVOKE
             internal static void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null, v); }
@@ -125,6 +135,10 @@ namespace RageCoop.Client.Scripting
             internal static void InvokePedDeleted(SyncedPed p) { OnPedDeleted?.Invoke(null, p); }
             internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
             internal static void InvokeTick() { OnTick?.Invoke(); }
+
+            internal static void InvokeKeyDown(object s,KeyEventArgs e) { OnKeyDown?.Invoke(s,e); }
+
+            internal static void InvokeKeyUp(object s, KeyEventArgs e) { OnKeyUp?.Invoke(s, e); }
 
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
@@ -139,15 +153,6 @@ namespace RageCoop.Client.Scripting
                 }
             }
             #endregion
-            internal static void ClearHandlers()
-            {
-                OnPlayerDied=null;
-                OnTick=null;
-                OnPedDeleted=null;
-                OnPedSpawned=null;
-                OnVehicleDeleted=null;
-                OnVehicleSpawned=null;
-            }
         }
 
         #region FUNCTIONS

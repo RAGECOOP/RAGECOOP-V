@@ -82,6 +82,8 @@ namespace RageCoop.Client
             Tick += OnTick;
             Tick += (s,e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
+            KeyDown+=(s, e) => { Scripting.API.Events.InvokeKeyDown(s, e); };
+            KeyUp+=(s, e) => { Scripting.API.Events.InvokeKeyUp(s, e); };
             Aborted += (object sender, EventArgs e) => CleanUp();
             
             Util.NativeMemory();
