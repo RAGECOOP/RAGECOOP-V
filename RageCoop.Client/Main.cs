@@ -128,7 +128,6 @@ namespace RageCoop.Client
             }
             
 
-            MapLoader.LoadAll();
 
 #if DEBUG
             if (Networking.ShowNetworkInfo)
