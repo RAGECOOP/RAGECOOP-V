@@ -43,7 +43,7 @@ namespace RageCoop.Client.Scripting
                 get { return Main.Settings.Username; }
                 set
                 {
-                    if (IsOnServer || string.IsNullOrEmpty(value))
+                    if (Networking.IsOnServer || string.IsNullOrEmpty(value))
                     {
                         return;
                     }
@@ -155,51 +155,7 @@ namespace RageCoop.Client.Scripting
             #endregion
         }
 
-        #region FUNCTIONS
-        /// <summary>
-        /// Send a local chat message to this player
-        /// </summary>
-        /// <param name="from">Name of the sender</param>
-        /// <param name="message">The player's message</param>
-        public static void LocalChatMessage(string from, string message)
-        {
-            Main.MainChat.AddMessage(from, message);
-        }
-
-        /// <summary>
-        /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
-        /// </summary>
-        /// <returns></returns>
-        public static Logger Logger
-        {
-            get
-            {
-                return Main.Logger;
-            }
-        }
-        /// <summary>
-        /// Queue an action to be executed on next tick.
-        /// </summary>
-        /// <param name="a"></param>
-        public static void QueueAction(Action a)
-        {
-            Main.QueueAction(a);
-        }
-        /// <summary>
-        /// Disconnect from the server
-        /// </summary>
-        public static void Disconnect()
-        {
-            Networking.ToggleConnection(null);
-        }
-
-        /// <summary>
-        /// Check if the player is already on a server
-        /// </summary>
-        public static bool IsOnServer
-        {
-            get { return Networking.IsOnServer; }
-        }
+        #region PROPERTIES
 
         /// <summary>
         /// Get the local player's ID
@@ -241,6 +197,48 @@ namespace RageCoop.Client.Scripting
         {
             get { return Main.CurrentVersion; }
         }
+
+
+        /// <summary>
+        /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
+        /// </summary>
+        /// <returns></returns>
+        public static Logger Logger
+        {
+            get
+            {
+                return Main.Logger;
+            }
+        }
+        #endregion
+
+        #region FUNCTIONS
+        /// <summary>
+        /// Send a local chat message to this player
+        /// </summary>
+        /// <param name="from">Name of the sender</param>
+        /// <param name="message">The player's message</param>
+        public static void LocalChatMessage(string from, string message)
+        {
+            Main.MainChat.AddMessage(from, message);
+        }
+
+        /// <summary>
+        /// Queue an action to be executed on next tick.
+        /// </summary>
+        /// <param name="a"></param>
+        public static void QueueAction(Action a)
+        {
+            Main.QueueAction(a);
+        }
+        /// <summary>
+        /// Disconnect from the server
+        /// </summary>
+        public static void Disconnect()
+        {
+            Networking.ToggleConnection(null);
+        }
+
         /// <summary>
         /// Send an event and data to the server.
         /// </summary>
@@ -263,10 +261,9 @@ namespace RageCoop.Client.Scripting
         /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
         public static void RegisterCustomEventHandler(int hash, Action<CustomEventReceivedArgs> handler)
         {
-            List<Action<CustomEventReceivedArgs>> handlers;
             lock (CustomEventHandlers)
             {
-                if (!CustomEventHandlers.TryGetValue(hash, out handlers))
+                if (!CustomEventHandlers.TryGetValue(hash, out List<Action<CustomEventReceivedArgs>> handlers))
                 {
                     CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
                 }
