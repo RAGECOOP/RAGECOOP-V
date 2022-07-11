@@ -302,7 +302,7 @@ namespace RageCoop.Client
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
             if (c==null)
             {
-                Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+                // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
                 EntityPool.ThreadSafe.Add(c=new SyncedPed(packet.ID));
             }
             PedDataFlags flags = packet.Flag;
@@ -414,7 +414,7 @@ namespace RageCoop.Client
             if (p==null)
             {
                 if (packet.Exploded) { return; }
-                Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
+                // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));
             }
             p.Position=packet.Position;

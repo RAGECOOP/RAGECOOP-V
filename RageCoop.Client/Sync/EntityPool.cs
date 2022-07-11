@@ -135,7 +135,7 @@ namespace RageCoop.Client
                 SyncedPed c = new SyncedPed(p);
                 Main.LocalPlayerID=c.OwnerID=c.ID;
                 Add(c);
-                Main.Logger.Debug($"My player ID is:{c.ID}");
+                Main.Logger.Debug($"Local player ID is:{c.ID}");
                 PlayerList.SetPlayer(c.ID, Main.Settings.Username );
                 return true;
             }

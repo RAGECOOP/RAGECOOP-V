@@ -30,7 +30,7 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
             API.RegisterCustomEventHandler(CustomEvents.CreateVehicle, CreateVehicle);
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
-            API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost=(bool)e.Args[0]; Main.Logger.Debug("Host:"+_isHost); });
+            API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost=(bool)e.Args[0]; });
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
             Task.Run(() =>
             {
@@ -47,14 +47,9 @@ namespace RageCoop.Client.Scripting
                                 int weather2 = default(int);
                                 float percent2 = default(float);
                                 Function.Call(Hash._GET_WEATHER_TYPE_TRANSITION, &weather1, &weather2, &percent2);
-                                Main.Logger.Debug("Sending: "+ string.Format("{0},{1},{2},{3},{4},{5}", time.Hours, time.Minutes, time.Seconds, weather1, weather2, percent2));
                                 API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes, time.Seconds, weather1, weather2, percent2);
                             }
                         });
-                    }
-                    else
-                    {
-                        Main.Logger.Debug("not host");
                     }
 
                     Thread.Sleep(1000);
@@ -76,7 +71,7 @@ namespace RageCoop.Client.Scripting
 
         private void UpdatePedBlip(CustomEventReceivedArgs e)
         {
-            var p = Ped.FromHandle((int)e.Args[0]);
+            var p = Entity.FromHandle((int)e.Args[0]);
             if (p == null) { return; }
             if (p.Handle==Game.Player.Character.Handle)
             {
@@ -102,7 +97,7 @@ namespace RageCoop.Client.Scripting
             while (veh==null)
             {
                 veh  = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
-                System.Threading.Thread.Sleep(10);
+                Thread.Sleep(10);
             }
             veh.CanPretendOccupants=false;
             var v = new SyncedVehicle()

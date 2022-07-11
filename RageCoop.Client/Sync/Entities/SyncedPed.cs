@@ -121,6 +121,7 @@ namespace RageCoop.Client
                 
                 if (IsPlayer)
                 {
+                    Main.Logger.Debug("blip:"+Player.Username);
                     PedBlip.Name=Player.Username;
                 }
                 PedBlip.Color=BlipColor;
@@ -147,11 +148,13 @@ namespace RageCoop.Client
                 var b = MainPed.AttachedBlip;
                 if (b==null || b.Color!=BlipColor || b.Sprite!=BlipSprite)
                 {
+                    PedBlip?.Delete();
                     PedBlip=MainPed.AddBlip();
                     PedBlip.Color=BlipColor;
                     PedBlip.Sprite =BlipSprite;
                     if (IsPlayer)
                     {
+                        Main.Logger.Debug("blip:"+Player.Username);
                         b.Name=Player.Username;
                     }
                 }
