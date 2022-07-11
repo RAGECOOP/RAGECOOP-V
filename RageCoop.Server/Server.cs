@@ -141,7 +141,6 @@ namespace RageCoop.Server
                             Logger?.Error(ex.InnerException?.Message ?? ex.Message);
                             return;
                         }
-                        var realMaster = Settings.MasterServer;
                         while (!_stopping)
                         {
                             string msg =
@@ -161,7 +160,8 @@ namespace RageCoop.Server
                             HttpResponseMessage response = null;
                             try
                             {
-                                response = await httpClient.PostAsync(realMaster, new StringContent(msg, Encoding.UTF8, "application/json"));
+                                var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
+                                response = await httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"));
                             }
                             catch (Exception ex)
                             {
