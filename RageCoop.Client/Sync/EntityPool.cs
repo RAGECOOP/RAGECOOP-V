@@ -518,6 +518,7 @@ namespace RageCoop.Client
                     // Outgoing sync
                     if (v.IsLocal)
                     {
+                        if (!v.MainVehicle.IsVisible) { continue; }
                         SyncEvents.Check(v);
 
                         Networking.SendVehicle(v);
