@@ -58,7 +58,7 @@
         /// <summary>
         /// Master server address, mostly doesn't need to be changed.
         /// </summary>
-        public string MasterServer { get; set; } = "[AUTO]";
+        public string MasterServer { get; set; } = "https://masterserver.ragecoop.online/";
 
         /// <summary>
         /// See <see cref="Core.Logger.LogLevel"/>.
