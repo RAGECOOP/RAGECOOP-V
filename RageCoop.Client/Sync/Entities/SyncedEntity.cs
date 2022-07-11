@@ -71,7 +71,6 @@ namespace RageCoop.Client
         /// 
         /// </summary>
         internal protected bool _lastFrozen=false;
-        internal bool IsFrozen { get; set; } = false;
         internal int ModelHash { get; set; }
         internal Vector3 Position { get; set; }
         internal Vector3 Rotation { get; set; }

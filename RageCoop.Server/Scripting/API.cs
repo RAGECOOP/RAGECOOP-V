@@ -304,7 +304,7 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Register an handler to the specifed event hash, one event can have multiple handlers.
         /// </summary>
-        /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
+        /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="CustomEvents.Hash(string)"/></param>
         /// <param name="handler">An handler to be invoked when the event is received from the server.</param>
         public void RegisterCustomEventHandler(int hash,Action<CustomEventReceivedArgs> handler)
         {

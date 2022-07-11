@@ -92,7 +92,10 @@ namespace RageCoop.Client
         public static PlayerData GetPlayer(SyncedPed p)
         {
             var player = GetPlayer(p.ID);
-            player.Character=p;
+            if (player!=null)
+            {
+                player.Character=p;
+            }
             return player;
         }
         public static void RemovePlayer(int id)

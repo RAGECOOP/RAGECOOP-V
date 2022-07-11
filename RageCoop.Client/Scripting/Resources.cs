@@ -82,21 +82,13 @@ namespace RageCoop.Client.Scripting
 		/// <summary>
 		/// Load all resources from the server
 		/// </summary>
-		/// <param name="path">The path to the directory containing all resources to load.</param>
-		public void Load(string path)
+		public void Load(string path,string[] zips)
 		{
 			Unload();
-			foreach (var d in Directory.GetDirectories(path))
+			foreach (var zip in zips)
 			{
-				if(Path.GetFileName(d).ToLower() != "data")
-				{
-					Directory.Delete(d, true);
-				}
-			}
-			Directory.CreateDirectory(path);
-			foreach (var zipPath in Directory.GetFiles(path,"*.zip",SearchOption.TopDirectoryOnly))
-			{
-				Logger?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zipPath)}");
+				var zipPath=Path.Combine(path, zip);
+				Logger?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
 				LoadResource(new ZipFile(zipPath),Path.Combine(path,"data"));
 			}
 			StartAll();

@@ -332,11 +332,6 @@ namespace RageCoop.Client
 
         private void DisplayOnFoot()
         {
-            if (IsFrozen != _lastFrozen)
-            {
-                MainPed.SetFrozen(IsFrozen);
-                _lastFrozen=IsFrozen;
-            }
             if (IsInParachuteFreeFall)
             {
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.Position, Position + Velocity, 0.5f);

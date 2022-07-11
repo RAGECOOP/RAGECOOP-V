@@ -127,20 +127,10 @@ namespace RageCoop.Client
             {
                 MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * SteeringAngle);
             }
-            if (MainVehicle.ThrottlePower!=ThrottlePower)
-            {
-                MainVehicle.ThrottlePower=ThrottlePower;
-            }
-            if (MainVehicle.BrakePower!=BrakePower)
-            {
-                MainVehicle.BrakePower=BrakePower;
-            }
-            if (IsFrozen != _lastFrozen)
-            {
-                MainVehicle.SetFrozen(IsFrozen);
-                _lastFrozen=IsFrozen;
-            }
-            else if (MainVehicle.Position.DistanceTo(Position)<5)
+            MainVehicle.ThrottlePower=ThrottlePower;
+            MainVehicle.BrakePower=BrakePower;
+
+            if (MainVehicle.Position.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
                 if (IsFlipped)

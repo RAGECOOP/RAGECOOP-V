@@ -14,6 +14,10 @@ namespace RageCoop.Client
             {
                 var fr = new Packets.FileTransferRequest();
                 fr.Unpack(data);
+                if (fr.Name.EndsWith(".zip"))
+                {
+                    _zips.Add(fr.Name);
+                }
                 return new Packets.FileTransferResponse()
                 {
                     ID= fr.ID,
@@ -39,7 +43,7 @@ namespace RageCoop.Client
             {
                 try
                 {
-                    Main.Resources.Load(ResourceFolder);
+                    Main.Resources.Load(ResourceFolder,_zips.ToArray());
                     return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
                 }
                 catch(Exception ex)
@@ -57,6 +61,7 @@ namespace RageCoop.Client
             }
         } 
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
+        private static readonly List<string> _zips = new List<string>();
         public static bool AddFile(int id, string name, long length)
         {
             Main.Logger.Debug($"Downloading file to {ResourceFolder}\\{name} , id:{id}");
@@ -140,6 +145,10 @@ namespace RageCoop.Client
             {
                 InProgressDownloads.Remove(id);
                 f.Dispose();
+                if (f.FileName.EndsWith(".zip"))
+                {
+                    _zips.Add(f.FileName);
+                }
                 Main.Logger.Info($"Download finished:{f.FileName}");
             }
             else
@@ -166,6 +175,7 @@ namespace RageCoop.Client
                     File.Delete(zip);
                 }
             }
+            _zips.Clear();
 
         }
     }
