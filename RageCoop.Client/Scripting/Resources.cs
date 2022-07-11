@@ -82,9 +82,9 @@ namespace RageCoop.Client.Scripting
 		/// <summary>
 		/// Load all resources from the server
 		/// </summary>
-		public void Load(string path,string[] zips)
+		/// <param name="path">The path to the directory containing all resources to load.</param>
+		public void Load(string path)
 		{
-			Unload();
 			foreach (var zip in zips)
 			{
 				var zipPath=Path.Combine(path, zip);
@@ -98,7 +98,7 @@ namespace RageCoop.Client.Scripting
 			StopAll();
 			if (LoadedResources.Count > 0)
             {
-				Util.Reload();
+				API.QueueAction(()=>Util.Reload());
 			}
 			LoadedResources.Clear();
         }
