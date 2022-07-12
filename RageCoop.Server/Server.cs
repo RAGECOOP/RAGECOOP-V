@@ -37,7 +37,7 @@ namespace RageCoop.Server
         /// The API for controlling server and hooking events.
         /// </summary>
         public API API { get; private set; }
-        internal BaseScript BaseScript { get; set; }=new BaseScript();
+        internal readonly BaseScript BaseScript;
         internal readonly ServerSettings Settings;
         internal NetServer MainNetServer;
         internal ServerEntities Entities;
@@ -76,6 +76,7 @@ namespace RageCoop.Server
             Resources=new Resources(this);
             Security=new Security(Logger);
             Entities=new ServerEntities(this);
+            BaseScript=new BaseScript(this);
         }
         /// <summary>
         /// Spawn threads and start the server
