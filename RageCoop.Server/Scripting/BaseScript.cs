@@ -10,6 +10,8 @@ namespace RageCoop.Server.Scripting
 {
     internal class BaseScript:ServerScript
     {
+        private readonly Server Server;
+        public BaseScript(Server server) { Server=server; }
         public override void OnStart()
         {
             API.RegisterCustomEventHandler(CustomEvents.NativeResponse, NativeResponse);
@@ -23,13 +25,16 @@ namespace RageCoop.Server.Scripting
             });
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, (e) =>
             {
-                foreach(var c in API.GetAllClients().Values)
+                if (Server.Settings.WeatherTimeSync)
                 {
-                    if (c==e.Sender)
+                    foreach (var c in API.GetAllClients().Values)
                     {
-                        continue;
+                        if (c==e.Sender)
+                        {
+                            continue;
+                        }
+                        c.SendCustomEventQueued(CustomEvents.WeatherTimeSync, e.Args);
                     }
-                    c.SendCustomEventQueued(CustomEvents.WeatherTimeSync,e.Args);
                 }
             });
         }

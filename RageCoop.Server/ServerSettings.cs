@@ -76,13 +76,8 @@
         public float PlayerStreamingDistance { get; set; } = -1;
 
         /// <summary>
-        /// If enabled, all clients will have same weather as host
+        /// If enabled, all clients will have same weather and time as host
         /// </summary>
-        public bool WeatherSync { get; set; } = true;
-
-        /// <summary>
-        /// If enabled, all clients will have same time as host
-        /// </summary>
-        public bool TimeSync { get; set; } = true;
+        public bool WeatherTimeSync { get; set; } = true;
     }
 }
