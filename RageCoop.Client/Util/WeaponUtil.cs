@@ -21,6 +21,23 @@ namespace RageCoop.Client
     }
     internal static class WeaponUtil
     {
+        public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)
+        {
+            Dictionary<uint, bool> result = null;
+
+            if (weapon.Components.Count > 0)
+            {
+                result = new Dictionary<uint, bool>();
+
+                foreach (var comp in weapon.Components)
+                {
+                    result.Add((uint)comp.ComponentHash, comp.Active);
+                }
+            }
+
+            return result;
+        }
+
         public static Vector3 GetMuzzlePosition(this Ped p)
         {
             var w = p.Weapons.CurrentWeaponObject;

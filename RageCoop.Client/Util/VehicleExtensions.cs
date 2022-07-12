@@ -81,24 +81,6 @@ namespace RageCoop.Client
             return flags;
         }
 
-
-        public static Dictionary<uint, bool> GetWeaponComponents(this Weapon weapon)
-        {
-            Dictionary<uint, bool> result = null;
-
-            if (weapon.Components.Count > 0)
-            {
-                result = new Dictionary<uint, bool>();
-
-                foreach (var comp in weapon.Components)
-                {
-                    result.Add((uint)comp.ComponentHash, comp.Active);
-                }
-            }
-
-            return result;
-        }
-
         public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
