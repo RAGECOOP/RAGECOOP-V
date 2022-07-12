@@ -139,6 +139,66 @@ namespace RageCoop.Client
                 RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
             };
         }
+        
+        public static void SetDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                var door = veh.Doors[(VehicleDoorIndex)i];
+                if ((model.BrokenDoors & (byte)(1 << i)) != 0)
+                {
+                    if (!door.IsBroken)
+                    {
+                        door.Break(leavedoors);
+                    }
+                }
+                else if (door.IsBroken)
+                {
+                    // The vehicle can only fix a door if the vehicle was completely fixed
+                    veh.Repair();
+                    return;
+                }
+                if ((model.OpenedDoors & (byte)(1 << i)) != 0)
+                {
+                    if ((!door.IsOpen)&&(!door.IsBroken))
+                    {
+                        door.Open();
+                    }
+                }
+                else if (door.IsOpen)
+                {
+                    if (!door.IsBroken) { door.Close(); }
+                }
+
+                if ((model.BrokenWindows & (byte)(1 << i)) != 0)
+                {
+                    veh.Windows[(VehicleWindowIndex)i].Smash();
+                }
+                else if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
+                {
+                    veh.Windows[(VehicleWindowIndex)i].Repair();
+                }
+            }
+
+            foreach (VehicleWheel wheel in veh.Wheels)
+            {
+                if ((model.BurstedTires & (short)(1 << (int)wheel.BoneId)) != 0)
+                {
+                    if (!wheel.IsBursted)
+                    {
+                        wheel.Puncture();
+                        wheel.Burst();
+                    }
+                }
+                else if (wheel.IsBursted)
+                {
+                    wheel.Fix();
+                }
+            }
+
+            veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
+            veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
+        }
 
         public static Dictionary<int, int> GetPassengers(this Vehicle veh)
         {
@@ -206,62 +266,6 @@ namespace RageCoop.Client
         public static void SetNozzleAngel(this Vehicle plane, float ratio)
         {
             Function.Call(Hash.SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
-        }
-        public static void SetDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                var door = veh.Doors[(VehicleDoorIndex)i];
-                if ((model.BrokenDoors & (byte)(1 << i)) != 0)
-                {
-                    door.Break(leavedoors);
-                }
-                else if (door.IsBroken)
-                {
-                    // The vehicle can only fix a door if the vehicle was completely fixed
-                    veh.Repair();
-                    return;
-                }
-                if ((model.OpenedDoors & (byte)(1 << i)) != 0)
-                {
-                    if ((!door.IsOpen)&&(!door.IsBroken))
-                    {
-                        door.Open();
-                    }
-                }
-                else if (door.IsOpen)
-                {
-                    if (!door.IsBroken) { door.Close(); }
-                }
-
-                if ((model.BrokenWindows & (byte)(1 << i)) != 0)
-                {
-                    veh.Windows[(VehicleWindowIndex)i].Smash();
-                }
-                else if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
-                {
-                    veh.Windows[(VehicleWindowIndex)i].Repair();
-                }
-            }
-
-            foreach (VehicleWheel wheel in veh.Wheels)
-            {
-                if ((model.BurstedTires & (short)(1 << (int)wheel.BoneId)) != 0)
-                {
-                    if (!wheel.IsBursted)
-                    {
-                        wheel.Puncture();
-                        wheel.Burst();
-                    }
-                }
-                else if (wheel.IsBursted)
-                {
-                    wheel.Fix();
-                }
-            }
-
-            veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
-            veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
         }
         
         #endregion
