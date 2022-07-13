@@ -145,7 +145,7 @@ namespace RageCoop.Client
             new Packets.PublicKeyRequest().Pack(msg); 
             var adds =address.Split(':');
             Client.SendUnconnectedMessage(msg,adds[0],int.Parse(adds[1]));
-            return PublicKeyReceived.WaitOne(timeout); 
+            return _publicKeyReceived.WaitOne(timeout); 
         }
         #endregion
 

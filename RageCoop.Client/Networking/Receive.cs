@@ -10,7 +10,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        private static Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
+        private static readonly Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
            {
                switch (t)
                {
@@ -27,10 +27,9 @@ namespace RageCoop.Client
                
                }
            };
-        private static AutoResetEvent PublicKeyReceived=new AutoResetEvent(false);
-
-        private static Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
-        internal static Dictionary<PacketType, Func< byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func< byte[], Packet>>();
+        private static readonly AutoResetEvent _publicKeyReceived=new AutoResetEvent(false);
+        private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
+        internal static readonly Dictionary<PacketType, Func< byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func< byte[], Packet>>();
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if(message == null) { return; }
@@ -160,7 +159,7 @@ namespace RageCoop.Client
                             var packet=new Packets.PublicKeyResponse();
                             packet.Unpack(data);
                             Security.SetServerPublicKey(packet.Modulus,packet.Exponent);
-                            PublicKeyReceived.Set();
+                            _publicKeyReceived.Set();
                         }
                         
                         break;
