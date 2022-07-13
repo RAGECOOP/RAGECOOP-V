@@ -238,6 +238,21 @@ namespace RageCoop.Client
                 File.WriteAllLines("ScriptHookVDotNet.ini",lineList.ToArray());
             }
             Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
+
+            // Move log file so it doesn't get deleted 
+            Main.Logger.Dispose();
+
+            var path = Main.Logger.LogPath+".last.log";
+            try
+            {
+                if (File.Exists(path)) { File.Delete(path); }
+                File.Move(Main.Logger.LogPath, path);
+            }
+            catch(Exception ex)
+            {
+                GTA.UI.Notification.Show(ex.Message);
+            }
+
             PostMessage(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, WM_KEYDOWN, (int)key, 0);
         }
         

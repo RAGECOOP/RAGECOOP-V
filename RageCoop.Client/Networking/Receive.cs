@@ -76,13 +76,11 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
                             CoopMenu.DisconnectedMenuSetting();
 #endif
-
+                            Main.Logger.Info($">> Disconnected << reason: {reason}");
                             Main.QueueAction(() =>
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason));
-
-                            Main.Resources.Unload(); 
-                            Main.Logger.Info($">> Disconnected << reason: {reason}");
-
+                            Main.Resources.Unload();
+                            
                             
                             break;
                     }
