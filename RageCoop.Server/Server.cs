@@ -119,7 +119,7 @@ namespace RageCoop.Server
                     {
                         // TLS only
                         ServicePointManager.Expect100Continue = true;
-                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12 ;
                         ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                         HttpClient httpClient = new();
