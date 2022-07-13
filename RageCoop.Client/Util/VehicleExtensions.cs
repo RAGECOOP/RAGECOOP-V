@@ -151,6 +151,7 @@ namespace RageCoop.Client
                     {
                         door.Break(leavedoors);
                     }
+                    continue;
                 }
                 else if (door.IsBroken)
                 {
