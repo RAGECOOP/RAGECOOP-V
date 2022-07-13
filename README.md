@@ -35,7 +35,7 @@ _Old name: GTACOOP:R_
 4. Simple ragdoll sync
 5. Smoother vehicle/ped movement.
 6. Ownership based sync logic, carjacking is now working (sort of).
-7. Introduced SyncEvents.
+7. Latency compensation, vehicle movement should look identical from both sides even with high ping (300+ ms)
 8. Code refactoring and namespace cleanup
 9. Synchronized vehicle doors, brake and throttle.
 10. Weaponized vehicle sync(WIP).
@@ -46,7 +46,6 @@ _Old name: GTACOOP:R_
 1. Weapon sounds are missing.
 2. Cover sync is still buggy.
 3. Framerate drop with high number of synchronized entities.
-5. Scripting API is screwed.(will be rewritten in the future)
 
 
 ## Installation
