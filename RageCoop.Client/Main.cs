@@ -359,9 +359,9 @@ namespace RageCoop.Client
         }
 
         /// <summary>
-        /// Queue an action  to be executed on next tick, allowing you to call scripting API from another thread.
+        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
         /// </summary>
-        /// <param name="a"> The action to be executed, must return a bool indicating whether the action cane be removed after execution.</param>
+        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
         internal static void QueueAction(Func<bool> a)
         {
             lock (QueuedActions)

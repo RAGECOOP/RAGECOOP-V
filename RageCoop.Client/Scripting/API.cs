@@ -231,6 +231,15 @@ namespace RageCoop.Client.Scripting
         {
             Main.QueueAction(a);
         }
+
+        /// <summary>
+        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
+        /// </summary>
+        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
+        public static void QueueAction(Func<bool> a)
+        {
+            Main.QueueAction(a);
+        }
         /// <summary>
         /// Disconnect from the server
         /// </summary>
