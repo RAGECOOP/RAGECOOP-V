@@ -279,7 +279,7 @@ namespace RageCoop.Client
             try
             {
                 if (File.Exists(path)) { File.Delete(path); }
-                File.Move(Main.Logger.LogPath, path);
+                if (File.Exists(Main.Logger.LogPath)) { File.Move(Main.Logger.LogPath, path); }
             }
             catch(Exception ex)
             {

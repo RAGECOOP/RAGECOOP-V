@@ -44,7 +44,16 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
-            Settings = Util.ReadSettings();
+            try
+            {
+                Settings = Util.ReadSettings();
+            }
+            catch
+            {
+                GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
+                Settings=new Settings();
+                Util.SaveSettings();
+            }
             Directory.CreateDirectory(Settings.DataDirectory);
             Logger=new Logger()
             {
