@@ -180,7 +180,7 @@ namespace RageCoop.Client
         }
     }
 
-    internal class DownloadFile: System.IDisposable
+    internal class DownloadFile: IDisposable
     {
         public int FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;

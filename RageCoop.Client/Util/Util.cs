@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using GTA.Math;
+using System.Drawing;
 using GTA;
 using RageCoop.Core;
 using GTA.Native;
@@ -16,6 +17,37 @@ namespace RageCoop.Client
 {
     internal static class Util
     {
+        public static SizeF ResolutionMaintainRatio
+        {
+            get
+            {
+                // Get the game width and height
+                int screenw = GTA.UI.Screen.Resolution.Width;
+                int screenh = GTA.UI.Screen.Resolution.Height;
+                // Calculate the ratio
+                float ratio = (float)screenw / screenh;
+                // And the width with that ratio
+                float width = 1080f * ratio;
+                // Finally, return a SizeF
+                return new SizeF(width, 1080f);
+            }
+        }
+        public static bool WorldToScreen(Vector3 pos, ref Point screenPos)
+        {
+            float x, y;
+            unsafe
+            {
+                var res = ResolutionMaintainRatio;
+                if (Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
+                {
+                    screenPos =new Point((int)(res.Width*x), (int)(y*1080));
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         #region -- POINTER --
         private static int _steeringAngleOffset { get; set; }
 
@@ -208,6 +240,7 @@ namespace RageCoop.Client
                 return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
 
+        #region WIN32
 
         const UInt32 WM_KEYDOWN = 0x0100;
         public static void Reload()
@@ -262,5 +295,6 @@ namespace RageCoop.Client
 
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();
+        #endregion
     }
 }

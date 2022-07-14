@@ -205,26 +205,23 @@ namespace RageCoop.Client
         
         private void RenderNameTag()
         {
-            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 20f))
+            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 40f))
             {
                 return;
             }
 
-            string renderText = IsOutOfSync ? "~r~AFK" : Player.Username;
-            Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position + new Vector3(0, 0, 0.35f);
-
-            Function.Call(Hash.SET_DRAW_ORIGIN, targetPos.X, targetPos.Y, targetPos.Z, 0);
-
-            float dist = (GameplayCamera.Position - MainPed.Position).Length();
-            var sizeOffset = Math.Max(1f - (dist / 30f), 0.3f);
-
-            new ScaledText(new PointF(0, 0), renderText, 0.4f * sizeOffset, GTA.UI.Font.ChaletLondon)
+            Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position;
+            Point toDraw=default;
+            if (Util.WorldToScreen(targetPos, ref toDraw))
             {
-                Outline = true,
-                Alignment = GTA.UI.Alignment.Center
-            }.Draw();
-
-            Function.Call(Hash.CLEAR_DRAW_ORIGIN);
+                toDraw.Y-=100;
+                new ScaledText(toDraw, Player.Username, 0.4f, GTA.UI.Font.ChaletLondon)
+                {
+                    Outline = true,
+                    Alignment = GTA.UI.Alignment.Center
+                }.Draw();
+            }
+            
         }
 
         private void CreateCharacter()
