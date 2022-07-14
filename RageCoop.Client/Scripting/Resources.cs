@@ -30,6 +30,11 @@ namespace RageCoop.Client.Scripting
 		/// Get the <see cref="ResourceFile"/> where this script is loaded from.
 		/// </summary>
 		public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
+		
+		/// <summary>
+		/// A <see cref="Core.Logger"/> instance that can be used to debug your resource.
+		/// </summary>
+		public Logger Logger { get; internal set; }
 	}
 	internal class Resources
 	{
