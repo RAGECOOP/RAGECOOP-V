@@ -86,7 +86,7 @@ namespace RageCoop.Client.Menus
             Menu.Clear();
             if (Networking.IsOnServer)
             {
-                Menu.Add(new NativeItem("Disconnect from the server before installing and update"));
+                Menu.Add(new NativeItem("Disconnect from the server first"));
             }
             else if (IsUpdating)
             {
