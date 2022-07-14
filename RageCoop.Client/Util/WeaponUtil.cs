@@ -209,9 +209,14 @@ namespace RageCoop.Client
         public static bool IsUsingProjectileWeapon(this Ped p)
         {
             var vp = p.VehicleWeapon;
+            var type = Function.Call<int>(Hash.GET_WEAPON_DAMAGE_TYPE, vp);
             if (vp!=VehicleWeaponHash.Invalid)
             {
-                return VehicleProjectileWeapons.Contains(vp);
+                if(type==3)
+                {
+                    return false;
+                }
+                return VehicleProjectileWeapons.Contains(vp) || (type==5 && !ExplosiveBullets.Contains((uint)vp));
             }
             else
             {
@@ -219,6 +224,13 @@ namespace RageCoop.Client
                 return w.Group==WeaponGroup.Thrown || ProjectileWeapons.Contains(w.Hash);
             }
         }
+
+        public static readonly HashSet<uint> ExplosiveBullets = new HashSet<uint>
+        {
+            (uint)VehicleWeaponHash.PlayerLazer,
+            (uint)WeaponHash.Railgun,
+            1638077257
+        };
         
         public static readonly Dictionary<WeaponHash, int> MuzzleBoneIndexes = new Dictionary<WeaponHash, int>
         {
