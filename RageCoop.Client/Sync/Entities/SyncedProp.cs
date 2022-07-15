@@ -32,7 +32,7 @@ namespace RageCoop.Client
             if (!NeedUpdate) { return; }
             if (MainProp== null || !MainProp.Exists())
             {
-                MainProp=World.CreateProp(ModelHash,Position,Rotation,false,false);
+                MainProp=World.CreateProp(Model,Position,Rotation,false,false);
                 MainProp.IsInvincible=true;
             }
             MainProp.Position=Position;

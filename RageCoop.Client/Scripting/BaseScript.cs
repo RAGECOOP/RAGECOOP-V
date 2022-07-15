@@ -183,7 +183,7 @@ namespace RageCoop.Client.Scripting
                 }
             }
             prop.LastSynced=Main.Ticked+1;
-            prop.ModelHash= (Model)e.Args[1];
+            prop.Model= (Model)e.Args[1];
             prop.Position=(Vector3)e.Args[2];
             prop.Rotation=(Vector3)e.Args[3];
             prop.Update();

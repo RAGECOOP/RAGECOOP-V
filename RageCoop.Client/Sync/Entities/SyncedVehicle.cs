@@ -116,10 +116,12 @@ namespace RageCoop.Client
             if (!NeedUpdate) { return; }
             #endregion
             #region -- CHECK EXISTENCE --
-            if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != ModelHash))
+            if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != Model))
             {
-                CreateVehicle();
-                return;
+                if (!CreateVehicle())
+                {
+                    return;
+                }
             }
             #endregion
             #region -- SYNC CRITICAL --
@@ -320,7 +322,7 @@ namespace RageCoop.Client
                         MainVehicle.SetDeluxoHoverState(true);
                     }
                 }
-                else if(ModelHash==1483171323)
+                else if(Model==1483171323)
                 {
                     if (MainVehicle.IsDeluxoHovering())
                     {
@@ -359,19 +361,23 @@ namespace RageCoop.Client
             return r;
             
         }
-        private void CreateVehicle()
+        private bool CreateVehicle()
         {
             MainVehicle?.Delete();
-            Model vehicleModel = ModelHash.ModelRequest();
-            if (vehicleModel == null)
+            MainVehicle = Util.CreateVehicle(Model, Position);
+            if (!Model.IsInCdImage)
             {
-                //GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
-                return;
+                // GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
+                return false;
             }
-            MainVehicle = World.CreateVehicle(vehicleModel, Position);
+            else if (MainVehicle==null)
+            {
+                Model.Request();
+                return false;
+            }
             lock (EntityPool.VehiclesLock)
             {
-                EntityPool.Add( this);
+                EntityPool.Add(this);
             }
             MainVehicle.Quaternion = Quaternion;
             if (MainVehicle.HasRoof)
@@ -379,7 +385,8 @@ namespace RageCoop.Client
                 MainVehicle.RoofState=RoofState;
             }
             if (IsInvincible) { MainVehicle.IsInvincible=true; }
-            vehicleModel.MarkAsNoLongerNeeded();
+            Model.MarkAsNoLongerNeeded();
+            return true;
         }
         #region -- PEDALING --
         /*
@@ -388,7 +395,7 @@ namespace RageCoop.Client
 
         private string PedalingAnimDict()
         {
-            switch ((VehicleHash)ModelHash)
+            switch ((VehicleHash)Model)
             {
                 case VehicleHash.Bmx:
                     return "veh@bicycle@bmx@front@base";

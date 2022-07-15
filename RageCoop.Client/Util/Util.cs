@@ -177,22 +177,15 @@ namespace RageCoop.Client
             return e.Position+e.Velocity*((applyDefault ? SyncParameters.PositioinPredictionDefault : 0)+Networking.Latency);
         }
 
-        public static Model ModelRequest(this int hash)
+        public static Vehicle CreateVehicle(Model model, Vector3 position, float heading = 0f)
         {
-            Model model = new Model(hash);
-
-            if (!model.IsValid)
-            {
-                //GTA.UI.Notification.Show("~y~Not valid!");
-                return null;
-            }
-
-            if (!model.IsLoaded)
-            {
-                return model.Request(1000) ? model : null;
-            }
-
-            return model;
+            if (!model.IsLoaded) { return null; }
+            return (Vehicle)Entity.FromHandle(Function.Call<int>(Hash.CREATE_VEHICLE, model.Hash, position.X, position.Y, position.Z, heading, false, false));
+        }
+        public static Ped CreatePed(Model model, Vector3 position, float heading = 0f)
+        {
+            if (!model.IsLoaded) { return null; }
+            return (Ped)Entity.FromHandle(Function.Call<int>(Hash.CREATE_PED, 26, model.Hash, position.X, position.Y, position.Z, heading, false, false));
         }
         public static void SetOnFire(this Entity e, bool toggle)
         {

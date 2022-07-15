@@ -101,12 +101,13 @@ namespace RageCoop.Client
             }
 
 
-            bool characterExist = (MainPed != null) && MainPed.Exists();
 
-            if (!characterExist)
+            if (MainPed == null || !MainPed.Exists())
             {
-                CreateCharacter();
-                return;
+                if (!CreateCharacter())
+                {
+                    return;
+                }
             }
 
 
@@ -135,10 +136,13 @@ namespace RageCoop.Client
             if (LastStateSynced>=LastUpdated)
             {
                 
-                if (MainPed!=null&& (ModelHash != MainPed.Model.Hash))
+                if (MainPed!=null&& (Model != MainPed.Model.Hash))
                 {
-                    CreateCharacter();
-                    return;
+                    if (!CreateCharacter())
+                    {
+                        return;
+                    }
+                    
                 }
 
                 if (!Clothes.SequenceEqual(_lastClothes))
@@ -224,7 +228,7 @@ namespace RageCoop.Client
             
         }
 
-        private void CreateCharacter()
+        private bool CreateCharacter()
         {
             if (MainPed != null)
             {
@@ -244,20 +248,18 @@ namespace RageCoop.Client
                 PedBlip.Delete();
                 PedBlip = null;
             }
-
-            Model characterModel = ModelHash.ModelRequest();
-            if (characterModel == null)
+            if (!Model.IsLoaded)
             {
-                return;
+                Model.Request();
+                return false;
             }
 
-            MainPed = World.CreatePed(characterModel, Position);
-            characterModel.MarkAsNoLongerNeeded();
-            if (MainPed == null)
+            if ((MainPed = Util.CreatePed(Model, Position)) == null)
             {
-                return;
+                return false;
             }
-            
+
+            Model.MarkAsNoLongerNeeded();
 
             
             MainPed.BlockPermanentEvents = true;
@@ -292,8 +294,13 @@ namespace RageCoop.Client
             }
             if (IsInvincible) { MainPed.IsInvincible=true; }
 
-            // Add to EntityPool so this Character can be accessed by handle.
-            EntityPool.Add(this);
+            lock (EntityPool.PedsLock)
+            {
+                // Add to EntityPool so this Character can be accessed by handle.
+                EntityPool.Add(this);
+            }
+
+            return true;
         }
 
         private void SetClothes()
@@ -348,7 +355,8 @@ namespace RageCoop.Client
             {
                 if (ParachuteProp == null)
                 {
-                    Model model = 1740193300.ModelRequest();
+                    Model model = 1740193300;
+                    model.Request(1000);
                     if (model != null)
                     {
                         ParachuteProp = World.CreateProp(model, MainPed.Position, MainPed.Rotation, false, false);

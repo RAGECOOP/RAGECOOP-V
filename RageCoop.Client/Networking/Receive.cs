@@ -342,7 +342,7 @@ namespace RageCoop.Client
             c.Clothes=packet.Clothes;
             c.WeaponComponents=packet.WeaponComponents;
             c.WeaponTint=packet.WeaponTint;
-            c.ModelHash=packet.ModelHash;
+            c.Model=packet.ModelHash;
             c.LastStateSynced = Main.Ticked;
             c.BlipColor=packet.BlipColor;
             c.BlipSprite=packet.BlipSprite;
@@ -377,7 +377,7 @@ namespace RageCoop.Client
             v.EngineHealth=packet.EngineHealth;
             v.OwnerID=packet.OwnerID;
             v.Mods=packet.Mods;
-            v.ModelHash=packet.ModelHash;
+            v.Model=packet.ModelHash;
             v.Colors=packet.Colors;
             v.LandingGear=packet.LandingGear;
             v.RoofState=(VehicleRoofState)packet.RoofState;
