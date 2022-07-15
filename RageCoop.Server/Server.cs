@@ -347,6 +347,15 @@ namespace RageCoop.Server
                                         }
                                         break;
                                     }
+                                case PacketType.EntitySync:
+                                    {
+                                        // Logger?.Trace("entitysync");
+                                        EntitiesData data = new(message);
+                                        var msg = MainNetServer.CreateMessage();
+                                        data.WriteTo(msg);
+                                        MainNetServer.SendToAll(msg, message.SenderConnection, NetDeliveryMethod.UnreliableSequenced, (int)ConnectionChannel.EntitySync);
+                                        break;
+                                    }
                                 default:
                                     {
                                         byte[] data = message.ReadBytes(message.ReadInt32());
@@ -439,6 +448,7 @@ namespace RageCoop.Server
 
                     #region SyncData
 
+                    
                     case PacketType.PedStateSync:
                         {
                             Packets.PedStateSync packet = new();

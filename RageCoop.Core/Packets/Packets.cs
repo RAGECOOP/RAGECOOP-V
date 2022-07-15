@@ -40,6 +40,7 @@ namespace RageCoop.Core
         PedSync = 22,
         PedStateSync = 23,
         ProjectileSync=24,
+        EntitySync = 25,
         #endregion
 
         #region EVENT
@@ -75,6 +76,7 @@ namespace RageCoop.Core
         File = 8,
         Event = 9,
         RequestResponse=10,
+        EntitySync= 11,
         VehicleSync=20,
         PedSync=21,
         ProjectileSync = 22,

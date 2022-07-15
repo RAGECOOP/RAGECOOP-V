@@ -47,6 +47,62 @@ namespace RageCoop.Client
 
         #region PED
 
+        public static PedData GetData(this SyncedPed c,bool copyState = false)
+        {
+            Ped p = c.MainPed;
+            var data = new PedData()
+            {
+
+                ID =c.ID,
+                OwnerID =c.OwnerID,
+                Health = p.Health,
+                Position = p.Position,
+                Rotation = p.Rotation,
+                Velocity = p.Velocity,
+                Speed = p.GetPedSpeed(),
+                CurrentWeaponHash = (uint)p.Weapons.Current.Hash,
+                Flag = p.GetPedFlags(),
+                Heading=p.Heading,
+            };
+            if (data.Flag.HasPedFlag(PedDataFlags.IsAiming))
+            {
+                data.AimCoords = p.GetAimCoord();
+            }
+            if (data.Flag.HasPedFlag(PedDataFlags.IsRagdoll))
+            {
+                data.RotationVelocity=p.RotationVelocity;
+            }
+
+            if (copyState)
+            {
+                data.State=new PedStateData()
+                {
+                    Clothes=p.GetPedClothes(),
+                    ModelHash=p.Model.Hash,
+                    WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
+                    WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash),
+                };
+                Blip b;
+                if (c.IsPlayer)
+                {
+                    data.State.BlipColor=Scripting.API.Config.BlipColor;
+                    data.State.BlipSprite=Scripting.API.Config.BlipSprite;
+                    data.State.BlipScale=Scripting.API.Config.BlipScale;
+                }
+                else if ((b = p.AttachedBlip) !=null)
+                {
+                    data.State.BlipColor=b.Color;
+                    data.State.BlipSprite=b.Sprite;
+
+                    if (data.State.BlipSprite==BlipSprite.PoliceOfficer || data.State.BlipSprite==BlipSprite.PoliceOfficer2)
+                    {
+                        data.State.BlipScale=0.5f;
+                    }
+                }
+            }
+            return data;
+        }
+
         public static byte GetPedSpeed(this Ped ped)
         {
             if (ped.IsSprinting)

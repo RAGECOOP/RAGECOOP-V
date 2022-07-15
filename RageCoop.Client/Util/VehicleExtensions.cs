@@ -13,6 +13,52 @@ namespace RageCoop.Client
     internal static class VehicleExtensions
     {
         #region VEHICLE
+        public static VehicleData GetData(this SyncedVehicle v,bool copyState=false)
+        {
+            Vehicle veh = v.MainVehicle;
+            VehicleData data = new VehicleData()
+            {
+                ID =v.ID,
+                SteeringAngle = veh.SteeringAngle,
+                Position = veh.PredictPosition(),
+                Quaternion=veh.Quaternion,
+                // Rotation = veh.Rotation,
+                Velocity = veh.Velocity,
+                RotationVelocity=veh.RotationVelocity,
+                ThrottlePower = veh.ThrottlePower,
+                BrakePower = veh.BrakePower,
+            };
+            if (v.MainVehicle.Model.Hash==1483171323) { data.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
+            if (copyState)
+            {
+                byte primaryColor = 0;
+                byte secondaryColor = 0;
+                unsafe
+                {
+                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                }
+                data.State=new VehicleStateData()
+                {
+                    Flag = veh.GetVehicleFlags(),
+                    Colors=new byte[] { primaryColor, secondaryColor },
+                    DamageModel=veh.GetVehicleDamageModel(),
+                    LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0,
+                    RoofState=(byte)veh.RoofState,
+                    Mods = veh.Mods.GetVehicleMods(),
+                    ModelHash=veh.Model.Hash,
+                    EngineHealth=veh.EngineHealth,
+                    Passengers=veh.GetPassengers(),
+                    LockStatus=veh.LockStatus,
+                    LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh),
+                    Livery=Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh)
+                };
+                if (v.MainVehicle==Game.Player.LastVehicle)
+                {
+                    data.State.RadioStation=Util.GetPlayerRadioIndex();
+                }
+            }
+            return data;
+        }
 
         public static VehicleDataFlags GetVehicleFlags(this Vehicle veh)
         {

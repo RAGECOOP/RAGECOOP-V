@@ -10,6 +10,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using Lidgren.Network;
 
 namespace RageCoop.Client
 {
@@ -317,13 +318,14 @@ namespace RageCoop.Client
         static int pedStateIndex;
         static int vehStatesPerFrame;
         static int pedStatesPerFrame;
-        static int i;
+        static int stateIndex;
         public static Ped[] allPeds=new Ped[0];
         public static Vehicle[] allVehicles=new Vehicle[0];
         public static Projectile[] allProjectiles=new Projectile[0];
 
         public static void DoSync()
         {
+            var packet = new EntitiesData();
 #if BENCHMARK
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles]=PerfCounter.ElapsedTicks;
@@ -331,6 +333,11 @@ namespace RageCoop.Client
             allPeds = World.GetAllPeds();
             allVehicles=World.GetAllVehicles();
             allProjectiles=World.GetAllProjectiles();
+            
+            packet.Peds=new PedData[allPeds.Length];
+            packet.Vehicles=new VehicleData[allVehicles.Length];
+            // packet.Vehicles=new VehicleData[allVehicles.Length];
+
             vehStatesPerFrame=allVehicles.Length*2/(int)Game.FPS+1;
             pedStatesPerFrame=allPeds.Length*2/(int)Game.FPS+1;
 
@@ -398,8 +405,12 @@ namespace RageCoop.Client
                 }
 
             }
-            
-            i=-1;
+
+
+            #region PED
+            stateIndex=-1;
+
+            int i=-1;
 
             lock (PedsLock)
             {
@@ -430,33 +441,40 @@ namespace RageCoop.Client
                 }
                 foreach (SyncedPed c in ps)
                 {
-                    i++;
+                    stateIndex++;
                     if ((c.MainPed!=null)&&(!c.MainPed.Exists()))
                     {
-                        EntityPool.RemovePed(c.ID, "non-existent");
+                        RemovePed(c.ID, "non-existent");
                         continue;
                     }
 
                     // Outgoing sync
                     if (c.IsLocal)
                     {
+                        i++;
 #if BENCHMARK
                         var start = PerfCounter2.ElapsedTicks;
 #endif
                         // event check
                         SyncEvents.Check(c);
+                        var syncState = (stateIndex-pedStateIndex)<pedStatesPerFrame;
+                        packet.Peds[i]=c.GetData(syncState);
 
+
+                        /*
+                        
                         Networking.SendPed(c);
 
                         // Send state
-                        if ((i-pedStateIndex)<pedStatesPerFrame)
+                        if ((stateIndex-pedStateIndex)<pedStatesPerFrame)
                         {
                             Networking.SendPedState(c);
                         }
+                        */
 #if BENCHMARK
 
                         Debug.TimeStamps[TimeStamp.SendPed]=PerfCounter2.ElapsedTicks-start;
-#endif                        
+#endif
                     }
                     else // Incoming sync
                     {
@@ -474,14 +492,19 @@ namespace RageCoop.Client
 #endif
                     }
                 }
+
+                Array.Resize(ref packet.Peds,i+1);
 #if BENCHMARK
 
                 Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
+            #endregion
 
+            #region VEHICLE
+
+            stateIndex=-1;
             i=-1;
-
             lock (VehiclesLock)
             {
 
@@ -508,7 +531,7 @@ namespace RageCoop.Client
                 }
                 foreach (SyncedVehicle v in vs)
                 {
-                    i++;
+                    stateIndex++;
                     if ((v.MainVehicle!=null)&&(!v.MainVehicle.Exists()))
                     {
                         EntityPool.RemoveVehicle(v.ID,"non-existent");
@@ -519,16 +542,19 @@ namespace RageCoop.Client
                     if (v.IsLocal)
                     {
                         if (!v.MainVehicle.IsVisible) { continue; }
+                        i++;
+                        packet.Vehicles[i]=v.GetData((stateIndex-vehStateIndex)<vehStatesPerFrame);
                         SyncEvents.Check(v);
-
+                        
+                        /*
                         Networking.SendVehicle(v);
 
                         // Send state
-                        if ((i-vehStateIndex)<vehStatesPerFrame)
+                        if ((stateIndex-vehStateIndex)<vehStatesPerFrame)
                         {
                             Networking.SendVehicleState(v);
                         }
-
+                        */
                     }
                     else // Incoming sync
                     {
@@ -544,11 +570,16 @@ namespace RageCoop.Client
 
                 }
 
+                Array.Resize(ref packet.Vehicles, i+1);
 #if BENCHMARK
                 Debug.TimeStamps[TimeStamp.VehicleTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
+            #endregion
 
+            var msg = Networking.Client.CreateMessage();
+            packet.WriteTo(msg);
+            Networking.Client.SendMessage(msg,NetDeliveryMethod.UnreliableSequenced,(int)ConnectionChannel.EntitySync);
 
         }
 

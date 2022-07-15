@@ -123,6 +123,20 @@ namespace RageCoop.Client
                                         }
                                         break;
                                     }
+
+                                case PacketType.EntitySync:
+                                    {
+                                        var packet = new EntitiesData(message);
+                                        foreach (var p in packet.Peds)
+                                        {
+                                            UpdatePed(p);
+                                        }
+                                        foreach (var p in packet.Vehicles)
+                                        {
+                                            UpdateVehicle(p);
+                                        }
+                                        break;
+                                    }
                                 default:
                                     {
                                         byte[] data = message.ReadBytes(message.ReadInt32());
@@ -173,6 +187,8 @@ namespace RageCoop.Client
 
             Client.Recycle(message);
         }
+
+
         private static void HandlePacket(PacketType packetType, byte[] data)
         {
 
@@ -294,6 +310,110 @@ namespace RageCoop.Client
             }
         }
 
+        private static void UpdatePed(PedData p)
+        {
+            SyncedPed c = EntityPool.GetPedByID(p.ID);
+            if (c==null)
+            {
+                // Main.Logger.Debug($"Creating character for incoming sync:{p.ID}");
+                EntityPool.ThreadSafe.Add(c=new SyncedPed(p.ID));
+            }
+            PedDataFlags flags = p.Flag;
+            c.ID=p.ID;
+            c.OwnerID=p.OwnerID;
+            c.Health = p.Health;
+            c.Position = p.Position;
+            c.Rotation = p.Rotation;
+            c.Velocity = p.Velocity;
+            c.Speed = p.Speed;
+            c.CurrentWeaponHash = p.CurrentWeaponHash;
+            c.IsAiming = flags.HasPedFlag(PedDataFlags.IsAiming);
+            c.IsReloading = flags.HasPedFlag(PedDataFlags.IsReloading);
+            c.IsJumping = flags.HasPedFlag(PedDataFlags.IsJumping);
+            c.IsRagdoll = flags.HasPedFlag(PedDataFlags.IsRagdoll);
+            c.IsOnFire = flags.HasPedFlag(PedDataFlags.IsOnFire);
+            c.IsInParachuteFreeFall = flags.HasPedFlag(PedDataFlags.IsInParachuteFreeFall);
+            c.IsParachuteOpen = flags.HasPedFlag(PedDataFlags.IsParachuteOpen);
+            c.IsOnLadder = flags.HasPedFlag(PedDataFlags.IsOnLadder);
+            c.IsVaulting = flags.HasPedFlag(PedDataFlags.IsVaulting);
+            c.IsInCover = flags.HasPedFlag(PedDataFlags.IsInCover);
+            c.IsInStealthMode = flags.HasPedFlag(PedDataFlags.IsInStealthMode);
+            c.Heading=p.Heading;
+            if (c.IsAiming)
+            {
+                c.AimCoords = p.AimCoords;
+            }
+            if (c.IsRagdoll)
+            {
+                c.RotationVelocity=p.RotationVelocity;
+            }
+            c.LastSynced =  Main.Ticked;
+            if (p.State != null)
+            {
+                c.Clothes=p.State.Clothes;
+                c.WeaponComponents=p.State.WeaponComponents;
+                c.WeaponTint=p.State.WeaponTint;
+                c.Model=p.State.ModelHash;
+                c.LastStateSynced = Main.Ticked;
+                c.BlipColor=p.State.BlipColor;
+                c.BlipSprite=p.State.BlipSprite;
+                c.BlipScale=p.State.BlipScale;
+                c.LastStateSynced =  Main.Ticked;
+
+            }
+        }
+        private static void UpdateVehicle(VehicleData p)
+        {
+            SyncedVehicle v = EntityPool.GetVehicleByID(p.ID);
+            if (v==null)
+            {
+                EntityPool.ThreadSafe.Add(v=new SyncedVehicle(p.ID));
+            }
+            if (v.IsLocal) { return; }
+            v.ID= p.ID;
+            v.OwnerID=p.OwnerID;
+            v.Position=p.Position;
+            v.Quaternion=p.Quaternion;
+            v.SteeringAngle=p.SteeringAngle;
+            v.ThrottlePower=p.ThrottlePower;
+            v.BrakePower=p.BrakePower;
+            v.Velocity=p.Velocity;
+            v.RotationVelocity=p.RotationVelocity;
+            v.DeluxoWingRatio=p.DeluxoWingRatio;
+            v.LastSynced=Main.Ticked;
+            if (p.State!=null)
+            {
+                v.DamageModel=p.State.DamageModel;
+                v.EngineHealth=p.State.EngineHealth;
+                v.Mods=p.State.Mods;
+                v.Model=p.State.ModelHash;
+                v.Colors=p.State.Colors;
+                v.LandingGear=p.State.LandingGear;
+                v.RoofState=(VehicleRoofState)p.State.RoofState;
+                v.EngineRunning = p.State.Flag.HasVehFlag(VehicleDataFlags.IsEngineRunning);
+                v.LightsOn = p.State.Flag.HasVehFlag(VehicleDataFlags.AreLightsOn);
+                v.BrakeLightsOn = p.State.Flag.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
+                v.HighBeamsOn = p.State.Flag.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
+                v.SireneActive = p.State.Flag.HasVehFlag(VehicleDataFlags.IsSirenActive);
+                v.IsDead = p.State.Flag.HasVehFlag(VehicleDataFlags.IsDead);
+                v.HornActive = p.State.Flag.HasVehFlag(VehicleDataFlags.IsHornActive);
+                v.Transformed = p.State.Flag.HasVehFlag(VehicleDataFlags.IsTransformed);
+                v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
+                v.LockStatus=p.State.LockStatus;
+                v.RadioStation=p.State.RadioStation;
+                v.LicensePlate=p.State.LicensePlate;
+                v.Livery=p.State.Livery;
+                v.Flags=p.State.Flag;
+                foreach (KeyValuePair<int, int> pair in p.State.Passengers)
+                {
+                    if (EntityPool.PedExists(pair.Value))
+                    {
+                        v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
+                    }
+                }
+                v.LastStateSynced= Main.Ticked;
+            }
+        }
         private static void PedSync(Packets.PedSync packet)
         {
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
