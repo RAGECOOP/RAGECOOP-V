@@ -76,6 +76,10 @@ namespace RageCoop.Client
             {
                 flags|=VehicleDataFlags.HasRoof;
             }
+            if (veh.IsOnFire)
+            {
+                flags|=VehicleDataFlags.IsOnFire;
+            }
 
 
             return flags;

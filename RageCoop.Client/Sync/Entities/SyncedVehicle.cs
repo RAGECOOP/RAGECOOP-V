@@ -158,6 +158,17 @@ namespace RageCoop.Client
                     MainVehicle.Repair();
                 }
             }
+            if (MainVehicle.IsOnFire)
+            {
+                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
+                {
+                    Function.Call(Hash.STOP_ENTITY_FIRE, MainVehicle);
+                }
+            }
+            else if (Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
+            {
+                Function.Call(Hash.START_ENTITY_FIRE, MainVehicle);
+            }
 
             if (EngineRunning != MainVehicle.IsEngineRunning)
             {
@@ -247,7 +258,6 @@ namespace RageCoop.Client
             #endregion
 
             #endregion
-
             if (LastFullSynced>=LastUpdated)
             {
                 #region -- SYNC STATE --

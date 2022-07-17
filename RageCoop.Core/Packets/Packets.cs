@@ -116,6 +116,7 @@ namespace RageCoop.Core
         IsDeluxoHovering=1 << 11, 
         HasRoof=1 << 12,
         IsFullSync = 1<<13,
+        IsOnFire = 1<<14,
     }
 
     internal enum PlayerConfigFlags : byte

@@ -465,12 +465,11 @@ namespace RageCoop.Client
 
             if (IsOnFire && !MainPed.IsOnFire)
             {
-
-                MainPed.SetOnFire(true);
+                Function.Call(Hash.START_ENTITY_FIRE, MainPed);
             }
             else if (!IsOnFire && MainPed.IsOnFire)
             {
-                MainPed.SetOnFire(false);
+                Function.Call(Hash.STOP_ENTITY_FIRE, MainPed);
             }
 
             if (IsJumping)
@@ -492,7 +491,6 @@ namespace RageCoop.Client
                 {
                     MainPed.Ragdoll();
                 }
-                
                 SmoothTransition();
                 if (!_lastRagdoll)
                 {
