@@ -222,27 +222,6 @@ namespace RageCoop.Client
 
                     }
                     break;
-                case PacketType.VehicleStateSync:
-                    {
-
-                        Packets.VehicleStateSync packet = new Packets.VehicleStateSync();
-                        packet.Unpack(data);
-                        VehicleStateSync(packet);
-
-                    }
-                    break;
-                    /*
-                case PacketType.PedStateSync:
-                    {
-
-
-                        Packets.PedStateSync packet = new Packets.PedStateSync();
-                        packet.Unpack(data);
-                        PedStateSync(packet);
-
-                    }
-                    break;
-                    */
                 case PacketType.ProjectileSync:
                     {
                         Packets.ProjectileSync packet = new Packets.ProjectileSync();
@@ -339,27 +318,10 @@ namespace RageCoop.Client
                 c.BlipColor=packet.BlipColor;
                 c.BlipSprite=packet.BlipSprite;
                 c.BlipScale=packet.BlipScale;
-                c.LastStateSynced = Main.Ticked;
+                c.LastFullSynced = Main.Ticked;
             }
             
         }
-        /*
-        private static void PedStateSync(Packets.PedStateSync packet)
-        {
-            SyncedPed c = EntityPool.GetPedByID(packet.ID);
-            if (c==null) { return; }
-            c.ID=packet.ID;
-            c.OwnerID=packet.OwnerID;
-            c.Clothes=packet.Clothes;
-            c.WeaponComponents=packet.WeaponComponents;
-            c.WeaponTint=packet.WeaponTint;
-            c.Model=packet.ModelHash;
-            c.BlipColor=packet.BlipColor;
-            c.BlipSprite=packet.BlipSprite;
-            c.BlipScale=packet.BlipScale;
-            c.LastStateSynced = Main.Ticked;
-        }
-        */
         private static void VehicleSync(Packets.VehicleSync packet)
         {
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID); 
@@ -369,6 +331,8 @@ namespace RageCoop.Client
             }
             if (v.IsLocal) { return; }
             v.ID= packet.ID;
+            v.OwnerID= packet.OwnerID;
+            v.Flags=packet.Flag;
             v.Position=packet.Position;
             v.Quaternion=packet.Quaternion;
             v.SteeringAngle=packet.SteeringAngle;
@@ -378,44 +342,37 @@ namespace RageCoop.Client
             v.RotationVelocity=packet.RotationVelocity;
             v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;
-        }
-        private static void VehicleStateSync(Packets.VehicleStateSync packet)
-        {
-            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-            if (v==null||v.IsLocal) { return; }
-            v.ID= packet.ID;
-            v.OwnerID= packet.OwnerID;
-            v.DamageModel=packet.DamageModel;
-            v.EngineHealth=packet.EngineHealth;
-            v.OwnerID=packet.OwnerID;
-            v.Mods=packet.Mods;
-            v.Model=packet.ModelHash;
-            v.Colors=packet.Colors;
-            v.LandingGear=packet.LandingGear;
-            v.RoofState=(VehicleRoofState)packet.RoofState;
-            v.EngineRunning = packet.Flag.HasVehFlag(VehicleDataFlags.IsEngineRunning);
-            v.LightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreLightsOn);
-            v.BrakeLightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
-            v.HighBeamsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
-            v.SireneActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsSirenActive);
-            v.IsDead = packet.Flag.HasVehFlag(VehicleDataFlags.IsDead);
-            v.HornActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsHornActive);
-            v.Transformed = packet.Flag.HasVehFlag(VehicleDataFlags.IsTransformed);
-            v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
-            v.LockStatus=packet.LockStatus;
-            v.RadioStation=packet.RadioStation;
-            v.LicensePlate=packet.LicensePlate;
-            v.Livery=packet.Livery;
-            v.Flags=packet.Flag;
-            foreach (KeyValuePair<int, int> pair in packet.Passengers)
+            if (packet.Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
-                if (EntityPool.PedExists(pair.Value))
+                v.DamageModel=packet.DamageModel;
+                v.EngineHealth=packet.EngineHealth;
+                v.Mods=packet.Mods;
+                v.Model=packet.ModelHash;
+                v.Colors=packet.Colors;
+                v.LandingGear=packet.LandingGear;
+                v.RoofState=(VehicleRoofState)packet.RoofState;
+                v.EngineRunning = packet.Flag.HasVehFlag(VehicleDataFlags.IsEngineRunning);
+                v.LightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreLightsOn);
+                v.BrakeLightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
+                v.HighBeamsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
+                v.SireneActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsSirenActive);
+                v.IsDead = packet.Flag.HasVehFlag(VehicleDataFlags.IsDead);
+                v.HornActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsHornActive);
+                v.Transformed = packet.Flag.HasVehFlag(VehicleDataFlags.IsTransformed);
+                v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
+                v.LockStatus=packet.LockStatus;
+                v.RadioStation=packet.RadioStation;
+                v.LicensePlate=packet.LicensePlate;
+                v.Livery=packet.Livery;
+                foreach (KeyValuePair<int, int> pair in packet.Passengers)
                 {
-                    v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
+                    if (EntityPool.PedExists(pair.Value))
+                    {
+                        v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
+                    }
                 }
+                v.LastFullSynced= Main.Ticked;
             }
-            v.LastStateSynced= Main.Ticked;
-            
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {

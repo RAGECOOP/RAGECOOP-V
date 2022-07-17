@@ -436,27 +436,7 @@ namespace RageCoop.Server
                 
                 switch (type)
                 {
-
-                    #region SyncData
-                    /*
-                    case PacketType.PedStateSync:
-                        {
-                            Packets.PedStateSync packet = new();
-                            packet.Unpack(data);
-
-                            PedStateSync(packet, sender);
-                            break;
-                        }
-                    */
-                    case PacketType.VehicleStateSync:
-                        {
-                            Packets.VehicleStateSync packet = new();
-                            packet.Unpack(data);
-
-                            VehicleStateSync(packet, sender);
-
-                            break;
-                        }
+                    #region INTERVAL-SYNC
                     case PacketType.PedSync:
                         {
 
@@ -714,33 +694,7 @@ namespace RageCoop.Server
         }
 
         #region SyncEntities
-        private void PedStateSync(Packets.PedStateSync packet, Client client)
-        {
-            
 
-
-            
-            foreach (var c in Clients.Values)
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                if (c.NetID==client.NetID) { continue; }
-                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
-        }
-        private void VehicleStateSync(Packets.VehicleStateSync packet, Client client)
-        {
-            _worker.QueueJob(() => Entities.Update(packet, client));
-
-
-            foreach (var c in Clients.Values)
-            {
-                if (c.NetID==client.NetID) { continue; }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
-        }
         private void PedSync(Packets.PedSync packet, Client client)
         {
             _worker.QueueJob(() => Entities.Update(packet, client));

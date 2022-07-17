@@ -116,7 +116,7 @@ namespace RageCoop.Client
 
 
             // Need to update state
-            if (LastStateSynced>=LastUpdated)
+            if (LastFullSynced>=LastUpdated)
             {
                 if (MainPed!=null&& (Model != MainPed.Model.Hash))
                 {

@@ -165,7 +165,7 @@ namespace RageCoop.Client
                 MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
             }
             #endregion
-            if (LastStateSynced>LastUpdated)
+            if (LastFullSynced>LastUpdated)
             {
                 #region -- SYNC STATE --
                 #region -- PASSENGER SYNC --

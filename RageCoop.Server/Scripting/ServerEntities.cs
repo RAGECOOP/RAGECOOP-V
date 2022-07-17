@@ -212,23 +212,6 @@ namespace RageCoop.Server.Scripting
             ped._rot=p.Rotation;
             ped.Owner=sender;
         }
-        internal void Update(Packets.PedStateSync p, Client sender)
-        {
-            ServerPed ped;
-            if (!Peds.TryGetValue(p.ID, out ped))
-            {
-                Peds.Add(p.ID, ped=new ServerPed(Server));
-                ped.ID=p.ID;
-            }
-            if ((byte)p.BlipColor!=255)
-            {
-                if (ped.AttachedBlip==null) { ped.AttachedBlip=new(ped); }
-                ped.AttachedBlip.Color=p.BlipColor;
-                ped.AttachedBlip.Sprite=p.BlipSprite;
-                ped.AttachedBlip.Scale=p.BlipScale;
-            }
-            ped.Owner=sender;
-        }
         internal void Update(Packets.VehicleSync p, Client sender)
         {
             ServerVehicle veh;
@@ -240,21 +223,14 @@ namespace RageCoop.Server.Scripting
             veh._pos = p.Position;
             veh.Owner=sender;
             veh._quat=p.Quaternion;
-        }
-        internal void Update(Packets.VehicleStateSync p, Client sender)
-        {
-            ServerVehicle veh;
-            if (!Vehicles.TryGetValue(p.ID, out veh))
+            if (p.Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
-                Vehicles.Add(p.ID, veh=new ServerVehicle(Server));
-            }
-            veh.ID=p.ID;
-            veh.Owner=sender;
-            foreach (var pair in p.Passengers)
-            {
-                if(Peds.TryGetValue(pair.Value,out var ped))
+                foreach (var pair in p.Passengers)
                 {
-                    ped.LastVehicle=veh;
+                    if (Peds.TryGetValue(pair.Value, out var ped))
+                    {
+                        ped.LastVehicle=veh;
+                    }
                 }
             }
         }

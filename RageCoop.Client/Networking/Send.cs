@@ -72,55 +72,49 @@ namespace RageCoop.Client
             }
             Send(packet, ConnectionChannel.PedSync);
         }
-        public static void SendVehicle(SyncedVehicle v)
+        public static void SendVehicle(SyncedVehicle v,bool full)
         {
             Vehicle veh = v.MainVehicle;
             var packet = new Packets.VehicleSync()
             {
                 ID =v.ID,
+                OwnerID=v.OwnerID,
+                Flag = veh.GetVehicleFlags(),
                 SteeringAngle = veh.SteeringAngle,
                 Position = veh.PredictPosition(),
                 Quaternion=veh.Quaternion,
-                // Rotation = veh.Rotation,
                 Velocity = veh.Velocity,
                 RotationVelocity=veh.RotationVelocity,
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
-            if (v.MainVehicle.Model.Hash==1483171323) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
+            if (packet.Flag.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
+            if (full)
+            {
+                byte primaryColor = 0;
+                byte secondaryColor = 0;
+                unsafe
+                {
+                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                }
+                packet.Flag |= VehicleDataFlags.IsFullSync;
+                packet.Colors = new byte[] { primaryColor, secondaryColor };
+                packet.DamageModel=veh.GetVehicleDamageModel();
+                packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
+                packet.RoofState=(byte)veh.RoofState;
+                packet.Mods = veh.Mods.GetVehicleMods();
+                packet.ModelHash=veh.Model.Hash;
+                packet.EngineHealth=veh.EngineHealth;
+                packet.Passengers=veh.GetPassengers();
+                packet.LockStatus=veh.LockStatus;
+                packet.LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
+                packet.Livery=Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh);
+                if (v.MainVehicle==Game.Player.LastVehicle)
+                {
+                    packet.RadioStation=Util.GetPlayerRadioIndex();
+                }
+            }
             Send(packet,ConnectionChannel.VehicleSync);
-        }
-        public static void SendVehicleState(SyncedVehicle v)
-        {
-            Vehicle veh = v.MainVehicle;
-            byte primaryColor = 0;
-            byte secondaryColor = 0;
-            unsafe
-            {
-                Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
-            }
-            var packet = new Packets.VehicleStateSync()
-            {
-                ID =v.ID,
-                OwnerID = v.OwnerID,
-                Flag = veh.GetVehicleFlags(),
-                Colors=new byte[] { primaryColor, secondaryColor },
-                DamageModel=veh.GetVehicleDamageModel(),
-                LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0,
-                RoofState=(byte)veh.RoofState,
-                Mods = veh.Mods.GetVehicleMods(),
-                ModelHash=veh.Model.Hash,
-                EngineHealth=veh.EngineHealth,
-                Passengers=veh.GetPassengers(),
-                LockStatus=veh.LockStatus,
-                LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh),
-                Livery=Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh)
-            };
-            if (v.MainVehicle==Game.Player.LastVehicle)
-            {
-                packet.RadioStation=Util.GetPlayerRadioIndex();
-            }
-            Send(packet, ConnectionChannel.VehicleSync);
         }
         public static void SendProjectile(SyncedProjectile sp)
         {

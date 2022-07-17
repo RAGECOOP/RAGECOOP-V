@@ -36,9 +36,7 @@ namespace RageCoop.Core
 
         #region INTERVAL
         VehicleSync = 20,
-        VehicleStateSync = 21,
         PedSync = 22,
-        PedStateSync = 23,
         ProjectileSync=24,
         #endregion
 
@@ -117,6 +115,7 @@ namespace RageCoop.Core
         IsAircraft = 1 << 10,
         IsDeluxoHovering=1 << 11, 
         HasRoof=1 << 12,
+        IsFullSync = 1<<13,
     }
 
     internal enum PlayerConfigFlags : byte

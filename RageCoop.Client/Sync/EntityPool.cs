@@ -541,13 +541,7 @@ namespace RageCoop.Client
                         if (!v.MainVehicle.IsVisible) { continue; }
                         SyncEvents.Check(v);
 
-                        Networking.SendVehicle(v);
-
-                        // Send state
-                        if ((i-vehStateIndex)<vehStatesPerFrame)
-                        {
-                            Networking.SendVehicleState(v);
-                        }
+                        Networking.SendVehicle(v, (i-vehStateIndex)<vehStatesPerFrame);
 
                     }
                     else // Incoming sync

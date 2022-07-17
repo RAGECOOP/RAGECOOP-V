@@ -45,12 +45,12 @@ namespace RageCoop.Client
         }
         internal bool IsReady
         {
-            get {return (LastSynced>0||LastStateSynced==0);}
+            get {return (LastSynced>0||LastFullSynced==0);}
         }
         internal bool IsInvincible { get; set; } = false;
         internal bool NeedUpdate
         {
-            get { return LastSynced>LastUpdated; }
+            get { return LastSynced>=LastUpdated; }
         }
         #region LAST STATE
         /// <summary>
@@ -60,7 +60,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Last time a new sync message arrived.
         /// </summary>
-        public ulong LastStateSynced { get; internal set; } = 0;
+        public ulong LastFullSynced { get; internal set; } = 0;
         /// <summary>
         /// Last time the local entity has been updated,
         /// </summary>
