@@ -111,56 +111,58 @@ namespace RageCoop.Client
             }
 
 
-            
+            if (((byte)BlipColor==255) && (PedBlip!=null))
+            {
+                PedBlip.Delete();
+                PedBlip=null;
+            }
+            else if (((byte)BlipColor != 255) && PedBlip==null)
+            {
+                PedBlip=MainPed.AddBlip();
+                
+                if (IsPlayer)
+                {
+                    Main.Logger.Debug("blip:"+Player.Username);
+                    PedBlip.Name=Player.Username;
+                }
+                PedBlip.Color=BlipColor;
+                PedBlip.Sprite=BlipSprite;
+                PedBlip.Scale=BlipScale;
+            }
 
 
 
             // Need to update state
             if (LastStateSynced>=LastUpdated)
             {
+                
                 if (MainPed!=null&& (Model != MainPed.Model.Hash))
                 {
                     if (!CreateCharacter())
                     {
                         return;
                     }
-
-                }
-
-                if (((byte)BlipColor==255) && (PedBlip!=null))
-                {
-                    PedBlip.Delete();
-                    PedBlip=null;
-                }
-                else if (((byte)BlipColor != 255) && PedBlip==null)
-                {
-                    PedBlip=MainPed.AddBlip();
-
-                    if (IsPlayer)
-                    {
-                        Main.Logger.Debug("blip:"+Player.Username);
-                        Main.QueueAction(() => { PedBlip.Name=Player.Username; });
-                    }
-                    PedBlip.Color=BlipColor;
-                    PedBlip.Sprite=BlipSprite;
-                    PedBlip.Scale=BlipScale;
-                }
-                if (PedBlip!=null)
-                {
-                    if (PedBlip.Color!=BlipColor)
-                    {
-                        PedBlip.Color=BlipColor;
-                    }
-                    if (PedBlip.Sprite!=BlipSprite)
-                    {
-                        PedBlip.Sprite=BlipSprite;
-                    }
+                    
                 }
 
                 if (!Clothes.SequenceEqual(_lastClothes))
                 {
                     SetClothes();
                 }
+                var b = MainPed.AttachedBlip;
+                if (b==null || b.Color!=BlipColor || b.Sprite!=BlipSprite)
+                {
+                    PedBlip?.Delete();
+                    PedBlip=MainPed.AddBlip();
+                    PedBlip.Color=BlipColor;
+                    PedBlip.Sprite =BlipSprite;
+                    if (IsPlayer)
+                    {
+                        Main.Logger.Debug("blip:"+Player.Username);
+                        b.Name=Player.Username;
+                    }
+                }
+
                 CheckCurrentWeapon();
             }
             

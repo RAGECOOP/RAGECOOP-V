@@ -51,27 +51,43 @@ namespace RageCoop.Client
                 packet.ModelHash=p.Model.Hash;
                 packet.WeaponComponents=p.Weapons.Current.GetWeaponComponents();
                 packet.WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash);
+            }
+            Send(packet, ConnectionChannel.PedSync);
+        }
+        /*
+        public static void SendPedState(SyncedPed c)
+        {
+            Ped p = c.MainPed;
 
-                Blip b;
-                if (c.IsPlayer)
-                {
-                    packet.BlipColor=Scripting.API.Config.BlipColor;
-                    packet.BlipSprite=Scripting.API.Config.BlipSprite;
-                    packet.BlipScale=Scripting.API.Config.BlipScale;
-                }
-                else if ((b = p.AttachedBlip) !=null)
-                {
-                    packet.BlipColor=b.Color;
-                    packet.BlipSprite=b.Sprite;
+            var packet = new Packets.PedStateSync()
+            {
+                ID = c.ID,
+                OwnerID=c.OwnerID,
+                Clothes=p.GetPedClothes(),
+                ModelHash=p.Model.Hash,
+                WeaponComponents=p.Weapons.Current.GetWeaponComponents(),
+                WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, p, p.Weapons.Current.Hash),
+            };
+            Blip b;
+            if (c.IsPlayer)
+            {
+                packet.BlipColor=Scripting.API.Config.BlipColor;
+                packet.BlipSprite=Scripting.API.Config.BlipSprite;
+                packet.BlipScale=Scripting.API.Config.BlipScale;
+            }
+            else if ((b = p.AttachedBlip) !=null)
+            {
+                packet.BlipColor=b.Color;
+                packet.BlipSprite=b.Sprite;
 
-                    if (packet.BlipSprite==BlipSprite.PoliceOfficer || packet.BlipSprite==BlipSprite.PoliceOfficer2)
-                    {
-                        packet.BlipScale=0.5f;
-                    }
+                if (packet.BlipSprite==BlipSprite.PoliceOfficer || packet.BlipSprite==BlipSprite.PoliceOfficer2)
+                {
+                    packet.BlipScale=0.5f;
                 }
             }
             Send(packet, ConnectionChannel.PedSync);
         }
+        */
         public static void SendVehicle(SyncedVehicle v)
         {
             Vehicle veh = v.MainVehicle;

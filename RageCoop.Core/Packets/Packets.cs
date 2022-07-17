@@ -96,6 +96,8 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover = 1 << 10,
+        IsInVehicle = 1 << 11,
+        IsFullSync = 1<<12 ,
     }
 
     #region ===== VEHICLE DATA =====

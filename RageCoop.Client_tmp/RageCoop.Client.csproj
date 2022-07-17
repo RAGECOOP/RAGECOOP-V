@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <UseWindowsForms>True</UseWindowsForms>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+	  <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <DocumentationFile></DocumentationFile>
+	  <DebugType>portable</DebugType>
+	  <AssemblyVersion>0.5.0</AssemblyVersion>
+	  <FileVersion>0.5.0</FileVersion>
+	  <Version>0.5.0</Version>
+	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <Authors>RAGECOOP</Authors>
+	  <Description>An API reference for developing client-side resource for RAGECOOP</Description>
+	  <PackageProjectUrl>https://ragecoop.online/</PackageProjectUrl>
+	  <RepositoryUrl>https://github.com/RAGECOOP/RAGECOOP-V</RepositoryUrl>
+	  <ApplicationIcon>icon.ico</ApplicationIcon>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <DefineConstants>SHVDN3</DefineConstants>
+	  <TargetFrameworks>net48</TargetFrameworks>
+	  <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<OutDir>..\bin\Debug\Client</OutDir>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<OutDir>..\bin\Release\Client</OutDir>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpZipLib" Version="1.3.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LemonUI.SHVDN3">
+      <HintPath>..\libs\LemonUI.SHVDN3.dll</HintPath>
+    </Reference>
+    <Reference Include="Lidgren.Network">
+      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ScriptHookVDotNet">
+      <HintPath>..\libs\ScriptHookVDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="ScriptHookVDotNet3">
+      <HintPath>..\libs\ScriptHookVDotNet3.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

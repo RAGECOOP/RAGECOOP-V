@@ -125,6 +125,8 @@ namespace RageCoop.Core
         internal class PedSync : Packet
         {
             public int ID { get; set; }
+
+            public int OwnerID { get; set; }
             public PedDataFlags Flag { get; set; }
 
             public int Health { get; set; }
@@ -135,7 +137,7 @@ namespace RageCoop.Core
 
             public Vector3 Velocity { get; set; }
 
-            public Vector3 RotationVelocity { get; set; }
+            // public Vector3 RotationVelocity { get; set; }
 
             public byte Speed { get; set; }
 
@@ -144,6 +146,21 @@ namespace RageCoop.Core
             public uint CurrentWeaponHash { get; set; }
 
             public float Heading { get; set; }
+            
+            #region FULL
+
+            public int ModelHash { get; set; }
+
+            public byte[] Clothes { get; set; }
+
+            public Dictionary<uint, bool> WeaponComponents { get; set; }
+
+            public byte WeaponTint { get; set; }
+            public BlipColor BlipColor { get; set; } = (BlipColor)255;
+
+            public BlipSprite BlipSprite { get; set; } = 0;
+            public float BlipScale { get; set; } = 1;
+#endregion
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -154,6 +171,9 @@ namespace RageCoop.Core
 
                 // Write ped ID
                 byteArray.AddInt(ID);
+
+                // Write OwnerID
+                byteArray.AddInt(OwnerID);
 
 
                 // Write ped flags
@@ -171,10 +191,6 @@ namespace RageCoop.Core
                 // Write ped velocity
                 byteArray.AddVector3(Velocity);
 
-                if (Flag.HasPedFlag(PedDataFlags.IsRagdoll))
-                {
-                    byteArray.AddVector3(RotationVelocity);
-                }
 
                 // Write ped speed
                 byteArray.Add(Speed);
@@ -189,6 +205,40 @@ namespace RageCoop.Core
                 }
 
                 byteArray.AddFloat(Heading);
+
+                if (Flag.HasPedFlag(PedDataFlags.IsFullSync))
+                {
+                    // Write model hash
+                    byteArray.AddInt(ModelHash);
+
+                    byteArray.AddRange(Clothes);
+
+                    // Write player weapon components
+                    if (WeaponComponents != null)
+                    {
+                        byteArray.Add(0x01);
+                        byteArray.AddRange(BitConverter.GetBytes((ushort)WeaponComponents.Count));
+                        foreach (KeyValuePair<uint, bool> component in WeaponComponents)
+                        {
+                            byteArray.AddRange(BitConverter.GetBytes(component.Key));
+                            byteArray.AddRange(BitConverter.GetBytes(component.Value));
+                        }
+                    }
+                    else
+                    {
+                        // Player weapon doesn't have any components
+                        byteArray.Add(0x00);
+                    }
+
+                    byteArray.Add(WeaponTint);
+
+                    byteArray.Add((byte)BlipColor);
+                    if ((byte)BlipColor!=255)
+                    {
+                        byteArray.AddUshort((ushort)BlipSprite);
+                        byteArray.AddFloat(BlipScale);
+                    }
+                }
 
                 byte[] result = byteArray.ToArray();
 
@@ -205,6 +255,8 @@ namespace RageCoop.Core
                 // Read player netHandle
                 ID = reader.ReadInt();
 
+                OwnerID=reader.ReadInt();
+
                 // Read player flags
                 Flag = (PedDataFlags)reader.ReadUShort();
 
@@ -220,12 +272,6 @@ namespace RageCoop.Core
                 // Read player velocity
                 Velocity = reader.ReadVector3();
 
-                // Read rotation velocity if in ragdoll
-                if (Flag.HasPedFlag(PedDataFlags.IsRagdoll))
-                {
-                    RotationVelocity=reader.ReadVector3();
-                }
-
                 // Read player speed
                 Speed = reader.ReadByte();
 
@@ -240,6 +286,35 @@ namespace RageCoop.Core
                 }
 
                 Heading=reader.ReadFloat();
+
+                if (Flag.HasPedFlag(PedDataFlags.IsFullSync))
+                {
+                    // Read player model hash
+                    ModelHash = reader.ReadInt();
+
+                    // Read player clothes
+                    Clothes =reader.ReadByteArray(36);
+
+                    // Read player weapon components
+                    if (reader.ReadBool())
+                    {
+                        WeaponComponents = new Dictionary<uint, bool>();
+                        ushort comCount = reader.ReadUShort();
+                        for (ushort i = 0; i < comCount; i++)
+                        {
+                            WeaponComponents.Add(reader.ReadUInt(), reader.ReadBool());
+                        }
+                    }
+                    WeaponTint=reader.ReadByte();
+
+                    BlipColor=(BlipColor)reader.ReadByte();
+
+                    if ((byte)BlipColor!=255)
+                    {
+                        BlipSprite=(BlipSprite)reader.ReadUShort();
+                        BlipScale=reader.ReadFloat();
+                    }
+                }
                 #endregion
             }
         }

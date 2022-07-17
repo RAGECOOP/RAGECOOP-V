@@ -438,7 +438,7 @@ namespace RageCoop.Server
                 {
 
                     #region SyncData
-
+                    /*
                     case PacketType.PedStateSync:
                         {
                             Packets.PedStateSync packet = new();
@@ -447,6 +447,7 @@ namespace RageCoop.Server
                             PedStateSync(packet, sender);
                             break;
                         }
+                    */
                     case PacketType.VehicleStateSync:
                         {
                             Packets.VehicleStateSync packet = new();
