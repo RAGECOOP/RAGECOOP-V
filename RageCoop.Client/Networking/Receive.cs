@@ -348,6 +348,7 @@ namespace RageCoop.Client
             v.RotationVelocity=packet.RotationVelocity;
             v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;
+            v.LastSyncedStopWatch.Restart();
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
                 v.DamageModel=packet.DamageModel;

@@ -8,6 +8,7 @@ using GTA;
 using GTA.Native;
 using GTA.Math;
 using RageCoop.Core;
+using System.Diagnostics;
 
 namespace RageCoop.Client
 {
@@ -50,6 +51,7 @@ namespace RageCoop.Client
         /// VehicleSeat,ID
         /// </summary>
         public Vehicle MainVehicle { get;internal set; }
+        public Stopwatch LastSyncedStopWatch=new Stopwatch();
 
 
         #region LAST STATE
@@ -116,8 +118,6 @@ namespace RageCoop.Client
 
             // Check if all data avalible
             if(!IsReady) { return; }
-            // Skip update if no new sync message has arrived.
-            if (!NeedUpdate) { return; }
             #endregion
             #region -- CHECK EXISTENCE --
             if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != Model))
@@ -127,6 +127,9 @@ namespace RageCoop.Client
                     return;
                 }
             }
+            DisplayVehicle();
+            // Skip update if no new sync message has arrived.
+            if (!NeedUpdate) { return; }
             #endregion
             #region -- SYNC CRITICAL --
             if (SteeringAngle != MainVehicle.SteeringAngle)
@@ -136,34 +139,6 @@ namespace RageCoop.Client
             MainVehicle.ThrottlePower=ThrottlePower;
             MainVehicle.BrakePower=BrakePower;
 
-            if (MainVehicle.Position.DistanceTo(Position)<5)
-            {
-                MainVehicle.Velocity = Velocity+5*(Position+Velocity*SyncParameters.PositioinPredictionDefault - MainVehicle.Position);
-                if (IsFlipped)
-                {
-                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
-                    MainVehicle.RotationVelocity=RotationVelocity;
-                }
-                else
-                {
-                    Vector3 cali = GetCalibrationRotation();
-                    if (cali.Length()<50)
-                    {
-                        MainVehicle.RotationVelocity = RotationVelocity+cali*0.2f;
-                    }
-                    else
-                    {
-                        MainVehicle.Quaternion=Quaternion;
-                        MainVehicle.RotationVelocity=RotationVelocity;
-                    }
-                }
-            }
-            else
-            {
-                MainVehicle.Position=Position;
-                MainVehicle.Velocity=Velocity;
-                MainVehicle.Quaternion=Quaternion;
-            }
             #region FLAGS
             if (IsDead)
             {
@@ -348,6 +323,45 @@ namespace RageCoop.Client
                 #endregion
             }
             LastUpdated=Main.Ticked;
+        }
+        void DisplayVehicle()
+        {
+            var current = MainVehicle.Position;
+            var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
+            if (current.DistanceTo(Main.PlayerPosition)>50)
+            {
+                MainVehicle.Position=predicted;
+                MainVehicle.Velocity=Velocity;
+                MainVehicle.Quaternion=Quaternion;
+            }
+            else if (current.DistanceTo(Position)<5)
+            {
+                MainVehicle.Velocity = Velocity+5*( predicted - current);
+                if (IsFlipped)
+                {
+                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
+                    MainVehicle.RotationVelocity=RotationVelocity;
+                }
+                else
+                {
+                    Vector3 cali = GetCalibrationRotation();
+                    if (cali.Length()<50)
+                    {
+                        MainVehicle.RotationVelocity = RotationVelocity+cali*0.2f;
+                    }
+                    else
+                    {
+                        MainVehicle.Quaternion=Quaternion;
+                        MainVehicle.RotationVelocity=RotationVelocity;
+                    }
+                }
+            }
+            else
+            {
+                MainVehicle.Position=predicted;
+                MainVehicle.Velocity=Velocity;
+                MainVehicle.Quaternion=Quaternion;
+            }
         }
         private Vector3 GetCalibrationRotation()
         {
