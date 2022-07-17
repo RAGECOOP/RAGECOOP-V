@@ -102,8 +102,6 @@ namespace RageCoop.Client
 
 #if DEBUG
 #endif
-
-        int pinPart = 0;
         private void OnTick(object sender, EventArgs e)
         {
             var P = Game.Player.Character;
@@ -189,16 +187,6 @@ namespace RageCoop.Client
         
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Right)
-            {
-                pinPart++;
-                GTA.UI.Notification.Show(pinPart.ToString());
-            }
-            if (e.KeyCode == Keys.Left)
-            {
-                pinPart--;
-                GTA.UI.Notification.Show(pinPart.ToString());
-            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
