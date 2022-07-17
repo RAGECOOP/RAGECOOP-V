@@ -283,7 +283,7 @@ namespace RageCoop.Client
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
                 EntityPool.ThreadSafe.Add(c=new SyncedPed(packet.ID));
             }
-            PedDataFlags flags = packet.Flag;
+            PedDataFlags flags = packet.Flags;
             c.ID=packet.ID;
             c.OwnerID=packet.OwnerID;
             c.Health = packet.Health;
@@ -309,7 +309,7 @@ namespace RageCoop.Client
             {
                 c.AimCoords = packet.AimCoords;
             }
-            if (packet.Flag.HasPedFlag(PedDataFlags.IsFullSync))
+            if (packet.Flags.HasPedFlag(PedDataFlags.IsFullSync))
             {
                 c.Clothes=packet.Clothes;
                 c.WeaponComponents=packet.WeaponComponents;
@@ -332,7 +332,7 @@ namespace RageCoop.Client
             if (v.IsLocal) { return; }
             v.ID= packet.ID;
             v.OwnerID= packet.OwnerID;
-            v.Flags=packet.Flag;
+            v.Flags=packet.Flags;
             v.Position=packet.Position;
             v.Quaternion=packet.Quaternion;
             v.SteeringAngle=packet.SteeringAngle;
@@ -342,7 +342,7 @@ namespace RageCoop.Client
             v.RotationVelocity=packet.RotationVelocity;
             v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;
-            if (packet.Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
+            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
                 v.DamageModel=packet.DamageModel;
                 v.EngineHealth=packet.EngineHealth;
@@ -351,14 +351,6 @@ namespace RageCoop.Client
                 v.Colors=packet.Colors;
                 v.LandingGear=packet.LandingGear;
                 v.RoofState=(VehicleRoofState)packet.RoofState;
-                v.EngineRunning = packet.Flag.HasVehFlag(VehicleDataFlags.IsEngineRunning);
-                v.LightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreLightsOn);
-                v.BrakeLightsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
-                v.HighBeamsOn = packet.Flag.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
-                v.SireneActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsSirenActive);
-                v.IsDead = packet.Flag.HasVehFlag(VehicleDataFlags.IsDead);
-                v.HornActive = packet.Flag.HasVehFlag(VehicleDataFlags.IsHornActive);
-                v.Transformed = packet.Flag.HasVehFlag(VehicleDataFlags.IsTransformed);
                 v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
                 v.LockStatus=packet.LockStatus;
                 v.RadioStation=packet.RadioStation;

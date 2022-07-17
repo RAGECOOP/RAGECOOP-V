@@ -223,7 +223,7 @@ namespace RageCoop.Server.Scripting
             veh._pos = p.Position;
             veh.Owner=sender;
             veh._quat=p.Quaternion;
-            if (p.Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
+            if (p.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
                 foreach (var pair in p.Passengers)
                 {

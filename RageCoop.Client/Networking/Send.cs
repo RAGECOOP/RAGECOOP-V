@@ -37,16 +37,16 @@ namespace RageCoop.Client
                 Velocity = p.Velocity,
                 Speed = p.GetPedSpeed(),
                 CurrentWeaponHash = (uint)p.Weapons.Current.Hash,
-                Flag = p.GetPedFlags(),
+                Flags = p.GetPedFlags(),
                 Heading=p.Heading,
             };
-            if (packet.Flag.HasPedFlag(PedDataFlags.IsAiming))
+            if (packet.Flags.HasPedFlag(PedDataFlags.IsAiming))
             {
                 packet.AimCoords = p.GetAimCoord();
             }
             if (full)
             {
-                packet.Flag |= PedDataFlags.IsFullSync;
+                packet.Flags |= PedDataFlags.IsFullSync;
                 packet.Clothes=p.GetPedClothes();
                 packet.ModelHash=p.Model.Hash;
                 packet.WeaponComponents=p.Weapons.Current.GetWeaponComponents();
@@ -79,7 +79,7 @@ namespace RageCoop.Client
             {
                 ID =v.ID,
                 OwnerID=v.OwnerID,
-                Flag = veh.GetVehicleFlags(),
+                Flags = veh.GetVehicleFlags(),
                 SteeringAngle = veh.SteeringAngle,
                 Position = veh.PredictPosition(),
                 Quaternion=veh.Quaternion,
@@ -88,7 +88,7 @@ namespace RageCoop.Client
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
-            if (packet.Flag.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
+            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
             if (full)
             {
                 byte primaryColor = 0;
@@ -97,7 +97,7 @@ namespace RageCoop.Client
                 {
                     Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
-                packet.Flag |= VehicleDataFlags.IsFullSync;
+                packet.Flags |= VehicleDataFlags.IsFullSync;
                 packet.Colors = new byte[] { primaryColor, secondaryColor };
                 packet.DamageModel=veh.GetVehicleDamageModel();
                 packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;

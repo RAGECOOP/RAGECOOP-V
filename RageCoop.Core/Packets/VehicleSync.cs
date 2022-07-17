@@ -17,7 +17,7 @@ namespace RageCoop.Core
 
             public int OwnerID { get; set; }
 
-            public VehicleDataFlags Flag { get; set; }
+            public VehicleDataFlags Flags { get; set; }
 
             public Vector3 Position { get; set; }
 
@@ -71,7 +71,7 @@ namespace RageCoop.Core
 
                 byteArray.AddInt(ID);
                 byteArray.AddInt(OwnerID);
-                byteArray.AddUshort((ushort)Flag);
+                byteArray.AddUshort((ushort)Flags);
                 byteArray.AddVector3(Position);
                 byteArray.AddQuaternion(Quaternion);
                 byteArray.AddVector3(Velocity);
@@ -80,23 +80,23 @@ namespace RageCoop.Core
                 byteArray.AddFloat(BrakePower);
                 byteArray.AddFloat(SteeringAngle);
 
-                if (Flag.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
+                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
                     byteArray.AddFloat(DeluxoWingRatio);
                 }
 
-                if (Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
+                if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
                     byteArray.AddInt(ModelHash);
                     byteArray.AddFloat(EngineHealth);
 
                     // Check
-                    if (Flag.HasVehFlag(VehicleDataFlags.IsAircraft))
+                    if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
                     {
                         // Write the vehicle landing gear
                         byteArray.Add(LandingGear);
                     }
-                    if (Flag.HasVehFlag(VehicleDataFlags.HasRoof))
+                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
                     {
                         byteArray.Add(RoofState);
                     }
@@ -181,7 +181,7 @@ namespace RageCoop.Core
 
                 OwnerID = reader.ReadInt();
 
-                Flag=(VehicleDataFlags)reader.ReadUShort();
+                Flags=(VehicleDataFlags)reader.ReadUShort();
 
                 // Read position
                 Position = reader.ReadVector3();
@@ -205,12 +205,12 @@ namespace RageCoop.Core
                 SteeringAngle = reader.ReadFloat();
 
 
-                if (Flag.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
+                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
                     DeluxoWingRatio = reader.ReadFloat();
                 }
 
-                if (Flag.HasVehFlag(VehicleDataFlags.IsFullSync))
+                if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
                     // Read vehicle model hash
                     ModelHash = reader.ReadInt();
@@ -220,12 +220,12 @@ namespace RageCoop.Core
 
 
                     // Check
-                    if (Flag.HasVehFlag(VehicleDataFlags.IsAircraft))
+                    if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
                     {
                         // Read vehicle landing gear
                         LandingGear = reader.ReadByte();
                     }
-                    if (Flag.HasVehFlag(VehicleDataFlags.HasRoof))
+                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
                     {
                         RoofState=reader.ReadByte();
                     }

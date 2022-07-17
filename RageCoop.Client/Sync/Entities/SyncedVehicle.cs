@@ -74,24 +74,28 @@ namespace RageCoop.Client
             }
         }
         #endregion
+        #region FLAGS
+        internal bool EngineRunning { get { return Flags.HasVehFlag(VehicleDataFlags.IsEngineRunning); } }
+        private bool _lastTransformed = false;
+        internal bool Transformed { get { return Flags.HasVehFlag(VehicleDataFlags.IsTransformed); } }
+        private bool _lastHornActive = false;
+        internal bool HornActive { get { return Flags.HasVehFlag(VehicleDataFlags.IsHornActive); } }
+        internal bool LightsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreLightsOn); } }
+        internal bool BrakeLightsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn); } }
+        internal bool HighBeamsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreHighBeamsOn); } }
+        internal bool SireneActive { get { return Flags.HasVehFlag(VehicleDataFlags.IsSirenActive); } }
+        internal bool IsDead { get { return Flags.HasVehFlag(VehicleDataFlags.IsDead); } }
+        internal bool IsDeluxoHovering { get { return Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering); } }
+        #endregion
 
         #region -- VEHICLE STATE --
         internal VehicleDataFlags Flags { get; set; }
-        internal bool EngineRunning { get; set; }
-        private bool _lastTransformed = false;
-        internal bool Transformed { get; set; }
-        private bool _lastHornActive = false;
-        internal bool HornActive { get; set; }
-        internal bool LightsOn { get; set; }
-        internal bool BrakeLightsOn { get; set; } = false;
-        internal bool HighBeamsOn { get; set; }
+
         internal byte LandingGear { get; set; }
         internal VehicleRoofState RoofState { get; set; }
-        internal bool SireneActive { get; set; }
         internal VehicleDamageModel DamageModel { get; set; }
         internal byte[] Colors { get; set; }
         internal Dictionary<int, int> Mods { get; set; }
-        internal bool IsDead { get; set; }
         internal float EngineHealth { get; set; }
         internal VehicleLockStatus LockStatus{get;set;}
         /// <summary>
@@ -160,12 +164,116 @@ namespace RageCoop.Client
                 MainVehicle.Velocity=Velocity;
                 MainVehicle.Quaternion=Quaternion;
             }
-            if (DeluxoWingRatio!=-1)
+            #region FLAGS
+            if (IsDead)
             {
+                if (MainVehicle.IsDead)
+                {
+                    return;
+                }
+                else
+                {
+                    MainVehicle.Explode();
+                }
+            }
+            else
+            {
+                if (MainVehicle.IsDead)
+                {
+                    MainVehicle.Repair();
+                }
+            }
+
+            if (EngineRunning != MainVehicle.IsEngineRunning)
+            {
+                MainVehicle.IsEngineRunning = EngineRunning;
+            }
+
+            if (LightsOn != MainVehicle.AreLightsOn)
+            {
+                MainVehicle.AreLightsOn = LightsOn;
+            }
+
+            if (HighBeamsOn != MainVehicle.AreHighBeamsOn)
+            {
+                MainVehicle.AreHighBeamsOn = HighBeamsOn;
+            }
+
+            if (MainVehicle.IsSubmarineCar)
+            {
+                if (Transformed)
+                {
+                    if (!_lastTransformed)
+                    {
+                        _lastTransformed = true;
+                        Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
+                    }
+                }
+                else if (_lastTransformed)
+                {
+                    _lastTransformed = false;
+                    Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
+                }
+            }
+
+            if (MainVehicle.IsAircraft)
+            {
+                if (LandingGear != (byte)MainVehicle.LandingGearState)
+                {
+                    MainVehicle.LandingGearState = (VehicleLandingGearState)LandingGear;
+                }
+            }
+            else
+            {
+                if (MainVehicle.HasSiren && SireneActive != MainVehicle.IsSirenActive)
+                {
+                    MainVehicle.IsSirenActive = SireneActive;
+                }
+
+                if (HornActive)
+                {
+                    if (!_lastHornActive)
+                    {
+                        _lastHornActive = true;
+                        MainVehicle.SoundHorn(99999);
+                    }
+                }
+                else if (_lastHornActive)
+                {
+                    _lastHornActive = false;
+                    MainVehicle.SoundHorn(1);
+                }
+
+                if (MainVehicle.HasRoof && MainVehicle.RoofState!=RoofState)
+                {
+                    MainVehicle.RoofState=RoofState;
+                }
+
+                Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
+                MainVehicle.SetDamageModel(DamageModel);
+
+            }
+            MainVehicle.LockStatus=LockStatus;
+            if (IsDeluxoHovering)
+            {
+                if (!MainVehicle.IsDeluxoHovering())
+                {
+                    MainVehicle.SetDeluxoHoverState(true);
+                }
                 MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
             }
+            else if (Model==1483171323)
+            {
+                if (MainVehicle.IsDeluxoHovering())
+                {
+                    MainVehicle.SetDeluxoHoverState(false);
+                }
+            }
             #endregion
-            if (LastFullSynced>LastUpdated)
+
+            #endregion
+
+            if (LastFullSynced>=LastUpdated)
             {
                 #region -- SYNC STATE --
                 #region -- PASSENGER SYNC --
@@ -226,109 +334,6 @@ namespace RageCoop.Client
                 }
 
 
-                if (IsDead)
-                {
-                    if (MainVehicle.IsDead)
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        MainVehicle.Explode();
-                    }
-                }
-                else
-                {
-                    if (MainVehicle.IsDead)
-                    {
-                        MainVehicle.Repair();
-                    }
-                }
-
-                if (EngineRunning != MainVehicle.IsEngineRunning)
-                {
-                    MainVehicle.IsEngineRunning = EngineRunning;
-                }
-
-                if (LightsOn != MainVehicle.AreLightsOn)
-                {
-                    MainVehicle.AreLightsOn = LightsOn;
-                }
-
-                if (HighBeamsOn != MainVehicle.AreHighBeamsOn)
-                {
-                    MainVehicle.AreHighBeamsOn = HighBeamsOn;
-                }
-
-                if (MainVehicle.IsSubmarineCar)
-                {
-                    if (Transformed)
-                    {
-                        if (!_lastTransformed)
-                        {
-                            _lastTransformed = true;
-                            Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
-                        }
-                    }
-                    else if (_lastTransformed)
-                    {
-                        _lastTransformed = false;
-                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
-                    }
-                }
-
-                if (MainVehicle.IsAircraft)
-                {
-                    if (LandingGear != (byte)MainVehicle.LandingGearState)
-                    {
-                        MainVehicle.LandingGearState = (VehicleLandingGearState)LandingGear;
-                    }
-                }
-                else
-                {
-                    if (MainVehicle.HasSiren && SireneActive != MainVehicle.IsSirenActive)
-                    {
-                        MainVehicle.IsSirenActive = SireneActive;
-                    }
-
-                    if (HornActive)
-                    {
-                        if (!_lastHornActive)
-                        {
-                            _lastHornActive = true;
-                            MainVehicle.SoundHorn(99999);
-                        }
-                    }
-                    else if (_lastHornActive)
-                    {
-                        _lastHornActive = false;
-                        MainVehicle.SoundHorn(1);
-                    }
-
-                    if (MainVehicle.HasRoof && MainVehicle.RoofState!=RoofState)
-                    {
-                        MainVehicle.RoofState=RoofState;
-                    }
-
-                    Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
-                    MainVehicle.SetDamageModel(DamageModel);
-
-                }
-                MainVehicle.LockStatus=LockStatus;
-                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
-                {
-                    if (!MainVehicle.IsDeluxoHovering())
-                    {
-                        MainVehicle.SetDeluxoHoverState(true);
-                    }
-                }
-                else if(Model==1483171323)
-                {
-                    if (MainVehicle.IsDeluxoHovering())
-                    {
-                        MainVehicle.SetDeluxoHoverState(false);
-                    }
-                }
 
                 if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle)!=LicensePlate)
                 {

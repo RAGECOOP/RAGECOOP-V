@@ -16,7 +16,7 @@ namespace RageCoop.Core
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
-            public PedDataFlags Flag { get; set; }
+            public PedDataFlags Flags { get; set; }
 
             public int Health { get; set; }
 
@@ -66,7 +66,7 @@ namespace RageCoop.Core
 
 
                 // Write ped flags
-                byteArray.AddRange(BitConverter.GetBytes((ushort)Flag));
+                byteArray.AddRange(BitConverter.GetBytes((ushort)Flags));
 
                 // Write ped health
                 byteArray.AddRange(BitConverter.GetBytes(Health));
@@ -87,7 +87,7 @@ namespace RageCoop.Core
                 // Write ped weapon hash
                 byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
 
-                if (Flag.HasPedFlag(PedDataFlags.IsAiming))
+                if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
                     // Write ped aim coords
                     byteArray.AddVector3(AimCoords);
@@ -95,7 +95,7 @@ namespace RageCoop.Core
 
                 byteArray.AddFloat(Heading);
 
-                if (Flag.HasPedFlag(PedDataFlags.IsFullSync))
+                if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
                     // Write model hash
                     byteArray.AddInt(ModelHash);
@@ -147,7 +147,7 @@ namespace RageCoop.Core
                 OwnerID=reader.ReadInt();
 
                 // Read player flags
-                Flag = (PedDataFlags)reader.ReadUShort();
+                Flags = (PedDataFlags)reader.ReadUShort();
 
                 // Read player health
                 Health = reader.ReadInt();
@@ -168,7 +168,7 @@ namespace RageCoop.Core
                 CurrentWeaponHash = reader.ReadUInt();
 
                 // Try to read aim coords
-                if (Flag.HasPedFlag(PedDataFlags.IsAiming))
+                if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
                     // Read player aim coords
                     AimCoords = reader.ReadVector3();
@@ -176,7 +176,7 @@ namespace RageCoop.Core
 
                 Heading=reader.ReadFloat();
 
-                if (Flag.HasPedFlag(PedDataFlags.IsFullSync))
+                if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
                     // Read player model hash
                     ModelHash = reader.ReadInt();
