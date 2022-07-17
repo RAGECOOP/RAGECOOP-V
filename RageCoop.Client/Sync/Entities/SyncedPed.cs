@@ -640,6 +640,7 @@ namespace RageCoop.Client
         private bool LastMoving;
         private void WalkTo()
         {
+            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
             Vector3 predictPosition = Position + (Position - MainPed.Position) + Velocity * 0.5f;
             float range = predictPosition.DistanceToSquared(MainPed.Position);
 
@@ -696,19 +697,21 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset=Position;
                 return;
             }
-            var f = dist*(Position+SyncParameters.PositioinPredictionDefault*Velocity-MainPed.Position)+(Velocity-MainPed.Velocity)*0.2f;
-            if (!localRagdoll) { f*=5; }
+            // var f = dist*(Position+SyncParameters.PositioinPredictionDefault*Velocity-MainPed.Position)+(Velocity-MainPed.Velocity)*0.2f;
+            // if (!localRagdoll) { f*=5; }
             if (!(localRagdoll|| MainPed.IsDead))
             {
-                MainPed.Rotation=Rotation;
-                if (MainPed.Speed<0.05) { f*=10; MainPed.Heading=Heading; }
+                MainPed.Heading=Heading;
+                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.Position);
+                // if (MainPed.Speed<0.05) { f*=10; MainPed.Heading=Heading; }
             }
-            else if (Main.Ticked-_lastRagdollTime<10)
+            else if (Main.Ticked-_lastRagdollTime<20)
             {
                 return;
             }
-            MainPed.ApplyForce(f);
+            // MainPed.ApplyForce(f);
         }
+
         private string LoadAnim(string anim)
         {
             ulong startTime = Util.GetTickCount64();

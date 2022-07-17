@@ -180,6 +180,7 @@ namespace RageCoop.Client
                     // Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
                     p.AttachedBlip?.Delete();
                     p.Kill();
+                    p.Model.MarkAsNoLongerNeeded();
                     p.MarkAsNoLongerNeeded();
                     p.Delete();
                 }
@@ -245,6 +246,7 @@ namespace RageCoop.Client
                     }
                     // Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
                     veh.AttachedBlip?.Delete();
+                    veh.Model.MarkAsNoLongerNeeded();
                     veh.MarkAsNoLongerNeeded();
                     veh.Delete();
                 }
