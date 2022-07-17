@@ -26,7 +26,12 @@ namespace RageCoop.Core
 
             public Vector3 Velocity { get; set; }
 
-            // public Vector3 RotationVelocity { get; set; }
+            #region RAGDOLL
+            public Vector3 HeadPosition { get; set; }
+            public Vector3 RightFootPosition { get; set; }
+            public Vector3 LeftFootPosition { get; set; }
+
+            #endregion
 
             public byte Speed { get; set; }
 
@@ -71,8 +76,19 @@ namespace RageCoop.Core
                 // Write ped health
                 byteArray.AddRange(BitConverter.GetBytes(Health));
 
-                // Write ped position
-                byteArray.AddVector3(Position);
+                // ragdoll sync
+                if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
+                {
+                    byteArray.AddVector3(HeadPosition);
+                    byteArray.AddVector3(RightFootPosition);
+                    byteArray.AddVector3(LeftFootPosition);
+
+                }
+                else
+                {
+                    // Write ped position
+                    byteArray.AddVector3(Position);
+                }
 
                 // Write ped rotation
                 byteArray.AddVector3(Rotation);
@@ -152,8 +168,18 @@ namespace RageCoop.Core
                 // Read player health
                 Health = reader.ReadInt();
 
-                // Read player position
-                Position = reader.ReadVector3();
+                if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
+                {
+                    HeadPosition=reader.ReadVector3();
+                    RightFootPosition=reader.ReadVector3();
+                    LeftFootPosition=reader.ReadVector3();
+                    Position=HeadPosition;
+                }
+                else
+                {
+                    // Read player position
+                    Position = reader.ReadVector3();
+                }
 
                 // Read player rotation
                 Rotation = reader.ReadVector3();

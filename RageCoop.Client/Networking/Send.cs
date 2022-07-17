@@ -32,7 +32,6 @@ namespace RageCoop.Client
                 ID =c.ID,
                 OwnerID=c.OwnerID,
                 Health = p.Health,
-                Position = p.Position,
                 Rotation = p.Rotation,
                 Velocity = p.Velocity,
                 Speed = p.GetPedSpeed(),
@@ -43,6 +42,16 @@ namespace RageCoop.Client
             if (packet.Flags.HasPedFlag(PedDataFlags.IsAiming))
             {
                 packet.AimCoords = p.GetAimCoord();
+            }
+            if (packet.Flags.HasPedFlag(PedDataFlags.IsRagdoll))
+            {
+                packet.HeadPosition=p.Bones[Bone.SkelHead].Position;
+                packet.RightFootPosition=p.Bones[Bone.SkelRightFoot].Position;
+                packet.LeftFootPosition=p.Bones[Bone.SkelLeftFoot].Position;
+            }
+            else
+            {
+                packet.Position = p.Position;
             }
             if (full)
             {

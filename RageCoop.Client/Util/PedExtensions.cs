@@ -333,7 +333,6 @@ namespace RageCoop.Client
         {
             return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
         }
-
         
 
         #endregion

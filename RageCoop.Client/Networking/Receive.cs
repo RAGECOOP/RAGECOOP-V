@@ -287,7 +287,6 @@ namespace RageCoop.Client
             c.ID=packet.ID;
             c.OwnerID=packet.OwnerID;
             c.Health = packet.Health;
-            c.Position = packet.Position;
             c.Rotation = packet.Rotation;
             c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
@@ -304,6 +303,13 @@ namespace RageCoop.Client
             c.IsInCover = flags.HasPedFlag(PedDataFlags.IsInCover);
             c.IsInStealthMode = flags.HasPedFlag(PedDataFlags.IsInStealthMode);
             c.Heading=packet.Heading;
+            c.Position = packet.Position;
+            if (c.IsRagdoll)
+            {
+                c.HeadPosition=packet.HeadPosition;
+                c.RightFootPosition=packet.RightFootPosition;
+                c.LeftFootPosition=packet.LeftFootPosition;
+            }
             c.LastSynced =  Main.Ticked;
             if (c.IsAiming)
             {

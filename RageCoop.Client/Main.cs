@@ -99,12 +99,16 @@ namespace RageCoop.Client
             Util.NativeMemory();
             Counter.Restart();
         }
-        
+
 #if DEBUG
 #endif
+
+        int pinPart = 0;
         private void OnTick(object sender, EventArgs e)
         {
-            PlayerPosition=Game.Player.Character.Position;
+            var P = Game.Player.Character;
+            
+            PlayerPosition=P.Position;
             if (Game.IsLoading)
             {
                 return;
@@ -160,8 +164,6 @@ namespace RageCoop.Client
                 Function.Call(Hash.IGNORE_NEXT_RESTART, true);
                 Function.Call(Hash.FORCE_GAME_STATE_PLAYING); 
                 Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
-
-                var P = Game.Player.Character;
                 if (P.IsDead)
                 {
                     Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
@@ -187,6 +189,16 @@ namespace RageCoop.Client
         
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if(e.KeyCode == Keys.Right)
+            {
+                pinPart++;
+                GTA.UI.Notification.Show(pinPart.ToString());
+            }
+            if (e.KeyCode == Keys.Left)
+            {
+                pinPart--;
+                GTA.UI.Notification.Show(pinPart.ToString());
+            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
@@ -337,7 +349,6 @@ namespace RageCoop.Client
                 ServerItems.Clear();
             }
         }
-
         private static void DoQueuedActions()
         {
             lock (QueuedActions)

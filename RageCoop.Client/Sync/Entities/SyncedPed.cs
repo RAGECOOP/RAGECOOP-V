@@ -63,6 +63,11 @@ namespace RageCoop.Client
         public Ped MainPed { get; internal set; }
         internal int Health { get; set; }
         internal bool IsInStealthMode { get; set; }
+
+        internal Vector3 HeadPosition { get; set; }
+        internal Vector3 RightFootPosition { get; set; }
+        internal Vector3 LeftFootPosition { get; set; }
+
         internal byte WeaponTint { get; set; }
         internal bool _lastEnteringVehicle=false;
         internal bool _lastSittingInVehicle=false;
@@ -703,11 +708,41 @@ namespace RageCoop.Client
             {
                 MainPed.Heading=Heading;
                 MainPed.Velocity=Velocity+5*dist*(Position-MainPed.Position);
-                // if (MainPed.Speed<0.05) { f*=10; MainPed.Heading=Heading; }
             }
-            else if (Main.Ticked-_lastRagdollTime<20)
+            else if (Main.Ticked-_lastRagdollTime<30)
             {
                 return;
+            }
+            else if (IsRagdoll)
+            {
+                var helper = new GTA.NaturalMotion.ApplyImpulseHelper(MainPed);
+                var head = MainPed.Bones[Bone.SkelHead];
+                var rightFoot = MainPed.Bones[Bone.SkelRightFoot];
+                var leftFoot = MainPed.Bones[Bone.SkelLeftFoot];
+
+                // 20:head, 3:left foot, 6:right foot, 17:right hand, 
+
+                helper.EqualizeAmount = 1;
+                helper.PartIndex=20;
+                helper.Impulse=20*(HeadPosition-head.Position);
+                helper.Start();
+                helper.Stop();
+
+                helper.EqualizeAmount = 1;
+                helper.PartIndex=6;
+                helper.Impulse=20*(RightFootPosition-rightFoot.Position);
+                helper.Start();
+                helper.Stop();
+
+                helper.EqualizeAmount = 1;
+                helper.PartIndex=3;
+                helper.Impulse=20*(LeftFootPosition-leftFoot.Position);
+                helper.Start();
+                helper.Stop();
+            }
+            else
+            {
+                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.Position);
             }
             // MainPed.ApplyForce(f);
         }
