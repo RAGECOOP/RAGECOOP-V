@@ -51,13 +51,13 @@ namespace RageCoop.Server.Scripting
 				r.Files.Add(dir, new ResourceFile()
 				{
 					IsDirectory=true,
-					Name=dir.Substring(resDir.Length+1)
-				});
+					Name=dir.Substring(resDir.Length+1).Replace('\\','/')
+				});;
 			}
 			foreach (var file in Directory.GetFiles(resDir, "*", SearchOption.AllDirectories))
 			{
 				if (ToIgnore.Contains(Path.GetFileName(file))) { try { File.Delete(file); } catch { } continue; }
-				var relativeName = file.Substring(resDir.Length+1);
+				var relativeName = file.Substring(resDir.Length+1).Replace('\\', '/');
 				var rfile = new ResourceFile()
 				{
 					GetStream=() => { return new FileStream(file, FileMode.Open, FileAccess.Read); },
