@@ -22,6 +22,8 @@ jobs:
         dotnet-version:  ${{ matrix.dotnet-version }}
     - name: Restore dependencies
       run: dotnet restore
+    - name: Restore client dependencies
+      run: dotnet restore RageCoop.Client/RageCoop.Client.csproj
     - name: Build client
       run: dotnet build RageCoop.Client/RageCoop.Client.csproj --configuration Release -o bin/Release/Client/RageCoop
     - name: Build server win-x64
