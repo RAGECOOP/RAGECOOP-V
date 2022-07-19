@@ -87,6 +87,7 @@ namespace RageCoop.Client.Scripting
 		}
 		public void Load(string path,string[] zips)
 		{
+			LoadedResources.Clear();
 			foreach (var zip in zips)
 			{
 				var zipPath=Path.Combine(path, zip);
