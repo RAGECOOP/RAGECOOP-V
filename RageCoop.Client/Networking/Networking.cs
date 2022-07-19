@@ -4,6 +4,7 @@ using RageCoop.Core;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace RageCoop.Client
 {
@@ -148,6 +149,37 @@ namespace RageCoop.Client
             return _publicKeyReceived.WaitOne(timeout); 
         }
         #endregion
+        internal static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()
+        {
+            var received = new AutoResetEvent(false);
+            var id = NewRequestID();
+            PendingResponses.Add(id, (type, p) =>
+            {
+                var result = new T();
+                result.Unpack(p);
+                callback(result);
+            });
+            var msg = Client.CreateMessage();
+            msg.Write((byte)PacketType.Request);
+            msg.Write(id);
+            request.Pack(msg);
+            Client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, (int)channel);
+        }
+        private static int NewRequestID()
+        {
+            int ID = 0;
+            while ((ID==0)
+                || PendingResponses.ContainsKey(ID))
+            {
+                byte[] rngBytes = new byte[4];
+
+                RandomNumberGenerator.Create().GetBytes(rngBytes);
+
+                // Convert the bytes into an integer
+                ID = BitConverter.ToInt32(rngBytes, 0);
+            }
+            return ID;
+        }
 
     }
 }

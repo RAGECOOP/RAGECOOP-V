@@ -7,7 +7,7 @@ using Lidgren.Network;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System.Reflection;
-using System.Net;
+using System.IO;
 
 namespace RageCoop.Server.Scripting
 {
@@ -135,10 +135,34 @@ namespace RageCoop.Server.Scripting
     public class API
     {
         internal readonly Server Server;
+        internal readonly Dictionary<string, Func<Stream>> RegisteredFiles=new Dictionary<string, Func<System.IO.Stream>>();
         internal API(Server server)
         {
             Server=server;
             Events=new(server);
+            Server.RequestHandlers.Add(PacketType.FileTransferRequest, (data,client) =>
+            {
+                var p = new Packets.FileTransferRequest();
+                p.Unpack(data);
+                var id=Server.NewFileID();
+                if(RegisteredFiles.TryGetValue(p.Name,out var s))
+                {
+                    Task.Run(() =>
+                    {
+                        Server.SendFile(s(), p.Name, client,id);
+                    });
+                    return new Packets.FileTransferResponse()
+                    {
+                        ID=id,
+                        Response=FileResponse.Loaded
+                    };
+                }
+                return new Packets.FileTransferResponse()
+                {
+                    ID=id,
+                    Response=FileResponse.LoadFailed
+                };
+            });
         }
         /// <summary>
         /// Server side events
@@ -197,8 +221,24 @@ namespace RageCoop.Server.Scripting
         }
 
         /// <summary>
-        /// Send CleanUpWorld to all players to delete all objects created by the server
+        /// Register a file to be shared with clients
         /// </summary>
+        /// <param name="name">name of this file</param>
+        /// <param name="path">path to this file</param>
+        public void RegisterSharedFile(string name,string path)
+        {
+            RegisteredFiles.Add(name, () => { return File.OpenRead(path); });
+        }
+
+        /// <summary>
+        /// Register a file to be shared with clients
+        /// </summary>
+        /// <param name="name">name of this file</param>
+        /// <param name="file"></param>
+        public void RegisterSharedFile(string name, ResourceFile file)
+        {
+            RegisteredFiles.Add(name, file.GetStream);
+        }
 
         /// <summary>
         /// Register a new command chat command (Example: "/test")

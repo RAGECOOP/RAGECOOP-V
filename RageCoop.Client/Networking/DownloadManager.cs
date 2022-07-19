@@ -8,6 +8,7 @@ namespace RageCoop.Client
 {
     internal static class DownloadManager
     {
+        public static event EventHandler<string> DownloadCompleted;
         static DownloadManager()
         {
             Networking.RequestHandlers.Add(PacketType.FileTransferRequest, (data) =>
@@ -64,23 +65,26 @@ namespace RageCoop.Client
         private static readonly List<string> _zips = new List<string>();
         public static bool AddFile(int id, string name, long length)
         {
-            Main.Logger.Debug($"Downloading file to {ResourceFolder}\\{name} , id:{id}");
-            if (!Directory.Exists(ResourceFolder))
+            var path = $"{ResourceFolder}\\{name}";
+            Main.Logger.Debug($"Downloading file to {path} , id:{id}");
+            if (!Directory.Exists(Directory.GetParent(path).FullName))
             {
-                Directory.CreateDirectory(ResourceFolder);
+                Directory.CreateDirectory(Directory.GetParent(path).FullName);
             }
 
             if (FileAlreadyExists(ResourceFolder, name, length))
             {
                 Main.Logger.Debug($"File already exists! canceling download:{name}");
+                DownloadCompleted?.Invoke(null, Path.Combine(ResourceFolder, name));
                 return false;
             }
-            
+            /*
             if (!name.EndsWith(".zip"))
             {
                 Main.Logger.Error($"File download blocked! [{name}]");
                 return false;
             }
+            */
             lock (InProgressDownloads)
             {
                 InProgressDownloads.Add(id, new DownloadFile()
@@ -88,7 +92,7 @@ namespace RageCoop.Client
                     FileID = id,
                     FileName = name,
                     FileLength = length,
-                    Stream = new FileStream($"{ResourceFolder}\\{name}", FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
+                    Stream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite)
                 });
             }
             return true;
@@ -150,6 +154,7 @@ namespace RageCoop.Client
                     _zips.Add(f.FileName);
                 }
                 Main.Logger.Info($"Download finished:{f.FileName}");
+                DownloadCompleted?.Invoke(null, Path.Combine(ResourceFolder, f.FileName));
             }
             else
             {

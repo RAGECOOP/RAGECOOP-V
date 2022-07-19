@@ -52,6 +52,7 @@ namespace RageCoop.Client.Scripting
 					{
                         try
                         {
+							s.CurrentResource=d;
 							s.OnStart();
 						}
 						catch(Exception ex)
@@ -118,6 +119,7 @@ namespace RageCoop.Client.Scripting
 		{
 			var r = new ClientResource()
 			{
+				Logger = Main.Logger,
 				Scripts = new List<ClientScript>(),
 				Name=Path.GetFileNameWithoutExtension(file.Name),
 				DataFolder=Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(file.Name))

@@ -15,7 +15,6 @@ namespace RageCoop.Client
 {
     internal class EntityPool
     {
-        private static bool _trafficSpawning=true;
         public static object PedsLock = new object();
         private static Dictionary<int, SyncedPed> ID_Peds = new Dictionary<int, SyncedPed>();
         public static int CharactersCount { get { return ID_Peds.Count; } }

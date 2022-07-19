@@ -46,7 +46,6 @@ namespace RageCoop.Server
         internal readonly Dictionary<long,Client> Clients = new();
         internal readonly Dictionary<string, Client> ClientsByName = new();
         internal Client _hostClient;
-        internal string CurrentWeather;
 
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         private Resources Resources;
@@ -58,7 +57,7 @@ namespace RageCoop.Server
         private Thread _announceThread;
         private Worker _worker;
         private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
-        private Dictionary<PacketType, Func<byte[],Packet>> RequestHandlers=new();
+        internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
         private readonly string _compatibleVersion = "V0_5";
         /// <summary>
         /// Instantiate a server.
@@ -239,17 +238,23 @@ namespace RageCoop.Server
         }
         private void Listen()
         {
+            NetIncomingMessage msg=null;
             Logger?.Info("Listening for clients");
             while (!_stopping)
             {
                 try
                 {
-                    ProcessMessage(MainNetServer.WaitMessage(200));
+                    msg=MainNetServer.WaitMessage(200);
+                    ProcessMessage(msg);
                 }
                 catch(Exception ex)
                 {
                     Logger?.Error("Error processing message");
                     Logger?.Error(ex);
+                    if (msg!=null)
+                    {
+                        DisconnectAndLog(msg.SenderConnection, PacketType.Unknown, ex);
+                    }
                 }
             }
             Logger?.Info("Server is shutting down!");
@@ -342,7 +347,7 @@ namespace RageCoop.Server
                                             var response=MainNetServer.CreateMessage();
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
-                                            handler(message.ReadBytes(message.ReadInt32())).Pack(response);
+                                            handler(message.ReadBytes(message.ReadInt32()),sender).Pack(response);
                                             MainNetServer.SendMessage(response,message.SenderConnection,NetDeliveryMethod.ReliableOrdered);
                                         }
                                         break;
@@ -867,21 +872,24 @@ namespace RageCoop.Server
         }
         internal void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
+            SendFile(File.OpenRead(path), name,client,NewFileID(),updateCallback);
+        }
+        internal void SendFile(Stream stream, string name, Client client,int id=default, Action<float> updateCallback = null)
+        {
 
-            int id = NewFileID();
-            var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-            fs.Seek(0, SeekOrigin.Begin);
-            var total = fs.Length;
+            id = id ==default? NewFileID(): id ;
+            stream.Seek(0, SeekOrigin.Begin);
+            var total = stream.Length;
             if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferRequest()
             {
                 FileLength= total,
                 Name=name,
                 ID=id,
-            },ConnectionChannel.File)?.Response!=FileResponse.NeedToDownload)
+            }, ConnectionChannel.File)?.Response!=FileResponse.NeedToDownload)
             {
                 Logger?.Info($"Skipping file transfer \"{name}\" to {client.Username}");
-                fs.Close();
-                fs.Dispose();
+                stream.Close();
+                stream.Dispose();
                 return;
             }
             Logger?.Debug($"Initiating file transfer:{name}, {total}");
@@ -897,7 +905,7 @@ namespace RageCoop.Server
             {
                 // 4 KB chunk
                 byte[] chunk = new byte[4096];
-                read += thisRead=fs.Read(chunk, 0, 4096);
+                read += thisRead=stream.Read(chunk, 0, 4096);
                 if (thisRead!=chunk.Length)
                 {
                     if (thisRead==0) { break; }
@@ -911,23 +919,23 @@ namespace RageCoop.Server
                     FileChunk=chunk,
                 },
                 client, ConnectionChannel.File, NetDeliveryMethod.ReliableOrdered);
-                transfer.Progress=read/fs.Length;
-                if (updateCallback!=null) { updateCallback(transfer.Progress);}
+                transfer.Progress=read/stream.Length;
+                if (updateCallback!=null) { updateCallback(transfer.Progress); }
 
             } while (thisRead>0);
-            if(GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferComplete()
+            if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferComplete()
             {
                 ID= id,
-            },ConnectionChannel.File)?.Response!=FileResponse.Completed)
+            }, ConnectionChannel.File)?.Response!=FileResponse.Completed)
             {
                 Logger.Warning($"File trasfer to {client.Username} failed: "+name);
-            } 
-            fs.Close();
-            fs.Dispose();
+            }
+            stream.Close();
+            stream.Dispose();
             Logger?.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }
-        private int NewFileID()
+        internal int NewFileID()
         {
             int ID = 0;
             while ((ID==0)

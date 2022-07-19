@@ -279,6 +279,34 @@ namespace RageCoop.Client.Scripting
                 handlers.Add(handler);
             }
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static void RequestSharedFile(string name,Action<string> callback)
+        {
+            EventHandler<string> handler = (s, e) =>
+            {
+                if (e.EndsWith(name))
+                {
+                    callback(e);
+                }
+            };
+            DownloadManager.DownloadCompleted+=handler;
+            Networking.GetResponse<Packets.FileTransferResponse>(new Packets.FileTransferRequest()
+            {
+                Name=name,
+            }, 
+            (p) =>
+            {
+                if(p.Response != FileResponse.Loaded)
+                {
+                    DownloadManager.DownloadCompleted-=handler;
+                    throw new ArgumentException("Requested file was not found on the server: "+name);
+                }
+            });
+        }
         #endregion
     }
 }
