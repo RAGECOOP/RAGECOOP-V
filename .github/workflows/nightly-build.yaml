@@ -22,8 +22,10 @@ jobs:
         dotnet-version:  ${{ matrix.dotnet-version }}
     - name: Restore dependencies
       run: dotnet restore
+    - name: Restore nuget packages
+      run: nuget restore
     - name: Build client
-      run: dotnet publish RageCoop.Client/RageCoop.Client.csproj --no-restore --configuration Release -o RageCoop.Client/bin/RageCoop -f net48
+      run: dotnet build RageCoop.Client/RageCoop.Client.csproj --configuration Release -o bin/Release/Client/RageCoop
     - name: Build server win-x64
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r win-x64 -o RageCoop.Server/bin/win-x64 -c Release
     - name: Build server linux-x64
@@ -33,7 +35,7 @@ jobs:
     
     - uses: vimtor/action-zip@v1
       with:
-        files: RageCoop.Client/bin
+        files: bin/Release/Client
         dest: RageCoop.Client.zip
 
     - uses: vimtor/action-zip@v1
