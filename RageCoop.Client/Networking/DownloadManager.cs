@@ -15,9 +15,9 @@ namespace RageCoop.Client
             {
                 var fr = new Packets.FileTransferRequest();
                 fr.Unpack(data);
-                if (fr.Name.EndsWith(".zip"))
+                if (fr.Name.EndsWith(".res"))
                 {
-                    _zips.Add(fr.Name);
+                    _resources.Add(fr.Name);
                 }
                 return new Packets.FileTransferResponse()
                 {
@@ -44,7 +44,7 @@ namespace RageCoop.Client
             {
                 try
                 {
-                    Main.Resources.Load(ResourceFolder,_zips.ToArray());
+                    Main.Resources.Load(ResourceFolder,_resources.ToArray());
                     return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
                 }
                 catch(Exception ex)
@@ -62,7 +62,7 @@ namespace RageCoop.Client
             }
         } 
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
-        private static readonly List<string> _zips = new List<string>();
+        private static readonly HashSet<string> _resources = new HashSet<string>();
         public static bool AddFile(int id, string name, long length)
         {
             var path = $"{ResourceFolder}\\{name}";
@@ -149,10 +149,6 @@ namespace RageCoop.Client
             {
                 InProgressDownloads.Remove(id);
                 f.Dispose();
-                if (f.FileName.EndsWith(".zip"))
-                {
-                    _zips.Add(f.FileName);
-                }
                 Main.Logger.Info($"Download finished:{f.FileName}");
                 DownloadCompleted?.Invoke(null, Path.Combine(ResourceFolder, f.FileName));
             }
@@ -172,15 +168,7 @@ namespace RageCoop.Client
                 }
                 InProgressDownloads.Clear();
             }
-            if (Directory.Exists(ResourceFolder))
-            {
-
-                foreach (var zip in Directory.GetDirectories(ResourceFolder, "*.zip"))
-                {
-                    File.Delete(zip);
-                }
-            }
-            _zips.Clear();
+            _resources.Clear();
 
         }
     }

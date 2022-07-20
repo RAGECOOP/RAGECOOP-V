@@ -41,7 +41,7 @@ namespace RageCoop.Server.Scripting
 					{
 						// Pack client side resource as a zip file
 						Logger?.Info("Packing client-side resource: "+resourceFolder);
-						var zipPath = Path.Combine(tmpDir, Path.GetFileName(resourceFolder))+".zip";
+						var zipPath = Path.Combine(tmpDir, Path.GetFileName(resourceFolder))+".res";
 						try
 						{
 							using (ZipFile zip = ZipFile.Create(zipPath))
@@ -67,7 +67,7 @@ namespace RageCoop.Server.Scripting
 						}
 					}
 				}
-				var packed = Directory.GetFiles(path, "*.zip", SearchOption.TopDirectoryOnly);
+				var packed = Directory.GetFiles(path, "*.res", SearchOption.TopDirectoryOnly);
 				if (packed.Length>0)
 				{
 					ClientResourceZips.AddRange(packed);
@@ -100,7 +100,7 @@ namespace RageCoop.Server.Scripting
 						Logger?.Error(ex);
 					}
 				}
-				foreach (var resource in Directory.GetFiles(path, "*.zip", SearchOption.TopDirectoryOnly))
+				foreach (var resource in Directory.GetFiles(path, "*.res", SearchOption.TopDirectoryOnly))
 				{
                     try
                     {
