@@ -1,14 +1,10 @@
 ﻿
-using System;
 using GTA;
 using GTA.Native;
-using RageCoop.Core;
+using RageCoop.Client.Scripting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using RageCoop.Client.Scripting;
-using System.Text;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 
 namespace RageCoop.Client
@@ -36,16 +32,16 @@ namespace RageCoop.Client
         private static Dictionary<int, SyncedProjectile> ID_Projectiles = new Dictionary<int, SyncedProjectile>();
         private static Dictionary<int, SyncedProjectile> Handle_Projectiles = new Dictionary<int, SyncedProjectile>();
 
-        public static object PropsLock=new object();
-        public static Dictionary<int,SyncedProp> ServerProps=new Dictionary<int,SyncedProp>();
+        public static object PropsLock = new object();
+        public static Dictionary<int, SyncedProp> ServerProps = new Dictionary<int, SyncedProp>();
 
         public static object BlipsLock = new object();
         public static Dictionary<int, Blip> ServerBlips = new Dictionary<int, Blip>();
 
 
-        public static void Cleanup(bool keepPlayer=true,bool keepMine=true)
+        public static void Cleanup(bool keepPlayer = true, bool keepMine = true)
         {
-            foreach(int id in new List<int>(ID_Peds.Keys))
+            foreach (int id in new List<int>(ID_Peds.Keys))
             {
                 if (keepPlayer&&(id==Main.LocalPlayerID)) { continue; }
                 if (keepMine&&(ID_Peds[id].OwnerID==Main.LocalPlayerID)) { continue; }
@@ -62,7 +58,7 @@ namespace RageCoop.Client
             ID_Vehicles.Clear();
             Handle_Vehicles.Clear();
 
-            foreach(var p in ID_Projectiles.Values)
+            foreach (var p in ID_Projectiles.Values)
             {
                 if (p.ShooterID!=Main.LocalPlayerID && p.MainProjectile!=null && p.MainProjectile.Exists())
                 {
@@ -72,13 +68,13 @@ namespace RageCoop.Client
             ID_Projectiles.Clear();
             Handle_Projectiles.Clear();
 
-            foreach(var p in ServerProps.Values)
+            foreach (var p in ServerProps.Values)
             {
                 p?.MainProp?.Delete();
             }
             ServerProps.Clear();
 
-            foreach(var b in ServerBlips.Values)
+            foreach (var b in ServerBlips.Values)
             {
                 if (b.Exists())
                 {
@@ -113,10 +109,10 @@ namespace RageCoop.Client
                     player.MainPed = p;
 
                     // Remove it from Handle_Characters
-                    var pairs=Handle_Peds.Where(x=>x.Value==player);
+                    var pairs = Handle_Peds.Where(x => x.Value==player);
                     if (pairs.Any())
                     {
-                        var pair=pairs.First();
+                        var pair = pairs.First();
 
                         // Re-add
                         Handle_Peds.Remove(pair.Key);
@@ -135,7 +131,7 @@ namespace RageCoop.Client
                 Main.LocalPlayerID=c.OwnerID=c.ID;
                 Add(c);
                 Main.Logger.Debug($"Local player ID is:{c.ID}");
-                PlayerList.SetPlayer(c.ID, Main.Settings.Username );
+                PlayerList.SetPlayer(c.ID, Main.Settings.Username);
                 return true;
             }
             return false;
@@ -164,7 +160,7 @@ namespace RageCoop.Client
                 API.Events.InvokePedSpawned(c);
             }
         }
-        public static void RemovePed(int id,string reason="Cleanup")
+        public static void RemovePed(int id, string reason = "Cleanup")
         {
             if (ID_Peds.ContainsKey(id))
             {
@@ -231,7 +227,7 @@ namespace RageCoop.Client
                 API.Events.InvokeVehicleSpawned(v);
             }
         }
-        public static void RemoveVehicle(int id,string reason = "Cleanup")
+        public static void RemoveVehicle(int id, string reason = "Cleanup")
         {
             if (ID_Vehicles.ContainsKey(id))
             {
@@ -319,9 +315,9 @@ namespace RageCoop.Client
         static int vehStatesPerFrame;
         static int pedStatesPerFrame;
         static int i;
-        public static Ped[] allPeds=new Ped[0];
-        public static Vehicle[] allVehicles=new Vehicle[0];
-        public static Projectile[] allProjectiles=new Projectile[0];
+        public static Ped[] allPeds = new Ped[0];
+        public static Vehicle[] allVehicles = new Vehicle[0];
+        public static Projectile[] allProjectiles = new Projectile[0];
 
         public static void DoSync()
         {
@@ -358,7 +354,7 @@ namespace RageCoop.Client
                     if (!Handle_Projectiles.ContainsKey(p.Handle))
                     {
                         Add(new SyncedProjectile(p));
-                        
+
                     }
                 }
 
@@ -399,7 +395,7 @@ namespace RageCoop.Client
                 }
 
             }
-            
+
             i=-1;
 
             lock (PedsLock)
@@ -497,13 +493,13 @@ namespace RageCoop.Client
                             var type = veh.PopulationType;
                             if (type==EntityPopulationType.RandomAmbient || type==EntityPopulationType.RandomParked)
                             {
-                                foreach(var p in veh.Occupants)
+                                foreach (var p in veh.Occupants)
                                 {
                                     p.Delete();
                                     var c = EntityPool.GetPedByHandle(p.Handle);
                                     if (c!=null)
                                     {
-                                        EntityPool.RemovePed(c.ID,"ThrottleTraffic");
+                                        EntityPool.RemovePed(c.ID, "ThrottleTraffic");
                                     }
                                 }
                                 veh.Delete();
@@ -532,7 +528,7 @@ namespace RageCoop.Client
                     i++;
                     if ((v.MainVehicle!=null)&&(!v.MainVehicle.Exists()))
                     {
-                        EntityPool.RemoveVehicle(v.ID,"non-existent");
+                        EntityPool.RemoveVehicle(v.ID, "non-existent");
                         continue;
                     }
 
@@ -570,7 +566,7 @@ namespace RageCoop.Client
 
         public static void RemoveAllFromPlayer(int playerPedId)
         {
-            foreach(SyncedPed p in ID_Peds.Values.ToArray())
+            foreach (SyncedPed p in ID_Peds.Values.ToArray())
             {
                 if (p.OwnerID==playerPedId)
                 {
@@ -588,10 +584,10 @@ namespace RageCoop.Client
 
         public static int RequestNewID()
         {
-            int ID=0;
-            while ((ID==0) 
-                || ID_Peds.ContainsKey(ID) 
-                || ID_Vehicles.ContainsKey(ID) 
+            int ID = 0;
+            while ((ID==0)
+                || ID_Peds.ContainsKey(ID)
+                || ID_Vehicles.ContainsKey(ID)
                 || ID_Projectiles.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
@@ -610,7 +606,7 @@ namespace RageCoop.Client
         }
         public static string DumpDebug()
         {
-            string s= "";
+            string s = "";
             s+="\nID_Peds: "+ID_Peds.Count;
             s+="\nHandle_Peds: "+Handle_Peds.Count;
             s+="\nID_Vehicles: "+ID_Vehicles.Count;

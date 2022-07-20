@@ -1,9 +1,9 @@
-﻿using System;
-using System.Net;
-using System.Drawing;
-using System.Collections.Generic;
+﻿using LemonUI.Menus;
 using Newtonsoft.Json;
-using LemonUI.Menus;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Net;
 using System.Threading;
 
 namespace RageCoop.Client.Menus
@@ -18,13 +18,13 @@ namespace RageCoop.Client.Menus
 
         [JsonProperty("name")]
         public string Name { get; set; }
-        
+
         [JsonProperty("version")]
         public string Version { get; set; }
-        
+
         [JsonProperty("players")]
         public int Players { get; set; }
-        
+
         [JsonProperty("maxPlayers")]
         public int MaxPlayers { get; set; }
 
@@ -59,7 +59,7 @@ namespace RageCoop.Client.Menus
                 Menu.Add(ResultItem = new NativeItem("Loading..."));
 
                 // Prevent freezing
-                GetServersThread=new Thread(()=> GetAllServers());
+                GetServersThread=new Thread(() => GetAllServers());
                 GetServersThread.Start();
             };
             Menu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
@@ -79,7 +79,7 @@ namespace RageCoop.Client.Menus
             List<ServerListClass> serverList = null;
             var realUrl = Main.Settings.MasterServer;
             serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(DownloadString(realUrl));
-            
+
             // Need to be processed in main thread
             Main.QueueAction(() =>
             {

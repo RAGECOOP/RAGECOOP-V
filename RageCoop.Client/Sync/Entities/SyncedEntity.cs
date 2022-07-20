@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA;
+﻿using GTA;
 using GTA.Math;
 
 namespace RageCoop.Client
@@ -28,7 +23,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Network ID for this entity
         /// </summary>
-        public int ID { get;internal set; }
+        public int ID { get; internal set; }
         /// <summary>
         /// 
         /// </summary>
@@ -45,7 +40,7 @@ namespace RageCoop.Client
         }
         internal bool IsReady
         {
-            get {return (LastSynced>0||LastFullSynced==0);}
+            get { return (LastSynced>0||LastFullSynced==0); }
         }
         internal bool IsInvincible { get; set; } = false;
         internal bool NeedUpdate
@@ -67,10 +62,13 @@ namespace RageCoop.Client
         public ulong LastUpdated { get; set; } = 0;
         #endregion
 
+        public bool SendNextFrame { get; set; } = false;
+        public bool SendFullNextFrame { get; set; } = false;
+
         /// <summary>
         /// 
         /// </summary>
-        internal protected bool _lastFrozen=false;
+        internal protected bool _lastFrozen = false;
         internal Model Model { get; set; }
         internal Vector3 Position { get; set; }
         internal Vector3 Rotation { get; set; }

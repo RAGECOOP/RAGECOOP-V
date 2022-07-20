@@ -1,10 +1,9 @@
 ﻿#undef DEBUG
-using System.Collections.Generic;
-using System;
-using System.Linq;
-using RageCoop.Core;
-using System.Windows.Forms;
 using GTA;
+using RageCoop.Core;
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 
 namespace RageCoop.Client.Scripting
 {
@@ -64,7 +63,7 @@ namespace RageCoop.Client.Scripting
             /// Get or set player's blip sprite
             /// </summary>
             public static BlipSprite BlipSprite { get; set; } = BlipSprite.Standard;
-            
+
             /// <summary>
             /// Get or set scale of player's blip
             /// </summary>
@@ -136,16 +135,16 @@ namespace RageCoop.Client.Scripting
             internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
             internal static void InvokeTick() { OnTick?.Invoke(); }
 
-            internal static void InvokeKeyDown(object s,KeyEventArgs e) { OnKeyDown?.Invoke(s,e); }
+            internal static void InvokeKeyDown(object s, KeyEventArgs e) { OnKeyDown?.Invoke(s, e); }
 
             internal static void InvokeKeyUp(object s, KeyEventArgs e) { OnKeyUp?.Invoke(s, e); }
 
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
-                var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args};
+                var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args };
 
                 // Main.Logger.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
-                
+
                 List<Action<CustomEventReceivedArgs>> handlers;
                 if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
                 {
@@ -279,12 +278,12 @@ namespace RageCoop.Client.Scripting
                 handlers.Add(handler);
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public static void RequestSharedFile(string name,Action<string> callback)
+        public static void RequestSharedFile(string name, Action<string> callback)
         {
             EventHandler<string> handler = (s, e) =>
             {
@@ -297,10 +296,10 @@ namespace RageCoop.Client.Scripting
             Networking.GetResponse<Packets.FileTransferResponse>(new Packets.FileTransferRequest()
             {
                 Name=name,
-            }, 
+            },
             (p) =>
             {
-                if(p.Response != FileResponse.Loaded)
+                if (p.Response != FileResponse.Loaded)
                 {
                     DownloadManager.DownloadCompleted-=handler;
                     throw new ArgumentException("Requested file was not found on the server: "+name);

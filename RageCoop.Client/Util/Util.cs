@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using GTA;
 using GTA.Math;
-using System.Drawing;
-using GTA;
-using RageCoop.Core;
 using GTA.Native;
+using RageCoop.Core;
+using System;
+using System.Drawing;
 using System.IO;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace RageCoop.Client
 {
@@ -54,7 +53,7 @@ namespace RageCoop.Client
         public static unsafe void NativeMemory()
         {
             IntPtr address;
-            
+
             address = Game.FindPattern("\x74\x0A\xF3\x0F\x11\xB3\x1C\x09\x00\x00\xEB\x25", "xxxxxx????xx");
             if (address != IntPtr.Zero)
             {
@@ -122,7 +121,7 @@ namespace RageCoop.Client
 
 
         #endregion
-        public static string SettingsPath= "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
+        public static string SettingsPath = "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
         public static Settings ReadSettings()
         {
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
@@ -157,7 +156,7 @@ namespace RageCoop.Client
         {
             try
             {
-                string path = SettingsPath ;
+                string path = SettingsPath;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
                 using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
@@ -198,7 +197,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
             }
         }
-        public static void SetFrozen(this Entity e,bool toggle)
+        public static void SetFrozen(this Entity e, bool toggle)
         {
             Function.Call(Hash.FREEZE_ENTITY_POSITION, e, toggle);
         }
@@ -219,7 +218,7 @@ namespace RageCoop.Client
             return v;
         }
 
-        public static void ApplyForce(this Entity e,int boneIndex, Vector3 direction, Vector3 rotation = default(Vector3), ForceType forceType = ForceType.MaxForceRot2)
+        public static void ApplyForce(this Entity e, int boneIndex, Vector3 direction, Vector3 rotation = default(Vector3), ForceType forceType = ForceType.MaxForceRot2)
         {
             Function.Call(Hash.APPLY_FORCE_TO_ENTITY, e.Handle, forceType, direction.X, direction.Y, direction.Z, rotation.X, rotation.Y, rotation.Z, boneIndex, false, true, true, false, true);
         }
@@ -242,12 +241,12 @@ namespace RageCoop.Client
         const UInt32 WM_KEYDOWN = 0x0100;
         public static void Reload()
         {
-            string reloadKey="None";
+            string reloadKey = "None";
             var lines = File.ReadAllLines("ScriptHookVDotNet.ini");
             foreach (var l in lines)
             {
                 var ss = l.Split('=');
-                if(ss.Length > 0 && ss[0]=="ReloadKey")
+                if (ss.Length > 0 && ss[0]=="ReloadKey")
                 {
                     reloadKey = ss[1];
                 }
@@ -265,7 +264,7 @@ namespace RageCoop.Client
                     }
                 }
                 lineList.Add("ReloadKey=Insert");
-                File.WriteAllLines("ScriptHookVDotNet.ini",lineList.ToArray());
+                File.WriteAllLines("ScriptHookVDotNet.ini", lineList.ToArray());
             }
             Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
 
@@ -278,14 +277,14 @@ namespace RageCoop.Client
                 if (File.Exists(path)) { File.Delete(path); }
                 if (File.Exists(Main.Logger.LogPath)) { File.Move(Main.Logger.LogPath, path); }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 GTA.UI.Notification.Show(ex.Message);
             }
 
             PostMessage(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, WM_KEYDOWN, (int)key, 0);
         }
-        
+
         [DllImport("user32.dll")]
         static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
 

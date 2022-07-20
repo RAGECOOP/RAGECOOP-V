@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using RageCoop.Core;
-using GTA;
+﻿using GTA;
 using GTA.Native;
+using System;
 
 namespace RageCoop.Client
 {
@@ -37,7 +35,7 @@ namespace RageCoop.Client
 
             if (!Networking.IsOnServer)
             {
-                return ;
+                return;
             }
             Game.DisableControlThisFrame(Control.FrontendPause);
             if (Main.Settings.DisableAlternatePause)
@@ -120,9 +118,9 @@ namespace RageCoop.Client
                         ped.Kill();
                         ped.Delete();
                     }
-                    
+
                 }
-                
+
                 foreach (Vehicle veh in World.GetAllVehicles())
                 {
                     SyncedVehicle v = veh.GetSyncEntity();
@@ -131,7 +129,7 @@ namespace RageCoop.Client
                         // Don't delete player's vehicle
                         continue;
                     }
-                    if((v== null) || (v.IsLocal&&veh.PopulationType!=EntityPopulationType.Mission))
+                    if ((v== null) || (v.IsLocal&&veh.PopulationType!=EntityPopulationType.Mission))
                     {
                         Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 

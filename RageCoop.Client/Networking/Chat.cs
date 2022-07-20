@@ -1,10 +1,9 @@
-﻿using System;
+﻿using GTA;
+using GTA.Native;
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using RageCoop.Core;
-using GTA;
-using GTA.Native;
 
 namespace RageCoop.Client
 {
@@ -106,7 +105,7 @@ namespace RageCoop.Client
                 CurrentInput = "";
                 return;
             }
-            
+
             if (key == Keys.PageUp)
             {
                 MainScaleForm.CallFunction("PAGE_UP");

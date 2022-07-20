@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using GTA;
 using Lidgren.Network;
-using RageCoop.Core;
-using GTA;
 using RageCoop.Client.Menus;
+using RageCoop.Core;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace RageCoop.Client
@@ -24,15 +24,15 @@ namespace RageCoop.Client
                        return EntityPool.ServerBlips[reader.ReadInt()].Handle;
                    default:
                        throw new ArgumentException("Cannot resolve server side argument: "+t);
-               
+
                }
            };
-        private static readonly AutoResetEvent _publicKeyReceived=new AutoResetEvent(false);
+        private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
         private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
-        internal static readonly Dictionary<PacketType, Func< byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func< byte[], Packet>>();
+        internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
         public static void ProcessMessage(NetIncomingMessage message)
         {
-            if(message == null) { return; }
+            if (message == null) { return; }
 
             switch (message.MessageType)
             {
@@ -49,7 +49,8 @@ namespace RageCoop.Client
 #endif
                             break;
                         case NetConnectionStatus.Connected:
-                            Main.QueueAction(() => {
+                            Main.QueueAction(() =>
+                            {
                                 CoopMenu.ConnectedMenuSetting();
                                 Main.MainChat.Init();
                                 PlayerList.Cleanup();
@@ -80,8 +81,8 @@ namespace RageCoop.Client
                             Main.QueueAction(() =>
                                 GTA.UI.Notification.Show("~r~Disconnected: " + reason));
                             Main.Resources.Unload();
-                            
-                            
+
+
                             break;
                     }
                     break;
@@ -119,7 +120,7 @@ namespace RageCoop.Client
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
                                             handler(message.ReadBytes(len)).Pack(response);
-                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered,message.SequenceChannel);
+                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
                                         }
                                         break;
                                     }
@@ -134,7 +135,8 @@ namespace RageCoop.Client
                         }
                         catch (Exception ex)
                         {
-                            Main.QueueAction(() => {
+                            Main.QueueAction(() =>
+                            {
                                 GTA.UI.Notification.Show("~r~~h~Packet Error");
                                 return true;
                             });
@@ -154,12 +156,12 @@ namespace RageCoop.Client
                         byte[] data = message.ReadBytes(len);
                         if (packetType==PacketType.PublicKeyResponse)
                         {
-                            var packet=new Packets.PublicKeyResponse();
+                            var packet = new Packets.PublicKeyResponse();
                             packet.Unpack(data);
-                            Security.SetServerPublicKey(packet.Modulus,packet.Exponent);
+                            Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
                             _publicKeyReceived.Set();
                         }
-                        
+
                         break;
                     }
                 case NetIncomingMessageType.DebugMessage:
@@ -326,11 +328,11 @@ namespace RageCoop.Client
                 c.BlipScale=packet.BlipScale;
                 c.LastFullSynced = Main.Ticked;
             }
-            
+
         }
         private static void VehicleSync(Packets.VehicleSync packet)
         {
-            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID); 
+            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v==null)
             {
                 EntityPool.ThreadSafe.Add(v=new SyncedVehicle(packet.ID));

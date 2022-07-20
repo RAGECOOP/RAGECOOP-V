@@ -42,7 +42,7 @@ namespace RageCoop.Client
         /// <summary>
         /// The key to enter a vehicle as passenger.
         /// </summary>
-        public Keys PassengerKey { get; set; }=Keys.G;
+        public Keys PassengerKey { get; set; } = Keys.G;
 
         /// <summary>
         /// Disable world NPC traffic, mission entities won't be affected

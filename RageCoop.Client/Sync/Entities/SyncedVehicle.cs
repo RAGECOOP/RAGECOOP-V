@@ -1,14 +1,11 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
+using GTA.Native;
 using RageCoop.Core;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace RageCoop.Client
 {
@@ -50,8 +47,8 @@ namespace RageCoop.Client
         /// <summary>
         /// VehicleSeat,ID
         /// </summary>
-        public Vehicle MainVehicle { get;internal set; }
-        public Stopwatch LastSyncedStopWatch=new Stopwatch();
+        public Vehicle MainVehicle { get; internal set; }
+        public Stopwatch LastSyncedStopWatch = new Stopwatch();
 
 
         #region LAST STATE
@@ -99,7 +96,7 @@ namespace RageCoop.Client
         internal byte[] Colors { get; set; }
         internal Dictionary<int, int> Mods { get; set; }
         internal float EngineHealth { get; set; }
-        internal VehicleLockStatus LockStatus{get;set;}
+        internal VehicleLockStatus LockStatus { get; set; }
         /// <summary>
         /// VehicleSeat,PedID
         /// </summary>
@@ -113,11 +110,11 @@ namespace RageCoop.Client
         #endregion
         internal override void Update()
         {
-            
+
             #region -- INITIAL CHECK --
 
             // Check if all data avalible
-            if(!IsReady) { return; }
+            if (!IsReady) { return; }
             #endregion
             #region -- CHECK EXISTENCE --
             if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != Model))
@@ -322,7 +319,7 @@ namespace RageCoop.Client
 
                 if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle)!=LicensePlate)
                 {
-                    Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT,MainVehicle,LicensePlate);
+                    Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
                 }
 
                 if (_lastLivery!=Livery)
@@ -346,7 +343,7 @@ namespace RageCoop.Client
             }
             else if (current.DistanceTo(Position)<5)
             {
-                MainVehicle.Velocity = Velocity+5*( predicted - current);
+                MainVehicle.Velocity = Velocity+5*(predicted - current);
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
@@ -375,12 +372,12 @@ namespace RageCoop.Client
         }
         private Vector3 GetCalibrationRotation()
         {
-            var rot=Quaternion.LookRotation(Quaternion*Vector3.RelativeFront, Quaternion*Vector3.RelativeTop).ToEulerAngles();
-            var curRot=Quaternion.LookRotation(MainVehicle.Quaternion*Vector3.RelativeFront, MainVehicle.Quaternion*Vector3.RelativeTop).ToEulerAngles();
-            
+            var rot = Quaternion.LookRotation(Quaternion*Vector3.RelativeFront, Quaternion*Vector3.RelativeTop).ToEulerAngles();
+            var curRot = Quaternion.LookRotation(MainVehicle.Quaternion*Vector3.RelativeFront, MainVehicle.Quaternion*Vector3.RelativeTop).ToEulerAngles();
+
             var r = (rot-curRot).ToDegree();
             if (r.X>180) { r.X=r.X-360; }
-            else if(r.X<-180) { r.X=360+r.X; }
+            else if (r.X<-180) { r.X=360+r.X; }
 
             if (r.Y>180) { r.Y=r.Y-360; }
             else if (r.Y<-180) { r.Y=360+r.Y; }
@@ -388,7 +385,7 @@ namespace RageCoop.Client
             if (r.Z>180) { r.Z=r.Z-360; }
             else if (r.Z<-180) { r.Z=360+r.Z; }
             return r;
-            
+
         }
         private bool CreateVehicle()
         {

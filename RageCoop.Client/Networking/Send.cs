@@ -1,8 +1,8 @@
-﻿using Lidgren.Network;
-using RageCoop.Core;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
+using GTA.Native;
+using Lidgren.Network;
+using RageCoop.Core;
 
 namespace RageCoop.Client
 {
@@ -24,10 +24,10 @@ namespace RageCoop.Client
             Client.SendMessage(outgoingMessage, method, (int)channel);
         }
 
-        public static void SendPed(SyncedPed c,bool full)
+        public static void SendPed(SyncedPed c, bool full)
         {
             Ped p = c.MainPed;
-            var packet=new Packets.PedSync()
+            var packet = new Packets.PedSync()
             {
                 ID =c.ID,
                 OwnerID=c.OwnerID,
@@ -81,7 +81,7 @@ namespace RageCoop.Client
             }
             Send(packet, ConnectionChannel.PedSync);
         }
-        public static void SendVehicle(SyncedVehicle v,bool full)
+        public static void SendVehicle(SyncedVehicle v, bool full)
         {
             Vehicle veh = v.MainVehicle;
             var packet = new Packets.VehicleSync()
@@ -123,7 +123,7 @@ namespace RageCoop.Client
                     packet.RadioStation=Util.GetPlayerRadioIndex();
                 }
             }
-            Send(packet,ConnectionChannel.VehicleSync);
+            Send(packet, ConnectionChannel.VehicleSync);
         }
         public static void SendProjectile(SyncedProjectile sp)
         {
@@ -138,13 +138,13 @@ namespace RageCoop.Client
                 WeaponHash=(uint)p.WeaponHash,
                 Exploded=p.IsDead
             };
-            if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID,"Dead"); }
+            if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
             Send(packet, ConnectionChannel.ProjectileSync);
         }
 
 
         #region SYNC EVENTS
-        public static void SendBulletShot(Vector3 start,Vector3 end,uint weapon,int ownerID)
+        public static void SendBulletShot(Vector3 start, Vector3 end, uint weapon, int ownerID)
         {
             Send(new Packets.BulletShot()
             {

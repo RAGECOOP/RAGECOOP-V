@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
+using GTA.Native;
+using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
     internal class MuzzleInfo
     {
-        public MuzzleInfo(Vector3 pos,Vector3 forward)
+        public MuzzleInfo(Vector3 pos, Vector3 forward)
         {
             Position = pos;
             ForawardVector=forward;
@@ -49,7 +45,7 @@ namespace RageCoop.Client
             }
             return p.Bones[Bone.SkelRightHand].Position;
         }
-        static long BulletsShot=0;
+        static long BulletsShot = 0;
 
         public static float GetWeaponDamage(this Ped P, uint hash)
         {
@@ -199,7 +195,7 @@ namespace RageCoop.Client
 
                 // RHINO
                 case 782665360:
-                    return new MuzzleInfo(v.Bones[35].Position,v.Bones[35].ForwardVector);
+                    return new MuzzleInfo(v.Bones[35].Position, v.Bones[35].ForwardVector);
 
                 default:
                     return null;
@@ -212,7 +208,7 @@ namespace RageCoop.Client
             var type = Function.Call<int>(Hash.GET_WEAPON_DAMAGE_TYPE, vp);
             if (vp!=VehicleWeaponHash.Invalid)
             {
-                if(type==3)
+                if (type==3)
                 {
                     return false;
                 }
@@ -231,7 +227,7 @@ namespace RageCoop.Client
             (uint)WeaponHash.Railgun,
             1638077257
         };
-        
+
         public static readonly Dictionary<WeaponHash, int> MuzzleBoneIndexes = new Dictionary<WeaponHash, int>
         {
             {WeaponHash.HeavySniper,6},
@@ -300,7 +296,7 @@ namespace RageCoop.Client
             {WeaponHash.PumpShotgunMk2,7},
 
         };
-        
+
 
         public static readonly HashSet<WeaponHash> ProjectileWeapons = new HashSet<WeaponHash> {
             WeaponHash.HomingLauncher,

@@ -1,16 +1,14 @@
-﻿using System;
+﻿using GTA;
+using GTA.Math;
+using GTA.Native;
+using RageCoop.Client.Menus;
+using RageCoop.Core;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
-using System.Diagnostics;
-using RageCoop.Client.Menus;
-using RageCoop.Core;
-using GTA;
-using GTA.Native;
-using GTA.Math;
 
 namespace RageCoop.Client
 {
@@ -19,26 +17,26 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
-        
+
         private bool _gameLoaded = false;
         internal static readonly string CurrentVersion = "V0_5_0";
 
-        internal static int LocalPlayerID=0;
+        internal static int LocalPlayerID = 0;
 
         internal static RelationshipGroup SyncedPedsGroup;
 
         internal static new Settings Settings = null;
-        internal static Scripting.BaseScript BaseScript=new Scripting.BaseScript();
+        internal static Scripting.BaseScript BaseScript = new Scripting.BaseScript();
 
 #if !NON_INTERACTIVE
 #endif
         internal static Chat MainChat = null;
         internal static Stopwatch Counter = new Stopwatch();
         internal static Logger Logger = null;
-        
+
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Scripting.Resources Resources=null;
+        internal static Scripting.Resources Resources = null;
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
         /// <summary>
         /// Don't use it!
@@ -90,22 +88,24 @@ namespace RageCoop.Client
 #endif
             MainChat = new Chat();
             Tick += OnTick;
-            Tick += (s,e) => { Scripting.API.Events.InvokeTick(); };
+            Tick += (s, e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
             KeyDown+=(s, e) => { Scripting.API.Events.InvokeKeyDown(s, e); };
             KeyUp+=(s, e) => { Scripting.API.Events.InvokeKeyUp(s, e); };
             Aborted += (object sender, EventArgs e) => CleanUp();
-            
+
             Util.NativeMemory();
             Counter.Restart();
         }
 
 #if DEBUG
 #endif
+        public static Ped P;
+        public static float FPS;
         private void OnTick(object sender, EventArgs e)
         {
-            var P = Game.Player.Character;
-            
+            P= Game.Player.Character;
+            FPS=Game.FPS;
             PlayerPosition=P.Position;
             if (Game.IsLoading)
             {
@@ -114,14 +114,14 @@ namespace RageCoop.Client
             else if (!_gameLoaded && (_gameLoaded = true))
             {
 #if !NON_INTERACTIVE
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP","Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
+                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
 #endif
             }
 
 #if !NON_INTERACTIVE
             CoopMenu.MenuPool.Process();
 #endif
-            
+
             DoQueuedActions();
             if (!Networking.IsOnServer)
             {
@@ -139,7 +139,7 @@ namespace RageCoop.Client
             {
                 Main.Logger.Error(ex);
             }
-            
+
 
 
 #if DEBUG
@@ -160,12 +160,12 @@ namespace RageCoop.Client
             {
                 Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
                 Function.Call(Hash.IGNORE_NEXT_RESTART, true);
-                Function.Call(Hash.FORCE_GAME_STATE_PLAYING); 
+                Function.Call(Hash.FORCE_GAME_STATE_PLAYING);
                 Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
                 if (P.IsDead)
                 {
                     Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
-                    
+
                     if (P.Health!=1)
                     {
                         P.Health=1;
@@ -184,7 +184,7 @@ namespace RageCoop.Client
 
             Ticked++;
         }
-        
+
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
@@ -241,7 +241,7 @@ namespace RageCoop.Client
             else if (e.KeyCode==Settings.PassengerKey)
             {
                 var P = Game.Player.Character;
-                
+
                 if (!P.IsInVehicle())
                 {
                     if (P.IsTaskActive(TaskType.CTaskEnterVehicle))
@@ -350,7 +350,7 @@ namespace RageCoop.Client
                             QueuedActions.Remove(action);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Logger.Error(ex);
                         QueuedActions.Remove(action);
@@ -374,7 +374,7 @@ namespace RageCoop.Client
         {
             lock (QueuedActions)
             {
-                QueuedActions.Add(() => { a(); return true; }) ;
+                QueuedActions.Add(() => { a(); return true; });
             }
         }
         /// <summary>

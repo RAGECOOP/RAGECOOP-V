@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RageCoop.Client
 {
@@ -21,7 +18,7 @@ namespace RageCoop.Client
         CheckProjectiles,
         GetAllEntities,
         Receive,
-
+        ProjectilesTotal,
     }
     internal static class Debug
     {
@@ -29,7 +26,7 @@ namespace RageCoop.Client
         private static int _lastNfHandle;
         static Debug()
         {
-            foreach(TimeStamp t in Enum.GetValues(typeof(TimeStamp)))
+            foreach (TimeStamp t in Enum.GetValues(typeof(TimeStamp)))
             {
                 TimeStamps.Add(t, 0);
             }
@@ -37,7 +34,7 @@ namespace RageCoop.Client
         public static string Dump(this Dictionary<TimeStamp, long> d)
         {
             string s = "";
-            foreach(KeyValuePair<TimeStamp, long> kvp in d)
+            foreach (KeyValuePair<TimeStamp, long> kvp in d)
             {
                 s+=kvp.Key+":"+kvp.Value+"\n";
             }

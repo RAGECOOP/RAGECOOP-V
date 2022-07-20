@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA;
+﻿using GTA;
 using GTA.Math;
+using System;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace RageCoop.Client
 {
-    internal class DevTool:Script
+    internal class DevTool : Script
     {
         public static Vehicle ToMark;
-        public static bool UseSecondary=false;
+        public static bool UseSecondary = false;
         public static int Current = 0;
         public static int Secondary = 0;
         public static MuzzleDir Direction = MuzzleDir.Forward;
@@ -27,7 +23,8 @@ namespace RageCoop.Client
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (ToMark==null||(!ToMark.Exists())) { return; }
-            if (DevToolMenu.Menu.SelectedItem==DevToolMenu.boneIndexItem) {
+            if (DevToolMenu.Menu.SelectedItem==DevToolMenu.boneIndexItem)
+            {
 
                 switch (e.KeyCode)
                 {
@@ -78,7 +75,7 @@ namespace RageCoop.Client
         }
         private static void OnTick(object sender, EventArgs e)
         {
-            if(ToMark == null || !ToMark.Exists()){ return;}
+            if (ToMark == null || !ToMark.Exists()) { return; }
             Update();
             Draw(Current);
             if (UseSecondary)
@@ -170,15 +167,15 @@ namespace RageCoop.Client
                 GTA.UI.Notification.Show("Copied to clipboard, please paste it on the GitHub issue page!");
             }
         }
-        
+
     }
-    internal enum MuzzleDir:byte
+    internal enum MuzzleDir : byte
     {
-        Forward=0,
+        Forward = 0,
         Right = 1,
-        Up=2,
-        Backward=3,
+        Up = 2,
+        Backward = 3,
         Left = 4,
-        Down=5,
+        Down = 5,
     }
 }

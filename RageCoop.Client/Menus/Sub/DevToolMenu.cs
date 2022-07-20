@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GTA;
 using LemonUI.Menus;
-using GTA;
+using System;
 using System.Drawing;
 
 namespace RageCoop.Client
@@ -18,7 +14,7 @@ namespace RageCoop.Client
         };
         private static NativeCheckboxItem enableItem = new NativeCheckboxItem("Enable");
 
-        private static NativeCheckboxItem enableSecondaryItem = new NativeCheckboxItem("Secondary","Enable if this vehicle have two muzzles");
+        private static NativeCheckboxItem enableSecondaryItem = new NativeCheckboxItem("Secondary", "Enable if this vehicle have two muzzles");
         public static NativeItem boneIndexItem = new NativeItem("Current bone index");
         public static NativeItem secondaryBoneIndexItem = new NativeItem("Secondary bone index");
         public static NativeItem clipboardItem = new NativeItem("Copy to clipboard");

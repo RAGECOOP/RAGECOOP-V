@@ -1,20 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using RageCoop.Core;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
-using System.Linq;
-using System.Diagnostics;
+using GTA.Native;
+using RageCoop.Core;
+using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
     internal static partial class PedExtensions
     {
-        
+
         public static bool IsBetween<T>(this T item, T start, T end)
         {
             return Comparer<T>.Default.Compare(item, start) >= 0 && Comparer<T>.Default.Compare(item, end) <= 0;
@@ -42,7 +36,7 @@ namespace RageCoop.Client
             return true;
         }
 
-        
+
 
 
         #region PED
@@ -61,7 +55,7 @@ namespace RageCoop.Client
             {
                 return 1;
             }
-            
+
             return 0;
         }
 
@@ -135,7 +129,7 @@ namespace RageCoop.Client
                 flags |=PedDataFlags.IsInCover;
             }
 
-            if(Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped))
+            if (Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped))
             {
                 flags |= PedDataFlags.IsInStealthMode;
             }
@@ -294,7 +288,7 @@ namespace RageCoop.Client
             }
             return result;
         }
-        public static bool IsTaskActive(this Ped p,TaskType task)
+        public static bool IsTaskActive(this Ped p, TaskType task)
         {
             return Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, p.Handle, task);
         }
@@ -333,17 +327,17 @@ namespace RageCoop.Client
         {
             return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
         }
-        
+
 
         #endregion
 
 
-        
-        
 
-        
 
-        
+
+
+
+
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
             if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
@@ -392,7 +386,7 @@ namespace RageCoop.Client
         }
 
 
-        
-        
+
+
     }
 }

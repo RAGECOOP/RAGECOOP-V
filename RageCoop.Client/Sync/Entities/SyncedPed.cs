@@ -1,20 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Drawing;
-using System.Collections.Generic;
-using RageCoop.Core;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
+using GTA.Native;
 using LemonUI.Elements;
-using System.Security.Cryptography;
+using RageCoop.Core;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 
 namespace RageCoop.Client
 {
     /// <summary>
     /// ?
     /// </summary>
-    public class SyncedPed:SyncedEntity
+    public class SyncedPed : SyncedEntity
     {
         #region CONSTRUCTORS
 
@@ -49,7 +48,7 @@ namespace RageCoop.Client
         internal Blip PedBlip = null;
         internal BlipColor BlipColor = (BlipColor)255;
         internal BlipSprite BlipSprite = (BlipSprite)0;
-        internal float BlipScale=1;
+        internal float BlipScale = 1;
         internal PlayerData Player;
         #endregion
 
@@ -69,10 +68,10 @@ namespace RageCoop.Client
         internal Vector3 LeftFootPosition { get; set; }
 
         internal byte WeaponTint { get; set; }
-        internal bool _lastEnteringVehicle=false;
-        internal bool _lastSittingInVehicle=false;
-        private bool _lastRagdoll=false;
-        private ulong _lastRagdollTime=0;
+        internal bool _lastEnteringVehicle = false;
+        internal bool _lastSittingInVehicle = false;
+        private bool _lastRagdoll = false;
+        private ulong _lastRagdollTime = 0;
         private bool _lastInCover = false;
         private byte[] _lastClothes = null;
         internal byte[] Clothes { get; set; }
@@ -116,7 +115,7 @@ namespace RageCoop.Client
             }
 
 
-            
+
 
 
 
@@ -168,9 +167,9 @@ namespace RageCoop.Client
                 }
                 CheckCurrentWeapon();
             }
-            
 
-            
+
+
             if (MainPed.IsDead)
             {
                 if (Health>0)
@@ -209,7 +208,7 @@ namespace RageCoop.Client
             return;
         }
 
-        
+
         private void RenderNameTag()
         {
             if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 40f))
@@ -218,7 +217,7 @@ namespace RageCoop.Client
             }
 
             Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position;
-            Point toDraw=default;
+            Point toDraw = default;
             if (Util.WorldToScreen(targetPos, ref toDraw))
             {
                 toDraw.Y-=100;
@@ -228,7 +227,7 @@ namespace RageCoop.Client
                     Alignment = GTA.UI.Alignment.Center
                 }.Draw();
             }
-            
+
         }
 
         private bool CreateCharacter()
@@ -242,7 +241,7 @@ namespace RageCoop.Client
                     MainPed.MarkAsNoLongerNeeded();
                     MainPed.Delete();
                 }
-                
+
                 MainPed = null;
             }
 
@@ -264,7 +263,7 @@ namespace RageCoop.Client
 
             Model.MarkAsNoLongerNeeded();
 
-            
+
             MainPed.BlockPermanentEvents = true;
             MainPed.CanWrithe=false;
             MainPed.CanBeDraggedOutOfVehicle = true;
@@ -282,7 +281,7 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
 
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater,false);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_AvoidTearGas, false);
@@ -549,7 +548,7 @@ namespace RageCoop.Client
             else if (IsInCover)
             {
 
-                
+
                 if (!_lastInCover)
                 {
                     Function.Call(Hash.TASK_STAY_IN_COVER, MainPed.Handle);
@@ -617,7 +616,7 @@ namespace RageCoop.Client
                 }
                 _lastWeaponComponents = WeaponComponents;
             }
-            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX,MainPed,CurrentWeaponHash)!=WeaponTint)
+            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeaponHash)!=WeaponTint)
             {
                 Function.Call<int>(Hash.SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeaponHash, WeaponTint);
             }
@@ -627,7 +626,7 @@ namespace RageCoop.Client
         {
             if (Velocity==default)
             {
-                MainPed.Task.AimAt(AimCoords,1000);
+                MainPed.Task.AimAt(AimCoords, 1000);
             }
             else
             {

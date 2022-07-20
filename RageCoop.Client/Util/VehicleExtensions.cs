@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA;
+﻿using GTA;
 using GTA.Native;
 using RageCoop.Core;
-using GTA.Math;
+using System;
+using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
@@ -143,7 +139,7 @@ namespace RageCoop.Client
                 RightHeadLightBroken = (byte)(veh.IsRightHeadLightBroken ? 1 : 0)
             };
         }
-        
+
         public static void SetDamageModel(this Vehicle veh, VehicleDamageModel model, bool leavedoors = true)
         {
             for (int i = 0; i < 8; i++)
@@ -272,7 +268,7 @@ namespace RageCoop.Client
         {
             Function.Call(Hash.SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
         }
-        
+
         #endregion
     }
 }

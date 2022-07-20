@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using RageCoop.Core;
+﻿using RageCoop.Core;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace RageCoop.Client
 {
@@ -22,7 +22,7 @@ namespace RageCoop.Client
                 return new Packets.FileTransferResponse()
                 {
                     ID= fr.ID,
-                    Response=AddFile(fr.ID,fr.Name,fr.FileLength) ? FileResponse.NeedToDownload : FileResponse.AlreadyExists
+                    Response=AddFile(fr.ID, fr.Name, fr.FileLength) ? FileResponse.NeedToDownload : FileResponse.AlreadyExists
                 };
             });
             Networking.RequestHandlers.Add(PacketType.FileTransferComplete, (data) =>
@@ -44,10 +44,10 @@ namespace RageCoop.Client
             {
                 try
                 {
-                    Main.Resources.Load(ResourceFolder,_resources.ToArray());
+                    Main.Resources.Load(ResourceFolder, _resources.ToArray());
                     return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                     Main.Logger.Error("Error occurred when loading server resource:");
@@ -56,11 +56,13 @@ namespace RageCoop.Client
                 }
             });
         }
-        public static string ResourceFolder { 
-            get {
-                return Path.Combine(Main.Settings.DataDirectory,"Resources", Main.Settings.LastServerAddress.Replace(":", "."));
+        public static string ResourceFolder
+        {
+            get
+            {
+                return Path.Combine(Main.Settings.DataDirectory, "Resources", Main.Settings.LastServerAddress.Replace(":", "."));
             }
-        } 
+        }
         private static readonly Dictionary<int, DownloadFile> InProgressDownloads = new Dictionary<int, DownloadFile>();
         private static readonly HashSet<string> _resources = new HashSet<string>();
         public static bool AddFile(int id, string name, long length)
@@ -173,7 +175,7 @@ namespace RageCoop.Client
         }
     }
 
-    internal class DownloadFile: IDisposable
+    internal class DownloadFile : IDisposable
     {
         public int FileID { get; set; } = 0;
         public string FileName { get; set; } = string.Empty;
@@ -182,7 +184,7 @@ namespace RageCoop.Client
         public FileStream Stream { get; set; }
         public void Dispose()
         {
-            if(Stream!= null)
+            if (Stream!= null)
             {
                 Stream.Flush();
                 Stream.Close();

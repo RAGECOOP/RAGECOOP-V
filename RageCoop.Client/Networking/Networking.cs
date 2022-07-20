@@ -1,10 +1,9 @@
-﻿using System;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO;
+using System;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RageCoop.Client
 {
@@ -34,7 +33,7 @@ namespace RageCoop.Client
             });
         }
 
-        public static void ToggleConnection(string address,string username=null,string password=null)
+        public static void ToggleConnection(string address, string username = null, string password = null)
         {
             if (IsOnServer)
             {
@@ -79,12 +78,12 @@ namespace RageCoop.Client
                         Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled=false;
                         Security.Regen();
-                        if(!GetServerPublicKey(address))
+                        if (!GetServerPublicKey(address))
                         {
                             Menus.CoopMenu._serverConnectItem.Enabled=true;
                             throw new TimeoutException("Failed to retrive server's public key");
                         }
-                        
+
                         // Send HandshakePacket
                         NetOutgoingMessage outgoingMessage = Client.CreateMessage();
                         var handshake = new Packets.Handshake()
@@ -100,7 +99,7 @@ namespace RageCoop.Client
                         Client.Connect(ip[0], short.Parse(ip[1]), outgoingMessage);
 
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server: ", ex);
                         Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server: "+ex.Message));
@@ -113,7 +112,7 @@ namespace RageCoop.Client
         {
             get { return Client?.ConnectionStatus == NetConnectionStatus.Connected; }
         }
-        
+
         #region -- GET --
         #region -- PLAYER --
         private static void PlayerConnect(Packets.PlayerConnect packet)
@@ -130,7 +129,7 @@ namespace RageCoop.Client
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
-            var name=PlayerList.GetPlayer(packet.PedID).Username;
+            var name = PlayerList.GetPlayer(packet.PedID).Username;
             GTA.UI.Notification.Show($"{name} left.");
             PlayerList.RemovePlayer(packet.PedID);
             EntityPool.RemoveAllFromPlayer(packet.PedID);
@@ -140,13 +139,13 @@ namespace RageCoop.Client
 
         #endregion // -- PLAYER --
 
-        private static bool GetServerPublicKey(string address,int timeout=10000)
+        private static bool GetServerPublicKey(string address, int timeout = 10000)
         {
-            var msg=Client.CreateMessage();
-            new Packets.PublicKeyRequest().Pack(msg); 
-            var adds =address.Split(':');
-            Client.SendUnconnectedMessage(msg,adds[0],int.Parse(adds[1]));
-            return _publicKeyReceived.WaitOne(timeout); 
+            var msg = Client.CreateMessage();
+            new Packets.PublicKeyRequest().Pack(msg);
+            var adds = address.Split(':');
+            Client.SendUnconnectedMessage(msg, adds[0], int.Parse(adds[1]));
+            return _publicKeyReceived.WaitOne(timeout);
         }
         #endregion
         internal static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()

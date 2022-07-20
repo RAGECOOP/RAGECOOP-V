@@ -1,10 +1,8 @@
 ﻿using GTA;
-
-using System.Drawing;
-
 using LemonUI;
 using LemonUI.Menus;
 using LemonUI.Scaleform;
+using System.Drawing;
 
 namespace RageCoop.Client.Menus
 {
@@ -19,7 +17,7 @@ namespace RageCoop.Client.Menus
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        public static PopUp PopUp=new PopUp()
+        public static PopUp PopUp = new PopUp()
         {
             Title="",
             Prompt="",
@@ -31,15 +29,16 @@ namespace RageCoop.Client.Menus
         public static NativeMenu LastMenu { get; set; } = Menu;
         #region ITEMS
         private static readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.Settings.Username };
-        private static readonly NativeItem _passwordItem = new NativeItem("Password") { AltTitle = new string('*',Main.Settings.Password.Length) };
+        private static readonly NativeItem _passwordItem = new NativeItem("Password") { AltTitle = new string('*', Main.Settings.Password.Length) };
 
         public static readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.Settings.LastServerAddress };
         internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
         private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +
-            Main.CurrentVersion.Replace("_", ".")) { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
-        
+            Main.CurrentVersion.Replace("_", "."))
+        { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
+
 
         #endregion
 
@@ -84,7 +83,7 @@ namespace RageCoop.Client.Menus
         }
 
 
-        public static bool ShowPopUp(string prompt, string title,string subtitle,string error,bool showbackground)
+        public static bool ShowPopUp(string prompt, string title, string subtitle, string error, bool showbackground)
         {
             PopUp.Prompt=prompt;
             PopUp.Title=title;

@@ -1,8 +1,8 @@
-﻿using System.Drawing;
-using System;
-using System.Windows.Forms;
-using GTA;
+﻿using GTA;
 using LemonUI.Menus;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace RageCoop.Client.Menus
 {
@@ -22,10 +22,10 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
 
         private static readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
-        
-        private static NativeItem _menuKey = new NativeItem("Menu Key","The key to open menu", Main.Settings.MenuKey.ToString());
+
+        private static NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
-        private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).",Main.Settings.WorldVehicleSoftLimit.ToString());
+        private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
 
         /// <summary>
         /// Don't use it!
@@ -102,7 +102,7 @@ namespace RageCoop.Client.Menus
         public static void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
-            Util.SaveSettings() ;
+            Util.SaveSettings();
         }
 
         public static void FlipMenuCheckboxChanged(object a, System.EventArgs b)

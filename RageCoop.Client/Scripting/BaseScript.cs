@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
-using GTA;
-using RageCoop.Core;
+using GTA.Native;
 using RageCoop.Core.Scripting;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
 {
     internal class BaseScript : ClientScript
     {
-        private bool _isHost=false;
+        private bool _isHost = false;
         public override void OnStart()
         {
             API.Events.OnPedDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
 
-            API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn,SetAutoRespawn);
-            API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag,SetDisplayNameTag);
-            API.RegisterCustomEventHandler(CustomEvents.NativeCall,NativeCall);
+            API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn, SetAutoRespawn);
+            API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag, SetDisplayNameTag);
+            API.RegisterCustomEventHandler(CustomEvents.NativeCall, NativeCall);
             API.RegisterCustomEventHandler(CustomEvents.ServerPropSync, ServerObjectSync);
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerProp, DeleteServerProp);
             API.RegisterCustomEventHandler(CustomEvents.DeleteEntity, DeleteEntity);
@@ -66,7 +64,7 @@ namespace RageCoop.Client.Scripting
         private void SetDisplayNameTag(CustomEventReceivedArgs e)
         {
             var p = PlayerList.GetPlayer((int)e.Args[0]);
-            if(p != null) { p.DisplayNameTag=(bool)e.Args[1]; }
+            if (p != null) { p.DisplayNameTag=(bool)e.Args[1]; }
         }
 
         private void UpdatePedBlip(CustomEventReceivedArgs e)
@@ -93,7 +91,7 @@ namespace RageCoop.Client.Scripting
         {
             var vehicleModel = (Model)e.Args[1];
             vehicleModel.Request(1000);
-            Vehicle veh= World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
+            Vehicle veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
             while (veh==null)
             {
                 veh  = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
@@ -120,13 +118,13 @@ namespace RageCoop.Client.Scripting
 
         private void ServerBlipSync(CustomEventReceivedArgs obj)
         {
-            int id= (int)obj.Args[0];
-            var sprite=(BlipSprite)(ushort)obj.Args[1];
+            int id = (int)obj.Args[0];
+            var sprite = (BlipSprite)(ushort)obj.Args[1];
             var color = (BlipColor)(byte)obj.Args[2];
-            var scale=(float)obj.Args[3];
-            var pos=(Vector3)obj.Args[4];
-            int rot= (int)obj.Args[5];
-            var name=(string)obj.Args[6];
+            var scale = (float)obj.Args[3];
+            var pos = (Vector3)obj.Args[4];
+            int rot = (int)obj.Args[5];
+            var name = (string)obj.Args[6];
             Blip blip;
             if (!EntityPool.ServerBlips.TryGetValue(id, out blip))
             {
@@ -151,8 +149,8 @@ namespace RageCoop.Client.Scripting
         }
         private void SetNameTag(CustomEventReceivedArgs e)
         {
-            var p =PlayerList.GetPlayer((int)e.Args[0]);
-            if(p!= null)
+            var p = PlayerList.GetPlayer((int)e.Args[0]);
+            if (p!= null)
             {
                 p.DisplayNameTag=(bool)e.Args[1];
             }
@@ -169,7 +167,7 @@ namespace RageCoop.Client.Scripting
                 EntityPool.ServerProps.Remove(id);
                 prop?.MainProp?.Delete();
             }
-        
+
         }
         private void ServerObjectSync(CustomEventReceivedArgs e)
         {
@@ -193,10 +191,10 @@ namespace RageCoop.Client.Scripting
             List<InputArgument> arguments = new List<InputArgument>();
             int i;
             var ty = (byte)e.Args[0];
-            TypeCode returnType=(TypeCode)ty;
+            TypeCode returnType = (TypeCode)ty;
             i = returnType==TypeCode.Empty ? 1 : 2;
             var hash = (Hash)e.Args[i++];
-            for(; i<e.Args.Length;i++)
+            for (; i<e.Args.Length; i++)
             {
                 arguments.Add(GetInputArgument(e.Args[i]));
             }
@@ -300,6 +298,6 @@ namespace RageCoop.Client.Scripting
                 default:
                     return null;
             }
-        } 
+        }
     }
 }

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Drawing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ICSharpCode.SharpZipLib.Zip;
 using LemonUI.Menus;
-using System.Web;
-using System.Net;
+using System;
+using System.Drawing;
 using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace RageCoop.Client.Menus
 {
@@ -16,7 +12,7 @@ namespace RageCoop.Client.Menus
     {
         public static bool IsUpdating { get; private set; } = false;
         private static NativeItem _updatingItem = new NativeItem("Updating...");
-        private static NativeItem _downloadItem = new NativeItem("Download","Download and update to latest nightly");
+        private static NativeItem _downloadItem = new NativeItem("Download", "Download and update to latest nightly");
 
         private static string _downloadPath = Path.Combine(Main.Settings.DataDirectory, "RageCoop.Client.zip");
         public static NativeMenu Menu = new NativeMenu("Update", "Update", "Download and install latest nightly build from GitHub")
@@ -68,7 +64,7 @@ namespace RageCoop.Client.Menus
                 {
                     _updatingItem.AltTitle="Installing...";
                 });
-                new FastZip().ExtractZip(_downloadPath, "Scripts",FastZip.Overwrite.Always, null,null,null,true);
+                new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
                 Main.QueueAction(() =>
                 {
                     Util.Reload();
