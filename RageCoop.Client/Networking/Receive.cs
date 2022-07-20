@@ -119,7 +119,7 @@ namespace RageCoop.Client
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
                                             handler(message.ReadBytes(len)).Pack(response);
-                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered,(int)ConnectionChannel.RequestResponse);
+                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered,message.SequenceChannel);
                                         }
                                         break;
                                     }
