@@ -122,6 +122,11 @@ namespace RageCoop.Client
                 {
                     packet.RadioStation=Util.GetPlayerRadioIndex();
                 }
+                if (packet.EngineHealth>v.LastEngineHealth)
+                {
+                    packet.Flags |= VehicleDataFlags.Repaired;
+                }
+                v.LastEngineHealth=packet.EngineHealth;
             }
             Send(packet, ConnectionChannel.VehicleSync);
         }

@@ -308,6 +308,10 @@ namespace RageCoop.Client
                     }
                 }
                 #endregion
+                if (Flags.HasVehFlag(VehicleDataFlags.Repaired))
+                {
+                    MainVehicle.Repair();
+                }
                 if (Colors != null && Colors != _lastVehicleColors)
                 {
                     Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, Colors[0], Colors[1]);
@@ -459,6 +463,8 @@ namespace RageCoop.Client
 
         #region OUTGOING
         internal float LastNozzleAngle { get; set; }
+
+        internal float LastEngineHealth { get; set; }
         #endregion
     }
 
