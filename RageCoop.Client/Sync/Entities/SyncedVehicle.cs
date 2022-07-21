@@ -124,9 +124,15 @@ namespace RageCoop.Client
                     return;
                 }
             }
-            DisplayVehicle();
             // Skip update if no new sync message has arrived.
-            if (!NeedUpdate) { return; }
+            if (!NeedUpdate) {
+                if (Velocity.Length()<3)
+                {
+                    DisplayVehicle();
+                }
+                return; 
+            }
+            DisplayVehicle();
             #endregion
             #region -- SYNC CRITICAL --
             if (SteeringAngle != MainVehicle.SteeringAngle)
@@ -334,7 +340,7 @@ namespace RageCoop.Client
         void DisplayVehicle()
         {
             var current = MainVehicle.Position;
-            var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
+            var predicted = Position+Velocity*(SyncParameters.PositioinPredictionDefault+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
             if (current.DistanceTo(Main.PlayerPosition)>50)
             {
                 MainVehicle.Position=predicted;
