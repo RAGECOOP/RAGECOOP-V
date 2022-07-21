@@ -158,7 +158,13 @@ namespace RageCoop.Client
             {
                 if (MainVehicle.IsDead)
                 {
-                    MainVehicle.Repair();
+                    Main.Delay(() =>
+                    {
+                        if (MainVehicle.IsDead && !IsDead)
+                        {
+                            MainVehicle.Repair();
+                        }
+                    },1000);
                 }
             }
             if (MainVehicle.IsOnFire)
@@ -341,13 +347,7 @@ namespace RageCoop.Client
         {
             var current = MainVehicle.Position;
             var predicted = Position+Velocity*(SyncParameters.PositioinPredictionDefault+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
-            if (current.DistanceTo(Main.PlayerPosition)>50)
-            {
-                MainVehicle.Position=predicted;
-                MainVehicle.Velocity=Velocity;
-                MainVehicle.Quaternion=Quaternion;
-            }
-            else if (current.DistanceTo(Position)<5)
+            if (current.DistanceTo(Position)<5)
             {
                 MainVehicle.Velocity = Velocity+5*(predicted - current);
                 if (IsFlipped)

@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace RageCoop.Client
 {
@@ -391,6 +393,13 @@ namespace RageCoop.Client
             lock (QueuedActions) { QueuedActions.Clear(); }
         }
 
-
+        public static void Delay(Action a, int time)
+        {
+            Task.Run(() =>
+            {
+                Thread.Sleep(time);
+                QueueAction(a);
+            });
+        }
     }
 }
