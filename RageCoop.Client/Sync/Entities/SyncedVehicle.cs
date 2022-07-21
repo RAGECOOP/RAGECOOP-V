@@ -124,18 +124,11 @@ namespace RageCoop.Client
                     return;
                 }
             }
+            DisplayVehicle();
             // Skip update if no new sync message has arrived.
-            if (!NeedUpdate)
-            {
-                if (Velocity.Length()<3)
-                {
-                    DisplayVehicle();
-                }
-                return;
-            }
+            if (!NeedUpdate) { return; }
             #endregion
             #region -- SYNC CRITICAL --
-            DisplayVehicle();
             if (SteeringAngle != MainVehicle.SteeringAngle)
             {
                 MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * SteeringAngle);
