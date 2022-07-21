@@ -102,6 +102,7 @@ namespace RageCoop.Client
 #endif
         public static Ped P;
         public static float FPS;
+        private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
             P= Game.Player.Character;
@@ -171,6 +172,7 @@ namespace RageCoop.Client
                         P.Health=1;
                         Game.Player.WantedLevel=0;
                         Main.Logger.Debug("Player died.");
+                        Scripting.API.Events.InvokePlayerDied();
                     }
                     GTA.UI.Screen.StopEffects();
                 }
@@ -181,7 +183,11 @@ namespace RageCoop.Client
                 }
 
             }
-
+            else if (P.IsDead && !_lastDead)
+            {
+                Scripting.API.Events.InvokePlayerDied();
+            }
+            _lastDead=P.IsDead;
             Ticked++;
         }
 

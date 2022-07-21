@@ -64,7 +64,7 @@ namespace RageCoop.Server.Scripting
 					IsDirectory=false,
 					Name=relativeName
 				};
-				if (file.EndsWith(".dll") && !file.Contains('/') && IsManagedAssembly(file))
+				if (file.EndsWith(".dll") && !relativeName.Contains('/') && IsManagedAssembly(file))
 				{
                     try
                     {

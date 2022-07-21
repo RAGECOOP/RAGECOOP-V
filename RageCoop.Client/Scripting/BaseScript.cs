@@ -16,6 +16,7 @@ namespace RageCoop.Client.Scripting
         {
             API.Events.OnPedDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
             API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+            API.Events.OnPlayerDied+=() => { API.SendCustomEvent(CustomEvents.OnPlayerDied); };
 
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn, SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag, SetDisplayNameTag);
@@ -30,6 +31,7 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
             API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost=(bool)e.Args[0]; });
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
+            API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) => { GTA.UI.Notification.Show($"~h~{e.Args[0]}~h~ died."); });
             Task.Run(() =>
             {
                 while (true)

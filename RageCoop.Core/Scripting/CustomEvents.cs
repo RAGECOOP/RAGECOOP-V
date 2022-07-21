@@ -12,6 +12,7 @@ namespace RageCoop.Core.Scripting
     {
         static MD5 Hasher = MD5.Create();
         static Dictionary<int,string> Hashed=new Dictionary<int,string>();
+        internal static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
         internal static readonly int SetWeather = Hash("RageCoop.SetWeather");
         internal static readonly int OnPedDeleted = Hash("RageCoop.OnPedDeleted");
         internal static readonly int OnVehicleDeleted = Hash("RageCoop.OnVehicleDeleted");

@@ -37,6 +37,10 @@ namespace RageCoop.Server.Scripting
                     }
                 }
             });
+            API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) =>
+            {
+                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x=>x!=e.Sender).ToList(),CustomEvents.OnPlayerDied,e.Sender.Username);
+            });
         }
         public override void OnStop()
         {

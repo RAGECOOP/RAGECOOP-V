@@ -122,7 +122,7 @@ namespace RageCoop.Client
                 PedID = packet.PedID,
                 Username= packet.Username,
             };
-            GTA.UI.Notification.Show($"{p.Username} connected.");
+            GTA.UI.Notification.Show($"~h~{p.Username}~h~ connected.");
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
             Main.Logger.Debug($"player connected:{p.Username}");
@@ -130,7 +130,7 @@ namespace RageCoop.Client
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
             var name = PlayerList.GetPlayer(packet.PedID).Username;
-            GTA.UI.Notification.Show($"{name} left.");
+            GTA.UI.Notification.Show($"~h~{name}~h~ left.");
             PlayerList.RemovePlayer(packet.PedID);
             EntityPool.RemoveAllFromPlayer(packet.PedID);
 

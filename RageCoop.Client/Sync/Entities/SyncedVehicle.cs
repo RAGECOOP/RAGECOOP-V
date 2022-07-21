@@ -125,12 +125,13 @@ namespace RageCoop.Client
                 }
             }
             // Skip update if no new sync message has arrived.
-            if (!NeedUpdate) {
+            if (!NeedUpdate)
+            {
                 if (Velocity.Length()<3)
                 {
                     DisplayVehicle();
                 }
-                return; 
+                return;
             }
             #endregion
             #region -- SYNC CRITICAL --
