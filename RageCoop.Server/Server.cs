@@ -221,6 +221,7 @@ namespace RageCoop.Server
             Resources.LoadAll();
             _listenerThread=new Thread(() => Listen());
             _listenerThread.Start();
+            Logger?.Info("Listening for clients");
         }
         /// <summary>
         /// Terminate threads and stop the server
@@ -239,7 +240,6 @@ namespace RageCoop.Server
         private void Listen()
         {
             NetIncomingMessage msg=null;
-            Logger?.Info("Listening for clients");
             while (!_stopping)
             {
                 try
@@ -481,7 +481,7 @@ namespace RageCoop.Server
                             packet.Unpack(data);
 
                             _worker.QueueJob(() => API.Events.InvokeOnChatMessage(packet, sender));
-                            SendChatMessage(packet, sender);
+                            ChatMessageReceived(packet.Username,packet.Message, sender);
                         }
                         break;
                     case PacketType.CustomEvent:
@@ -666,7 +666,7 @@ namespace RageCoop.Server
 
             if (!string.IsNullOrEmpty(Settings.WelcomeMessage))
             {
-                SendChatMessage(new Packets.ChatMessage() { Username = "Server", Message = Settings.WelcomeMessage }, null,new List<NetConnection>() { newClient.Connection });
+                ChatMessageReceived("Server",Settings.WelcomeMessage , null);
             }
         }
 
@@ -773,35 +773,44 @@ namespace RageCoop.Server
 
         #endregion
         // Send a message to targets or all players
-        private void SendChatMessage(Packets.ChatMessage packet,Client sender=null, List<NetConnection> targets = null)
+        internal void ChatMessageReceived(string name, string message,Client sender=null)
         {
-            if (packet.Message.StartsWith('/'))
+            if (message.StartsWith('/'))
             {
-                string[] cmdArgs = packet.Message.Split(" ");
+                string[] cmdArgs = message.Split(" ");
                 string cmdName = cmdArgs[0].Remove(0, 1);
                 _worker.QueueJob(()=>API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender));
-                
-
                 return;
             }
-            packet.Message = packet.Message.Replace("~", "");
-            SendChatMessage(packet.Username, packet.Message, targets);
+            message = message.Replace("~", "");
 
-            Logger?.Info(packet.Username + ": " + packet.Message);
+            var msg=MainNetServer.CreateMessage();
+            new Packets.ChatMessage()
+            {
+                Username=name,
+                Message=message
+            }.Pack(msg);
+
+            if (sender==null)
+            {
+                // Sent by server
+                MainNetServer.SendToAll(msg,NetDeliveryMethod.ReliableOrdered,(int)ConnectionChannel.Chat);
+            }
+            else
+            {
+                MainNetServer.SendToAll(msg,sender.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+            }
+            Logger?.Info(name + ": " + message);
         }
-
-        internal void SendChatMessage(string username, string message, List<NetConnection> targets = null)
+        internal void SendChatMessage(string name, string message, Client target)
         {
-            if (MainNetServer.Connections.Count==0) { return; }
-            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-
-            new Packets.ChatMessage() { Username = username, Message = message }.Pack(outgoingMessage);
-            
-            MainNetServer.SendMessage(outgoingMessage, targets ?? MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
-        }
-        internal void SendChatMessage(string username, string message, NetConnection target)
-        {
-            SendChatMessage(username, message, new List<NetConnection>() { target });
+            var msg = MainNetServer.CreateMessage();
+            new Packets.ChatMessage()
+            {
+                Username= name,
+                Message=message,
+            }.Pack(msg);
+            MainNetServer.SendMessage(msg, target.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
         }
         #endregion
 

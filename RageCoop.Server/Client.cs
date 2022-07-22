@@ -134,13 +134,7 @@ namespace RageCoop.Server
         {
             try
             {
-                NetConnection userConnection = Server.MainNetServer.Connections.Find(x => x.RemoteUniqueIdentifier == NetID);
-                if (userConnection == null)
-                {
-                    return;
-                }
-
-                Server.SendChatMessage(from, message, userConnection);
+                Server.SendChatMessage(from, message, this);
             }
             catch (Exception e)
             {

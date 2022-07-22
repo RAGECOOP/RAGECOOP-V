@@ -39,6 +39,7 @@ namespace RageCoop.Server
                             mainLogger.Info("Server stopped.");
                             mainLogger.Dispose();
                             Thread.Sleep(3000);
+                            Environment.Exit(0);
                         }
                         else
                         {
@@ -49,6 +50,15 @@ namespace RageCoop.Server
                 };
                 server.Start();
                 mainLogger?.Info("Please use CTRL + C if you want to stop the server!");
+                while (true)
+                {
+                    mainLogger?.Info("Type here to send chat message: ");
+                    var s=Console.ReadLine();
+                    if (!Stopping && s!=null)
+                    {
+                        server.ChatMessageReceived("Server", s, null);
+                    }
+                }
             }
             catch (Exception e)
             {

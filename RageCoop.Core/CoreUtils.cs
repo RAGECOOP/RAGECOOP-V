@@ -111,13 +111,6 @@ namespace RageCoop.Core
             bytes.AddInt(toadd.Length);
             bytes.AddRange(toadd);
         }
-
-        public static int GetHash(string s)
-        {
-            MD5 md5Hasher = MD5.Create();
-            var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(s));
-            return BitConverter.ToInt32(hashed, 0);
-        }
         public static byte[] GetBytes(this string s)
         {
             return Encoding.UTF8.GetBytes(s);
@@ -282,6 +275,23 @@ namespace RageCoop.Core
                 if (t.FullName == baseTypeName)
                     return true;
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Some extension methods provided by RageCoop
+    /// </summary>
+    public static class PublicExtensions
+    {
+        /// <summary>
+        /// Get a hex-encoded string of the input string hashed by SHA256 algorithmn, internally used to hash password at client side.
+        /// </summary>
+        /// <param name="inputString"></param>
+        /// <returns></returns>
+        public static byte[] GetSHA256Hash(this string inputString)
+        {
+            using (HashAlgorithm algorithm = SHA256.Create())
+                return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         }
     }
 }

@@ -230,11 +230,6 @@ namespace RageCoop.Client
         {
             Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
         }
-        public static byte[] GetHash(this string inputString)
-        {
-            using (HashAlgorithm algorithm = SHA256.Create())
-                return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-        }
 
         #region WIN32
 

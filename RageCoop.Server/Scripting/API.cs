@@ -95,7 +95,7 @@ namespace RageCoop.Server.Scripting
             else
             {
 
-                Server.SendChatMessage("Server", "Command not found!", sender.Connection);
+                Server.SendChatMessage("Server", "Command not found!", sender);
             }
         }
 
@@ -211,7 +211,7 @@ namespace RageCoop.Server.Scripting
                 targets ??= new(Server.Clients.Values);
                 foreach(Client client in targets)
                 {
-                    Server.SendChatMessage(username, message, client.Connection);
+                    Server.SendChatMessage(username, message, client);
                 }
             }
             catch (Exception e)
