@@ -51,7 +51,7 @@ namespace RageCoop.Client
             }
             else
             {
-                packet.Position = p.Position;
+                packet.Position = p.ReadPosition();
             }
             if (full)
             {

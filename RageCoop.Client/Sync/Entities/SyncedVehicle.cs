@@ -349,7 +349,7 @@ namespace RageCoop.Client
         }
         void DisplayVehicle()
         {
-            var current = MainVehicle.Position;
+            var current = MainVehicle.ReadPosition();
             var predicted = Position+Velocity*(SyncParameters.PositioinPredictionDefault+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
             if (current.DistanceTo(Position)<5)
             {

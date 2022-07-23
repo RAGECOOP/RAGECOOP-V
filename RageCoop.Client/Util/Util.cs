@@ -173,7 +173,7 @@ namespace RageCoop.Client
 
         public static Vector3 PredictPosition(this Entity e, bool applyDefault = true)
         {
-            return e.Position+e.Velocity*((applyDefault ? SyncParameters.PositioinPredictionDefault : 0)+Networking.Latency);
+            return e.ReadPosition()+e.Velocity*((applyDefault ? SyncParameters.PositioinPredictionDefault : 0)+Networking.Latency);
         }
 
         public static Vehicle CreateVehicle(Model model, Vector3 position, float heading = 0f)

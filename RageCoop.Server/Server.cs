@@ -563,7 +563,7 @@ namespace RageCoop.Server
             try
             {
                 Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted,packet.AesIVCrypted);
-                passhash=BitConverter.ToString(Security.Decrypt(packet.PassHashEncrypted, connection.RemoteEndPoint)).Replace("-", String.Empty);
+                passhash=Security.Decrypt(packet.PassHashEncrypted, connection.RemoteEndPoint).ToHexString();
             }
             catch (Exception ex)
             {

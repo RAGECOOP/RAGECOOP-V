@@ -284,7 +284,7 @@ namespace RageCoop.Core
     public static class PublicExtensions
     {
         /// <summary>
-        /// Get a hex-encoded string of the input string hashed by SHA256 algorithmn, internally used to hash password at client side.
+        /// Get a SHA256 hashed byte array of the input string, internally used to hash password at client side.
         /// </summary>
         /// <param name="inputString"></param>
         /// <returns></returns>
@@ -292,6 +292,16 @@ namespace RageCoop.Core
         {
             using (HashAlgorithm algorithm = SHA256.Create())
                 return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        }
+
+        /// <summary>
+        /// Convert a byte array to hex-encoded string, internally used to trigger handshake event
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ToHexString(this byte[] data)
+        {
+            return BitConverter.ToString(data).Replace("-", String.Empty);
         }
     }
 }

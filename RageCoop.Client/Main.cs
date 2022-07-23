@@ -108,8 +108,9 @@ namespace RageCoop.Client
         private void OnTick(object sender, EventArgs e)
         {
             P= Game.Player.Character;
+            PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
-            PlayerPosition=P.Position;
+            PlayerPosition=P.ReadPosition();
             if (Game.IsLoading)
             {
                 return;
@@ -258,7 +259,7 @@ namespace RageCoop.Client
                     }
                     else
                     {
-                        var V = World.GetClosestVehicle(P.Position, 50);
+                        var V = World.GetClosestVehicle(P.ReadPosition(), 50);
 
                         if (V!=null)
                         {

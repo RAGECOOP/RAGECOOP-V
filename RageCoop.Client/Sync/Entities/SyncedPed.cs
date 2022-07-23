@@ -211,7 +211,7 @@ namespace RageCoop.Client
 
         private void RenderNameTag()
         {
-            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Game.Player.Character.Position, 40f))
+            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Main.PlayerPosition, 40f))
             {
                 return;
             }
@@ -343,7 +343,7 @@ namespace RageCoop.Client
         {
             if (IsInParachuteFreeFall)
             {
-                MainPed.PositionNoOffset = Vector3.Lerp(MainPed.Position, Position + Velocity, 0.5f);
+                MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
                 MainPed.Quaternion = Rotation.ToQuaternion();
 
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@base", "free_idle", 3))
@@ -361,7 +361,7 @@ namespace RageCoop.Client
                     model.Request(1000);
                     if (model != null)
                     {
-                        ParachuteProp = World.CreateProp(model, MainPed.Position, MainPed.Rotation, false, false);
+                        ParachuteProp = World.CreateProp(model, MainPed.ReadPosition(), MainPed.Rotation, false, false);
                         model.MarkAsNoLongerNeeded();
                         ParachuteProp.IsPositionFrozen = true;
                         ParachuteProp.IsCollisionEnabled = false;
@@ -372,7 +372,7 @@ namespace RageCoop.Client
                     MainPed.Task.ClearSecondary();
                 }
 
-                MainPed.PositionNoOffset = Vector3.Lerp(MainPed.Position, Position + Velocity, 0.5f);
+                MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
                 MainPed.Quaternion = Rotation.ToQuaternion();
 
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@parachute@first_person", "chute_idle_right", 3))
@@ -643,8 +643,8 @@ namespace RageCoop.Client
         private void WalkTo()
         {
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
-            Vector3 predictPosition = Position + (Position - MainPed.Position) + Velocity * 0.5f;
-            float range = predictPosition.DistanceToSquared(MainPed.Position);
+            Vector3 predictPosition = Position + (Position - MainPed.ReadPosition()) + Velocity * 0.5f;
+            float range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
 
             switch (Speed)
             {
@@ -693,7 +693,7 @@ namespace RageCoop.Client
         private void SmoothTransition()
         {
             var localRagdoll = MainPed.IsRagdoll;
-            var dist = Position.DistanceTo(MainPed.Position);
+            var dist = Position.DistanceTo(MainPed.ReadPosition());
             if (dist>3)
             {
                 MainPed.PositionNoOffset=Position;
@@ -704,7 +704,7 @@ namespace RageCoop.Client
             if (!(localRagdoll|| MainPed.IsDead))
             {
                 MainPed.Heading=Heading;
-                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.Position);
+                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
             }
             else if (Main.Ticked-_lastRagdollTime<30)
             {
@@ -739,7 +739,7 @@ namespace RageCoop.Client
             }
             else
             {
-                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.Position);
+                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
             }
             // MainPed.ApplyForce(f);
         }
