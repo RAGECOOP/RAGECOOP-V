@@ -98,6 +98,10 @@ namespace RageCoop.Core
         {
             return radian*(float)(180/Math.PI);
         }
+        public static Vector3 ToEulerDegrees(this Quaternion q)
+        {
+            return q.ToEulerAngles().ToDegree();
+        }
         public static Vector3 ToEulerAngles(this Quaternion q)
         {
             Vector3 angles = new Vector3();

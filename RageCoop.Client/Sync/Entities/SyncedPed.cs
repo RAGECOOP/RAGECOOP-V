@@ -361,7 +361,7 @@ namespace RageCoop.Client
                     model.Request(1000);
                     if (model != null)
                     {
-                        ParachuteProp = World.CreateProp(model, MainPed.ReadPosition(), MainPed.Rotation, false, false);
+                        ParachuteProp = World.CreateProp(model, MainPed.ReadPosition(), MainPed.ReadRotation(), false, false);
                         model.MarkAsNoLongerNeeded();
                         ParachuteProp.IsPositionFrozen = true;
                         ParachuteProp.IsCollisionEnabled = false;

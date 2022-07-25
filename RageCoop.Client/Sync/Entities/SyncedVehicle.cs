@@ -356,7 +356,7 @@ namespace RageCoop.Client
                 MainVehicle.Velocity = Velocity+5*(predicted - current);
                 if (IsFlipped)
                 {
-                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.Quaternion, Quaternion, 0.5f);
+                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
                     MainVehicle.RotationVelocity=RotationVelocity;
                 }
                 else
@@ -383,7 +383,7 @@ namespace RageCoop.Client
         private Vector3 GetCalibrationRotation()
         {
             var rot = Quaternion.LookRotation(Quaternion*Vector3.RelativeFront, Quaternion*Vector3.RelativeTop).ToEulerAngles();
-            var curRot = Quaternion.LookRotation(MainVehicle.Quaternion*Vector3.RelativeFront, MainVehicle.Quaternion*Vector3.RelativeTop).ToEulerAngles();
+            var curRot = Quaternion.LookRotation(MainVehicle.ReadQuaternion()*Vector3.RelativeFront, MainVehicle.ReadQuaternion()*Vector3.RelativeTop).ToEulerAngles();
 
             var r = (rot-curRot).ToDegree();
             if (r.X>180) { r.X=r.X-360; }
