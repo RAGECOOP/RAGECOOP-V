@@ -49,6 +49,7 @@ namespace RageCoop.Client
 #endif
                             break;
                         case NetConnectionStatus.Connected:
+                            Memory.ApplyPatches();
                             Main.QueueAction(() =>
                             {
                                 CoopMenu.ConnectedMenuSetting();
@@ -60,6 +61,7 @@ namespace RageCoop.Client
                             Main.Logger.Info(">> Connected <<");
                             break;
                         case NetConnectionStatus.Disconnected:
+                            Memory.RestorePatches();
                             DownloadManager.Cleanup();
 
                             // Reset all values
