@@ -255,7 +255,6 @@
   </Target>
   <Import Project="..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>cd /d $(OutDir)
-copy ..\Core\RageCoop.Core.dll %25cd%25 /y</PostBuildEvent>
+    <PostBuildEvent>cd /d $(ProjectDir) && copy ..\bin\$(Configuration)\Core\RageCoop.Core.dll  ..\bin\$(Configuration)\Client\RageCoop.Core.dll /y</PostBuildEvent>
   </PropertyGroup>
 </Project>
