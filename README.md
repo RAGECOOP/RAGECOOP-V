@@ -10,7 +10,7 @@
 # 🧠 That's it
 RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP or just drive around with your buddy.
 
-_Old name: GTACOOP:R_
+
 
 # 📋 Requirements
 - Visual Studio 2022
