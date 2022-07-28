@@ -783,7 +783,7 @@ namespace RageCoop.Server
             }
             message = message.Replace("~", "");
  
-            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(packet, sender));
+            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(message, sender));
                             
             var msg=MainNetServer.CreateMessage();
             new Packets.ChatMessage()
