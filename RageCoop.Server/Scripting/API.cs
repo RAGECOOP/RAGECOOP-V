@@ -99,12 +99,12 @@ namespace RageCoop.Server.Scripting
             }
         }
 
-        internal void InvokeOnChatMessage(Packets.ChatMessage p, Client sender)
+        internal void InvokeOnChatMessage(string msg, Client sender)
         {
             OnChatMessage?.Invoke(this, new ChatEventArgs()
             {
                 Sender=sender,
-                Message=p.Message
+                Message=msg
             });
         }
         internal void InvokePlayerConnected(Client client)
