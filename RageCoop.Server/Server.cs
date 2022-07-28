@@ -480,7 +480,6 @@ namespace RageCoop.Server
                             Packets.ChatMessage packet = new();
                             packet.Unpack(data);
 
-                            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(packet, sender));
                             ChatMessageReceived(packet.Username,packet.Message, sender);
                         }
                         break;
@@ -783,7 +782,9 @@ namespace RageCoop.Server
                 return;
             }
             message = message.Replace("~", "");
-
+ 
+            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(packet, sender));
+                            
             var msg=MainNetServer.CreateMessage();
             new Packets.ChatMessage()
             {
