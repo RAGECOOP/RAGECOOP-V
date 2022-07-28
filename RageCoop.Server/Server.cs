@@ -791,15 +791,8 @@ namespace RageCoop.Server
                 Message=message
             }.Pack(msg);
 
-            if (sender==null)
-            {
-                // Sent by server
-                MainNetServer.SendToAll(msg,NetDeliveryMethod.ReliableOrdered,(int)ConnectionChannel.Chat);
-            }
-            else
-            {
-                MainNetServer.SendToAll(msg,sender.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
-            }
+            MainNetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+
             Logger?.Info(name + ": " + message);
         }
         internal void SendChatMessage(string name, string message, Client target)
