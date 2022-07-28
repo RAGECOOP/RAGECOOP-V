@@ -60,17 +60,6 @@ namespace RageCoop.Client
                 _steeringAngleOffset = *(int*)(address + 6) + 8;
             }
 
-            // breaks some stuff.
-            /*
-            address = Game.FindPattern("\x32\xc0\xf3\x0f\x11\x09", "xxxxxx"); // Weapon / Radio slowdown
-            if (address != IntPtr.Zero)
-            {
-                for (int i = 0; i < 6; i++)
-                {
-                    *(byte*)(address + i).ToPointer() = 0x90;
-                }
-            }
-            */
         }
 
         public static unsafe void CustomSteeringAngle(this Vehicle veh, float value)
