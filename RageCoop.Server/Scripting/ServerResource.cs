@@ -54,6 +54,7 @@ namespace RageCoop.Server.Scripting
 					Name=dir.Substring(resDir.Length+1).Replace('\\','/')
 				});;
 			}
+			var assemblies=new Dictionary<ResourceFile,Assembly>();
 			foreach (var file in Directory.GetFiles(resDir, "*", SearchOption.AllDirectories))
 			{
 				if (ToIgnore.Contains(Path.GetFileName(file))) { try { File.Delete(file); } catch { } continue; }
@@ -66,20 +67,24 @@ namespace RageCoop.Server.Scripting
 				};
 				if (file.EndsWith(".dll") && !relativeName.Contains('/') && IsManagedAssembly(file))
 				{
-                    try
-                    {
-						r.LoadScriptsFromAssembly(rfile, r.LoadAssemblyFromPath(Path.GetFullPath(file)));
-					}
-					catch(FileLoadException ex)
-                    {
-						if(!ex.Message.EndsWith("Assembly with same name is already loaded"))
-                        {
-							logger?.Warning("Failed to load assembly: "+Path.GetFileName(file));
-							logger?.Trace(ex.Message);
-                        }
-                    }
+					assemblies.Add(rfile, r.LoadAssemblyFromPath(Path.GetFullPath(file)));
 				}
 				r.Files.Add(relativeName, rfile);
+			}
+			foreach(var a in assemblies)
+            {
+				try
+				{
+					r.LoadScriptsFromAssembly(a.Key,a.Value);
+				}
+				catch (FileLoadException ex)
+				{
+					if (!ex.Message.EndsWith("Assembly with same name is already loaded"))
+					{
+						logger?.Warning("Failed to load assembly: "+a.Key.Name);
+						logger?.Trace(ex.Message);
+					}
+				}
 			}
 			return r;
 		}
