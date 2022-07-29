@@ -41,7 +41,7 @@ namespace RageCoop.Server.Scripting
 				r.Dispose();
 				throw new FileNotFoundException($"Main assembly for resource \"{r.Name}\" cannot be found.");
 			}
-			r.Scripts = new List<ServerScript>();
+			r.Scripts = new();
 			r.DataFolder=Path.Combine(dataFolder, r.Name);
 			r.Reloaded+=(s, e) => { r.Logger?.Info($"Resource: {r.Name} has been reloaded"); };
 
@@ -105,7 +105,7 @@ namespace RageCoop.Server.Scripting
 		/// <summary>
 		/// Get all <see cref="ServerScript"/> instance in this resource
 		/// </summary>
-		public List<ServerScript> Scripts { get; internal set; } = new List<ServerScript>();
+		public Dictionary<string,ServerScript> Scripts { get; internal set; } = new();
 		/// <summary>
 		/// Get all <see cref="ResourceFile"/> that can be used to acces files in this resource
 		/// </summary>
@@ -132,7 +132,7 @@ namespace RageCoop.Server.Scripting
 							var script = constructor.Invoke(null) as ServerScript;
 							script.CurrentResource = this;
 							script.CurrentFile=rfile;
-							Scripts.Add(script);
+							Scripts.Add(script.GetType().FullName,script);
 							count++;
 						}
 						catch (Exception ex)

@@ -48,7 +48,7 @@ namespace RageCoop.Server
         internal Client _hostClient;
 
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
-        private Resources Resources;
+        internal Resources Resources;
         internal Logger Logger;
         private Security Security;
         private System.Timers.Timer _sendInfoTimer = new System.Timers.Timer(5000);

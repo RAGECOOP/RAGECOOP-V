@@ -13,9 +13,10 @@ namespace RageCoop.Server.Scripting
 {
 	internal class Resources
 	{
-		private Dictionary<string,ServerResource> LoadedResources=new();
+		public Dictionary<string,ServerResource> LoadedResources=new();
 		private readonly Server Server;
 		private readonly Logger Logger;
+		public bool IsLoaded { get; private set; } = false;
 		public Resources(Server server)
 		{
 			Server = server;
@@ -110,7 +111,7 @@ namespace RageCoop.Server.Scripting
 							Logger?.Warning($"Resource \"{name}\" has already been loaded, ignoring...");
 							continue;
 						}
-						Logger?.Info($"Loading resource: name");
+						Logger?.Info($"Loading resource: "+name);
 						var r = ServerResource.LoadFromZip(resource, Path.Combine("Resources", "Temp", "Server"), dataFolder, Logger);
 						LoadedResources.Add(r.Name, r);
 					}
@@ -126,7 +127,7 @@ namespace RageCoop.Server.Scripting
 				{
 					foreach (var r in LoadedResources.Values)
 					{
-						foreach (ServerScript s in r.Scripts)
+						foreach (ServerScript s in r.Scripts.Values)
 						{
 							s.API=Server.API;
 							try
@@ -138,6 +139,7 @@ namespace RageCoop.Server.Scripting
 						}
 					}
 				}
+				IsLoaded=true;
 			}
 		}
 
@@ -147,7 +149,7 @@ namespace RageCoop.Server.Scripting
 			{
 				foreach (var d in LoadedResources.Values)
 				{
-					foreach (var s in d.Scripts)
+					foreach (var s in d.Scripts.Values)
 					{
                         try
                         {

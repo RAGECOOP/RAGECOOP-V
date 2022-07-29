@@ -375,6 +375,43 @@ namespace RageCoop.Server.Scripting
         {
             RegisterCustomEventHandler(CustomEvents.Hash(name), handler);
         }
+
+
+        /// <summary>
+        /// Find a script matching the specified type
+        /// </summary>
+        /// <typeparam name="T">Type of the script to search for</typeparam>
+        /// <param name="resourceName">Which resource to search for this script. Will search in all loaded resources if unspecified </param>
+        /// <returns></returns>
+        public dynamic FindScript<T>(string resourceName=null) where T : ServerScript
+        {
+            if (resourceName==null)
+            {
+                foreach(var res in LoadedResources.Values)
+                {
+                    if (res.Scripts.TryGetValue(typeof(T).FullName, out var script))
+                    {
+                        return script;
+                    }
+                }
+            }
+            else if (LoadedResources.TryGetValue(resourceName, out var res))
+            {
+                Logger?.Debug("Found matching resource:"+resourceName);
+                Logger.Debug(typeof(T).FullName);
+                if(res.Scripts.TryGetValue(typeof(T).FullName, out var script))
+                {
+                    return script;
+                }    
+            }
+            return null;
+        }
+
+        #endregion
+
+
+        #region PROPERTIES
+
         /// <summary>
         /// Get a <see cref="Core.Logger"/> that the server is currently using, you should use <see cref="ServerResource.Logger"/> to display resource-specific information.
         /// </summary>
@@ -394,6 +431,25 @@ namespace RageCoop.Server.Scripting
                     value.SendCustomEvent(CustomEvents.IsHost, true);
                     Server._hostClient = value; 
                 } 
+            }
+        }
+
+        /// <summary>
+        /// Get all currently loaded <see cref="ServerResource"/> as a dictionary indexed by their names
+        /// </summary>
+        /// <remarks>Accessing this property from script constructor is stronly discouraged since other scripts and resources might have yet been loaded.
+        /// Accessing from <see cref="ServerScript.OnStart"/> is not recommended either. Although all script assemblies will have been loaded to memory and instantiated, <see cref="ServerScript.OnStart"/> invocation of other scripts are not guaranteed.
+        /// </remarks>
+        public Dictionary<string,ServerResource> LoadedResources
+        {
+            get
+            {
+                if (!Server.Resources.IsLoaded)
+                {
+                    Logger?.Warning("Attempting to get resources before all scripts are loaded");
+                    Logger.Trace(new System.Diagnostics.StackTrace().ToString());
+                }
+                return Server.Resources.LoadedResources;
             }
         }
         #endregion
