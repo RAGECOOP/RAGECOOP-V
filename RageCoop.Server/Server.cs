@@ -665,7 +665,7 @@ namespace RageCoop.Server
 
             if (!string.IsNullOrEmpty(Settings.WelcomeMessage))
             {
-                ChatMessageReceived("Server",Settings.WelcomeMessage , null);
+                SendChatMessage("Server",Settings.WelcomeMessage , newClient);
             }
         }
 
