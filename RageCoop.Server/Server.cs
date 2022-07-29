@@ -771,7 +771,7 @@ namespace RageCoop.Server
                     Username=name,
                     Message=message
                 }.Pack(msg); 
-                MainNetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                MainNetServer.SendMessage(msg,c.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
             }
 
             Logger?.Info(name + ": " + message);
