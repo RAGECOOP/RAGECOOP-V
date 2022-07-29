@@ -1,7 +1,7 @@
 ﻿using Lidgren.Network;
 using RageCoop.Core;
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,10 +13,17 @@ namespace RageCoop.Client
         public static NetClient Client;
         public static float Latency = 0;
         public static bool ShowNetworkInfo = false;
-        public static Security Security;
+        public static Security Security; 
+        private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
+        internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
+
         static Networking()
         {
             Security=new Security(Main.Logger);
+            RequestHandlers.Add(PacketType.PingPong, (b) =>
+            {
+                return new Packets.PingPong();
+            });
             Task.Run(() =>
             {
                 while (true)

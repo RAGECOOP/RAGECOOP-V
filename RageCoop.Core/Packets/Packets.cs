@@ -17,12 +17,8 @@ namespace RageCoop.Core
         PublicKeyResponse=5,
         Request=6,
         Response=7,
-        
-        ChatMessage=10,
-        // NativeCall=11,
-        // NativeResponse=12,
-        // Mod=13,
-        // CleanUpWorld=14,
+        PingPong = 8,
+        ChatMessage =10,
        
         FileTransferChunk=11,
         FileTransferRequest=12,

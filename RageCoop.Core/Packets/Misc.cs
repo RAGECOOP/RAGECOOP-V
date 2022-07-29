@@ -12,9 +12,9 @@ namespace RageCoop.Core
             public override void Pack(NetOutgoingMessage message)
             {
                 #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.ChatMessage);
-                message.Write(0);
-
+                message.Write((byte)PacketType.PingPong);
+                message.Write(1);
+                message.Write((byte)0);
                 #endregion
             }
 

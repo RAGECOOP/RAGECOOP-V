@@ -85,7 +85,7 @@ namespace RageCoop.Server
             {
                 while (!_stopping)
                 {
-                    foreach(var c in Clients.Values)
+                    foreach(var c in Clients.Values.ToArray())
                     {
                         c.UpdateLatency();
                     }

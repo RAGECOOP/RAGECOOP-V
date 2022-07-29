@@ -28,8 +28,6 @@ namespace RageCoop.Client
                }
            };
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
-        private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
-        internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if (message == null) { return; }
@@ -111,7 +109,6 @@ namespace RageCoop.Client
                                         int id = message.ReadInt32();
                                         var realType = (PacketType)message.ReadByte();
                                         int len = message.ReadInt32();
-                                        Main.Logger.Debug($"{id},{realType},{len}");
                                         if (RequestHandlers.TryGetValue(realType, out var handler))
                                         {
                                             var response = Client.CreateMessage();
@@ -119,6 +116,7 @@ namespace RageCoop.Client
                                             response.Write(id);
                                             handler(message.ReadBytes(len)).Pack(response);
                                             Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
+                                            Client.FlushSendQueue();
                                         }
                                         break;
                                     }

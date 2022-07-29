@@ -56,7 +56,6 @@
     <Compile Include="Sync\Entities\SyncedVehicle.cs" />
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
-    <Compile Include="Sync\SyncParameters.cs" />
     <Compile Include="Util\Memory.cs" />
     <Compile Include="Util\NativeCaller.cs" />
     <Compile Include="Util\PedConfigFlags.cs" />
