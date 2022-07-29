@@ -29,7 +29,7 @@ namespace RageCoop.Core
             /// <summary>
             /// The password hash with client Aes
             /// </summary>
-            public byte[] PassHashEncrypted { get; set; }
+            public byte[] PasswordEncrypted { get; set; }
 
             public override void Pack(NetOutgoingMessage message)
             {
@@ -59,7 +59,7 @@ namespace RageCoop.Core
 
 
                 // Write PassHash
-                byteArray.AddArray(PassHashEncrypted);
+                byteArray.AddArray(PasswordEncrypted);
 
                 byte[] result = byteArray.ToArray();
 
@@ -87,7 +87,7 @@ namespace RageCoop.Core
                 AesIVCrypted=reader.ReadByteArray();
 
 
-                PassHashEncrypted=reader.ReadByteArray();
+                PasswordEncrypted=reader.ReadByteArray();
                 #endregion
             }
         }

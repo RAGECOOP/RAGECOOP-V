@@ -91,7 +91,7 @@ namespace RageCoop.Client
                             PedID =  Main.LocalPlayerID,
                             Username =username,
                             ModVersion = Main.CurrentVersion,
-                            PassHashEncrypted=Security.Encrypt(password.GetSHA256Hash())
+                            PasswordEncrypted=Security.Encrypt(password.GetBytes())
                         };
 
                         Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted, out handshake.AesIVCrypted);
