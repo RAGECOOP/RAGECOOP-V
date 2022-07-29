@@ -1,6 +1,7 @@
 ﻿using Lidgren.Network;
 using RageCoop.Core;
 using System;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,7 +49,6 @@ namespace RageCoop.Client
                     AutoFlushSendQueue = false
                 };
 
-                config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
 
@@ -66,6 +66,7 @@ namespace RageCoop.Client
                     throw new Exception("Malformed URL");
                 }
 
+                PlayerList.Cleanup();
                 EntityPool.AddPlayer();
                 Task.Run(() =>
                 {
@@ -112,7 +113,6 @@ namespace RageCoop.Client
             get { return Client?.ConnectionStatus == NetConnectionStatus.Connected; }
         }
 
-        #region -- GET --
         #region -- PLAYER --
         private static void PlayerConnect(Packets.PlayerConnect packet)
         {
@@ -137,6 +137,7 @@ namespace RageCoop.Client
         }
 
         #endregion // -- PLAYER --
+        #region -- GET --
 
         private static bool GetServerPublicKey(string address, int timeout = 10000)
         {
@@ -146,8 +147,8 @@ namespace RageCoop.Client
             Client.SendUnconnectedMessage(msg, adds[0], int.Parse(adds[1]));
             return _publicKeyReceived.WaitOne(timeout);
         }
-        #endregion
-        internal static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()
+
+        public static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()
         {
             var received = new AutoResetEvent(false);
             var id = NewRequestID();
@@ -163,6 +164,8 @@ namespace RageCoop.Client
             request.Pack(msg);
             Client.SendMessage(msg, NetDeliveryMethod.ReliableOrdered, (int)channel);
         }
+
+        #endregion
         private static int NewRequestID()
         {
             int ID = 0;

@@ -54,7 +54,6 @@ namespace RageCoop.Client
                             {
                                 CoopMenu.ConnectedMenuSetting();
                                 Main.MainChat.Init();
-                                PlayerList.Cleanup();
                                 GTA.UI.Notification.Show("~g~Connected!");
                             });
 
@@ -63,9 +62,6 @@ namespace RageCoop.Client
                         case NetConnectionStatus.Disconnected:
                             Memory.RestorePatches();
                             DownloadManager.Cleanup();
-
-                            // Reset all values
-                            Latency = 0;
 
                             Main.QueueAction(() => Main.CleanUpWorld());
 
@@ -148,9 +144,6 @@ namespace RageCoop.Client
                         }
                         break;
                     }
-                case NetIncomingMessageType.ConnectionLatencyUpdated:
-                    Latency = message.ReadFloat();
-                    break;
                 case NetIncomingMessageType.UnconnectedData:
                     {
                         var packetType = (PacketType)message.ReadByte();

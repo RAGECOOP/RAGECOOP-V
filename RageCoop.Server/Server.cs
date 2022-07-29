@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Net;
 using System.Linq;
@@ -51,10 +52,10 @@ namespace RageCoop.Server
         internal Resources Resources;
         internal Logger Logger;
         private Security Security;
-        private System.Timers.Timer _sendInfoTimer = new System.Timers.Timer(5000);
         private bool _stopping = false;
         private Thread _listenerThread;
         private Thread _announceThread;
+        private Thread _latencyThread;
         private Worker _worker;
         private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
         internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
@@ -76,7 +77,125 @@ namespace RageCoop.Server
             Security=new Security(Logger);
             Entities=new ServerEntities(this);
             BaseScript=new BaseScript(this);
+
+            _worker=new Worker("ServerWorker", Logger);
+
+            _listenerThread=new Thread(() => Listen());
+            _latencyThread=new Thread(() =>
+            {
+                while (!_stopping)
+                {
+                    foreach(var c in Clients.Values)
+                    {
+                        c.UpdateLatency();
+                    }
+                    Thread.Sleep(3000);
+                }
+            });
+            _announceThread=new Thread(async () =>
+            {
+                try
+                {
+                    // TLS only
+                    ServicePointManager.Expect100Continue = true;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                    HttpClient httpClient = new();
+
+                    IpInfo info;
+                    try
+                    {
+                        HttpResponseMessage response = await httpClient.GetAsync("https://ipinfo.io/json");
+                        if (response.StatusCode != HttpStatusCode.OK)
+                        {
+                            throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
+                        }
+
+                        string content = await response.Content.ReadAsStringAsync();
+                        info = JsonConvert.DeserializeObject<IpInfo>(content);
+                        Logger?.Info($"Your public IP is {info.Address}, announcing to master server...");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger?.Error(ex.InnerException?.Message ?? ex.Message);
+                        return;
+                    }
+                    while (!_stopping)
+                    {
+                        string msg =
+                            "{ " +
+                            "\"address\": \"" + info.Address + "\", " +
+                            "\"port\": \"" + Settings.Port + "\", " +
+                            "\"country\": \"" + info.Country + "\", " +
+                            "\"name\": \"" + Settings.Name + "\", " +
+                            "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
+                            "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
+                            "\"maxPlayers\": \"" + Settings.MaxPlayers + "\", " +
+                            "\"description\": \"" + Settings.Description + "\", " +
+                            "\"website\": \"" + Settings.Website + "\", " +
+                            "\"gameMode\": \"" + Settings.GameMode + "\", " +
+                            "\"language\": \"" + Settings.Language + "\"" +
+                            " }";
+                        HttpResponseMessage response = null;
+                        try
+                        {
+                            var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
+                            response = await httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"));
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger?.Error($"MasterServer: {ex.Message}");
+
+                            // Sleep for 5s
+                            Thread.Sleep(5000);
+                            continue;
+                        }
+
+                        if (response == null)
+                        {
+                            Logger?.Error("MasterServer: Something went wrong!");
+                        }
+                        else if (response.StatusCode != HttpStatusCode.OK)
+                        {
+                            if (response.StatusCode == HttpStatusCode.BadRequest)
+                            {
+                                string requestContent = await response.Content.ReadAsStringAsync();
+                                Logger?.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
+                            }
+                            else
+                            {
+                                Logger?.Error($"MasterServer: [{(int)response.StatusCode}]");
+                                Logger?.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
+                            }
+                        }
+
+                        // Sleep for 10s
+                        for (int i = 0; i<10; i++)
+                        {
+                            if (_stopping)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                Thread.Sleep(1000);
+                            }
+                        }
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    Logger?.Error($"MasterServer: {ex.InnerException.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error($"MasterServer: {ex.Message}");
+                }
+            });
         }
+
+        
         /// <summary>
         /// Spawn threads and start the server
         /// </summary>
@@ -98,129 +217,22 @@ namespace RageCoop.Server
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
-            config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);
             config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            _worker=new Worker("ServerWorker",Logger);
-            _sendInfoTimer.Elapsed+=(s, e) => { SendPlayerInfos(); };
-            _sendInfoTimer.AutoReset=true;
-            _sendInfoTimer.Enabled=true;
             Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
-            if (Settings.AnnounceSelf)
-            {
-
-                #region -- MASTERSERVER --
-                _announceThread=new Thread(async () =>
-                {
-                    try
-                    {
-                        // TLS only
-                        ServicePointManager.Expect100Continue = true;
-                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12 ;
-                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                        HttpClient httpClient = new();
-
-                        IpInfo info;
-                        try
-                        {
-                            HttpResponseMessage response = await httpClient.GetAsync("https://ipinfo.io/json");
-                            if (response.StatusCode != HttpStatusCode.OK)
-                            {
-                                throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
-                            }
-
-                            string content = await response.Content.ReadAsStringAsync();
-                            info = JsonConvert.DeserializeObject<IpInfo>(content);
-                            Logger?.Info($"Your public IP is {info.Address}, announcing to master server...");
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger?.Error(ex.InnerException?.Message ?? ex.Message);
-                            return;
-                        }
-                        while (!_stopping)
-                        {
-                            string msg =
-                                "{ " +
-                                "\"address\": \"" + info.Address + "\", " +
-                                "\"port\": \"" + Settings.Port + "\", " +
-                                "\"country\": \"" + info.Country + "\", " +
-                                "\"name\": \"" + Settings.Name + "\", " +
-                                "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
-                                "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                                "\"maxPlayers\": \"" + Settings.MaxPlayers + "\", " +
-                                "\"description\": \"" + Settings.Description + "\", " +
-                                "\"website\": \"" + Settings.Website + "\", " +
-                                "\"gameMode\": \"" + Settings.GameMode + "\", " +
-                                "\"language\": \"" + Settings.Language + "\"" +
-                                " }";
-                            HttpResponseMessage response = null;
-                            try
-                            {
-                                var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
-                                response = await httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"));
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger?.Error($"MasterServer: {ex.Message}");
-
-                                // Sleep for 5s
-                                Thread.Sleep(5000);
-                                continue;
-                            }
-
-                            if (response == null)
-                            {
-                                Logger?.Error("MasterServer: Something went wrong!");
-                            }
-                            else if (response.StatusCode != HttpStatusCode.OK)
-                            {
-                                if (response.StatusCode == HttpStatusCode.BadRequest)
-                                {
-                                    string requestContent = await response.Content.ReadAsStringAsync();
-                                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
-                                }
-                                else
-                                {
-                                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}]");
-                                    Logger?.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
-                                }
-                            }
-
-                            // Sleep for 10s
-                            for(int i = 0; i<10; i++)
-                            {
-                                if (_stopping)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    Thread.Sleep(1000);
-                                }
-                            }
-                        }
-                    }
-                    catch (HttpRequestException ex)
-                    {
-                        Logger?.Error($"MasterServer: {ex.InnerException.Message}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger?.Error($"MasterServer: {ex.Message}");
-                    }
-                });
-                _announceThread.Start();
-                #endregion
-            }
+            
             BaseScript.API=API;
             BaseScript.OnStart();
             Resources.LoadAll();
-            _listenerThread=new Thread(() => Listen());
             _listenerThread.Start();
+            _latencyThread.Start();
+            if (Settings.AnnounceSelf)
+            {
+                _announceThread.Start();
+            }
+
             Logger?.Info("Listening for clients");
         }
         /// <summary>
@@ -229,12 +241,10 @@ namespace RageCoop.Server
         public void Stop()
         {
             _stopping = true;
-            _sendInfoTimer.Stop();
-            _sendInfoTimer.Enabled=false;
-            _sendInfoTimer.Dispose();
             Logger?.Flush();
-            _listenerThread?.Join();
-            _announceThread?.Join();
+            _listenerThread.Join();
+            _announceThread.Join();
+            _latencyThread.Join();
             _worker.Dispose();
         }
         private void Listen()
@@ -386,19 +396,6 @@ namespace RageCoop.Server
                         }
                         break;
                     }
-                case NetIncomingMessageType.ConnectionLatencyUpdated:
-                    {
-                        // Get sender client
-                        if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
-                        {
-                            break;
-                        }
-                        if (sender != null)
-                        {
-                            sender.Latency = message.ReadFloat();
-                        }
-                    }
-                    break;
                 case NetIncomingMessageType.ErrorMessage:
                     Logger?.Error(message.ReadString());
                     break;
@@ -441,7 +438,6 @@ namespace RageCoop.Server
                 
                 switch (type)
                 {
-                    #region INTERVAL-SYNC
                     case PacketType.PedSync:
                         {
 
@@ -471,9 +467,6 @@ namespace RageCoop.Server
                         }
                         break;
 
-
-                    #endregion
-
                     case PacketType.ChatMessage:
                         {
 
@@ -502,28 +495,6 @@ namespace RageCoop.Server
             catch (Exception e)
             {
                 DisconnectAndLog(sender.Connection, type, e);
-            }
-        }
-        object _sendPlayersLock=new object();
-        internal void SendPlayerInfos()
-        {
-            lock (_sendPlayersLock)
-            {
-                foreach (Client c in Clients.Values)
-                {
-                    MainNetServer.Connections.FindAll(x => x.RemoteUniqueIdentifier != c.NetID).ForEach(x =>
-                    {
-                        NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                        new Packets.PlayerInfoUpdate()
-                        {
-                            PedID=c.Player.ID,
-                            Username=c.Username,
-                            Latency=c.Latency,
-                        }.Pack(outgoingMessage);
-                        MainNetServer.SendMessage(outgoingMessage, x, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
-                    });
-                }
-
             }
         }
 

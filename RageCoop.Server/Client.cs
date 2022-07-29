@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using RageCoop.Core;
 using Lidgren.Network;
-using System.Linq;
-using GTA;
+using System.Diagnostics;
 using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
@@ -60,6 +59,7 @@ namespace RageCoop.Server
         }
 
         private bool _displayNameTag=true;
+        private Stopwatch _latencyWatch = new Stopwatch();
 
         /// <summary>
         /// Gets or sets whether to enable automatic respawn for this client's main ped.
@@ -73,40 +73,21 @@ namespace RageCoop.Server
                 _displayNameTag=value;
             }
         }
-        #region CUSTOMDATA FUNCTIONS
-        /*
-        public void SetData<T>(string name, T data)
+        internal void UpdateLatency()
         {
-            if (HasData(name))
+            _latencyWatch.Restart();
+            Server.GetResponse<Packets.PingPong>(this, new Packets.PingPong(), ConnectionChannel.PingPong);
+            _latencyWatch.Stop();
+            Latency = (float)_latencyWatch.ElapsedMilliseconds/2000;
+            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
+            new Packets.PlayerInfoUpdate()
             {
-                _customData[name] = data;
-            }
-            else
-            {
-                _customData.Add(name, data);
-            }
+                PedID=Player.ID,
+                Username=Username,
+                Latency=Latency,
+            }.Pack(outgoingMessage);
+            Server.MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);    
         }
-
-        public bool HasData(string name)
-        {
-            return _customData.ContainsKey(name);
-        }
-
-        public T GetData<T>(string name)
-        {
-            return HasData(name) ? (T)_customData[name] : default;
-        }
-
-        public void RemoveData(string name)
-        {
-            if (HasData(name))
-            {
-                _customData.Remove(name);
-            }
-        }
-        */
-
-        #endregion
         #region FUNCTIONS
         /// <summary>
         /// Kick this client

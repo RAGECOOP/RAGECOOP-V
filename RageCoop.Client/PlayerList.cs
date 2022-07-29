@@ -45,21 +45,21 @@ namespace RageCoop.Client
             _lastUpdate = Util.GetTickCount64();
 
             _mainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            _mainScaleform.CallFunction("SET_DATA_SLOT", 0, $"{Networking.Latency * 1000:N0}ms", localUsername, 116, 0, 0, "", "", 2, "", "", ' ');
-
-            int i = 1;
+            
+            int i=0;
 
             foreach (var player in Players)
             {
                 _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Value.Latency * 1000:N0}ms", player.Value.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
-            _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count+1} players");
+            _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count} players");
             _mainScaleform.CallFunction("DISPLAY_VIEW");
         }
         public static void SetPlayer(int id, string username, float latency = 0)
         {
-
+            if(id == Main.LocalPlayerID) { Networking.Latency=latency; }
+            Main.Logger.Debug($"{id},{username},{latency}");
             PlayerData p;
             if (Players.TryGetValue(id, out p))
             {
