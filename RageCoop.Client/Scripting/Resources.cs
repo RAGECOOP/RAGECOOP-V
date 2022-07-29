@@ -119,6 +119,7 @@ namespace RageCoop.Client.Scripting
 
         private void LoadResource(ZipFile file, string dataFolderRoot)
         {
+            List<Action> toLoad = new List<Action>(10);
             var r = new ClientResource()
             {
                 Logger = Main.Logger,
@@ -139,52 +140,27 @@ namespace RageCoop.Client.Scripting
                 if (!entry.IsDirectory)
                 {
                     rFile.GetStream=() => { return file.GetInputStream(entry); };
-                    if (entry.Name.EndsWith(".dll"))
+                    if (entry.Name.EndsWith(".dll") && !entry.Name.Contains("/"))
                     {
                         var tmp = Path.GetTempFileName();
                         var f = File.OpenWrite(tmp);
                         rFile.GetStream().CopyTo(f);
                         f.Close();
-                        LoadScriptsFromAssembly(rFile, tmp, r, false);
+                        if (!IsManagedAssembly(tmp))
+                        {
+                            continue;
+                        }
+                        var asm=Assembly.LoadFrom(tmp);
+                        toLoad.Add(() => LoadScriptsFromAssembly(rFile,asm, entry.Name,r));
                     }
                 }
+            }
+            foreach(var a in toLoad)
+            {
+                a();
             }
             LoadedResources.Add(r);
             file.Close();
-        }
-        private bool LoadScriptsFromAssembly(ResourceFile file, string path, ClientResource resource, bool shadowCopy = true)
-        {
-            lock (LoadedResources)
-            {
-                if (!IsManagedAssembly(path)) { return false; }
-                if (ToIgnore.Contains(file.Name)) { try { File.Delete(path); } catch { }; return false; }
-
-                Logger?.Debug($"Loading assembly {file.Name} ...");
-
-                Assembly assembly;
-
-                try
-                {
-                    if (shadowCopy)
-                    {
-                        var temp = Path.GetTempFileName();
-                        File.Copy(path, temp, true);
-                        assembly = Assembly.LoadFrom(temp);
-                    }
-                    else
-                    {
-                        assembly = Assembly.LoadFrom(path);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger?.Error("Unable to load "+file.Name);
-                    Logger?.Error(ex);
-                    return false;
-                }
-
-                return LoadScriptsFromAssembly(file, assembly, path, resource);
-            }
         }
         private bool LoadScriptsFromAssembly(ResourceFile rfile, Assembly assembly, string filename, ClientResource toload)
         {

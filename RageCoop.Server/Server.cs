@@ -625,7 +625,7 @@ namespace RageCoop.Server
         {
             if (newClient==_hostClient)
             {
-                _hostClient.SendCustomEvent(CustomEvents.IsHost, true);
+                API.SendCustomEvent(new() { newClient },CustomEvents.IsHost, true);
             }
 
             // Send other players to this client
