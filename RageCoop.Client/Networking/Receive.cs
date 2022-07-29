@@ -237,7 +237,10 @@ namespace RageCoop.Client
                 case PacketType.ChatMessage:
                     {
 
-                        Packets.ChatMessage packet = new Packets.ChatMessage();
+                        Packets.ChatMessage packet = new Packets.ChatMessage((b) =>
+                        {
+                            return Security.Decrypt(b);
+                        });
                         packet.Unpack(data);
 
                         Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });

@@ -477,7 +477,10 @@ namespace RageCoop.Server
                     case PacketType.ChatMessage:
                         {
 
-                            Packets.ChatMessage packet = new();
+                            Packets.ChatMessage packet = new((b) =>
+                            {
+                                return Security.Decrypt(b,sender.EndPoint);
+                            });
                             packet.Unpack(data);
 
                             ChatMessageReceived(packet.Username,packet.Message, sender);
@@ -785,14 +788,20 @@ namespace RageCoop.Server
  
             _worker.QueueJob(() => API.Events.InvokeOnChatMessage(message, sender));
                             
-            var msg=MainNetServer.CreateMessage();
-            new Packets.ChatMessage()
+            foreach(var c in Clients.Values)
             {
-                Username=name,
-                Message=message
-            }.Pack(msg);
-
-            MainNetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+                var msg = MainNetServer.CreateMessage();
+                var crypt = new Func<string, byte[]>((s) =>
+                {
+                    return Security.Encrypt(s.GetBytes(), c.EndPoint);
+                });
+                new Packets.ChatMessage(crypt)
+                {
+                    Username=name,
+                    Message=message
+                }.Pack(msg); 
+                MainNetServer.SendToAll(msg, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
+            }
 
             Logger?.Info(name + ": " + message);
         }
@@ -800,7 +809,10 @@ namespace RageCoop.Server
         {
             if(target == null) { return; }
             var msg = MainNetServer.CreateMessage();
-            new Packets.ChatMessage()
+            new Packets.ChatMessage(new Func<string, byte[]>((s) =>
+            {
+                return Security.Encrypt(s.GetBytes(), target.EndPoint);
+            }))
             {
                 Username= name,
                 Message=message,

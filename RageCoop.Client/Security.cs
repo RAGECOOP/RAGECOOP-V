@@ -24,6 +24,10 @@ namespace RageCoop.Client
         {
             return new CryptoStream(new MemoryStream(data), ClientAes.CreateEncryptor(), CryptoStreamMode.Read).ReadToEnd();
         }
+        public byte[] Decrypt(byte[] data)
+        {
+            return new CryptoStream(new MemoryStream(data), ClientAes.CreateDecryptor(), CryptoStreamMode.Read).ReadToEnd();
+        }
         public void SetServerPublicKey(byte[] modulus, byte[] exponent)
         {
             var para = new RSAParameters();

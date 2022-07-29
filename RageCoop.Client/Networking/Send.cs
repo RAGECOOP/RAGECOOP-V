@@ -3,6 +3,7 @@ using GTA.Math;
 using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Core;
+using System;
 
 namespace RageCoop.Client
 {
@@ -164,7 +165,10 @@ namespace RageCoop.Client
         {
             NetOutgoingMessage outgoingMessage = Client.CreateMessage();
 
-            new Packets.ChatMessage() { Username = Main.Settings.Username, Message = message }.Pack(outgoingMessage);
+            new Packets.ChatMessage(new Func<string, byte[]>((s) =>
+            {
+                return Security.Encrypt(s.GetBytes());
+            })) { Username = Main.Settings.Username, Message = message }.Pack(outgoingMessage);
 
             Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
             Client.FlushSendQueue();

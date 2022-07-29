@@ -155,6 +155,16 @@ namespace RageCoop.Core
 
         internal class ChatMessage : Packet
         {
+            private Func<string, byte[]> crypt;
+            private Func<byte[], byte[]> decrypt;
+            public ChatMessage(Func<string,byte[]> crypter)
+            {
+                crypt = crypter;
+            }
+            public ChatMessage(Func<byte[], byte[]> decrypter)
+            {
+                decrypt = decrypter;
+            }
             public string Username { get; set; }
 
             public string Message { get; set; }
@@ -166,20 +176,14 @@ namespace RageCoop.Core
 
                 List<byte> byteArray = new List<byte>();
 
-                byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
-                byte[] messageBytes = Encoding.UTF8.GetBytes(Message);
 
-                // Write UsernameLength
-                byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
 
                 // Write Username
-                byteArray.AddRange(usernameBytes);
+                byteArray.AddString(Username);
 
-                // Write MessageLength
-                byteArray.AddRange(BitConverter.GetBytes(messageBytes.Length));
 
                 // Write Message
-                byteArray.AddRange(messageBytes);
+                byteArray.AddArray(crypt(Message));
 
                 byte[] result = byteArray.ToArray();
 
@@ -197,9 +201,7 @@ namespace RageCoop.Core
                 int usernameLength = reader.ReadInt();
                 Username = reader.ReadString(usernameLength);
 
-                // Read message
-                int messageLength = reader.ReadInt();
-                Message = reader.ReadString(messageLength);
+                Message = decrypt(reader.ReadByteArray()).GetString();
                 #endregion
             }
         }
