@@ -13,9 +13,20 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 namespace RageCoop.Core
 {
-    internal class CoreUtils
+    internal static class CoreUtils
     {
-
+        private static readonly HashSet<string> ToIgnore = new HashSet<string>()
+        {
+            "RageCoop.Client.dll",
+            "RageCoop.Core.dll",
+            "RageCoop.Server.dll",
+            "ScriptHookVDotNet3.dll",
+            "ScriptHookVDotNet.dll"
+        };
+        public static bool CanBeIgnored(this string name)
+        {
+            return ToIgnore.Contains(name);
+        }
         public static (byte, byte[]) GetBytesFromObject(object obj)
         {
             switch (obj)

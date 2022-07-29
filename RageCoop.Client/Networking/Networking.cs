@@ -23,7 +23,6 @@ namespace RageCoop.Client
                     if (Client!=null)
                     {
                         ProcessMessage(Client.WaitMessage(200));
-                        Client.FlushSendQueue();
                     }
                     else
                     {
@@ -46,7 +45,7 @@ namespace RageCoop.Client
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
-                    AutoFlushSendQueue = true
+                    AutoFlushSendQueue = false
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.ConnectionLatencyUpdated);

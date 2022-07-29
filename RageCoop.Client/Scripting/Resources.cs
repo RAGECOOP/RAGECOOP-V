@@ -142,6 +142,8 @@ namespace RageCoop.Client.Scripting
                     rFile.GetStream=() => { return file.GetInputStream(entry); };
                     if (entry.Name.EndsWith(".dll") && !entry.Name.Contains("/"))
                     {
+                        // Don't load API assembly
+                        if (Path.GetFileName(entry.Name).CanBeIgnored()) { continue; }
                         var tmp = Path.GetTempFileName();
                         var f = File.OpenWrite(tmp);
                         rFile.GetStream().CopyTo(f);

@@ -15,14 +15,7 @@ namespace RageCoop.Server.Scripting
 	/// </summary>
 	public class ServerResource : PluginLoader
 	{
-		private static readonly HashSet<string> ToIgnore = new()
-		{
-			"RageCoop.Client.dll",
-			"RageCoop.Core.dll",
-			"RageCoop.Server.dll",
-			"ScriptHookVDotNet3.dll",
-			"ScriptHookVDotNet.dll"
-		};
+		
 		internal ServerResource(PluginConfig config) : base(config) { }
 		internal static ServerResource LoadFrom(string resDir, string dataFolder, Logger logger = null, bool isTemp = false)
 		{
@@ -57,7 +50,7 @@ namespace RageCoop.Server.Scripting
 			var assemblies=new Dictionary<ResourceFile,Assembly>();
 			foreach (var file in Directory.GetFiles(resDir, "*", SearchOption.AllDirectories))
 			{
-				if (ToIgnore.Contains(Path.GetFileName(file))) { try { File.Delete(file); } catch { } continue; }
+				if (Path.GetFileName(file).CanBeIgnored()) { try { File.Delete(file); } catch { } continue; }
 				var relativeName = file.Substring(resDir.Length+1).Replace('\\', '/');
 				var rfile = new ResourceFile()
 				{
