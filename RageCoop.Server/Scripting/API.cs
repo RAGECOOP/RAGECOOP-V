@@ -99,12 +99,13 @@ namespace RageCoop.Server.Scripting
             }
         }
 
-        internal void InvokeOnChatMessage(string msg, Client sender)
+        internal void InvokeOnChatMessage(string msg, Client sender, string clamiedSender=null)
         {
             OnChatMessage?.Invoke(this, new ChatEventArgs()
             {
-                Sender=sender,
-                Message=msg
+                Client=sender,
+                Message=msg,
+                ClaimedSender=clamiedSender
             });
         }
         internal void InvokePlayerConnected(Client client)
@@ -200,8 +201,11 @@ namespace RageCoop.Server.Scripting
         /// <param name="targets">The clients to send message, leave it null to send to all clients</param>
         /// <param name="message">The chat message</param>
         /// <param name="username">The username which send this message (default = "Server")</param>
-        public void SendChatMessage(string message, List<Client> targets = null, string username = "Server")
+        /// <param name="raiseEvent">Weather to raise the <see cref="ServerEvents.OnChatMessage"/> event defined in <see cref="API.Events"/></param>
+        /// <remarks>When <paramref name="raiseEvent"/> is unspecified and <paramref name="targets"/> is null or unspecified, <paramref name="raiseEvent"/> will be set to true</remarks>
+        public void SendChatMessage(string message, List<Client> targets = null, string username = "Server",bool? raiseEvent=null)
         {
+            raiseEvent ??= targets==null;
             try
             {
                 if (Server.MainNetServer.ConnectionsCount == 0)
@@ -217,6 +221,10 @@ namespace RageCoop.Server.Scripting
             catch (Exception e)
             {
                 Server.Logger?.Error($">> {e.Message} <<>> {e.Source ?? string.Empty} <<>> {e.StackTrace ?? string.Empty} <<");
+            }
+            if (raiseEvent.Value)
+            {
+                Events.InvokeOnChatMessage(message, null, username);
             }
         }
 

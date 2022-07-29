@@ -15,11 +15,16 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// The client that sent this message
         /// </summary>
-        public Client Sender { get; set; }
+        public Client Client { get; set; }
         /// <summary>
         /// Message
         /// </summary>
         public string Message { get; set; }
+
+        /// <summary>
+        /// Only used when sending a message via <see cref="API.SendChatMessage(string, List{Client}, string, bool?)"/>
+        /// </summary>
+        public string ClaimedSender { get; set; }
     }
     /// <summary>
     /// 

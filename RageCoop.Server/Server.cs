@@ -798,6 +798,7 @@ namespace RageCoop.Server
         }
         internal void SendChatMessage(string name, string message, Client target)
         {
+            if(target == null) { return; }
             var msg = MainNetServer.CreateMessage();
             new Packets.ChatMessage()
             {
