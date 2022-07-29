@@ -72,7 +72,7 @@ namespace RageCoop.Server.Scripting
             {
                 Name=cmdName,
                 Args=cmdArgs,
-                Sender=sender
+                Client=sender
             };
             OnCommandReceived?.Invoke(this, args);
             if (args.Cancel)
@@ -117,7 +117,7 @@ namespace RageCoop.Server.Scripting
 
         internal void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
         {
-            var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args, Sender=sender };
+            var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args, Client=sender };
             List<Action<CustomEventReceivedArgs>> handlers;
             if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
             {

@@ -13,7 +13,7 @@ namespace RageCoop.Server.Scripting
     public class ChatEventArgs : EventArgs
     {
         /// <summary>
-        /// The client that sent this message
+        /// The client that sent this message, will be null if sent from server
         /// </summary>
         public Client Client { get; set; }
         /// <summary>
@@ -32,9 +32,9 @@ namespace RageCoop.Server.Scripting
     public class CustomEventReceivedArgs : EventArgs
     {
         /// <summary>
-        /// The <see cref="Client"/> that triggered this event
+        /// The <see cref="RageCoop.Server.Client"/> that triggered this event
         /// </summary>
-        public Client Sender { get; set; }
+        public Client Client { get; set; }
 
         /// <summary>
         /// The event hash
@@ -52,9 +52,9 @@ namespace RageCoop.Server.Scripting
     public class OnCommandEventArgs : EventArgs
     {
         /// <summary>
-        /// The <see cref="Client"/> that executed this command.
+        /// The <see cref="RageCoop.Server.Client"/> that executed this command, will be null if sent from server.
         /// </summary>
-        public Client Sender { get; set; }
+        public Client Client { get; set; }
         /// <summary>
         /// The name of executed command
         /// </summary>

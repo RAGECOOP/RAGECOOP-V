@@ -29,7 +29,7 @@ namespace RageCoop.Server.Scripting
                 {
                     foreach (var c in API.GetAllClients().Values)
                     {
-                        if (c==e.Sender)
+                        if (c==e.Client)
                         {
                             continue;
                         }
@@ -39,7 +39,7 @@ namespace RageCoop.Server.Scripting
             });
             API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) =>
             {
-                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x=>x!=e.Sender).ToList(),CustomEvents.OnPlayerDied,e.Sender.Username);
+                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x=>x!=e.Client).ToList(),CustomEvents.OnPlayerDied,e.Client.Username);
             });
         }
         public override void OnStop()
@@ -77,12 +77,12 @@ namespace RageCoop.Server.Scripting
             {
                 int id = (int)e.Args[0];
                 Action<object> callback;
-                lock (e.Sender.Callbacks)
+                lock (e.Client.Callbacks)
                 {
-                    if (e.Sender.Callbacks.TryGetValue(id, out callback))
+                    if (e.Client.Callbacks.TryGetValue(id, out callback))
                     {
                         callback(e.Args[1]);
-                        e.Sender.Callbacks.Remove(id);
+                        e.Client.Callbacks.Remove(id);
                     }
                 }
             }
