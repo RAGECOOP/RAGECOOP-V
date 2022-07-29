@@ -351,9 +351,10 @@ namespace RageCoop.Client
         {
             var current = MainVehicle.ReadPosition();
             var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
-            if (current.DistanceTo(Position)<8)
+            var dist = current.DistanceTo(Position);
+            if (dist<8)
             {
-                MainVehicle.Velocity = Velocity+3.5f*(predicted - current);
+                MainVehicle.Velocity = Velocity+dist*(predicted - current);
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
