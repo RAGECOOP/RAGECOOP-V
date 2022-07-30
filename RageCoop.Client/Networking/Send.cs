@@ -138,12 +138,12 @@ namespace RageCoop.Client
             {
                 ID =sp.ID,
                 ShooterID=sp.ShooterID,
-                Position=p.PredictPosition(),
                 Rotation=p.Rotation,
                 Velocity=p.Velocity,
                 WeaponHash=(uint)p.WeaponHash,
                 Exploded=p.IsDead
             };
+            packet.Position=p.Position+packet.Velocity*Latency;
             if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
             Send(packet, ConnectionChannel.ProjectileSync);
         }
