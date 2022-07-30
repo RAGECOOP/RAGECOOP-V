@@ -363,7 +363,7 @@ namespace RageCoop.Client
                 {
                     MainVehicle.Velocity = Velocity;
                 }
-                MainVehicle.ApplyForce((touching? 0.001f:1) *dist*dist*(predicted - current));
+                MainVehicle.ApplyForce((touching? 0.001f:1)*dist*(predicted - current));
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
