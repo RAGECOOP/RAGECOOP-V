@@ -141,11 +141,11 @@ namespace RageCoop.Client
             var v = Main.P.CurrentVehicle;
             if (v!= null && MainVehicle.IsTouching(v))
             {
-                DisplayVehicle(00.1f);
+                DisplayVehicle(true);
             }
             else
             {
-                DisplayVehicle(1);
+                DisplayVehicle(false);
             }
             #region FLAGS
             if (IsDead)
@@ -352,7 +352,7 @@ namespace RageCoop.Client
             }
             LastUpdated=Main.Ticked;
         }
-        void DisplayVehicle(float calibrationMultiplier=1)
+        void DisplayVehicle(bool touching)
         {
             var current = MainVehicle.ReadPosition();
             var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
@@ -374,7 +374,7 @@ namespace RageCoop.Client
                     Vector3 cali = GetCalibrationRotation();
                     if (cali.Length()<50)
                     {
-                        MainVehicle.RotationVelocity = calibrationMultiplier*(RotationVelocity+cali*0.2f);
+                        MainVehicle.RotationVelocity = (touching ? 0.001f : 1)*(RotationVelocity+cali*0.2f);
                     }
                     else
                     {
