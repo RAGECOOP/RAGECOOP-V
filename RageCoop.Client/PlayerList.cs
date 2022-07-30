@@ -77,7 +77,10 @@ namespace RageCoop.Client
         {
             if (packet.PedID == Main.LocalPlayerID) {Main.Logger.Debug("Latency updated"); Networking.Latency=packet.Latency; }
             var p = GetPlayer(packet.PedID);
-            p.Latency= packet.Latency;
+            if (p!=null)
+            {
+                p.Latency= packet.Latency;
+            }
         }
         public static PlayerData GetPlayer(int id)
         {
