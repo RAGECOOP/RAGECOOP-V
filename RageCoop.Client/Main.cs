@@ -109,6 +109,30 @@ namespace RageCoop.Client
         {
             P= Game.Player.Character;
             PlayerPosition=P.ReadPosition();
+
+            /*
+            var V = P.CurrentVehicle;
+            List<int> found;
+            if (V!=null)
+            {
+                found = Memory.FindOffset(V.Velocity.X, V.MemoryAddress);
+                
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 100), V.Velocity.ToString()).Draw();
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 150), V.ReadVelocity().ToString()).Draw();
+            }
+            else
+            {
+                found = Memory.FindOffset(P.Velocity.X, P.MemoryAddress);
+
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 100), P.Velocity.ToString()).Draw();
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 150), P.ReadVelocity().ToString()).Draw();
+            }
+            for (int i = 0; i<found.Count; i++)
+            {
+                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(200*(i+1), 50), found[i].ToString()).Draw();
+            }
+            */
+            PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
             PlayerPosition=P.ReadPosition();
             if (Game.IsLoading)
@@ -193,9 +217,17 @@ namespace RageCoop.Client
             _lastDead=P.IsDead;
             Ticked++;
         }
-
+        Vector3 vel =new Vector3(0,0,0.123f);
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if(e.KeyCode == Keys.Right)
+            {
+                vel.Z+=0.1f;
+            }
+            if (e.KeyCode == Keys.Left)
+            {
+                vel.Z-=0.1f;
+            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
@@ -277,74 +309,6 @@ namespace RageCoop.Client
             PlayerList.Cleanup();
             Main.LocalPlayerID=default;
 
-        }
-
-        internal static readonly Dictionary<ulong, byte> CheckNativeHash = new Dictionary<ulong, byte>()
-        {
-            { 0xD49F9B0955C367DE, 1 }, // Entities
-            { 0xEF29A16337FACADB, 1 }, //
-            { 0xB4AC7D0CF06BFE8F, 1 }, //
-            { 0x9B62392B474F44A0, 1 }, //
-            { 0x7DD959874C1FD534, 1 }, //
-            { 0xAF35D0D2583051B0, 2 }, // Vehicles
-            { 0x63C6CCA8E68AE8C8, 2 }, //
-            { 0x509D5878EB39E842, 3 }, // Props
-            { 0x9A294B2138ABB884, 3 }, //
-            { 0x46818D79B1F7499A, 4 }, // Blips
-            { 0x5CDE92C702A8FCE7, 4 }, //
-            { 0xBE339365C863BD36, 4 }, //
-            { 0x5A039BB0BCA604B6, 4 }, //
-            { 0x0134F0835AB6BFCB, 5 }  // Checkpoints
-        };
-        internal static Dictionary<int, byte> ServerItems = new Dictionary<int, byte>();
-        internal static void CleanUpWorld()
-        {
-            if (ServerItems.Count == 0)
-            {
-                return;
-            }
-
-            lock (ServerItems)
-            {
-                foreach (KeyValuePair<int, byte> item in ServerItems)
-                {
-                    try
-                    {
-                        switch (item.Value)
-                        {
-                            case 1:
-                                World.GetAllEntities().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
-                                break;
-                            case 2:
-                                World.GetAllVehicles().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
-                                break;
-                            case 3:
-                                World.GetAllProps().FirstOrDefault(x => x.Handle == item.Key)?.Delete();
-                                break;
-                            case 4:
-                                Blip blip = new Blip(item.Key);
-                                if (blip.Exists())
-                                {
-                                    blip.Delete();
-                                }
-                                break;
-                            case 5:
-                                Checkpoint checkpoint = new Checkpoint(item.Key);
-                                if (checkpoint.Exists())
-                                {
-                                    checkpoint.Delete();
-                                }
-                                break;
-                        }
-                    }
-                    catch
-                    {
-                        GTA.UI.Notification.Show("~r~~h~CleanUpWorld() Error");
-                        Main.Logger.Error($"CleanUpWorld(): ~r~Item {item.Value} cannot be deleted!");
-                    }
-                }
-                ServerItems.Clear();
-            }
         }
         private static void DoQueuedActions()
         {

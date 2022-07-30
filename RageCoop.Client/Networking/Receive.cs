@@ -61,8 +61,6 @@ namespace RageCoop.Client
                             Memory.RestorePatches();
                             DownloadManager.Cleanup();
 
-                            Main.QueueAction(() => Main.CleanUpWorld());
-
                             if (Main.MainChat.Focused)
                             {
                                 Main.MainChat.Focused = false;

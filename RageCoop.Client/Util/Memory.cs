@@ -69,6 +69,8 @@ internal static unsafe class Memory
         #endregion
         #region OFFSET-CONST
         public const int PositionOffset = 144;
+        public const int VelocityOffset = 800;
+        public const int MatrixOffset = 96;
         #endregion
         #region OPCODE
 
@@ -88,6 +90,10 @@ internal static unsafe class Memory
         {
             return e.ReadQuaternion().ToEulerDegrees();
         }
+        public static Vector3 ReadVelocity(this Ped e)
+        {
+            return ReadVector3(e.MemoryAddress+VelocityOffset);
+        }
         public static Vector3 ReadVector3(IntPtr address)
         {
             float* ptr = (float*)address.ToPointer();
@@ -97,6 +103,19 @@ internal static unsafe class Memory
                 Y=ptr[1],
                 Z=ptr[2]
             };
+        }
+        public static List<int> FindOffset(float toSearch,IntPtr start, int range=1000, float tolerance = 0.01f)
+        {
+            var foundOffsets = new List<int>(100);
+            for (int i = 0; i <= range; i++)
+            {
+                var val = NativeMemory.ReadFloat(start+i);
+                if (Math.Abs(val-toSearch)<tolerance)
+                {
+                    foundOffsets.Add(i);
+                }
+            }
+            return foundOffsets;
         }
     }
 }

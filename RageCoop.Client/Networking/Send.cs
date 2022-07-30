@@ -34,7 +34,7 @@ namespace RageCoop.Client
                 OwnerID=c.OwnerID,
                 Health = p.Health,
                 Rotation = p.ReadRotation(),
-                Velocity = p.Velocity,
+                Velocity = p.ReadVelocity(),
                 Speed = p.GetPedSpeed(),
                 CurrentWeaponHash = (uint)p.Weapons.Current.Hash,
                 Flags = p.GetPedFlags(),
