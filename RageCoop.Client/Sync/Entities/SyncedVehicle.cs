@@ -69,7 +69,7 @@ namespace RageCoop.Client
         {
             get
             {
-                return _isMotorcycle||(Quaternion*Vector3.RelativeTop).Z <(Quaternion*Vector3.RelativeBottom).Z;
+                return _isMotorcycle||((Quaternion*Vector3.RelativeTop).Z - (Quaternion*Vector3.RelativeBottom).Z)<0.5;
             }
         }
         private bool _isMotorcycle;
