@@ -45,7 +45,6 @@ namespace RageCoop.Client
             if (IsOnServer)
             {
                 Client.Disconnect("Bye!");
-                Client=null;
             }
             else if (IsConnecting) {
                 _publicKeyReceived.Set();
