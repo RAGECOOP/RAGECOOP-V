@@ -166,6 +166,16 @@ namespace RageCoop.Client.Scripting
         }
 
         /// <summary>
+        /// Check if player is connected to a server
+        /// </summary>
+        public static bool IsOnServer { get { return Networking.IsOnServer; } }
+
+        /// <summary>
+        /// Get an <see cref="System.Net.IPEndPoint"/> that the player is currently connected to, or null if not connected to the server
+        /// </summary>
+        public static System.Net.IPEndPoint ServerEndPoint { get { return Networking.Client?.ServerConnection.RemoteEndPoint; } }
+
+        /// <summary>
         /// Check if a RAGECOOP menu is visible
         /// </summary>
         public static bool IsMenuVisible
@@ -213,6 +223,29 @@ namespace RageCoop.Client.Scripting
 
         #region FUNCTIONS
         /// <summary>
+        /// Connect to a server
+        /// </summary>
+        /// <param name="address">Address of the server, e.g. 127.0.0.1:4499</param>
+        /// <exception cref="InvalidOperationException">When a connection is active or being established</exception>
+        public static void Connect(string address)
+        {
+            if (Networking.IsOnServer || Networking.IsConnecting)
+            {
+                throw new InvalidOperationException("Cannot connect to server when another connection is active");
+            }
+            Networking.ToggleConnection(address);
+        }
+        /// <summary>
+        /// Disconnect from current server or cancel the connection attempt.
+        /// </summary>
+        public static void Disconnect()
+        {
+            if (Networking.IsOnServer || Networking.IsConnecting)
+            {
+                Networking.ToggleConnection(null);
+            }
+        }
+        /// <summary>
         /// Send a local chat message to this player
         /// </summary>
         /// <param name="from">Name of the sender</param>
@@ -234,17 +267,10 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
         /// </summary>
-        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
+        /// <param name="a"> An <see cref="Func{T, TResult}"/> to be executed with a return value indicating whether it can be removed after execution.</param>
         public static void QueueAction(Func<bool> a)
         {
             Main.QueueAction(a);
-        }
-        /// <summary>
-        /// Disconnect from the server
-        /// </summary>
-        public static void Disconnect()
-        {
-            Networking.ToggleConnection(null);
         }
 
         /// <summary>

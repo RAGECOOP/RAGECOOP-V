@@ -16,7 +16,7 @@ namespace RageCoop.Client
         public static Security Security; 
         private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
         internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
-
+        public static bool IsConnecting { get; private set; }
         static Networking()
         {
             Security=new Security(Main.Logger);
@@ -46,8 +46,14 @@ namespace RageCoop.Client
             {
                 Client.Disconnect("Bye!");
             }
+            else if (IsConnecting) {
+                _publicKeyReceived.Set();
+                IsConnecting = false;
+                GTA.UI.Notification.Show("Connection has been canceled");
+            }
             else
             {
+                IsConnecting = true;
                 password = password ?? Main.Settings.Password;
                 username=username ?? Main.Settings.Username;
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
@@ -111,7 +117,7 @@ namespace RageCoop.Client
                         Main.Logger.Error("Cannot connect to server: ", ex);
                         Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server: "+ex.Message));
                     }
-
+                    IsConnecting=false;
                 });
             }
         }
@@ -148,11 +154,12 @@ namespace RageCoop.Client
 
         private static bool GetServerPublicKey(string address, int timeout = 10000)
         {
+            Security.ServerRSA=null;
             var msg = Client.CreateMessage();
             new Packets.PublicKeyRequest().Pack(msg);
             var adds = address.Split(':');
             Client.SendUnconnectedMessage(msg, adds[0], int.Parse(adds[1]));
-            return _publicKeyReceived.WaitOne(timeout);
+            return _publicKeyReceived.WaitOne(timeout) && Security.ServerRSA!=null;
         }
 
         public static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()
