@@ -57,6 +57,7 @@ namespace RageCoop.Server
         private Thread _announceThread;
         private Thread _latencyThread;
         private Worker _worker;
+        private HashSet<char> _allowedCharacterSet;
         private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
         internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
         private readonly string _compatibleVersion = "V0_5";
@@ -77,6 +78,8 @@ namespace RageCoop.Server
             Security=new Security(Logger);
             Entities=new ServerEntities(this);
             BaseScript=new BaseScript(this);
+            _allowedCharacterSet=new HashSet<char>(Settings.AllowedUsernameChars.ToCharArray());
+
 
             _worker=new Worker("ServerWorker", Logger);
 
@@ -522,7 +525,7 @@ namespace RageCoop.Server
                 connection.Deny("Username is empty or contains spaces!");
                 return;
             }
-            if (packet.Username.Any(p => !char.IsLetterOrDigit(p) && !(p == '_') && !(p=='-')))
+            if (packet.Username.Any(p => !_allowedCharacterSet.Contains(p)))
             {
                 connection.Deny("Username contains special chars!");
                 return;
@@ -532,11 +535,23 @@ namespace RageCoop.Server
                 connection.Deny("Username is already taken!");
                 return;
             }
-            string passhash;
             try
             {
                 Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted,packet.AesIVCrypted);
-                passhash=Security.Decrypt(packet.PasswordEncrypted, connection.RemoteEndPoint).GetString().GetSHA256Hash().ToHexString();
+
+                var args = new HandshakeEventArgs()
+                {
+                    EndPoint=connection.RemoteEndPoint,
+                    ID=packet.PedID,
+                    Username=packet.Username,
+                    PasswordHash=Security.Decrypt(packet.PasswordEncrypted, connection.RemoteEndPoint).GetString().GetSHA256Hash().ToHexString(),
+                };
+                API.Events.InvokePlayerHandshake(args);
+                if (args.Cancel)
+                {
+                    connection.Deny(args.DenyReason);
+                    return;
+                }
             }
             catch (Exception ex)
             {
@@ -545,23 +560,8 @@ namespace RageCoop.Server
                 connection.Deny("Malformed handshak packet!");
                 return;
             }
-            var args = new HandshakeEventArgs()
-            {
-                EndPoint=connection.RemoteEndPoint,
-                ID=packet.PedID,
-                Username=packet.Username,
-                PasswordHash=passhash,
-            };
-            API.Events.InvokePlayerHandshake(args);
-            if (args.Cancel)
-            {
-                connection.Deny(args.DenyReason);
-                return;
-            }
-
 
             connection.Approve();
-
             Client tmpClient;
 
             // Add the player to Players

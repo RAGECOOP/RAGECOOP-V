@@ -79,5 +79,10 @@
         /// If enabled, all clients will have same weather and time as host
         /// </summary>
         public bool WeatherTimeSync { get; set; } = true;
+
+        /// <summary>
+        /// List of all allowed username characters
+        /// </summary>
+        public string AllowedUsernameChars { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
     }
 }
