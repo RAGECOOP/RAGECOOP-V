@@ -83,6 +83,6 @@
         /// <summary>
         /// List of all allowed username characters
         /// </summary>
-        public string AllowedUsernameChars { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
+        public string AllowedUsernameChars { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-_";
     }
 }
