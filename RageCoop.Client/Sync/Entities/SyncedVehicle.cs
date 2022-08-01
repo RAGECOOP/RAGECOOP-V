@@ -357,13 +357,15 @@ namespace RageCoop.Client
             var current = MainVehicle.ReadPosition();
             var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
             var dist = current.DistanceTo(Position);
+            var cali = (touching ? 0.001f : 1)*dist*(predicted - current);
+            // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), dist.ToString()).Draw();
+            
             if (dist<8)
             {
                 if (!touching)
                 {
-                    MainVehicle.Velocity = Velocity;
+                    MainVehicle.Velocity = Velocity+cali;
                 }
-                MainVehicle.ApplyForce((touching? 0.001f:1)*dist*(predicted - current));
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
@@ -371,10 +373,10 @@ namespace RageCoop.Client
                 }
                 else
                 {
-                    Vector3 cali = GetCalibrationRotation();
-                    if (cali.Length()<50)
+                    Vector3 calirot = GetCalibrationRotation();
+                    if (calirot.Length()<50)
                     {
-                        MainVehicle.RotationVelocity = (touching ? 0.001f : 1)*(RotationVelocity+cali*0.2f);
+                        MainVehicle.RotationVelocity = (touching ? 0.001f : 1)*(RotationVelocity+calirot*0.2f);
                     }
                     else
                     {
