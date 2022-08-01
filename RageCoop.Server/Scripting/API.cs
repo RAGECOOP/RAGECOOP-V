@@ -380,16 +380,18 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Find a script matching the specified type
         /// </summary>
-        /// <typeparam name="T">Type of the script to search for</typeparam>
+        /// <param name="scriptFullName">The full name of the script's type, e.g. RageCoop.Resources.Discord.Main</param>
         /// <param name="resourceName">Which resource to search for this script. Will search in all loaded resources if unspecified </param>
-        /// <returns></returns>
-        public dynamic FindScript<T>(string resourceName=null) where T : ServerScript
+        /// <returns>A <see langword="dynamic"/> object reprensenting the script, or <see langword="null"/> if not found.</returns>
+        /// <remarks>Explicitly casting the return value to orginal type will case a exception to be thrown due to the dependency isolation mechanism in resource system. 
+        /// You shouldn't reference the target resource assemblies either, since it causes the referenced assembly to be loaded and started in your resource.</remarks>
+        public dynamic FindScript(string scriptFullName,string resourceName=null)
         {
             if (resourceName==null)
             {
                 foreach(var res in LoadedResources.Values)
                 {
-                    if (res.Scripts.TryGetValue(typeof(T).FullName, out var script))
+                    if (res.Scripts.TryGetValue(scriptFullName, out var script))
                     {
                         return script;
                     }
@@ -397,9 +399,7 @@ namespace RageCoop.Server.Scripting
             }
             else if (LoadedResources.TryGetValue(resourceName, out var res))
             {
-                Logger?.Debug("Found matching resource:"+resourceName);
-                Logger.Debug(typeof(T).FullName);
-                if(res.Scripts.TryGetValue(typeof(T).FullName, out var script))
+                if(res.Scripts.TryGetValue(scriptFullName, out var script))
                 {
                     return script;
                 }    
