@@ -50,14 +50,17 @@ namespace RageCoop.Server
                 };
                 server.Start();
                 mainLogger?.Info("Please use CTRL + C if you want to stop the server!");
+                mainLogger?.Info("Type here to send chat messages or execute commands");
+                mainLogger?.Flush();
                 while (true)
                 {
-                    mainLogger?.Info("Type here to send chat message: ");
+                    
                     var s=Console.ReadLine();
                     if (!Stopping && s!=null)
                     {
                         server.ChatMessageReceived("Server", s, null);
                     }
+                    Thread.Sleep(20);
                 }
             }
             catch (Exception e)
