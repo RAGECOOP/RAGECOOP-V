@@ -246,8 +246,11 @@ namespace RageCoop.Server
             _stopping = true;
             Logger?.Flush();
             _listenerThread.Join();
-            _announceThread.Join();
             _latencyThread.Join();
+            if (_announceThread.IsAlive)
+            {
+                _announceThread.Join();
+            }
             _worker.Dispose();
         }
         private void Listen()

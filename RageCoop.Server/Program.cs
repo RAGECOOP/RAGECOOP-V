@@ -38,7 +38,7 @@ namespace RageCoop.Server
                             server.Stop();
                             mainLogger.Info("Server stopped.");
                             mainLogger.Dispose();
-                            Thread.Sleep(3000);
+                            Thread.Sleep(1000);
                             Environment.Exit(0);
                         }
                         else
