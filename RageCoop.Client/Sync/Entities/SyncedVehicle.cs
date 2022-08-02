@@ -364,12 +364,13 @@ namespace RageCoop.Client
             LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
-            var cali = dist*(_predictedPos - current);
+            var cali = (dist<1?dist*4:dist)*(_predictedPos - current);
             // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), dist.ToString()).Draw();
             
             if (dist<8)
             {
-                MainVehicle.Velocity = _predictedVel+cali;
+                MainVehicle.Velocity = _predictedVel;
+                MainVehicle.ApplyForce(cali);
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);

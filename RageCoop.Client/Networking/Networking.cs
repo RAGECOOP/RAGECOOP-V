@@ -59,7 +59,8 @@ namespace RageCoop.Client
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
-                    AutoFlushSendQueue = false
+                    AutoFlushSendQueue = false,
+                    SimulatedMinimumLatency =0.3f
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
