@@ -341,6 +341,7 @@ namespace RageCoop.Client
             v.ThrottlePower=packet.ThrottlePower;
             v.BrakePower=packet.BrakePower;
             v.Velocity=packet.Velocity;
+            v.Acceleration=packet.Acceleration;
             v.RotationVelocity=packet.RotationVelocity;
             v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;

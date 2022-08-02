@@ -56,10 +56,10 @@ namespace RageCoop.Client
 
         private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
-        private bool _lastTouchingPlayer = false;
         #endregion
 
         #region -- CRITICAL STUFF --
+        internal Vector3 Acceleration { get; set; }
         internal Vector3 RotationVelocity { get; set; }
         internal float SteeringAngle { get; set; }
         internal float ThrottlePower { get; set; }
@@ -352,20 +352,24 @@ namespace RageCoop.Client
             }
             LastUpdated=Main.Ticked;
         }
+        float _elapsed;
+        Vector3 _predictedVel;
+        Vector3 _predictedPos;
         void DisplayVehicle(bool touching)
         {
+            // predict velocity/position
+            _elapsed = Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
+            _predictedVel = Velocity+Acceleration*_elapsed;
+            _predictedPos = Position+_elapsed*(LastVelocity+_predictedVel)/2;
+            LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
-            var predicted = Position+Velocity*(Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds);
             var dist = current.DistanceTo(Position);
-            var cali = (touching ? 0.001f : 1)*dist*(predicted - current);
+            var cali = dist*(_predictedPos - current);
             // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), dist.ToString()).Draw();
             
             if (dist<8)
             {
-                if (!touching)
-                {
-                    MainVehicle.Velocity = Velocity+cali;
-                }
+                MainVehicle.Velocity = _predictedVel+cali;
                 if (IsFlipped)
                 {
                     MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
@@ -376,7 +380,7 @@ namespace RageCoop.Client
                     Vector3 calirot = GetCalibrationRotation();
                     if (calirot.Length()<50)
                     {
-                        MainVehicle.RotationVelocity = (touching ? 0.001f : 1)*(RotationVelocity+calirot*0.2f);
+                        MainVehicle.RotationVelocity = RotationVelocity+calirot*0.2f;
                     }
                     else
                     {
@@ -387,8 +391,8 @@ namespace RageCoop.Client
             }
             else
             {
-                MainVehicle.Position=predicted;
-                MainVehicle.Velocity=Velocity;
+                MainVehicle.Position=_predictedPos;
+                MainVehicle.Velocity=_predictedVel;
                 MainVehicle.Quaternion=Quaternion;
             }
         }

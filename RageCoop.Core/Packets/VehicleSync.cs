@@ -25,6 +25,7 @@ namespace RageCoop.Core
             // public Vector3 Rotation { get; set; }
 
             public Vector3 Velocity { get; set; }
+            public Vector3 Acceleration { get; set; }
 
             public Vector3 RotationVelocity { get; set; }
 
@@ -67,7 +68,7 @@ namespace RageCoop.Core
                 #region PacketToNetOutGoingMessage
                 message.Write((byte)PacketType.VehicleSync);
 
-                List<byte> byteArray = new List<byte>();
+                List<byte> byteArray = new List<byte>(100);
 
                 byteArray.AddInt(ID);
                 byteArray.AddInt(OwnerID);
@@ -75,6 +76,7 @@ namespace RageCoop.Core
                 byteArray.AddVector3(Position);
                 byteArray.AddQuaternion(Quaternion);
                 byteArray.AddVector3(Velocity);
+                byteArray.AddVector3(Acceleration);
                 byteArray.AddVector3(RotationVelocity);
                 byteArray.AddFloat(ThrottlePower);
                 byteArray.AddFloat(BrakePower);
@@ -191,6 +193,8 @@ namespace RageCoop.Core
 
                 // Read velocity
                 Velocity =reader.ReadVector3();
+
+                Acceleration=reader.ReadVector3();
 
                 // Read rotation velocity
                 RotationVelocity=reader.ReadVector3();

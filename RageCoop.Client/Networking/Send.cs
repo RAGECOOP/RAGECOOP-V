@@ -93,11 +93,14 @@ namespace RageCoop.Client
                 SteeringAngle = veh.SteeringAngle,
                 Position = veh.PredictPosition(),
                 Quaternion=veh.ReadQuaternion(),
-                Velocity = veh.Velocity,
                 RotationVelocity=veh.RotationVelocity,
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
+            var velo = veh.Velocity;
+            packet.Acceleration = (velo-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
+            packet.Velocity=(v.LastVelocity = velo) + packet.Acceleration*Latency;
+            v.LastSentStopWatch.Restart();
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
             if (full)
             {
