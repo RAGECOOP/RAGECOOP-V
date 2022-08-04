@@ -21,8 +21,7 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
 
-        private static readonly NativeCheckboxItem _showNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
-
+        
         private static NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
         private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
@@ -38,7 +37,6 @@ namespace RageCoop.Client.Menus
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _disablePauseAlt.CheckboxChanged+=_disablePauseAlt_CheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
-            _showNetworkInfoItem.CheckboxChanged += ShowNetworkInfoCheckboxChanged;
             _menuKey.Activated+=ChaneMenuKey;
             _passengerKey.Activated+=ChangePassengerKey;
             _vehicleSoftLimit.Activated+=vehicleSoftLimit_Activated;
@@ -46,7 +44,6 @@ namespace RageCoop.Client.Menus
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);
             Menu.Add(_flipMenuItem);
-            Menu.Add(_showNetworkInfoItem);
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
@@ -114,10 +111,5 @@ namespace RageCoop.Client.Menus
             Util.SaveSettings();
         }
 
-        public static void ShowNetworkInfoCheckboxChanged(object a, System.EventArgs b)
-        {
-            Networking.ShowNetworkInfo = _showNetworkInfoItem.Checked;
-
-        }
     }
 }

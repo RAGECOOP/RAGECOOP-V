@@ -18,6 +18,8 @@ namespace RageCoop.Client
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
+        private static readonly NativeCheckboxItem ShowNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
+
         static DebugMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
@@ -41,11 +43,12 @@ namespace RageCoop.Client
                 }
                 catch(Exception ex) { Main.Logger.Error(ex); }
             };
+            ShowNetworkInfoItem.CheckboxChanged += (s,e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
             Menu.Add(SimulatedLatencyItem);
+            Menu.Add(ShowNetworkInfoItem);
             Menu.AddSubMenu(DiagnosticMenu);
 
         }
-
 
 
     }
