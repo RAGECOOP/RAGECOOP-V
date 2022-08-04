@@ -46,7 +46,6 @@
     <Compile Include="Scripting\API.cs" />
     <Compile Include="Scripting\BaseScript.cs" />
     <Compile Include="Scripting\ClientScript.cs" />
-    <Compile Include="Scripting\ResourceDomain.cs" />
     <Compile Include="Scripting\Resources.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Settings.cs" />
