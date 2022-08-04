@@ -8,9 +8,7 @@
 
 
 # 🧠 That's it
-RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP or just drive around with your buddy.
-
-
+RAGECOOP brings multiplayer experience to the story mode, you can complete missions together with your friends, use mods without any restriction/getting banned, or just mess around with your fella!
 
 # 📋 Requirements
 - Visual Studio 2022
@@ -36,7 +34,7 @@ RAGECOOP is a multiplayer mod to play story mode or some mods made for RAGECOOP 
 5. Decent compatibility with other mods, set up a private modded server to have some fun!
 6. Weaponized vehicle sync(WIP).
 7. Optimization for high-Ping condition, play with friends around the world!
-8. Powerful scripting API and resource system ,easily [add multiplayer functionality for your mod](HTTPS://docs.ragecoop.online).
+8. Powerful scripting API and resource system, easily [add multiplayer functionality to your mod](HTTPS://docs.ragecoop.online).
 
 # Known issues
 
