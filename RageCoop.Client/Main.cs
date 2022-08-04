@@ -213,17 +213,8 @@ namespace RageCoop.Client
             _lastDead=P.IsDead;
             Ticked++;
         }
-        Vector3 vel =new Vector3(0,0,0.123f);
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Right)
-            {
-                vel.Z+=0.1f;
-            }
-            if (e.KeyCode == Keys.Left)
-            {
-                vel.Z-=0.1f;
-            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);

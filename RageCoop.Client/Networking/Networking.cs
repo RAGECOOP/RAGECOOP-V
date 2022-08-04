@@ -16,6 +16,7 @@ namespace RageCoop.Client
         public static Security Security; 
         private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
         internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
+        internal static float SimulatedLatency=0;
         public static bool IsConnecting { get; private set; }
         static Networking()
         {
@@ -56,10 +57,12 @@ namespace RageCoop.Client
                 IsConnecting = true;
                 password = password ?? Main.Settings.Password;
                 username=username ?? Main.Settings.Username;
+
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
                     AutoFlushSendQueue = false,
+                    SimulatedMinimumLatency =SimulatedLatency,
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);

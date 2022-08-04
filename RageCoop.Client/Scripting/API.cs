@@ -24,7 +24,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     /// Provides vital functionality to interact with RAGECOOP
     /// </summary>
-    public static class API
+    public class API
     {
         #region INTERNAL
         internal static Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new Dictionary<int, List<Action<CustomEventReceivedArgs>>>();

@@ -1,6 +1,7 @@
 ﻿using GTA;
 using LemonUI.Menus;
 using System.Drawing;
+using System;
 
 namespace RageCoop.Client
 {
@@ -16,13 +17,13 @@ namespace RageCoop.Client
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
+        public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
         static DebugMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
 
-            Menu.AddSubMenu(DiagnosticMenu);
             DiagnosticMenu.Opening+=(sender, e) =>
             {
                 DiagnosticMenu.Clear();
@@ -32,6 +33,16 @@ namespace RageCoop.Client
                     DiagnosticMenu.Add(new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
                 }
             };
+            SimulatedLatencyItem.Activated+=(s, e) =>
+            {
+                try
+                {
+                    SimulatedLatencyItem.AltTitle=((Networking.SimulatedLatency=int.Parse(Game.GetUserInput(SimulatedLatencyItem.AltTitle))*0.002f)*500).ToString();
+                }
+                catch(Exception ex) { Main.Logger.Error(ex); }
+            };
+            Menu.Add(SimulatedLatencyItem);
+            Menu.AddSubMenu(DiagnosticMenu);
 
         }
 

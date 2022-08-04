@@ -11,6 +11,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using System.Collections.Generic;
+using mscoree;
 
 namespace RageCoop.Client
 {
@@ -218,6 +220,36 @@ namespace RageCoop.Client
         public static void SetPlayerRadioIndex(int index)
         {
             Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
+        }
+
+        public static IList<AppDomain> GetAppDomains()
+        {
+            IList<AppDomain> _IList = new List<AppDomain>();
+            IntPtr enumHandle = IntPtr.Zero;
+            var host = new CorRuntimeHost();
+            try
+            {
+                host.EnumDomains(out enumHandle);
+                object domain = null;
+                while (true)
+                {
+                    host.NextDomain(enumHandle, out domain);
+                    if (domain == null) break;
+                    AppDomain appDomain = (AppDomain)domain;
+                    _IList.Add(appDomain);
+                }
+                return _IList;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return null;
+            }
+            finally
+            {
+                host.CloseEnum(enumHandle);
+                Marshal.ReleaseComObject(host);
+            }
         }
 
         #region WIN32

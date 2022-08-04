@@ -98,6 +98,7 @@ namespace RageCoop.Client
                 BrakePower = veh.BrakePower,
             };
             var velo = veh.Velocity;
+            if (v.LastVelocity==default) {v.LastVelocity=velo; }
             packet.Acceleration = (velo-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
             packet.Velocity=(v.LastVelocity = velo) + packet.Acceleration*Latency;
             v.LastSentStopWatch.Restart();
