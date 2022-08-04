@@ -1,5 +1,6 @@
 ﻿using GTA;
 using GTA.Math;
+using System.Diagnostics;
 
 namespace RageCoop.Client
 {
@@ -60,6 +61,9 @@ namespace RageCoop.Client
         /// Last time the local entity has been updated,
         /// </summary>
         public ulong LastUpdated { get; set; } = 0;
+
+
+        internal Stopwatch LastSentStopWatch { get; set; } = Stopwatch.StartNew();
         #endregion
 
         public bool SendNextFrame { get; set; } = false;

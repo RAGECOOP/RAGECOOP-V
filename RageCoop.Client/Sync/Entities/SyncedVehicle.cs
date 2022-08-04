@@ -484,7 +484,6 @@ namespace RageCoop.Client
 
         internal float LastEngineHealth { get; set; }
         internal Vector3 LastVelocity { get; set; }
-        internal Stopwatch LastSentStopWatch { get; set; }=new Stopwatch();
         #endregion
     }
 

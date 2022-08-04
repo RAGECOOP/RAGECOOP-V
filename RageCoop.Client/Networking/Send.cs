@@ -10,7 +10,7 @@ namespace RageCoop.Client
     internal static partial class Networking
     {
 
-
+        public static int SyncInterval = 30;
         #region -- SEND --
         /// <summary>
         /// Pack the packet then send to server.
@@ -27,6 +27,10 @@ namespace RageCoop.Client
 
         public static void SendPed(SyncedPed c, bool full)
         {
+            if (c.LastSentStopWatch.ElapsedMilliseconds<SyncInterval)
+            {
+                return;
+            }
             Ped p = c.MainPed;
             var packet = new Packets.PedSync()
             {
@@ -54,6 +58,7 @@ namespace RageCoop.Client
             {
                 packet.Position = p.ReadPosition();
             }
+            c.LastSentStopWatch.Restart();
             if (full)
             {
                 packet.Flags |= PedDataFlags.IsFullSync;
@@ -84,6 +89,10 @@ namespace RageCoop.Client
         }
         public static void SendVehicle(SyncedVehicle v, bool full)
         {
+            if (v.LastSentStopWatch.ElapsedMilliseconds<SyncInterval)
+            {
+                return;
+            }
             Vehicle veh = v.MainVehicle;
             var packet = new Packets.VehicleSync()
             {

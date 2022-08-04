@@ -325,11 +325,11 @@ namespace RageCoop.Server
                         if (status == NetConnectionStatus.Disconnected)
                         {
 
-                            SendPlayerDisconnectPacket(sender);
+                            PlayerDisconnected(sender);
                         }
                         else if (status == NetConnectionStatus.Connected)
                         {
-                            SendPlayerConnectPacket(sender);
+                            PlayerConnected(sender);
                             _worker.QueueJob(() => API.Events.InvokePlayerConnected(sender));
                             Resources.SendTo(sender);
                         }
@@ -512,8 +512,6 @@ namespace RageCoop.Server
             senderConnection.Disconnect(e.Message);
         }
 
-        #region -- SYNC --
-        // Before we approve the connection, we must shake hands
         private void GetHandshake(NetConnection connection, Packets.Handshake packet)
         {
             Logger?.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + connection.RemoteEndPoint.Address.ToString() + "]");
@@ -595,7 +593,7 @@ namespace RageCoop.Server
         }
 
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
-        private void SendPlayerConnectPacket(Client newClient)
+        private void PlayerConnected(Client newClient)
         {
             if (newClient==_hostClient)
             {
@@ -616,7 +614,7 @@ namespace RageCoop.Server
                 }.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, newClient.Connection, NetDeliveryMethod.ReliableOrdered, 0);
             });
-
+            
             // Send all props to this player
             BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
 
@@ -647,7 +645,7 @@ namespace RageCoop.Server
         }
 
         // Send all players a message that someone has left the server
-        private void SendPlayerDisconnectPacket(Client localClient)
+        private void PlayerDisconnected(Client localClient)
         {
             var cons = MainNetServer.Connections.Exclude(localClient.Connection);
             if (cons.Count!=0)
@@ -674,6 +672,7 @@ namespace RageCoop.Server
             Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
         }
 
+        #region -- SYNC --
         #region SyncEntities
 
         private void PedSync(Packets.PedSync packet, Client client)
