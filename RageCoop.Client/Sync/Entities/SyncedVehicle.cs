@@ -364,7 +364,7 @@ namespace RageCoop.Client
             LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
-            var cali = (dist<1?dist*4:dist)*(_predictedPos - current);
+            var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);
             // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), dist.ToString()).Draw();
             
             if (dist<8)
