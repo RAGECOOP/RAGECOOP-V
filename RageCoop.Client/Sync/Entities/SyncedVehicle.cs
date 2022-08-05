@@ -437,6 +437,10 @@ namespace RageCoop.Client
             {
                 MainVehicle.RoofState=RoofState;
             }
+            foreach(var w in MainVehicle.Wheels)
+            {
+                w.Fix();
+            }
             if (IsInvincible) { MainVehicle.IsInvincible=true; }
             _isMotorcycle=Model.IsMotorcycle;
             Model.MarkAsNoLongerNeeded();
