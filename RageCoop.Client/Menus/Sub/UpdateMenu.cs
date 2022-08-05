@@ -64,6 +64,11 @@ namespace RageCoop.Client.Menus
                 {
                     _updatingItem.AltTitle="Installing...";
                 });
+                foreach(var f in Directory.GetFiles(Directory.GetParent(typeof(Main).Assembly.Location).FullName, "*.dll", SearchOption.AllDirectories))
+                {
+                    try { File.Delete(f); }
+                    catch { }
+                }
                 new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
                 Main.QueueAction(() =>
                 {
