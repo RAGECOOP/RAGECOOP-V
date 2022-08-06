@@ -44,7 +44,7 @@ namespace RageCoop.Server
         internal ServerEntities Entities;
 
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
-        internal readonly Dictionary<long,Client> Clients = new();
+        internal readonly Dictionary<long,Client> ClientsByNetHandle = new();
         internal readonly Dictionary<string, Client> ClientsByName = new();
         internal Client _hostClient;
 
@@ -88,7 +88,7 @@ namespace RageCoop.Server
             {
                 while (!_stopping)
                 {
-                    foreach(var c in Clients.Values.ToArray())
+                    foreach(var c in ClientsByNetHandle.Values.ToArray())
                     {
                         c.UpdateLatency();
                     }
@@ -316,7 +316,7 @@ namespace RageCoop.Server
                 case NetIncomingMessageType.StatusChanged:
                     {
                         // Get sender client
-                        if (!Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
+                        if (!ClientsByNetHandle.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
                         {
                             break;
                         }
@@ -339,7 +339,7 @@ namespace RageCoop.Server
                     {
                         
                         // Get sender client
-                        if (Clients.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
+                        if (ClientsByNetHandle.TryGetValue(message.SenderConnection.RemoteUniqueIdentifier, out sender))
                         {
                             // Get packet type
                             var type = (PacketType)message.ReadByte();
@@ -531,7 +531,7 @@ namespace RageCoop.Server
                 connection.Deny("Username contains special chars!");
                 return;
             }
-            if (Clients.Values.Any(x => x.Username.ToLower() == packet.Username.ToLower()))
+            if (ClientsByNetHandle.Values.Any(x => x.Username.ToLower() == packet.Username.ToLower()))
             {
                 connection.Deny("Username is already taken!");
                 return;
@@ -566,14 +566,14 @@ namespace RageCoop.Server
             Client tmpClient;
 
             // Add the player to Players
-            lock (Clients)
+            lock (ClientsByNetHandle)
             {
                 var player = new ServerPed(this)
                 {
                     ID= packet.PedID,
                 };
                 Entities.Add(player);
-                Clients.Add(connection.RemoteUniqueIdentifier,
+                ClientsByNetHandle.Add(connection.RemoteUniqueIdentifier,
                     tmpClient = new Client(this)
                     {
                         NetID = connection.RemoteUniqueIdentifier,
@@ -582,8 +582,8 @@ namespace RageCoop.Server
                         Player = player
                     }
                 );
-                ClientsByName.Add(packet.Username, tmpClient);
-                if (Clients.Count==1) { 
+                ClientsByName.Add(packet.Username.ToLower(), tmpClient);
+                if (ClientsByNetHandle.Count==1) { 
                     _hostClient=tmpClient;
                 }
             }
@@ -601,7 +601,7 @@ namespace RageCoop.Server
             }
 
             // Send other players to this client
-            Clients.Values.ForEach(target =>
+            ClientsByNetHandle.Values.ForEach(target =>
             {
                 if (target==newClient) { return; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -661,12 +661,12 @@ namespace RageCoop.Server
             Entities.CleanUp(localClient);
             _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
-            Clients.Remove(localClient.NetID);
-            ClientsByName.Remove(localClient.Username);
+            ClientsByNetHandle.Remove(localClient.NetID);
+            ClientsByName.Remove(localClient.Username.ToLower());
             if (localClient==_hostClient)
             {
 
-                _hostClient = Clients.Values.FirstOrDefault();
+                _hostClient = ClientsByNetHandle.Values.FirstOrDefault();
                 _hostClient?.SendCustomEvent(CustomEvents.IsHost, true);
             }
             Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
@@ -685,7 +685,7 @@ namespace RageCoop.Server
                 _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client)); 
             }
             
-            foreach (var c in Clients.Values)
+            foreach (var c in ClientsByNetHandle.Values)
             {
 
                 // Don't send data back
@@ -713,7 +713,7 @@ namespace RageCoop.Server
         {
             _worker.QueueJob(() => Entities.Update(packet, client));
             bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
-            foreach (var c in Clients.Values)
+            foreach (var c in ClientsByNetHandle.Values)
             {
                 if (c.NetID==client.NetID) { continue; }
                 if (isPlayer)
@@ -737,7 +737,7 @@ namespace RageCoop.Server
         private void ProjectileSync(Packets.ProjectileSync packet, Client client)
         {
 
-            foreach (var c in Clients.Values)
+            foreach (var c in ClientsByNetHandle.Values)
             {
                 if (c.NetID==client.NetID) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
@@ -761,7 +761,7 @@ namespace RageCoop.Server
  
             _worker.QueueJob(() => API.Events.InvokeOnChatMessage(message, sender));
                             
-            foreach(var c in Clients.Values)
+            foreach(var c in ClientsByNetHandle.Values)
             {
                 var msg = MainNetServer.CreateMessage();
                 var crypt = new Func<string, byte[]>((s) =>

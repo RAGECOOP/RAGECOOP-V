@@ -192,7 +192,8 @@ namespace RageCoop.Server.Scripting
         /// <returns>The Client from this user or null</returns>
         public Client GetClientByUsername(string username)
         {
-            return Server.Clients.Values.FirstOrDefault(x => x.Username.ToLower() == username.ToLower());
+            Server.ClientsByName.TryGetValue(username, out Client c);
+            return c;
         }
 
         /// <summary>
@@ -212,7 +213,7 @@ namespace RageCoop.Server.Scripting
                 {
                     return;
                 }
-                targets ??= new(Server.Clients.Values);
+                targets ??= new(Server.ClientsByNetHandle.Values);
                 foreach(Client client in targets)
                 {
                     Server.SendChatMessage(username, message, client);
@@ -317,7 +318,7 @@ namespace RageCoop.Server.Scripting
         public void SendCustomEvent(List<Client> targets, int eventHash,  params object[] args)
         {
 
-            targets ??= new(Server.Clients.Values);
+            targets ??= new(Server.ClientsByNetHandle.Values);
             var p = new Packets.CustomEvent()
             {
                 Args=args,
@@ -338,7 +339,7 @@ namespace RageCoop.Server.Scripting
         public void SendCustomEventQueued(List<Client> targets, int eventHash, params object[] args)
         {
 
-            targets ??= new(Server.Clients.Values);
+            targets ??= new(Server.ClientsByNetHandle.Values);
             var p = new Packets.CustomEvent(null,true)
             {
                 Args=args,
