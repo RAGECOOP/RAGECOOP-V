@@ -32,8 +32,8 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID=reader.ReadInt();
-                NewOwnerID=reader.ReadInt();
+                ID=reader.ReadInt32();
+                NewOwnerID=reader.ReadInt32();
                 
                 #endregion
             }

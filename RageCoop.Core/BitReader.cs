@@ -2,116 +2,30 @@
 using System.Text;
 using System.Linq;
 using GTA.Math;
+using System.IO;
 
 namespace RageCoop.Core
 {
-    internal class BitReader
+    internal class BitReader:BinaryReader
     {
-        public int CurrentIndex { get; set; }
 
-        private byte[] ResultArray;
-
-        public BitReader(byte[] array)
+        public BitReader(byte[] array):base(new MemoryStream(array))
         {
-            CurrentIndex = 0;
-            ResultArray = array;
         }
 
         ~BitReader()
         {
-            ResultArray = null;
+            Close();
+            Dispose();
         }
 
-        public bool CanRead(int bytes)
-        {
-            return ResultArray.Length >= CurrentIndex + bytes;
-        }
-
-        public bool ReadBool()
-        {
-            bool value = BitConverter.ToBoolean(ResultArray, CurrentIndex);
-            CurrentIndex += 1;
-            return value;
-        }
-
-        public float ReadFloat()
-        {
-            float value = BitConverter.ToSingle(ResultArray, CurrentIndex);
-            CurrentIndex += 4;
-            return value;
-        }
-
-        public byte ReadByte()
-        {
-            byte value = ResultArray[CurrentIndex];
-            CurrentIndex += 1;
-            return value;
-        }
-
-        public byte[] ReadByteArray(int length)
-        {
-            byte[] value = new byte[length];
-            Array.Copy(ResultArray, CurrentIndex,value,0,length);
-            CurrentIndex += length;
-            return value;
-        }
         public byte[] ReadByteArray()
         {
-            return ReadByteArray(ReadInt());
+            return base.ReadBytes(ReadInt32());
         }
-        public short ReadShort()
+        public override string ReadString()
         {
-            short value = BitConverter.ToInt16(ResultArray, CurrentIndex);
-            CurrentIndex += 2;
-            return value;
-        }
-
-        public ushort ReadUShort()
-        {
-            ushort value = BitConverter.ToUInt16(ResultArray, CurrentIndex);
-            CurrentIndex += 2;
-            return value;
-        }
-
-        public int ReadInt()
-        {
-            int value = BitConverter.ToInt32(ResultArray, CurrentIndex);
-            CurrentIndex += 4;
-            return value;
-        }
-
-        public uint ReadUInt()
-        {
-            uint value = BitConverter.ToUInt32(ResultArray, CurrentIndex);
-            CurrentIndex += 4;
-            return value;
-        }
-
-        public long ReadLong()
-        {
-            long value = BitConverter.ToInt64(ResultArray, CurrentIndex);
-            CurrentIndex += 8;
-            return value;
-        }
-
-        public ulong ReadULong()
-        {
-            ulong value = BitConverter.ToUInt64(ResultArray, CurrentIndex);
-            CurrentIndex += 8;
-            return value;
-        }
-
-        public string ReadString(int index)
-        {
-            string value = Encoding.UTF8.GetString(ResultArray.Skip(CurrentIndex).Take(index).ToArray());
-            CurrentIndex += index;
-            return value;
-        }
-        public string ReadString()
-        {
-            var len = ReadInt();
-            string value = Encoding.UTF8.GetString(ResultArray.Skip(CurrentIndex).Take(len).ToArray());
-            CurrentIndex += len;
+            string value = Encoding.UTF8.GetString(ReadBytes(ReadInt32()));
             return value;
         }
 
@@ -119,27 +33,27 @@ namespace RageCoop.Core
         {
             return new Vector3()
             {
-                X = ReadFloat(),
-                Y = ReadFloat(),
-                Z = ReadFloat()
+                X = ReadSingle(),
+                Y = ReadSingle(),
+                Z = ReadSingle()
             };
         }
         public Vector2 ReadVector2()
         {
             return new Vector2()
             {
-                X = ReadFloat(),
-                Y = ReadFloat()
+                X = ReadSingle(),
+                Y = ReadSingle()
             };
         }
         public Quaternion ReadQuaternion()
         {
             return new Quaternion()
             {
-                X = ReadFloat(),
-                Y = ReadFloat(),
-                Z = ReadFloat(),
-                W = ReadFloat()
+                X = ReadSingle(),
+                Y = ReadSingle(),
+                Z = ReadSingle(),
+                W = ReadSingle()
             };
         }
     }

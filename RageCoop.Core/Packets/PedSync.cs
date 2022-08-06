@@ -153,15 +153,15 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read player netHandle
-                ID = reader.ReadInt();
+                ID = reader.ReadInt32();
 
-                OwnerID=reader.ReadInt();
+                OwnerID=reader.ReadInt32();
 
                 // Read player flags
-                Flags = (PedDataFlags)reader.ReadUShort();
+                Flags = (PedDataFlags)reader.ReadUInt16();
 
                 // Read player health
-                Health = reader.ReadInt();
+                Health = reader.ReadInt32();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
@@ -186,7 +186,7 @@ namespace RageCoop.Core
                 Speed = reader.ReadByte();
 
                 // Read player weapon hash
-                CurrentWeaponHash = reader.ReadUInt();
+                CurrentWeaponHash = reader.ReadUInt32();
 
                 // Try to read aim coords
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
@@ -195,24 +195,24 @@ namespace RageCoop.Core
                     AimCoords = reader.ReadVector3();
                 }
 
-                Heading=reader.ReadFloat();
+                Heading=reader.ReadSingle();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
                     // Read player model hash
-                    ModelHash = reader.ReadInt();
+                    ModelHash = reader.ReadInt32();
 
                     // Read player clothes
-                    Clothes =reader.ReadByteArray(36);
+                    Clothes =reader.ReadBytes(36);
 
                     // Read player weapon components
-                    if (reader.ReadBool())
+                    if (reader.ReadBoolean())
                     {
                         WeaponComponents = new Dictionary<uint, bool>();
-                        ushort comCount = reader.ReadUShort();
+                        ushort comCount = reader.ReadUInt16();
                         for (ushort i = 0; i < comCount; i++)
                         {
-                            WeaponComponents.Add(reader.ReadUInt(), reader.ReadBool());
+                            WeaponComponents.Add(reader.ReadUInt32(), reader.ReadBoolean());
                         }
                     }
                     WeaponTint=reader.ReadByte();
@@ -221,8 +221,8 @@ namespace RageCoop.Core
 
                     if ((byte)BlipColor!=255)
                     {
-                        BlipSprite=(BlipSprite)reader.ReadUShort();
-                        BlipScale=reader.ReadFloat();
+                        BlipSprite=(BlipSprite)reader.ReadUInt16();
+                        BlipScale=reader.ReadSingle();
                     }
                 }
                 #endregion

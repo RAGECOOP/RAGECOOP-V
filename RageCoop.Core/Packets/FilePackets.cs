@@ -48,14 +48,11 @@ namespace RageCoop.Core
 
             public override void Deserialize(byte[] array)
             {
-                #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt();
-                int nameArrayLength = reader.ReadInt();
-                Name = reader.ReadString(nameArrayLength);
-                FileLength = reader.ReadLong();
-                #endregion
+                ID = reader.ReadInt32();
+                Name = reader.ReadString();
+                FileLength = reader.ReadInt64();
             }
         }
 
@@ -81,7 +78,7 @@ namespace RageCoop.Core
             {
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt();
+                ID = reader.ReadInt32();
                 Response = (FileResponse)reader.ReadByte();
             }
         }
@@ -110,13 +107,10 @@ namespace RageCoop.Core
 
             public override void Deserialize(byte[] array)
             {
-                #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt();
-                int chunkLength = reader.ReadInt();
-                FileChunk = reader.ReadByteArray(chunkLength);
-                #endregion
+                ID = reader.ReadInt32();
+                FileChunk = reader.ReadByteArray();
             }
         }
 
@@ -138,25 +132,15 @@ namespace RageCoop.Core
 
             public override void Deserialize(byte[] array)
             {
-                #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt();
-                #endregion
+                ID = reader.ReadInt32();
             }
         }
         internal class AllResourcesSent : Packet
         {
 
             public override PacketType Type  => PacketType.AllResourcesSent;
-            public override byte[] Serialize()
-            {
-                return new byte[0];
-            }
-
-            public override void Deserialize(byte[] array)
-            {
-            }
         }
     }
 }

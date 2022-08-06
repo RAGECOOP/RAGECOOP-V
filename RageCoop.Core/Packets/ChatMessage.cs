@@ -49,8 +49,7 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read username
-                int usernameLength = reader.ReadInt();
-                Username = reader.ReadString(usernameLength);
+                Username = reader.ReadString();
 
                 Message = decrypt(reader.ReadByteArray()).GetString();
                 #endregion

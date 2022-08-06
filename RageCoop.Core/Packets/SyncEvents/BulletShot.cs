@@ -47,10 +47,10 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read OwnerID
-                OwnerID=reader.ReadInt();
+                OwnerID=reader.ReadInt32();
 
                 // Read WeponHash
-                WeaponHash=reader.ReadUInt();
+                WeaponHash=reader.ReadUInt32();
 
                 // Read StartPosition
                 StartPosition=reader.ReadVector3();

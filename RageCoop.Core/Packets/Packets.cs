@@ -28,6 +28,8 @@ namespace RageCoop.Core
         
         CustomEvent = 16,
         CustomEventQueued = 17,
+
+        ConnectionRequest=18,
         #region Sync
 
         #region INTERVAL
@@ -146,7 +148,11 @@ namespace RageCoop.Core
     internal abstract class Packet : IPacket
     {
         public abstract PacketType Type { get; }
-        public abstract byte[] Serialize();
+        public virtual byte[] Serialize()
+        {
+            return new byte[0];
+        }
+        public virtual void Deserialize(byte[] array) { }
         public void Pack(NetOutgoingMessage message)
         {
             var d=Serialize();
@@ -154,6 +160,5 @@ namespace RageCoop.Core
             message.Write(d.Length);
             message.Write(d);
         }
-        public abstract void Deserialize(byte[] array);
     }
 }

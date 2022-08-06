@@ -174,11 +174,11 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read vehicle id
-                ID = reader.ReadInt();
+                ID = reader.ReadInt32();
 
-                OwnerID = reader.ReadInt();
+                OwnerID = reader.ReadInt32();
 
-                Flags=(VehicleDataFlags)reader.ReadUShort();
+                Flags=(VehicleDataFlags)reader.ReadUInt16();
 
                 // Read position
                 Position = reader.ReadVector3();
@@ -195,27 +195,27 @@ namespace RageCoop.Core
                 RotationVelocity=reader.ReadVector3();
 
                 // Read throttle power
-                ThrottlePower=reader.ReadFloat();
+                ThrottlePower=reader.ReadSingle();
 
                 // Read brake power
-                BrakePower=reader.ReadFloat();
+                BrakePower=reader.ReadSingle();
 
                 // Read steering angle
-                SteeringAngle = reader.ReadFloat();
+                SteeringAngle = reader.ReadSingle();
 
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
-                    DeluxoWingRatio = reader.ReadFloat();
+                    DeluxoWingRatio = reader.ReadSingle();
                 }
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
                     // Read vehicle model hash
-                    ModelHash = reader.ReadInt();
+                    ModelHash = reader.ReadInt32();
 
                     // Read vehicle engine health
-                    EngineHealth = reader.ReadFloat();
+                    EngineHealth = reader.ReadSingle();
 
 
                     // Check
@@ -238,15 +238,15 @@ namespace RageCoop.Core
                     // Create new Dictionary
                     Mods = new Dictionary<int, int>();
                     // Read count of mods
-                    short vehModCount = reader.ReadShort();
+                    short vehModCount = reader.ReadInt16();
                     // Loop
                     for (int i = 0; i < vehModCount; i++)
                     {
                         // Read the mod value
-                        Mods.Add(reader.ReadInt(), reader.ReadInt());
+                        Mods.Add(reader.ReadInt32(), reader.ReadInt32());
                     }
 
-                    if (reader.ReadBool())
+                    if (reader.ReadBoolean())
                     {
                         // Read vehicle damage model
                         DamageModel = new VehicleDamageModel()
@@ -254,7 +254,7 @@ namespace RageCoop.Core
                             BrokenDoors = reader.ReadByte(),
                             OpenedDoors=reader.ReadByte(),
                             BrokenWindows = reader.ReadByte(),
-                            BurstedTires = reader.ReadShort(),
+                            BurstedTires = reader.ReadInt16(),
                             LeftHeadLightBroken = reader.ReadByte(),
                             RightHeadLightBroken = reader.ReadByte()
                         };
@@ -263,12 +263,12 @@ namespace RageCoop.Core
 
                     // Read Passengers
                     Passengers=new Dictionary<int, int>();
-                    int count = reader.ReadInt();
+                    int count = reader.ReadInt32();
                     for (int i = 0; i<count; i++)
                     {
                         int seat, id;
-                        seat = reader.ReadInt();
-                        id = reader.ReadInt();
+                        seat = reader.ReadInt32();
+                        id = reader.ReadInt32();
                         Passengers.Add(seat, id);
 
                     }
@@ -280,7 +280,7 @@ namespace RageCoop.Core
                     // Read RadioStation
                     RadioStation=reader.ReadByte();
 
-                    LicensePlate=Encoding.ASCII.GetString(reader.ReadByteArray(8));
+                    LicensePlate=Encoding.ASCII.GetString(reader.ReadBytes(8));
 
                     Livery=(int)(reader.ReadByte()-1);
                 }

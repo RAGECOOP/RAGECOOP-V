@@ -29,7 +29,7 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                VictimID=reader.ReadInt();
+                VictimID=reader.ReadInt32();
 
                 #endregion
             }

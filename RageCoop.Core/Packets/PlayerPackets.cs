@@ -70,13 +70,13 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read player netHandle
-                PedID = reader.ReadInt();
+                PedID = reader.ReadInt32();
 
                 // Read Username
-                Username = reader.ReadString(reader.ReadInt());
+                Username = reader.ReadString();
 
                 // Read ModVersion
-                ModVersion = reader.ReadString(reader.ReadInt());
+                ModVersion = reader.ReadString();
 
                 AesKeyCrypted=reader.ReadByteArray();
 
@@ -121,11 +121,10 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read player netHandle
-                PedID = reader.ReadInt();
+                PedID = reader.ReadInt32();
 
                 // Read Username
-                int usernameLength = reader.ReadInt();
-                Username = reader.ReadString(usernameLength);
+                Username = reader.ReadString();
                 #endregion
             }
         }
@@ -150,7 +149,7 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                PedID = reader.ReadInt();
+                PedID = reader.ReadInt32();
                 #endregion
             }
         }
@@ -193,13 +192,12 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read player ID
-                PedID = reader.ReadInt();
+                PedID = reader.ReadInt32();
 
                 // Read Username
-                int usernameLength = reader.ReadInt();
-                Username = reader.ReadString(usernameLength);
+                Username = reader.ReadString();
 
-                Latency=reader.ReadFloat();
+                Latency=reader.ReadSingle();
             }
         }
 
@@ -236,14 +234,6 @@ namespace RageCoop.Core
         public class PublicKeyRequest : Packet
         {
             public override PacketType Type  => PacketType.PublicKeyRequest;
-
-            public override byte[] Serialize()
-            {
-                return new byte[0];
-            }
-            public override void Deserialize(byte[] array)
-            {
-            }
         }
     }
 }

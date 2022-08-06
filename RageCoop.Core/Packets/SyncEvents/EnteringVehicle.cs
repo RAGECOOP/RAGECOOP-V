@@ -24,7 +24,7 @@ namespace RageCoop.Core
 
                 byteArray.AddInt(PedID);
                 byteArray.AddInt(VehicleID);
-                byteArray.AddInt(VehicleSeat);
+                byteArray.AddShort(VehicleSeat);
 
                 return byteArray.ToArray();
 
@@ -35,9 +35,9 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                PedID=reader.ReadInt();
-                VehicleID=reader.ReadInt();
-                VehicleSeat=reader.ReadShort();
+                PedID=reader.ReadInt32();
+                VehicleID=reader.ReadInt32();
+                VehicleSeat=reader.ReadInt16();
                 
                 #endregion
             }

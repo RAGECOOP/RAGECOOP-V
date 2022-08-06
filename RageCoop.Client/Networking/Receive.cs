@@ -15,13 +15,13 @@ namespace RageCoop.Client
                switch (t)
                {
                    case 50:
-                       return EntityPool.ServerProps[reader.ReadInt()].MainProp?.Handle;
+                       return EntityPool.ServerProps[reader.ReadInt32()].MainProp?.Handle;
                    case 51:
-                       return EntityPool.GetPedByID(reader.ReadInt())?.MainPed?.Handle;
+                       return EntityPool.GetPedByID(reader.ReadInt32())?.MainPed?.Handle;
                    case 52:
-                       return EntityPool.GetVehicleByID(reader.ReadInt())?.MainVehicle?.Handle;
+                       return EntityPool.GetVehicleByID(reader.ReadInt32())?.MainVehicle?.Handle;
                    case 60:
-                       return EntityPool.ServerBlips[reader.ReadInt()].Handle;
+                       return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
                    default:
                        throw new ArgumentException("Cannot resolve server side argument: "+t);
 

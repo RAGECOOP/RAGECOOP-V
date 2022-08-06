@@ -48,8 +48,7 @@ namespace RageCoop.Core
 
                 // Write velocity
                 byteArray.AddVector3(Velocity);
-
-                if (Exploded) { byteArray.Add(1); }
+                byteArray.Add(Exploded?(byte)1:(byte)0);
 
                 return byteArray.ToArray();
 
@@ -61,12 +60,12 @@ namespace RageCoop.Core
                 BitReader reader = new BitReader(array);
 
                 // Read id
-                ID = reader.ReadInt();
+                ID = reader.ReadInt32();
 
                 // Read ShooterID
-                ShooterID= reader.ReadInt();
+                ShooterID= reader.ReadInt32();
 
-                WeaponHash= reader.ReadUInt();
+                WeaponHash= reader.ReadUInt32();
 
                 // Read position
                 Position = reader.ReadVector3();
@@ -77,7 +76,7 @@ namespace RageCoop.Core
                 // Read velocity
                 Velocity =reader.ReadVector3();
 
-                if (reader.CanRead(1))
+                if (reader.ReadBoolean())
                 {
                     Exploded=true;
                 }

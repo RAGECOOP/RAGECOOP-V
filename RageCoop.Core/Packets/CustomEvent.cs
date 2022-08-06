@@ -45,8 +45,8 @@ namespace RageCoop.Core
             {
                 BitReader reader = new BitReader(array);
 
-                Hash = reader.ReadInt();
-                var len=reader.ReadInt();
+                Hash = reader.ReadInt32();
+                var len=reader.ReadInt32();
                 Args=new object[len];
                 for (int i = 0; i < len; i++)
                 {
@@ -56,21 +56,21 @@ namespace RageCoop.Core
                         case 0x01:
                             Args[i]=reader.ReadByte(); break;
                         case 0x02:
-                            Args[i]=reader.ReadShort(); break;
+                            Args[i]=reader.ReadInt32(); break;
                         case 0x03:
-                            Args[i]=reader.ReadUShort(); break;
+                            Args[i]=reader.ReadUInt16(); break;
                         case 0x04:
-                            Args[i]=reader.ReadInt(); break;
+                            Args[i]=reader.ReadInt32(); break;
                         case 0x05:
-                            Args[i]=reader.ReadUInt(); break;
+                            Args[i]=reader.ReadUInt32(); break;
                         case 0x06:
-                            Args[i]=reader.ReadLong(); break;
+                            Args[i]=reader.ReadInt64(); break;
                         case 0x07:
-                            Args[i]=reader.ReadULong(); break;
+                            Args[i]=reader.ReadUInt64(); break;
                         case 0x08:
-                            Args[i]=reader.ReadFloat(); break;
+                            Args[i]=reader.ReadSingle(); break;
                         case 0x09:
-                            Args[i]=reader.ReadBool(); break;
+                            Args[i]=reader.ReadBoolean(); break;
                         case 0x10:
                             Args[i]=reader.ReadString(); break;
                         case 0x11: 
@@ -78,7 +78,7 @@ namespace RageCoop.Core
                         case 0x12:
                             Args[i]=reader.ReadQuaternion(); break;
                         case 0x13:
-                            Args[i]=(GTA.Model)reader.ReadInt(); break;
+                            Args[i]=(GTA.Model)reader.ReadInt32(); break;
                         case 0x14:
                             Args[i]=reader.ReadVector2(); break;
                         default:

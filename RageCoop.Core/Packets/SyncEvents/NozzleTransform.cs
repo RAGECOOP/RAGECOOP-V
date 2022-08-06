@@ -21,7 +21,7 @@ namespace RageCoop.Core
                 List<byte> byteArray = new List<byte>();
 
                 byteArray.AddInt(VehicleID);
-                if (Hover) { byteArray.Add(1); }
+                byteArray.AddBool(Hover);
 
                 return byteArray.ToArray();
 
@@ -31,8 +31,8 @@ namespace RageCoop.Core
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
-                VehicleID=reader.ReadInt();
-                Hover=reader.CanRead(1);
+                VehicleID=reader.ReadInt32();
+                Hover=reader.ReadBoolean();
                 
                 #endregion
             }
