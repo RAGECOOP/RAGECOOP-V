@@ -91,7 +91,7 @@ namespace RageCoop.Client
                     try
                     {
                         DownloadManager.Cleanup();
-                        Peer = new NetClient(config);
+                        Peer = new NetPeer(config);
                         Peer.Start();
                         Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled=false;
