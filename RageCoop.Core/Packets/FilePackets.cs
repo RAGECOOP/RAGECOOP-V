@@ -18,7 +18,7 @@ namespace RageCoop.Core
     {
         internal class FileTransferRequest : Packet
         {
-            public override PacketType Type { get { return PacketType.FileTransferRequest; } }
+            public override PacketType Type => PacketType.FileTransferRequest;
             public int ID { get; set; }
 
             public string Name { get; set; }
@@ -61,7 +61,7 @@ namespace RageCoop.Core
 
         internal class FileTransferResponse : Packet
         {
-            public override PacketType Type { get { return PacketType.FileTransferResponse; } }
+            public override PacketType Type => PacketType.FileTransferResponse;
             public int ID { get; set; }
             public FileResponse Response { get; set; }
             public override byte[] Serialize()
@@ -88,7 +88,7 @@ namespace RageCoop.Core
 
         internal class FileTransferChunk : Packet
         {
-            public override PacketType Type { get { return PacketType.FileTransferChunk; } }
+            public override PacketType Type  => PacketType.FileTransferChunk;
             public int ID { get; set; }
 
             public byte[] FileChunk { get; set; }
@@ -122,7 +122,7 @@ namespace RageCoop.Core
 
         internal class FileTransferComplete : Packet
         {
-            public override PacketType Type { get { return PacketType.FileTransferComplete; } }
+            public override PacketType Type  => PacketType.FileTransferComplete;
             public int ID { get; set; }
 
             public override byte[] Serialize()
@@ -148,7 +148,7 @@ namespace RageCoop.Core
         internal class AllResourcesSent : Packet
         {
 
-            public override PacketType Type { get { return PacketType.AllResourcesSent; } }
+            public override PacketType Type  => PacketType.AllResourcesSent;
             public override byte[] Serialize()
             {
                 return new byte[0];

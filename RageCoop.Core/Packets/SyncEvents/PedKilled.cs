@@ -11,7 +11,7 @@ namespace RageCoop.Core
 
         internal class PedKilled : Packet
         {
-            public override PacketType Type { get { return PacketType.PedKilled; } }
+            public override PacketType Type  => PacketType.PedKilled;
             public int VictimID { get; set; }
 
             public override byte[] Serialize()

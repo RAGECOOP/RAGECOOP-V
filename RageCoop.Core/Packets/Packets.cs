@@ -141,7 +141,6 @@ namespace RageCoop.Core
         byte[] Serialize();
 
         void Deserialize(byte[] data);
-        void Pack(NetOutgoingMessage message);
     }
 
     internal abstract class Packet : IPacket

@@ -10,7 +10,7 @@ namespace RageCoop.Core
     {
         internal class NozzleTransform : Packet
         {
-            public override PacketType Type { get { return PacketType.NozzleTransform; } }
+            public override PacketType Type  => PacketType.NozzleTransform;
             public int VehicleID { get; set; }
 
             public bool Hover { get; set; }

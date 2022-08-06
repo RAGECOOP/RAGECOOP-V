@@ -11,7 +11,7 @@ namespace RageCoop.Core
 
         internal class LeaveVehicle : Packet
         {
-            public override PacketType Type { get { return PacketType.LeaveVehicle; } }
+            public override PacketType Type  => PacketType.LeaveVehicle;
             public int ID { get; set; }
 
 

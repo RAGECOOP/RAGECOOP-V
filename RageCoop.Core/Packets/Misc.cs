@@ -8,7 +8,7 @@ namespace RageCoop.Core
     {
         internal class PingPong : Packet
         {
-            public override PacketType Type { get { return PacketType.PingPong; } }
+            public override PacketType Type  => PacketType.PingPong;
             public override byte[] Serialize()
             {
                 return new byte[0];

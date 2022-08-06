@@ -9,7 +9,7 @@ namespace RageCoop.Core
 
         internal class CustomEvent : Packet
         {
-            public override PacketType Type { get { return (_queued ? PacketType.CustomEventQueued : PacketType.CustomEvent); } }
+            public override PacketType Type  => (_queued ? PacketType.CustomEventQueued : PacketType.CustomEvent);
             public CustomEvent(Func<byte,BitReader,object> onResolve = null,bool queued=false)
             {
                 _resolve= onResolve;

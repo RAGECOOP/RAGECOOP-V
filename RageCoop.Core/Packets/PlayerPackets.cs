@@ -10,7 +10,7 @@ namespace RageCoop.Core
     {
         internal class Handshake : Packet
         {
-            public override PacketType Type { get { return PacketType.Handshake; } }
+            public override PacketType Type  => PacketType.Handshake;
             public int PedID { get; set; }
 
             public string Username { get; set; }
@@ -90,7 +90,7 @@ namespace RageCoop.Core
 
         public class PlayerConnect : Packet
         {
-            public override PacketType Type { get { return PacketType.PlayerConnect; } }
+            public override PacketType Type  => PacketType.PlayerConnect;
             public int PedID { get; set; }
 
             public string Username { get; set; }
@@ -132,7 +132,7 @@ namespace RageCoop.Core
 
         public class PlayerDisconnect : Packet
         {
-            public override PacketType Type { get { return PacketType.PlayerDisconnect; } }
+            public override PacketType Type  => PacketType.PlayerDisconnect;
             public int PedID { get; set; }
 
             public override byte[] Serialize()
@@ -156,7 +156,7 @@ namespace RageCoop.Core
         }
         public class PlayerInfoUpdate : Packet
         {
-            public override PacketType Type { get { return PacketType.PlayerInfoUpdate; } }
+            public override PacketType Type  => PacketType.PlayerInfoUpdate;
 
             /// <summary>
             /// Ped ID for this Player
@@ -205,7 +205,7 @@ namespace RageCoop.Core
 
         public class PublicKeyResponse : Packet
         {
-            public override PacketType Type { get { return PacketType.PublicKeyResponse; } }
+            public override PacketType Type  => PacketType.PublicKeyResponse;
 
             public byte[] Modulus;
             public byte[] Exponent;
@@ -235,7 +235,7 @@ namespace RageCoop.Core
 
         public class PublicKeyRequest : Packet
         {
-            public override PacketType Type { get { return PacketType.PublicKeyRequest; } }
+            public override PacketType Type  => PacketType.PublicKeyRequest;
 
             public override byte[] Serialize()
             {

@@ -10,7 +10,7 @@ namespace RageCoop.Core
     {
         internal class EnteringVehicle : Packet
         {
-            public override PacketType Type { get { return PacketType.EnteringVehicle; } }
+            public override PacketType Type  => PacketType.EnteringVehicle;
             public int PedID { get; set; }
 
             public int VehicleID { get; set; }

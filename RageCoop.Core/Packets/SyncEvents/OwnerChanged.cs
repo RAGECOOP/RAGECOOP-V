@@ -11,7 +11,7 @@ namespace RageCoop.Core
 
         internal class OwnerChanged : Packet
         {
-            public override PacketType Type { get { return PacketType.OwnerChanged; } }
+            public override PacketType Type  => PacketType.OwnerChanged;
             public int ID { get; set; }
 
             public int NewOwnerID { get; set; }

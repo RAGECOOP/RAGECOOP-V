@@ -13,7 +13,7 @@ namespace RageCoop.Core
 
         public class VehicleSync : Packet
         {
-            public override PacketType Type { get { return PacketType.VehicleSync; } }
+            public override PacketType Type  => PacketType.VehicleSync;
             public int ID { get; set; }
 
             public int OwnerID { get; set; }

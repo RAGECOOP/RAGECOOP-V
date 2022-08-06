@@ -10,7 +10,7 @@ namespace RageCoop.Core
 
         internal class ChatMessage : Packet
         {
-            public override PacketType Type { get { return PacketType.ChatMessage; } }
+            public override PacketType Type  => PacketType.ChatMessage;
             private Func<string, byte[]> crypt;
             private Func<byte[], byte[]> decrypt;
             public ChatMessage(Func<string, byte[]> crypter)

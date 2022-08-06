@@ -11,7 +11,7 @@ namespace RageCoop.Core
 
         internal class BulletShot : Packet
         {
-            public override PacketType Type { get { return PacketType.BulletShot; } }
+            public override PacketType Type  => PacketType.BulletShot;
             public int OwnerID { get; set; }
 
             public uint WeaponHash { get; set; }

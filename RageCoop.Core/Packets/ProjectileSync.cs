@@ -10,7 +10,7 @@ namespace RageCoop.Core
     {
         internal class ProjectileSync : Packet
         {
-            public override PacketType Type { get { return PacketType.ProjectileSync; } }
+            public override PacketType Type  => PacketType.ProjectileSync;
             public int ID { get; set; }
 
             public int ShooterID { get; set; }

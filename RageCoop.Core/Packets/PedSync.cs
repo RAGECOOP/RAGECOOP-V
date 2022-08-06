@@ -13,7 +13,7 @@ namespace RageCoop.Core
 
         internal class PedSync : Packet
         {
-            public override PacketType Type { get { return PacketType.PedSync; } }
+            public override PacketType Type  => PacketType.PedSync;
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
