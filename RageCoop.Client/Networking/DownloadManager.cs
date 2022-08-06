@@ -14,7 +14,7 @@ namespace RageCoop.Client
             Networking.RequestHandlers.Add(PacketType.FileTransferRequest, (data) =>
             {
                 var fr = new Packets.FileTransferRequest();
-                fr.Unpack(data);
+                fr.Deserialize(data);
                 if (fr.Name.EndsWith(".res"))
                 {
                     _resources.Add(fr.Name);
@@ -28,7 +28,7 @@ namespace RageCoop.Client
             Networking.RequestHandlers.Add(PacketType.FileTransferComplete, (data) =>
             {
                 Packets.FileTransferComplete packet = new Packets.FileTransferComplete();
-                packet.Unpack(data);
+                packet.Deserialize(data);
 
                 Main.Logger.Debug($"Finalizing download:{packet.ID}");
                 Complete(packet.ID);

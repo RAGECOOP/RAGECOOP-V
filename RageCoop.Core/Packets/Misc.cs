@@ -8,17 +8,13 @@ namespace RageCoop.Core
     {
         internal class PingPong : Packet
         {
-
-            public override void Pack(NetOutgoingMessage message)
+            public override PacketType Type { get { return PacketType.PingPong; } }
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PingPong);
-                message.Write(1);
-                message.Write((byte)0);
-                #endregion
+                return new byte[0];
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
             }
         }

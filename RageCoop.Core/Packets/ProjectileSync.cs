@@ -10,7 +10,7 @@ namespace RageCoop.Core
     {
         internal class ProjectileSync : Packet
         {
-
+            public override PacketType Type { get { return PacketType.ProjectileSync; } }
             public int ID { get; set; }
 
             public int ShooterID { get; set; }
@@ -26,10 +26,8 @@ namespace RageCoop.Core
 
 
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.ProjectileSync);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -53,14 +51,11 @@ namespace RageCoop.Core
 
                 if (Exploded) { byteArray.Add(1); }
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

@@ -13,6 +13,7 @@ namespace RageCoop.Core
 
         internal class PedSync : Packet
         {
+            public override PacketType Type { get { return PacketType.PedSync; } }
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
@@ -56,10 +57,8 @@ namespace RageCoop.Core
             public float BlipScale { get; set; } = 1;
 #endregion
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PedSync);
                 
                 List<byte> byteArray = new List<byte>();
 
@@ -145,14 +144,10 @@ namespace RageCoop.Core
                     }
                 }
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

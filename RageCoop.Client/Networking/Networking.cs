@@ -172,7 +172,7 @@ namespace RageCoop.Client
             PendingResponses.Add(id, (type, p) =>
             {
                 var result = new T();
-                result.Unpack(p);
+                result.Deserialize(p);
                 callback(result);
             });
             var msg = Client.CreateMessage();

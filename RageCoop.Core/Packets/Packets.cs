@@ -135,47 +135,26 @@ namespace RageCoop.Core
     }
     #endregion
 
-    interface IPacket
+    internal interface IPacket
     {
+        PacketType Type { get; }
+        byte[] Serialize();
+
+        void Deserialize(byte[] data);
         void Pack(NetOutgoingMessage message);
-        void Unpack(byte[] array);
     }
 
     internal abstract class Packet : IPacket
     {
-        public abstract void Pack(NetOutgoingMessage message);
-        public abstract void Unpack(byte[] array);
-    }
-
-
-    internal static class CoopSerializer
-    {
-        /// <summary>
-        /// ?
-        /// </summary>
-        public static byte[] Serialize(this object obj)
+        public abstract PacketType Type { get; }
+        public abstract byte[] Serialize();
+        public void Pack(NetOutgoingMessage message)
         {
-            if (obj == null)
-            {
-                return null;
-            }
-
-            string jsonString = JsonConvert.SerializeObject(obj);
-            return System.Text.Encoding.UTF8.GetBytes(jsonString);
+            var d=Serialize();
+            message.Write((byte)Type);
+            message.Write(d.Length);
+            message.Write(d);
         }
-
-        /// <summary>
-        /// ?
-        /// </summary>
-        public static T Deserialize<T>(this byte[] bytes) where T : class
-        {
-            if (bytes == null)
-            {
-                return null;
-            }
-
-            var jsonString = System.Text.Encoding.UTF8.GetString(bytes);
-            return JsonConvert.DeserializeObject<T>(jsonString);
-        }
+        public abstract void Deserialize(byte[] array);
     }
 }

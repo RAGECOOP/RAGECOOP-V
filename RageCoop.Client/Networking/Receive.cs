@@ -148,7 +148,7 @@ namespace RageCoop.Client
                         if (packetType==PacketType.PublicKeyResponse)
                         {
                             var packet = new Packets.PublicKeyResponse();
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
                             Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
                             _publicKeyReceived.Set();
                         }
@@ -175,7 +175,7 @@ namespace RageCoop.Client
                     {
 
                         Packets.PlayerConnect packet = new Packets.PlayerConnect();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
 
                         Main.QueueAction(() => PlayerConnect(packet));
                     }
@@ -184,7 +184,7 @@ namespace RageCoop.Client
                     {
 
                         Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         Main.QueueAction(() => PlayerDisconnect(packet));
 
                     }
@@ -192,7 +192,7 @@ namespace RageCoop.Client
                 case PacketType.PlayerInfoUpdate:
                     {
                         var packet = new Packets.PlayerInfoUpdate();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         PlayerList.UpdatePlayer(packet);
                         break;
                     }
@@ -201,7 +201,7 @@ namespace RageCoop.Client
                     {
 
                         Packets.VehicleSync packet = new Packets.VehicleSync();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         VehicleSync(packet);
 
                     }
@@ -210,7 +210,7 @@ namespace RageCoop.Client
                     {
 
                         Packets.PedSync packet = new Packets.PedSync();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         PedSync(packet);
 
                     }
@@ -218,7 +218,7 @@ namespace RageCoop.Client
                 case PacketType.ProjectileSync:
                     {
                         Packets.ProjectileSync packet = new Packets.ProjectileSync();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         ProjectileSync(packet);
                         break;
                     }
@@ -230,7 +230,7 @@ namespace RageCoop.Client
                         {
                             return Security.Decrypt(b);
                         });
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
 
                         Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
 
@@ -240,7 +240,7 @@ namespace RageCoop.Client
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }
                     break;
@@ -249,7 +249,7 @@ namespace RageCoop.Client
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
                         Main.QueueAction(() =>
                         {
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
                             Scripting.API.Events.InvokeCustomEventReceived(packet);
                         });
                     }
@@ -257,7 +257,7 @@ namespace RageCoop.Client
                 case PacketType.FileTransferChunk:
                     {
                         Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         DownloadManager.Write(packet.ID, packet.FileChunk);
                     }
                     break;

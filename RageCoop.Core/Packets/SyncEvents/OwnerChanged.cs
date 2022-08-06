@@ -11,28 +11,23 @@ namespace RageCoop.Core
 
         internal class OwnerChanged : Packet
         {
+            public override PacketType Type { get { return PacketType.OwnerChanged; } }
             public int ID { get; set; }
 
             public int NewOwnerID { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.OwnerChanged);
 
                 List<byte> byteArray = new List<byte>();
 
                 byteArray.AddInt(ID);
                 byteArray.AddInt(NewOwnerID);
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+               return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

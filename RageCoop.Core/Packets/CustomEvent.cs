@@ -9,6 +9,7 @@ namespace RageCoop.Core
 
         internal class CustomEvent : Packet
         {
+            public override PacketType Type { get { return (_queued ? PacketType.CustomEventQueued : PacketType.CustomEvent); } }
             public CustomEvent(Func<byte,BitReader,object> onResolve = null,bool queued=false)
             {
                 _resolve= onResolve;
@@ -17,13 +18,11 @@ namespace RageCoop.Core
             private bool _queued;
             private Func<byte, BitReader, object> _resolve { get; set; }
             public int Hash { get; set; }
-            public bool IsStaged { get; set; }=false;
             public object[] Args { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
                 Args= Args ?? new object[] { };
-                message.Write(_queued ? (byte)PacketType.CustomEventQueued: (byte)PacketType.CustomEvent);
 
                 List<byte> result = new List<byte>();
                 result.AddInt(Hash);
@@ -39,12 +38,10 @@ namespace RageCoop.Core
                     result.Add(tup.Item1);
                     result.AddRange(tup.Item2);
                 }
-
-                message.Write(result.Count);
-                message.Write(result.ToArray());
+                return result.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 BitReader reader = new BitReader(array);
 

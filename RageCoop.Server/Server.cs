@@ -301,7 +301,7 @@ namespace RageCoop.Server
                                 byte[] data = message.ReadBytes(len);
 
                                 Packets.Handshake packet = new();
-                                packet.Unpack(data);
+                                packet.Deserialize(data);
                                 GetHandshake(message.SenderConnection, packet);
                             }
                             catch (Exception e)
@@ -448,7 +448,7 @@ namespace RageCoop.Server
                         {
 
                             Packets.PedSync packet = new();
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
 
                             PedSync(packet, sender);
 
@@ -457,7 +457,7 @@ namespace RageCoop.Server
                     case PacketType.VehicleSync:
                         {
                             Packets.VehicleSync packet = new();
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
 
                             VehicleSync(packet, sender);
 
@@ -467,7 +467,7 @@ namespace RageCoop.Server
                         {
 
                             Packets.ProjectileSync packet = new();
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
                             ProjectileSync(packet, sender);
 
                         }
@@ -480,7 +480,7 @@ namespace RageCoop.Server
                             {
                                 return Security.Decrypt(b,sender.EndPoint);
                             });
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
 
                             ChatMessageReceived(packet.Username,packet.Message, sender);
                         }
@@ -488,7 +488,7 @@ namespace RageCoop.Server
                     case PacketType.CustomEvent:
                         {
                             Packets.CustomEvent packet = new Packets.CustomEvent();
-                            packet.Unpack(data);
+                            packet.Deserialize(data);
                             _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                         }
                         break;
@@ -851,7 +851,7 @@ namespace RageCoop.Server
             if (received.WaitOne(timeout))
             {
                 var p = new T();
-                p.Unpack(response);
+                p.Deserialize(response);
                 return p;
             }
             else

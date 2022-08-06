@@ -232,14 +232,14 @@ namespace RageCoop.Client
                 case PacketType.BulletShot:
                     {
                         Packets.BulletShot p = new Packets.BulletShot();
-                        p.Unpack(data);
+                        p.Deserialize(data);
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }
                 case PacketType.EnteringVehicle:
                     {
                         Packets.EnteringVehicle p = new Packets.EnteringVehicle();
-                        p.Unpack(data);
+                        p.Deserialize(data);
                         HandleEnteringVehicle(EntityPool.GetPedByID(p.PedID), EntityPool.GetVehicleByID(p.VehicleID), (VehicleSeat)p.VehicleSeat);
 
 
@@ -248,35 +248,35 @@ namespace RageCoop.Client
                 case PacketType.LeaveVehicle:
                     {
                         Packets.LeaveVehicle packet = new Packets.LeaveVehicle();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         HandleLeaveVehicle(packet);
                     }
                     break;
                 case PacketType.OwnerChanged:
                     {
                         Packets.OwnerChanged packet = new Packets.OwnerChanged();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         HandleOwnerChanged(packet);
                     }
                     break;
                 case PacketType.PedKilled:
                     {
                         var packet = new Packets.PedKilled();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         HandlePedKilled(packet);
                     }
                     break;
                 case PacketType.EnteredVehicle:
                     {
                         var packet = new Packets.EnteredVehicle();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         HandleEnteredVehicle(packet.PedID, packet.VehicleID, (VehicleSeat)packet.VehicleSeat);
                         break;
                     }
                 case PacketType.NozzleTransform:
                     {
                         var packet = new Packets.NozzleTransform();
-                        packet.Unpack(data);
+                        packet.Deserialize(data);
                         HandleNozzleTransform(packet);
                         break;
                     }

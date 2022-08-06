@@ -144,7 +144,7 @@ namespace RageCoop.Server.Scripting
             Server.RequestHandlers.Add(PacketType.FileTransferRequest, (data,client) =>
             {
                 var p = new Packets.FileTransferRequest();
-                p.Unpack(data);
+                p.Deserialize(data);
                 var id=Server.NewFileID();
                 if(RegisteredFiles.TryGetValue(p.Name,out var s))
                 {

@@ -10,16 +10,15 @@ namespace RageCoop.Core
     {
         internal class EnteringVehicle : Packet
         {
+            public override PacketType Type { get { return PacketType.EnteringVehicle; } }
             public int PedID { get; set; }
 
             public int VehicleID { get; set; }
 
             public short VehicleSeat { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.EnteringVehicle);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -27,14 +26,11 @@ namespace RageCoop.Core
                 byteArray.AddInt(VehicleID);
                 byteArray.AddInt(VehicleSeat);
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

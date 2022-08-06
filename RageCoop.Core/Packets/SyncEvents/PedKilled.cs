@@ -11,24 +11,20 @@ namespace RageCoop.Core
 
         internal class PedKilled : Packet
         {
+            public override PacketType Type { get { return PacketType.PedKilled; } }
             public int VictimID { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PedKilled);
 
                 List<byte> byteArray = new List<byte>();
 
                 byteArray.AddInt(VictimID);
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

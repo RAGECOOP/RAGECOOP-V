@@ -10,6 +10,7 @@ namespace RageCoop.Core
     {
         internal class Handshake : Packet
         {
+            public override PacketType Type { get { return PacketType.Handshake; } }
             public int PedID { get; set; }
 
             public string Username { get; set; }
@@ -31,10 +32,8 @@ namespace RageCoop.Core
             /// </summary>
             public byte[] PasswordEncrypted { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.Handshake);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -61,14 +60,11 @@ namespace RageCoop.Core
                 // Write PassHash
                 byteArray.AddArray(PasswordEncrypted);
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -94,14 +90,13 @@ namespace RageCoop.Core
 
         public class PlayerConnect : Packet
         {
+            public override PacketType Type { get { return PacketType.PlayerConnect; } }
             public int PedID { get; set; }
 
             public string Username { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PlayerConnect);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -117,14 +112,10 @@ namespace RageCoop.Core
                 // Write Username
                 byteArray.AddRange(usernameBytes);
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -141,25 +132,20 @@ namespace RageCoop.Core
 
         public class PlayerDisconnect : Packet
         {
+            public override PacketType Type { get { return PacketType.PlayerDisconnect; } }
             public int PedID { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PlayerDisconnect);
 
                 List<byte> byteArray = new List<byte>();
 
                 byteArray.AddRange(BitConverter.GetBytes(PedID));
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -170,16 +156,16 @@ namespace RageCoop.Core
         }
         public class PlayerInfoUpdate : Packet
         {
+            public override PacketType Type { get { return PacketType.PlayerInfoUpdate; } }
+
             /// <summary>
             /// Ped ID for this Player
             /// </summary>
             public int PedID { get; set; }
             public string Username { get; set; }
             public float Latency { get; set; }
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PlayerInfoUpdate);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -199,14 +185,10 @@ namespace RageCoop.Core
                 // Write Latency
                 byteArray.AddFloat(Latency);
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 BitReader reader = new BitReader(array);
 
@@ -223,13 +205,13 @@ namespace RageCoop.Core
 
         public class PublicKeyResponse : Packet
         {
+            public override PacketType Type { get { return PacketType.PublicKeyResponse; } }
+
             public byte[] Modulus;
             public byte[] Exponent;
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PublicKeyResponse);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -238,13 +220,9 @@ namespace RageCoop.Core
                 byteArray.AddArray(Exponent);
 
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 var reader=new BitReader(array);
@@ -257,13 +235,13 @@ namespace RageCoop.Core
 
         public class PublicKeyRequest : Packet
         {
-            public override void Pack(NetOutgoingMessage message)
+            public override PacketType Type { get { return PacketType.PublicKeyRequest; } }
+
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.PublicKeyRequest);
-                #endregion
+                return new byte[0];
             }
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
             }
         }

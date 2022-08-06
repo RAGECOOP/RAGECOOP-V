@@ -11,6 +11,7 @@ namespace RageCoop.Core
 
         internal class BulletShot : Packet
         {
+            public override PacketType Type { get { return PacketType.BulletShot; } }
             public int OwnerID { get; set; }
 
             public uint WeaponHash { get; set; }
@@ -18,10 +19,8 @@ namespace RageCoop.Core
             public Vector3 StartPosition { get; set; }
             public Vector3 EndPosition { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.BulletShot);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -38,14 +37,11 @@ namespace RageCoop.Core
                 byteArray.AddVector3(EndPosition);
 
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

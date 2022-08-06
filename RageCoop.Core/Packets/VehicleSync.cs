@@ -13,6 +13,7 @@ namespace RageCoop.Core
 
         public class VehicleSync : Packet
         {
+            public override PacketType Type { get { return PacketType.VehicleSync; } }
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
@@ -63,10 +64,8 @@ namespace RageCoop.Core
             public string LicensePlate { get; set; }
             #endregion
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.VehicleSync);
 
                 List<byte> byteArray = new List<byte>(100);
 
@@ -166,14 +165,10 @@ namespace RageCoop.Core
 
                     byteArray.Add((byte)(Livery+1));
                 }
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

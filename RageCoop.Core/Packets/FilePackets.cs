@@ -18,16 +18,15 @@ namespace RageCoop.Core
     {
         internal class FileTransferRequest : Packet
         {
+            public override PacketType Type { get { return PacketType.FileTransferRequest; } }
             public int ID { get; set; }
 
             public string Name { get; set; }
 
             public long FileLength { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.FileTransferRequest);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -43,14 +42,11 @@ namespace RageCoop.Core
                 // The length of the file
                 byteArray.AddRange(BitConverter.GetBytes(FileLength));
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -65,11 +61,11 @@ namespace RageCoop.Core
 
         internal class FileTransferResponse : Packet
         {
+            public override PacketType Type { get { return PacketType.FileTransferResponse; } }
             public int ID { get; set; }
             public FileResponse Response { get; set; }
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                message.Write((byte)PacketType.FileTransferResponse);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -78,13 +74,10 @@ namespace RageCoop.Core
 
                 byteArray.Add((byte)Response);
 
-                byte[] result = byteArray.ToArray();
-
-                message.Write(result.Length);
-                message.Write(result);
+                return byteArray.ToArray();
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 BitReader reader = new BitReader(array);
 
@@ -95,32 +88,27 @@ namespace RageCoop.Core
 
         internal class FileTransferChunk : Packet
         {
+            public override PacketType Type { get { return PacketType.FileTransferChunk; } }
             public int ID { get; set; }
 
             public byte[] FileChunk { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.FileTransferChunk);
-
                 List<byte> byteArray = new List<byte>();
 
                 // The ID from the download
                 byteArray.AddInt(ID);
 
                 // The chunk of the file
-                byteArray.AddRange(BitConverter.GetBytes(FileChunk.Length));
+                byteArray.AddInt(FileChunk.Length);
                 byteArray.AddRange(FileChunk);
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -134,26 +122,21 @@ namespace RageCoop.Core
 
         internal class FileTransferComplete : Packet
         {
+            public override PacketType Type { get { return PacketType.FileTransferComplete; } }
             public int ID { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.FileTransferComplete);
-
                 List<byte> byteArray = new List<byte>();
 
                 // The ID for the download
                 byteArray.AddInt(ID);
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
@@ -165,18 +148,14 @@ namespace RageCoop.Core
         internal class AllResourcesSent : Packet
         {
 
-            public override void Pack(NetOutgoingMessage message)
+            public override PacketType Type { get { return PacketType.AllResourcesSent; } }
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.AllResourcesSent);
-                message.Write(0);
-                #endregion
+                return new byte[0];
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
-                #region NetIncomingMessageToPacket
-                #endregion
             }
         }
     }

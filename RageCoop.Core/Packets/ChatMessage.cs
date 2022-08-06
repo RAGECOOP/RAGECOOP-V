@@ -10,6 +10,7 @@ namespace RageCoop.Core
 
         internal class ChatMessage : Packet
         {
+            public override PacketType Type { get { return PacketType.ChatMessage; } }
             private Func<string, byte[]> crypt;
             private Func<byte[], byte[]> decrypt;
             public ChatMessage(Func<string, byte[]> crypter)
@@ -24,10 +25,8 @@ namespace RageCoop.Core
 
             public string Message { get; set; }
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.ChatMessage);
 
                 List<byte> byteArray = new List<byte>();
 
@@ -40,14 +39,11 @@ namespace RageCoop.Core
                 // Write Message
                 byteArray.AddArray(crypt(Message));
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);

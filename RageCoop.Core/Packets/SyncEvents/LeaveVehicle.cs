@@ -11,26 +11,22 @@ namespace RageCoop.Core
 
         internal class LeaveVehicle : Packet
         {
+            public override PacketType Type { get { return PacketType.LeaveVehicle; } }
             public int ID { get; set; }
 
 
-            public override void Pack(NetOutgoingMessage message)
+            public override byte[] Serialize()
             {
-                #region PacketToNetOutGoingMessage
-                message.Write((byte)PacketType.LeaveVehicle);
 
                 List<byte> byteArray = new List<byte>();
 
                 byteArray.AddInt(ID);
 
-                byte[] result = byteArray.ToArray();
+                return byteArray.ToArray();
 
-                message.Write(result.Length);
-                message.Write(result);
-                #endregion
             }
 
-            public override void Unpack(byte[] array)
+            public override void Deserialize(byte[] array)
             {
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
