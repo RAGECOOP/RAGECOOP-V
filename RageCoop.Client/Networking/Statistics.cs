@@ -13,11 +13,11 @@ namespace RageCoop.Client
             {
                 while (true)
                 {
-                    var bu = Networking.Client.Statistics.SentBytes;
-                    var bd = Networking.Client.Statistics.ReceivedBytes;
+                    var bu = Networking.Peer.Statistics.SentBytes;
+                    var bd = Networking.Peer.Statistics.ReceivedBytes;
                     Thread.Sleep(1000);
-                    BytesUpPerSecond=Networking.Client.Statistics.SentBytes-bu;
-                    BytesDownPerSecond=Networking.Client.Statistics.ReceivedBytes-bd;
+                    BytesUpPerSecond=Networking.Peer.Statistics.SentBytes-bu;
+                    BytesDownPerSecond=Networking.Peer.Statistics.ReceivedBytes-bd;
                 }
             });
         }

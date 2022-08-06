@@ -561,7 +561,7 @@ namespace RageCoop.Client
 #endif
             }
 
-            ThreadPool.QueueUserWorkItem((o) => { Networking.Client.FlushSendQueue(); });
+            ThreadPool.QueueUserWorkItem((o) => { Networking.Peer.FlushSendQueue(); });
 
         }
 

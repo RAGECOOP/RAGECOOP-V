@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Lidgren.Network;
+using System.Net;
 
 namespace RageCoop.Core
 {
@@ -32,6 +32,7 @@ namespace RageCoop.Core
             /// </summary>
             public byte[] PasswordEncrypted { get; set; }
 
+            public IPEndPoint InternalEndPoint { get; set; }
             public override byte[] Serialize()
             {
 
@@ -49,6 +50,8 @@ namespace RageCoop.Core
                 byte[] modVersionBytes = Encoding.UTF8.GetBytes(ModVersion);
                 byteArray.AddRange(BitConverter.GetBytes(modVersionBytes.Length));
                 byteArray.AddRange(modVersionBytes);
+
+                byteArray.AddString(InternalEndPoint.ToString());
 
                 // Write AesKeyCrypted
                 byteArray.AddArray(AesKeyCrypted);
@@ -77,6 +80,8 @@ namespace RageCoop.Core
 
                 // Read ModVersion
                 ModVersion = reader.ReadString();
+
+                InternalEndPoint=CoreUtils.StringToEndPoint(reader.ReadString());
 
                 AesKeyCrypted=reader.ReadByteArray();
 

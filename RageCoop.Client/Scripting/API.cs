@@ -173,7 +173,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Get an <see cref="System.Net.IPEndPoint"/> that the player is currently connected to, or null if not connected to the server
         /// </summary>
-        public static System.Net.IPEndPoint ServerEndPoint { get { return Networking.IsOnServer ? Networking.Client?.ServerConnection.RemoteEndPoint : null; } }
+        public static System.Net.IPEndPoint ServerEndPoint { get { return Networking.IsOnServer ? Networking.ServerConnection?.RemoteEndPoint : null; } }
 
         /// <summary>
         /// Check if a RAGECOOP menu is visible

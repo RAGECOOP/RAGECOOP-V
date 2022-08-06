@@ -6,6 +6,7 @@ using System.Diagnostics;
 using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
+using System.Net;
 
 namespace RageCoop.Server
 {
@@ -22,8 +23,14 @@ namespace RageCoop.Server
         /// <summary>
         /// Th client's IP address and port.
         /// </summary>
-        public System.Net.IPEndPoint EndPoint { get { return Connection?.RemoteEndPoint; } }
-        internal long NetID = 0;
+        public IPEndPoint EndPoint { get { return Connection?.RemoteEndPoint; } }
+
+        /// <summary>
+        /// Internal(LAN) address of this client, used for NAT hole-punching
+        /// </summary>
+        public IPEndPoint InternalEndPoint { get; internal set; }
+
+        internal long NetHandle = 0;
         internal NetConnection Connection { get;set; }
         /// <summary>
         /// The <see cref="ServerPed"/> instance representing the client's main character.

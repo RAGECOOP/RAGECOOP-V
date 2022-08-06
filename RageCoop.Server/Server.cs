@@ -46,6 +46,7 @@ namespace RageCoop.Server
         internal readonly Dictionary<Command, Action<CommandContext>> Commands = new();
         internal readonly Dictionary<long,Client> ClientsByNetHandle = new();
         internal readonly Dictionary<string, Client> ClientsByName = new();
+        internal readonly Dictionary<int, Client> ClientsByID = new();
         internal Client _hostClient;
 
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
@@ -449,39 +450,31 @@ namespace RageCoop.Server
 
                             Packets.PedSync packet = new();
                             packet.Deserialize(data);
-
                             PedSync(packet, sender);
-
                         }
                         break;
                     case PacketType.VehicleSync:
                         {
                             Packets.VehicleSync packet = new();
                             packet.Deserialize(data);
-
                             VehicleSync(packet, sender);
-
                         }
                         break;
                     case PacketType.ProjectileSync:
                         {
-
                             Packets.ProjectileSync packet = new();
                             packet.Deserialize(data);
                             ProjectileSync(packet, sender);
-
                         }
                         break;
 
                     case PacketType.ChatMessage:
                         {
-
                             Packets.ChatMessage packet = new((b) =>
                             {
                                 return Security.Decrypt(b,sender.EndPoint);
                             });
                             packet.Deserialize(data);
-
                             ChatMessageReceived(packet.Username,packet.Message, sender);
                         }
                         break;
@@ -492,7 +485,16 @@ namespace RageCoop.Server
                             _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                         }
                         break;
-
+                    case PacketType.ConnectionRequest:
+                        {
+                            var p=new Packets.ConnectionRequest();
+                            p.Deserialize(data);
+                            if (ClientsByID.TryGetValue(p.TargetID,out var target))
+                            {
+                                MainNetServer.Introduce(target.InternalEndPoint,target.EndPoint,sender.InternalEndPoint,sender.EndPoint,Guid.NewGuid().ToString());
+                            }
+                            break;
+                        }
                     default:
                         Logger?.Error("Unhandled Data / Packet type");
                         break;
@@ -576,13 +578,15 @@ namespace RageCoop.Server
                 ClientsByNetHandle.Add(connection.RemoteUniqueIdentifier,
                     tmpClient = new Client(this)
                     {
-                        NetID = connection.RemoteUniqueIdentifier,
+                        NetHandle = connection.RemoteUniqueIdentifier,
                         Connection=connection,
                         Username=packet.Username,
-                        Player = player
+                        Player = player,
+                        InternalEndPoint=packet.InternalEndPoint,
                     }
                 );
                 ClientsByName.Add(packet.Username.ToLower(), tmpClient);
+                ClientsByID.Add(player.ID, tmpClient);
                 if (ClientsByNetHandle.Count==1) { 
                     _hostClient=tmpClient;
                 }
@@ -661,8 +665,9 @@ namespace RageCoop.Server
             Entities.CleanUp(localClient);
             _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
-            ClientsByNetHandle.Remove(localClient.NetID);
-            ClientsByName.Remove(localClient.Username.ToLower());
+            if (ClientsByNetHandle.ContainsKey(localClient.NetHandle)) { ClientsByNetHandle.Remove(localClient.NetHandle); }
+            if (ClientsByName.ContainsKey(localClient.Username.ToLower())) { ClientsByName.Remove(localClient.Username.ToLower()); }
+            if (ClientsByID.ContainsKey(localClient.Player.ID)) { ClientsByID.Remove(localClient.Player.ID); }
             if (localClient==_hostClient)
             {
 
@@ -689,7 +694,7 @@ namespace RageCoop.Server
             {
 
                 // Don't send data back
-                if (c.NetID==client.NetID) { continue; }
+                if (c.NetHandle==client.NetHandle) { continue; }
 
                 // Check streaming distance
                 if (isPlayer)
@@ -715,7 +720,7 @@ namespace RageCoop.Server
             bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
             foreach (var c in ClientsByNetHandle.Values)
             {
-                if (c.NetID==client.NetID) { continue; }
+                if (c.NetHandle==client.NetHandle) { continue; }
                 if (isPlayer)
                 {
                     // Player's vehicle
@@ -739,7 +744,7 @@ namespace RageCoop.Server
 
             foreach (var c in ClientsByNetHandle.Values)
             {
-                if (c.NetID==client.NetID) { continue; }
+                if (c.NetHandle==client.NetHandle) { continue; }
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 packet.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);

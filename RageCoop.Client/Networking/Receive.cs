@@ -58,23 +58,24 @@ namespace RageCoop.Client
                             Main.Logger.Info(">> Connected <<");
                             break;
                         case NetConnectionStatus.Disconnected:
-                            Memory.RestorePatches();
-                            DownloadManager.Cleanup();
-
-                            if (Main.MainChat.Focused)
+                            if (message.SenderConnection==ServerConnection)
                             {
-                                Main.MainChat.Focused = false;
+                                Memory.RestorePatches();
+                                DownloadManager.Cleanup();
+
+                                if (Main.MainChat.Focused)
+                                {
+                                    Main.MainChat.Focused = false;
+                                }
+
+                                Main.QueueAction(() => Main.CleanUp());
+                                CoopMenu.DisconnectedMenuSetting();
+                                Main.Logger.Info($">> Disconnected << reason: {reason}");
+                                Main.QueueAction(() =>
+                                    GTA.UI.Notification.Show("~r~Disconnected: " + reason));
+                                Main.Resources.Unload();
                             }
-
-                            Main.QueueAction(() => Main.CleanUp());
-
-#if !NON_INTERACTIVE
-                            CoopMenu.DisconnectedMenuSetting();
-#endif
-                            Main.Logger.Info($">> Disconnected << reason: {reason}");
-                            Main.QueueAction(() =>
-                                GTA.UI.Notification.Show("~r~Disconnected: " + reason));
-                            Main.Resources.Unload();
+                            
 
 
                             break;
@@ -109,12 +110,12 @@ namespace RageCoop.Client
                                         int len = message.ReadInt32();
                                         if (RequestHandlers.TryGetValue(realType, out var handler))
                                         {
-                                            var response = Client.CreateMessage();
+                                            var response = Peer.CreateMessage();
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
                                             handler(message.ReadBytes(len)).Pack(response);
-                                            Client.SendMessage(response, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
-                                            Client.FlushSendQueue();
+                                            Peer.SendMessage(response,ServerConnection, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
+                                            Peer.FlushSendQueue();
                                         }
                                         break;
                                     }
@@ -136,7 +137,7 @@ namespace RageCoop.Client
                             });
                             Main.Logger.Error($"[{packetType}] {ex.Message}");
                             Main.Logger.Error(ex);
-                            Client.Disconnect($"Packet Error [{packetType}]");
+                            Peer.Shutdown($"Packet Error [{packetType}]");
                         }
                         break;
                     }
@@ -164,7 +165,7 @@ namespace RageCoop.Client
                     break;
             }
 
-            Client.Recycle(message);
+            Peer.Recycle(message);
         }
         private static void HandlePacket(PacketType packetType, byte[] data)
         {

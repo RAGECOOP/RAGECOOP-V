@@ -20,9 +20,9 @@ namespace RageCoop.Client
         /// <param name="method"></param>
         public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
             p.Pack(outgoingMessage);
-            Client.SendMessage(outgoingMessage, method, (int)channel);
+            Peer.SendMessage(outgoingMessage,ServerConnection, method, (int)channel);
         }
 
         public static void SendPed(SyncedPed c, bool full)
@@ -176,15 +176,15 @@ namespace RageCoop.Client
         #endregion
         public static void SendChatMessage(string message)
         {
-            NetOutgoingMessage outgoingMessage = Client.CreateMessage();
+            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
 
             new Packets.ChatMessage(new Func<string, byte[]>((s) =>
             {
                 return Security.Encrypt(s.GetBytes());
             })) { Username = Main.Settings.Username, Message = message }.Pack(outgoingMessage);
 
-            Client.SendMessage(outgoingMessage, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
-            Client.FlushSendQueue();
+            Peer.SendMessage(outgoingMessage,ServerConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
+            Peer.FlushSendQueue();
 
 #if DEBUG
 #endif

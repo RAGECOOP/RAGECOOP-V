@@ -179,10 +179,10 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Get a list of all Clients
         /// </summary>
-        /// <returns>All clients as a dictionary indexed by NetID</returns>
-        public Dictionary<string, Client> GetAllClients()
+        /// <returns>All clients as a dictionary indexed by their main character's id</returns>
+        public Dictionary<int, Client> GetAllClients()
         {
-            return new(Server.ClientsByName);
+            return new(Server.ClientsByID);
         }
 
         /// <summary>
