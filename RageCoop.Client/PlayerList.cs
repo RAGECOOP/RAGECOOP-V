@@ -83,6 +83,27 @@ namespace RageCoop.Client
             {
                 p._latencyToServer = packet.Latency;
                 p.Position = packet.Position;
+
+                Main.QueueAction(() =>
+                {
+                    if (p.Position.DistanceTo(Main.PlayerPosition)>500)
+                    {
+                        if (p.FakeBlip?.Exists()!=true)
+                        {
+                            p.FakeBlip=World.CreateBlip(p.Position);
+                        }
+                        p.FakeBlip.Color=Scripting.API.Config.BlipColor;
+                        p.FakeBlip.Scale=Scripting.API.Config.BlipScale;
+                        p.FakeBlip.Sprite=Scripting.API.Config.BlipSprite; 
+                        p.FakeBlip.DisplayType=BlipDisplayType.Default;
+                        p.FakeBlip.Position=p.Position;
+                    }
+                    else
+                    {
+                        p.FakeBlip.DisplayType=BlipDisplayType.NoDisplay;
+                    }          
+                });
+                
             }
         }
         public static Player GetPlayer(int id)
@@ -125,6 +146,7 @@ namespace RageCoop.Client
         {
             get; internal set;
         }
+        public Blip FakeBlip { get; set; }
         public Vector3 Position { get; set; }
         public SyncedPed Character { get; set; }
         /// <summary>
