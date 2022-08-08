@@ -86,12 +86,12 @@ namespace RageCoop.Client
 
                 Main.QueueAction(() =>
                 {
+                    if (p.FakeBlip?.Exists()!=true)
+                    {
+                        p.FakeBlip=World.CreateBlip(p.Position);
+                    }
                     if (p.Position.DistanceTo(Main.PlayerPosition)>500)
                     {
-                        if (p.FakeBlip?.Exists()!=true)
-                        {
-                            p.FakeBlip=World.CreateBlip(p.Position);
-                        }
                         p.FakeBlip.Color=Scripting.API.Config.BlipColor;
                         p.FakeBlip.Scale=Scripting.API.Config.BlipScale;
                         p.FakeBlip.Sprite=Scripting.API.Config.BlipSprite; 
