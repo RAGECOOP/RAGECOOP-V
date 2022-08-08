@@ -44,13 +44,11 @@ namespace RageCoop.Client
             LastSynced=Main.Ticked;
         }
         #endregion
-        #region PLAYER -- ONLY
         internal Blip PedBlip = null;
         internal BlipColor BlipColor = (BlipColor)255;
         internal BlipSprite BlipSprite = (BlipSprite)0;
         internal float BlipScale = 1;
         internal Player Player;
-        #endregion
 
         /// <summary>
         /// Indicates whether this ped is a player
@@ -165,7 +163,6 @@ namespace RageCoop.Client
                 {
                     SetClothes();
                 }
-                CheckCurrentWeapon();
             }
 
 
@@ -341,6 +338,7 @@ namespace RageCoop.Client
 
         private void DisplayOnFoot()
         {
+            CheckCurrentWeapon();
             if (IsInParachuteFreeFall)
             {
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
@@ -588,11 +586,11 @@ namespace RageCoop.Client
         #region WEAPON
         private void CheckCurrentWeapon()
         {
+            if (!WeaponAsset.IsLoaded) { WeaponAsset.Request(); }
             if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
             {
                 if (WeaponAsset!=null) { WeaponAsset.MarkAsNoLongerNeeded(); }
                 WeaponAsset=new WeaponAsset(CurrentWeaponHash);
-                if (!WeaponAsset.IsLoaded) { WeaponAsset.Request(); }
                 MainPed.Weapons.RemoveAll();
                 _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
 
@@ -766,8 +764,12 @@ namespace RageCoop.Client
         {
             if (MainPed.IsOnTurretSeat())
             {
-                Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
+                // Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
                 Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+            }
+            if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
+            {
+                MainPed.VehicleWeapon=(VehicleWeaponHash)CurrentWeaponHash;
             }
             /*
             Function.Call(Hash.TASK_SWEEP_AIM_ENTITY,P, "random@paparazzi@pap_anims", "sweep_low", "sweep_med", "sweep_high", -1,V, 1.57f, 0.25f);

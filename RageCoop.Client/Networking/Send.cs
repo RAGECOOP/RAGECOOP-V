@@ -41,7 +41,6 @@ namespace RageCoop.Client
                 Rotation = p.ReadRotation(),
                 Velocity = p.ReadVelocity(),
                 Speed = p.GetPedSpeed(),
-                CurrentWeaponHash = (uint)p.Weapons.Current.Hash,
                 Flags = p.GetPedFlags(),
                 Heading=p.Heading,
             };
@@ -62,6 +61,14 @@ namespace RageCoop.Client
             c.LastSentStopWatch.Restart();
             if (full)
             {
+                if (packet.Flags.HasPedFlag(PedDataFlags.IsInVehicle))
+                {
+                    packet.CurrentWeaponHash=(uint)p.VehicleWeapon;
+                }
+                else
+                {
+                    packet.CurrentWeaponHash=(uint)p.Weapons.Current.Hash;
+                }
                 packet.Flags |= PedDataFlags.IsFullSync;
                 packet.Clothes=p.GetPedClothes();
                 packet.ModelHash=p.Model.Hash;

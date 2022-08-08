@@ -38,13 +38,14 @@ namespace RageCoop.Core
 
             public Vector3 AimCoords { get; set; }
 
-            public uint CurrentWeaponHash { get; set; }
 
             public float Heading { get; set; }
             
             #region FULL
 
             public int ModelHash { get; set; }
+
+            public uint CurrentWeaponHash { get; set; }
 
             public byte[] Clothes { get; set; }
 
@@ -99,8 +100,6 @@ namespace RageCoop.Core
                 // Write ped speed
                 byteArray.Add(Speed);
 
-                // Write ped weapon hash
-                byteArray.AddRange(BitConverter.GetBytes(CurrentWeaponHash));
 
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
@@ -114,6 +113,9 @@ namespace RageCoop.Core
                 {
                     // Write model hash
                     byteArray.AddInt(ModelHash);
+
+                    // Write ped weapon hash
+                    byteArray.AddUint(CurrentWeaponHash);
 
                     byteArray.AddRange(Clothes);
 
@@ -185,8 +187,6 @@ namespace RageCoop.Core
                 // Read player speed
                 Speed = reader.ReadByte();
 
-                // Read player weapon hash
-                CurrentWeaponHash = reader.ReadUInt32();
 
                 // Try to read aim coords
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
@@ -201,6 +201,9 @@ namespace RageCoop.Core
                 {
                     // Read player model hash
                     ModelHash = reader.ReadInt32();
+
+                    // Read player weapon hash
+                    CurrentWeaponHash = reader.ReadUInt32();
 
                     // Read player clothes
                     Clothes =reader.ReadBytes(36);

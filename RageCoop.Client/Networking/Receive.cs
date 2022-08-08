@@ -337,7 +337,6 @@ namespace RageCoop.Client
             c.Rotation = packet.Rotation;
             c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
-            c.CurrentWeaponHash = packet.CurrentWeaponHash;
             c.IsAiming = flags.HasPedFlag(PedDataFlags.IsAiming);
             c.IsReloading = flags.HasPedFlag(PedDataFlags.IsReloading);
             c.IsJumping = flags.HasPedFlag(PedDataFlags.IsJumping);
@@ -364,6 +363,7 @@ namespace RageCoop.Client
             }
             if (packet.Flags.HasPedFlag(PedDataFlags.IsFullSync))
             {
+                c.CurrentWeaponHash = packet.CurrentWeaponHash;
                 c.Clothes=packet.Clothes;
                 c.WeaponComponents=packet.WeaponComponents;
                 c.WeaponTint=packet.WeaponTint;
