@@ -25,8 +25,7 @@ namespace RageCoop.Core
         }
         public override string ReadString()
         {
-            string value = Encoding.UTF8.GetString(ReadBytes(ReadInt32()));
-            return value;
+            return Encoding.UTF8.GetString(ReadBytes(ReadInt32()));
         }
 
         public Vector3 ReadVector3()

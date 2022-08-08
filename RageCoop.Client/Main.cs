@@ -41,11 +41,13 @@ namespace RageCoop.Client
         internal static Vector3 PlayerPosition;
         internal static Scripting.Resources Resources = null;
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
+        public static Worker Worker;
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
+            Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {
                 Settings = Util.ReadSettings();

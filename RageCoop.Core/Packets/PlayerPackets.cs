@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-
+using GTA.Math;
 using System.Net;
 
 namespace RageCoop.Core
 {
     internal partial class Packets
     {
-        internal class Handshake : Packet
+        internal struct PlayerData
+        {
+            public int ID;
+            public string Username;
+        }
+        public class Handshake : Packet
         {
             public override PacketType Type  => PacketType.Handshake;
             public int PedID { get; set; }
@@ -92,7 +97,35 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-
+        public class HandshakeSuccess : Packet
+        {
+            public PlayerData[] Players { get; set; }
+            public override PacketType Type => PacketType.HandshakeSuccess;
+            public override byte[] Serialize()
+            {
+                var data = new List<byte>();
+                data.AddInt(Players.Length);
+                foreach(var p in Players)
+                {
+                    data.AddInt(p.ID);
+                    data.AddString(p.Username);
+                }
+                return data.ToArray();
+            }
+            public override void Deserialize(byte[] array)
+            {
+                var reader = new BitReader(array);
+                Players=new PlayerData[reader.ReadInt32()];
+                for(int i = 0; i<Players.Length; i++)
+                {
+                    Players[i]=new PlayerData()
+                    {
+                        ID=reader.ReadInt32(),
+                        Username=reader.ReadString(),
+                    };
+                }
+            }
+        }
         public class PlayerConnect : Packet
         {
             public override PacketType Type  => PacketType.PlayerConnect;
@@ -168,6 +201,7 @@ namespace RageCoop.Core
             public int PedID { get; set; }
             public string Username { get; set; }
             public float Latency { get; set; }
+            public Vector3 Position { get; set; }
             public override byte[] Serialize()
             {
 
@@ -176,18 +210,13 @@ namespace RageCoop.Core
                 // Write ID
                 byteArray.AddRange(BitConverter.GetBytes(PedID));
 
-                // Get Username bytes
-                byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
-
-
-                // Write UsernameLength
-                byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
-
                 // Write Username
-                byteArray.AddRange(usernameBytes);
+                byteArray.AddString(Username);
 
                 // Write Latency
                 byteArray.AddFloat(Latency);
+
+                byteArray.AddVector3(Position);
 
                 return byteArray.ToArray();
             }
@@ -203,6 +232,8 @@ namespace RageCoop.Core
                 Username = reader.ReadString();
 
                 Latency=reader.ReadSingle();
+
+                Position=reader.ReadVector3();
             }
         }
 

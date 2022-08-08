@@ -49,7 +49,7 @@ namespace RageCoop.Client
         internal BlipColor BlipColor = (BlipColor)255;
         internal BlipSprite BlipSprite = (BlipSprite)0;
         internal float BlipScale = 1;
-        internal PlayerData Player;
+        internal Player Player;
         #endregion
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace RageCoop.Client
 
                     if (IsPlayer)
                     {
-                        Main.Logger.Debug("blip:"+Player.Username);
+                        // Main.Logger.Debug("blip:"+Player.Username);
                         Main.QueueAction(() => { PedBlip.Name=Player.Username; });
                     }
                     PedBlip.Color=BlipColor;
@@ -236,7 +236,7 @@ namespace RageCoop.Client
             {
                 if (MainPed.Exists())
                 {
-                    Main.Logger.Debug($"Removing ped {ID}. Reason:CreateCharacter");
+                    // Main.Logger.Debug($"Removing ped {ID}. Reason:CreateCharacter");
                     MainPed.Kill();
                     MainPed.MarkAsNoLongerNeeded();
                     MainPed.Delete();

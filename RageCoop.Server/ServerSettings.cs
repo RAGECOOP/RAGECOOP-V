@@ -84,5 +84,10 @@
         /// List of all allowed username characters
         /// </summary>
         public string AllowedUsernameChars { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-_";
+
+        /// <summary>
+        /// Whether to use direct connection between players to send entity information
+        /// </summary>
+        public bool UseP2P { get; set; } = true;
     }
 }

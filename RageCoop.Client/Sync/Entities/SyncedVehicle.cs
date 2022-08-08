@@ -358,14 +358,14 @@ namespace RageCoop.Client
         void DisplayVehicle(bool touching)
         {
             // predict velocity/position
-            _elapsed = Networking.Latency+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
+            _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
+            // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), Owner.HasDirectConnection+" "+LastSyncedStopWatch.ElapsedMilliseconds).Draw();
             _predictedVel = Velocity+Acceleration*_elapsed;
             _predictedPos = Position+_elapsed*(LastVelocity+_predictedVel)/2;
             LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
             var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);
-            // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), dist.ToString()).Draw();
             
             if (dist<8)
             {

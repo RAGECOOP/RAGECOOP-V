@@ -36,26 +36,51 @@ namespace RageCoop.Client
             {
                 case NetIncomingMessageType.StatusChanged:
                     NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
-
                     string reason = message.ReadString();
-
                     switch (status)
                     {
                         case NetConnectionStatus.InitiatedConnect:
-#if !NON_INTERACTIVE
-                            CoopMenu.InitiateConnectionMenuSetting();
-#endif
+                            if (message.SenderConnection==ServerConnection)
+                            {
+
+                                CoopMenu.InitiateConnectionMenuSetting();
+                            }
                             break;
                         case NetConnectionStatus.Connected:
-                            Memory.ApplyPatches();
-                            Main.QueueAction(() =>
+                            if (message.SenderConnection==ServerConnection)
                             {
-                                CoopMenu.ConnectedMenuSetting();
-                                Main.MainChat.Init();
-                                GTA.UI.Notification.Show("~g~Connected!");
-                            });
-
-                            Main.Logger.Info(">> Connected <<");
+                                Memory.ApplyPatches();
+                                var response = message.SenderConnection.RemoteHailMessage;
+                                if ((PacketType)response.ReadByte()!=PacketType.HandshakeSuccess)
+                                {
+                                    throw new Exception("Invalid handshake response!");
+                                }
+                                var p = new Packets.HandshakeSuccess();
+                                p.Deserialize(response.ReadBytes(response.ReadInt32()));
+                                foreach(var player in p.Players)
+                                {
+                                    PlayerList.SetPlayer(player.ID,player.Username);
+                                }
+                                Main.QueueAction(() =>
+                                {
+                                    CoopMenu.ConnectedMenuSetting();
+                                    Main.MainChat.Init();
+                                    GTA.UI.Notification.Show("~g~Connected!");
+                                });
+                                
+                                Main.Logger.Info(">> Connected <<");
+                            }
+                            else if (PlayerList.PendingConnections.TryGetValue(message.SenderEndPoint.ToString(),out var player))
+                            {
+                                PlayerList.PendingConnections.Remove(message.SenderEndPoint.ToString());
+                                Main.Logger.Debug($"Connection to {player.Username},{player.PedID},{player.Connection.Status} established, sending ID...");
+                                // Inform target our ID
+                                SendTo(new Packets.ConnectionEstablished()
+                                {
+                                    ID=Main.LocalPlayerID
+                                }, player.Connection, ConnectionChannel.Default, NetDeliveryMethod.ReliableOrdered);
+                                Peer.FlushSendQueue();
+                            }
                             break;
                         case NetConnectionStatus.Disconnected:
                             if (message.SenderConnection==ServerConnection)
@@ -75,12 +100,25 @@ namespace RageCoop.Client
                                     GTA.UI.Notification.Show("~r~Disconnected: " + reason));
                                 Main.Resources.Unload();
                             }
-                            
-
-
                             break;
                     }
                     break;
+                case NetIncomingMessageType.NatIntroductionSuccess:
+                    {
+                        var playerID = int.Parse(message.ReadString());
+                        // Main.Logger.Debug("NatIntroductionSuccess received from "+message.SenderEndPoint+" "+playerID);
+                        if (PlayerList.Players.TryGetValue(playerID, out var player) && (player.Connection==null || player.Connection.Status==NetConnectionStatus.Disconnected))
+                        {
+                            Main.Logger.Debug($"Establishing direct connection to {player.Username},{player.PedID}");
+                            player.Connection=Peer.Connect(message.SenderEndPoint);
+                            var ep = message.SenderEndPoint.ToString();
+                            if (!PlayerList.PendingConnections.ContainsKey(ep))
+                            {
+                                PlayerList.PendingConnections.Add(ep, player);
+                            }
+                        }
+                        break;
+                    }
                 case NetIncomingMessageType.Data:
                     {
 
@@ -123,7 +161,7 @@ namespace RageCoop.Client
                                     {
                                         byte[] data = message.ReadBytes(message.ReadInt32());
 
-                                        HandlePacket(packetType, data);
+                                        HandlePacket(packetType, data,message.SenderConnection);
                                         break;
                                     }
                             }
@@ -160,6 +198,7 @@ namespace RageCoop.Client
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
+                    Main.Logger.Trace(message.ReadString());
                     break;
                 default:
                     break;
@@ -167,11 +206,22 @@ namespace RageCoop.Client
 
             Peer.Recycle(message);
         }
-        private static void HandlePacket(PacketType packetType, byte[] data)
+        private static void HandlePacket(PacketType packetType, byte[] data, NetConnection senderConnection)
         {
 
             switch (packetType)
             {
+                case PacketType.ConnectionEstablished:
+                    {
+                        var p=new Packets.ConnectionEstablished();
+                        p.Deserialize(data);
+                        Main.Logger.Debug("Connection message received from "+senderConnection.RemoteEndPoint+","+p.ID);
+                        if(PlayerList.Players.TryGetValue(p.ID,out var player)){
+                            Main.Logger.Debug($"Direct connection to {player.Username},{player.PedID} has been established");
+                            player.Connection=senderConnection;
+                        }
+                        break;
+                    }
                 case PacketType.PlayerConnect:
                     {
 

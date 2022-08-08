@@ -113,7 +113,7 @@ namespace RageCoop.Client
                     {
                         if (ped.Handle==Game.Player.Character.Handle) { continue; }
 
-                        Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
                         ped.CurrentVehicle?.Delete();
                         ped.Kill();
                         ped.Delete();
@@ -131,7 +131,7 @@ namespace RageCoop.Client
                     }
                     if ((v== null) || (v.IsLocal&&veh.PopulationType!=EntityPopulationType.Mission))
                     {
-                        Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+                        // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 
                         veh.Delete();
                     }

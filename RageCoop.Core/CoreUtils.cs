@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTA.Math;
 using System.Security.Cryptography;
 using System.Net;
+using System.Net.Sockets;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -100,7 +101,7 @@ namespace RageCoop.Core
 
                 //try to use the address as IPv4, otherwise get hostname
                 if (!IPAddress.TryParse(values[0], out ipaddy))
-                    ipaddy = getIPfromHost(values[0]);
+                    ipaddy = GetIPfromHost(values[0]);
             }
             else if (values.Length > 2) //ipv6
             {
@@ -141,8 +142,16 @@ namespace RageCoop.Core
 
             return port;
         }
-
-        private static IPAddress getIPfromHost(string p)
+        public static IPAddress GetLocalAddress(string target= "8.8.8.8")
+        {
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect(target, 65530);
+                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
+                return endPoint.Address;
+            }
+        }
+        private static IPAddress GetIPfromHost(string p)
         {
             var hosts = Dns.GetHostAddresses(p);
 

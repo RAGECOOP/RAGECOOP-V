@@ -91,9 +91,24 @@ namespace RageCoop.Server
                 {
                     foreach(var c in ClientsByNetHandle.Values.ToArray())
                     {
-                        c.UpdateLatency();
+                        try
+                        {
+                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                            new Packets.PlayerInfoUpdate()
+                            {
+                                PedID=c.Player.ID,
+                                Username=c.Username,
+                                Latency=c.Latency,
+                                Position=c.Player.Position
+                            }.Pack(outgoingMessage);
+                            MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
+                        }
+                        catch(Exception ex)
+                        {
+                            Logger?.Error(ex);
+                        }
                     }
-                    Thread.Sleep(3000);
+                    Thread.Sleep(5000);
                 }
             });
             _announceThread=new Thread(async () =>
@@ -217,7 +232,8 @@ namespace RageCoop.Server
                 Port = Settings.Port,
                 MaximumConnections = Settings.MaxPlayers,
                 EnableUPnP = false,
-                AutoFlushSendQueue = true
+                AutoFlushSendQueue = true,
+                PingInterval=5
             };
 
             config.EnableMessageType(NetIncomingMessageType.ConnectionApproval);
@@ -375,6 +391,8 @@ namespace RageCoop.Server
                                         if (type.IsSyncEvent())
                                         {
                                             // Sync Events
+
+                                            if (Settings.UseP2P) { break; }
                                             try
                                             {
                                                 var toSend = MainNetServer.Connections.Exclude(message.SenderConnection);
@@ -563,8 +581,22 @@ namespace RageCoop.Server
                 connection.Deny("Malformed handshak packet!");
                 return;
             }
-
-            connection.Approve();
+            var handshakeSuccess = MainNetServer.CreateMessage();
+            var currentClients = ClientsByID.Values.ToArray();
+            var players = new Packets.PlayerData[currentClients.Length];
+            for(int i= 0; i<players.Length; i++)
+            {
+                players[i]=new Packets.PlayerData()
+                {
+                    ID=currentClients[i].Player.ID,
+                    Username=currentClients[i].Username,
+                };
+            }
+            new Packets.HandshakeSuccess()
+            {
+                Players=players
+            }.Pack(handshakeSuccess);
+            connection.Approve(handshakeSuccess);
             Client tmpClient;
 
             // Add the player to Players
@@ -604,27 +636,6 @@ namespace RageCoop.Server
                 API.SendCustomEvent(new() { newClient },CustomEvents.IsHost, true);
             }
 
-            // Send other players to this client
-            ClientsByNetHandle.Values.ForEach(target =>
-            {
-                if (target==newClient) { return; }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                new Packets.PlayerConnect()
-                {
-                    // NetHandle = targetNetHandle,
-                    Username = target.Username,
-                    PedID=target.Player.ID,
-
-                }.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, newClient.Connection, NetDeliveryMethod.ReliableOrdered, 0);
-            });
-            
-            // Send all props to this player
-            BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
-
-            // Send all blips to this player
-            BaseScript.SendServerBlipsTo(new(Entities.Blips.Values), new() { newClient});
-
             // Send new client to all players
             var cons = MainNetServer.Connections.Exclude(newClient.Connection);
             if (cons.Count!=0)
@@ -636,10 +647,28 @@ namespace RageCoop.Server
                     Username = newClient.Username
                 }.Pack(outgoingMessage);
 
-                MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
+                MainNetServer.SendMessage(outgoingMessage, cons, NetDeliveryMethod.ReliableOrdered, 0);
 
             }
-            
+
+            // Send all props to this player
+            BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
+
+            // Send all blips to this player
+            BaseScript.SendServerBlipsTo(new(Entities.Blips.Values), new() { newClient});
+
+
+
+            // Create P2P connection
+            if (Settings.UseP2P)
+            {
+                ClientsByNetHandle.Values.ForEach(target =>
+                {
+                    if (target==newClient) { return; }
+                    MainNetServer.Introduce(target.InternalEndPoint, target.EndPoint, newClient.InternalEndPoint, newClient.EndPoint, target.Player.ID.ToString());
+                });
+            }
+
             Logger?.Info($"Player {newClient.Username} connected!");
 
             if (!string.IsNullOrEmpty(Settings.WelcomeMessage))
@@ -689,7 +718,8 @@ namespace RageCoop.Server
             { 
                 _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client)); 
             }
-            
+
+            if (Settings.UseP2P) { return; }
             foreach (var c in ClientsByNetHandle.Values)
             {
 
@@ -718,6 +748,9 @@ namespace RageCoop.Server
         {
             _worker.QueueJob(() => Entities.Update(packet, client));
             bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
+
+
+            if (Settings.UseP2P) { return; }
             foreach (var c in ClientsByNetHandle.Values)
             {
                 if (c.NetHandle==client.NetHandle) { continue; }
@@ -742,6 +775,7 @@ namespace RageCoop.Server
         private void ProjectileSync(Packets.ProjectileSync packet, Client client)
         {
 
+            if (Settings.UseP2P) { return; }
             foreach (var c in ClientsByNetHandle.Values)
             {
                 if (c.NetHandle==client.NetHandle) { continue; }

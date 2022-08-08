@@ -1,12 +1,11 @@
-﻿
-using GTA;
+﻿using GTA;
 using GTA.Native;
 using RageCoop.Client.Scripting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading;
+using Lidgren.Network;
 
 namespace RageCoop.Client
 {
@@ -291,7 +290,7 @@ namespace RageCoop.Client
                     {
                         Handle_Projectiles.Remove(p.Handle);
                     }
-                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    // Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
                     p.Explode();
                 }
                 ID_Projectiles.Remove(id);
@@ -322,6 +321,7 @@ namespace RageCoop.Client
 
         public static void DoSync()
         {
+            UpdateTargets();
 #if BENCHMARK
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles]=PerfCounter.ElapsedTicks;
@@ -560,11 +560,19 @@ namespace RageCoop.Client
                 Debug.TimeStamps[TimeStamp.VehicleTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
-
-            ThreadPool.QueueUserWorkItem((o) => { Networking.Peer.FlushSendQueue(); });
-
+            Networking.Peer.FlushSendQueue();
         }
-
+        static void UpdateTargets()
+        {
+            Networking.Targets=new List<NetConnection>(PlayerList.Players.Count) { Networking.ServerConnection };
+            foreach (var p in PlayerList.Players.Values.ToArray())
+            {
+                if (p.HasDirectConnection && p.Position.DistanceTo(Main.PlayerPosition)<500)
+                {
+                    Networking.Targets.Add(p.Connection);
+                }
+            }
+        }
 
         public static void RemoveAllFromPlayer(int playerPedId)
         {

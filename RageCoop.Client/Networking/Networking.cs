@@ -11,7 +11,7 @@ namespace RageCoop.Client
     internal static partial class Networking
     {
         public static NetPeer Peer;
-        public static float Latency = 0;
+        public static float Latency => ServerConnection.AverageRoundtripTime/2;
         public static bool ShowNetworkInfo = false;
         public static Security Security;
         public static NetConnection ServerConnection;
@@ -22,17 +22,21 @@ namespace RageCoop.Client
         static Networking()
         {
             Security=new Security(Main.Logger);
-            RequestHandlers.Add(PacketType.PingPong, (b) =>
-            {
-                return new Packets.PingPong();
-            });
             Task.Run(() =>
             {
                 while (true)
                 {
                     if (Peer!=null)
                     {
-                        ProcessMessage(Peer.WaitMessage(200));
+                        try
+                        {
+
+                            ProcessMessage(Peer.WaitMessage(200));
+                        }
+                        catch(Exception ex)
+                        {
+                            Main.Logger.Error(ex);
+                        }
                     }
                     else
                     {
@@ -64,7 +68,9 @@ namespace RageCoop.Client
                 {
                     AutoFlushSendQueue = false,
                     SimulatedMinimumLatency =SimulatedLatency,
-                    AcceptIncomingConnections = true
+                    AcceptIncomingConnections = true,
+                    MaximumConnections = 32,
+                    PingInterval = 5
                 };
 
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
@@ -110,7 +116,7 @@ namespace RageCoop.Client
                             Username =username,
                             ModVersion = Main.CurrentVersion,
                             PasswordEncrypted=Security.Encrypt(password.GetBytes()),
-                            InternalEndPoint = (System.Net.IPEndPoint)Peer.Socket.LocalEndPoint
+                            InternalEndPoint = new System.Net.IPEndPoint(CoreUtils.GetLocalAddress(ip[0]),Peer.Port)
                         };
 
                         Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted, out handshake.AesIVCrypted);
@@ -135,7 +141,7 @@ namespace RageCoop.Client
         #region -- PLAYER --
         private static void PlayerConnect(Packets.PlayerConnect packet)
         {
-            var p = new PlayerData
+            var p = new Player
             {
                 PedID = packet.PedID,
                 Username= packet.Username,

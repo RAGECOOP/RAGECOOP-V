@@ -18,6 +18,7 @@ namespace RageCoop.Core
         Request=6,
         Response=7,
         PingPong = 8,
+        HandshakeSuccess = 9,
         ChatMessage =10,
        
         FileTransferChunk=11,
@@ -30,6 +31,7 @@ namespace RageCoop.Core
         CustomEventQueued = 17,
 
         ConnectionRequest=18,
+        ConnectionEstablished = 19,
         #region Sync
 
         #region INTERVAL

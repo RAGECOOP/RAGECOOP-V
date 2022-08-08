@@ -285,7 +285,7 @@ namespace RageCoop.Client.Scripting
                 Args=args,
                 Hash=eventHash
             };
-            Networking.Send(p, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
+            Networking.SendTo(p,Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
         }
 
         /// <summary>

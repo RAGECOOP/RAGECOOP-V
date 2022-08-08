@@ -39,7 +39,7 @@ namespace RageCoop.Server
         /// <summary>
         /// The client's latency in seconds.
         /// </summary>
-        public float Latency { get; internal set; }
+        public float Latency => Connection.AverageRoundtripTime/2;
         internal readonly Dictionary<int, Action<object>> Callbacks = new();
         internal byte[] PublicKey { get; set; }
         /// <summary>
@@ -79,21 +79,6 @@ namespace RageCoop.Server
                 Server.BaseScript.SetNameTag(this,value);
                 _displayNameTag=value;
             }
-        }
-        internal void UpdateLatency()
-        {
-            _latencyWatch.Restart();
-            Server.GetResponse<Packets.PingPong>(this, new Packets.PingPong(), ConnectionChannel.PingPong);
-            _latencyWatch.Stop();
-            Latency = (float)_latencyWatch.ElapsedMilliseconds/2000;
-            NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-            new Packets.PlayerInfoUpdate()
-            {
-                PedID=Player.ID,
-                Username=Username,
-                Latency=Latency,
-            }.Pack(outgoingMessage);
-            Server.MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);    
         }
         #region FUNCTIONS
         /// <summary>

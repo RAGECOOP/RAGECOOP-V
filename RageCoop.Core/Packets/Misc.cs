@@ -5,15 +5,6 @@ namespace RageCoop.Core
 {
     internal partial class Packets
     {
-
-        /// <summary>
-        /// Used to measure the connection latency
-        /// </summary>
-        internal class PingPong : Packet
-        {
-            public override PacketType Type  => PacketType.PingPong;
-        }
-
         /// <summary>
         /// Request direct connection to another client
         /// </summary>
@@ -31,6 +22,27 @@ namespace RageCoop.Core
             {
                 var reader=new BitReader(array);
                 TargetID = reader.ReadInt32();
+            }
+        }
+
+
+        /// <summary>
+        /// Sent to the host when a direct connection has been established
+        /// </summary>
+        internal class ConnectionEstablished : Packet
+        {
+            public int ID { get; set; }
+            public override PacketType Type => PacketType.ConnectionEstablished;
+            public override byte[] Serialize()
+            {
+                var data = new List<byte>(10);
+                data.AddInt(ID);
+                return data.ToArray();
+            }
+            public override void Deserialize(byte[] array)
+            {
+                var reader = new BitReader(array);
+                ID = reader.ReadInt32();
             }
         }
     }

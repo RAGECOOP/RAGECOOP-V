@@ -25,10 +25,27 @@ namespace RageCoop.Client
         /// Network ID for this entity
         /// </summary>
         public int ID { get; internal set; }
+
+
+        private int _ownerID;
         /// <summary>
         /// 
         /// </summary>
-        public int OwnerID { get; internal set; }
+        public int OwnerID
+        {
+            get
+            {
+                return _ownerID;
+            }
+            internal set
+            {
+                if (value==_ownerID) { return; }
+                _ownerID = value;
+                Owner=PlayerList.GetPlayer(value);
+            }
+        }
+
+        internal Player Owner { get; private set; }
         /// <summary>
         /// 
         /// </summary>

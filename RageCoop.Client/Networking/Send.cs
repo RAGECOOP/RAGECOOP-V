@@ -4,6 +4,7 @@ using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Core;
 using System;
+using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
@@ -11,18 +12,18 @@ namespace RageCoop.Client
     {
 
         public static int SyncInterval = 30;
-        #region -- SEND --
-        /// <summary>
-        /// Pack the packet then send to server.
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="channel"></param>
-        /// <param name="method"></param>
+        public static List<NetConnection> Targets = new List<NetConnection>();
         public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
             p.Pack(outgoingMessage);
-            Peer.SendMessage(outgoingMessage,ServerConnection, method, (int)channel);
+            Peer.SendMessage(outgoingMessage,Targets, method, (int)channel);
+        }
+        public static void SendTo(Packet p,NetConnection connection, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        {
+            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
+            p.Pack(outgoingMessage);
+            Peer.SendMessage(outgoingMessage, connection, method, (int)channel);
         }
 
         public static void SendPed(SyncedPed c, bool full)
@@ -101,16 +102,16 @@ namespace RageCoop.Client
                 Flags = veh.GetVehicleFlags(),
                 SteeringAngle = veh.SteeringAngle,
                 Position = veh.PredictPosition(),
+                Velocity=veh.Velocity,
                 Quaternion=veh.ReadQuaternion(),
                 RotationVelocity=veh.RotationVelocity,
                 ThrottlePower = veh.ThrottlePower,
                 BrakePower = veh.BrakePower,
             };
-            var velo = veh.Velocity;
-            if (v.LastVelocity==default) {v.LastVelocity=velo; }
-            packet.Acceleration = (velo-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
-            packet.Velocity=(v.LastVelocity = velo) + packet.Acceleration*Latency;
+            if (v.LastVelocity==default) {v.LastVelocity=packet.Velocity; }
+            packet.Acceleration = (packet.Velocity-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
             v.LastSentStopWatch.Restart();
+            v.LastVelocity= packet.Velocity;
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
             if (full)
             {
@@ -185,10 +186,6 @@ namespace RageCoop.Client
 
             Peer.SendMessage(outgoingMessage,ServerConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
             Peer.FlushSendQueue();
-
-#if DEBUG
-#endif
         }
-        #endregion
     }
 }
