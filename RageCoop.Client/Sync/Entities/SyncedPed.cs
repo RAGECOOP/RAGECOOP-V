@@ -221,7 +221,8 @@ namespace RageCoop.Client
                 new ScaledText(toDraw, Player.Username, 0.4f, GTA.UI.Font.ChaletLondon)
                 {
                     Outline = true,
-                    Alignment = GTA.UI.Alignment.Center
+                    Alignment = GTA.UI.Alignment.Center,
+                    Color=Owner.HasDirectConnection? Color.FromArgb(179, 229, 252) : Color.White,
                 }.Draw();
             }
 

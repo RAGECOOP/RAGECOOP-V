@@ -31,13 +31,13 @@ namespace RageCoop.Core
         CustomEventQueued = 17,
 
         ConnectionRequest=18,
-        ConnectionEstablished = 19,
+        P2PConnect = 19,
+        HolePunchInit=20,
+        HolePunch=21,
         #region Sync
-
-        #region INTERVAL
-        VehicleSync = 20,
         PedSync = 22,
-        ProjectileSync=24,
+        VehicleSync = 23,
+        ProjectileSync =24,
         #endregion
 
         #region EVENT
@@ -53,7 +53,6 @@ namespace RageCoop.Core
 
         #endregion
 
-        #endregion
         Unknown=255
     }
     internal static class PacketExtensions

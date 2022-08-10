@@ -18,7 +18,6 @@ namespace RageCoop.Client
 
         public static bool LeftAlign = true;
         public static Dictionary<int, Player> Players = new Dictionary<int, Player> { };
-        public static Dictionary<string, Player> PendingConnections = new Dictionary<string, Player>();
         public static void Tick()
         {
             if (!Networking.IsOnServer)
@@ -138,6 +137,7 @@ namespace RageCoop.Client
 
     internal class Player
     {
+        public byte HolePunchStatus { get; set; } = 1;
         public string Username { get; internal set; }
         /// <summary>
         /// Universal character ID.
@@ -146,6 +146,9 @@ namespace RageCoop.Client
         {
             get; internal set;
         }
+        public IPEndPoint InternalEndPoint { get; set; }
+        public IPEndPoint ExternalEndPoint { get; set; }
+        public bool ConnectWhenPunched { get; set; }
         public Blip FakeBlip { get; set; }
         public Vector3 Position { get; set; }
         public SyncedPed Character { get; set; }

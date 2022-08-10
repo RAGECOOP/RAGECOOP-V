@@ -70,16 +70,22 @@ namespace RageCoop.Client
                                 
                                 Main.Logger.Info(">> Connected <<");
                             }
-                            else if (PlayerList.PendingConnections.TryGetValue(message.SenderEndPoint.ToString(),out var player))
+                            else
                             {
-                                PlayerList.PendingConnections.Remove(message.SenderEndPoint.ToString());
-                                Main.Logger.Debug($"Connection to {player.Username},{player.PedID},{player.Connection.Status} established, sending ID...");
-                                // Inform target our ID
-                                SendTo(new Packets.ConnectionEstablished()
+                                // Self-initiated connection
+                                if (message.SenderConnection.RemoteHailMessage==null) { return; }
+                                
+                                var p = message.SenderConnection.RemoteHailMessage.GetPacket<Packets.P2PConnect>();
+                                if (PlayerList.Players.TryGetValue(p.ID,out var player))
                                 {
-                                    ID=Main.LocalPlayerID
-                                }, player.Connection, ConnectionChannel.Default, NetDeliveryMethod.ReliableOrdered);
-                                Peer.FlushSendQueue();
+                                    player.Connection=message.SenderConnection;
+                                    Main.Logger.Debug($"Direct connectionn to {player.Username} established");
+                                }
+                                else
+                                {
+                                    Main.Logger.Info($"Unidentified peer connection from {message.SenderEndPoint} was rejected.");
+                                    message.SenderConnection.Disconnect("eat poop");
+                                }
                             }
                             break;
                         case NetConnectionStatus.Disconnected:
@@ -103,22 +109,6 @@ namespace RageCoop.Client
                             break;
                     }
                     break;
-                case NetIncomingMessageType.NatIntroductionSuccess:
-                    {
-                        var playerID = int.Parse(message.ReadString());
-                        // Main.Logger.Debug("NatIntroductionSuccess received from "+message.SenderEndPoint+" "+playerID);
-                        if (PlayerList.Players.TryGetValue(playerID, out var player) && (player.Connection==null || player.Connection.Status==NetConnectionStatus.Disconnected))
-                        {
-                            Main.Logger.Debug($"Establishing direct connection to {player.Username},{player.PedID}");
-                            player.Connection=Peer.Connect(message.SenderEndPoint);
-                            var ep = message.SenderEndPoint.ToString();
-                            if (!PlayerList.PendingConnections.ContainsKey(ep))
-                            {
-                                PlayerList.PendingConnections.Add(ep, player);
-                            }
-                        }
-                        break;
-                    }
                 case NetIncomingMessageType.Data:
                     {
 
@@ -184,14 +174,23 @@ namespace RageCoop.Client
                         var packetType = (PacketType)message.ReadByte();
                         int len = message.ReadInt32();
                         byte[] data = message.ReadBytes(len);
-                        if (packetType==PacketType.PublicKeyResponse)
+                        switch (packetType)
                         {
-                            var packet = new Packets.PublicKeyResponse();
-                            packet.Deserialize(data);
-                            Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
-                            _publicKeyReceived.Set();
-                        }
 
+                            case PacketType.HolePunch:
+                                {
+                                    HolePunch.Punched(data.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
+                                    break;
+                                }
+                            case PacketType.PublicKeyResponse:
+                                { 
+                                
+                                    var packet = data.GetPacket<Packets.PublicKeyResponse>();
+                                    Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
+                                    _publicKeyReceived.Set();
+                                    break;
+                                }
+                        }
                         break;
                     }
                 case NetIncomingMessageType.DebugMessage:
@@ -211,69 +210,33 @@ namespace RageCoop.Client
 
             switch (packetType)
             {
-                case PacketType.ConnectionEstablished:
-                    {
-                        var p=new Packets.ConnectionEstablished();
-                        p.Deserialize(data);
-                        Main.Logger.Debug("Connection message received from "+senderConnection.RemoteEndPoint+","+p.ID);
-                        if(PlayerList.Players.TryGetValue(p.ID,out var player)){
-                            Main.Logger.Debug($"Direct connection to {player.Username},{player.PedID} has been established");
-                            player.Connection=senderConnection;
-                        }
-                        break;
-                    }
+                case PacketType.HolePunchInit:
+                    HolePunch.Add(data.GetPacket<Packets.HolePunchInit>());
+                    break;
+
                 case PacketType.PlayerConnect:
-                    {
-
-                        Packets.PlayerConnect packet = new Packets.PlayerConnect();
-                        packet.Deserialize(data);
-
-                        Main.QueueAction(() => PlayerConnect(packet));
-                    }
+                    PlayerConnect(data.GetPacket<Packets.PlayerConnect>());
                     break;
+
                 case PacketType.PlayerDisconnect:
-                    {
-
-                        Packets.PlayerDisconnect packet = new Packets.PlayerDisconnect();
-                        packet.Deserialize(data);
-                        Main.QueueAction(() => PlayerDisconnect(packet));
-
-                    }
+                    PlayerDisconnect(data.GetPacket<Packets.PlayerDisconnect>());
                     break;
+
                 case PacketType.PlayerInfoUpdate:
-                    {
-                        var packet = new Packets.PlayerInfoUpdate();
-                        packet.Deserialize(data);
-                        PlayerList.UpdatePlayer(packet);
-                        break;
-                    }
-                #region ENTITY SYNC
-                case PacketType.VehicleSync:
-                    {
-
-                        Packets.VehicleSync packet = new Packets.VehicleSync();
-                        packet.Deserialize(data);
-                        VehicleSync(packet);
-
-                    }
+                    PlayerList.UpdatePlayer(data.GetPacket<Packets.PlayerInfoUpdate>());
                     break;
+
+                case PacketType.VehicleSync:
+                    VehicleSync(data.GetPacket<Packets.VehicleSync>());
+                    break;
+
                 case PacketType.PedSync:
-                    {
-
-                        Packets.PedSync packet = new Packets.PedSync();
-                        packet.Deserialize(data);
-                        PedSync(packet);
-
-                    }
+                    PedSync(data.GetPacket<Packets.PedSync>());
                     break;
                 case PacketType.ProjectileSync:
-                    {
-                        Packets.ProjectileSync packet = new Packets.ProjectileSync();
-                        packet.Deserialize(data);
-                        ProjectileSync(packet);
-                        break;
-                    }
-                #endregion
+                    ProjectileSync(data.GetPacket<Packets.ProjectileSync>());
+                    break;
+
                 case PacketType.ChatMessage:
                     {
 
@@ -284,10 +247,9 @@ namespace RageCoop.Client
                         packet.Deserialize(data);
 
                         Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
-
-
                     }
                     break;
+
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
@@ -295,6 +257,7 @@ namespace RageCoop.Client
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }
                     break;
+
                 case PacketType.CustomEventQueued:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
@@ -305,6 +268,7 @@ namespace RageCoop.Client
                         });
                     }
                     break;
+
                 case PacketType.FileTransferChunk:
                     {
                         Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
@@ -312,10 +276,11 @@ namespace RageCoop.Client
                         DownloadManager.Write(packet.ID, packet.FileChunk);
                     }
                     break;
+
                 default:
                     if (packetType.IsSyncEvent())
                     {
-                        // Dispatch to main thread
+                        // Dispatch to script thread
                         Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
                     }
                     break;

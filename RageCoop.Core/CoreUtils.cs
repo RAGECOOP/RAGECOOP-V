@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Lidgren.Network;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -259,6 +260,18 @@ namespace RageCoop.Core
             return new List<byte[]>() { BitConverter.GetBytes(qua.X), BitConverter.GetBytes(qua.Y), BitConverter.GetBytes(qua.Z), BitConverter.GetBytes(qua.W) }.Join(4);
         }
 
+
+        public static T GetPacket<T>(this NetIncomingMessage msg) where T : Packet, new()
+        {
+            msg.ReadByte();
+            return GetPacket<T>(msg.ReadBytes(msg.ReadInt32()));
+        }
+        public static T GetPacket<T>(this byte[] data) where T : Packet, new()
+        {
+            T p = new T();
+            p.Deserialize(data);
+            return p;
+        }
         public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
         {
             return (flagToCheck & flag)!=0;

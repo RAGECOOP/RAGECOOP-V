@@ -161,10 +161,6 @@ namespace RageCoop.Client
             }
         }
 
-        public static Vector3 PredictPosition(this Entity e)
-        {
-            return e.ReadPosition()+e.Velocity*(Networking.Latency);
-        }
 
         public static Vehicle CreateVehicle(Model model, Vector3 position, float heading = 0f)
         {

@@ -37,6 +37,7 @@
     <Compile Include="Menus\Sub\UpdateMenu.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
+    <Compile Include="Networking\HolePunch.cs" />
     <Compile Include="Networking\Networking.cs" />
     <Compile Include="Networking\Receive.cs" />
     <Compile Include="Networking\Send.cs" />

@@ -32,7 +32,7 @@ namespace RageCoop.Server
     /// <summary>
     /// The instantiable RageCoop server class
     /// </summary>
-    public class Server
+    public partial class Server
     {
         /// <summary>
         /// The API for controlling server and hooking events.
@@ -108,7 +108,7 @@ namespace RageCoop.Server
                             Logger?.Error(ex);
                         }
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(1000);
                 }
             });
             _announceThread=new Thread(async () =>
@@ -316,10 +316,7 @@ namespace RageCoop.Server
                             {
                                 int len = message.ReadInt32();
                                 byte[] data = message.ReadBytes(len);
-
-                                Packets.Handshake packet = new();
-                                packet.Deserialize(data);
-                                GetHandshake(message.SenderConnection, packet);
+                                GetHandshake(message.SenderConnection, data.GetPacket<Packets.Handshake>());
                             }
                             catch (Exception e)
                             {
@@ -457,33 +454,20 @@ namespace RageCoop.Server
         }
         private void HandlePacket(PacketType type,byte[] data,Client sender)
         {
-
             try
             {
-                
                 switch (type)
                 {
                     case PacketType.PedSync:
-                        {
+                        PedSync(data.GetPacket<Packets.PedSync>(), sender);
+                        break;
 
-                            Packets.PedSync packet = new();
-                            packet.Deserialize(data);
-                            PedSync(packet, sender);
-                        }
-                        break;
                     case PacketType.VehicleSync:
-                        {
-                            Packets.VehicleSync packet = new();
-                            packet.Deserialize(data);
-                            VehicleSync(packet, sender);
-                        }
+                        VehicleSync(data.GetPacket<Packets.VehicleSync>(), sender);
                         break;
+
                     case PacketType.ProjectileSync:
-                        {
-                            Packets.ProjectileSync packet = new();
-                            packet.Deserialize(data);
-                            ProjectileSync(packet, sender);
-                        }
+                        ProjectileSync(data.GetPacket<Packets.ProjectileSync>(), sender);
                         break;
 
                     case PacketType.ChatMessage:
@@ -496,6 +480,7 @@ namespace RageCoop.Server
                             ChatMessageReceived(packet.Username,packet.Message, sender);
                         }
                         break;
+
                     case PacketType.CustomEvent:
                         {
                             Packets.CustomEvent packet = new Packets.CustomEvent();
@@ -503,19 +488,10 @@ namespace RageCoop.Server
                             _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                         }
                         break;
-                    case PacketType.ConnectionRequest:
-                        {
-                            var p=new Packets.ConnectionRequest();
-                            p.Deserialize(data);
-                            if (ClientsByID.TryGetValue(p.TargetID,out var target))
-                            {
-                                MainNetServer.Introduce(target.InternalEndPoint,target.EndPoint,sender.InternalEndPoint,sender.EndPoint,Guid.NewGuid().ToString());
-                            }
-                            break;
-                        }
                     default:
                         Logger?.Error("Unhandled Data / Packet type");
                         break;
+
                 }
             }
             catch (Exception e)
@@ -524,268 +500,6 @@ namespace RageCoop.Server
             }
         }
 
-        private void DisconnectAndLog(NetConnection senderConnection,PacketType type, Exception e)
-        {
-            Logger?.Error($"Error receiving a packet of type {type}");
-            Logger?.Error(e.Message);
-            Logger?.Error(e.StackTrace);
-            senderConnection.Disconnect(e.Message);
-        }
-
-        private void GetHandshake(NetConnection connection, Packets.Handshake packet)
-        {
-            Logger?.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + connection.RemoteEndPoint.Address.ToString() + "]");
-
-            if (!packet.ModVersion.StartsWith(_compatibleVersion))
-            {
-                connection.Deny($"RAGECOOP version {_compatibleVersion.Replace('_', '.')}.x required!");
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(packet.Username))
-            {
-                connection.Deny("Username is empty or contains spaces!");
-                return;
-            }
-            if (packet.Username.Any(p => !_allowedCharacterSet.Contains(p)))
-            {
-                connection.Deny("Username contains special chars!");
-                return;
-            }
-            if (ClientsByNetHandle.Values.Any(x => x.Username.ToLower() == packet.Username.ToLower()))
-            {
-                connection.Deny("Username is already taken!");
-                return;
-            }
-            try
-            {
-                Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted,packet.AesIVCrypted);
-
-                var args = new HandshakeEventArgs()
-                {
-                    EndPoint=connection.RemoteEndPoint,
-                    ID=packet.PedID,
-                    Username=packet.Username,
-                    PasswordHash=Security.Decrypt(packet.PasswordEncrypted, connection.RemoteEndPoint).GetString().GetSHA256Hash().ToHexString(),
-                };
-                API.Events.InvokePlayerHandshake(args);
-                if (args.Cancel)
-                {
-                    connection.Deny(args.DenyReason);
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger?.Error($"Cannot process handshake packet from {connection.RemoteEndPoint}");
-                Logger?.Error(ex);
-                connection.Deny("Malformed handshak packet!");
-                return;
-            }
-            var handshakeSuccess = MainNetServer.CreateMessage();
-            var currentClients = ClientsByID.Values.ToArray();
-            var players = new Packets.PlayerData[currentClients.Length];
-            for(int i= 0; i<players.Length; i++)
-            {
-                players[i]=new Packets.PlayerData()
-                {
-                    ID=currentClients[i].Player.ID,
-                    Username=currentClients[i].Username,
-                };
-            }
-            new Packets.HandshakeSuccess()
-            {
-                Players=players
-            }.Pack(handshakeSuccess);
-            connection.Approve(handshakeSuccess);
-            Client tmpClient;
-
-            // Add the player to Players
-            lock (ClientsByNetHandle)
-            {
-                var player = new ServerPed(this)
-                {
-                    ID= packet.PedID,
-                };
-                Entities.Add(player);
-                ClientsByNetHandle.Add(connection.RemoteUniqueIdentifier,
-                    tmpClient = new Client(this)
-                    {
-                        NetHandle = connection.RemoteUniqueIdentifier,
-                        Connection=connection,
-                        Username=packet.Username,
-                        Player = player,
-                        InternalEndPoint=packet.InternalEndPoint,
-                    }
-                );
-                ClientsByName.Add(packet.Username.ToLower(), tmpClient);
-                ClientsByID.Add(player.ID, tmpClient);
-                if (ClientsByNetHandle.Count==1) { 
-                    _hostClient=tmpClient;
-                }
-            }
-            
-            Logger?.Debug($"Handshake sucess, Player:{packet.Username} PedID:{packet.PedID}");
-            
-        }
-
-        // The connection has been approved, now we need to send all other players to the new player and the new player to all players
-        private void PlayerConnected(Client newClient)
-        {
-            if (newClient==_hostClient)
-            {
-                API.SendCustomEvent(new() { newClient },CustomEvents.IsHost, true);
-            }
-
-            // Send new client to all players
-            var cons = MainNetServer.Connections.Exclude(newClient.Connection);
-            if (cons.Count!=0)
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                new Packets.PlayerConnect()
-                {
-                    PedID=newClient.Player.ID,
-                    Username = newClient.Username
-                }.Pack(outgoingMessage);
-
-                MainNetServer.SendMessage(outgoingMessage, cons, NetDeliveryMethod.ReliableOrdered, 0);
-
-            }
-
-            // Send all props to this player
-            BaseScript.SendServerPropsTo( new(Entities.ServerProps.Values), new() { newClient});
-
-            // Send all blips to this player
-            BaseScript.SendServerBlipsTo(new(Entities.Blips.Values), new() { newClient});
-
-
-
-            // Create P2P connection
-            if (Settings.UseP2P)
-            {
-                ClientsByNetHandle.Values.ForEach(target =>
-                {
-                    if (target==newClient) { return; }
-                    MainNetServer.Introduce(target.InternalEndPoint, target.EndPoint, newClient.InternalEndPoint, newClient.EndPoint, target.Player.ID.ToString());
-                });
-            }
-
-            Logger?.Info($"Player {newClient.Username} connected!");
-
-            if (!string.IsNullOrEmpty(Settings.WelcomeMessage))
-            {
-                SendChatMessage("Server",Settings.WelcomeMessage , newClient);
-            }
-        }
-
-        // Send all players a message that someone has left the server
-        private void PlayerDisconnected(Client localClient)
-        {
-            var cons = MainNetServer.Connections.Exclude(localClient.Connection);
-            if (cons.Count!=0)
-            {
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                new Packets.PlayerDisconnect()
-                {
-                    PedID=localClient.Player.ID,
-
-                }.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage,cons , NetDeliveryMethod.ReliableOrdered, 0);
-            }
-            Entities.CleanUp(localClient);
-            _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
-            Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
-            if (ClientsByNetHandle.ContainsKey(localClient.NetHandle)) { ClientsByNetHandle.Remove(localClient.NetHandle); }
-            if (ClientsByName.ContainsKey(localClient.Username.ToLower())) { ClientsByName.Remove(localClient.Username.ToLower()); }
-            if (ClientsByID.ContainsKey(localClient.Player.ID)) { ClientsByID.Remove(localClient.Player.ID); }
-            if (localClient==_hostClient)
-            {
-
-                _hostClient = ClientsByNetHandle.Values.FirstOrDefault();
-                _hostClient?.SendCustomEvent(CustomEvents.IsHost, true);
-            }
-            Security.RemoveConnection(localClient.Connection.RemoteEndPoint);
-        }
-
-        #region -- SYNC --
-        #region SyncEntities
-
-        private void PedSync(Packets.PedSync packet, Client client)
-        {
-            _worker.QueueJob(() => Entities.Update(packet, client));
-
-            bool isPlayer = packet.ID==client.Player.ID;
-            if (isPlayer) 
-            { 
-                _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client)); 
-            }
-
-            if (Settings.UseP2P) { return; }
-            foreach (var c in ClientsByNetHandle.Values)
-            {
-
-                // Don't send data back
-                if (c.NetHandle==client.NetHandle) { continue; }
-
-                // Check streaming distance
-                if (isPlayer)
-                {
-                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
-                    {
-                        continue;
-                    }
-                }
-                else if ((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
-                {
-                    continue;
-                }
-
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage,c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
-        }
-        private void VehicleSync(Packets.VehicleSync packet, Client client)
-        {
-            _worker.QueueJob(() => Entities.Update(packet, client));
-            bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
-
-
-            if (Settings.UseP2P) { return; }
-            foreach (var c in ClientsByNetHandle.Values)
-            {
-                if (c.NetHandle==client.NetHandle) { continue; }
-                if (isPlayer)
-                {
-                    // Player's vehicle
-                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
-                    {
-                        continue;
-                    }
-
-                }
-                else if((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
-                {
-                    continue;
-                }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
-        }
-        private void ProjectileSync(Packets.ProjectileSync packet, Client client)
-        {
-
-            if (Settings.UseP2P) { return; }
-            foreach (var c in ClientsByNetHandle.Values)
-            {
-                if (c.NetHandle==client.NetHandle) { continue; }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
-        }
-
-        #endregion
         // Send a message to targets or all players
         internal void ChatMessageReceived(string name, string message,Client sender=null)
         {
@@ -831,8 +545,6 @@ namespace RageCoop.Server
             }.Pack(msg);
             MainNetServer.SendMessage(msg, target.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
         }
-        #endregion
-
 
         internal void RegisterCommand(string name, string usage, short argsLength, Action<CommandContext> callback)
         {

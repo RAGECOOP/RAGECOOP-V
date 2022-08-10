@@ -88,6 +88,6 @@
         /// <summary>
         /// Whether to use direct connection between players to send entity information
         /// </summary>
-        public bool UseP2P { get; set; } = true;
+        public bool UseP2P { get; set; } = false;
     }
 }

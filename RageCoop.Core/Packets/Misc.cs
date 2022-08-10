@@ -29,10 +29,10 @@ namespace RageCoop.Core
         /// <summary>
         /// Sent to the host when a direct connection has been established
         /// </summary>
-        internal class ConnectionEstablished : Packet
+        internal class P2PConnect : Packet
         {
             public int ID { get; set; }
-            public override PacketType Type => PacketType.ConnectionEstablished;
+            public override PacketType Type => PacketType.P2PConnect;
             public override byte[] Serialize()
             {
                 var data = new List<byte>(10);

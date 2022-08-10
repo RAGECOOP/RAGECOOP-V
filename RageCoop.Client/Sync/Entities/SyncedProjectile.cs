@@ -67,7 +67,7 @@ namespace RageCoop.Client
                 CreateProjectile();
                 return;
             }
-            MainProjectile.Velocity=Velocity+(Position+Networking.Latency*Velocity-MainProjectile.Position);
+            MainProjectile.Velocity=Velocity+(Position+Shooter.Owner.PacketTravelTime*Velocity-MainProjectile.Position);
             MainProjectile.Rotation=Rotation;
             LastUpdated=Main.Ticked;
         }

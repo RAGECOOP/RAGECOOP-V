@@ -353,23 +353,22 @@ namespace RageCoop.Client
             LastUpdated=Main.Ticked;
         }
         float _elapsed;
-        Vector3 _predictedVel;
         Vector3 _predictedPos;
         void DisplayVehicle(bool touching)
         {
             // predict velocity/position
             _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
             // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), Owner.HasDirectConnection+" "+LastSyncedStopWatch.ElapsedMilliseconds).Draw();
-            _predictedVel = Velocity+Acceleration*_elapsed;
-            _predictedPos = Position+_elapsed*(LastVelocity+_predictedVel)/2;
-            LastVelocity=_predictedVel;
+            // _predictedVel = Velocity+Acceleration*_elapsed;
+            _predictedPos = Position+_elapsed*Velocity;
+            // LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
             var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);
             
             if (dist<8)
             {
-                MainVehicle.Velocity = _predictedVel;
+                MainVehicle.Velocity = Velocity;
                 MainVehicle.ApplyForce(cali);
                 if (IsFlipped)
                 {
@@ -393,7 +392,7 @@ namespace RageCoop.Client
             else
             {
                 MainVehicle.Position=_predictedPos;
-                MainVehicle.Velocity=_predictedVel;
+                MainVehicle.Velocity=Velocity;
                 MainVehicle.Quaternion=Quaternion;
             }
         }

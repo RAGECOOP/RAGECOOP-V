@@ -108,7 +108,7 @@ namespace RageCoop.Client
                 OwnerID=v.OwnerID,
                 Flags = veh.GetVehicleFlags(),
                 SteeringAngle = veh.SteeringAngle,
-                Position = veh.PredictPosition(),
+                Position = veh.Position,
                 Velocity=veh.Velocity,
                 Quaternion=veh.ReadQuaternion(),
                 RotationVelocity=veh.RotationVelocity,
@@ -160,11 +160,11 @@ namespace RageCoop.Client
                 ID =sp.ID,
                 ShooterID=sp.ShooterID,
                 Rotation=p.Rotation,
+                Position=p.Position,
                 Velocity=p.Velocity,
                 WeaponHash=(uint)p.WeaponHash,
                 Exploded=p.IsDead
             };
-            packet.Position=p.Position+packet.Velocity*Latency;
             if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
             Send(packet, ConnectionChannel.ProjectileSync);
         }
