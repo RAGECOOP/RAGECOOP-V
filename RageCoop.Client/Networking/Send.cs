@@ -53,14 +53,7 @@ namespace RageCoop.Client
             c.LastSentStopWatch.Restart();
             if (full)
             {
-                if (packet.Flags.HasPedFlag(PedDataFlags.IsInVehicle))
-                {
-                    packet.CurrentWeaponHash=(uint)p.VehicleWeapon;
-                }
-                else
-                {
-                    packet.CurrentWeaponHash=(uint)p.Weapons.Current.Hash;
-                }
+                packet.CurrentWeaponHash = packet.Flags.HasPedFlag(PedDataFlags.IsInVehicle) ? (uint)p.VehicleWeapon : (uint)p.Weapons.Current.Hash;
                 packet.Flags |= PedDataFlags.IsFullSync;
                 packet.Clothes=p.GetPedClothes();
                 packet.ModelHash=p.Model.Hash;
@@ -176,13 +169,7 @@ namespace RageCoop.Client
         #endregion
         public static void SendChatMessage(string message)
         {
-
-            
-
-            Peer.SendTo(new Packets.ChatMessage(new Func<string, byte[]>((s) =>
-            {
-                return Security.Encrypt(s.GetBytes());
-            }))
+            Peer.SendTo(new Packets.ChatMessage(new Func<string, byte[]>((s) => Security.Encrypt(s.GetBytes())))
             { Username = Main.Settings.Username, Message = message },ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
