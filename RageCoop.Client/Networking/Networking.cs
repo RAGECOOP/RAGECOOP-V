@@ -26,7 +26,7 @@ namespace RageCoop.Client
 
         public static void ToggleConnection(string address, string username = null, string password = null)
         {
-            Peer?.Dispose();
+            Peer?.Shutdown("Bye");
             if (IsOnServer)
             {
             }
@@ -37,6 +37,8 @@ namespace RageCoop.Client
             }
             else
             {
+                Peer?.Dispose();
+
                 IsConnecting = true;
                 password = password ?? Main.Settings.Password;
                 username=username ?? Main.Settings.Username;

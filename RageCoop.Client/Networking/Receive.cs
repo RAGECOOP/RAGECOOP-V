@@ -10,6 +10,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
+        private static PacketPool PacketPool=new PacketPool();
         private static readonly Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
            {
                switch (t)
@@ -205,6 +206,7 @@ namespace RageCoop.Client
 
             Peer.Recycle(message);
         }
+        static Packet packet;
         private static void HandlePacket(PacketType packetType, byte[] data, NetConnection senderConnection)
         {
 
@@ -227,11 +229,15 @@ namespace RageCoop.Client
                     break;
 
                 case PacketType.VehicleSync:
-                    VehicleSync(data.GetPacket<Packets.VehicleSync>());
+                    packet = data.GetPacket<Packets.VehicleSync>(PacketPool);
+                    VehicleSync((Packets.VehicleSync)packet);
+                    PacketPool.Recycle((Packets.VehicleSync)packet);
                     break;
 
                 case PacketType.PedSync:
-                    PedSync(data.GetPacket<Packets.PedSync>());
+                    packet = data.GetPacket<Packets.PedSync>(PacketPool);
+                    PedSync((Packets.PedSync)packet);
+                    PacketPool.Recycle((Packets.PedSync)packet);
                     break;
                 case PacketType.ProjectileSync:
                     ProjectileSync(data.GetPacket<Packets.ProjectileSync>());

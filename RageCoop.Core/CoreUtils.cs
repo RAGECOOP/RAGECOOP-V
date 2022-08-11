@@ -261,14 +261,14 @@ namespace RageCoop.Core
         }
 
 
-        public static T GetPacket<T>(this NetIncomingMessage msg) where T : Packet, new()
+        public static T GetPacket<T>(this NetIncomingMessage msg,PacketPool pool=null) where T : Packet, new()
         {
             msg.ReadByte();
             return GetPacket<T>(msg.ReadBytes(msg.ReadInt32()));
         }
-        public static T GetPacket<T>(this byte[] data) where T : Packet, new()
+        public static T GetPacket<T>(this byte[] data, PacketPool pool = null) where T : Packet, new()
         {
-            T p = new T();
+            T p = pool?.Get<T>() ?? new T();
             p.Deserialize(data);
             return p;
         }
