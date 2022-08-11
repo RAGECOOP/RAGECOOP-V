@@ -28,15 +28,11 @@ namespace RageCoop.Client
 
         private void OnTick(object sender, EventArgs e)
         {
-            if (Game.IsLoading)
+            if (Game.IsLoading || !Networking.IsOnServer)
             {
                 return;
             }
 
-            if (!Networking.IsOnServer)
-            {
-                return;
-            }
             Game.DisableControlThisFrame(Control.FrontendPause);
             if (Main.Settings.DisableAlternatePause)
             {

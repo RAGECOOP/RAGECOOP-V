@@ -25,7 +25,6 @@ namespace RageCoop.Client
                        return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
                    default:
                        throw new ArgumentException("Cannot resolve server side argument: "+t);
-
                }
            };
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
@@ -43,7 +42,6 @@ namespace RageCoop.Client
                         case NetConnectionStatus.InitiatedConnect:
                             if (message.SenderConnection==ServerConnection)
                             {
-
                                 CoopMenu.InitiateConnectionMenuSetting();
                             }
                             break;
@@ -103,8 +101,7 @@ namespace RageCoop.Client
                                 Main.QueueAction(() => Main.CleanUp());
                                 CoopMenu.DisconnectedMenuSetting();
                                 Main.Logger.Info($">> Disconnected << reason: {reason}");
-                                Main.QueueAction(() =>
-                                    GTA.UI.Notification.Show("~r~Disconnected: " + reason));
+                                Main.QueueAction(() => GTA.UI.Notification.Show("~r~Disconnected: " + reason));
                                 Main.Resources.Unload();
                             }
                             break;
@@ -112,12 +109,10 @@ namespace RageCoop.Client
                     break;
                 case NetIncomingMessageType.Data:
                     {
-
                         if (message.LengthBytes==0) { break; }
                         var packetType = PacketType.Unknown;
                         try
                         {
-
                             // Get packet type
                             packetType = (PacketType)message.ReadByte();
                             switch (packetType)
@@ -246,10 +241,7 @@ namespace RageCoop.Client
                 case PacketType.ChatMessage:
                     {
 
-                        Packets.ChatMessage packet = new Packets.ChatMessage((b) =>
-                        {
-                            return Security.Decrypt(b);
-                        });
+                        Packets.ChatMessage packet = new Packets.ChatMessage((b) => Security.Decrypt(b));
                         packet.Deserialize(data);
 
                         Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });

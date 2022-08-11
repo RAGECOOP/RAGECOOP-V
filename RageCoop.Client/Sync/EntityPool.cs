@@ -46,8 +46,7 @@ namespace RageCoop.Client
         {
             foreach (int id in new List<int>(PedsByID.Keys))
             {
-                if (keepPlayer&&(id==Main.LocalPlayerID)) { continue; }
-                if (keepMine&&(PedsByID[id].OwnerID==Main.LocalPlayerID)) { continue; }
+                if (keepPlayer && (id==Main.LocalPlayerID)|| keepMine && (PedsByID[id].OwnerID == Main.LocalPlayerID)) { continue; }
                 RemovePed(id);
             }
             PedsByID.Clear();
@@ -88,54 +87,43 @@ namespace RageCoop.Client
         }
 
         #region PEDS
-        public static SyncedPed GetPedByID(int id)
-        {
-            return PedsByID.ContainsKey(id) ? PedsByID[id] : null;
-        }
-        public static SyncedPed GetPedByHandle(int handle)
-        {
-            return PedsByHandle.ContainsKey(handle) ? PedsByHandle[handle] : null;
-        }
-        public static List<int> GetPedIDs()
-        {
-            return new List<int>(PedsByID.Keys);
-        }
+        public static SyncedPed GetPedByID(int id) => PedsByID.ContainsKey(id) ? PedsByID[id] : null;
+        public static SyncedPed GetPedByHandle(int handle) => PedsByHandle.ContainsKey(handle) ? PedsByHandle[handle] : null;
+        public static List<int> GetPedIDs() => new List<int>(PedsByID.Keys);
         public static bool AddPlayer()
         {
             Ped p = Game.Player.Character;
             SyncedPed player = GetPedByID(Main.LocalPlayerID);
-            if (player!=null)
-            {
-                if (player.MainPed!=p)
-                {
-                    // Player model changed
-                    player.MainPed = p;
-
-                    // Remove it from Handle_Characters
-                    var pairs = PedsByHandle.Where(x => x.Value==player);
-                    if (pairs.Any())
-                    {
-                        var pair = pairs.First();
-
-                        // Re-add
-                        PedsByHandle.Remove(pair.Key);
-                        if (PedsByHandle.ContainsKey(p.Handle))
-                        {
-                            RemovePed(PedsByHandle[p.Handle].ID);
-                        }
-                        PedsByHandle.Add(p.Handle, player);
-                    }
-                }
-            }
-            else
+            if (player==null)
             {
                 Main.Logger.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
                 SyncedPed c = new SyncedPed(p);
-                Main.LocalPlayerID=c.OwnerID=c.ID;
+                Main.LocalPlayerID = c.OwnerID = c.ID;
                 Add(c);
                 Main.Logger.Debug($"Local player ID is:{c.ID}");
                 PlayerList.SetPlayer(c.ID, Main.Settings.Username);
                 return true;
+            }
+
+            if (player.MainPed != p)
+            {
+                // Player model changed
+                player.MainPed = p;
+
+                // Remove it from Handle_Characters
+                var pairs = PedsByHandle.Where(x => x.Value == player);
+                if (pairs.Any())
+                {
+                    var pair = pairs.First();
+
+                    // Re-add
+                    PedsByHandle.Remove(pair.Key);
+                    if (PedsByHandle.ContainsKey(p.Handle))
+                    {
+                        RemovePed(PedsByHandle[p.Handle].ID);
+                    }
+                    PedsByHandle.Add(p.Handle, player);
+                }
             }
             return false;
         }
@@ -194,18 +182,9 @@ namespace RageCoop.Client
         #endregion
 
         #region VEHICLES
-        public static SyncedVehicle GetVehicleByID(int id)
-        {
-            return VehiclesByID.ContainsKey(id) ? VehiclesByID[id] : null;
-        }
-        public static SyncedVehicle GetVehicleByHandle(int handle)
-        {
-            return VehiclesByHandle.ContainsKey(handle) ? VehiclesByHandle[handle] : null;
-        }
-        public static List<int> GetVehicleIDs()
-        {
-            return new List<int>(VehiclesByID.Keys);
-        }
+        public static SyncedVehicle GetVehicleByID(int id) => VehiclesByID.ContainsKey(id) ? VehiclesByID[id] : null;
+        public static SyncedVehicle GetVehicleByHandle(int handle) => VehiclesByHandle.ContainsKey(handle) ? VehiclesByHandle[handle] : null;
+        public static List<int> GetVehicleIDs() => new List<int>(VehiclesByID.Keys);
         public static void Add(SyncedVehicle v)
         {
             if (VehiclesByID.ContainsKey(v.ID))
@@ -300,18 +279,9 @@ namespace RageCoop.Client
             }
         }
 
-        public static bool PedExists(int id)
-        {
-            return PedsByID.ContainsKey(id);
-        }
-        public static bool VehicleExists(int id)
-        {
-            return VehiclesByID.ContainsKey(id);
-        }
-        public static bool ProjectileExists(int id)
-        {
-            return ProjectilesByID.ContainsKey(id);
-        }
+        public static bool PedExists(int id) => PedsByID.ContainsKey(id);
+        public static bool VehicleExists(int id) => VehiclesByID.ContainsKey(id);
+        public static bool ProjectileExists(int id) => ProjectilesByID.ContainsKey(id);
         #endregion
         static int vehStateIndex;
         static int pedStateIndex;
@@ -358,26 +328,21 @@ namespace RageCoop.Client
                     if (!ProjectilesByHandle.ContainsKey(p.Handle))
                     {
                         Add(new SyncedProjectile(p));
-
                     }
                 }
 
                 foreach (SyncedProjectile p in ProjectilesByID.Values.ToArray())
                 {
-
                     // Outgoing sync
                     if (p.IsLocal)
                     {
                         if (p.MainProjectile.AttachedEntity==null)
                         {
-
                             // Prevent projectiles from exploding next to vehicle
-                            if (WeaponUtil.VehicleProjectileWeapons.Contains((VehicleWeaponHash)p.MainProjectile.WeaponHash))
+                            if (WeaponUtil.VehicleProjectileWeapons.Contains((VehicleWeaponHash)p.MainProjectile.WeaponHash) &&
+                                p.MainProjectile.WeaponHash != (WeaponHash)VehicleWeaponHash.Tank && p.Origin.DistanceTo(p.MainProjectile.Position) < 2)
                             {
-                                if (p.MainProjectile.WeaponHash!=(WeaponHash)VehicleWeaponHash.Tank && p.Origin.DistanceTo(p.MainProjectile.Position)<2)
-                                {
-                                    continue;
-                                }
+                                continue;
                             }
 
                             Networking.SendProjectile(p);
@@ -393,11 +358,8 @@ namespace RageCoop.Client
                         {
                             p.Update();
                         }
-
                     }
-
                 }
-
             }
 
             i=-1;
@@ -411,20 +373,15 @@ namespace RageCoop.Client
                     SyncedPed c = EntityPool.GetPedByHandle(p.Handle);
                     if (c==null && (p!=Game.Player.Character))
                     {
-                        if (allPeds.Length>Main.Settings.WorldPedSoftLimit)
+                        if (allPeds.Length>Main.Settings.WorldPedSoftLimit && p.PopulationType != EntityPopulationType.RandomAmbient)
                         {
-                            if (p.PopulationType!=EntityPopulationType.RandomAmbient)
-                            {
-                                p.Delete();
-                                continue;
-                            }
+                            p.Delete();
+                            continue;
                         }
                         // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
                         c=new SyncedPed(p);
 
                         EntityPool.Add(c);
-
-
                     }
                 }
 #if BENCHMARK
@@ -437,6 +394,7 @@ namespace RageCoop.Client
                 {
                     pedStateIndex=0;
                 }
+
                 foreach (SyncedPed c in ps)
                 {
                     i++;
@@ -457,7 +415,6 @@ namespace RageCoop.Client
 
                         Networking.SendPed(c, (i-pedStateIndex)<pedStatesPerFrame);
 #if BENCHMARK
-
                         Debug.TimeStamps[TimeStamp.SendPed]=PerfCounter2.ElapsedTicks-start;
 #endif                        
                     }
@@ -472,13 +429,11 @@ namespace RageCoop.Client
                             RemovePed(c.ID, "OutOfSync");
                         }
 #if BENCHMARK
-
                         Debug.TimeStamps[TimeStamp.UpdatePed]=PerfCounter2.ElapsedTicks-start;
 #endif
                     }
                 }
 #if BENCHMARK
-
                 Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
@@ -487,7 +442,6 @@ namespace RageCoop.Client
 
             lock (VehiclesLock)
             {
-
                 foreach (Vehicle veh in allVehicles)
                 {
                     if (!VehiclesByHandle.ContainsKey(veh.Handle))
@@ -513,12 +467,9 @@ namespace RageCoop.Client
                         // Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
                         Add(new SyncedVehicle(veh));
-
-
                     }
                 }
 #if BENCHMARK
-
                 Debug.TimeStamps[TimeStamp.AddVehicles]=PerfCounter.ElapsedTicks;
 #endif
                 var vs = VehiclesByID.Values.ToArray();
@@ -527,6 +478,7 @@ namespace RageCoop.Client
                 {
                     vehStateIndex=0;
                 }
+
                 foreach (SyncedVehicle v in vs)
                 {
                     i++;
@@ -543,20 +495,15 @@ namespace RageCoop.Client
                         SyncEvents.Check(v);
 
                         Networking.SendVehicle(v, (i-vehStateIndex)<vehStatesPerFrame);
-
                     }
                     else // Incoming sync
                     {
-
-
                         v.Update();
                         if (v.IsOutOfSync)
                         {
                             RemoveVehicle(v.ID, "OutOfSync");
                         }
-
                     }
-
                 }
 
 #if BENCHMARK
@@ -586,6 +533,7 @@ namespace RageCoop.Client
                     RemovePed(p.ID);
                 }
             }
+
             foreach (SyncedVehicle v in VehiclesByID.Values.ToArray())
             {
                 if (v.OwnerID==playerPedId)
@@ -598,10 +546,7 @@ namespace RageCoop.Client
         public static int RequestNewID()
         {
             int ID = 0;
-            while ((ID==0)
-                || PedsByID.ContainsKey(ID)
-                || VehiclesByID.ContainsKey(ID)
-                || ProjectilesByID.ContainsKey(ID))
+            while ((ID==0) || PedsByID.ContainsKey(ID) || VehiclesByID.ContainsKey(ID) || ProjectilesByID.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
 
@@ -619,16 +564,14 @@ namespace RageCoop.Client
         }
         public static string DumpDebug()
         {
-            string s = "";
-            s+="\nID_Peds: "+PedsByID.Count;
-            s+="\nHandle_Peds: "+PedsByHandle.Count;
-            s+="\nID_Vehicles: "+VehiclesByID.Count;
-            s+="\nHandle_Vehicles: "+VehiclesByHandle.Count;
-            s+="\nID_Projectiles: "+ProjectilesByID.Count;
-            s+="\nHandle_Projectiles: "+ProjectilesByHandle.Count;
-            s+="\npedStatesPerFrame:"+pedStatesPerFrame;
-            s+="\nvehStatesPerFrame:"+vehStatesPerFrame;
-            return s;
+            return $"\nID_Peds: {PedsByID.Count}" +
+                   $"\nHandle_Peds: {PedsByHandle.Count}" +
+                   $"\nID_Vehicles: {VehiclesByID.Count}" +
+                   $"\nHandle_vehicles: {VehiclesByHandle.Count}" +
+                   $"\nID_Projectiles: {ProjectilesByID.Count}" +
+                   $"\nHandle_Projectiles: {ProjectilesByHandle.Count}" +
+                   $"\npedStatesPerFrame: {pedStatesPerFrame}" +
+                   $"\nvehStatesPerFrame: {vehStatesPerFrame}";
         }
         public static class ThreadSafe
         {

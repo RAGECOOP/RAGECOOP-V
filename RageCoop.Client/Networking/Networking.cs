@@ -29,6 +29,7 @@ namespace RageCoop.Client
             Peer?.Shutdown("Bye");
             if (IsOnServer)
             {
+                // ?
             }
             else if (IsConnecting) {
                 _publicKeyReceived.Set();
@@ -117,10 +118,7 @@ namespace RageCoop.Client
                 });
             }
         }
-        public static bool IsOnServer
-        {
-            get { return ServerConnection?.Status == NetConnectionStatus.Connected; }
-        }
+        public static bool IsOnServer { get => ServerConnection?.Status == NetConnectionStatus.Connected; }
 
         #region -- PLAYER --
         private static void PlayerConnect(Packets.PlayerConnect packet)
@@ -149,7 +147,6 @@ namespace RageCoop.Client
 
         #endregion // -- PLAYER --
         #region -- GET --
-
         private static bool GetServerPublicKey(string address, int timeout = 10000)
         {
             Security.ServerRSA=null;
@@ -181,8 +178,7 @@ namespace RageCoop.Client
         private static int NewRequestID()
         {
             int ID = 0;
-            while ((ID==0)
-                || PendingResponses.ContainsKey(ID))
+            while ((ID==0) || PendingResponses.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
 

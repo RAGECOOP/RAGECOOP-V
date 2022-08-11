@@ -137,9 +137,7 @@ namespace RageCoop.Client
             }
             Players=new Dictionary<int, Player> { };
         }
-
     }
-
 
     internal class Player
     {
