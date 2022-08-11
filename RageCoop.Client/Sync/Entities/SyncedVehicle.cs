@@ -52,8 +52,6 @@ namespace RageCoop.Client
 
 
         #region LAST STATE
-
-
         private byte[] _lastVehicleColors = new byte[] { 0, 0 };
         private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
         #endregion
@@ -67,25 +65,22 @@ namespace RageCoop.Client
         internal float DeluxoWingRatio { get; set; } = -1;
         internal bool IsFlipped
         {
-            get
-            {
-                return _isMotorcycle||((Quaternion*Vector3.RelativeTop).Z - (Quaternion*Vector3.RelativeBottom).Z)<0.5;
-            }
+            get => _isMotorcycle || ((Quaternion * Vector3.RelativeTop).Z - (Quaternion * Vector3.RelativeBottom).Z) < 0.5;
         }
         private bool _isMotorcycle;
         #endregion
         #region FLAGS
-        internal bool EngineRunning { get { return Flags.HasVehFlag(VehicleDataFlags.IsEngineRunning); } }
+        internal bool EngineRunning { get => Flags.HasVehFlag(VehicleDataFlags.IsEngineRunning); }
         private bool _lastTransformed = false;
-        internal bool Transformed { get { return Flags.HasVehFlag(VehicleDataFlags.IsTransformed); } }
+        internal bool Transformed { get => Flags.HasVehFlag(VehicleDataFlags.IsTransformed); }
         private bool _lastHornActive = false;
-        internal bool HornActive { get { return Flags.HasVehFlag(VehicleDataFlags.IsHornActive); } }
-        internal bool LightsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreLightsOn); } }
-        internal bool BrakeLightsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn); } }
-        internal bool HighBeamsOn { get { return Flags.HasVehFlag(VehicleDataFlags.AreHighBeamsOn); } }
-        internal bool SireneActive { get { return Flags.HasVehFlag(VehicleDataFlags.IsSirenActive); } }
-        internal bool IsDead { get { return Flags.HasVehFlag(VehicleDataFlags.IsDead); } }
-        internal bool IsDeluxoHovering { get { return Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering); } }
+        internal bool HornActive { get => Flags.HasVehFlag(VehicleDataFlags.IsHornActive); }
+        internal bool LightsOn { get => Flags.HasVehFlag(VehicleDataFlags.AreLightsOn); }
+        internal bool BrakeLightsOn { get => Flags.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn); }
+        internal bool HighBeamsOn { get => Flags.HasVehFlag(VehicleDataFlags.AreHighBeamsOn); }
+        internal bool SireneActive { get => Flags.HasVehFlag(VehicleDataFlags.IsSirenActive); }
+        internal bool IsDead { get => Flags.HasVehFlag(VehicleDataFlags.IsDead); }
+        internal bool IsDeluxoHovering { get => Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering); }
         #endregion
 
         #region -- VEHICLE STATE --
@@ -139,14 +134,7 @@ namespace RageCoop.Client
             MainVehicle.ThrottlePower=ThrottlePower;
             MainVehicle.BrakePower=BrakePower;
             var v = Main.P.CurrentVehicle;
-            if (v!= null && MainVehicle.IsTouching(v))
-            {
-                DisplayVehicle(true);
-            }
-            else
-            {
-                DisplayVehicle(false);
-            }
+            DisplayVehicle(v != null && MainVehicle.IsTouching(v));
             #region FLAGS
             if (IsDead)
             {
@@ -154,10 +142,8 @@ namespace RageCoop.Client
                 {
                     return;
                 }
-                else
-                {
-                    MainVehicle.Explode();
-                }
+
+                MainVehicle.Explode();
             }
             else
             {
@@ -280,7 +266,6 @@ namespace RageCoop.Client
                 // check passengers (and driver).
                 if (_checkSeat)
                 {
-
                     var currentPassengers = MainVehicle.GetPassengers();
 
                     lock (Passengers)
@@ -290,7 +275,6 @@ namespace RageCoop.Client
                             VehicleSeat seat = (VehicleSeat)i;
                             if (Passengers.ContainsKey(seat))
                             {
-
                                 SyncedPed c = Passengers[seat];
                                 if (c?.ID==Main.LocalPlayerID && (RadioStation!=Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX)))
                                 {
@@ -336,8 +320,6 @@ namespace RageCoop.Client
                     _lastVehicleMods = Mods;
                 }
 
-
-
                 if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle)!=LicensePlate)
                 {
                     Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
@@ -366,34 +348,32 @@ namespace RageCoop.Client
             var dist = current.DistanceTo(Position);
             var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);
             
-            if (dist<8)
+            if (dist>=8)
             {
+                MainVehicle.Position = _predictedPos;
                 MainVehicle.Velocity = Velocity;
-                MainVehicle.ApplyForce(cali);
-                if (IsFlipped)
-                {
-                    MainVehicle.Quaternion=Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
-                    MainVehicle.RotationVelocity=RotationVelocity;
-                }
-                else
-                {
-                    Vector3 calirot = GetCalibrationRotation();
-                    if (calirot.Length()<50)
-                    {
-                        MainVehicle.RotationVelocity = RotationVelocity+calirot*0.2f;
-                    }
-                    else
-                    {
-                        MainVehicle.Quaternion=Quaternion;
-                        MainVehicle.RotationVelocity=RotationVelocity;
-                    }
-                }
+                MainVehicle.Quaternion = Quaternion;
+                return;
+            }
+
+            MainVehicle.Velocity = Velocity;
+            MainVehicle.ApplyForce(cali);
+            if (IsFlipped)
+            {
+                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
+                MainVehicle.RotationVelocity = RotationVelocity;
+                return;
+            }
+
+            Vector3 calirot = GetCalibrationRotation();
+            if (calirot.Length() < 50)
+            {
+                MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
             }
             else
             {
-                MainVehicle.Position=_predictedPos;
-                MainVehicle.Velocity=Velocity;
-                MainVehicle.Quaternion=Quaternion;
+                MainVehicle.Quaternion = Quaternion;
+                MainVehicle.RotationVelocity = RotationVelocity;
             }
         }
         private Vector3 GetCalibrationRotation()
@@ -411,7 +391,6 @@ namespace RageCoop.Client
             if (r.Z>180) { r.Z=r.Z-360; }
             else if (r.Z<-180) { r.Z=360+r.Z; }
             return r;
-
         }
         private bool CreateVehicle()
         {
@@ -489,5 +468,4 @@ namespace RageCoop.Client
         internal Vector3 LastVelocity { get; set; }
         #endregion
     }
-
 }
