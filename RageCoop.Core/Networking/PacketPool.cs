@@ -8,6 +8,7 @@ namespace RageCoop.Core
     {
         public ObjectPool<Packets.VehicleSync> VehicleSyncPool=ObjectPool.Create<Packets.VehicleSync>();
         public ObjectPool<Packets.PedSync> PedSyncPool = ObjectPool.Create<Packets.PedSync>();
+
         public void Recycle(Packets.VehicleSync p)
         {
             VehicleSyncPool.Return(p);

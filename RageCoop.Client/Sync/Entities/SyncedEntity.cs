@@ -39,7 +39,7 @@ namespace RageCoop.Client
             }
             internal set
             {
-                if (value==_ownerID) { return; }
+                if (value==_ownerID && Owner!=null) { return; }
                 _ownerID = value;
                 Owner=PlayerList.GetPlayer(value);
             }
