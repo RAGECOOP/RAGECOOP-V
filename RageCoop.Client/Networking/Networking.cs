@@ -154,12 +154,13 @@ namespace RageCoop.Client
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
-            var name = PlayerList.GetPlayer(packet.PedID).Username;
+            var player = PlayerList.GetPlayer(packet.PedID);
+            if (player==null) { return; }
             PlayerList.RemovePlayer(packet.PedID);
-            EntityPool.RemoveAllFromPlayer(packet.PedID);
-
-            Main.QueueAction(() =>
-            GTA.UI.Notification.Show($"~h~{name}~h~ left."));
+            Main.QueueAction(() => {
+                EntityPool.RemoveAllFromPlayer(packet.PedID);
+                GTA.UI.Notification.Show($"~h~{player.Username}~h~ left.");
+            });
         }
 
         #endregion // -- PLAYER --

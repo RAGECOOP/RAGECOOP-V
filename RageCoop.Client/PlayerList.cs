@@ -5,6 +5,7 @@ using RageCoop.Core;
 using System.Collections.Generic;
 using Lidgren.Network;
 using System.Net;
+using System.Linq;
 
 namespace RageCoop.Client
 {
@@ -122,13 +123,18 @@ namespace RageCoop.Client
         }
         public static void RemovePlayer(int id)
         {
-            if (Players.ContainsKey(id))
+            if (Players.TryGetValue(id,out var player))
             {
                 Players.Remove(id);
+                Main.QueueAction(() => player.FakeBlip?.Delete());
             }
         }
         public static void Cleanup()
         {
+            foreach(var p in Players.Values.ToArray())
+            {
+                p.FakeBlip?.Delete();
+            }
             Players=new Dictionary<int, Player> { };
         }
 
