@@ -280,12 +280,12 @@ namespace RageCoop.Client.Scripting
         /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
         public static void SendCustomEvent(int eventHash, params object[] args)
         {
-            var p = new Packets.CustomEvent()
+            
+            Networking.Peer.SendTo(new Packets.CustomEvent()
             {
                 Args=args,
                 Hash=eventHash
-            };
-            Networking.SendTo(p,Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
+            },Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
         }
 
         /// <summary>

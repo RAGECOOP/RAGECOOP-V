@@ -10,7 +10,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        public static NetPeer Peer;
+        public static CoopPeer Peer;
         public static float Latency => ServerConnection.AverageRoundtripTime/2;
         public static bool ShowNetworkInfo = false;
         public static Security Security;
@@ -22,35 +22,13 @@ namespace RageCoop.Client
         static Networking()
         {
             Security=new Security(Main.Logger);
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    if (Peer!=null)
-                    {
-                        try
-                        {
-
-                            ProcessMessage(Peer.WaitMessage(200));
-                        }
-                        catch(Exception ex)
-                        {
-                            Main.Logger.Error(ex);
-                        }
-                    }
-                    else
-                    {
-                        Thread.Sleep(20);
-                    }
-                }
-            });
         }
 
         public static void ToggleConnection(string address, string username = null, string password = null)
         {
+            Peer?.Dispose();
             if (IsOnServer)
             {
-                Peer.Shutdown("Bye!");
             }
             else if (IsConnecting) {
                 _publicKeyReceived.Set();
@@ -97,8 +75,12 @@ namespace RageCoop.Client
                     try
                     {
                         DownloadManager.Cleanup();
-                        Peer = new NetPeer(config);
-                        Peer.Start();
+                        Peer = new CoopPeer(config);
+                        Peer.OnMessageReceived+= (s, m) =>
+                        {
+                            try { ProcessMessage(m); }
+                            catch (Exception ex) { Main.Logger.Error(ex); }
+                        };
                         Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled=false;
                         Security.Regen();
@@ -116,7 +98,7 @@ namespace RageCoop.Client
                             Username =username,
                             ModVersion = Main.CurrentVersion,
                             PasswordEncrypted=Security.Encrypt(password.GetBytes()),
-                            InternalEndPoint = new System.Net.IPEndPoint(CoreUtils.GetLocalAddress(ip[0]),Peer.Port)
+                            InternalEndPoint = new System.Net.IPEndPoint(CoreUtils.GetLocalAddress(ip[0]), Peer.Port)
                         };
 
                         Security.GetSymmetricKeysCrypted(out handshake.AesKeyCrypted, out handshake.AesIVCrypted);

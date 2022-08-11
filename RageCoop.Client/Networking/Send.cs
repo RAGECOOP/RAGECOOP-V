@@ -13,19 +13,11 @@ namespace RageCoop.Client
 
         public static int SyncInterval = 30;
         public static List<NetConnection> Targets = new List<NetConnection>();
-        public static void Send(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        public static void SendSync(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
-            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
-            p.Pack(outgoingMessage);
-            Peer.SendMessage(outgoingMessage,Targets, method, (int)channel);
+            Peer.SendTo(p, Targets, channel, method);
         }
-        public static void SendTo(Packet p,NetConnection connection, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
-        {
-            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
-            p.Pack(outgoingMessage);
-            Peer.SendMessage(outgoingMessage, connection, method, (int)channel);
-        }
-
+        
         public static void SendPed(SyncedPed c, bool full)
         {
             if (c.LastSentStopWatch.ElapsedMilliseconds<SyncInterval)
@@ -93,7 +85,7 @@ namespace RageCoop.Client
                     }
                 }
             }
-            Send(packet, ConnectionChannel.PedSync);
+            SendSync(packet, ConnectionChannel.PedSync);
         }
         public static void SendVehicle(SyncedVehicle v, bool full)
         {
@@ -150,7 +142,7 @@ namespace RageCoop.Client
                 }
                 v.LastEngineHealth=packet.EngineHealth;
             }
-            Send(packet, ConnectionChannel.VehicleSync);
+            SendSync(packet, ConnectionChannel.VehicleSync);
         }
         public static void SendProjectile(SyncedProjectile sp)
         {
@@ -166,14 +158,14 @@ namespace RageCoop.Client
                 Exploded=p.IsDead
             };
             if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
-            Send(packet, ConnectionChannel.ProjectileSync);
+            SendSync(packet, ConnectionChannel.ProjectileSync);
         }
 
 
         #region SYNC EVENTS
         public static void SendBulletShot(Vector3 start, Vector3 end, uint weapon, int ownerID)
         {
-            Send(new Packets.BulletShot()
+            SendSync(new Packets.BulletShot()
             {
                 StartPosition = start,
                 EndPosition = end,
@@ -184,14 +176,14 @@ namespace RageCoop.Client
         #endregion
         public static void SendChatMessage(string message)
         {
-            NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
 
-            new Packets.ChatMessage(new Func<string, byte[]>((s) =>
+            
+
+            Peer.SendTo(new Packets.ChatMessage(new Func<string, byte[]>((s) =>
             {
                 return Security.Encrypt(s.GetBytes());
-            })) { Username = Main.Settings.Username, Message = message }.Pack(outgoingMessage);
-
-            Peer.SendMessage(outgoingMessage,ServerConnection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Chat);
+            }))
+            { Username = Main.Settings.Username, Message = message },ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
     }

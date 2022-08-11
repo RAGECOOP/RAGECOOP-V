@@ -12,13 +12,13 @@ namespace RageCoop.Client
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
-            Networking.Send(new Packets.PedKilled() { VictimID=victim.ID }, ConnectionChannel.SyncEvents);
+            Networking.SendSync(new Packets.PedKilled() { VictimID=victim.ID }, ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerEnteringVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
         {
             Networking.
-            Send(new Packets.EnteringVehicle()
+            SendSync(new Packets.EnteringVehicle()
             {
                 PedID=c.ID,
                 VehicleID= veh.ID,
@@ -34,7 +34,7 @@ namespace RageCoop.Client
                 veh.LastSynced=Main.Ticked;
                 TriggerChangeOwner(veh, c.ID);
             }
-            Networking.Send(new Packets.EnteredVehicle()
+            Networking.SendSync(new Packets.EnteredVehicle()
             {
                 VehicleSeat=(short)seat,
                 PedID=c.ID,
@@ -45,7 +45,7 @@ namespace RageCoop.Client
         public static void TriggerChangeOwner(SyncedVehicle c, int newOwnerID)
         {
 
-            Networking.Send(new Packets.OwnerChanged()
+            Networking.SendSync(new Packets.OwnerChanged()
             {
                 ID= c.ID,
                 NewOwnerID= newOwnerID,
@@ -70,7 +70,7 @@ namespace RageCoop.Client
         public static void TriggerLeaveVehicle(int id)
         {
             Networking.
-            Send(new Packets.LeaveVehicle()
+            SendSync(new Packets.LeaveVehicle()
             {
                 ID=id
             }, ConnectionChannel.SyncEvents);
@@ -94,7 +94,7 @@ namespace RageCoop.Client
         }
         public static void TriggerNozzleTransform(int vehID, bool hover)
         {
-            Networking.Send(new Packets.NozzleTransform() { VehicleID=vehID, Hover=hover }, ConnectionChannel.SyncEvents);
+            Networking.SendSync(new Packets.NozzleTransform() { VehicleID=vehID, Hover=hover }, ConnectionChannel.SyncEvents);
         }
 
         #endregion
