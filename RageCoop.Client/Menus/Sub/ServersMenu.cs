@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Net;
 using System.Threading;
 using RageCoop.Core;
+using GTA.UI;
 
 namespace RageCoop.Client.Menus
 {
@@ -81,7 +82,15 @@ namespace RageCoop.Client.Menus
                         try
                         {
                             Menu.Visible = false;
-
+                            if (server.ZeroTier)
+                            {
+                                address=$"{server.ZeroTierAddress}:{server.Port}";
+                                Main.QueueAction(() => { Notification.Show($"~y~Joining ZeroTier network... {address}"); });
+                                if (ZeroTierHelper.Join(server.ZeroTierNetWorkID)==null)
+                                {
+                                    throw new Exception("Failed to obtain ZeroTier network IP");
+                                }
+                            }
                             Networking.ToggleConnection(address);
 #if !NON_INTERACTIVE
                             CoopMenu.ServerIpItem.AltTitle = address;
@@ -93,7 +102,7 @@ namespace RageCoop.Client.Menus
                         }
                         catch (Exception ex)
                         {
-                            GTA.UI.Notification.Show($"~r~{ex.Message}");
+                            Notification.Show($"~r~{ex.Message}");
                         }
                     };
                     Menu.Add(tmpItem);

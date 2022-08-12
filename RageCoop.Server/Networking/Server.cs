@@ -20,14 +20,6 @@ using RageCoop.Core.Scripting;
 
 namespace RageCoop.Server
 {
-    internal struct IpInfo
-    {
-        [JsonProperty("ip")]
-        public string Address { get; set; }
-
-        [JsonProperty("country")]
-        public string Country { get; set; }
-    }
 
     /// <summary>
     /// The instantiable RageCoop server class
@@ -121,18 +113,10 @@ namespace RageCoop.Server
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                     HttpClient httpClient = new();
-
                     IpInfo info;
                     try
                     {
-                        HttpResponseMessage response = await httpClient.GetAsync("https://ipinfo.io/json");
-                        if (response.StatusCode != HttpStatusCode.OK)
-                        {
-                            throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
-                        }
-
-                        string content = await response.Content.ReadAsStringAsync();
-                        info = JsonConvert.DeserializeObject<IpInfo>(content);
+                        info = CoreUtils.GetIPInfo();
                         Logger?.Info($"Your public IP is {info.Address}, announcing to master server...");
                     }
                     catch (Exception ex)
@@ -142,24 +126,29 @@ namespace RageCoop.Server
                     }
                     while (!_stopping)
                     {
-                        var serverInfo = new ServerInfo
-                        {
-                            Address = info.Address,
-                            Port=Settings.Port,
-                            Country=info.Country,
-                            Name=Settings.Name,
-                            Version=_compatibleVersion.Replace("_", "."),
-                            Players=MainNetServer.ConnectionsCount,
-                            MaxPlayers=Settings.MaxPlayers,
-                            Description=Settings.Description,
-                            Website=Settings.Website,
-                            GameMode=Settings.GameMode,
-                            Language=Settings.Language,
-                        };
-                        string msg = JsonConvert.SerializeObject(serverInfo);
                         HttpResponseMessage response = null;
                         try
                         {
+                            var serverInfo = new ServerInfo
+                            {
+                                Address = info.Address,
+                                Port=Settings.Port.ToString(),
+                                Country=info.Country,
+                                Name=Settings.Name,
+                                Version=_compatibleVersion.Replace("_", "."),
+                                Players=MainNetServer.ConnectionsCount.ToString(),
+                                MaxPlayers=Settings.MaxPlayers.ToString(),
+                                Description=Settings.Description,
+                                Website=Settings.Website,
+                                GameMode=Settings.GameMode,
+                                Language=Settings.Language,
+                                P2P=Settings.UseP2P,
+                                ZeroTier=Settings.UseZeroTier,
+                                ZeroTierNetWorkID=Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
+                                ZeroTierAddress=Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
+                            };
+                            string msg = JsonConvert.SerializeObject(serverInfo);
+
                             var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
                             response = await httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"));
                         }
@@ -226,6 +215,19 @@ namespace RageCoop.Server
             Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
             Logger?.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
             Logger?.Info("================");
+
+            if (Settings.UseZeroTier)
+            {
+                Logger?.Info($"Joining ZeroTier network: "+Settings.ZeroTierNetworkID);
+                if (ZeroTierHelper.Join(Settings.ZeroTierNetworkID)==null)
+                {
+                    throw new Exception("Failed to obtain ZeroTier network IP");
+                }
+            }
+            else if (Settings.UseP2P)
+            {
+                Logger?.Warning("ZeroTier is not enabled, P2P connection may not work as expected.");
+            }
 
             // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
             NetPeerConfiguration config = new("623c92c287cc392406e7aaaac1c0f3b0")

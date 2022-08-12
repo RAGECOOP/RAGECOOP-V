@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-
+using GTA.UI;
 namespace RageCoop.Client
 {
     internal static partial class Networking
@@ -34,7 +34,7 @@ namespace RageCoop.Client
             else if (IsConnecting) {
                 _publicKeyReceived.Set();
                 IsConnecting = false;
-                GTA.UI.Notification.Show("Connection has been canceled");
+                Notification.Show("Connection has been canceled");
             }
             else
             {
@@ -84,10 +84,10 @@ namespace RageCoop.Client
                             try { ProcessMessage(m); }
                             catch (Exception ex) { Main.Logger.Error(ex); }
                         };
-                        Main.QueueAction(() => { GTA.UI.Notification.Show($"~y~Trying to connect..."); });
+                        Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled=false;
                         Security.Regen();
-                        if (!GetServerPublicKey(address))
+                        if (!GetServerPublicKey(ip[0],int.Parse(ip[1])))
                         {
                             Menus.CoopMenu._serverConnectItem.Enabled=true;
                             throw new TimeoutException("Failed to retrive server's public key");
@@ -112,7 +112,7 @@ namespace RageCoop.Client
                     catch (Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server: ", ex);
-                        Main.QueueAction(() => GTA.UI.Notification.Show("Cannot connect to server: "+ex.Message));
+                        Main.QueueAction(() => Notification.Show("Cannot connect to server: "+ex.Message));
                     }
                     IsConnecting=false;
                 });
@@ -147,13 +147,12 @@ namespace RageCoop.Client
 
         #endregion // -- PLAYER --
         #region -- GET --
-        private static bool GetServerPublicKey(string address, int timeout = 10000)
+        private static bool GetServerPublicKey(string host,int port, int timeout = 10000)
         {
             Security.ServerRSA=null;
             var msg = Peer.CreateMessage();
             new Packets.PublicKeyRequest().Pack(msg);
-            var adds = address.Split(':');
-            Peer.SendUnconnectedMessage(msg, adds[0], int.Parse(adds[1]));
+            Peer.SendUnconnectedMessage(msg, host, port);
             return _publicKeyReceived.WaitOne(timeout) && Security.ServerRSA!=null;
         }
 

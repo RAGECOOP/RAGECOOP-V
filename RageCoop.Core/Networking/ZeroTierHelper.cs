@@ -54,7 +54,7 @@ namespace RageCoop.Core
                 throw new Exception("ZeroTier not ready: "+status);
             }
         }
-        public static ZeroTierNetwork Join(string networkId, bool waitIpAssign=true)
+        public static ZeroTierNetwork Join(string networkId, int timeout=10000)
         {
             var p = Run("join "+networkId);
             var o = p.StandardOutput.ReadToEnd();
@@ -62,10 +62,12 @@ namespace RageCoop.Core
             {
                 throw new Exception(o+p.StandardError.ReadToEnd());
             }
-            if (!waitIpAssign) { return ListNetworks()[networkId]; }
-            while (true)
+            if (timeout==0) { return Networks[networkId]; }
+            int i = 0;
+            while (i<=timeout)
             {
-                if(ListNetworks().TryGetValue(networkId,out var n))
+                i+=100;
+                if(Networks.TryGetValue(networkId,out var n))
                 {
                     if (n.Addresses.Count!=0 && (!n.Addresses.Where(x=>x=="-").Any()))
                     {
@@ -89,22 +91,24 @@ namespace RageCoop.Core
                 throw new Exception(o+p.StandardError.ReadToEnd());
             }
         }
-        public static Dictionary<string, ZeroTierNetwork> ListNetworks()
+        public static Dictionary<string, ZeroTierNetwork> Networks
         {
-            Dictionary<string, ZeroTierNetwork> networks=new Dictionary<string, ZeroTierNetwork>();
-            var p = Run("listnetworks");
-            var lines=Regex.Split(p.StandardOutput.ReadToEnd(),"\n").Skip(1);
+            get {
+                Dictionary<string, ZeroTierNetwork> networks = new Dictionary<string, ZeroTierNetwork>();
+                var p = Run("listnetworks");
+                var lines = Regex.Split(p.StandardOutput.ReadToEnd(), "\n").Skip(1);
 
-            foreach (var line in lines)
-            {
-                var l=line.Replace("\r","");
-                if (!string.IsNullOrWhiteSpace(l))
+                foreach (var line in lines)
                 {
-                    var n = new ZeroTierNetwork(l);
-                    networks.Add(n.ID,n);
+                    var l = line.Replace("\r", "");
+                    if (!string.IsNullOrWhiteSpace(l))
+                    {
+                        var n = new ZeroTierNetwork(l);
+                        networks.Add(n.ID, n);
+                    }
                 }
+                return networks;
             }
-            return networks;
         }
         private static Process Run(string args)
         {
@@ -116,6 +120,7 @@ namespace RageCoop.Core
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                CreateNoWindow=true,
             };
             p.Start();
             p.WaitForExit();

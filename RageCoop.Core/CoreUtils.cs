@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using GTA.Math;
 using System.Security.Cryptography;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Lidgren.Network;
+using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -152,7 +154,7 @@ namespace RageCoop.Core
                 return endPoint.Address;
             }
         }
-        private static IPAddress GetIPfromHost(string p)
+        public static IPAddress GetIPfromHost(string p)
         {
             var hosts = Dns.GetHostAddresses(p);
 
@@ -161,7 +163,34 @@ namespace RageCoop.Core
 
             return hosts[0];
         }
+        public static IpInfo GetIPInfo()
+        {
+            // TLS only
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
+            var httpClient = new HttpClient();
+            HttpResponseMessage response = httpClient.GetAsync("https://ipinfo.io/json").GetAwaiter().GetResult();
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
+            }
+
+            string content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            return JsonConvert.DeserializeObject<IpInfo>(content);
+        }
+
+        
+
+    }
+    internal struct IpInfo
+    {
+        [JsonProperty("ip")]
+        public string Address { get; set; }
+
+        [JsonProperty("country")]
+        public string Country { get; set; }
     }
     internal static class Extensions
     {

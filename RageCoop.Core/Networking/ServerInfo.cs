@@ -12,7 +12,7 @@ namespace RageCoop.Core
         public string Address { get; set; }
 
         [JsonProperty("port")]
-        public int Port { get; set; }
+        public string Port { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -21,10 +21,10 @@ namespace RageCoop.Core
         public string Version { get; set; }
 
         [JsonProperty("players")]
-        public int Players { get; set; }
+        public string Players { get; set; }
 
         [JsonProperty("maxPlayers")]
-        public int MaxPlayers { get; set; }
+        public string MaxPlayers { get; set; }
 
         [JsonProperty("country")]
         public string Country { get; set; }
@@ -40,5 +40,19 @@ namespace RageCoop.Core
         
         [JsonProperty("language")]
         public string Language { get; set; }
+
+
+        [JsonProperty("useP2P")]
+        public bool P2P { get; set; }
+
+        [JsonProperty("useZT")]
+        public bool ZeroTier { get; set; }
+
+        [JsonProperty("ztID")]
+        public string ZeroTierNetWorkID { get; set; }
+
+
+        [JsonProperty("ztAddress")]
+        public string ZeroTierAddress { get; set; }
     }
 }
