@@ -85,7 +85,7 @@ namespace RageCoop.Client.Menus
                             if (server.ZeroTier)
                             {
                                 address=$"{server.ZeroTierAddress}:{server.Port}";
-                                Main.QueueAction(() => { Notification.Show($"~y~Joining ZeroTier network... {address}"); });
+                                Main.QueueAction(() => { Notification.Show($"~y~Joining ZeroTier network... {server.ZeroTierNetWorkID}"); });
                                 if (ZeroTierHelper.Join(server.ZeroTierNetWorkID)==null)
                                 {
                                     throw new Exception("Failed to obtain ZeroTier network IP");
