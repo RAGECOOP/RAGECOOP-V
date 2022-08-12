@@ -425,5 +425,15 @@ namespace RageCoop.Core
         {
             return BitConverter.ToString(data).Replace("-", String.Empty);
         }
+
+        /// <summary>
+        /// Convert a string to IP address
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <returns></returns>
+        public static IPAddress ToIP(this string ip)
+        {
+            return IPAddress.Parse(ip);
+        }
     }
 }

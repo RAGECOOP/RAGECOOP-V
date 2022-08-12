@@ -3,7 +3,7 @@
     /// <summary>
     /// Settings for RageCoop Server
     /// </summary>
-    public class ServerSettings
+    public class Settings
     {
         /// <summary>
         /// Port to listen for incoming connections
@@ -86,8 +86,18 @@
         public string AllowedUsernameChars { get; set; } = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-_";
 
         /// <summary>
-        /// Whether to use direct connection between players to send entity information
+        /// Whether to use direct connection between players to send entity information, <see cref="UseZeroTier"/> needs to be enabled if on WAN  for this feature to function properly.
         /// </summary>
         public bool UseP2P { get; set; } = false;
+
+        /// <summary>
+        /// Whether to enable zerotier VLAN functionality, allowing you to host a server behind NAT firewall, no port forward required.
+        /// </summary>
+        public bool UseZeroTier { get; set; } = false;
+
+        /// <summary>
+        /// The zerotier network id to join, default value is zerotier's public Earth network.
+        /// </summary>
+        public string ZeroTierNetworkID = "8056c2e21c000001";
     }
 }
