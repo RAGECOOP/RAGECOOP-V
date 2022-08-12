@@ -47,6 +47,8 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
+            Sync.Voice.InitRecording();
+
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {
@@ -110,6 +112,8 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
+            
+
             P= Game.Player.Character;
             PlayerPosition=P.ReadPosition();
 
@@ -211,8 +215,23 @@ namespace RageCoop.Client
             _lastDead=P.IsDead;
             Ticked++;
         }
+        private bool recording = false;
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.B)
+            {
+                if (!recording)
+                {
+                    recording = true;
+                    Sync.Voice.StartRecording();
+                }
+                else
+                {
+                    Sync.Voice.StopRecording();
+                    recording = false;
+                }
+            } 
+
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
