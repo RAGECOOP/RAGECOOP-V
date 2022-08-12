@@ -11,11 +11,11 @@ namespace RageCoop.Client
             ID=EntityPool.RequestNewID();
             MainProjectile = p;
             Origin=p.Position;
-            var shooter = EntityPool.GetPedByHandle((p.Owner?.Handle).GetValueOrDefault());
+            var shooter = EntityPool.GetPedByHandle((p.OwnerEntity?.Handle).GetValueOrDefault());
             if (shooter==null)
             {
                 // Owner will be the vehicle if projectile is shot with a vehicle
-                var shooterVeh = EntityPool.GetVehicleByHandle((p.Owner?.Handle).GetValueOrDefault());
+                var shooterVeh = EntityPool.GetVehicleByHandle((p.OwnerEntity?.Handle).GetValueOrDefault());
                 if (shooterVeh!=null && shooterVeh.MainVehicle.Driver!=null)
                 {
                     shooter=shooterVeh.MainVehicle.Driver?.GetSyncEntity();
