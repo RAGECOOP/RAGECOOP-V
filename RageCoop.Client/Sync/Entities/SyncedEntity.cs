@@ -15,10 +15,7 @@ namespace RageCoop.Client
         /// </summary>
         public bool IsLocal
         {
-            get
-            {
-                return OwnerID==Main.LocalPlayerID;
-            }
+            get => OwnerID == Main.LocalPlayerID;
         }
 
         /// <summary>
@@ -33,10 +30,7 @@ namespace RageCoop.Client
         /// </summary>
         public int OwnerID
         {
-            get
-            {
-                return _ownerID;
-            }
+            get => _ownerID;
             internal set
             {
                 if (value==_ownerID && Owner!=null) { return; }
@@ -51,19 +45,16 @@ namespace RageCoop.Client
         /// </summary>
         public bool IsOutOfSync
         {
-            get
-            {
-                return Main.Ticked-LastSynced>200 && ID!=0;
-            }
+            get => Main.Ticked - LastSynced > 200 && ID != 0;
         }
         internal bool IsReady
         {
-            get { return (LastSynced>0||LastFullSynced==0); }
+            get => LastSynced > 0 || LastFullSynced == 0;
         }
         internal bool IsInvincible { get; set; } = false;
         internal bool NeedUpdate
         {
-            get { return LastSynced>=LastUpdated; }
+            get => LastSynced >= LastUpdated;
         }
         #region LAST STATE
         /// <summary>
@@ -100,6 +91,5 @@ namespace RageCoop.Client
         {
             LastUpdated=Main.Ticked+frames;
         }
-
     }
 }

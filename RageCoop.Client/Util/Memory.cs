@@ -1,9 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GTA.Math;
 using GTA;
 using SHVDN;
@@ -40,8 +37,6 @@ internal static unsafe class Memory
         public static MemPatch TimeScalePatch;
         static Memory()
         {
-
-
             // Weapon/radio wheel slow-mo patch
             // Thanks @CamxxCore, https://github.com/CamxxCore/GTAVWeaponWheelMod
             var result = NativeMemory.FindPattern("\x38\x51\x64\x74\x19", "xxxxx");
@@ -73,27 +68,13 @@ internal static unsafe class Memory
         public const int MatrixOffset = 96;
         #endregion
         #region OPCODE
-
         const byte XOR_32_64 = 0x31;
         const byte RET = 0xC3;
-
         #endregion
-        public static Vector3 ReadPosition(this Entity e)
-        {
-            return ReadVector3(e.MemoryAddress+PositionOffset);
-        }
-        public static Quaternion ReadQuaternion(this Entity e)
-        {
-            return Quaternion.RotationMatrix(e.Matrix);
-        }
-        public static Vector3 ReadRotation(this Entity e)
-        {
-            return e.ReadQuaternion().ToEulerDegrees();
-        }
-        public static Vector3 ReadVelocity(this Ped e)
-        {
-            return ReadVector3(e.MemoryAddress+VelocityOffset);
-        }
+        public static Vector3 ReadPosition(this Entity e) => ReadVector3(e.MemoryAddress + PositionOffset);
+        public static Quaternion ReadQuaternion(this Entity e) => Quaternion.RotationMatrix(e.Matrix);
+        public static Vector3 ReadRotation(this Entity e) => e.ReadQuaternion().ToEulerDegrees();
+        public static Vector3 ReadVelocity(this Ped e) => ReadVector3(e.MemoryAddress+VelocityOffset);
         public static Vector3 ReadVector3(IntPtr address)
         {
             float* ptr = (float*)address.ToPointer();

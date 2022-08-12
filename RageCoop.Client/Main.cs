@@ -173,12 +173,10 @@ namespace RageCoop.Client
 
             if (Networking.ShowNetworkInfo)
             {
-
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0), $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30), $"R: {Lidgren.Network.NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
                 new LemonUI.Elements.ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60), $"S: {Lidgren.Network.NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f) { Alignment = GTA.UI.Alignment.Center }.Draw();
             }
-
 
             MainChat.Tick();
             PlayerList.Tick();
@@ -203,10 +201,8 @@ namespace RageCoop.Client
                 }
                 else
                 {
-
                     Function.Call(Hash.DISPLAY_HUD, true);
                 }
-
             }
             else if (P.IsDead && !_lastDead)
             {

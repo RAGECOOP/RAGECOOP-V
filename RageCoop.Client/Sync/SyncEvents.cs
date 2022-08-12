@@ -136,12 +136,9 @@ namespace RageCoop.Client
             var v = EntityPool.GetVehicleByID(vehId);
             var p = EntityPool.GetPedByID(pedId)?.MainPed;
             if (v==null||p==null) { return; }
-            if (!v.MainVehicle.IsSeatFree(seat))
+            if (!v.MainVehicle.IsSeatFree(seat) && v.MainVehicle.GetPedOnSeat(seat) != p)
             {
-                if (v.MainVehicle.GetPedOnSeat(seat)!=p)
-                {
-                    v.MainVehicle.GetPedOnSeat(seat).Task.WarpOutOfVehicle(v.MainVehicle);
-                }
+                v.MainVehicle.GetPedOnSeat(seat).Task.WarpOutOfVehicle(v.MainVehicle);
             }
             p.SetIntoVehicle(v.MainVehicle, seat);
         }
@@ -215,14 +212,10 @@ namespace RageCoop.Client
                 {
                     World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_assault_rifle", p.GetMuzzlePosition(), w.Rotation, 1);
                 }
-
             }
-            else if (p.VehicleWeapon!=VehicleWeaponHash.Invalid)
+            else if (p.VehicleWeapon!=VehicleWeaponHash.Invalid && p.VehicleWeapon == VehicleWeaponHash.Tank)
             {
-                if (p.VehicleWeapon==VehicleWeaponHash.Tank)
-                {
-                    World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_tank", p.CurrentVehicle.GetMuzzleInfo().Position, p.CurrentVehicle.Bones[35].ForwardVector.ToEulerRotation(p.CurrentVehicle.Bones[35].UpVector), 1);
-                }
+                World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_tank", p.CurrentVehicle.GetMuzzleInfo().Position, p.CurrentVehicle.Bones[35].ForwardVector.ToEulerRotation(p.CurrentVehicle.Bones[35].UpVector), 1);
             }
         }
         public static void HandleEvent(PacketType type, byte[] data)
@@ -303,32 +296,10 @@ namespace RageCoop.Client
                         Vector3 endPos = subject.LastWeaponImpactPosition;
                         if (endPos==default)
                         {
-                            if (i>5)
-                            {
-                                endPos=subject.GetAimCoord();
-                                if (subject.IsInVehicle() && subject.VehicleWeapon!=VehicleWeaponHash.Invalid)
-                                {
-                                    if (subject.IsOnTurretSeat())
-                                    {
-                                        TriggerBulletShot((uint)subject.VehicleWeapon, c, endPos);
-                                    }
-                                    else
-                                    {
-                                        TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle, c);
-                                    }
-                                }
-                                else
-                                {
-                                    TriggerBulletShot((uint)subject.Weapons.Current.Hash, c, endPos);
-                                }
-                                return true;
-                            }
-                            i++;
-                            return false;
-                        }
-                        else
-                        {
-                            if (subject.IsInVehicle() && subject.VehicleWeapon!=VehicleWeaponHash.Invalid)
+                            if (++i<=5) { return false; }
+
+                            endPos = subject.GetAimCoord();
+                            if (subject.IsInVehicle() && subject.VehicleWeapon != VehicleWeaponHash.Invalid)
                             {
                                 if (subject.IsOnTurretSeat())
                                 {
@@ -346,8 +317,25 @@ namespace RageCoop.Client
                             return true;
                         }
 
+                        if (subject.IsInVehicle() && subject.VehicleWeapon != VehicleWeaponHash.Invalid)
+                        {
+                            if (subject.IsOnTurretSeat())
+                            {
+                                TriggerBulletShot((uint)subject.VehicleWeapon, c, endPos);
+                            }
+                            else
+                            {
+                                TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle, c);
+                            }
+                        }
+                        else
+                        {
+                            TriggerBulletShot((uint)subject.Weapons.Current.Hash, c, endPos);
+                        }
 
+                        return true;
                     });
+
                     if (!getBulletImpact())
                     {
                         Main.QueueAction(getBulletImpact);
@@ -357,9 +345,7 @@ namespace RageCoop.Client
                 {
                     TriggerBulletShot((uint)VehicleWeaponHash.Tank, c, subject.LastWeaponImpactPosition);
                 }
-
             }
-
 
             // Vehicles
             var g = subject.IsGettingIntoVehicle;
@@ -368,6 +354,7 @@ namespace RageCoop.Client
                 var v = subject.VehicleTryingToEnter.GetSyncEntity();
                 TriggerEnteringVehicle(c, v, subject.GetSeatTryingToEnter());
             }
+
             var currentSitting = subject.IsSittingInVehicle();
             if (c._lastSittingInVehicle)
             {
@@ -391,18 +378,20 @@ namespace RageCoop.Client
 
         public static void Check(SyncedVehicle v)
         {
-            if (v.MainVehicle!=null&&v.MainVehicle.HasNozzle())
+            if (v.MainVehicle==null||!v.MainVehicle.HasNozzle())
             {
-                if ((v.LastNozzleAngle==1) && (v.MainVehicle.GetNozzleAngel()!=1))
-                {
-                    TriggerNozzleTransform(v.ID, false);
-                }
-                else if ((v.LastNozzleAngle==0) && (v.MainVehicle.GetNozzleAngel()!=0))
-                {
-                    TriggerNozzleTransform(v.ID, true);
-                }
-                v.LastNozzleAngle=v.MainVehicle.GetNozzleAngel();
+                return;
             }
+
+            if ((v.LastNozzleAngle == 1) && (v.MainVehicle.GetNozzleAngel() != 1))
+            {
+                TriggerNozzleTransform(v.ID, false);
+            }
+            else if ((v.LastNozzleAngle == 0) && (v.MainVehicle.GetNozzleAngel() != 0))
+            {
+                TriggerNozzleTransform(v.ID, true);
+            }
+            v.LastNozzleAngle = v.MainVehicle.GetNozzleAngel();
         }
         #endregion
     }

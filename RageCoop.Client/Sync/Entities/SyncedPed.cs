@@ -53,7 +53,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Indicates whether this ped is a player
         /// </summary>
-        public bool IsPlayer { get { return (OwnerID==ID)&&(ID!=0); } }
+        public bool IsPlayer { get => OwnerID == ID && ID != 0; }
         /// <summary>
         /// real entity
         /// </summary>
@@ -80,7 +80,6 @@ namespace RageCoop.Client
 
         private WeaponAsset WeaponAsset { get; set; }
 
-
         internal override void Update()
         {
             if (IsPlayer)
@@ -97,12 +96,7 @@ namespace RageCoop.Client
             if (!IsReady) { return; }
 
             // Skip update if no new sync message has arrived.
-            if (!NeedUpdate)
-            {
-                return;
-            }
-
-
+            if (!NeedUpdate) { return; }
 
             if (MainPed == null || !MainPed.Exists())
             {
@@ -111,11 +105,6 @@ namespace RageCoop.Client
                     return;
                 }
             }
-
-
-
-
-
 
             // Need to update state
             if (LastFullSynced>=LastUpdated)
@@ -126,7 +115,6 @@ namespace RageCoop.Client
                     {
                         return;
                     }
-
                 }
 
                 if (((byte)BlipColor==255) && (PedBlip!=null))
@@ -165,8 +153,6 @@ namespace RageCoop.Client
                 }
             }
 
-
-
             if (MainPed.IsDead)
             {
                 if (Health>0)
@@ -201,10 +187,9 @@ namespace RageCoop.Client
             {
                 DisplayOnFoot();
             }
-            LastUpdated=Main.Ticked;
-            return;
-        }
 
+            LastUpdated=Main.Ticked;
+        }
 
         private void RenderNameTag()
         {
@@ -225,7 +210,6 @@ namespace RageCoop.Client
                     Color=Owner.HasDirectConnection? Color.FromArgb(179, 229, 252) : Color.White,
                 }.Draw();
             }
-
         }
 
         private bool CreateCharacter()
@@ -261,7 +245,6 @@ namespace RageCoop.Client
 
             Model.MarkAsNoLongerNeeded();
 
-
             MainPed.BlockPermanentEvents = true;
             MainPed.CanWrithe=false;
             MainPed.CanBeDraggedOutOfVehicle = true;
@@ -278,7 +261,6 @@ namespace RageCoop.Client
             Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
-
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
@@ -288,10 +270,7 @@ namespace RageCoop.Client
 
             SetClothes();
 
-            if (IsPlayer)
-            {
-                MainPed.IsInvincible=true;
-            }
+            if (IsPlayer) { MainPed.IsInvincible=true; }
             if (IsInvincible) { MainPed.IsInvincible=true; }
 
             lock (EntityPool.PedsLock)
@@ -517,12 +496,9 @@ namespace RageCoop.Client
                     }
                     return;
                 }
-                else
-                {
-                    _lastRagdoll = false;
-                }
-            }
 
+                _lastRagdoll = false;
+            }
 
             if (IsReloading)
             {
@@ -546,8 +522,6 @@ namespace RageCoop.Client
             }
             else if (IsInCover)
             {
-
-
                 if (!_lastInCover)
                 {
                     Function.Call(Hash.TASK_STAY_IN_COVER, MainPed.Handle);
@@ -563,7 +537,6 @@ namespace RageCoop.Client
                 {
                     SmoothTransition();
                 }
-                return;
             }
             else if (_lastInCover)
             {
@@ -601,17 +574,13 @@ namespace RageCoop.Client
                     {
                         foreach (KeyValuePair<uint, bool> comp in WeaponComponents)
                         {
-
                             if (comp.Value)
                             {
                                 Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _lastWeaponObj, comp.Key);
                             }
-
                         }
-
                     }
                     Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, MainPed.Handle);
-
                 }
                 _lastWeaponComponents = WeaponComponents;
             }
