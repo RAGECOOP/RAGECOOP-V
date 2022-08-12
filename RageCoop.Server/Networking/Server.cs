@@ -39,7 +39,7 @@ namespace RageCoop.Server
         /// </summary>
         public API API { get; private set; }
         internal readonly BaseScript BaseScript;
-        internal readonly ServerSettings Settings;
+        internal readonly Settings Settings;
         internal NetServer MainNetServer;
         internal ServerEntities Entities;
 
@@ -68,7 +68,7 @@ namespace RageCoop.Server
         /// <param name="settings"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public Server(ServerSettings settings,Logger logger=null)
+        public Server(Settings settings,Logger logger=null)
         {
             Settings = settings;
             if (settings==null) { throw new ArgumentNullException("Server settings cannot be null!"); }
@@ -142,20 +142,21 @@ namespace RageCoop.Server
                     }
                     while (!_stopping)
                     {
-                        string msg =
-                            "{ " +
-                            "\"address\": \"" + info.Address + "\", " +
-                            "\"port\": \"" + Settings.Port + "\", " +
-                            "\"country\": \"" + info.Country + "\", " +
-                            "\"name\": \"" + Settings.Name + "\", " +
-                            "\"version\": \"" + _compatibleVersion.Replace("_", ".") + "\", " +
-                            "\"players\": \"" + MainNetServer.ConnectionsCount + "\", " +
-                            "\"maxPlayers\": \"" + Settings.MaxPlayers + "\", " +
-                            "\"description\": \"" + Settings.Description + "\", " +
-                            "\"website\": \"" + Settings.Website + "\", " +
-                            "\"gameMode\": \"" + Settings.GameMode + "\", " +
-                            "\"language\": \"" + Settings.Language + "\"" +
-                            " }";
+                        var serverInfo = new ServerInfo
+                        {
+                            Address = info.Address,
+                            Port=Settings.Port,
+                            Country=info.Country,
+                            Name=Settings.Name,
+                            Version=_compatibleVersion.Replace("_", "."),
+                            Players=MainNetServer.ConnectionsCount,
+                            MaxPlayers=Settings.MaxPlayers,
+                            Description=Settings.Description,
+                            Website=Settings.Website,
+                            GameMode=Settings.GameMode,
+                            Language=Settings.Language,
+                        };
+                        string msg = JsonConvert.SerializeObject(serverInfo);
                         HttpResponseMessage response = null;
                         try
                         {

@@ -5,32 +5,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Net;
 using System.Threading;
+using RageCoop.Core;
 
 namespace RageCoop.Client.Menus
 {
-    internal class ServerListClass
-    {
-        [JsonProperty("address")]
-        public string Address { get; set; }
-
-        [JsonProperty("port")]
-        public string Port { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("version")]
-        public string Version { get; set; }
-
-        [JsonProperty("players")]
-        public int Players { get; set; }
-
-        [JsonProperty("maxPlayers")]
-        public int MaxPlayers { get; set; }
-
-        [JsonProperty("country")]
-        public string Country { get; set; }
-    }
 
     /// <summary>
     /// Don't use it!
@@ -76,9 +54,9 @@ namespace RageCoop.Client.Menus
 
         private static void GetAllServers()
         {
-            List<ServerListClass> serverList = null;
+            List<ServerInfo> serverList = null;
             var realUrl = Main.Settings.MasterServer;
-            serverList = JsonConvert.DeserializeObject<List<ServerListClass>>(DownloadString(realUrl));
+            serverList = JsonConvert.DeserializeObject<List<ServerInfo>>(DownloadString(realUrl));
 
             // Need to be processed in main thread
             Main.QueueAction(() =>
@@ -94,7 +72,7 @@ namespace RageCoop.Client.Menus
                     return;
                 }
                 CleanUpList();
-                foreach (ServerListClass server in serverList)
+                foreach (ServerInfo server in serverList)
                 {
                     string address = $"{server.Address}:{server.Port}";
                     NativeItem tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~") { AltTitle = $"[{server.Players}/{server.MaxPlayers}]" };

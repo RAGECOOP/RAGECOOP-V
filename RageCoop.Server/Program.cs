@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RageCoop.Core;
+using Newtonsoft.Json;
 namespace RageCoop.Server
 {
     class Program
@@ -20,7 +21,7 @@ namespace RageCoop.Server
             try
             {
                 Console.Title = "RAGECOOP";
-                var setting = Util.Read<ServerSettings>("Settings.xml");
+                var setting = Util.Read<Settings>("Settings.xml");
 #if DEBUG
                 setting.LogLevel=0;
 #endif
