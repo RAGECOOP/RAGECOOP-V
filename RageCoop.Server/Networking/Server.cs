@@ -486,7 +486,7 @@ namespace RageCoop.Server
 
                     case PacketType.Voice:
                         {
-                            SendToAll(data.GetPacket<Packets.Voice>());
+                            Forward(data.GetPacket<Packets.Voice>(),sender,ConnectionChannel.Voice);
                         }
                         break;
 
