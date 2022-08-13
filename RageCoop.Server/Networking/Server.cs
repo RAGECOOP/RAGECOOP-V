@@ -487,8 +487,7 @@ namespace RageCoop.Server
                     case PacketType.Voice:
                         {
                             var msg = MainNetServer.CreateMessage();
-                            Packets.Voice packet = data.GetPacket<Packets.Voice>();
-                            packet.Deserialize(data);
+                            data.GetPacket<Packets.Voice>().Pack(msg);
                             MainNetServer.SendMessage(msg, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Voice);
                         }
                         break;

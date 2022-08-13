@@ -27,6 +27,7 @@ namespace RageCoop.Client.Sync
 
         public static void InitRecording()
         {
+            // I tried without thread but the game will lag without
             _thread = new Thread(new ThreadStart(() =>
             {
                 while (true)
@@ -43,7 +44,6 @@ namespace RageCoop.Client.Sync
                     }
                 }
             }));
-
             _thread.Start();
 
             _waveIn = new WaveInEvent
@@ -79,6 +79,7 @@ namespace RageCoop.Client.Sync
             try
             {
                 _waveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
+
                 Networking.SendVoiceMessage(e.Buffer);
             } catch (Exception ex)
             {
