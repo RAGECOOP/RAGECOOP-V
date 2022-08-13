@@ -110,35 +110,6 @@ namespace RageCoop.Client
         private void OnTick(object sender, EventArgs e)
         {
             
-
-            P= Game.Player.Character;
-            PlayerPosition=P.ReadPosition();
-
-            /*
-            var V = P.CurrentVehicle;
-            List<int> found;
-            if (V!=null)
-            {
-                found = Memory.FindOffset(V.Velocity.X, V.MemoryAddress);
-                
-                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 100), V.Velocity.ToString()).Draw();
-                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 150), V.ReadVelocity().ToString()).Draw();
-            }
-            else
-            {
-                found = Memory.FindOffset(P.Velocity.X, P.MemoryAddress);
-
-                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 100), P.Velocity.ToString()).Draw();
-                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 150), P.ReadVelocity().ToString()).Draw();
-            }
-            for (int i = 0; i<found.Count; i++)
-            {
-                new LemonUI.Elements.ScaledText(new System.Drawing.PointF(200*(i+1), 50), found[i].ToString()).Draw();
-            }
-            */
-            PlayerPosition=P.ReadPosition();
-            FPS=Game.FPS;
-            PlayerPosition=P.ReadPosition();
             if (Game.IsLoading)
             {
                 return;
@@ -153,6 +124,11 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
             CoopMenu.MenuPool.Process();
 #endif
+
+
+            P= Game.Player.Character;
+            PlayerPosition=P.ReadPosition();
+            FPS=Game.FPS;
 
             DoQueuedActions();
             if (!Networking.IsOnServer)
