@@ -246,6 +246,7 @@ namespace RageCoop.Client
                 }
                 lineList.Add("ReloadKey=Insert");
                 File.WriteAllLines("ScriptHookVDotNet.ini", lineList.ToArray());
+                GTA.UI.Notification.Show("Reload cannot be performed automatically, please type \"Reload()\" manually in the SHVDN console.");
             }
             Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
 

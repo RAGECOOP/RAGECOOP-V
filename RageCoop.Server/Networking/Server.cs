@@ -131,21 +131,21 @@ namespace RageCoop.Server
                         {
                             var serverInfo = new ServerInfo
                             {
-                                Address = info.Address,
-                                Port=Settings.Port.ToString(),
-                                Country=info.Country,
-                                Name=Settings.Name,
-                                Version=_compatibleVersion.Replace("_", "."),
-                                Players=MainNetServer.ConnectionsCount.ToString(),
-                                MaxPlayers=Settings.MaxPlayers.ToString(),
-                                Description=Settings.Description,
-                                Website=Settings.Website,
-                                GameMode=Settings.GameMode,
-                                Language=Settings.Language,
-                                P2P=Settings.UseP2P,
-                                ZeroTier=Settings.UseZeroTier,
-                                ZeroTierNetWorkID=Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
-                                ZeroTierAddress=Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
+                                address = info.Address,
+                                port=Settings.Port.ToString(),
+                                country=info.Country,
+                                name=Settings.Name,
+                                version=_compatibleVersion.Replace("_", "."),
+                                players=MainNetServer.ConnectionsCount.ToString(),
+                                maxPlayers=Settings.MaxPlayers.ToString(),
+                                description=Settings.Description,
+                                website=Settings.Website,
+                                gameMode=Settings.GameMode,
+                                language=Settings.Language,
+                                useP2P=Settings.UseP2P,
+                                useZT=Settings.UseZeroTier,
+                                ztID=Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
+                                ztAddress=Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
                             };
                             string msg = JsonConvert.SerializeObject(serverInfo);
 

@@ -75,18 +75,18 @@ namespace RageCoop.Client.Menus
                 CleanUpList();
                 foreach (ServerInfo server in serverList)
                 {
-                    string address = $"{server.Address}:{server.Port}";
-                    NativeItem tmpItem = new NativeItem($"[{server.Country}] {server.Name}", $"~b~{address}~s~~n~~g~Version {server.Version}.x~s~") { AltTitle = $"[{server.Players}/{server.MaxPlayers}]" };
+                    string address = $"{server.address}:{server.port}";
+                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}.x~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try
                         {
                             Menu.Visible = false;
-                            if (server.ZeroTier)
+                            if (server.useZT)
                             {
-                                address=$"{server.ZeroTierAddress}:{server.Port}";
-                                Main.QueueAction(() => { Notification.Show($"~y~Joining ZeroTier network... {server.ZeroTierNetWorkID}"); });
-                                if (ZeroTierHelper.Join(server.ZeroTierNetWorkID)==null)
+                                address=$"{server.ztAddress}:{server.port}";
+                                Main.QueueAction(() => { Notification.Show($"~y~Joining ZeroTier network... {server.ztID}"); });
+                                if (ZeroTierHelper.Join(server.ztID)==null)
                                 {
                                     throw new Exception("Failed to obtain ZeroTier network IP");
                                 }
@@ -103,6 +103,10 @@ namespace RageCoop.Client.Menus
                         catch (Exception ex)
                         {
                             Notification.Show($"~r~{ex.Message}");
+                            if (server.useZT)
+                            {
+                                Notification.Show($"Make sure ZeroTier is correctly installed, download it from https://www.zerotier.com/");
+                            }
                         }
                     };
                     Menu.Add(tmpItem);
