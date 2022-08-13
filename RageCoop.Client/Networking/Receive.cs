@@ -64,6 +64,10 @@ namespace RageCoop.Client
                                 {
                                     CoopMenu.ConnectedMenuSetting();
                                     Main.MainChat.Init();
+                                    if (Main.Settings.Voice && !Sync.Voice.WasInitialized())
+                                    {
+                                        Sync.Voice.InitRecording();
+                                    }
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 });
                                 

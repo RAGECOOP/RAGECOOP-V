@@ -91,10 +91,6 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
 #endif
             MainChat = new Chat();
-            if (Settings.Voice && !Sync.Voice.WasInitialized())
-            {
-                Sync.Voice.InitRecording();
-            }
             Tick += OnTick;
             Tick += (s, e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
@@ -309,7 +305,7 @@ namespace RageCoop.Client
         public static void CleanUp()
         {
             MainChat.Clear();
-            Sync.Voice.ClearBuffer();
+            Sync.Voice.ClearAll();
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             Main.LocalPlayerID=default;

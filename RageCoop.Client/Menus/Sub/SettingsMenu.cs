@@ -50,6 +50,8 @@ namespace RageCoop.Client.Menus
             if (_disableVoice.Checked && !Sync.Voice.WasInitialized())
             {
                 Sync.Voice.InitRecording();
+            } else {
+                Sync.Voice.ClearAll();
             }
 
             Main.Settings.Voice = _disableVoice.Checked;

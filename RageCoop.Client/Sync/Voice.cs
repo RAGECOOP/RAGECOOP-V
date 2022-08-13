@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
+﻿using System.Threading;
 
 using NAudio.Wave;
 
@@ -18,19 +15,31 @@ namespace RageCoop.Client.Sync
         private static Thread _thread;
 
         public static bool WasInitialized() => _initialized;
-        public static void ClearBuffer() => _waveProvider.ClearBuffer();
+        public static void ClearAll()
+        {
+            _waveProvider.ClearBuffer();
+
+            StopRecording();
+
+            if (_thread != null && _thread.IsAlive)
+            {
+                _thread.Abort();
+                _thread = null;
+            }
+
+            _initialized = false;
+        }
 
         public static void StopRecording()
         {
-            if (!IsRecording || _waveIn == null)
-                return;
-
-            _waveIn.StopRecording();
-            _waveIn.Dispose();
-            _waveIn = null;
+            if (_waveIn != null)
+            {
+                _waveIn.StopRecording();
+                _waveIn.Dispose();
+                _waveIn = null;
+            }
 
             IsRecording = false;
-            GTA.UI.Notification.Show("STOPPED");
         }
 
         public static void InitRecording()
@@ -77,7 +86,6 @@ namespace RageCoop.Client.Sync
             _waveIn.DataAvailable += WaveInDataAvailable;
 
             _waveIn.StartRecording();
-            GTA.UI.Notification.Show("STARTED");
         }
 
         public static void AddVoiceData(byte[] buffer, int recorded)
