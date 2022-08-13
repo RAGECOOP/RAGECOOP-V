@@ -20,7 +20,6 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
-
         private bool _gameLoaded = false;
         internal static readonly string CurrentVersion = "V0_5_0";
 
@@ -47,8 +46,6 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
-            Sync.Voice.InitRecording();
-
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {
@@ -94,6 +91,10 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
 #endif
             MainChat = new Chat();
+            if (Settings.Voice && !Sync.Voice.WasInitialized())
+            {
+                Sync.Voice.InitRecording();
+            }
             Tick += OnTick;
             Tick += (s, e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
@@ -224,16 +225,20 @@ namespace RageCoop.Client
             }
             if (Networking.IsOnServer)
             {
-                if (Game.IsControlPressed(GTA.Control.PushToTalk))
+                if (Sync.Voice.WasInitialized())
                 {
-                    Sync.Voice.StartRecording();
-                    return;
+                    if (Game.IsControlPressed(GTA.Control.PushToTalk))
+                    {
+                        Sync.Voice.StartRecording();
+                        return;
+                    }
+                    else if (Sync.Voice.IsRecording)
+                    {
+                        Sync.Voice.StopRecording();
+                        return;
+                    }
                 }
-                else if (Sync.Voice.IsRecording)
-                {
-                    Sync.Voice.StopRecording();
-                }
-
+                
                 if (Game.IsControlPressed(GTA.Control.FrontendPause))
                 {
                     Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
@@ -304,10 +309,10 @@ namespace RageCoop.Client
         public static void CleanUp()
         {
             MainChat.Clear();
+            Sync.Voice.ClearBuffer();
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             Main.LocalPlayerID=default;
-
         }
         private static void DoQueuedActions()
         {

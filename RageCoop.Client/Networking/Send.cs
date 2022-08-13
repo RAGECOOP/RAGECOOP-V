@@ -173,9 +173,9 @@ namespace RageCoop.Client
             { Username = Main.Settings.Username, Message = message },ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
-        public static void SendVoiceMessage(byte[] buffer)
+        public static void SendVoiceMessage(byte[] buffer, int recorded)
         {
-            SendSync(new Packets.Voice() { Buffer = buffer }, ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
+            SendSync(new Packets.Voice() { Buffer = buffer, Recorded = recorded }, ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

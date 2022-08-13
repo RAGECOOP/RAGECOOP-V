@@ -250,7 +250,16 @@ namespace RageCoop.Client
 
                 case PacketType.Voice:
                     {
-                        Main.QueueAction(() => GTA.UI.Notification.Show("VOICE RECEIVED!"));
+                        if (Main.Settings.Voice)
+                        {
+                            Packets.Voice packet = new Packets.Voice();
+                            packet.Deserialize(data);
+
+                            Main.QueueAction(() =>
+                            {
+                                Sync.Voice.AddVoiceData(packet.Buffer, packet.Recorded);
+                            });
+                        }
                     }
                     break;
 

@@ -9,6 +9,7 @@ namespace RageCoop.Client.Sync
 {
     internal static class Voice
     {
+        private static bool _initialized = false;
         public static bool IsRecording = false;
 
         private static WaveInEvent _waveIn;
@@ -16,17 +17,27 @@ namespace RageCoop.Client.Sync
 
         private static Thread _thread;
 
+        public static bool WasInitialized() => _initialized;
+        public static void ClearBuffer() => _waveProvider.ClearBuffer();
+
         public static void StopRecording()
         {
-            if (!IsRecording)
+            if (!IsRecording || _waveIn == null)
                 return;
 
             _waveIn.StopRecording();
-            GTA.UI.Notification.Show("STOPPED [1]");
+            _waveIn.Dispose();
+            _waveIn = null;
+
+            IsRecording = false;
+            GTA.UI.Notification.Show("STOPPED");
         }
 
         public static void InitRecording()
         {
+            if (_initialized)
+                return;
+
             // I tried without thread but the game will lag without
             _thread = new Thread(new ThreadStart(() =>
             {
@@ -46,19 +57,7 @@ namespace RageCoop.Client.Sync
             }));
             _thread.Start();
 
-            _waveIn = new WaveInEvent
-            {
-                DeviceNumber = 0,
-                BufferMilliseconds = 20,
-                NumberOfBuffers = 1,
-                WaveFormat = _waveProvider.WaveFormat
-            };
-            _waveIn.DataAvailable += WaveInDataAvailable;
-            _waveIn.RecordingStopped += (object sender, StoppedEventArgs e) =>
-            {
-                IsRecording = false;
-            };
-            GTA.UI.Notification.Show("INIT");
+            _initialized = true;
         }
 
         public static void StartRecording()
@@ -67,24 +66,31 @@ namespace RageCoop.Client.Sync
                 return;
 
             IsRecording = true;
+
+            _waveIn = new WaveInEvent
+            {
+                DeviceNumber = 0,
+                BufferMilliseconds = 20,
+                NumberOfBuffers = 1,
+                WaveFormat = _waveProvider.WaveFormat
+            };
+            _waveIn.DataAvailable += WaveInDataAvailable;
+
             _waveIn.StartRecording();
             GTA.UI.Notification.Show("STARTED");
         }
 
+        public static void AddVoiceData(byte[] buffer, int recorded)
+        {
+            _waveProvider.AddSamples(buffer, 0, recorded);
+        }
+
         private static void WaveInDataAvailable(object sender, WaveInEventArgs e)
         {
-            if (_waveIn == null)
+            if (_waveIn == null || !IsRecording)
                 return;
 
-            try
-            {
-                _waveProvider.AddSamples(e.Buffer, 0, e.BytesRecorded);
-
-                Networking.SendVoiceMessage(e.Buffer);
-            } catch (Exception ex)
-            {
-                // if some happens along the way...
-            }
+            Networking.SendVoiceMessage(e.Buffer, e.BytesRecorded);
         }
     }
 }

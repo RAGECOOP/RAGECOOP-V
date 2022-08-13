@@ -30,6 +30,7 @@ namespace RageCoop.Client.Menus
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _disablePauseAlt.CheckboxChanged+= DisablePauseAltCheckboxChanged;
+            _disableVoice.CheckboxChanged += DisableVoiceCheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
             _menuKey.Activated+= ChaneMenuKey;
             _passengerKey.Activated+= ChangePassengerKey;
@@ -42,6 +43,17 @@ namespace RageCoop.Client.Menus
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
+        }
+
+        private static void DisableVoiceCheckboxChanged(object sender, EventArgs e)
+        {
+            if (_disableVoice.Checked && !Sync.Voice.WasInitialized())
+            {
+                Sync.Voice.InitRecording();
+            }
+
+            Main.Settings.Voice = _disableVoice.Checked;
+            Util.SaveSettings();
         }
 
         private static void DisablePauseAltCheckboxChanged(object sender, EventArgs e)

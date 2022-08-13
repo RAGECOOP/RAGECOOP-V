@@ -7,14 +7,20 @@ namespace RageCoop.Core
         internal class Voice : Packet
         {
             public byte[] Buffer { get; set; }
+            public int Recorded { get; set; }
             public override PacketType Type => PacketType.Voice;
             public override byte[] Serialize()
             {
-                return Buffer;
+                var data = new List<byte>();
+                data.AddArray(Buffer);
+                data.AddInt(Recorded);
+                return data.ToArray();
             }
             public override void Deserialize(byte[] array)
             {
-                Buffer = array;
+                var reader = new BitReader(array);
+                Buffer = reader.ReadByteArray();
+                Recorded = reader.ReadInt32();
             }
         }
     }
