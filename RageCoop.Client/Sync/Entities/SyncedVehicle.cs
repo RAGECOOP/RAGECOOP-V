@@ -110,7 +110,7 @@ namespace RageCoop.Client
             #region -- INITIAL CHECK --
 
             // Check if all data avalible
-            if (!IsReady) { return; }
+            if (!IsReady || Owner==null ) { return; }
             #endregion
             #region -- CHECK EXISTENCE --
             if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != Model))

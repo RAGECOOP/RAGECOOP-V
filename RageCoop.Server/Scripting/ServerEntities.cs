@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ namespace RageCoop.Server.Scripting
         {
             Server = server;
         }
-        internal Dictionary<int, ServerPed> Peds { get; set; } = new();
-        internal Dictionary<int, ServerVehicle> Vehicles { get; set; } = new();
-        internal Dictionary<int,ServerProp> ServerProps { get; set; }=new();
-        internal Dictionary<int,ServerBlip> Blips { get; set; } = new();
+        internal ConcurrentDictionary<int, ServerPed> Peds { get; set; } = new();
+        internal ConcurrentDictionary<int, ServerVehicle> Vehicles { get; set; } = new();
+        internal ConcurrentDictionary<int,ServerProp> ServerProps { get; set; }=new();
+        internal ConcurrentDictionary<int,ServerBlip> Blips { get; set; } = new();
         
         /// <summary>
         /// Get a <see cref="ServerPed"/> by it's id
@@ -106,7 +107,7 @@ namespace RageCoop.Server.Scripting
         {
             int id = RequestNetworkID();
             ServerProp prop;
-            ServerProps.Add(id,prop=new ServerProp(Server)
+            ServerProps.TryAdd(id,prop=new ServerProp(Server)
             {
                 ID=id,
                 Model=model,
@@ -136,7 +137,7 @@ namespace RageCoop.Server.Scripting
                 _pos= pos,
             };
             owner.SendCustomEventQueued(CustomEvents.CreateVehicle,veh.ID, model, pos, heading);
-            Vehicles.Add(veh.ID, veh);
+            Vehicles.TryAdd(veh.ID, veh);
             return veh;
         }
 
@@ -154,7 +155,7 @@ namespace RageCoop.Server.Scripting
                 Position=pos,
                 Rotation=rotation
             };
-            Blips.Add(b.ID,b);
+            Blips.TryAdd(b.ID,b);
             b.Update();
             return b;
         }
@@ -203,7 +204,7 @@ namespace RageCoop.Server.Scripting
             ServerPed ped;
             if(!Peds.TryGetValue(p.ID,out ped))
             {
-                Peds.Add(p.ID,ped=new ServerPed(Server));
+                Peds.TryAdd(p.ID,ped=new ServerPed(Server));
                 ped.ID=p.ID;
             }
             ped._pos = p.Position;
@@ -217,7 +218,7 @@ namespace RageCoop.Server.Scripting
             ServerVehicle veh;
             if (!Vehicles.TryGetValue(p.ID, out veh))
             {
-                Vehicles.Add(p.ID, veh=new ServerVehicle(Server));
+                Vehicles.TryAdd(p.ID, veh=new ServerVehicle(Server));
                 veh.ID=p.ID;
             }
             veh._pos = p.Position;
@@ -242,14 +243,14 @@ namespace RageCoop.Server.Scripting
             {
                 if (pair.Value.Owner==left)
                 {
-                    Server.QueueJob(()=>Peds.Remove(pair.Key));
+                    Server.QueueJob(()=>Peds.TryRemove(pair.Key,out _));
                 }
             }
             foreach (var pair in Vehicles)
             {
                 if (pair.Value.Owner==left)
                 {
-                    Server.QueueJob(() => Vehicles.Remove(pair.Key));
+                    Server.QueueJob(() => Vehicles.TryRemove(pair.Key, out _));
                 }
             }
             // Server.QueueJob(() =>
@@ -257,24 +258,20 @@ namespace RageCoop.Server.Scripting
         }
         internal void RemoveVehicle(int id)
         {
-            // Server.Logger?.Trace($"Removing vehicle:{id}");
-            if (Vehicles.ContainsKey(id)) { Vehicles.Remove(id); }
+            Vehicles.TryRemove(id, out _);
         }
 
         internal void RemoveProp(int id)
         {
-            // Server.Logger?.Trace($"Removing vehicle:{id}");
-            if (ServerProps.ContainsKey(id)) { ServerProps.Remove(id); }
+            ServerProps.TryRemove(id, out _);
         }
         internal void RemoveServerBlip(int id)
         {
-            // Server.Logger?.Trace($"Removing vehicle:{id}");
-            if (Blips.ContainsKey(id)) { Blips.Remove(id); }
+            Blips.TryRemove(id, out _);
         }
         internal void RemovePed(int id)
         {
-            // Server.Logger?.Trace($"Removing ped:{id}");
-            if (Peds.ContainsKey(id)) { Peds.Remove(id); }
+            Peds.TryRemove(id, out _);
         }
 
         internal void Add(ServerPed ped)
@@ -285,7 +282,7 @@ namespace RageCoop.Server.Scripting
             }
             else
             {
-                Peds.Add(ped.ID, ped);
+                Peds.TryAdd(ped.ID, ped);
             }
         }
         internal int RequestNetworkID()

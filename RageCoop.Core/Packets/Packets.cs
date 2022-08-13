@@ -95,9 +95,10 @@ namespace RageCoop.Core
         IsVaulting = 1 << 9,
         IsInCover = 1 << 10,
         IsInVehicle = 1 << 11,
-        IsFullSync = 1<<12 ,
+        IsEnteringVehicle = 1 << 12,
+        IsLeavingVehicle = 1 << 13,
+        IsFullSync = 1<<15 ,
     }
-
     #region ===== VEHICLE DATA =====
     internal enum VehicleDataFlags:ushort
     {
