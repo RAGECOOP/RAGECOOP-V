@@ -57,7 +57,6 @@ namespace RageCoop.Client
         #endregion
 
         #region -- CRITICAL STUFF --
-        internal Vector3 Acceleration { get; set; }
         internal Vector3 RotationVelocity { get; set; }
         internal float SteeringAngle { get; set; }
         internal float ThrottlePower { get; set; }

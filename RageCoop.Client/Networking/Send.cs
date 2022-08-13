@@ -109,7 +109,6 @@ namespace RageCoop.Client
             packet.ThrottlePower = veh.ThrottlePower;
             packet.BrakePower = veh.BrakePower;
             if (v.LastVelocity==default) {v.LastVelocity=packet.Velocity; }
-            packet.Acceleration = (packet.Velocity-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
             v.LastSentStopWatch.Restart();
             v.LastVelocity= packet.Velocity;
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
@@ -178,6 +177,10 @@ namespace RageCoop.Client
             Peer.SendTo(new Packets.ChatMessage(new Func<string, byte[]>((s) => Security.Encrypt(s.GetBytes())))
             { Username = Main.Settings.Username, Message = message },ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
+        }
+        public static void SendVoiceMessage(byte[] buffer, int recorded)
+        {
+            SendSync(new Packets.Voice() { Buffer = buffer, Recorded = recorded }, ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }

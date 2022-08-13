@@ -6,9 +6,6 @@ using System.Windows.Forms;
 
 namespace RageCoop.Client.Menus
 {
-    /// <summary>
-    /// Don't use it!
-    /// </summary>
     internal static class SettingsMenu
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
@@ -20,43 +17,53 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
         private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
-
+        private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable/Disable the voice", Main.Settings.Voice);
         
         private static NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
         private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
 
-        /// <summary>
-        /// Don't use it!
-        /// </summary>
         static SettingsMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
-            _disablePauseAlt.CheckboxChanged+=_disablePauseAlt_CheckboxChanged;
+            _disablePauseAlt.CheckboxChanged+= DisablePauseAltCheckboxChanged;
+            _disableVoice.CheckboxChanged += DisableVoiceCheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
-            _menuKey.Activated+=ChaneMenuKey;
-            _passengerKey.Activated+=ChangePassengerKey;
-            _vehicleSoftLimit.Activated+=vehicleSoftLimit_Activated;
+            _menuKey.Activated+= ChaneMenuKey;
+            _passengerKey.Activated+= ChangePassengerKey;
+            _vehicleSoftLimit.Activated+= VehicleSoftLimitActivated;
 
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);
             Menu.Add(_flipMenuItem);
+            Menu.Add(_disableVoice);
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
         }
 
+        private static void DisableVoiceCheckboxChanged(object sender, EventArgs e)
+        {
+            if (_disableVoice.Checked && !Sync.Voice.WasInitialized())
+            {
+                Sync.Voice.InitRecording();
+            } else {
+                Sync.Voice.ClearAll();
+            }
 
+            Main.Settings.Voice = _disableVoice.Checked;
+            Util.SaveSettings();
+        }
 
-        private static void _disablePauseAlt_CheckboxChanged(object sender, EventArgs e)
+        private static void DisablePauseAltCheckboxChanged(object sender, EventArgs e)
         {
             Main.Settings.DisableAlternatePause=_disablePauseAlt.Checked;
             Util.SaveSettings();
         }
-        private static void vehicleSoftLimit_Activated(object sender, EventArgs e)
+        private static void VehicleSoftLimitActivated(object sender, EventArgs e)
         {
             try
             {
@@ -110,6 +117,5 @@ namespace RageCoop.Client.Menus
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }
-
     }
 }

@@ -20,7 +20,6 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
-
         private bool _gameLoaded = false;
         internal static readonly string CurrentVersion = "V0_5_0";
 
@@ -110,6 +109,8 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
+            
+
             P= Game.Player.Character;
             PlayerPosition=P.ReadPosition();
 
@@ -220,6 +221,20 @@ namespace RageCoop.Client
             }
             if (Networking.IsOnServer)
             {
+                if (Sync.Voice.WasInitialized())
+                {
+                    if (Game.IsControlPressed(GTA.Control.PushToTalk))
+                    {
+                        Sync.Voice.StartRecording();
+                        return;
+                    }
+                    else if (Sync.Voice.IsRecording)
+                    {
+                        Sync.Voice.StopRecording();
+                        return;
+                    }
+                }
+                
                 if (Game.IsControlPressed(GTA.Control.FrontendPause))
                 {
                     Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
@@ -290,10 +305,10 @@ namespace RageCoop.Client
         public static void CleanUp()
         {
             MainChat.Clear();
+            Sync.Voice.ClearAll();
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             Main.LocalPlayerID=default;
-
         }
         private static void DoQueuedActions()
         {

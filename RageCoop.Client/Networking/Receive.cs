@@ -77,6 +77,10 @@ namespace RageCoop.Client
                                 {
                                     CoopMenu.ConnectedMenuSetting();
                                     Main.MainChat.Init();
+                                    if (Main.Settings.Voice && !Sync.Voice.WasInitialized())
+                                    {
+                                        Sync.Voice.InitRecording();
+                                    }
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 });
                                 
@@ -259,6 +263,21 @@ namespace RageCoop.Client
                     }
                     break;
 
+                case PacketType.Voice:
+                    {
+                        if (Main.Settings.Voice)
+                        {
+                            Packets.Voice packet = new Packets.Voice();
+                            packet.Deserialize(data);
+
+                            Main.QueueAction(() =>
+                            {
+                                Sync.Voice.AddVoiceData(packet.Buffer, packet.Recorded);
+                            });
+                        }
+                    }
+                    break;
+
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
@@ -366,7 +385,6 @@ namespace RageCoop.Client
             v.ThrottlePower=packet.ThrottlePower;
             v.BrakePower=packet.BrakePower;
             v.Velocity=packet.Velocity;
-            v.Acceleration=packet.Acceleration;
             v.RotationVelocity=packet.RotationVelocity;
             v.DeluxoWingRatio=packet.DeluxoWingRatio;
             v.LastSynced=Main.Ticked;

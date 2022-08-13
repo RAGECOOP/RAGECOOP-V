@@ -4,10 +4,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Collections.Generic;
-using RageCoop.Core;
 using Lidgren.Network;
 using System.Net;
-using System.Net.Sockets;
+using System.Net.Http;
 
 namespace RageCoop.Server
 {
@@ -22,9 +21,14 @@ namespace RageCoop.Server
                 ServicePointManager.Expect100Continue = true;
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-                
-                WebClient client = new();
-                return client.DownloadString(url);
+
+                HttpClient client = new();
+                HttpRequestMessage request = new(HttpMethod.Get, url);
+                HttpResponseMessage response = client.Send(request);
+                using var reader = new StreamReader(response.Content.ReadAsStream());
+                string responseBody = reader.ReadToEnd();
+
+                return responseBody;
             }
             catch
             {
@@ -113,15 +117,17 @@ namespace RageCoop.Server
             string newUrl = url;
             do
             {
-                HttpWebRequest req = null;
-                HttpWebResponse resp = null;
                 try
                 {
-                    req = (HttpWebRequest)HttpWebRequest.Create(url);
-                    req.Method = "HEAD";
-                    req.AllowAutoRedirect = false;
-                    resp = (HttpWebResponse)req.GetResponse();
-                    switch (resp.StatusCode)
+                    HttpClientHandler handler = new()
+                    {
+                        AllowAutoRedirect = false
+                    };
+                    HttpClient client = new(handler);
+                    HttpRequestMessage request = new(HttpMethod.Head, url);
+                    HttpResponseMessage response = client.Send(request);
+
+                    switch (response.StatusCode)
                     {
                         case HttpStatusCode.OK:
                             return newUrl;
@@ -129,11 +135,13 @@ namespace RageCoop.Server
                         case HttpStatusCode.MovedPermanently:
                         case HttpStatusCode.RedirectKeepVerb:
                         case HttpStatusCode.RedirectMethod:
-                            newUrl = resp.Headers["Location"];
+                            newUrl = response.Headers.Location.ToString();
                             if (newUrl == null)
                                 return url;
 
-                            if (newUrl.IndexOf("://", System.StringComparison.Ordinal) == -1)
+                            string newUrlString = newUrl;
+
+                            if (!newUrlString.Contains("://"))
                             {
                                 // Doesn't have a URL Schema, meaning it's a relative or absolute URL
                                 Uri u = new Uri(new Uri(url), newUrl);
@@ -143,6 +151,7 @@ namespace RageCoop.Server
                         default:
                             return newUrl;
                     }
+
                     url = newUrl;
                 }
                 catch (WebException)
@@ -153,11 +162,6 @@ namespace RageCoop.Server
                 catch
                 {
                     return null;
-                }
-                finally
-                {
-                    if (resp != null)
-                        resp.Close();
                 }
             } while (maxRedirCount-- > 0);
 

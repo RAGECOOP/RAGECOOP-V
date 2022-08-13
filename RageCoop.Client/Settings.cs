@@ -27,6 +27,10 @@ namespace RageCoop.Client
         /// Don't use it!
         /// </summary>
         public bool FlipMenu { get; set; } = false;
+        /// <summary>
+        /// Don't use it!
+        /// </summary>
+        public bool Voice { get; set; } = false;
 
         /// <summary>
         /// LogLevel for RageCoop.
