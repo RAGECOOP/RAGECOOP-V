@@ -8,51 +8,24 @@ namespace RageCoop.Core
 
     internal class ServerInfo
     {
-        [JsonProperty("address")]
-        public string Address { get; set; }
+        public string address { get; set; }
+        public string port { get; set; }
+        public string name { get; set; }
+        public string version { get; set; }
+        public string players { get; set; }
+        public string maxPlayers { get; set; }
+        public string country { get; set; }
+        public string description { get; set; }
+        public string website { get; set; }
+        public string gameMode { get; set; }
+        public string language { get; set; }
 
-        [JsonProperty("port")]
-        public string Port { get; set; }
+        public bool useP2P { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        public bool useZT { get; set; }
 
-        [JsonProperty("version")]
-        public string Version { get; set; }
+        public string ztID { get; set; }
 
-        [JsonProperty("players")]
-        public string Players { get; set; }
-
-        [JsonProperty("maxPlayers")]
-        public string MaxPlayers { get; set; }
-
-        [JsonProperty("country")]
-        public string Country { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-        
-        [JsonProperty("website")]
-        public string Website { get; set; }
-        
-        [JsonProperty("gameMode")]
-        public string GameMode { get; set; }
-        
-        [JsonProperty("language")]
-        public string Language { get; set; }
-
-
-        [JsonProperty("useP2P")]
-        public bool P2P { get; set; }
-
-        [JsonProperty("useZT")]
-        public bool ZeroTier { get; set; }
-
-        [JsonProperty("ztID")]
-        public string ZeroTierNetWorkID { get; set; }
-
-
-        [JsonProperty("ztAddress")]
-        public string ZeroTierAddress { get; set; }
+        public string ztAddress { get; set; }
     }
 }
