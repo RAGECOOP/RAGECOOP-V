@@ -10,7 +10,20 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        private static PacketPool PacketPool=new PacketPool();
+
+        /// <summary>
+        /// Reduce GC pressure by reusing frequently used packets
+        /// </summary>
+        static class ReceivedPackets
+        {
+            public static Packets.PedSync PedPacket = new Packets.PedSync();
+            public static Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
+            public static Packets.ProjectileSync ProjectilePacket = new Packets.ProjectileSync();
+        }
+
+        /// <summary>
+        /// Used to reslove entity handle in a <see cref="Packets.CustomEvent"/>
+        /// </summary>
         private static readonly Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
            {
                switch (t)
@@ -201,7 +214,6 @@ namespace RageCoop.Client
 
             Peer.Recycle(message);
         }
-        static Packet packet;
         private static void HandlePacket(PacketType packetType, byte[] data, NetConnection senderConnection)
         {
 
@@ -224,18 +236,17 @@ namespace RageCoop.Client
                     break;
 
                 case PacketType.VehicleSync:
-                    packet = data.GetPacket<Packets.VehicleSync>(PacketPool);
-                    VehicleSync((Packets.VehicleSync)packet);
-                    PacketPool.Recycle((Packets.VehicleSync)packet);
+                    ReceivedPackets.VehicelPacket.Deserialize(data);
+                    VehicleSync(ReceivedPackets.VehicelPacket);
                     break;
 
                 case PacketType.PedSync:
-                    packet = data.GetPacket<Packets.PedSync>(PacketPool);
-                    PedSync((Packets.PedSync)packet);
-                    PacketPool.Recycle((Packets.PedSync)packet);
+                    ReceivedPackets.PedPacket.Deserialize(data);
+                    PedSync(ReceivedPackets.PedPacket);
                     break;
                 case PacketType.ProjectileSync:
-                    ProjectileSync(data.GetPacket<Packets.ProjectileSync>());
+                    ReceivedPackets.ProjectilePacket.Deserialize(data);
+                    ProjectileSync(ReceivedPackets.ProjectilePacket);
                     break;
 
                 case PacketType.ChatMessage:

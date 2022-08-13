@@ -10,7 +10,15 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-
+        /// <summary>
+        /// Reduce GC pressure by reusing frequently used packets
+        /// </summary>
+        static class SendPackets
+        {
+            public static Packets.PedSync PedPacket = new Packets.PedSync();
+            public static Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
+            public static Packets.ProjectileSync ProjectilePacket = new Packets.ProjectileSync();
+        }
         public static int SyncInterval = 30;
         public static List<NetConnection> Targets = new List<NetConnection>();
         public static void SendSync(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
@@ -25,17 +33,15 @@ namespace RageCoop.Client
                 return;
             }
             Ped p = c.MainPed;
-            var packet = new Packets.PedSync()
-            {
-                ID =c.ID,
-                OwnerID=c.OwnerID,
-                Health = p.Health,
-                Rotation = p.ReadRotation(),
-                Velocity = p.ReadVelocity(),
-                Speed = p.GetPedSpeed(),
-                Flags = p.GetPedFlags(),
-                Heading=p.Heading,
-            };
+            var packet = SendPackets.PedPacket;
+            packet.ID =c.ID;
+            packet.OwnerID=c.OwnerID;
+            packet.Health = p.Health;
+            packet.Rotation = p.ReadRotation();
+            packet.Velocity = p.ReadVelocity();
+            packet.Speed = p.GetPedSpeed();
+            packet.Flags = p.GetPedFlags();
+            packet.Heading=p.Heading;
             if (packet.Flags.HasPedFlag(PedDataFlags.IsAiming))
             {
                 packet.AimCoords = p.GetAimCoord();
@@ -77,6 +83,10 @@ namespace RageCoop.Client
                         packet.BlipScale=0.5f;
                     }
                 }
+                else
+                {
+                    packet.BlipColor=(BlipColor)255;
+                }
             }
             SendSync(packet, ConnectionChannel.PedSync);
         }
@@ -87,19 +97,17 @@ namespace RageCoop.Client
                 return;
             }
             Vehicle veh = v.MainVehicle;
-            var packet = new Packets.VehicleSync()
-            {
-                ID =v.ID,
-                OwnerID=v.OwnerID,
-                Flags = veh.GetVehicleFlags(),
-                SteeringAngle = veh.SteeringAngle,
-                Position = veh.Position,
-                Velocity=veh.Velocity,
-                Quaternion=veh.ReadQuaternion(),
-                RotationVelocity=veh.RotationVelocity,
-                ThrottlePower = veh.ThrottlePower,
-                BrakePower = veh.BrakePower,
-            };
+            var packet = SendPackets.VehicelPacket;
+            packet.ID =v.ID;
+            packet.OwnerID=v.OwnerID;
+            packet.Flags = veh.GetVehicleFlags();
+            packet.SteeringAngle = veh.SteeringAngle;
+            packet.Position = veh.Position;
+            packet.Velocity=veh.Velocity;
+            packet.Quaternion=veh.ReadQuaternion();
+            packet.RotationVelocity=veh.RotationVelocity;
+            packet.ThrottlePower = veh.ThrottlePower;
+            packet.BrakePower = veh.BrakePower;
             if (v.LastVelocity==default) {v.LastVelocity=packet.Velocity; }
             packet.Acceleration = (packet.Velocity-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
             v.LastSentStopWatch.Restart();
@@ -140,16 +148,14 @@ namespace RageCoop.Client
         public static void SendProjectile(SyncedProjectile sp)
         {
             var p = sp.MainProjectile;
-            var packet = new Packets.ProjectileSync()
-            {
-                ID =sp.ID,
-                ShooterID=sp.ShooterID,
-                Rotation=p.Rotation,
-                Position=p.Position,
-                Velocity=p.Velocity,
-                WeaponHash=(uint)p.WeaponHash,
-                Exploded=p.IsDead
-            };
+            var packet = SendPackets.ProjectilePacket;
+            packet.ID =sp.ID;
+            packet.ShooterID=sp.ShooterID;
+            packet.Rotation=p.Rotation;
+            packet.Position=p.Position;
+            packet.Velocity=p.Velocity;
+            packet.WeaponHash=(uint)p.WeaponHash;
+            packet.Exploded=p.IsDead;
             if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
             SendSync(packet, ConnectionChannel.ProjectileSync);
         }
