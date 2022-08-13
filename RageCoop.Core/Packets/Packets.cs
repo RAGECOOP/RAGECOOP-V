@@ -34,10 +34,13 @@ namespace RageCoop.Core
         P2PConnect = 19,
         HolePunchInit=20,
         HolePunch=21,
+
+        Voice = 22,
+
         #region Sync
-        PedSync = 22,
-        VehicleSync = 23,
-        ProjectileSync =24,
+        PedSync = 23,
+        VehicleSync = 24,
+        ProjectileSync =25,
         #endregion
 
         #region EVENT
@@ -66,17 +69,18 @@ namespace RageCoop.Core
     internal enum ConnectionChannel
     {
         Default = 0,
-        Chat = 5,
-        Native = 6,
-        Mod = 7,
-        File = 8,
-        Event = 9,
-        RequestResponse=10,
-        PingPong = 11,
-        VehicleSync =20,
-        PedSync=21,
-        ProjectileSync = 22,
-        SyncEvents =30,
+        Chat = 1,
+        Voice = 2,
+        Native = 3,
+        Mod = 4,
+        File = 5,
+        Event = 6,
+        RequestResponse=7,
+        PingPong = 8,
+        VehicleSync = 9,
+        PedSync= 10,
+        ProjectileSync = 11,
+        SyncEvents = 12,
     }
 
     [Flags]

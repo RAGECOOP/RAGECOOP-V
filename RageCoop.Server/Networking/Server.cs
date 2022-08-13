@@ -484,6 +484,15 @@ namespace RageCoop.Server
                         }
                         break;
 
+                    case PacketType.Voice:
+                        {
+                            var msg = MainNetServer.CreateMessage();
+                            Packets.Voice packet = data.GetPacket<Packets.Voice>();
+                            packet.Deserialize(data);
+                            MainNetServer.SendMessage(msg, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Voice);
+                        }
+                        break;
+
                     case PacketType.CustomEvent:
                         {
                             Packets.CustomEvent packet = new Packets.CustomEvent();

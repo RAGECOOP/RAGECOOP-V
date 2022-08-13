@@ -248,6 +248,12 @@ namespace RageCoop.Client
                     }
                     break;
 
+                case PacketType.Voice:
+                    {
+                        GTA.UI.Notification.Show("VOICE RECEIVED!");
+                    }
+                    break;
+
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);

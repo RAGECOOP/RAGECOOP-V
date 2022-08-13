@@ -215,23 +215,8 @@ namespace RageCoop.Client
             _lastDead=P.IsDead;
             Ticked++;
         }
-        private bool recording = false;
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.B)
-            {
-                if (!recording)
-                {
-                    recording = true;
-                    Sync.Voice.StartRecording();
-                }
-                else
-                {
-                    Sync.Voice.StopRecording();
-                    recording = false;
-                }
-            } 
-
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
@@ -239,6 +224,16 @@ namespace RageCoop.Client
             }
             if (Networking.IsOnServer)
             {
+                if (Game.IsControlPressed(GTA.Control.PushToTalk))
+                {
+                    Sync.Voice.StartRecording();
+                    return;
+                }
+                else if (Sync.Voice.IsRecording)
+                {
+                    Sync.Voice.StopRecording();
+                }
+
                 if (Game.IsControlPressed(GTA.Control.FrontendPause))
                 {
                     Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
