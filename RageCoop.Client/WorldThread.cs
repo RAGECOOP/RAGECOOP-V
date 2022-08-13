@@ -34,9 +34,32 @@ namespace RageCoop.Client
             }
 
             Game.DisableControlThisFrame(Control.FrontendPause);
+            Game.DisableControlThisFrame(Control.VehicleExit);
+            Game.DisableControlThisFrame(Control.Enter);
+
             if (Main.Settings.DisableAlternatePause)
             {
                 Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
+            }
+            var P = Game.Player.Character;
+            if (Game.IsControlJustPressed(Control.VehicleExit))
+            {
+                if (P.IsInVehicle())
+                {
+                    P.Task.LeaveVehicle();
+                }
+                else if (P.IsTaskActive(TaskType.CTaskMoveGoToVehicleDoor))
+                {
+                    P.Task.ClearAll();
+                }
+                else
+                {
+                    var v = World.GetClosestVehicle(P.Position, 10);
+                    if (v!=null)
+                    {
+                        P.Task.EnterVehicle(v,VehicleSeat.Driver,-1,5, EnterVehicleFlags.AllowJacking);
+                    }
+                }
             }
 
             // Sets a value that determines how aggressive the ocean waves will be.

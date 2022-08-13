@@ -57,17 +57,17 @@ namespace RageCoop.Client
                 return 3;
             }
 
-            if (ped.IsTaskActive(TaskType.CTaskExitVehicle))
-            {
-                return 6;
-            }
-            if (ped.IsInVehicle())
+            if (ped.IsSittingInVehicle())
             {
                 return 4;
             }
             if (ped.IsTaskActive(TaskType.CTaskEnterVehicle))
             {
                 return 5;
+            }
+            if (ped.IsTaskActive(TaskType.CTaskExitVehicle))
+            {
+                return 6;
             }
 
             return 0;

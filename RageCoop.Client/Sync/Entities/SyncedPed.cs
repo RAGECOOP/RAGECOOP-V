@@ -749,7 +749,7 @@ namespace RageCoop.Client
                 case 5:
                     if (MainPed.VehicleTryingToEnter!=CurrentVehicle.MainVehicle || MainPed.GetSeatTryingToEnter()!=Seat)
                     {
-                        MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle,Seat,-1,1,EnterVehicleFlags.AllowJacking);
+                        MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle,Seat,-1,5,EnterVehicleFlags.AllowJacking);
                     }
                     break;
                 case 6:
