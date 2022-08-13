@@ -486,9 +486,7 @@ namespace RageCoop.Server
 
                     case PacketType.Voice:
                         {
-                            var msg = MainNetServer.CreateMessage();
-                            data.GetPacket<Packets.Voice>().Pack(msg);
-                            MainNetServer.SendMessage(msg, MainNetServer.Connections, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Voice);
+                            SendToAll(data.GetPacket<Packets.Voice>());
                         }
                         break;
 
@@ -721,6 +719,18 @@ namespace RageCoop.Server
             NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
             p.Pack(outgoingMessage);
             MainNetServer.SendMessage(outgoingMessage, client.Connection,method,(int)channel);
+        }
+        internal void Forward(Packet p, Client except, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        {
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            p.Pack(outgoingMessage);
+            MainNetServer.SendToAll(outgoingMessage, except.Connection, method, (int)channel);
+        }
+        internal void SendToAll(Packet p, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        {
+            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+            p.Pack(outgoingMessage);
+            MainNetServer.SendToAll(outgoingMessage, method, (int)channel);
         }
     }
 }

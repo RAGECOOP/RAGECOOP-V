@@ -250,7 +250,7 @@ namespace RageCoop.Client
 
                 case PacketType.Voice:
                     {
-                        GTA.UI.Notification.Show("VOICE RECEIVED!");
+                        Main.QueueAction(() => GTA.UI.Notification.Show("VOICE RECEIVED!"));
                     }
                     break;
 

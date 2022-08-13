@@ -10,14 +10,11 @@ namespace RageCoop.Core
             public override PacketType Type => PacketType.Voice;
             public override byte[] Serialize()
             {
-                var data = new List<byte>();
-                data.AddArray(Buffer);
-                return data.ToArray();
+                return Buffer;
             }
             public override void Deserialize(byte[] array)
             {
-                var reader = new BitReader(array);
-                Buffer = reader.ReadByteArray();
+                Buffer = array;
             }
         }
     }
