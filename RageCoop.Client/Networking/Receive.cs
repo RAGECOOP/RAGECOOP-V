@@ -349,6 +349,11 @@ namespace RageCoop.Client
                 c.RightFootPosition=packet.RightFootPosition;
                 c.LeftFootPosition=packet.LeftFootPosition;
             }
+            else if (c.Speed>=4)
+            {
+                c.VehicleID=packet.VehicleID;
+                c.Seat=packet.Seat;
+            }
             c.LastSynced =  Main.Ticked;
             if (c.IsAiming)
             {
@@ -398,26 +403,20 @@ namespace RageCoop.Client
                 v.Colors=packet.Colors;
                 v.LandingGear=packet.LandingGear;
                 v.RoofState=(VehicleRoofState)packet.RoofState;
-                v.Passengers=new Dictionary<VehicleSeat, SyncedPed>();
                 v.LockStatus=packet.LockStatus;
                 v.RadioStation=packet.RadioStation;
                 v.LicensePlate=packet.LicensePlate;
                 v.Livery=packet.Livery;
-                foreach (KeyValuePair<int, int> pair in packet.Passengers)
-                {
-                    if (EntityPool.PedExists(pair.Value))
-                    {
-                        v.Passengers.Add((VehicleSeat)pair.Key, EntityPool.GetPedByID(pair.Value));
-                    }
-                }
                 v.LastFullSynced= Main.Ticked;
             }
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {
+
             var p = EntityPool.GetProjectileByID(packet.ID);
             if (p==null)
             {
+                
                 if (packet.Exploded) { return; }
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));

@@ -87,8 +87,8 @@ namespace RageCoop.Client
         }
 
         #region PEDS
-        public static SyncedPed GetPedByID(int id) => PedsByID.ContainsKey(id) ? PedsByID[id] : null;
-        public static SyncedPed GetPedByHandle(int handle) => PedsByHandle.ContainsKey(handle) ? PedsByHandle[handle] : null;
+        public static SyncedPed GetPedByID(int id) => PedsByID.TryGetValue(id, out var p) ? p : null;
+        public static SyncedPed GetPedByHandle(int handle) => PedsByHandle.TryGetValue(handle, out var p) ? p : null;
         public static List<int> GetPedIDs() => new List<int>(PedsByID.Keys);
         public static bool AddPlayer()
         {
@@ -182,8 +182,8 @@ namespace RageCoop.Client
         #endregion
 
         #region VEHICLES
-        public static SyncedVehicle GetVehicleByID(int id) => VehiclesByID.ContainsKey(id) ? VehiclesByID[id] : null;
-        public static SyncedVehicle GetVehicleByHandle(int handle) => VehiclesByHandle.ContainsKey(handle) ? VehiclesByHandle[handle] : null;
+        public static SyncedVehicle GetVehicleByID(int id) => VehiclesByID.TryGetValue(id,out var v) ? v : null;
+        public static SyncedVehicle GetVehicleByHandle(int handle) => VehiclesByHandle.TryGetValue(handle,out var v) ? v : null;
         public static List<int> GetVehicleIDs() => new List<int>(VehiclesByID.Keys);
         public static void Add(SyncedVehicle v)
         {
@@ -237,7 +237,7 @@ namespace RageCoop.Client
         #region PROJECTILES
         public static SyncedProjectile GetProjectileByID(int id)
         {
-            return ProjectilesByID.ContainsKey(id) ? ProjectilesByID[id] : null;
+            return ProjectilesByID.TryGetValue(id,out var p) ? p : null;
         }
         public static void Add(SyncedProjectile p)
         {
@@ -272,7 +272,7 @@ namespace RageCoop.Client
                     {
                         ProjectilesByHandle.Remove(p.Handle);
                     }
-                    // Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
                     p.Explode();
                 }
                 ProjectilesByID.Remove(id);

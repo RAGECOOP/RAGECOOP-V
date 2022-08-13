@@ -15,39 +15,12 @@ namespace RageCoop.Client
             Networking.SendSync(new Packets.PedKilled() { VictimID=victim.ID }, ConnectionChannel.SyncEvents);
         }
 
-        public static void TriggerEnteringVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
-        {
-            Networking.
-            SendSync(new Packets.EnteringVehicle()
-            {
-                PedID=c.ID,
-                VehicleID= veh.ID,
-                VehicleSeat=(short)seat,
-            }, ConnectionChannel.SyncEvents);
-        }
-
-        public static void TriggerEnteredVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
-        {
-            if (seat==VehicleSeat.Driver)
-            {
-                veh.OwnerID=Main.LocalPlayerID;
-                veh.LastSynced=Main.Ticked;
-                TriggerChangeOwner(veh, c.ID);
-            }
-            Networking.SendSync(new Packets.EnteredVehicle()
-            {
-                VehicleSeat=(short)seat,
-                PedID=c.ID,
-                VehicleID=veh.ID
-            }, ConnectionChannel.SyncEvents);
-        }
-
-        public static void TriggerChangeOwner(SyncedVehicle c, int newOwnerID)
+        public static void TriggerChangeOwner(int vehicleID, int newOwnerID)
         {
 
             Networking.SendSync(new Packets.OwnerChanged()
             {
-                ID= c.ID,
+                ID= vehicleID,
                 NewOwnerID= newOwnerID,
             }, ConnectionChannel.SyncEvents);
 
@@ -66,14 +39,6 @@ namespace RageCoop.Client
                 start=impactPosition-(impactPosition-start).Normalized*10;
             }
             Networking.SendBulletShot(start, impactPosition, hash, owner.ID);
-        }
-        public static void TriggerLeaveVehicle(int id)
-        {
-            Networking.
-            SendSync(new Packets.LeaveVehicle()
-            {
-                ID=id
-            }, ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
@@ -106,50 +71,19 @@ namespace RageCoop.Client
         static WeaponAsset _weaponAsset = default;
         static uint _lastWeaponHash;
 
-        private static void HandleLeaveVehicle(Packets.LeaveVehicle p)
-        {
-            var ped = EntityPool.GetPedByID(p.ID);
-            var veh = ped.MainPed.CurrentVehicle.GetSyncEntity();
-            veh._checkSeat=false;
-            var flag = LeaveVehicleFlags.None;
-            if (ped.MainPed?.CurrentVehicle==null) { return; }
-            // Bail out
-            if (ped.MainPed.CurrentVehicle.Speed>5) { flag|=LeaveVehicleFlags.BailOut; }
-            // ped.PauseUpdate((ulong)Game.FPS*2);
-            ped.MainPed.Task.LeaveVehicle(flag);
-            Task.Run(() =>
-            {
-                Thread.Sleep(1000);
-                veh._checkSeat=true;
-            });
-        }
         private static void HandlePedKilled(Packets.PedKilled p)
         {
             EntityPool.GetPedByID(p.VictimID)?.MainPed?.Kill();
-        }
-        private static void HandleEnteringVehicle(SyncedPed c, SyncedVehicle veh, VehicleSeat seat)
-        {
-            c.MainPed?.Task.EnterVehicle(veh.MainVehicle, seat, -1, 2, EnterVehicleFlags.WarpToDoor|EnterVehicleFlags.AllowJacking);
-        }
-        private static void HandleEnteredVehicle(int pedId, int vehId, VehicleSeat seat)
-        {
-            var v = EntityPool.GetVehicleByID(vehId);
-            var p = EntityPool.GetPedByID(pedId)?.MainPed;
-            if (v==null||p==null) { return; }
-            if (!v.MainVehicle.IsSeatFree(seat) && v.MainVehicle.GetPedOnSeat(seat) != p)
-            {
-                v.MainVehicle.GetPedOnSeat(seat).Task.WarpOutOfVehicle(v.MainVehicle);
-            }
-            p.SetIntoVehicle(v.MainVehicle, seat);
         }
         private static void HandleOwnerChanged(Packets.OwnerChanged p)
         {
             var v = EntityPool.GetVehicleByID(p.ID);
             if (v==null) { return; }
             v.OwnerID=p.NewOwnerID;
-
-            v.Model=v.MainVehicle.Model;
             v.LastSynced=Main.Ticked;
+            v.LastFullSynced=Main.Ticked;
+            v.Position=v.MainVehicle.Position;
+            v.Quaternion=v.MainVehicle.Quaternion;
             // So this vehicle doesn's get re-spawned
         }
         private static void HandleNozzleTransform(Packets.NozzleTransform p)
@@ -229,22 +163,6 @@ namespace RageCoop.Client
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }
-                case PacketType.EnteringVehicle:
-                    {
-                        Packets.EnteringVehicle p = new Packets.EnteringVehicle();
-                        p.Deserialize(data);
-                        HandleEnteringVehicle(EntityPool.GetPedByID(p.PedID), EntityPool.GetVehicleByID(p.VehicleID), (VehicleSeat)p.VehicleSeat);
-
-
-                    }
-                    break;
-                case PacketType.LeaveVehicle:
-                    {
-                        Packets.LeaveVehicle packet = new Packets.LeaveVehicle();
-                        packet.Deserialize(data);
-                        HandleLeaveVehicle(packet);
-                    }
-                    break;
                 case PacketType.OwnerChanged:
                     {
                         Packets.OwnerChanged packet = new Packets.OwnerChanged();
@@ -259,13 +177,6 @@ namespace RageCoop.Client
                         HandlePedKilled(packet);
                     }
                     break;
-                case PacketType.EnteredVehicle:
-                    {
-                        var packet = new Packets.EnteredVehicle();
-                        packet.Deserialize(data);
-                        HandleEnteredVehicle(packet.PedID, packet.VehicleID, (VehicleSeat)packet.VehicleSeat);
-                        break;
-                    }
                 case PacketType.NozzleTransform:
                     {
                         var packet = new Packets.NozzleTransform();
@@ -346,34 +257,6 @@ namespace RageCoop.Client
                     TriggerBulletShot((uint)VehicleWeaponHash.Tank, c, subject.LastWeaponImpactPosition);
                 }
             }
-
-            // Vehicles
-            var g = subject.IsGettingIntoVehicle;
-            if (g && (!c._lastEnteringVehicle))
-            {
-                var v = subject.VehicleTryingToEnter.GetSyncEntity();
-                TriggerEnteringVehicle(c, v, subject.GetSeatTryingToEnter());
-            }
-
-            var currentSitting = subject.IsSittingInVehicle();
-            if (c._lastSittingInVehicle)
-            {
-                if (!currentSitting)
-                {
-                    var veh = subject.CurrentVehicle;
-                    if (veh!=null)
-                    {
-                        var v = veh.GetSyncEntity();
-                        TriggerLeaveVehicle(c.ID);
-                    }
-                }
-            }
-            else if (currentSitting)
-            {
-                TriggerEnteredVehicle(c, subject.CurrentVehicle.GetSyncEntity(), subject.SeatIndex);
-            }
-            c._lastSittingInVehicle=currentSitting;
-            c._lastEnteringVehicle=g;
         }
 
         public static void Check(SyncedVehicle v)

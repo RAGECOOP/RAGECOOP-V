@@ -125,8 +125,8 @@ namespace RageCoop.Client
             CoopMenu.MenuPool.Process();
 #endif
 
-
             P= Game.Player.Character;
+            // GTA.UI.Screen.ShowHelpTextThisFrame(P.GetPedSpeed().ToString());
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
 

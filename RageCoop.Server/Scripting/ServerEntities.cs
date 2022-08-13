@@ -212,6 +212,10 @@ namespace RageCoop.Server.Scripting
             ped.Health=p.Health;
             ped._rot=p.Rotation;
             ped.Owner=sender;
+            if (p.Speed>=4 && Vehicles.TryGetValue(p.VehicleID,out var v))
+            {
+                ped.LastVehicle=v;
+            }
         }
         internal void Update(Packets.VehicleSync p, Client sender)
         {
@@ -224,16 +228,6 @@ namespace RageCoop.Server.Scripting
             veh._pos = p.Position;
             veh.Owner=sender;
             veh._quat=p.Quaternion;
-            if (p.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
-            {
-                foreach (var pair in p.Passengers)
-                {
-                    if (Peds.TryGetValue(pair.Value, out var ped))
-                    {
-                        ped.LastVehicle=veh;
-                    }
-                }
-            }
         }
         internal void CleanUp(Client left)
         {

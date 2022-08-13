@@ -17,6 +17,9 @@ namespace RageCoop.Core
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
+
+            public int VehicleID { get; set; }
+            public VehicleSeat Seat { get; set; }
             public PedDataFlags Flags { get; set; }
 
             public int Health { get; set; }
@@ -62,21 +65,11 @@ namespace RageCoop.Core
             {
                 
                 List<byte> byteArray = new List<byte>();
-
-                // Write ped ID
                 byteArray.AddInt(ID);
-
-                // Write OwnerID
                 byteArray.AddInt(OwnerID);
-
-
-                // Write ped flags
                 byteArray.AddRange(BitConverter.GetBytes((ushort)Flags));
-
-                // Write ped health
                 byteArray.AddRange(BitConverter.GetBytes(Health));
-
-                // ragdoll sync
+                byteArray.Add(Speed);
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
                     byteArray.AddVector3(HeadPosition);
@@ -86,24 +79,19 @@ namespace RageCoop.Core
                 }
                 else
                 {
-                    // Write ped position
+                    if (Speed>=4)
+                    {
+                        byteArray.AddInt(VehicleID);
+                        byteArray.Add((byte)(Seat+3));
+                    }
                     byteArray.AddVector3(Position);
                 }
-
-                // Write ped rotation
                 byteArray.AddVector3(Rotation);
-
-                // Write ped velocity
                 byteArray.AddVector3(Velocity);
-
-
-                // Write ped speed
-                byteArray.Add(Speed);
 
 
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
-                    // Write ped aim coords
                     byteArray.AddVector3(AimCoords);
                 }
 
@@ -111,15 +99,9 @@ namespace RageCoop.Core
 
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
-                    // Write model hash
                     byteArray.AddInt(ModelHash);
-
-                    // Write ped weapon hash
                     byteArray.AddUint(CurrentWeaponHash);
-
                     byteArray.AddRange(Clothes);
-
-                    // Write player weapon components
                     if (WeaponComponents != null)
                     {
                         byteArray.Add(0x01);
@@ -154,16 +136,11 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
                 BitReader reader = new BitReader(array);
 
-                // Read player netHandle
                 ID = reader.ReadInt32();
-
                 OwnerID=reader.ReadInt32();
-
-                // Read player flags
                 Flags = (PedDataFlags)reader.ReadUInt16();
-
-                // Read player health
                 Health = reader.ReadInt32();
+                Speed = reader.ReadByte();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
@@ -174,21 +151,20 @@ namespace RageCoop.Core
                 }
                 else
                 {
+                    // Vehicle related
+                    if (Speed>=4)
+                    {
+                        VehicleID=reader.ReadInt32();
+                        Seat=(VehicleSeat)(reader.ReadByte()-3);
+                    }
+
                     // Read player position
                     Position = reader.ReadVector3();
                 }
 
-                // Read player rotation
                 Rotation = reader.ReadVector3();
-
-                // Read player velocity
                 Velocity = reader.ReadVector3();
 
-                // Read player speed
-                Speed = reader.ReadByte();
-
-
-                // Try to read aim coords
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
                     // Read player aim coords

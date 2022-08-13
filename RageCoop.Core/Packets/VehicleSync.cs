@@ -54,11 +54,6 @@ namespace RageCoop.Core
 
             public int Livery { get; set; } = -1;
 
-            /// <summary>
-            /// VehicleSeat,PedID
-            /// </summary>
-            public Dictionary<int, int> Passengers { get; set; }
-
             public byte RadioStation { get; set; } = 255;
             public string LicensePlate { get; set; }
             #endregion
@@ -131,15 +126,6 @@ namespace RageCoop.Core
                     {
                         // Write boolean = false
                         byteArray.Add(0x00);
-                    }
-
-                    // Write passengers
-                    byteArray.AddRange(BitConverter.GetBytes(Passengers.Count));
-
-                    foreach (KeyValuePair<int, int> p in Passengers)
-                    {
-                        byteArray.AddRange(BitConverter.GetBytes(p.Key));
-                        byteArray.AddRange(BitConverter.GetBytes(p.Value));
                     }
 
 
@@ -254,19 +240,6 @@ namespace RageCoop.Core
                             LeftHeadLightBroken = reader.ReadByte(),
                             RightHeadLightBroken = reader.ReadByte()
                         };
-                    }
-
-
-                    // Read Passengers
-                    Passengers=new Dictionary<int, int>();
-                    int count = reader.ReadInt32();
-                    for (int i = 0; i<count; i++)
-                    {
-                        int seat, id;
-                        seat = reader.ReadInt32();
-                        id = reader.ReadInt32();
-                        Passengers.Add(seat, id);
-
                     }
 
 

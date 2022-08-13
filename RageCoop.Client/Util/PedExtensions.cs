@@ -43,17 +43,31 @@ namespace RageCoop.Client
 
         public static byte GetPedSpeed(this Ped ped)
         {
-            if (ped.IsSprinting)
+
+            if (ped.IsWalking)
             {
-                return 3;
+                return 1;
             }
             if (ped.IsRunning)
             {
                 return 2;
             }
-            if (ped.IsWalking)
+            if (ped.IsSprinting)
             {
-                return 1;
+                return 3;
+            }
+
+            if (ped.IsTaskActive(TaskType.CTaskExitVehicle))
+            {
+                return 6;
+            }
+            if (ped.IsInVehicle())
+            {
+                return 4;
+            }
+            if (ped.IsTaskActive(TaskType.CTaskEnterVehicle))
+            {
+                return 5;
             }
 
             return 0;
@@ -133,6 +147,7 @@ namespace RageCoop.Client
             {
                 flags |= PedDataFlags.IsInStealthMode;
             }
+
 
             return flags;
         }

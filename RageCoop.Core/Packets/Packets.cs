@@ -47,9 +47,6 @@ namespace RageCoop.Core
 
         PedKilled=30,
         BulletShot=31,
-        EnteringVehicle=32,
-        LeaveVehicle = 33,
-        EnteredVehicle=34,
         OwnerChanged=35,
         VehicleBulletShot = 36,
         NozzleTransform=37,
@@ -98,9 +95,6 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover = 1 << 10,
-        IsInVehicle = 1 << 11,
-        IsEnteringVehicle = 1 << 12,
-        IsLeavingVehicle = 1 << 13,
         IsFullSync = 1<<15 ,
     }
     #region ===== VEHICLE DATA =====

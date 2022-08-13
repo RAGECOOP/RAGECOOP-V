@@ -92,15 +92,10 @@ namespace RageCoop.Client
         internal Dictionary<int, int> Mods { get; set; }
         internal float EngineHealth { get; set; }
         internal VehicleLockStatus LockStatus { get; set; }
-        /// <summary>
-        /// VehicleSeat,PedID
-        /// </summary>
-        internal Dictionary<VehicleSeat, SyncedPed> Passengers { get; set; }
         internal byte RadioStation = 255;
         internal string LicensePlate { get; set; }
         internal int _lastLivery = -1;
         internal int Livery { get; set; } = -1;
-        internal bool _checkSeat { get; set; } = true;
 
         #endregion
         internal override void Update()
@@ -112,7 +107,7 @@ namespace RageCoop.Client
             if (!IsReady || Owner==null ) { return; }
             #endregion
             #region -- CHECK EXISTENCE --
-            if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model.Hash != Model))
+            if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model != Model))
             {
                 if (!CreateVehicle())
                 {
@@ -260,42 +255,6 @@ namespace RageCoop.Client
             if (LastFullSynced>=LastUpdated)
             {
                 #region -- SYNC STATE --
-                #region -- PASSENGER SYNC --
-
-                // check passengers (and driver).
-                if (_checkSeat)
-                {
-                    var currentPassengers = MainVehicle.GetPassengers();
-
-                    lock (Passengers)
-                    {
-                        for (int i = -1; i<MainVehicle.PassengerCapacity; i++)
-                        {
-                            VehicleSeat seat = (VehicleSeat)i;
-                            if (Passengers.ContainsKey(seat))
-                            {
-                                SyncedPed c = Passengers[seat];
-                                if (c?.ID==Main.LocalPlayerID && (RadioStation!=Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX)))
-                                {
-                                    Util.SetPlayerRadioIndex(RadioStation);
-                                }
-                                if (c?.MainPed!=null&&(!currentPassengers.ContainsKey(i))&&(!c.MainPed.IsBeingJacked)&&(!c.MainPed.IsTaskActive(TaskType.CTaskExitVehicleSeat)))
-                                {
-                                    Passengers[seat].MainPed.SetIntoVehicle(MainVehicle, seat);
-                                }
-                            }
-                            else if (!MainVehicle.IsSeatFree(seat))
-                            {
-                                var p = MainVehicle.Occupants.Where(x => x.SeatIndex==seat).FirstOrDefault();
-                                if ((p!=null)&& !p.IsTaskActive(TaskType.CTaskLeaveAnyCar))
-                                {
-                                    p.Task.WarpOutOfVehicle(MainVehicle);
-                                }
-                            }
-                        }
-                    }
-                }
-                #endregion
                 if (Flags.HasVehFlag(VehicleDataFlags.Repaired))
                 {
                     MainVehicle.Repair();
@@ -337,12 +296,8 @@ namespace RageCoop.Client
         Vector3 _predictedPos;
         void DisplayVehicle(bool touching)
         {
-            // predict velocity/position
             _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
-            // new LemonUI.Elements.ScaledText(new System.Drawing.PointF(50, 50), Owner.HasDirectConnection+" "+LastSyncedStopWatch.ElapsedMilliseconds).Draw();
-            // _predictedVel = Velocity+Acceleration*_elapsed;
             _predictedPos = Position+_elapsed*Velocity;
-            // LastVelocity=_predictedVel;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
             var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);

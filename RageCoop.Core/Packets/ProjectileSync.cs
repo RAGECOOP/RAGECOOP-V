@@ -48,7 +48,7 @@ namespace RageCoop.Core
 
                 // Write velocity
                 byteArray.AddVector3(Velocity);
-                byteArray.Add(Exploded?(byte)1:(byte)0);
+                byteArray.AddBool(Exploded);
 
                 return byteArray.ToArray();
 
@@ -76,10 +76,7 @@ namespace RageCoop.Core
                 // Read velocity
                 Velocity =reader.ReadVector3();
 
-                if (reader.ReadBoolean())
-                {
-                    Exploded=true;
-                }
+                Exploded=reader.ReadBoolean();
 
                 #endregion
             }

@@ -46,17 +46,22 @@ namespace RageCoop.Client
         #endregion
         internal Blip PedBlip = null;
         internal BlipColor BlipColor = (BlipColor)255;
-        internal BlipSprite BlipSprite = (BlipSprite)0;
+        internal BlipSprite BlipSprite = 0;
         internal float BlipScale = 1;
-        internal Player Player;
-
-        /// <summary>
-        /// Indicates whether this ped is a player
-        /// </summary>
+        internal int VehicleID
+        {
+            get => CurrentVehicle?.ID ?? 0;
+            set
+            {
+                if (CurrentVehicle == null || value != CurrentVehicle?.ID)
+                {
+                    CurrentVehicle=EntityPool.GetVehicleByID(value);
+                }
+            }
+        }
+        internal SyncedVehicle CurrentVehicle { get; private set; }
+        internal VehicleSeat Seat;
         public bool IsPlayer { get => OwnerID == ID && ID != 0; }
-        /// <summary>
-        /// real entity
-        /// </summary>
         public Ped MainPed { get; internal set; }
         internal int Health { get; set; }
         internal bool IsInStealthMode { get; set; }
@@ -66,8 +71,8 @@ namespace RageCoop.Client
         internal Vector3 LeftFootPosition { get; set; }
 
         internal byte WeaponTint { get; set; }
-        internal bool _lastEnteringVehicle = false;
-        internal bool _lastSittingInVehicle = false;
+        internal Vehicle _lastVehicle { get; set; }
+        internal int _lastVehicleID { get; set; }
         private bool _lastRagdoll = false;
         private ulong _lastRagdollTime = 0;
         private bool _lastInCover = false;
@@ -75,20 +80,36 @@ namespace RageCoop.Client
         internal byte[] Clothes { get; set; }
 
         internal float Heading { get; set; }
-        // internal Vector3 RotationVelocity { get; set; }
+
+        
+        #region -- VARIABLES --
+        public byte Speed { get; set; }
+        private bool _lastIsJumping = false;
+        internal bool IsJumping { get; set; }
+        internal bool IsOnLadder { get; set; }
+        internal bool IsVaulting { get; set; }
+        internal bool IsInParachuteFreeFall { get; set; }
+        internal bool IsParachuteOpen { get; set; }
+        internal Prop ParachuteProp { get; set; } = null;
+        internal bool IsRagdoll { get; set; }
+        internal bool IsOnFire { get; set; }
+        internal bool IsAiming { get; set; }
+        internal bool IsReloading { get; set; }
+        internal bool IsInCover { get; set; }
+        internal uint CurrentWeaponHash { get; set; }
+        private Dictionary<uint, bool> _lastWeaponComponents = null;
+        internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
+        private int _lastWeaponObj = 0;
+        #endregion
         internal Vector3 AimCoords { get; set; }
 
         private WeaponAsset WeaponAsset { get; set; }
 
         internal override void Update()
         {
+            if (Owner==null) { return; }
             if (IsPlayer)
             {
-                if (Player==null)
-                {
-                    Player = PlayerList.GetPlayer(this);
-                    return;
-                }
                 RenderNameTag();
             }
 
@@ -129,7 +150,7 @@ namespace RageCoop.Client
                     if (IsPlayer)
                     {
                         // Main.Logger.Debug("blip:"+Player.Username);
-                        Main.QueueAction(() => { PedBlip.Name=Player.Username; });
+                        Main.QueueAction(() => { PedBlip.Name=Owner.Username; });
                     }
                     PedBlip.Color=BlipColor;
                     PedBlip.Sprite=BlipSprite;
@@ -178,13 +199,13 @@ namespace RageCoop.Client
                     return;
                 }
             }
-
-            if (MainPed.IsInVehicle()||MainPed.IsGettingIntoVehicle)
+            if (Speed>=4)
             {
                 DisplayInVehicle();
             }
             else
             {
+                if (MainPed.IsInVehicle()) { MainPed.Task.LeaveVehicle(LeaveVehicleFlags.WarpOut); }
                 DisplayOnFoot();
             }
 
@@ -193,7 +214,7 @@ namespace RageCoop.Client
 
         private void RenderNameTag()
         {
-            if (!Player.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Main.PlayerPosition, 40f))
+            if (!Owner.DisplayNameTag || (MainPed==null) || !MainPed.IsVisible || !MainPed.IsInRange(Main.PlayerPosition, 40f))
             {
                 return;
             }
@@ -203,7 +224,7 @@ namespace RageCoop.Client
             if (Util.WorldToScreen(targetPos, ref toDraw))
             {
                 toDraw.Y-=100;
-                new ScaledText(toDraw, Player.Username, 0.4f, GTA.UI.Font.ChaletLondon)
+                new ScaledText(toDraw, Owner.Username, 0.4f, GTA.UI.Font.ChaletLondon)
                 {
                     Outline = true,
                     Alignment = GTA.UI.Alignment.Center,
@@ -290,30 +311,9 @@ namespace RageCoop.Client
             }
             _lastClothes = Clothes;
         }
-        #region ONFOOT
-        #region -- VARIABLES --
-        /// <summary>
-        /// The latest character rotation (may not have been applied yet)
-        /// </summary>
-        public byte Speed { get; set; }
-        private bool _lastIsJumping = false;
-        internal bool IsJumping { get; set; }
-        internal bool IsOnLadder { get; set; }
-        internal bool IsVaulting { get; set; }
-        internal bool IsInParachuteFreeFall { get; set; }
-        internal bool IsParachuteOpen { get; set; }
-        internal Prop ParachuteProp { get; set; } = null;
-        internal bool IsRagdoll { get; set; }
-        internal bool IsOnFire { get; set; }
-        internal bool IsAiming { get; set; }
-        internal bool IsReloading { get; set; }
-        internal bool IsInCover { get; set; }
-        internal uint CurrentWeaponHash { get; set; }
-        private Dictionary<uint, bool> _lastWeaponComponents = null;
-        internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
-        private int _lastWeaponObj = 0;
-        #endregion
 
+
+        #region ONFOOT
         private string[] _currentAnimation = new string[2] { "", "" };
 
         private void DisplayOnFoot()
@@ -667,8 +667,6 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset=Position;
                 return;
             }
-            // var f = dist*(Position+SyncParameters.PositioinPredictionDefault*Velocity-MainPed.Position)+(Velocity-MainPed.Velocity)*0.2f;
-            // if (!localRagdoll) { f*=5; }
             if (!(localRagdoll|| MainPed.IsDead))
             {
                 MainPed.Heading=Heading;
@@ -709,7 +707,6 @@ namespace RageCoop.Client
             {
                 MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
             }
-            // MainPed.ApplyForce(f);
         }
 
         private string LoadAnim(string anim)
@@ -729,18 +726,42 @@ namespace RageCoop.Client
             return anim;
         }
         #endregion
-
         private void DisplayInVehicle()
         {
-            if (MainPed.IsOnTurretSeat())
+            if (CurrentVehicle==null || CurrentVehicle.MainVehicle==null) { return; }
+            switch (Speed)
             {
-                // Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
-                Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                case 4:
+                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle)
+                    {
+                        MainPed.SetIntoVehicle(CurrentVehicle.MainVehicle, Seat);
+                    }
+                    if (MainPed.IsOnTurretSeat())
+                    {
+                        // Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
+                        Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                    }
+                    if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
+                    {
+                        MainPed.VehicleWeapon=(VehicleWeaponHash)CurrentWeaponHash;
+                    }
+                    break;
+                case 5:
+                    if (MainPed.VehicleTryingToEnter!=CurrentVehicle.MainVehicle || MainPed.GetSeatTryingToEnter()!=Seat)
+                    {
+                        MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle,Seat,-1,1,EnterVehicleFlags.AllowJacking);
+                    }
+                    break;
+                case 6:
+                    if (!MainPed.IsTaskActive(TaskType.CTaskExitVehicle))
+                    {
+                        MainPed.Task.LeaveVehicle(CurrentVehicle.Velocity.Length() > 5f ? LeaveVehicleFlags.BailOut:LeaveVehicleFlags.None);
+                    }
+                    break;
             }
-            if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
-            {
-                MainPed.VehicleWeapon=(VehicleWeaponHash)CurrentWeaponHash;
-            }
+
+
+
             /*
             Function.Call(Hash.TASK_SWEEP_AIM_ENTITY,P, "random@paparazzi@pap_anims", "sweep_low", "sweep_med", "sweep_high", -1,V, 1.57f, 0.25f);
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, P,true, 0);

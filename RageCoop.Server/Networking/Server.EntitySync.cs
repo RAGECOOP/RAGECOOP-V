@@ -79,13 +79,7 @@ namespace RageCoop.Server
         {
 
             if (Settings.UseP2P) { return; }
-            foreach (var c in ClientsByNetHandle.Values)
-            {
-                if (c.NetHandle==client.NetHandle) { continue; }
-                NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                packet.Pack(outgoingMessage);
-                MainNetServer.SendMessage(outgoingMessage, c.Connection, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.PedSync);
-            }
+            Forward(packet, client, ConnectionChannel.ProjectileSync);
         }
 
     }
