@@ -101,7 +101,6 @@ namespace RageCoop.Client
                 BrakePower = veh.BrakePower,
             };
             if (v.LastVelocity==default) {v.LastVelocity=packet.Velocity; }
-            packet.Acceleration = (packet.Velocity-v.LastVelocity)*1000/v.LastSentStopWatch.ElapsedMilliseconds;
             v.LastSentStopWatch.Restart();
             v.LastVelocity= packet.Velocity;
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
