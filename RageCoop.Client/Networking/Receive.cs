@@ -416,17 +416,17 @@ namespace RageCoop.Client
             var p = EntityPool.GetProjectileByID(packet.ID);
             if (p==null)
             {
-                
-                if (packet.Exploded) { return; }
+                if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) { return; }
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));
             }
+            p.Flags=packet.Flags;
             p.Position=packet.Position;
             p.Rotation=packet.Rotation;
             p.Velocity=packet.Velocity;
-            p.Hash=(WeaponHash)packet.WeaponHash;
-            p.ShooterID=packet.ShooterID;
-            p.Exploded=packet.Exploded;
+            p.WeaponHash=(WeaponHash)packet.WeaponHash;
+            p.Shooter= packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle) ?
+                (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID) : EntityPool.GetPedByID(packet.ShooterID);
             p.LastSynced=Main.Ticked;
         }
     }

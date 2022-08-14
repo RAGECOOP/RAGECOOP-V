@@ -22,7 +22,7 @@ namespace RageCoop.Core
 
             public Vector3 Velocity { get; set; }
 
-            public bool Exploded { get; set; }
+            public ProjectileDataFlags Flags { get; set; }
 
 
 
@@ -48,7 +48,7 @@ namespace RageCoop.Core
 
                 // Write velocity
                 byteArray.AddVector3(Velocity);
-                byteArray.AddBool(Exploded);
+                byteArray.Add((byte)Flags);
 
                 return byteArray.ToArray();
 
@@ -76,7 +76,7 @@ namespace RageCoop.Core
                 // Read velocity
                 Velocity =reader.ReadVector3();
 
-                Exploded=reader.ReadBoolean();
+                Flags=(ProjectileDataFlags)reader.ReadByte();
 
                 #endregion
             }

@@ -305,6 +305,10 @@ namespace RageCoop.Core
         {
             return (flagToCheck & flag)!=0;
         }
+        public static bool HasProjDataFlag(this ProjectileDataFlags flagToCheck, ProjectileDataFlags flag)
+        {
+            return (flagToCheck & flag)!=0;
+        }
 
         public static bool HasVehFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
         {

@@ -39,7 +39,7 @@ namespace RageCoop.Client
             }
         }
 
-        internal Player Owner { get; private set; }
+        internal virtual Player Owner { get; private set; }
         /// <summary>
         /// 
         /// </summary>

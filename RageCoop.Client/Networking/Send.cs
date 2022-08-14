@@ -164,17 +164,9 @@ namespace RageCoop.Client
         }
         public static void SendProjectile(SyncedProjectile sp)
         {
-            var p = sp.MainProjectile;
-            var packet = SendPackets.ProjectilePacket;
-            packet.ID =sp.ID;
-            packet.ShooterID=sp.ShooterID;
-            packet.Rotation=p.Rotation;
-            packet.Position=p.Position;
-            packet.Velocity=p.Velocity;
-            packet.WeaponHash=(uint)p.WeaponHash;
-            packet.Exploded=p.IsDead;
-            if (p.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
-            SendSync(packet, ConnectionChannel.ProjectileSync);
+            sp.ExtractData(ref SendPackets.ProjectilePacket);
+            if (sp.MainProjectile.IsDead) { EntityPool.RemoveProjectile(sp.ID, "Dead"); }
+            SendSync(SendPackets.ProjectilePacket, ConnectionChannel.ProjectileSync);
         }
 
 

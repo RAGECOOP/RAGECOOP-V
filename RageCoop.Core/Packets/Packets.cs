@@ -97,6 +97,15 @@ namespace RageCoop.Core
         IsInCover = 1 << 10,
         IsFullSync = 1<<15 ,
     }
+
+    internal enum ProjectileDataFlags:byte
+    {
+        None = 0,
+        Exploded = 1 << 0,
+        IsAttached = 1 << 1,
+        IsOrgin = 1 << 2,
+        IsShotByVehicle = 1 << 3,
+    }
     #region ===== VEHICLE DATA =====
     internal enum VehicleDataFlags:ushort
     {

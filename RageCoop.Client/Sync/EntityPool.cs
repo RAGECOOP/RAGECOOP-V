@@ -19,15 +19,15 @@ namespace RageCoop.Client
 #endif
         #region ACTIVE INSTANCES
 
-        private static Dictionary<int, SyncedPed> PedsByID = new Dictionary<int, SyncedPed>();
-        private static Dictionary<int, SyncedPed> PedsByHandle = new Dictionary<int, SyncedPed>();
+        public static Dictionary<int, SyncedPed> PedsByID = new Dictionary<int, SyncedPed>();
+        public static Dictionary<int, SyncedPed> PedsByHandle = new Dictionary<int, SyncedPed>();
 
 
-        private static Dictionary<int, SyncedVehicle> VehiclesByID = new Dictionary<int, SyncedVehicle>();
-        private static Dictionary<int, SyncedVehicle> VehiclesByHandle = new Dictionary<int, SyncedVehicle>();
+        public static Dictionary<int, SyncedVehicle> VehiclesByID = new Dictionary<int, SyncedVehicle>();
+        public static Dictionary<int, SyncedVehicle> VehiclesByHandle = new Dictionary<int, SyncedVehicle>();
 
-        private static Dictionary<int, SyncedProjectile> ProjectilesByID = new Dictionary<int, SyncedProjectile>();
-        private static Dictionary<int, SyncedProjectile> ProjectilesByHandle = new Dictionary<int, SyncedProjectile>();
+        public static Dictionary<int, SyncedProjectile> ProjectilesByID = new Dictionary<int, SyncedProjectile>();
+        public static Dictionary<int, SyncedProjectile> ProjectilesByHandle = new Dictionary<int, SyncedProjectile>();
 
         public static Dictionary<int, SyncedProp> ServerProps = new Dictionary<int, SyncedProp>();
         public static Dictionary<int, Blip> ServerBlips = new Dictionary<int, Blip>();
@@ -62,7 +62,7 @@ namespace RageCoop.Client
 
             foreach (var p in ProjectilesByID.Values)
             {
-                if (p.ShooterID!=Main.LocalPlayerID && p.MainProjectile!=null && p.MainProjectile.Exists())
+                if (p.Shooter.ID!=Main.LocalPlayerID && p.MainProjectile!=null && p.MainProjectile.Exists())
                 {
                     p.MainProjectile.Delete();
                 }
@@ -242,6 +242,10 @@ namespace RageCoop.Client
         public static void Add(SyncedProjectile p)
         {
             if (!p.IsValid) { return; }
+            if (p.WeaponHash==(WeaponHash)VehicleWeaponHash.Tank)
+            {
+                Networking.SendBullet(p.Position, p.Position+p.Velocity, (uint)VehicleWeaponHash.Tank, ((SyncedVehicle)p.Shooter).MainVehicle.Driver.GetSyncEntity().ID);
+            }
             if (ProjectilesByID.ContainsKey(p.ID))
             {
                 ProjectilesByID[p.ID]=p;
@@ -339,12 +343,10 @@ namespace RageCoop.Client
                         if (p.MainProjectile.AttachedEntity==null)
                         {
                             // Prevent projectiles from exploding next to vehicle
-                            if (WeaponUtil.VehicleProjectileWeapons.Contains((VehicleWeaponHash)p.MainProjectile.WeaponHash) &&
-                                p.MainProjectile.WeaponHash != (WeaponHash)VehicleWeaponHash.Tank && p.Origin.DistanceTo(p.MainProjectile.Position) < 2)
+                            if (p.WeaponHash==(WeaponHash)VehicleWeaponHash.Tank )
                             {
                                 continue;
                             }
-
                             Networking.SendProjectile(p);
                         }
                     }

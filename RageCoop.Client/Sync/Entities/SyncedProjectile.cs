@@ -1,61 +1,95 @@
 ﻿using GTA;
 using GTA.Math;
 using RageCoop.Core;
+using GTA.Native;
 
 namespace RageCoop.Client
 {
     internal class SyncedProjectile : SyncedEntity
     {
+        public ProjectileDataFlags Flags { private get; set; }=ProjectileDataFlags.None;
+
+        public readonly Vector3 Origin;
+        private bool _firstSend = false;
+
+
+        public bool IsValid { get; private set; } = true;
+        public new bool IsLocal { get; private set; } = false;
+        public Projectile MainProjectile { get; set; }
+        public SyncedEntity Shooter { get; set; }
+        public bool Exploded => Flags.HasProjDataFlag(ProjectileDataFlags.Exploded);
+
+        /// <summary>
+        /// Invalid property for projectile.
+        /// </summary>
+        private new int OwnerID { set { } }
+
+        internal override Player Owner => Shooter.Owner;
+        public WeaponHash WeaponHash { get; set; }
+        private WeaponAsset Asset { get; set; }
+        public void ExtractData(ref Packets.ProjectileSync p)
+        {
+            p.Position=MainProjectile.Position;
+            p.Velocity=MainProjectile.Velocity;
+            p.Rotation=MainProjectile.Rotation;
+            p.ID=ID;
+            p.ShooterID=Shooter.ID;
+            p.WeaponHash=(uint)MainProjectile.WeaponHash;
+            p.Flags=ProjectileDataFlags.None;
+            if (MainProjectile.IsDead)
+            {
+                p.Flags |= ProjectileDataFlags.Exploded;
+            }
+            if (MainProjectile.AttachedEntity!=null)
+            {
+                p.Flags |= ProjectileDataFlags.IsAttached;
+            }
+            if (Shooter is SyncedVehicle)
+            {
+                p.Flags |= ProjectileDataFlags.IsShotByVehicle;
+            }
+            if (_firstSend)
+            {
+                p.Flags |= ProjectileDataFlags.IsAttached;
+                _firstSend=false;
+            }
+            
+        }
         public SyncedProjectile(Projectile p)
         {
+            var owner = p.OwnerEntity;
+            if (owner==null) { IsValid=false;return; }
             ID=EntityPool.RequestNewID();
             MainProjectile = p;
             Origin=p.Position;
-            var shooter = EntityPool.GetPedByHandle((p.OwnerEntity?.Handle).GetValueOrDefault());
-            if (shooter==null)
+            if(EntityPool.PedsByHandle.TryGetValue(owner.Handle,out var shooter))
             {
-                // Owner will be the vehicle if projectile is shot with a vehicle
-                var shooterVeh = EntityPool.GetVehicleByHandle((p.OwnerEntity?.Handle).GetValueOrDefault());
-                if (shooterVeh!=null && shooterVeh.MainVehicle.Driver!=null)
-                {
-                    shooter=shooterVeh.MainVehicle.Driver?.GetSyncEntity();
-                }
-                else
-                {
-                    Main.Logger.Warning($"Could not find owner for projectile:{Hash}");
-                }
-            }
-            if (shooter != null)
-            {
-                if (shooter.MainPed!=null && (p.AttachedEntity==shooter.MainPed.Weapons.CurrentWeaponObject ||  p.AttachedEntity== shooter.MainPed))
+                if (shooter.MainPed!=null 
+                    && (p.AttachedEntity==shooter.MainPed.Weapons.CurrentWeaponObject 
+                    ||  p.AttachedEntity== shooter.MainPed))
                 {
                     // Reloading
                     IsValid=false;
+                    return;
                 }
-                ShooterID=shooter.ID;
+                Shooter=shooter;
                 IsLocal=shooter.IsLocal;
             }
-
+            else if(EntityPool.VehiclesByHandle.TryGetValue(owner.Handle,out var shooterVeh))
+            {
+                Shooter=shooterVeh;
+                IsLocal=shooterVeh.IsLocal;
+            }
+            else
+            {
+                IsValid=false;
+            }
         }
         public SyncedProjectile(int id)
         {
             ID= id;
             IsLocal=false;
         }
-        public bool IsValid { get; private set; } = true;
-        public new bool IsLocal { get; private set; } = false;
-        public bool Exploded { get; set; } = false;
-        public Projectile MainProjectile { get; set; }
-        public int ShooterID { get; set; }
-        private SyncedPed Shooter { get; set; }
-        public Vector3 Origin { get; set; }
-
-        /// <summary>
-        /// Invalid property for projectile.
-        /// </summary>
-        private new int OwnerID { set { } }
-        public WeaponHash Hash { get; set; }
-        private WeaponAsset Asset { get; set; }
         internal override void Update()
         {
 
@@ -74,19 +108,20 @@ namespace RageCoop.Client
 
         private void CreateProjectile()
         {
-            Asset=new WeaponAsset(Hash);
-            if (!Asset.IsLoaded) { Asset.Request(); }
-            World.ShootBullet(Position, Position+Velocity, (Shooter=EntityPool.GetPedByID(ShooterID))?.MainPed, Asset, 0);
+            Asset=new WeaponAsset(WeaponHash);
+            if (!Asset.IsLoaded) { Asset.Request(); return; }
+            if(Shooter == null) { return; }
+            Entity owner;
+            owner=(Shooter as SyncedPed)?.MainPed ?? (Entity)(Shooter as SyncedVehicle)?.MainVehicle;
+            var end = Position+Velocity;
+            Function.Call(Hash.SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z, end.X, end.Y, end.Z, 0, 1, WeaponHash, owner?.Handle ?? 0, 1, 0, -1,owner);
             var ps = World.GetAllProjectiles();
             MainProjectile=ps[ps.Length-1];
-            if (Hash==(WeaponHash)VehicleWeaponHash.Tank)
-            {
-                var v = Shooter?.MainPed?.CurrentVehicle;
-                if (v!=null)
-                {
-                    World.CreateParticleEffectNonLooped(SyncEvents.CorePFXAsset, "muz_tank", v.Bones[v.GetMuzzleIndex()].Position, v.Bones[35].ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
-                }
-            }
+            MainProjectile.IsCollisionEnabled=false;
+            MainProjectile.Position=Position;
+            MainProjectile.Rotation =Rotation;
+            MainProjectile.Velocity=Velocity;
+            Main.Delay(()=>MainProjectile.IsCollisionEnabled=true, 100);
             EntityPool.Add(this);
         }
     }
