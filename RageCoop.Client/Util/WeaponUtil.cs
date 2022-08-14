@@ -2,6 +2,7 @@
 using GTA.Math;
 using GTA.Native;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace RageCoop.Client
 {
@@ -73,132 +74,123 @@ namespace RageCoop.Client
             */
         }
 
-        public static MuzzleInfo GetMuzzleInfo(this Vehicle v)
+        public static int GetMuzzleIndex(this Vehicle v)
         {
             BulletsShot++;
-            int i;
             switch (v.Model.Hash)
             {
                 // JB7002
                 case 394110044:
-                    i=BulletsShot%2==0 ? 54 : 53;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 54 : 53;
 
                 // DOMINATOR5
                 case -1375060657:
-                    i=BulletsShot%2==0 ? 35 : 36;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
-
-
+                    return BulletsShot%2==0 ? 35 : 36;
 
                 // IMPALER3
                 case -1924800695:
-                    i=BulletsShot%2==0 ? 75 : 76;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
-
+                    return BulletsShot%2==0 ? 75 : 76;
 
 
                 // IMPERATOR2
                 case 1637620610:
-                    i=BulletsShot%2==0 ? 97 : 99;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
-
+                    return BulletsShot%2==0 ? 97 : 99;
 
 
                 // SLAMVAN5
                 case 373261600:
-                    i=BulletsShot%2==0 ? 51 : 53;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 51 : 53;
+
 
                 // RUINER2
                 case 941494461:
-                    i=BulletsShot%2==0 ? 65 : 66;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 65 : 66;
+
 
                 // TAMPA3
                 case -1210451983:
-                    return new MuzzleInfo(v.Bones[87].Position, v.Bones[87].ForwardVector);
+                    return 87;
 
                 // SCRAMJET
                 case -638562243:
-                    i=BulletsShot%2==0 ? 44 : 45;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 44 : 45;
+
 
                 // VIGILANTE
                 case -1242608589:
-                    i=BulletsShot%2==0 ? 42 : 43;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 42 : 43;
+
 
                 // ZR380
                 case 540101442:
-                    i=BulletsShot%2==0 ? 57 : 63;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 57 : 63;
+
 
                 // ZR3802
                 case -1106120762:
-                    i=BulletsShot%2==0 ? 57 : 63;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 57 : 63;
+
 
                 // ZR3803
                 case -1478704292:
-                    i=BulletsShot%2==0 ? 53 : 59;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 53 : 59;
+
 
                 // STROMBERG
                 case 886810209:
-                    i=BulletsShot%2==0 ? 85 : 84;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 85 : 84;
+
 
                 // SLAMVAN4
                 case -2061049099:
-                    i=BulletsShot%2==0 ? 76 : 78;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 76 : 78;
+
 
                 // IMPERATOR
                 case 444994115:
-                    i=BulletsShot%2==0 ? 88 : 86;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 88 : 86;
+
 
                 // IMPALER2
                 case 1009171724:
-                    i=BulletsShot%2==0 ? 63 : 64;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 63 : 64;
+
 
                 // DOMINATOR4
                 case -688189648:
-                    i=BulletsShot%2==0 ? 59 : 60;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 59 : 60;
+
 
                 // SAVAGE
                 case -82626025:
-                    return new MuzzleInfo(v.Bones[30].Position, v.Bones[30].ForwardVector);
+                    return 30;
 
                 // BUZZARD
                 case 788747387:
-                    i=BulletsShot%2==0 ? 28 : 23;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 28 : 23;
+
 
                 // ANNIHL
                 case 837858166:
-                    i=(int)BulletsShot%4+35;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return (int)BulletsShot%4+35;
+
 
                 // HYDRA
                 case 970385471:
-                    i=BulletsShot%2==0 ? 29 : 28;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 29 : 28;
+
 
                 // STARLING
                 case -1700874274:
-                    i=BulletsShot%2==0 ? 24 : 12;
-                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                    return BulletsShot%2==0 ? 24 : 12;
+
 
                 // RHINO
                 case 782665360:
-                    return new MuzzleInfo(v.Bones[35].Position, v.Bones[35].ForwardVector);
+                    return 30;
 
                 default:
-                    return null;
+                    return -1;
             }
         }
 
@@ -315,5 +307,71 @@ namespace RageCoop.Client
             (VehicleWeaponHash)3565779982, // STROMBERG missiles
             (VehicleWeaponHash)3169388763, // SCRAMJET missiles
         };
+        public static string GetFlashFX(this WeaponHash w)
+        {
+            switch (w.GetWeaponGroup())
+            {
+                case WeaponGroup.SMG:
+                    return "muz_smg";
+
+                case WeaponGroup.Shotgun:
+                    return "muz_smg";
+
+                case WeaponGroup.AssaultRifle:
+                    return "muz_assault_rifle";
+
+                case WeaponGroup.Pistol:
+                    return "muz_pistol";
+
+                case WeaponGroup.Stungun:
+                    return "muz_stungun";
+
+                case WeaponGroup.Heavy:
+                    switch (w)
+                    {
+                        case WeaponHash.Minigun:
+                            return "muz_minigun";
+
+                        case WeaponHash.RPG:
+                            return "muz_rpg";
+
+                        default:
+                            return "muz_minigun";
+                    }
+                case WeaponGroup.Sniper:
+                    return "muz_alternate_star";
+
+                case WeaponGroup.PetrolCan:
+                    return "weap_petrol_can";
+
+                case WeaponGroup.FireExtinguisher:
+                    return "weap_extinguisher";
+            }
+            switch ((VehicleWeaponHash)w)
+            {
+                case VehicleWeaponHash.Tank:
+                    return "muz_tank";
+
+                case VehicleWeaponHash.PlayerBuzzard:
+                    return "muz_buzzard";
+            }
+            return "muz_assault_rifle";
+        }
+        public static WeaponGroup GetWeaponGroup(this WeaponHash hash)
+        {
+            return Function.Call<WeaponGroup>(Hash.GET_WEAPONTYPE_GROUP, hash);
+        }
+    }
+    class WeaponInfo
+    {
+        public string Name;
+        public string MuzzleFx;
+    }
+    public class AimingInfo
+    {
+        public string Name;
+        public float HeadingLimit;
+        public float SweepPitchMin;
+        public float SweepPitchMax;
     }
 }

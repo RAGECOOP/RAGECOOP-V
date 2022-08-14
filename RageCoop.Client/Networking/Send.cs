@@ -179,7 +179,7 @@ namespace RageCoop.Client
 
 
         #region SYNC EVENTS
-        public static void SendBulletShot(Vector3 start, Vector3 end, uint weapon, int ownerID)
+        public static void SendBullet(Vector3 start, Vector3 end, uint weapon, int ownerID)
         {
             SendSync(new Packets.BulletShot()
             {
@@ -188,6 +188,17 @@ namespace RageCoop.Client
                 OwnerID = ownerID,
                 WeaponHash=weapon,
             }, ConnectionChannel.SyncEvents);
+        }
+        public static void SendVehicleBullet(uint hash,SyncedPed owner,EntityBone b)
+        {
+            SendSync(new Packets.VehicleBulletShot
+            {
+                StartPosition = b.Position,
+                EndPosition = b.Position+b.ForwardVector,
+                OwnerID=owner.ID,
+                Bone=(ushort)b.Index,
+                WeaponHash=hash
+            });
         }
         #endregion
         public static void SendChatMessage(string message)

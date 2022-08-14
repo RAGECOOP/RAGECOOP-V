@@ -84,7 +84,7 @@ namespace RageCoop.Client
                 var v = Shooter?.MainPed?.CurrentVehicle;
                 if (v!=null)
                 {
-                    World.CreateParticleEffectNonLooped(SyncEvents.CorePFXAsset, "muz_tank", v.GetMuzzleInfo().Position, v.Bones[35].ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
+                    World.CreateParticleEffectNonLooped(SyncEvents.CorePFXAsset, "muz_tank", v.Bones[v.GetMuzzleIndex()].Position, v.Bones[35].ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
                 }
             }
             EntityPool.Add(this);

@@ -47,8 +47,8 @@ namespace RageCoop.Core
 
         PedKilled=30,
         BulletShot=31,
-        OwnerChanged=35,
-        VehicleBulletShot = 36,
+        VehicleBulletShot = 32,
+        OwnerChanged =35,
         NozzleTransform=37,
 
         #endregion

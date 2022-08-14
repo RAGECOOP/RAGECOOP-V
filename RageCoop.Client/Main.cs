@@ -41,6 +41,7 @@ namespace RageCoop.Client
         internal static Scripting.Resources Resources = null;
         private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
         public static Worker Worker;
+
         /// <summary>
         /// Don't use it!
         /// </summary>
@@ -101,7 +102,14 @@ namespace RageCoop.Client
             Util.NativeMemory();
             Counter.Restart();
         }
-        
+
+        string hash(string t)
+        {
+            unchecked
+            {
+                return "0x"+((uint)Game.GenerateHash(t)).ToString("X");
+            }
+        }
 #if DEBUG
 #endif
         public static Ped P;

@@ -4,6 +4,7 @@ using RageCoop.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Lidgren.Network;
 
 namespace RageCoop.Client
 {
@@ -22,7 +23,7 @@ namespace RageCoop.Client
             {
                 ID= vehicleID,
                 NewOwnerID= newOwnerID,
-            }, ConnectionChannel.SyncEvents);
+            }, ConnectionChannel.SyncEvents,NetDeliveryMethod.ReliableOrdered);
 
         }
 
@@ -38,24 +39,29 @@ namespace RageCoop.Client
                 // Reduce latency
                 start=impactPosition-(impactPosition-start).Normalized*10;
             }
-            Networking.SendBulletShot(start, impactPosition, hash, owner.ID);
+            Networking.SendBullet(start, impactPosition, hash, owner.ID);
         }
 
         public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
         {
+
+            int i;
             // ANNIHL
             if (veh.Model.Hash==837858166)
             {
-                Networking.SendBulletShot(veh.Bones[35].Position, veh.Bones[35].Position+veh.Bones[35].ForwardVector, hash, owner.ID);
-                Networking.SendBulletShot(veh.Bones[36].Position, veh.Bones[36].Position+veh.Bones[36].ForwardVector, hash, owner.ID);
-                Networking.SendBulletShot(veh.Bones[37].Position, veh.Bones[37].Position+veh.Bones[37].ForwardVector, hash, owner.ID);
-                Networking.SendBulletShot(veh.Bones[38].Position, veh.Bones[38].Position+veh.Bones[38].ForwardVector, hash, owner.ID);
-                return;
+                Networking.SendVehicleBullet(hash, owner, veh.Bones[35]);
+                Networking.SendVehicleBullet(hash, owner, veh.Bones[36]);
+                Networking.SendVehicleBullet(hash, owner, veh.Bones[37]);
+                Networking.SendVehicleBullet(hash, owner, veh.Bones[38]);
             }
-
-            var info = veh.GetMuzzleInfo();
-            if (info==null) { Main.Logger.Warning($"Failed to get muzzle info for vehicle:{veh.DisplayName}"); return; }
-            Networking.SendBulletShot(info.Position, info.Position+info.ForawardVector, hash, owner.ID);
+            else if((i = veh.GetMuzzleIndex())!=-1)
+            {
+                Networking.SendVehicleBullet(hash, owner, veh.Bones[i]);
+            }
+            else
+            {
+                Main.Logger.Warning($"Failed to get muzzle info for vehicle:{veh.DisplayName}");
+            }
         }
         public static void TriggerNozzleTransform(int vehID, bool hover)
         {
@@ -81,10 +87,8 @@ namespace RageCoop.Client
             if (v==null) { return; }
             v.OwnerID=p.NewOwnerID;
             v.LastSynced=Main.Ticked;
-            v.LastFullSynced=Main.Ticked;
             v.Position=v.MainVehicle.Position;
             v.Quaternion=v.MainVehicle.Quaternion;
-            // So this vehicle doesn's get re-spawned
         }
         private static void HandleNozzleTransform(Packets.NozzleTransform p)
         {
@@ -144,13 +148,19 @@ namespace RageCoop.Client
                 }
                 else
                 {
-                    World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_assault_rifle", p.GetMuzzlePosition(), w.Rotation, 1);
+                    World.CreateParticleEffectNonLooped(CorePFXAsset, WeaponUtil.GetFlashFX((WeaponHash)weaponHash), p.GetMuzzlePosition(), w.Rotation, 1);
                 }
             }
-            else if (p.VehicleWeapon!=VehicleWeaponHash.Invalid && p.VehicleWeapon == VehicleWeaponHash.Tank)
-            {
-                World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_tank", p.CurrentVehicle.GetMuzzleInfo().Position, p.CurrentVehicle.Bones[35].ForwardVector.ToEulerRotation(p.CurrentVehicle.Bones[35].UpVector), 1);
-            }
+        }
+        public static void HandleVehicleBulletShot(Packets.VehicleBulletShot p)
+        {
+            HandleBulletShot(p.StartPosition,p.EndPosition,p.WeaponHash,p.OwnerID);
+            var v = EntityPool.GetPedByID(p.OwnerID)?.MainPed.CurrentVehicle;
+            if(v == null) { return; }
+            var b = v.Bones[p.Bone];
+            World.CreateParticleEffectNonLooped(CorePFXAsset, 
+                WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash),
+                b.Position,b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector),1);
         }
         public static void HandleEvent(PacketType type, byte[] data)
         {
@@ -161,6 +171,11 @@ namespace RageCoop.Client
                         Packets.BulletShot p = new Packets.BulletShot();
                         p.Deserialize(data);
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
+                        break;
+                    }
+                case PacketType.VehicleBulletShot:
+                    {
+                        HandleVehicleBulletShot(data.GetPacket<Packets.VehicleBulletShot>());
                         break;
                     }
                 case PacketType.OwnerChanged:
