@@ -79,7 +79,7 @@ namespace RageCoop.Client
                                     Main.MainChat.Init();
                                     if (Main.Settings.Voice && !Sync.Voice.WasInitialized())
                                     {
-                                        Sync.Voice.InitRecording();
+                                        Sync.Voice.Init();
                                     }
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 });
@@ -95,7 +95,7 @@ namespace RageCoop.Client
                                 if (PlayerList.Players.TryGetValue(p.ID,out var player))
                                 {
                                     player.Connection=message.SenderConnection;
-                                    Main.Logger.Debug($"Direct connectionn to {player.Username} established");
+                                    Main.Logger.Debug($"Direct connection to {player.Username} established");
                                 }
                                 else
                                 {
