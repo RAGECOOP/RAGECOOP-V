@@ -1,15 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using GTA;
+﻿using GTA;
 using GTA.Native;
-using System.Threading.Tasks;
 
 namespace RageCoop.Client
 {
     public partial class SyncedPed
     {
+        private void DisplaySpeaking(bool speaking)
+        {
+            if (MainPed == null || !MainPed.Exists() || !MainPed.IsHuman)
+                return;
+
+            if (speaking)
+            {
+                Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mic_chatter", "mp_facial");
+                return;
+            }
+
+            switch (MainPed.Gender)
+            {
+                case Gender.Male:
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@gen_male@variations@normal");
+                    break;
+                case Gender.Female:
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@gen_female@variations@normal");
+                    break;
+                default:
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@mime@variations@normal");
+                    break;
+            }
+        }
 
         private void DisplayInCover()
         {

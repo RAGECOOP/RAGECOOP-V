@@ -272,6 +272,10 @@ namespace RageCoop.Client
 
                             Main.QueueAction(() =>
                             {
+                                SyncedPed player = EntityPool.GetPedByID(packet.ID);
+                                player.IsSpeaking = true;
+                                player.LastSpeakingTime = Main.Ticked;
+
                                 Sync.Voice.AddVoiceData(packet.Buffer, packet.Recorded);
                             });
                         }

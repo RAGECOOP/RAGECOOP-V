@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace RageCoop.Client
 {
@@ -80,6 +81,8 @@ namespace RageCoop.Client
 
         internal float Heading { get; set; }
 
+        internal ulong LastSpeakingTime { get; set; } = 0;
+        internal bool IsSpeaking { get; set; } = false;
         
         #region -- VARIABLES --
         public byte Speed { get; set; }
@@ -212,6 +215,21 @@ namespace RageCoop.Client
             {
                 if (MainPed.IsInVehicle()) { MainPed.Task.LeaveVehicle(LeaveVehicleFlags.WarpOut); }
                 DisplayOnFoot();
+            }
+
+            if (IsSpeaking)
+            {
+                if (Main.Ticked - LastSpeakingTime < 10)
+                {
+                    DisplaySpeaking(true);
+                }
+                else
+                {
+                    DisplaySpeaking(false);
+
+                    IsSpeaking = false;
+                    LastSpeakingTime = 0;
+                }
             }
 
             LastUpdated=Main.Ticked;

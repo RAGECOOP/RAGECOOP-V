@@ -201,7 +201,7 @@ namespace RageCoop.Client
         }
         public static void SendVoiceMessage(byte[] buffer, int recorded)
         {
-            SendSync(new Packets.Voice() { Buffer = buffer, Recorded = recorded }, ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
+            SendSync(new Packets.Voice() { ID = Main.LocalPlayerID, Buffer = buffer, Recorded = recorded }, ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
         }
     }
 }
