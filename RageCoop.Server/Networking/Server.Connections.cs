@@ -105,6 +105,7 @@ namespace RageCoop.Server
                         InternalEndPoint=packet.InternalEndPoint,
                     }
                 );
+                player.Owner=tmpClient;
                 ClientsByName.Add(packet.Username.ToLower(), tmpClient);
                 ClientsByID.Add(player.ID, tmpClient);
                 if (ClientsByNetHandle.Count==1)
