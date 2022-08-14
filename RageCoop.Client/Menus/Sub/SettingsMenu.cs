@@ -17,7 +17,7 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
         private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableTraffic);
-        private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable/Disable the voice", Main.Settings.Voice);
+        private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable voice", "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends", Main.Settings.Voice);
         
         private static NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
         private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
@@ -47,9 +47,12 @@ namespace RageCoop.Client.Menus
 
         private static void DisableVoiceCheckboxChanged(object sender, EventArgs e)
         {
-            if (_disableVoice.Checked && !Sync.Voice.WasInitialized())
+            if (_disableVoice.Checked)
             {
-                Sync.Voice.InitRecording();
+                if (Networking.IsOnServer && !Sync.Voice.WasInitialized())
+                {
+                    Sync.Voice.Init();
+                }
             } else {
                 Sync.Voice.ClearAll();
             }

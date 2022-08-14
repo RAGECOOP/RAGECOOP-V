@@ -204,7 +204,7 @@ namespace RageCoop.Client
                         Sync.Voice.StartRecording();
                         return;
                     }
-                    else if (Sync.Voice.IsRecording)
+                    else if (Sync.Voice.IsRecording())
                     {
                         Sync.Voice.StopRecording();
                         return;
