@@ -67,8 +67,6 @@ namespace RageCoop.Client.Menus
                 Directory.CreateDirectory(@"Scripts\RageCoop");
                 foreach(var f in Directory.GetFiles(@"Scripts\RageCoop", "*.dll", SearchOption.AllDirectories))
                 {
-                    Main.QueueAction(() =>
-                    GTA.UI.Notification.Show(f));
                     try { File.Delete(f); }
                     catch { }
                 }
