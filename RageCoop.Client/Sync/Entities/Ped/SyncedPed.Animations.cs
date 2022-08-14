@@ -7,7 +7,7 @@ namespace RageCoop.Client
     {
         private void DisplaySpeaking(bool speaking)
         {
-            if (MainPed == null || !MainPed.Exists() || !MainPed.IsHuman)
+            if (!MainPed.IsHuman)
                 return;
 
             if (speaking)
