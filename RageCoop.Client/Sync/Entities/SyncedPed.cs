@@ -667,7 +667,7 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset=Position;
                 return;
             }
-            if (!(localRagdoll|| MainPed.IsDead))
+            if (!(localRagdoll || MainPed.IsDead || IsAiming))
             {
                 MainPed.Heading=Heading;
                 MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());

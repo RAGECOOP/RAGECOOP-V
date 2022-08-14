@@ -103,13 +103,6 @@ namespace RageCoop.Client
             Counter.Restart();
         }
 
-        string hash(string t)
-        {
-            unchecked
-            {
-                return "0x"+((uint)Game.GenerateHash(t)).ToString("X");
-            }
-        }
 #if DEBUG
 #endif
         public static Ped P;
@@ -117,7 +110,6 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
-
             if (Game.IsLoading)
             {
                 return;
@@ -137,6 +129,7 @@ namespace RageCoop.Client
             // GTA.UI.Screen.ShowHelpTextThisFrame(P.GetPedSpeed().ToString());
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
+            GTA.UI.Screen.ShowHelpTextThisFrame(P.Heading.ToString());
 
             DoQueuedActions();
             if (!Networking.IsOnServer)
