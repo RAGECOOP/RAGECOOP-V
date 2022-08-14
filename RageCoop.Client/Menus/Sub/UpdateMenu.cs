@@ -64,8 +64,11 @@ namespace RageCoop.Client.Menus
                 {
                     _updatingItem.AltTitle="Installing...";
                 });
-                foreach(var f in Directory.GetFiles(Directory.GetParent(typeof(Main).Assembly.Location).FullName, "*.dll", SearchOption.AllDirectories))
+                Directory.CreateDirectory(@"Scripts\RageCoop");
+                foreach(var f in Directory.GetFiles(@"Scripts\RageCoop", "*.dll", SearchOption.AllDirectories))
                 {
+                    Main.QueueAction(() =>
+                    GTA.UI.Notification.Show(f));
                     try { File.Delete(f); }
                     catch { }
                 }
