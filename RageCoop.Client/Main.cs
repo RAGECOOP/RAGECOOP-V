@@ -126,10 +126,8 @@ namespace RageCoop.Client
 #endif
 
             P= Game.Player.Character;
-            // GTA.UI.Screen.ShowHelpTextThisFrame(P.GetPedSpeed().ToString());
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
-            GTA.UI.Screen.ShowHelpTextThisFrame(P.Heading.ToString());
 
             DoQueuedActions();
             if (!Networking.IsOnServer)

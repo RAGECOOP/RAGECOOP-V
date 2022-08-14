@@ -672,7 +672,7 @@ namespace RageCoop.Client
                 MainPed.Heading=Heading;
                 MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
             }
-            else if (Main.Ticked-_lastRagdollTime<30)
+            else if (Main.Ticked-_lastRagdollTime<10)
             {
                 return;
             }
