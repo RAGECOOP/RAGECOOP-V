@@ -39,9 +39,7 @@ RAGECOOP brings multiplayer experience to the story mode, you can complete missi
 
 # Known issues
 
-1. Weapon sounds are missing.
-2. Cover sync is still buggy.
-3. Framerate drop with high number of synchronized entities.
+See [Bugs](https://github.com/RAGECOOP/RAGECOOP-V/issues/33)
 
 
 ## Installation
