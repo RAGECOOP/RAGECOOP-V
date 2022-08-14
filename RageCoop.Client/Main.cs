@@ -101,7 +101,7 @@ namespace RageCoop.Client
             Util.NativeMemory();
             Counter.Restart();
         }
-
+        
 #if DEBUG
 #endif
         public static Ped P;
@@ -109,7 +109,7 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
-            
+
             if (Game.IsLoading)
             {
                 return;
@@ -284,7 +284,8 @@ namespace RageCoop.Client
             Sync.Voice.ClearAll();
             EntityPool.Cleanup();
             PlayerList.Cleanup();
-            Main.LocalPlayerID=default;
+            LocalPlayerID=default;
+            WorldThread.Traffic(true);
         }
         private static void DoQueuedActions()
         {

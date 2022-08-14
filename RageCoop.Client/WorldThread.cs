@@ -91,7 +91,7 @@ namespace RageCoop.Client
             _lastDisableTraffic = Main.Settings.DisableTraffic;
         }
 
-        private void Traffic(bool enable)
+        public static void Traffic(bool enable)
         {
             if (enable)
             {
