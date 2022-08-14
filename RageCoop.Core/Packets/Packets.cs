@@ -95,6 +95,9 @@ namespace RageCoop.Core
         IsOnLadder = 1 << 8,
         IsVaulting = 1 << 9,
         IsInCover = 1 << 10,
+        IsInLowCover = 1 << 11,
+        IsInCoverFacingLeft = 1 << 12,
+        IsBlindFiring = 1 << 13,
         IsFullSync = 1<<15 ,
     }
 

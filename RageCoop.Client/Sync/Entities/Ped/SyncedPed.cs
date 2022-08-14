@@ -13,7 +13,7 @@ namespace RageCoop.Client
     /// <summary>
     /// ?
     /// </summary>
-    public class SyncedPed : SyncedEntity
+    public partial class SyncedPed : SyncedEntity
     {
         #region CONSTRUCTORS
 
@@ -64,7 +64,6 @@ namespace RageCoop.Client
         public bool IsPlayer { get => OwnerID == ID && ID != 0; }
         public Ped MainPed { get; internal set; }
         internal int Health { get; set; }
-        internal bool IsInStealthMode { get; set; }
 
         internal Vector3 HeadPosition { get; set; }
         internal Vector3 RightFootPosition { get; set; }
@@ -85,17 +84,23 @@ namespace RageCoop.Client
         #region -- VARIABLES --
         public byte Speed { get; set; }
         private bool _lastIsJumping = false;
-        internal bool IsJumping { get; set; }
-        internal bool IsOnLadder { get; set; }
-        internal bool IsVaulting { get; set; }
-        internal bool IsInParachuteFreeFall { get; set; }
-        internal bool IsParachuteOpen { get; set; }
+        internal PedDataFlags Flags;
+
+        internal bool IsAiming => Flags.HasPedFlag(PedDataFlags.IsAiming);
+        internal bool IsReloading => Flags.HasPedFlag(PedDataFlags.IsReloading);
+        internal bool IsJumping => Flags.HasPedFlag(PedDataFlags.IsJumping);
+        internal bool IsRagdoll => Flags.HasPedFlag(PedDataFlags.IsRagdoll);
+        internal bool IsOnFire => Flags.HasPedFlag(PedDataFlags.IsOnFire);
+        internal bool IsInParachuteFreeFall => Flags.HasPedFlag(PedDataFlags.IsInParachuteFreeFall);
+        internal bool IsParachuteOpen => Flags.HasPedFlag(PedDataFlags.IsParachuteOpen);
+        internal bool IsOnLadder => Flags.HasPedFlag(PedDataFlags.IsOnLadder);
+        internal bool IsVaulting => Flags.HasPedFlag(PedDataFlags.IsVaulting);
+        internal bool IsInCover => Flags.HasPedFlag(PedDataFlags.IsInCover);
+        internal bool IsInLowCover => Flags.HasPedFlag(PedDataFlags.IsInLowCover);
+        internal bool IsInCoverFacingLeft => Flags.HasPedFlag(PedDataFlags.IsInCoverFacingLeft);
+        internal bool IsBlindFiring => Flags.HasPedFlag(PedDataFlags.IsBlindFiring);
+        internal bool IsInStealthMode => Flags.HasPedFlag(PedDataFlags.IsInStealthMode);
         internal Prop ParachuteProp { get; set; } = null;
-        internal bool IsRagdoll { get; set; }
-        internal bool IsOnFire { get; set; }
-        internal bool IsAiming { get; set; }
-        internal bool IsReloading { get; set; }
-        internal bool IsInCover { get; set; }
         internal uint CurrentWeaponHash { get; set; }
         private Dictionary<uint, bool> _lastWeaponComponents = null;
         internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
@@ -286,6 +291,10 @@ namespace RageCoop.Client
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_AvoidTearGas, false);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_IgnoreBeingOnFire, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableEvasiveDives, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisablePanicInVehicle, true);
+            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_BlockNonTemporaryEvents, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableShockingEvents, true);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
 
@@ -318,6 +327,8 @@ namespace RageCoop.Client
 
         private void DisplayOnFoot()
         {
+
+            MainPed.Task.ClearAll();
             CheckCurrentWeapon();
             if (IsInParachuteFreeFall)
             {
@@ -418,7 +429,7 @@ namespace RageCoop.Client
                 SmoothTransition();
                 return;
             }
-            if (!IsOnLadder && MainPed.IsTaskActive(TaskType.CTaskGoToAndClimbLadder))
+            else if (MainPed.IsTaskActive(TaskType.CTaskGoToAndClimbLadder))
             {
                 MainPed.Task.ClearAllImmediately();
                 _currentAnimation[1] = "";
@@ -474,12 +485,6 @@ namespace RageCoop.Client
                     _lastRagdoll = true;
                     _lastRagdollTime=Main.Ticked;
                 }
-                /*
-                if((Main.Ticked-_lastRagdollTime>30)&&((Position.DistanceTo(MainPed.Position)>2)||MainPed.Velocity.Length()<3f))
-                {
-                    MainPed.ApplyForce((Position-MainPed.Position)*0.2f, (RotationVelocity-MainPed.RotationVelocity)*0.1f);
-
-                }*/
                 return;
             }
             else
@@ -712,22 +717,9 @@ namespace RageCoop.Client
             }
         }
 
-        private string LoadAnim(string anim)
-        {
-            ulong startTime = Util.GetTickCount64();
 
-            while (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
-            {
-                Script.Yield();
-                Function.Call(Hash.REQUEST_ANIM_DICT, anim);
-                if (Util.GetTickCount64() - startTime >= 1000)
-                {
-                    break;
-                }
-            }
 
-            return anim;
-        }
+
         #endregion
         private void DisplayInVehicle()
         {

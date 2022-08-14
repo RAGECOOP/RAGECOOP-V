@@ -140,7 +140,18 @@ namespace RageCoop.Client
 
             if (ped.IsInCover || ped.IsGoingIntoCover)
             {
-                flags |=PedDataFlags.IsInCover;
+                flags |= PedDataFlags.IsInCover;
+                if (ped.IsInCoverFacingLeft)
+                {
+                    flags |=PedDataFlags.IsInCover;
+                }
+                if (!Function.Call<bool>(Hash.IS_PED_IN_HIGH_COVER, ped)){
+                    flags|=PedDataFlags.IsInLowCover;
+                }
+                if (ped.IsTaskActive(TaskType.CTaskAimGunBlindFire))
+                {
+                    flags|=PedDataFlags.IsBlindFiring;
+                }
             }
 
             if (Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped))

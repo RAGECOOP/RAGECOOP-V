@@ -330,17 +330,7 @@ namespace RageCoop.Client
             c.Rotation = packet.Rotation;
             c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
-            c.IsAiming = flags.HasPedFlag(PedDataFlags.IsAiming);
-            c.IsReloading = flags.HasPedFlag(PedDataFlags.IsReloading);
-            c.IsJumping = flags.HasPedFlag(PedDataFlags.IsJumping);
-            c.IsRagdoll = flags.HasPedFlag(PedDataFlags.IsRagdoll);
-            c.IsOnFire = flags.HasPedFlag(PedDataFlags.IsOnFire);
-            c.IsInParachuteFreeFall = flags.HasPedFlag(PedDataFlags.IsInParachuteFreeFall);
-            c.IsParachuteOpen = flags.HasPedFlag(PedDataFlags.IsParachuteOpen);
-            c.IsOnLadder = flags.HasPedFlag(PedDataFlags.IsOnLadder);
-            c.IsVaulting = flags.HasPedFlag(PedDataFlags.IsVaulting);
-            c.IsInCover = flags.HasPedFlag(PedDataFlags.IsInCover);
-            c.IsInStealthMode = flags.HasPedFlag(PedDataFlags.IsInStealthMode);
+            c.Flags=packet.Flags;
             c.Heading=packet.Heading;
             c.Position = packet.Position;
             if (c.IsRagdoll)
