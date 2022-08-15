@@ -79,6 +79,11 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // CHAMPION
+                case -915234475:
+                    return BulletsShot%2==0 ? 60 : 61;
+
+
                 // MONSTER4
                 case 840387324:
                     return BulletsShot%2==0 ? 63 : 65;
