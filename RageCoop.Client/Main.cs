@@ -110,6 +110,21 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
+            P= Game.Player.Character;
+            PlayerPosition=P.ReadPosition();
+            FPS=Game.FPS;
+            /*
+            try
+            {
+                P.CurrentVehicle.Passengers[0].Delete();
+            }
+            catch { }
+            var p = P.CurrentVehicle.CreateRandomPedOnSeat(VehicleSeat.Passenger);
+            p.Weapons.Current.InfiniteAmmoClip = true;
+            p.Weapons.Give(WeaponHash.MicroSMG, 100, true, true);
+            // Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, p, 0, 0, 0f, 0f, 0f);
+            Function.Call(Hash.TASK_DRIVE_BY, p, 0, 0, 0f, 0f, 0f, 0, 0, 1, unchecked((int)FiringPattern.FullAuto));
+            */
             if (Game.IsLoading)
             {
                 return;
@@ -125,9 +140,6 @@ namespace RageCoop.Client
             CoopMenu.MenuPool.Process();
 #endif
 
-            P= Game.Player.Character;
-            PlayerPosition=P.ReadPosition();
-            FPS=Game.FPS;
 
             DoQueuedActions();
             if (!Networking.IsOnServer)
@@ -184,11 +196,22 @@ namespace RageCoop.Client
             {
                 Scripting.API.Events.InvokePlayerDied();
             }
+            
             _lastDead=P.IsDead;
             Ticked++;
         }
+        float p1;
+        float p2;
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode==Keys.Right)
+            {
+                p1+=0.05f;
+            }
+            if (e.KeyCode==Keys.Up)
+            {
+                p2+=0.05f;
+            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);

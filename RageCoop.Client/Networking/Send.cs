@@ -78,7 +78,8 @@ namespace RageCoop.Client
             sp.LastSentStopWatch.Restart();
             if (full)
             {
-                p.CurrentWeaponHash = p.Speed>=4 ? (uint)ped.VehicleWeapon : (uint)ped.Weapons.Current.Hash;
+                var w = ped.VehicleWeapon;
+                p.CurrentWeaponHash = (w!=VehicleWeaponHash.Invalid)? (uint)w:(uint)ped.Weapons.Current.Hash;
                 p.Flags |= PedDataFlags.IsFullSync;
                 p.Clothes=ped.GetPedClothes();
                 p.ModelHash=ped.Model.Hash;

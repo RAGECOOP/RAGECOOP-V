@@ -345,7 +345,6 @@ namespace RageCoop.Client
         private void DisplayOnFoot()
         {
 
-            MainPed.Task.ClearAll();
             CheckCurrentWeapon();
             if (IsInParachuteFreeFall)
             {
@@ -632,6 +631,7 @@ namespace RageCoop.Client
         private bool LastMoving;
         private void WalkTo()
         {
+            MainPed.Task.ClearAll();
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
             Vector3 predictPosition = Position + (Position - MainPed.ReadPosition()) + Velocity * 0.5f;
             float range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
@@ -753,7 +753,38 @@ namespace RageCoop.Client
                         // Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
                         Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
                     }
-                    if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
+                    if (MainPed.VehicleWeapon==VehicleWeaponHash.Invalid)
+                    {
+                        // World.DrawMarker(MarkerType.DebugSphere,AimCoords,default,default,new Vector3(0.2f,0.2f,0.2f),Color.AliceBlue);
+                        CheckCurrentWeapon();
+                        if (IsAiming)
+                        {
+                            if (MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
+                            {
+                                
+                                Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed , 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                            }
+                            else
+                            {
+                                Function.Call(Hash.SET_PED_INFINITE_AMMO_CLIP, MainPed, true);
+                                /*
+                                Main.QueueAction(() =>
+                                {
+                                    if (!IsAiming) { return true; }
+                                    Function.Call(Hash.SET_PED_AMMO, MainPed, CurrentWeaponHash, 0);
+                                    return false;
+                                });
+                                */
+                                Function.Call(Hash.TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z, 1, 100, 1,FiringPattern.SingleShot);
+                            }
+                        }
+                        else if (MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
+                        {
+                            MainPed.Task.ClearAll();
+                        }
+                        
+                    }
+                    else if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
                     {
                         MainPed.VehicleWeapon=(VehicleWeaponHash)CurrentWeaponHash;
                     }
@@ -775,7 +806,6 @@ namespace RageCoop.Client
 
 
             /*
-            Function.Call(Hash.TASK_SWEEP_AIM_ENTITY,P, "random@paparazzi@pap_anims", "sweep_low", "sweep_med", "sweep_high", -1,V, 1.57f, 0.25f);
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, P,true, 0);
             return Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, P);
             */
