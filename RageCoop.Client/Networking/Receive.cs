@@ -77,9 +77,9 @@ namespace RageCoop.Client
                                 {
                                     CoopMenu.ConnectedMenuSetting();
                                     Main.MainChat.Init();
-                                    if (Main.Settings.Voice && !Sync.Voice.WasInitialized())
+                                    if (Main.Settings.Voice && !Voice.WasInitialized())
                                     {
-                                        Sync.Voice.Init();
+                                        Voice.Init();
                                     }
                                     GTA.UI.Notification.Show("~g~Connected!");
                                 });
@@ -270,14 +270,12 @@ namespace RageCoop.Client
                             Packets.Voice packet = new Packets.Voice();
                             packet.Deserialize(data);
 
-                            Main.QueueAction(() =>
-                            {
-                                SyncedPed player = EntityPool.GetPedByID(packet.ID);
-                                player.IsSpeaking = true;
-                                player.LastSpeakingTime = Main.Ticked;
 
-                                Sync.Voice.AddVoiceData(packet.Buffer, packet.Recorded);
-                            });
+                            SyncedPed player = EntityPool.GetPedByID(packet.ID);
+                            player.IsSpeaking = true;
+                            player.LastSpeakingTime = Main.Ticked;
+
+                            Voice.AddVoiceData(packet.Buffer, packet.Recorded);
                         }
                     }
                     break;

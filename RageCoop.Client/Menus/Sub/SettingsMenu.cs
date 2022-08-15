@@ -49,12 +49,12 @@ namespace RageCoop.Client.Menus
         {
             if (_disableVoice.Checked)
             {
-                if (Networking.IsOnServer && !Sync.Voice.WasInitialized())
+                if (Networking.IsOnServer && !Voice.WasInitialized())
                 {
-                    Sync.Voice.Init();
+                    Voice.Init();
                 }
             } else {
-                Sync.Voice.ClearAll();
+                Voice.ClearAll();
             }
 
             Main.Settings.Voice = _disableVoice.Checked;

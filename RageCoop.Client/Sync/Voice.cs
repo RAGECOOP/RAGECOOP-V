@@ -2,7 +2,7 @@
 
 using NAudio.Wave;
 
-namespace RageCoop.Client.Sync
+namespace RageCoop.Client
 {
     internal static class Voice
     {

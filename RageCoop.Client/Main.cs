@@ -196,16 +196,16 @@ namespace RageCoop.Client
             }
             if (Networking.IsOnServer)
             {
-                if (Sync.Voice.WasInitialized())
+                if (Voice.WasInitialized())
                 {
                     if (Game.IsControlPressed(GTA.Control.PushToTalk))
                     {
-                        Sync.Voice.StartRecording();
+                        Voice.StartRecording();
                         return;
                     }
-                    else if (Sync.Voice.IsRecording())
+                    else if (Voice.IsRecording())
                     {
-                        Sync.Voice.StopRecording();
+                        Voice.StopRecording();
                         return;
                     }
                 }
@@ -280,7 +280,7 @@ namespace RageCoop.Client
         public static void CleanUp()
         {
             MainChat.Clear();
-            Sync.Voice.ClearAll();
+            Voice.ClearAll();
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             LocalPlayerID=default;
