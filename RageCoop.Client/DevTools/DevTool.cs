@@ -127,8 +127,7 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            i=BulletsShot%2==0 ? {Current} : {Secondary};
-                            return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].{dir}Vector);
+                            return BulletsShot%2==0 ? {Current} : {Secondary};
                         ";
                     }
                     else
@@ -136,8 +135,7 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            i=BulletsShot%2==0 ? {Current} : {Secondary};
-                            return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].{((MuzzleDir)(dir-3)).ToString()}Vector*-1);
+                            return BulletsShot%2==0 ? {Current} : {Secondary};
                         ";
                     }
                 }
@@ -148,7 +146,7 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            return new MuzzleInfo(v.Bones[{Current}].Position, v.Bones[{Current}].{dir}Vector);
+                            return {Current};
                         ";
                     }
                     else
@@ -156,12 +154,12 @@ namespace RageCoop.Client
                         s=$@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
-                            return new MuzzleInfo(v.Bones[{Current}].Position, v.Bones[{Current}].{((MuzzleDir)(dir-3)).ToString()}Vector*-1);
+                            return {Current};
                         ";
                     }
                 }
                 Thread thread = new Thread(() => Clipboard.SetText(s));
-                thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+                thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
                 thread.Join();
                 GTA.UI.Notification.Show("Copied to clipboard, please paste it on the GitHub issue page!");
