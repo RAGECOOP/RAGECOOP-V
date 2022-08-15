@@ -767,13 +767,9 @@ namespace RageCoop.Client
                                 Function.Call(Hash.TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z, 1, 100, 1, FiringPattern.SingleShot);
                             }
                         }
-                        else
+                        else if (_lastDriveBy || MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
                         {
-                            if (MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
-                            {
-
-                                MainPed.Task.ClearAll();
-                            }
+                            MainPed.Task.ClearAll();
                             _lastDriveBy=false;
                         }
 

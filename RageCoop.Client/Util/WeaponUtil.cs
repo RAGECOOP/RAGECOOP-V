@@ -79,6 +79,18 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // BRUISER3
+                case -2042350822:
+                    return BulletsShot%2==0 ? 52 : 50;
+
+                // BRUTUS3
+                case 2038858402:
+                    return 84;
+
+                // MONSTER5
+                case -715746948:
+                    return BulletsShot%2==0 ? 63 : 65;
+
                 // JB7002
                 case 394110044:
                     return BulletsShot%2==0 ? 54 : 53;
@@ -193,7 +205,15 @@ namespace RageCoop.Client
                     return -1;
             }
         }
+        public static int GetMuzzleTurret(this Vehicle v)
+        {
+            switch (v.Model.Hash)
+            {
+                default:
+                    return 0;
+            }
 
+        }
         public static bool IsUsingProjectileWeapon(this Ped p)
         {
             var vp = p.VehicleWeapon;
