@@ -113,20 +113,8 @@ namespace RageCoop.Client
             P= Game.Player.Character;
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
-            World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
+            // World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
 
-            /*
-            try
-            {
-                P.CurrentVehicle.Passengers[0].Delete();
-            }
-            catch { }
-            var p = P.CurrentVehicle.CreateRandomPedOnSeat(VehicleSeat.Passenger);
-            p.Weapons.Current.InfiniteAmmoClip = true;
-            p.Weapons.Give(WeaponHash.MicroSMG, 100, true, true);
-            // Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, p, 0, 0, 0f, 0f, 0f);
-            Function.Call(Hash.TASK_DRIVE_BY, p, 0, 0, 0f, 0f, 0f, 0, 0, 1, unchecked((int)FiringPattern.FullAuto));
-            */
             if (Game.IsLoading)
             {
                 return;
