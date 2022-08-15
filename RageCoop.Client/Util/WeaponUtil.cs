@@ -79,6 +79,28 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // cerberus3
+                case 1909700336:
+                    return 53;
+
+                // cerberus2
+                case 679453769:
+                    return 54;
+
+                // cerberus
+                case -801550069:
+                    return 90;
+                /*
+                // cerberus (flame)
+                case -801550069:
+                    i=BulletsShot%2==0 ? 89 : 88;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                // cerberus (passenger flame)
+                case -801550069:
+                    i=BulletsShot%2==0 ? 76 : 75;
+                    return new MuzzleInfo(v.Bones[i].Position, v.Bones[i].ForwardVector);
+                 */
+
                 // ISSI6
                 case 1239571361:
                     return BulletsShot%2==0 ? 12 : 14;
