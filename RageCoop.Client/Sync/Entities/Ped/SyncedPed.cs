@@ -692,7 +692,7 @@ namespace RageCoop.Client
             }
             if (!(localRagdoll || MainPed.IsDead))
             {
-                if (!IsAiming)
+                if (!IsAiming && !MainPed.IsGettingUp)
                 {
                     MainPed.Heading=Heading;
                 }
@@ -741,7 +741,7 @@ namespace RageCoop.Client
         #endregion
         private void DisplayInVehicle()
         {
-            if (CurrentVehicle==null || CurrentVehicle.MainVehicle==null) { return; }
+            if (CurrentVehicle==null || CurrentVehicle.MainVehicle==null) { Main.Logger.Error("Veh not found"); return; }
             switch (Speed)
             {
                 case 4:

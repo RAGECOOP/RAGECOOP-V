@@ -59,6 +59,7 @@ namespace RageCoop.Client
                 {
                     var veh = ped.CurrentVehicle?.GetSyncEntity() ?? ped.VehicleTryingToEnter?.GetSyncEntity() ?? ped.LastVehicle?.GetSyncEntity();
                     p.VehicleID = veh?.ID ?? 0;
+                    if (p.VehicleID==0) { Main.Logger.Error("Invalid vehicle"); }
                     if (p.Speed==5)
                     {
                         p.Seat=ped.GetSeatTryingToEnter();

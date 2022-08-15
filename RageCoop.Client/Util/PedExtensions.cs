@@ -45,6 +45,18 @@ namespace RageCoop.Client
         public static byte GetPedSpeed(this Ped ped)
         {
 
+            if (ped.IsSittingInVehicle())
+            {
+                return 4;
+            }
+            if (ped.IsTaskActive(TaskType.CTaskEnterVehicle))
+            {
+                return 5;
+            }
+            if (ped.IsTaskActive(TaskType.CTaskExitVehicle))
+            {
+                return 6;
+            }
             if (ped.IsWalking)
             {
                 return 1;
@@ -58,18 +70,6 @@ namespace RageCoop.Client
                 return 3;
             }
 
-            if (ped.IsSittingInVehicle())
-            {
-                return 4;
-            }
-            if (ped.IsTaskActive(TaskType.CTaskEnterVehicle))
-            {
-                return 5;
-            }
-            if (ped.IsTaskActive(TaskType.CTaskExitVehicle))
-            {
-                return 6;
-            }
 
             return 0;
         }
