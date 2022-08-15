@@ -113,6 +113,8 @@ namespace RageCoop.Client
             P= Game.Player.Character;
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
+            World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
+
             /*
             try
             {

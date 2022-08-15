@@ -8,6 +8,21 @@ namespace RageCoop.Core
     {
         public const float Deg2Rad=(float)(Math.PI* 2) / 360;
         public const float Rad2Deg = 360 / (float)(Math.PI * 2);
+
+        public static Vector3 ToDirection(this Vector3 rotation)
+        {
+            double z = DegToRad(rotation.Z);
+            double x = DegToRad(rotation.X);
+            double num = Math.Abs(Math.Cos(x));
+
+            return new Vector3
+            {
+                X = (float)(-Math.Sin(z) * num),
+                Y = (float)(Math.Cos(z) * num),
+                Z = (float)Math.Sin(x)
+            };
+        }
+
         /// <summary>
         /// 
         /// </summary>

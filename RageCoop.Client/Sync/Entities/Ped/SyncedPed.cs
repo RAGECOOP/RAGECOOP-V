@@ -89,6 +89,7 @@ namespace RageCoop.Client
         internal PedDataFlags Flags;
 
         internal bool IsAiming => Flags.HasPedFlag(PedDataFlags.IsAiming);
+        internal bool _lastDriveBy;
         internal bool IsReloading => Flags.HasPedFlag(PedDataFlags.IsReloading);
         internal bool IsJumping => Flags.HasPedFlag(PedDataFlags.IsJumping);
         internal bool IsRagdoll => Flags.HasPedFlag(PedDataFlags.IsRagdoll);
@@ -759,30 +760,23 @@ namespace RageCoop.Client
                         CheckCurrentWeapon();
                         if (IsAiming)
                         {
+                            Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z);
+                            if (!_lastDriveBy)
+                            {
+                                _lastDriveBy=true;
+                                Function.Call(Hash.TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z, 1, 100, 1, FiringPattern.SingleShot);
+                            }
+                        }
+                        else
+                        {
                             if (MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
                             {
-                                
-                                Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed , 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z);
+
+                                MainPed.Task.ClearAll();
                             }
-                            else
-                            {
-                                Function.Call(Hash.SET_PED_INFINITE_AMMO_CLIP, MainPed, true);
-                                /*
-                                Main.QueueAction(() =>
-                                {
-                                    if (!IsAiming) { return true; }
-                                    Function.Call(Hash.SET_PED_AMMO, MainPed, CurrentWeaponHash, 0);
-                                    return false;
-                                });
-                                */
-                                Function.Call(Hash.TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z, 1, 100, 1,FiringPattern.SingleShot);
-                            }
+                            _lastDriveBy=false;
                         }
-                        else if (MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))
-                        {
-                            MainPed.Task.ClearAll();
-                        }
-                        
+
                     }
                     else if (MainPed.VehicleWeapon!=(VehicleWeaponHash)CurrentWeaponHash)
                     {

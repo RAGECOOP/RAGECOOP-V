@@ -3,6 +3,7 @@ using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
 using System.Collections.Generic;
+using System;
 
 namespace RageCoop.Client
 {
@@ -340,14 +341,13 @@ namespace RageCoop.Client
         }
         public static Vector3 GetLookingCoord(this Ped p)
         {
+            if (p==Main.P && Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE)==4)
+            {
+                return RaycastEverything(default);
+            }
             EntityBone b = p.Bones[Bone.FacialForehead];
             Vector3 v = b.UpVector.Normalized;
             return b.Position+200*v;
-        }
-
-        public static void StayInCover(this Ped p)
-        {
-            Function.Call(Hash.TASK_STAY_IN_COVER, p);
         }
         public static VehicleSeat GetSeatTryingToEnter(this Ped p)
         {
@@ -363,6 +363,93 @@ namespace RageCoop.Client
 
 
 
+        public static Vector3 RaycastEverything(Vector2 screenCoord)
+        {
+            Vector3 camPos = GameplayCamera.Position;
+            Vector3 camRot = GameplayCamera.Rotation;
+            const float raycastToDist = 100.0f;
+            const float raycastFromDist = 1f;
+
+            Vector3 target3D = ScreenRelToWorld(camPos, camRot, screenCoord);
+            Vector3 source3D = camPos;
+
+            Entity ignoreEntity = Game.Player.Character;
+            if (Game.Player.Character.IsInVehicle())
+            {
+                ignoreEntity = Game.Player.Character.CurrentVehicle;
+            }
+
+            Vector3 dir = target3D - source3D;
+            dir.Normalize();
+            RaycastResult raycastResults = World.Raycast(source3D + dir * raycastFromDist,
+                source3D + dir * raycastToDist,
+                IntersectFlags.Everything,
+                ignoreEntity);
+
+            if (raycastResults.DidHit)
+            {
+                return raycastResults.HitPosition;
+            }
+
+            return camPos + dir * raycastToDist;
+        }
+        public static Vector3 ScreenRelToWorld(Vector3 camPos, Vector3 camRot, Vector2 coord)
+        {
+            Vector3 camForward = camRot.ToDirection();
+            Vector3 rotUp = camRot + new Vector3(10, 0, 0);
+            Vector3 rotDown = camRot + new Vector3(-10, 0, 0);
+            Vector3 rotLeft = camRot + new Vector3(0, 0, -10);
+            Vector3 rotRight = camRot + new Vector3(0, 0, 10);
+
+            Vector3 camRight = rotRight.ToDirection() - rotLeft.ToDirection();
+            Vector3 camUp = rotUp.ToDirection() - rotDown.ToDirection();
+
+            double rollRad = -camRot.Y.ToRadians();
+
+            Vector3 camRightRoll = camRight * (float)Math.Cos(rollRad) - camUp * (float)Math.Sin(rollRad);
+            Vector3 camUpRoll = camRight * (float)Math.Sin(rollRad) + camUp * (float)Math.Cos(rollRad);
+
+            Vector3 point3D = camPos + camForward * 10.0f + camRightRoll + camUpRoll;
+            if (!WorldToScreenRel(point3D, out Vector2 point2D))
+            {
+                return camPos + camForward * 10.0f;
+            }
+
+            Vector3 point3DZero = camPos + camForward * 10.0f;
+            if (!WorldToScreenRel(point3DZero, out Vector2 point2DZero))
+            {
+                return camPos + camForward * 10.0f;
+            }
+
+            const double eps = 0.001;
+            if (Math.Abs(point2D.X - point2DZero.X) < eps || Math.Abs(point2D.Y - point2DZero.Y) < eps)
+            {
+                return camPos + camForward * 10.0f;
+            }
+
+            float scaleX = (coord.X - point2DZero.X) / (point2D.X - point2DZero.X);
+            float scaleY = (coord.Y - point2DZero.Y) / (point2D.Y - point2DZero.Y);
+
+            return camPos + camForward * 10.0f + camRightRoll * scaleX + camUpRoll * scaleY;
+        }
+        public static bool WorldToScreenRel(Vector3 worldCoords, out Vector2 screenCoords)
+        {
+            OutputArgument num1 = new OutputArgument();
+            OutputArgument num2 = new OutputArgument();
+
+            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y, worldCoords.Z, num1, num2))
+            {
+                screenCoords = new Vector2();
+                return false;
+            }
+
+            screenCoords = new Vector2((num1.GetResult<float>() - 0.5f) * 2, (num2.GetResult<float>() - 0.5f) * 2);
+            return true;
+        }
+        public static void StayInCover(this Ped p)
+        {
+            Function.Call(Hash.TASK_STAY_IN_COVER, p);
+        }
 
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
