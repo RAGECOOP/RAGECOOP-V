@@ -79,6 +79,28 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // DOMINATOR6
+                case -1293924613:
+                    return BulletsShot%2==0 ? 51 : 55;
+
+
+                // IMPALER4
+                case -1744505657:
+                    return BulletsShot%2==0 ? 64 : 63;
+
+
+
+                // IMPERATOR3
+                case -755532233:
+                    return BulletsShot%2==0 ? 86 : 88;
+
+
+
+                // SLAMVAN6
+                case 1742022738:
+                    return BulletsShot%2==0 ? 78 : 76;
+
+
                 // CHAMPION
                 case -915234475:
                     return BulletsShot%2==0 ? 60 : 61;
@@ -158,7 +180,7 @@ namespace RageCoop.Client
                 /*
                 // INSURGENT3
                 case -1924433270:
-                    i=BulletsShot%2==0 ? 86 : 91;
+                    return BulletsShot%2==0 ? 86 : 91;
                 */
 
                 // BLAZER5
