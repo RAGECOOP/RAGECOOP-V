@@ -79,6 +79,21 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // ISSI6
+                case 1239571361:
+                    return BulletsShot%2==0 ? 12 : 14;
+
+
+                // ISSI5
+                case 1537277726:
+                    return BulletsShot%2==0 ? 30 : 32;
+
+
+                // ISSI4
+                case 628003514:
+                    return BulletsShot%2==0 ? 14 : 12;
+
+
                 // DOMINATOR6
                 case -1293924613:
                     return BulletsShot%2==0 ? 51 : 55;
