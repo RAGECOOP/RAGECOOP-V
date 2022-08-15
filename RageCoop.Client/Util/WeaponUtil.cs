@@ -79,6 +79,102 @@ namespace RageCoop.Client
             BulletsShot++;
             switch (v.Model.Hash)
             {
+                // MONSTER4
+                case 840387324:
+                    return BulletsShot%2==0 ? 63 : 65;
+
+
+                // BRUTUS2
+                case -1890996696:
+                    return 67;
+
+                // BRUISER2
+                case -1694081890:
+                    return BulletsShot%2==0 ? 45 : 51;
+
+
+                // TECHNICAL3
+                case 1356124575:
+                    return 67;
+
+                // TECHNICAL2
+                case 1180875963:
+                    return 54;
+
+                // TECHNICAL
+                case -2096818938:
+                    return 63;
+
+                // PATRIOT3
+                case -670086588:
+                    return BulletsShot%2==0 ? 87 : 89;
+
+                // NIGHTSHARK
+                case 433954513:
+                    return BulletsShot%2==0 ? 1 : 2;
+
+                /*
+                // NIGHTSHARK (second)
+                case 433954513:
+                    return BulletsShot%2==0 ? 3 : 4;
+                */
+
+                // MENACER
+                case 2044532910:
+                    return BulletsShot%2==0 ? 91 : 90;
+                /*
+                // MENACER
+                case 2044532910:
+                    return new MuzzleInfo(v.Bones[75].Position, v.Bones[75].ForwardVector);
+                // MENACER
+                case 2044532910:
+                    return new MuzzleInfo(v.Bones[78].Position, v.Bones[78].ForwardVector);
+                 
+                 */
+
+                // CARACARA
+                case 1254014755:
+                    return 83;
+
+                /*
+                // CARACARA
+                case 1254014755:
+                    return BulletsShot%2==0 ? 93 : 94;
+                */
+
+                // INSURGENT
+                case -1860900134:
+                    return 49;
+
+                // INSURGENT3
+                case -1924433270:
+                    return 81;
+
+                /*
+                // INSURGENT3
+                case -1924433270:
+                    i=BulletsShot%2==0 ? 86 : 91;
+                */
+
+                // BLAZER5
+                case -1590337689:
+                    return BulletsShot%2==0 ? 17 : 18;
+
+                // BRUISER
+                case 668439077:
+                    return BulletsShot%2==0 ? 66 : 68;
+
+
+                // BRUTUS
+                case 2139203625:
+                    return 84;
+
+
+                // MONSTER3
+                case 1721676810:
+                    return BulletsShot%2==0 ? 53 : 55;
+
+
                 // BRUISER3
                 case -2042350822:
                     return BulletsShot%2==0 ? 52 : 50;
@@ -204,15 +300,6 @@ namespace RageCoop.Client
                 default:
                     return -1;
             }
-        }
-        public static int GetMuzzleTurret(this Vehicle v)
-        {
-            switch (v.Model.Hash)
-            {
-                default:
-                    return 0;
-            }
-
         }
         public static bool IsUsingProjectileWeapon(this Ped p)
         {
