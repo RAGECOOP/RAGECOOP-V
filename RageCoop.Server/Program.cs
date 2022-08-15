@@ -10,9 +10,11 @@ namespace RageCoop.Server
     class Program
     {
         private static bool Stopping = false;
+        static Logger mainLogger;
         static void Main(string[] args)
         {
-            var mainLogger= new Logger()
+            AppDomain.CurrentDomain.UnhandledException+=UnhandledException;
+            mainLogger = new Logger()
             {
                 LogPath="RageCoop.Server.log",
                 UseConsole=true,
@@ -66,12 +68,23 @@ namespace RageCoop.Server
             }
             catch (Exception e)
             {
-                mainLogger.Error(e);
-                mainLogger.Error($"Fatal error occurred, server shutting down.");
-                mainLogger.Flush();
-                Thread.Sleep(5000);
-                Environment.Exit(1);
+                Fatal(e);
             }
+        }
+
+        private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            mainLogger.Error($"Unhandled exception thrown from user thread:",e.ExceptionObject as Exception);
+            mainLogger.Flush();
+        }
+
+        static void Fatal(Exception e)
+        {
+            mainLogger.Error(e);
+            mainLogger.Error($"Fatal error occurred, server shutting down.");
+            mainLogger.Flush();
+            Thread.Sleep(5000);
+            Environment.Exit(1);
         }
     }
 }
