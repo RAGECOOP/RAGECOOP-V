@@ -95,7 +95,7 @@
     </Compile>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(DevEnvDir)' != '*Undefined*'">
     <Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
   </Target>
 

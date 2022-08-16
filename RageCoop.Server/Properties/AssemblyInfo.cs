@@ -5,17 +5,17 @@ using System.Runtime.InteropServices;
 using System.Resources;
 
 // General Information
-[assembly: AssemblyTitle("Insert title here")]
-[assembly: AssemblyDescription("Insert description here")]
+[assembly: AssemblyTitle("RageCoop.Server")]
+[assembly: AssemblyDescription("RageCoop.Server")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Insert company here")]
-[assembly: AssemblyProduct("Insert product here")]
-[assembly: AssemblyCopyright("Insert copyright here")]
-[assembly: AssemblyTrademark("Insert trademark here")]
+[assembly: AssemblyCompany("RAGECOOP")]
+[assembly: AssemblyProduct("RageCoop.Server")]
+[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyTrademark("RAGECOOP")]
 [assembly: AssemblyCulture("")]
 
 // Version informationr(
-[assembly: AssemblyVersion("1.5.0.8")]
-[assembly: AssemblyFileVersion("1.5.0.8")]
+[assembly: AssemblyVersion("1.5.0.13")]
+[assembly: AssemblyFileVersion("1.5.0.13")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 

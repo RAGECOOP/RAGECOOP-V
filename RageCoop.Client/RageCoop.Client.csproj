@@ -301,7 +301,7 @@
     <Error Condition="!Exists('..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets'))" />
   </Target>
   <Import Project="..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.5.7.0\build\Costura.Fody.targets')" />
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(DevEnvDir)' != '*Undefined*'">
     <PostBuildEvent>"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"</PostBuildEvent>
   </PropertyGroup>
 </Project>
