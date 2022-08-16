@@ -257,14 +257,6 @@ namespace RageCoop.Client
                     CoopMenu.LastMenu.Visible = true;
                 }
             }
-            else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
-            {
-                if (Networking.IsOnServer)
-                {
-                    ulong currentTimestamp = Util.GetTickCount64();
-                    PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
-                }
-            }
             else if (Game.IsControlJustPressed(GTA.Control.MpTextChatAll))
             {
                 if (Networking.IsOnServer)
@@ -272,7 +264,34 @@ namespace RageCoop.Client
                     MainChat.Focused = true;
                 }
             }
-            else if (e.KeyCode==Settings.PassengerKey)
+            else if (Game.IsEnabledControlJustPressed(GTA.Control.MultiplayerInfo))
+            {
+                if (Networking.IsOnServer)
+                {
+                    ulong currentTimestamp = Util.GetTickCount64();
+                    PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
+                }
+            }
+            else if (Game.IsEnabledControlJustPressed(GTA.Control.VehicleExit))
+            {
+                if (P.IsInVehicle())
+                {
+                    P.Task.LeaveVehicle();
+                }
+                else if (P.IsTaskActive(TaskType.CTaskMoveGoToVehicleDoor))
+                {
+                    P.Task.ClearAll();
+                }
+                else
+                {
+                    var v = World.GetClosestVehicle(P.Position, 10);
+                    if (v!=null)
+                    {
+                        P.Task.EnterVehicle(v, VehicleSeat.Driver, -1, 5, EnterVehicleFlags.AllowJacking);
+                    }
+                }
+            }
+            else if (e.KeyCode==Settings.PassengerKey && !MainChat.Focused)
             {
                 var P = Game.Player.Character;
 
