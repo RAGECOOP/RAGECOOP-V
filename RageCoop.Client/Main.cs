@@ -264,7 +264,8 @@ namespace RageCoop.Client
                     MainChat.Focused = true;
                 }
             }
-            else if (Game.IsEnabledControlJustPressed(GTA.Control.MultiplayerInfo))
+            else if (MainChat.Focused) { return; }
+            else if (Game.IsControlJustPressed(GTA.Control.MultiplayerInfo))
             {
                 if (Networking.IsOnServer)
                 {
@@ -272,7 +273,7 @@ namespace RageCoop.Client
                     PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                 }
             }
-            else if (Game.IsEnabledControlJustPressed(GTA.Control.VehicleExit))
+            else if (Game.IsControlJustPressed(GTA.Control.VehicleExit))
             {
                 if (P.IsInVehicle())
                 {
@@ -291,7 +292,7 @@ namespace RageCoop.Client
                     }
                 }
             }
-            else if (e.KeyCode==Settings.PassengerKey && !MainChat.Focused)
+            else if (e.KeyCode==Settings.PassengerKey)
             {
                 var P = Game.Player.Character;
 
