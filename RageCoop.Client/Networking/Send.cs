@@ -123,7 +123,7 @@ namespace RageCoop.Client
             packet.OwnerID=v.OwnerID;
             packet.Flags = veh.GetVehicleFlags();
             packet.SteeringAngle = veh.SteeringAngle;
-            packet.Position = veh.Position;
+            packet.Position = veh.ReadPosition();
             packet.Velocity=veh.Velocity;
             packet.Quaternion=veh.ReadQuaternion();
             packet.RotationVelocity=veh.RotationVelocity;

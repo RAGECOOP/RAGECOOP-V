@@ -5,7 +5,7 @@ using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Drawing;
 
 namespace RageCoop.Client
 {
@@ -96,17 +96,29 @@ namespace RageCoop.Client
         internal string LicensePlate { get; set; }
         internal int _lastLivery = -1;
         internal int Livery { get; set; } = -1;
+        List<Vector3> _predictedTrace = new List<Vector3>();
+        List<Vector3> _orgTrace = new List<Vector3>();
 
         #endregion
         internal override void Update()
         {
+#if DEBUG_VEH
+            foreach(var s in _predictedTrace)
+            {
+                World.DrawMarker(MarkerType.DebugSphere, s, default, default, new Vector3(0.3f, 0.3f, 0.3f), Color.AliceBlue);
+            }
+            foreach (var s in _orgTrace)
+            {
+                World.DrawMarker(MarkerType.DebugSphere, s, default, default, new Vector3(0.3f, 0.3f, 0.3f), Color.Orange);
+            }
+#endif
 
-            #region -- INITIAL CHECK --
+#region -- INITIAL CHECK --
 
             // Check if all data avalible
             if (!IsReady || Owner==null ) { return; }
-            #endregion
-            #region -- CHECK EXISTENCE --
+#endregion
+#region -- CHECK EXISTENCE --
             if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model != Model))
             {
                 if (!CreateVehicle())
@@ -118,8 +130,8 @@ namespace RageCoop.Client
             if (!NeedUpdate) {
                 return; 
             }
-            #endregion
-            #region -- SYNC CRITICAL --
+#endregion
+#region -- SYNC CRITICAL --
             
             if (SteeringAngle != MainVehicle.SteeringAngle)
             {
@@ -129,7 +141,7 @@ namespace RageCoop.Client
             MainVehicle.BrakePower=BrakePower;
             var v = Main.P.CurrentVehicle;
             DisplayVehicle(v != null && MainVehicle.IsTouching(v));
-            #region FLAGS
+#region FLAGS
             if (IsDead)
             {
                 if (MainVehicle.IsDead)
@@ -249,12 +261,12 @@ namespace RageCoop.Client
                     MainVehicle.SetDeluxoHoverState(false);
                 }
             }
-            #endregion
+#endregion
 
-            #endregion
+#endregion
             if (LastFullSynced>=LastUpdated)
             {
-                #region -- SYNC STATE --
+#region -- SYNC STATE --
                 if (Flags.HasVehFlag(VehicleDataFlags.Repaired))
                 {
                     MainVehicle.Repair();
@@ -288,7 +300,7 @@ namespace RageCoop.Client
                     Function.Call(Hash.SET_VEHICLE_LIVERY, MainVehicle, Livery);
                     _lastLivery=Livery;
                 }
-                #endregion
+#endregion
             }
             LastUpdated=Main.Ticked;
         }
@@ -296,22 +308,26 @@ namespace RageCoop.Client
         Vector3 _predictedPos;
         void DisplayVehicle(bool touching)
         {
+            /*
+            var smoothed = (LastVelocity+Velocity)/2;
+            LastVelocity=Velocity;
+            Velocity=smoothed;
+            */
             _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
             _predictedPos = Position+_elapsed*Velocity;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
-            var cali = ((Velocity.Length()<0.1 && !touching)?dist*4:dist)*(_predictedPos - current);
+            var cali = 5*(_predictedPos - current);
             
-            if (dist>=8)
+            if (dist>30)
             {
                 MainVehicle.Position = _predictedPos;
                 MainVehicle.Velocity = Velocity;
                 MainVehicle.Quaternion = Quaternion;
                 return;
             }
-
-            MainVehicle.Velocity = Velocity;
-            MainVehicle.ApplyForce(cali);
+            
+            MainVehicle.Velocity = Velocity+cali;
             if (IsFlipped)
             {
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
@@ -329,6 +345,19 @@ namespace RageCoop.Client
                 MainVehicle.Quaternion = Quaternion;
                 MainVehicle.RotationVelocity = RotationVelocity;
             }
+
+#if DEBUG_VEH
+            if (_orgTrace.Count >= 30)
+            {
+                _orgTrace.RemoveAt(0);
+            }
+            if (_predictedTrace.Count >= 30)
+            {
+                _predictedTrace.RemoveAt(0);
+            }
+            _orgTrace.Add(Position);
+            _predictedTrace.Add(_predictedPos);
+#endif
         }
         private Vector3 GetCalibrationRotation()
         {
@@ -378,7 +407,7 @@ namespace RageCoop.Client
             Model.MarkAsNoLongerNeeded();
             return true;
         }
-        #region -- PEDALING --
+#region -- PEDALING --
         /*
          * Thanks to @oldnapalm.
          */
@@ -413,13 +442,13 @@ namespace RageCoop.Client
         {
             MainVehicle.Driver.Task.ClearAnimation(PedalingAnimDict(), PedalingAnimName(fast));
         }
-        #endregion
+#endregion
 
-        #region OUTGOING
+#region OUTGOING
         internal float LastNozzleAngle { get; set; }
 
         internal float LastEngineHealth { get; set; }
         internal Vector3 LastVelocity { get; set; }
-        #endregion
+#endregion
     }
 }

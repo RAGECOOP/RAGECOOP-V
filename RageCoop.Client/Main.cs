@@ -47,6 +47,9 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
+#if DEBUG_HIGH_PING
+            Networking.SimulatedLatency=0.3f;
+#endif
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {
@@ -103,8 +106,6 @@ namespace RageCoop.Client
             Counter.Restart();
         }
 
-#if DEBUG
-#endif
         public static Ped P;
         public static float FPS;
         private bool _lastDead;

@@ -49,6 +49,7 @@ namespace RageCoop.Client
                 {
                     AutoFlushSendQueue = false,
                     SimulatedMinimumLatency =SimulatedLatency,
+                    SimulatedRandomLatency=0,
                     AcceptIncomingConnections = true,
                     MaximumConnections = 32,
                     PingInterval = 5
