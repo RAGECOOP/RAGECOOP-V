@@ -36,7 +36,7 @@ namespace RageCoop.Client.Menus
         private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
             "https://github.com/RAGECOOP~n~" +
             "~y~VERSION~s~~n~" +
-            Main.CurrentVersion.Replace("_", "."))
+            Main.Version)
         { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
 
 

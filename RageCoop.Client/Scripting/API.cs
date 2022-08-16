@@ -202,9 +202,9 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Get the version of RAGECOOP
         /// </summary>
-        public static string CurrentVersion
+        public static Version CurrentVersion
         {
-            get { return Main.CurrentVersion; }
+            get { return Main.Version; }
         }
 
 

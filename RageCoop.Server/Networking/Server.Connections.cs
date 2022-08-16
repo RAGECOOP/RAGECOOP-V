@@ -23,10 +23,9 @@ namespace RageCoop.Server
         private void GetHandshake(NetConnection connection, Packets.Handshake packet)
         {
             Logger?.Debug("New handshake from: [Name: " + packet.Username + " | Address: " + connection.RemoteEndPoint.Address.ToString() + "]");
-
-            if (!packet.ModVersion.StartsWith(_compatibleVersion))
+            if (!packet.ModVersion.StartsWith(Version.ToString(2)))
             {
-                connection.Deny($"RAGECOOP version {_compatibleVersion.Replace('_', '.')}.x required!");
+                connection.Deny($"RAGECOOP version {Version.ToString(2)} required!");
                 return;
             }
             if (string.IsNullOrWhiteSpace(packet.Username))

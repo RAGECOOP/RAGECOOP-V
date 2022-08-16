@@ -100,7 +100,7 @@ namespace RageCoop.Client
                         {
                             PedID =  Main.LocalPlayerID,
                             Username =username,
-                            ModVersion = Main.CurrentVersion,
+                            ModVersion = Main.Version.ToString(),
                             PasswordEncrypted=Security.Encrypt(password.GetBytes()),
                             InternalEndPoint = new System.Net.IPEndPoint(CoreUtils.GetLocalAddress(ip[0]), Peer.Port)
                         };

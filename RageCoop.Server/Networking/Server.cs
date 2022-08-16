@@ -53,7 +53,10 @@ namespace RageCoop.Server
         private HashSet<char> _allowedCharacterSet;
         private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
         internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
-        private readonly string _compatibleVersion = "V0_5";
+        /// <summary>
+        /// Get the current server version
+        /// </summary>
+        public static readonly Version Version = typeof(Server).Assembly.GetName().Version;
         /// <summary>
         /// Instantiate a server.
         /// </summary>
@@ -135,7 +138,7 @@ namespace RageCoop.Server
                                 port=Settings.Port.ToString(),
                                 country=info.Country,
                                 name=Settings.Name,
-                                version=_compatibleVersion.Replace("_", "."),
+                                version=Version.ToString(),
                                 players=MainNetServer.ConnectionsCount.ToString(),
                                 maxPlayers=Settings.MaxPlayers.ToString(),
                                 description=Settings.Description,
@@ -212,8 +215,8 @@ namespace RageCoop.Server
         {
             Logger?.Info("================");
             Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
-            Logger?.Info($"Server version: {Assembly.GetCallingAssembly().GetName().Version}");
-            Logger?.Info($"Compatible RAGECOOP versions: {_compatibleVersion.Replace('_', '.')}.x");
+            Logger?.Info($"Server version: {Version}");
+            Logger?.Info($"Compatible RAGECOOP versions: {Version.ToString(2)}");
             Logger?.Info("================");
 
             if (Settings.UseZeroTier)
