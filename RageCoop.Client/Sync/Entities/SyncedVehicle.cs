@@ -308,17 +308,12 @@ namespace RageCoop.Client
         Vector3 _predictedPos;
         void DisplayVehicle(bool touching)
         {
-            /*
-            var smoothed = (LastVelocity+Velocity)/2;
-            LastVelocity=Velocity;
-            Velocity=smoothed;
-            */
             _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
             _predictedPos = Position+_elapsed*Velocity;
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(Position);
-            var cali = 5*(_predictedPos - current);
-            
+            var cali = dist*(_predictedPos - current);
+            if (Velocity.Length()<0.1) { cali*=10; }
             if (dist>30)
             {
                 MainVehicle.Position = _predictedPos;
