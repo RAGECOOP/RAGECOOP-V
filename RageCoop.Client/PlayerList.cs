@@ -54,7 +54,7 @@ namespace RageCoop.Client
 
             foreach (var player in Players.Values)
             {
-                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{(player.PedID==Main.LocalPlayerID ? Networking.Latency : player.Latency) * 1000:N0}ms", player.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
+                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{(player.PedID==Main.LocalPlayerID ? Networking.Latency : player.Ping) * 1000:N0}ms", player.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
             _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count} players");
@@ -159,7 +159,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Player Latency in seconds, will be the latency to server if not using P2P connection.
         /// </summary>
-        public float Latency => HasDirectConnection ? Connection.AverageRoundtripTime/2 : _latencyToServer;
+        public float Ping => HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer*2;
         public float PacketTravelTime => HasDirectConnection ? Connection.AverageRoundtripTime/2 : Networking.Latency+_latencyToServer;
         public float _latencyToServer = 0;
         public bool DisplayNameTag { get; set; } = true;
