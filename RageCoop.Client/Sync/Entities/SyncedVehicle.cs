@@ -241,6 +241,18 @@ namespace RageCoop.Client
                     MainVehicle.RoofState=RoofState;
                 }
 
+                if(MainVehicle.HasRocketBoost){
+                    if(Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) )
+                    {
+                        if(!MainVehicle.IsRocketBoostActive()){
+                            MainVehicle.SetRocketBoostActive(true);
+                        }
+                    }
+                    else if(MainVehicle.IsRocketBoostActive()){
+                        MainVehicle.SetRocketBoostActive(false);
+                    }
+                }
+
                 Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
                 MainVehicle.SetDamageModel(DamageModel);
 
