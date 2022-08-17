@@ -311,10 +311,10 @@ namespace RageCoop.Client
             _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
             _predictedPos = Position+_elapsed*Velocity;
             var current = MainVehicle.ReadPosition();
-            var dist = current.DistanceTo(Position);
+            var dist = current.DistanceTo(_predictedPos);
             var cali = dist*(_predictedPos - current);
             if (Velocity.Length()<0.1) { cali*=10; }
-            if (dist>30)
+            if (dist>10)
             {
                 MainVehicle.Position = _predictedPos;
                 MainVehicle.Velocity = Velocity;
