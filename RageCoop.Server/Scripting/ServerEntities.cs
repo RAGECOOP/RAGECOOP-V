@@ -225,7 +225,7 @@ namespace RageCoop.Server.Scripting
                 Vehicles.TryAdd(p.ID, veh=new ServerVehicle(Server));
                 veh.ID=p.ID;
             }
-            veh._pos = p.Position;
+            veh._pos = p.Position+p.Velocity*sender.Latency;
             veh.Owner=sender;
             veh._quat=p.Quaternion;
         }
