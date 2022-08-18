@@ -121,6 +121,7 @@ namespace RageCoop.Core
         IsDead = 1 << 5,
         IsHornActive = 1 << 6,
         IsTransformed = 1 << 7,
+        IsParachuteActive = 1 << 8,
         IsRocketBoostActive = 1 << 9,
         IsAircraft = 1 << 10,
         IsDeluxoHovering=1 << 11, 
