@@ -21,6 +21,7 @@ namespace RageCoop.Client
         internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
         internal static float SimulatedLatency=0;
         public static bool IsConnecting { get; private set; }
+        public static IPEndPoint _targetServerEP;
         static Networking()
         {
             Security=new Security(Main.Logger);
@@ -77,7 +78,7 @@ namespace RageCoop.Client
 
                 PlayerList.Cleanup();
                 EntityPool.AddPlayer();
-                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("WARNING", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
+                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
                 {
                     IsConnecting=false;
                     return;
@@ -86,6 +87,7 @@ namespace RageCoop.Client
                 {
                     try
                     {
+                        _targetServerEP=CoreUtils.StringToEndPoint(address);
                         DownloadManager.Cleanup();
                         Peer = new CoopPeer(config);
                         Peer.OnMessageReceived+= (s, m) =>
