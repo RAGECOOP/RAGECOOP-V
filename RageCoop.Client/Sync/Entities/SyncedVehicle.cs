@@ -261,20 +261,21 @@ namespace RageCoop.Client
         }
         void DisplayVehicle(bool touching)
         {
-            _elapsed = Owner.PacketTravelTime+0.001f*LastSyncedStopWatch.ElapsedMilliseconds;
-            Position += _elapsed*Velocity;
+            _elapsed = Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds;
+            _predictedPosition = Position + _elapsed * Velocity;
             var current = MainVehicle.ReadPosition();
-            var dist = current.DistanceTo(Position);
-            var cali = dist*(Position - current);
-            if (Velocity.Length()<0.1) { cali*=10; }
-            if (dist>10)
+            var dist = current.DistanceTo(_predictedPosition);
+            var cali = dist * (_predictedPosition - current);
+            if (Velocity.Length() < 0.1) { cali *= 10; }
+            if (dist > 10)
             {
-                MainVehicle.Position = Position;
+                MainVehicle.Position = _predictedPosition;
                 MainVehicle.Velocity = Velocity;
                 MainVehicle.Quaternion = Quaternion;
                 return;
             }
-            
+
+
             MainVehicle.Velocity = Velocity+cali;
 
             if (IsFlipped)

@@ -71,6 +71,7 @@ namespace RageCoop.Client{
         internal int _lastLivery = -1;
         List<Vector3> _predictedTrace = new List<Vector3>();
         List<Vector3> _orgTrace = new List<Vector3>();
+        private Vector3 _predictedPosition;
 
         float _elapsed;
         #endregion
