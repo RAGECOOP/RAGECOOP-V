@@ -25,12 +25,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Lidgren.Network\**" />
-    <EmbeddedResource Remove="Lidgren.Network\**" />
-    <None Remove="Lidgren.Network\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="5.7.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
