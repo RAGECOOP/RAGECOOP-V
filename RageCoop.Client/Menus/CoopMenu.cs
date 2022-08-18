@@ -91,6 +91,7 @@ namespace RageCoop.Client.Menus
             PopUp.Error=error;
             PopUp.ShowBackground=showbackground;
             PopUp.Visible=true;
+            Script.Yield();
             while (true)
             {
                 Game.DisableAllControlsThisFrame();
@@ -123,12 +124,9 @@ namespace RageCoop.Client.Menus
         private static void _passwordActivated(object sender, System.EventArgs e)
         {
             string newPass = Game.GetUserInput(WindowTitle.EnterMessage20, "", 20);
-            if (!string.IsNullOrWhiteSpace(newPass))
-            {
-                Main.Settings.Password = newPass;
-                Util.SaveSettings();
-                _passwordItem.AltTitle = new string('*', newPass.Length);
-            }
+            Main.Settings.Password = newPass;
+            Util.SaveSettings();
+            _passwordItem.AltTitle = new string('*', newPass.Length);
         }
         public static void ServerIpActivated(object a, System.EventArgs b)
         {

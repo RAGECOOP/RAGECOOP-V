@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using GTA.UI;
+using System.Net;
+
 namespace RageCoop.Client
 {
     internal static partial class Networking
@@ -24,8 +26,9 @@ namespace RageCoop.Client
             Security=new Security(Main.Logger);
         }
 
-        public static void ToggleConnection(string address, string username = null, string password = null)
+        public static void ToggleConnection(string address, string username = null, string password = null,PublicKey publicKey=null)
         {
+            Menus.CoopMenu.Menu.Visible=false;
             Peer?.Shutdown("Bye");
             if (IsOnServer)
             {
@@ -74,6 +77,11 @@ namespace RageCoop.Client
 
                 PlayerList.Cleanup();
                 EntityPool.AddPlayer();
+                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("WARNING", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
+                {
+                    IsConnecting=false;
+                    return;
+                }
                 Task.Run(() =>
                 {
                     try
@@ -88,13 +96,18 @@ namespace RageCoop.Client
                         Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled=false;
                         Security.Regen();
-                        if (!GetServerPublicKey(ip[0],int.Parse(ip[1])))
-                        {
-                            Menus.CoopMenu._serverConnectItem.Enabled=true;
-                            throw new TimeoutException("Failed to retrive server's public key");
+                        if(publicKey==null){
+                            if (!GetServerPublicKey(ip[0],int.Parse(ip[1])))
+                            {
+                                Menus.CoopMenu._serverConnectItem.Enabled=true;
+                                throw new TimeoutException("Failed to retrive server's public key");
+                            }
+                        }
+                        else{
+                            Security.SetServerPublicKey(publicKey.Modulus,publicKey.Exponent);
                         }
 
-                        // Send HandshakePacket
+                        // Send handshake packet
                         NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
                         var handshake = new Packets.Handshake()
                         {

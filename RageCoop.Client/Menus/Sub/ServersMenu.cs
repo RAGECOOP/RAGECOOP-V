@@ -91,7 +91,7 @@ namespace RageCoop.Client.Menus
                                     throw new Exception("Failed to obtain ZeroTier network IP");
                                 }
                             }
-                            Networking.ToggleConnection(address);
+                            Networking.ToggleConnection(address,null,null,PublicKey.FromServerInfo(server));
 #if !NON_INTERACTIVE
                             CoopMenu.ServerIpItem.AltTitle = address;
 

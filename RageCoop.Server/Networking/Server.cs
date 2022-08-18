@@ -132,6 +132,7 @@ namespace RageCoop.Server
                         HttpResponseMessage response = null;
                         try
                         {
+                            Security.GetPublicKey(out var pModulus,out var pExpoenet);
                             var serverInfo = new ServerInfo
                             {
                                 address = info.Address,
@@ -149,6 +150,8 @@ namespace RageCoop.Server
                                 useZT=Settings.UseZeroTier,
                                 ztID=Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
                                 ztAddress=Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
+                                publicKeyModulus=Convert.ToBase64String(pModulus),
+                                publicKeyExponent=Convert.ToBase64String(pExpoenet)
                             };
                             string msg = JsonConvert.SerializeObject(serverInfo);
 
@@ -216,7 +219,7 @@ namespace RageCoop.Server
             Logger?.Info("================");
             Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
             Logger?.Info($"Server version: {Version}");
-            Logger?.Info($"Compatible RAGECOOP versions: {Version.ToString(2)}");
+            Logger?.Info($"Compatible RAGECOOP versions: {Version.ToString(3)}");
             Logger?.Info("================");
 
             if (Settings.UseZeroTier)

@@ -197,7 +197,7 @@ namespace RageCoop.Client
                                 }
                             case PacketType.PublicKeyResponse:
                                 { 
-                                
+                                    if(Security.ServerRSA!=null){break;}
                                     var packet = data.GetPacket<Packets.PublicKeyResponse>();
                                     Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
                                     _publicKeyReceived.Set();

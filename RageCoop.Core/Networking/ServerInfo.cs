@@ -27,5 +27,8 @@ namespace RageCoop.Core
         public string ztID { get; set; }
 
         public string ztAddress { get; set; }
+        public string publicKeyModulus{get;set;}
+        public string publicKeyExponent{get;set;}
+
     }
 }

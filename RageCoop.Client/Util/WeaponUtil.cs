@@ -533,6 +533,7 @@ namespace RageCoop.Client
             return Function.Call<WeaponGroup>(Hash.GET_WEAPONTYPE_GROUP, hash);
         }
     }
+    /*
     class WeaponInfo
     {
         public string Name;
@@ -545,4 +546,5 @@ namespace RageCoop.Client
         public float SweepPitchMin;
         public float SweepPitchMax;
     }
+    */
 }
