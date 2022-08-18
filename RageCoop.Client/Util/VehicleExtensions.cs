@@ -53,8 +53,6 @@ namespace RageCoop.Client
             {
                 flags |= VehicleDataFlags.IsTransformed;
             }
-
-
             if (veh.IsAircraft)
             {
                 flags |= VehicleDataFlags.IsAircraft;
@@ -71,6 +69,9 @@ namespace RageCoop.Client
             {
                 flags|=VehicleDataFlags.IsRocketBoostActive;
             }
+            if(veh.IsParachuteActive()){
+                flags|=VehicleDataFlags.IsParachuteActive;
+            }
             if (veh.IsOnFire)
             {
                 flags|=VehicleDataFlags.IsOnFire;
@@ -83,9 +84,16 @@ namespace RageCoop.Client
         {
             return Function.Call<bool>(Hash._IS_VEHICLE_ROCKET_BOOST_ACTIVE,veh);
         }
+        public static bool IsParachuteActive(this Vehicle veh){
+            return Function.Call<bool>((Hash)0x3DE51E9C80B116CF,veh);
+        }
         public static void SetRocketBoostActive(this Vehicle veh,bool toggle)
         {
             Function.Call(Hash._SET_VEHICLE_ROCKET_BOOST_ACTIVE,veh,toggle);
+        }
+        public static void SetParachuteActive(this Vehicle veh,bool toggle)
+        {
+            Function.Call((Hash)0x0BFFB028B3DD0A97,veh,toggle);
         }
         public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
         {
