@@ -61,6 +61,7 @@
     <Compile Include="Sync\Entities\SyncedProjectile.cs" />
     <Compile Include="Sync\Entities\SyncedProp.cs" />
     <Compile Include="Sync\Entities\SyncedVehicle.cs" />
+    <Compile Include="Sync\Entities\SyncedVehicle.Members.cs" />
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Voice.cs" />

@@ -10,8 +10,9 @@ namespace RageCoop.Client
     {
         #region VEHICLE
 
-        public static VehicleDataFlags GetVehicleFlags(this Vehicle veh)
+        public static VehicleDataFlags GetVehicleFlags(this SyncedVehicle v)
         {
+            var veh=v.MainVehicle;
             VehicleDataFlags flags = 0;
 
             if (veh.IsEngineRunning)
@@ -49,27 +50,27 @@ namespace RageCoop.Client
                 flags |= VehicleDataFlags.IsHornActive;
             }
 
-            if (veh.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
+            if (v.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
             {
                 flags |= VehicleDataFlags.IsTransformed;
             }
-            if (veh.IsAircraft)
+            if (v.IsAircraft)
             {
                 flags |= VehicleDataFlags.IsAircraft;
             }
-            if (veh.Model.Hash==1483171323 && veh.IsDeluxoHovering())
+            if (v.IsDeluxo && veh.IsDeluxoHovering())
             {
                 flags|= VehicleDataFlags.IsDeluxoHovering;
             }
-            if (veh.HasRoof)
+            if (v.HasRoof)
             {
                 flags|=VehicleDataFlags.HasRoof;
             }
-            if (veh.IsRocketBoostActive())
+            if (v.HasRocketBoost && veh.IsRocketBoostActive())
             {
                 flags|=VehicleDataFlags.IsRocketBoostActive;
             }
-            if(veh.IsParachuteActive()){
+            if(v.HasParachute && veh.IsParachuteActive()){
                 flags|=VehicleDataFlags.IsParachuteActive;
             }
             if (veh.IsOnFire)

@@ -121,7 +121,7 @@ namespace RageCoop.Client
             var packet = SendPackets.VehicelPacket;
             packet.ID =v.ID;
             packet.OwnerID=v.OwnerID;
-            packet.Flags = veh.GetVehicleFlags();
+            packet.Flags = v.GetVehicleFlags();
             packet.SteeringAngle = veh.SteeringAngle;
             packet.Position = veh.ReadPosition();
             packet.Velocity=veh.Velocity;
@@ -129,9 +129,7 @@ namespace RageCoop.Client
             packet.RotationVelocity=veh.RotationVelocity;
             packet.ThrottlePower = veh.ThrottlePower;
             packet.BrakePower = veh.BrakePower;
-            if (v.LastVelocity==default) {v.LastVelocity=packet.Velocity; }
             v.LastSentStopWatch.Restart();
-            v.LastVelocity= packet.Velocity;
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
             if (full)
             {
