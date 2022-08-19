@@ -63,7 +63,7 @@
         /// <summary>
         /// See <see cref="Core.Logger.LogLevel"/>.
         /// </summary>
-        public int LogLevel { get; set; }=2;
+        public int LogLevel { get; set; } = 0;
         
         /// <summary>
         /// NPC data won't be sent to a player if their distance is greater than this value. -1 for unlimited.
