@@ -27,7 +27,7 @@ Recommended IDE:
 - Visual Studio Code
 - Visul Studio 2022
 
-Then run `dotnet build` in the solution directory, built binaries are in the `bin folder`
+Then run `dotnet build` in the solution directory, built binaries are in the `bin` folder
 
 # 📚 Third-party libraries
 - [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet)
