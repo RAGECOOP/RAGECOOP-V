@@ -39,7 +39,7 @@ Then run `dotnet build` in the solution directory, built binaries are in the `bi
 - [SharpZipLib](https://github.com/icsharpcode/SharpZipLib)
 - [DotNetCorePlugins](https://github.com/natemcmaster/DotNetCorePlugins)
 
-# Features
+# 👋 Features
 
 1. Synchronized bullets
 2. Synchronized vehicle/player/NPC
@@ -50,15 +50,15 @@ Then run `dotnet build` in the solution directory, built binaries are in the `bi
 7. Optimization for high-Ping condition, play with friends around the world!
 8. Powerful scripting API and resource system, easily [add multiplayer functionality to your mod](HTTPS://docs.ragecoop.online).
 
-# Known issues
+# ⚠ Known issues
 
 See [Bugs](https://github.com/RAGECOOP/RAGECOOP-V/issues/33)
 
 
-# Installation
+# 🔫 Installation
 Refer to the [wiki](https://github.com/RAGECOOP/RAGECOOP-V/wiki)
 
-# Downloads
+# 🧨 Downloads
 
 Download latest release [here](https://github.com/RAGECOOP/RAGECOOP-V/releases/latest)
 
