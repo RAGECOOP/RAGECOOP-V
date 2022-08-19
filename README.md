@@ -1,6 +1,7 @@
 
 
 # 🌐 RAGECOOP
+
 [![Downloads][downloads-shield]][downloads-url]
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -9,19 +10,31 @@
 
 
 # 🧠 That's it
+
 RAGECOOP brings multiplayer experience to the story mode, you can complete missions together with your friends, use mods without any restriction/getting banned, or just mess around with your fella!
 
-# 📋 Requirements
-- Visual Studio 2022
-- .NET 6.0
-- .NET Framework 4.8
+# 👁 Requirements
+- ScriptHookV
+- ScriptHookVDotNet 3.5.1 or later
 
-# 📚 Libraries
-- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet/releases/tag/v3.4.0)
-- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI/releases/tag/v1.6)
-- Lidgren Network Custom (***PRIVATE***)
+# 📋 Building the project
+
+You'll need:
+- .NET 6.0 SDK
+- .NET Framework 4.8 SDK
+
+Recommended IDE:
+- Visual Studio Code
+- Visul Studio 2022
+
+Then run `dotnet build` in the solution directory, built binaries are in the `bin` folder
+
+# 📚 Third-party libraries
+- [ScriptHookVDotNet3](https://github.com/crosire/scripthookvdotnet)
+- [LemonUI.SHVDN3](https://github.com/justalemon/LemonUI)
+- Lidgren Network Custom
 - - No new features (only improvements)
-- [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/13.0.1)
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [ClearScript](https://github.com/microsoft/ClearScript)
 - [SharpZipLib](https://github.com/icsharpcode/SharpZipLib)
 - [DotNetCorePlugins](https://github.com/natemcmaster/DotNetCorePlugins)
@@ -42,7 +55,7 @@ RAGECOOP brings multiplayer experience to the story mode, you can complete missi
 See [Bugs](https://github.com/RAGECOOP/RAGECOOP-V/issues/33)
 
 
-## Installation
+# Installation
 Refer to the [wiki](https://github.com/RAGECOOP/RAGECOOP-V/wiki)
 
 # Downloads
@@ -56,6 +69,7 @@ Please note that this is incompatible with all previous versions of ragecoop, re
 
 
 # 🦆 Special thanks to
+
 - [Makinolo](https://github.com/Makinolo), [oldnapalm](https://github.com/oldnapalm)
 - - For testing, ideas, contributions and the first modification with the API
 - [crosire](https://github.com/crosire)
@@ -64,6 +78,7 @@ Please note that this is incompatible with all previous versions of ragecoop, re
 - - For the extensive work in LemonUI
 
 # 📝 License
+
 This project is licensed under [MIT license](https://github.com/RAGECOOP/RAGECOOP-V/blob/main/LICENSE)
 
 [downloads-shield]: https://img.shields.io/github/downloads/RAGECOOP/RAGECOOP-V/total?style=for-the-badge
@@ -76,4 +91,5 @@ This project is licensed under [MIT license](https://github.com/RAGECOOP/RAGECOO
 [stars-url]: https://github.com/RAGECOOP/RAGECOOP-V/stargazers
 [issues-shield]: https://img.shields.io/github/issues/RAGECOOP/RAGECOOP-V.svg?style=for-the-badge
 [issues-url]: https://github.com/RAGECOOP/RAGECOOP-V/issues
+
 
