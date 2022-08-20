@@ -79,7 +79,7 @@ namespace RageCoop.Client
         public static void UpdatePlayer(Packets.PlayerInfoUpdate packet)
         {
             var p = GetPlayer(packet.PedID);
-            if (p!=null)
+            if (p!=null && p.PedID!=Main.LocalPlayerID)
             {
                 p._latencyToServer = packet.Latency;
                 p.Position = packet.Position;
@@ -90,7 +90,7 @@ namespace RageCoop.Client
                     {
                         p.FakeBlip=World.CreateBlip(p.Position);
                     }
-                    if (p.Character?.MainPed != null && p.Character.MainPed.Exists())
+                    if (EntityPool.PedExists(p.PedID))
                     {
                         p.FakeBlip.DisplayType = BlipDisplayType.NoDisplay;
                     }
