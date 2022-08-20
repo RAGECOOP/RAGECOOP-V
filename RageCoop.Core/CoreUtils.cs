@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
+[assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Core
 {
     internal static class CoreUtils

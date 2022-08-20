@@ -27,12 +27,13 @@ jobs:
     - name: Build client
       run: dotnet build RageCoop.Client/RageCoop.Client.csproj --configuration Release -o bin/Release/Client/RageCoop
     - name: Build server win-x64
-      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r win-x64 -o RageCoop.Server/bin/win-x64 -c Release
+      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r win-x64 -o bin/Release/Server/win-x64 -c Release
     - name: Build server linux-x64
-      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-x64 -o RageCoop.Server/bin/linux-x64 -c Release
+      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-x64 -o bin/Release/Server/linux-x64 -c Release
     - name: Build server linux-arm
-      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-arm -o RageCoop.Server/bin/linux-arm -c Release
-    
+      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-arm -o bin/Release/Server/linux-arm -c Release
+    - name: Build installer
+      run: dotnet build RageCoop.Client.Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client
     - uses: vimtor/action-zip@v1
       with:
         files: bin/Release/Client
@@ -40,17 +41,17 @@ jobs:
 
     - uses: vimtor/action-zip@v1
       with:
-        files: RageCoop.Server/bin/win-x64
+        files: bin/Release/Server/win-x64
         dest: RageCoop.Server-win-x64.zip
 
     - uses: vimtor/action-zip@v1
       with:
-        files: RageCoop.Server/bin/linux-x64
+        files: bin/Release/Server/linux-x64
         dest: RageCoop.Server-linux-x64.zip
 
     - uses: vimtor/action-zip@v1
       with:
-        files: RageCoop.Server/bin/linux-arm
+        files: bin/Release/Server/linux-arm
         dest: RageCoop.Server-linux-arm.zip
 
     - uses: WebFreak001/deploy-nightly@v1.1.0

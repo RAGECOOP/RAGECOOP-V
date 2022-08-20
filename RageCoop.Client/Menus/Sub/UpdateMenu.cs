@@ -71,6 +71,8 @@ namespace RageCoop.Client.Menus
                     catch { }
                 }
                 new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
+                try { File.Delete(_downloadPath); } catch { }
+                try { File.Delete(Path.Combine("Scripts","RageCoop.Client.Installer.exe")); } catch { }
                 Main.QueueAction(() =>
                 {
                     Util.Reload();
