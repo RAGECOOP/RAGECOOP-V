@@ -277,23 +277,16 @@ namespace RageCoop.Client
 
 
             MainVehicle.Velocity = Velocity+cali;
-
-            if (IsFlipped)
+            Vector3 calirot;
+            if (IsFlipped || (calirot = GetCalibrationRotation()).Length()>50)
             {
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
                 MainVehicle.RotationVelocity = RotationVelocity;
                 return;
             }
-
-            Vector3 calirot = GetCalibrationRotation();
-            if (calirot.Length() < 50)
-            {
-                MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
-            }
             else
             {
-                MainVehicle.Quaternion = Quaternion;
-                MainVehicle.RotationVelocity = RotationVelocity;
+                MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
             }
 
 #if DEBUG_VEH
