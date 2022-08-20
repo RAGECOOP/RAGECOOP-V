@@ -170,7 +170,7 @@ namespace RageCoop.Client
                     {
                         PedBlip.Sprite=BlipSprite;
                     }
-                    if (IsPlayer && PedBlip.Name!=Owner.Username)
+                    if (IsPlayer)
                     {
                         PedBlip.Name = Owner.Username;
                     }

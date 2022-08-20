@@ -36,6 +36,9 @@ namespace RageCoop.Client
                 if (value==_ownerID && Owner!=null) { return; }
                 _ownerID = value;
                 Owner=PlayerList.GetPlayer(value);
+                if(this is SyncedPed && Owner!=null){
+                    Owner.Character=((SyncedPed)this);
+                }
             }
         }
 
