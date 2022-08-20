@@ -90,17 +90,17 @@ namespace RageCoop.Client
                     {
                         p.FakeBlip=World.CreateBlip(p.Position);
                     }
-                    if (p.Position.DistanceTo(Main.PlayerPosition)>500)
+                    if (p.Character?.MainPed != null && p.Character.MainPed.Exists())
                     {
-                        p.FakeBlip.Color=Scripting.API.Config.BlipColor;
-                        p.FakeBlip.Scale=Scripting.API.Config.BlipScale;
-                        p.FakeBlip.Sprite=Scripting.API.Config.BlipSprite; 
-                        p.FakeBlip.DisplayType=BlipDisplayType.Default;
-                        p.FakeBlip.Position=p.Position;
+                        p.FakeBlip.DisplayType = BlipDisplayType.NoDisplay;
                     }
                     else
                     {
-                        p.FakeBlip.DisplayType=BlipDisplayType.NoDisplay;
+                        p.FakeBlip.Color = Scripting.API.Config.BlipColor;
+                        p.FakeBlip.Scale = Scripting.API.Config.BlipScale;
+                        p.FakeBlip.Sprite = Scripting.API.Config.BlipSprite;
+                        p.FakeBlip.DisplayType = BlipDisplayType.Default;
+                        p.FakeBlip.Position = p.Position;
                     }          
                 });
                 

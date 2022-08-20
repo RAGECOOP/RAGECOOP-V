@@ -115,7 +115,7 @@ namespace RageCoop.Client
 
         internal override void Update()
         {
-            if (Owner==null) { return; }
+            if (Owner==null) { OwnerID=OwnerID;return; }
             if (IsPlayer)
             {
                 RenderNameTag();
@@ -155,11 +155,7 @@ namespace RageCoop.Client
                 {
                     PedBlip=MainPed.AddBlip();
 
-                    if (IsPlayer)
-                    {
-                        // Main.Logger.Debug("blip:"+Player.Username);
-                        Main.QueueAction(() => { PedBlip.Name=Owner.Username; });
-                    }
+                    
                     PedBlip.Color=BlipColor;
                     PedBlip.Sprite=BlipSprite;
                     PedBlip.Scale=BlipScale;
@@ -173,6 +169,10 @@ namespace RageCoop.Client
                     if (PedBlip.Sprite!=BlipSprite)
                     {
                         PedBlip.Sprite=BlipSprite;
+                    }
+                    if (IsPlayer && PedBlip.Name!=Owner.Username)
+                    {
+                        PedBlip.Name = Owner.Username;
                     }
                 }
 
