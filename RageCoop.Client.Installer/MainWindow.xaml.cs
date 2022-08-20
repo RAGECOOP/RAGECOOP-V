@@ -41,9 +41,18 @@ namespace RageCoop.Client.Installer
                 Filter = "GTA 5 executable |GTA5.exe;PlayGTAV.exe",
                 Title="Select you GTAV executable"
             };
-            if (od.ShowDialog() ?? false==true)
+            if (od.ShowDialog() ?? false == true)
             {
-                Task.Run(() => Install(Directory.GetParent(od.FileName).FullName));
+                Task.Run(() => {
+                    try
+                    {
+                        Install(Directory.GetParent(od.FileName).FullName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Installation failed: " + ex.ToString());
+                    }
+                });
             }
             else
             {
@@ -147,7 +156,7 @@ namespace RageCoop.Client.Installer
             foreach (DirectoryInfo dir in source.GetDirectories())
                 CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
             foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
+                file.CopyTo(Path.Combine(target.FullName, file.Name),true);
         }
     }
 }
