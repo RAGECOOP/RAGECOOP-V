@@ -103,6 +103,6 @@
         /// <summary>
         /// The zerotier network id to join, default value is zerotier's public Earth network.
         /// </summary>
-        public string ZeroTierNetworkID = "8056c2e21c000001";
+        public string ZeroTierNetworkID { get; set; } = "8056c2e21c000001";
     }
 }
