@@ -5,12 +5,6 @@
     <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutDir>..\bin\Debug\Installer</OutDir>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<OutDir>..\bin\Release\Installer</OutDir>
-	</PropertyGroup>
   <ItemGroup>
     <None Remove="bg.png" />
     <None Remove="FodyWeavers.xml" />
