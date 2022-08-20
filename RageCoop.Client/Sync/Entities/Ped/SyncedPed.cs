@@ -694,7 +694,12 @@ namespace RageCoop.Client
             {
                 if (!IsAiming && !MainPed.IsGettingUp)
                 {
-                    MainPed.Heading=Heading;
+                    var cur=MainPed.Heading;
+                    var diff=Heading-cur;
+                    if (diff > 180) { diff = diff - 360; }
+                    else if (diff < -180) { diff = 360 + diff; }
+                    
+                    MainPed.Heading=cur+diff/2;
                 }
                 MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
             }

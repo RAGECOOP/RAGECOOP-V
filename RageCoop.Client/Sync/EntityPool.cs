@@ -93,6 +93,8 @@ namespace RageCoop.Client
         public static bool AddPlayer()
         {
             Ped p = Game.Player.Character;
+            // var clipset=p.Gender==Gender.Male? "MOVE_M@TOUGH_GUY@" : "MOVE_F@TOUGH_GUY@";
+            // Function.Call(Hash.SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
             SyncedPed player = GetPedByID(Main.LocalPlayerID);
             if (player==null)
             {
