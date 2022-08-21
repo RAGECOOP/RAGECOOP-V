@@ -25,6 +25,7 @@ namespace RageCoop.Server
                     try
                     {
                         Console.WriteLine("Applying update to "+target);
+
                         CoreUtils.CopyFilesRecursively(new(AppDomain.CurrentDomain.BaseDirectory), new(target));
                         Process.Start(Path.Combine(target, "RageCoop.Server"));
                         Environment.Exit(0);

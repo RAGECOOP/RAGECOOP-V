@@ -147,7 +147,7 @@ namespace RageCoop.Server
                 MainNetServer.Shutdown("Server updating");
                 Logger.Info("Server shutting down!");
                 Logger.Flush();
-                Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe": "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory + "\"");
+                Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe": "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory[0..^1] + "\"");
                 Environment.Exit(0);
             }
             catch(Exception ex)
