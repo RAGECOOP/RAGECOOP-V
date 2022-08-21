@@ -131,5 +131,9 @@ namespace RageCoop.Core
             var p = Run(command);
             return p.StandardOutput.ReadToEnd()+p.StandardError.ReadToEnd();
         }
+        public static void Check()
+        {
+
+        }
     }
 }

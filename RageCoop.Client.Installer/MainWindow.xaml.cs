@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
-using RageCoop.Client;
+using RageCoop.Core;
 using System.Threading;
 using System.Net;
 using System.Windows.Forms;
@@ -54,6 +54,7 @@ namespace RageCoop.Client.Installer
                     catch (Exception ex)
                     {
                         MessageBox.Show("Installation failed: " + ex.ToString());
+                        Environment.Exit(1);
                     }
                 });
             }
@@ -107,6 +108,7 @@ namespace RageCoop.Client.Installer
 
             foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
             {
+                if (f.EndsWith("RageCoop.Client.Settings.xml")) { continue; }
                 File.Delete(f);
             }
             foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories))
@@ -162,7 +164,7 @@ namespace RageCoop.Client.Installer
                 }
                 if (File.Exists(menyooConfig))
                 {
-                    var lines = File.ReadAllLines(menyooConfig).Where(x => x.EndsWith(" = " +(int)settings.MenuKey));
+                    var lines = File.ReadAllLines(menyooConfig).Where(x => !x.StartsWith(";") && x.EndsWith(" = " +(int)settings.MenuKey));
                     if (lines.Any())
                     {
                         if(MessageBox.Show("Following menyoo config value will conflict with RAGECOOP menu key\n" +
@@ -185,6 +187,46 @@ namespace RageCoop.Client.Installer
                             }
                             MessageBox.Show("Menu key changed to "+settings.MenuKey);
                             goto checkKeys;
+                        }
+                    }
+                }
+
+                checkZT:
+                UpdateStatus("Checking ZeroTier");
+                try
+                {
+                    ZeroTierHelper.Check();
+                }
+                catch
+                {
+                    if (MessageBox.Show("You can't join ZeroTier server unless ZeroTier is installed, do you want to download and install it?","Install ZeroTier",MessageBoxButton.YesNo)==MessageBoxResult.Yes)
+                    {
+                        var url = "https://download.zerotier.com/dist/ZeroTier%20One.msi";
+                        UpdateStatus("Downloading ZeroTier from "+url);
+                        try
+                        {
+                            HttpHelper.DownloadFile(url, "ZeroTier.msi", (p) => UpdateStatus("Downloading ZeroTier " + p + "%"));
+                            UpdateStatus("Installing ZeroTier");
+                            Process.Start("ZeroTier.msi").WaitForExit();
+                            /*
+                            for (int i = 0; i < 10; i++)
+                            {
+                                Thread.Sleep(1000);
+                                UpdateStatus("Waiting ZeroTier to start... " + i);
+                                try
+                                {
+                                    ZeroTierHelper.Check();
+                                    break;
+                                }
+                                catch(Exception ex) { UpdateStatus(ex.ToString()); }
+                            }
+                            goto checkZT;
+                            */
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Failed to download ZeroTier, please download it from officail website");
+                            Process.Start(url);
                         }
                     }
                 }
