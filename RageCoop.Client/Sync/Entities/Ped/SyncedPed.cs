@@ -750,7 +750,7 @@ namespace RageCoop.Client
             switch (Speed)
             {
                 case 4:
-                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle)
+                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle || MainPed.SeatIndex!=Seat)
                     {
                         MainPed.SetIntoVehicle(CurrentVehicle.MainVehicle, Seat);
                     }
