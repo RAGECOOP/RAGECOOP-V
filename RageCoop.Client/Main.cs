@@ -309,7 +309,20 @@ namespace RageCoop.Client
                         if (V!=null)
                         {
                             var seat = P.GetNearestSeat(V);
-                            P.Task.EnterVehicle(V, seat);
+                            var p = V.GetPedOnSeat(seat);
+                            if (p != null && !p.IsDead)
+                            {
+                                for(int i = -1; i < V.PassengerCapacity; i++)
+                                {
+                                    seat = (VehicleSeat)i;
+                                    p = V.GetPedOnSeat(seat);
+                                    if (p == null || p.IsDead)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            P.Task.EnterVehicle(V, seat,-1,5,EnterVehicleFlags.None);
                         }
                     }
                 }
