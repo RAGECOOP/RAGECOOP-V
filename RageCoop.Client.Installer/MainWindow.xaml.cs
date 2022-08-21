@@ -150,7 +150,7 @@ namespace RageCoop.Client.Installer
                 checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
-                var settingsPath = Path.Combine(installPath, @"Data\Settings.xml");
+                var settingsPath = Path.Combine(installPath, @"Data\RageCoop.Client.Settings.xml");
                 Settings settings = null;
                 try
                 {
