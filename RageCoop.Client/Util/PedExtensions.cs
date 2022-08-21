@@ -155,6 +155,11 @@ namespace RageCoop.Client
                 }
             }
 
+            if (ped.IsInvincible)
+            {
+                flags |= PedDataFlags.IsInvincible;
+            }
+
             if (Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped))
             {
                 flags |= PedDataFlags.IsInStealthMode;

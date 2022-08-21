@@ -202,6 +202,7 @@ namespace RageCoop.Core
             public string Username { get; set; }
             public float Latency { get; set; }
             public Vector3 Position { get; set; }
+            public bool IsHost;
             public override byte[] Serialize()
             {
 
@@ -217,6 +218,8 @@ namespace RageCoop.Core
                 byteArray.AddFloat(Latency);
 
                 byteArray.AddVector3(Position);
+
+                byteArray.AddBool(IsHost);
 
                 return byteArray.ToArray();
             }
@@ -234,6 +237,8 @@ namespace RageCoop.Core
                 Latency=reader.ReadSingle();
 
                 Position=reader.ReadVector3();
+
+                IsHost=reader.ReadBoolean();
             }
         }
 

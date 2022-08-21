@@ -211,6 +211,7 @@ namespace RageCoop.Server.Scripting
             ped.Owner=sender;
             ped.Health=p.Health;
             ped._rot=p.Rotation;
+            ped._isInvincible = p.Flags.HasPedFlag(PedDataFlags.IsInvincible);
             if (p.Speed>=4 && Vehicles.TryGetValue(p.VehicleID,out var v))
             {
                 ped.LastVehicle=v;
@@ -270,7 +271,7 @@ namespace RageCoop.Server.Scripting
         internal void RemoveVehicle(int id)
         {
             Vehicles.TryRemove(id, out var veh);
-            if (veh.Owner != null)
+            if (veh?.Owner != null)
             {
                 veh.Owner.EntitiesCount--;
             }
@@ -287,7 +288,7 @@ namespace RageCoop.Server.Scripting
         internal void RemovePed(int id)
         {
             Peds.TryRemove(id, out var ped);
-            if (ped.Owner != null)
+            if (ped?.Owner != null)
             {
                 ped.Owner.EntitiesCount--;
             }

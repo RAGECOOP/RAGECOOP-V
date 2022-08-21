@@ -54,7 +54,7 @@ namespace RageCoop.Client
 
             foreach (var player in Players.Values)
             {
-                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Ping * 1000:N0}ms", player.Username, 116, 0, i - 1, "", "", 2, "", "", ' ');
+                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Ping * 1000:N0}ms", player.Username+(player.IsHost ? " (Host)" : ""), 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
             _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count} players");
@@ -79,11 +79,11 @@ namespace RageCoop.Client
         public static void UpdatePlayer(Packets.PlayerInfoUpdate packet)
         {
             var p = GetPlayer(packet.PedID);
-            if (p!=null && p.PedID!=Main.LocalPlayerID)
+            if (p!=null)
             {
                 p._latencyToServer = packet.Latency;
                 p.Position = packet.Position;
-
+                p.IsHost= packet.IsHost;
                 Main.QueueAction(() =>
                 {
                     if (p.FakeBlip?.Exists()!=true)
@@ -142,6 +142,7 @@ namespace RageCoop.Client
     internal class Player
     {
         public byte HolePunchStatus { get; set; } = 1;
+        public bool IsHost;
         public string Username { get; internal set; }
         /// <summary>
         /// Universal character ID.

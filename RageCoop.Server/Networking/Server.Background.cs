@@ -32,7 +32,8 @@ namespace RageCoop.Server
                         PedID = c.Player.ID,
                         Username = c.Username,
                         Latency = c.Latency,
-                        Position = c.Player.Position
+                        Position = c.Player.Position,
+                        IsHost = c == _hostClient
                     }.Pack(outgoingMessage);
                     MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
                 }
@@ -166,6 +167,17 @@ namespace RageCoop.Server
                 return "linux-"+RuntimeInformation.OSArchitecture.ToString().ToLower();
             }
             return "unknown";
+        }
+        private void KickAssholes()
+        {
+            foreach(var c in ClientsByNetHandle.Values.ToArray())
+            {
+                if (c.EntitiesCount > 100 || c.Player.IsInvincible)
+                {
+                    c.Kick("Bye bye asshole~");
+                    API.SendChatMessage($"Asshole {c.Username} was kicked!");
+                }
+            }
         }
     }
 }

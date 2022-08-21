@@ -192,6 +192,16 @@ namespace RageCoop.Server.Scripting
         /// Health
         /// </summary>
         public int Health { get; internal set; }
+
+
+        internal bool _isInvincible;
+        /// <summary>
+        /// Get or set whether this ped is invincible
+        /// </summary>
+        public bool IsInvincible {
+            get => _isInvincible;
+            set => Owner.SendNativeCall(Hash.SET_ENTITY_INVINCIBLE,Handle,value);
+        }
     }
     /// <summary>
     /// Represents a vehicle from a client

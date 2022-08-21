@@ -98,6 +98,7 @@ namespace RageCoop.Core
         IsInLowCover = 1 << 11,
         IsInCoverFacingLeft = 1 << 12,
         IsBlindFiring = 1 << 13,
+        IsInvincible = 1 << 14,
         IsFullSync = 1<<15 ,
     }
 

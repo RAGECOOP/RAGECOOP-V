@@ -109,11 +109,10 @@
         /// Automatically update to nightly build when an update is avalible, check is performed every 10 minutes.
         /// </summary>
         public bool AutoUpdate { get; set; } = false;
-        /*
+
         /// <summary>
-        /// Kick godmode and spamming idiots
+        /// Kick godmode and spamming assholes
         /// </summary>
-        public bool AntiIdiots { get; set; } = true;
-        */
+        public bool AntiAssholes { get; set; } = true;
     }
 }
