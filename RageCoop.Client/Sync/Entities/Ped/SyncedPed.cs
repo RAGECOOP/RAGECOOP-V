@@ -746,7 +746,7 @@ namespace RageCoop.Client
         #endregion
         private void DisplayInVehicle()
         {
-            if (CurrentVehicle==null || CurrentVehicle.MainVehicle==null) { Main.Logger.Error("Veh not found"); return; }
+            if (CurrentVehicle?.MainVehicle==null) { return; }
             switch (Speed)
             {
                 case 4:
