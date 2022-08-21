@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
+	  <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="bg.png" />
@@ -26,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RageCoop.Client\RageCoop.Client.csproj" />
     <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj" />
   </ItemGroup>
 

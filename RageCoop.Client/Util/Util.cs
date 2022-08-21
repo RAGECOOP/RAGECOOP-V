@@ -12,7 +12,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
@@ -112,11 +114,11 @@ namespace RageCoop.Client
 
         #endregion
         public static string SettingsPath = "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
-        public static Settings ReadSettings()
+        public static Settings ReadSettings(string path=null)
         {
+            path = path ?? SettingsPath;
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
 
-            string path = SettingsPath;
             Directory.CreateDirectory(Directory.GetParent(path).FullName);
             Settings settings = null;
 
@@ -124,7 +126,7 @@ namespace RageCoop.Client
             {
                 using (FileStream stream = File.OpenRead(path))
                 {
-                    settings = (RageCoop.Client.Settings)ser.Deserialize(stream);
+                    settings = (Settings)ser.Deserialize(stream);
                 }
 
                 using (FileStream stream = new FileStream(path, FileMode.Truncate, FileAccess.ReadWrite))
@@ -142,22 +144,25 @@ namespace RageCoop.Client
 
             return settings;
         }
-        public static void SaveSettings()
+        public static bool SaveSettings(string path = null,Settings settings=null)
         {
             try
             {
-                string path = SettingsPath;
+                path = path ?? SettingsPath;
+                settings = settings ?? Main.Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
                 using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
                 {
                     XmlSerializer ser = new XmlSerializer(typeof(Settings));
-                    ser.Serialize(stream, Main.Settings);
+                    ser.Serialize(stream, settings);
                 }
+                return true;
             }
             catch (Exception ex)
             {
-                GTA.UI.Notification.Show("Error saving player settings: " + ex.Message);
+                return false;
+                // GTA.UI.Notification.Show("Error saving player settings: " + ex.Message);
             }
         }
 

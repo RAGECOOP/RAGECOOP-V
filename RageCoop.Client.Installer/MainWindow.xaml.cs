@@ -12,13 +12,16 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Win32;
 using System.IO;
-using Path = System.IO.Path;
 using System.Diagnostics;
 using System.Reflection;
-using RageCoop.Core;
+using RageCoop.Client;
+using System.Threading;
 using System.Net;
+using System.Windows.Forms;
+using Path = System.IO.Path;
+using MessageBox = System.Windows.MessageBox;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace RageCoop.Client.Installer
@@ -67,6 +70,10 @@ namespace RageCoop.Client.Installer
             var scriptsPath = Path.Combine(root, "Scripts");
             var lemonPath = Path.Combine(scriptsPath, "LemonUI.SHVDN3.dll");
             var installPath = Path.Combine(scriptsPath, "RageCoop");
+            if(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == scriptsPath)
+            {
+                throw new InvalidOperationException("The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
+            }
             Directory.CreateDirectory(installPath);
             if (!File.Exists(shvPath))
             {
@@ -94,6 +101,8 @@ namespace RageCoop.Client.Installer
                     File.WriteAllBytes(lemonPath,getLemon());
                 }
             }
+
+
             UpdateStatus("Removing old versions");
 
             foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
@@ -109,9 +118,7 @@ namespace RageCoop.Client.Installer
             {
                 UpdateStatus("Installing...");
                 CopyFilesRecursively(new DirectoryInfo("RageCoop"),new DirectoryInfo(installPath));
-                UpdateStatus("Completed!");
-                MessageBox.Show("Installation sucessful!");
-                Environment.Exit(0);
+                Finish();
             }
             else
             {
@@ -132,11 +139,59 @@ namespace RageCoop.Client.Installer
                     UpdateStatus("Installing...");
                     Directory.CreateDirectory(installPath);
                     new FastZip().ExtractZip(downloadPath, scriptsPath, FastZip.Overwrite.Always, null, null, null, true);
-                    UpdateStatus("Completed!");
-                    MessageBox.Show("Installation sucessful!");
-                    Environment.Exit(0);
+                    Finish();
                 };
                 client.DownloadFileAsync(new Uri("https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Client.zip"), downloadPath);
+            }
+
+            void Finish()
+            {
+
+                checkKeys:
+                UpdateStatus("Checking conflicts");
+                var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
+                var settingsPath = Path.Combine(installPath, @"Data\Settings.xml");
+                Settings settings = null;
+                try
+                {
+                    settings = Util.ReadSettings(settingsPath);
+                }
+                catch
+                {
+                    settings = new Settings();
+                }
+                if (File.Exists(menyooConfig))
+                {
+                    var lines = File.ReadAllLines(menyooConfig).Where(x => x.EndsWith(" = " +(int)settings.MenuKey));
+                    if (lines.Any())
+                    {
+                        if(MessageBox.Show("Following menyoo config value will conflict with RAGECOOP menu key\n" +
+                            string.Join("\n", lines)
+                            + "\nDo you wish to change the Menu Key?", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            var ae=new AutoResetEvent(false);
+                            UpdateStatus("Press the key you wish to change to");
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            KeyDown += (s,e) =>
+                            {
+                                settings.MenuKey = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
+                                ae.Set();
+                            }));
+                            ae.WaitOne();
+                            if (!Util.SaveSettings(settingsPath,settings))
+                            {
+                                MessageBox.Show("Error occurred when saving settings");
+                                Environment.Exit(1);
+                            }
+                            MessageBox.Show("Menu key changed to "+settings.MenuKey);
+                            goto checkKeys;
+                        }
+                    }
+                }
+
+                UpdateStatus("Completed!");
+                MessageBox.Show("Installation sucessful!");
+                Environment.Exit(0);
             }
         }
         void UpdateStatus(string status)
