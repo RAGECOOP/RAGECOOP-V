@@ -144,8 +144,10 @@ namespace RageCoop.Server
                 Logger?.Info("Installing update");
                 Directory.CreateDirectory("Update");
                 new FastZip().ExtractZip("Update.zip", "Update", FastZip.Overwrite.Always, null, null, null, true);
+                MainNetServer.Shutdown("Server updating");
+                Logger.Info("Server shutting down!");
+                Logger.Flush();
                 Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe": "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory + "\"");
-                Stop();
                 Environment.Exit(0);
             }
             catch(Exception ex)

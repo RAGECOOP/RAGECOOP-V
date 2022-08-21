@@ -21,18 +21,21 @@ namespace RageCoop.Server
                 int i =0;
                 while (i < 10)
                 {
+                    i++;
                     try
                     {
+                        Console.WriteLine("Applying update to "+target);
                         CoreUtils.CopyFilesRecursively(new(AppDomain.CurrentDomain.BaseDirectory), new(target));
                         Process.Start(Path.Combine(target, "RageCoop.Server"));
                         Environment.Exit(0);
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        Console.WriteLine(ex.ToString());
                         Thread.Sleep(3000);
                     }
                 }
-                return;
+                Environment.Exit(i);
             }
             AppDomain.CurrentDomain.UnhandledException+=UnhandledException;
             mainLogger = new Logger()
