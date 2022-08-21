@@ -14,8 +14,8 @@ using System.Resources;
 [assembly: AssemblyTrademark("RAGECOOP")]
 [assembly: AssemblyCulture("")]
 
-// Version informationr(
-[assembly: AssemblyVersion("1.5.1.34")]
-[assembly: AssemblyFileVersion("1.5.1.34")]
+// Version information
+[assembly: AssemblyVersion("1.5.1.62")]
+[assembly: AssemblyFileVersion("1.5.1.62")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 

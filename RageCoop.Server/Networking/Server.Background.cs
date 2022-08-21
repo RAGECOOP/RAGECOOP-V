@@ -1,0 +1,169 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Lidgren.Network;
+using RageCoop.Core;
+using System.Net;
+using System.Net.Http;
+using Newtonsoft.Json;
+using RageCoop.Core.Scripting;
+using RageCoop.Server.Scripting;
+using System.Threading;
+using System.Runtime.InteropServices;
+using System.IO;
+using ICSharpCode.SharpZipLib.Zip;
+using System.Diagnostics;
+
+namespace RageCoop.Server
+{
+    public partial class Server
+    {
+        const string _versionURL = "https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/main/RageCoop.Server/Properties/AssemblyInfo.cs";
+        private void SendPlayerUpdate()
+        {
+            foreach (var c in ClientsByNetHandle.Values.ToArray())
+            {
+                try
+                {
+                    NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
+                    new Packets.PlayerInfoUpdate()
+                    {
+                        PedID = c.Player.ID,
+                        Username = c.Username,
+                        Latency = c.Latency,
+                        Position = c.Player.Position
+                    }.Pack(outgoingMessage);
+                    MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error(ex);
+                }
+            }
+        }
+        private IpInfo IpInfo = null;
+        private void Announce()
+        {
+            HttpResponseMessage response = null;
+            HttpClient httpClient = new();
+            if (IpInfo == null)
+            {
+                try
+                {
+                    // TLS only
+                    ServicePointManager.Expect100Continue = true;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
+
+                    try
+                    {
+                        IpInfo = CoreUtils.GetIPInfo();
+                        Logger?.Info($"Your public IP is {IpInfo.Address}, announcing to master server...");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger?.Error(ex.InnerException?.Message ?? ex.Message);
+                        return;
+                    }
+                }
+                catch (HttpRequestException ex)
+                {
+                    Logger?.Error($"MasterServer: {ex.InnerException.Message}");
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error($"MasterServer: {ex.Message}");
+                }
+            }
+            try
+            {
+                Security.GetPublicKey(out var pModulus, out var pExpoenet);
+                var serverInfo = new ServerInfo
+                {
+                    address = IpInfo.Address,
+                    port = Settings.Port.ToString(),
+                    country = IpInfo.Country,
+                    name = Settings.Name,
+                    version = Version.ToString(),
+                    players = MainNetServer.ConnectionsCount.ToString(),
+                    maxPlayers = Settings.MaxPlayers.ToString(),
+                    description = Settings.Description,
+                    website = Settings.Website,
+                    gameMode = Settings.GameMode,
+                    language = Settings.Language,
+                    useP2P = Settings.UseP2P,
+                    useZT = Settings.UseZeroTier,
+                    ztID = Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
+                    ztAddress = Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
+                    publicKeyModulus = Convert.ToBase64String(pModulus),
+                    publicKeyExponent = Convert.ToBase64String(pExpoenet)
+                };
+                string msg = JsonConvert.SerializeObject(serverInfo);
+
+                var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
+                response = httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json")).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Logger?.Error($"MasterServer: {ex.Message}");
+                return;
+            }
+
+            if (response == null)
+            {
+                Logger?.Error("MasterServer: Something went wrong!");
+            }
+            else if (response.StatusCode != HttpStatusCode.OK)
+            {
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    string requestContent = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
+                }
+                else
+                {
+                    Logger?.Error($"MasterServer: [{(int)response.StatusCode}]");
+                    Logger?.Error($"MasterServer: [{response.Content.ReadAsStringAsync().GetAwaiter().GetResult()}]");
+                }
+            }
+        }
+        private void CheckUpdate()
+        {
+            try
+            {
+                var versionLine = HttpHelper.DownloadString(_versionURL).Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains("[assembly: AssemblyVersion(")).First();
+                var start = versionLine.IndexOf('\"') + 1;
+                var end = versionLine.LastIndexOf('\"');
+                var latest = Version.Parse(versionLine.AsSpan(start, end - start));
+                if (latest <= Version) { return; }
+                API.SendChatMessage($"New server version found: {latest}, downloading update...");
+                var downloadURL = $"https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Server-{GetRID()}.zip";
+                if (Directory.Exists("Update")) { Directory.Delete("Update", true); }
+                HttpHelper.DownloadFile(downloadURL, "Update.zip", null);
+                Logger?.Info("Installing update");
+                Directory.CreateDirectory("Update");
+                new FastZip().ExtractZip("Update.zip", "Update", FastZip.Overwrite.Always, null, null, null, true);
+                Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe": "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory + "\"");
+                Stop();
+                Environment.Exit(0);
+            }
+            catch(Exception ex)
+            {
+                Logger?.Error("Update",ex);
+            }
+        }
+        static string GetRID()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return "win-"+RuntimeInformation.OSArchitecture.ToString().ToLower();
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return "linux-"+RuntimeInformation.OSArchitecture.ToString().ToLower();
+            }
+            return "unknown";
+        }
+    }
+}

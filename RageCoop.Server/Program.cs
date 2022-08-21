@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using RageCoop.Core;
 using Newtonsoft.Json;
+using System.Linq;
+
 namespace RageCoop.Server
 {
     class Program
@@ -13,6 +15,25 @@ namespace RageCoop.Server
         static Logger mainLogger;
         static void Main(string[] args)
         {
+            if (args.Length>=2 && args[0]=="update")
+            {
+                var target = args[1];
+                int i =0;
+                while (i < 10)
+                {
+                    try
+                    {
+                        CoreUtils.CopyFilesRecursively(new(AppDomain.CurrentDomain.BaseDirectory), new(target));
+                        Process.Start(Path.Combine(target, "RageCoop.Server"));
+                        Environment.Exit(0);
+                    }
+                    catch
+                    {
+                        Thread.Sleep(3000);
+                    }
+                }
+                return;
+            }
             AppDomain.CurrentDomain.UnhandledException+=UnhandledException;
             mainLogger = new Logger()
             {

@@ -14,6 +14,7 @@ using Lidgren.Network;
 using System.Timers;
 using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
+using Timer = System.Timers.Timer;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using RageCoop.Core.Scripting;
@@ -44,13 +45,14 @@ namespace RageCoop.Server
         private Dictionary<int,FileTransfer> InProgressFileTransfers=new();
         internal Resources Resources;
         internal Logger Logger;
-        private Security Security;
+        internal Security Security;
         private bool _stopping = false;
-        private Thread _listenerThread;
-        private Thread _announceThread;
-        private Thread _latencyThread;
-        private Worker _worker;
-        private HashSet<char> _allowedCharacterSet;
+        private readonly Thread _listenerThread;
+        private readonly Timer _announceTimer = new();
+        private readonly Timer _playerUpdateTimer = new();
+        private readonly Timer _updateTimer = new();
+        private readonly Worker _worker;
+        private readonly HashSet<char> _allowedCharacterSet;
         private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
         internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
         /// <summary>
@@ -80,134 +82,28 @@ namespace RageCoop.Server
             _worker=new Worker("ServerWorker", Logger);
 
             _listenerThread=new Thread(() => Listen());
-            _latencyThread=new Thread(() =>
+
+            _announceTimer.Interval = 1;
+            _announceTimer.Elapsed += (s, e) =>
             {
-                while (!_stopping)
-                {
-                    foreach(var c in ClientsByNetHandle.Values.ToArray())
-                    {
-                        try
-                        {
-                            NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
-                            new Packets.PlayerInfoUpdate()
-                            {
-                                PedID=c.Player.ID,
-                                Username=c.Username,
-                                Latency=c.Latency,
-                                Position=c.Player.Position
-                            }.Pack(outgoingMessage);
-                            MainNetServer.SendToAll(outgoingMessage, NetDeliveryMethod.ReliableSequenced, (byte)ConnectionChannel.Default);
-                        }
-                        catch(Exception ex)
-                        {
-                            Logger?.Error(ex);
-                        }
-                    }
-                    Thread.Sleep(1000);
-                }
-            });
-            _announceThread=new Thread(async () =>
+                _announceTimer.Interval = 10000;
+                _announceTimer.Stop();
+                Announce();
+                _announceTimer.Start();
+            };
+
+            _playerUpdateTimer.Interval = 1000;
+            _playerUpdateTimer.Elapsed += (s, e) => SendPlayerUpdate();
+
+            
+            _updateTimer.Interval = 1;
+            _updateTimer.Elapsed += (s, e) =>
             {
-                try
-                {
-                    // TLS only
-                    ServicePointManager.Expect100Continue = true;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
-                    ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                    HttpClient httpClient = new();
-                    IpInfo info;
-                    try
-                    {
-                        info = CoreUtils.GetIPInfo();
-                        Logger?.Info($"Your public IP is {info.Address}, announcing to master server...");
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger?.Error(ex.InnerException?.Message ?? ex.Message);
-                        return;
-                    }
-                    while (!_stopping)
-                    {
-                        HttpResponseMessage response = null;
-                        try
-                        {
-                            Security.GetPublicKey(out var pModulus,out var pExpoenet);
-                            var serverInfo = new ServerInfo
-                            {
-                                address = info.Address,
-                                port=Settings.Port.ToString(),
-                                country=info.Country,
-                                name=Settings.Name,
-                                version=Version.ToString(),
-                                players=MainNetServer.ConnectionsCount.ToString(),
-                                maxPlayers=Settings.MaxPlayers.ToString(),
-                                description=Settings.Description,
-                                website=Settings.Website,
-                                gameMode=Settings.GameMode,
-                                language=Settings.Language,
-                                useP2P=Settings.UseP2P,
-                                useZT=Settings.UseZeroTier,
-                                ztID=Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
-                                ztAddress=Settings.UseZeroTier ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First() : "0.0.0.0",
-                                publicKeyModulus=Convert.ToBase64String(pModulus),
-                                publicKeyExponent=Convert.ToBase64String(pExpoenet)
-                            };
-                            string msg = JsonConvert.SerializeObject(serverInfo);
-
-                            var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
-                            response = await httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"));
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger?.Error($"MasterServer: {ex.Message}");
-
-                            // Sleep for 5s
-                            Thread.Sleep(5000);
-                            continue;
-                        }
-
-                        if (response == null)
-                        {
-                            Logger?.Error("MasterServer: Something went wrong!");
-                        }
-                        else if (response.StatusCode != HttpStatusCode.OK)
-                        {
-                            if (response.StatusCode == HttpStatusCode.BadRequest)
-                            {
-                                string requestContent = await response.Content.ReadAsStringAsync();
-                                Logger?.Error($"MasterServer: [{(int)response.StatusCode}], {requestContent}");
-                            }
-                            else
-                            {
-                                Logger?.Error($"MasterServer: [{(int)response.StatusCode}]");
-                                Logger?.Error($"MasterServer: [{await response.Content.ReadAsStringAsync()}]");
-                            }
-                        }
-
-                        // Sleep for 10s
-                        for (int i = 0; i<10; i++)
-                        {
-                            if (_stopping)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                Thread.Sleep(1000);
-                            }
-                        }
-                    }
-                }
-                catch (HttpRequestException ex)
-                {
-                    Logger?.Error($"MasterServer: {ex.InnerException.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Logger?.Error($"MasterServer: {ex.Message}");
-                }
-            });
+                _updateTimer.Interval= 1000 * 60 * 10; // 10 minutes
+                _updateTimer.Stop();
+                CheckUpdate();
+                _updateTimer.Start();
+            };
         }
 
         
@@ -256,10 +152,14 @@ namespace RageCoop.Server
             BaseScript.OnStart();
             Resources.LoadAll();
             _listenerThread.Start();
-            _latencyThread.Start();
+            _playerUpdateTimer.Enabled=true;
             if (Settings.AnnounceSelf)
             {
-                _announceThread.Start();
+                _announceTimer.Enabled=true;
+            }
+            if (Settings.AutoUpdate)
+            {
+                _updateTimer.Enabled = true;
             }
 
             Logger?.Info("Listening for clients");
@@ -269,14 +169,12 @@ namespace RageCoop.Server
         /// </summary>
         public void Stop()
         {
-            _stopping = true;
             Logger?.Flush();
+            Logger?.Dispose();
+            _stopping = true;
             _listenerThread.Join();
-            _latencyThread.Join();
-            if (_announceThread.IsAlive)
-            {
-                _announceThread.Join();
-            }
+            _playerUpdateTimer.Enabled = false;
+            _announceTimer.Enabled = false;
             _worker.Dispose();
         }
         private void Listen()
@@ -546,8 +444,6 @@ namespace RageCoop.Server
                 }.Pack(msg); 
                 MainNetServer.SendMessage(msg,c.Connection, NetDeliveryMethod.ReliableOrdered, (int)ConnectionChannel.Chat);
             }
-
-            Logger?.Info(name + ": " + message);
         }
         internal void SendChatMessage(string name, string message, Client target)
         {

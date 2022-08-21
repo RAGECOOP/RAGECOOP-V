@@ -119,7 +119,7 @@ namespace RageCoop.Client.Installer
             if (Directory.Exists("RageCoop"))
             {
                 UpdateStatus("Installing...");
-                CopyFilesRecursively(new DirectoryInfo("RageCoop"),new DirectoryInfo(installPath));
+                CoreUtils.CopyFilesRecursively(new DirectoryInfo("RageCoop"),new DirectoryInfo(installPath));
                 Finish();
             }
             else
@@ -248,12 +248,6 @@ namespace RageCoop.Client.Installer
         {
             return (byte[])Resource.ResourceManager.GetObject("LemonUI_SHVDN3");
         }
-        public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
-        {
-            foreach (DirectoryInfo dir in source.GetDirectories())
-                CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
-            foreach (FileInfo file in source.GetFiles())
-                file.CopyTo(Path.Combine(target.FullName, file.Name),true);
-        }
+        
     }
 }

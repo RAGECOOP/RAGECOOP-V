@@ -43,6 +43,8 @@ namespace RageCoop.Server.Scripting
             {
                 API.SendCustomEventQueued(API.GetAllClients().Values.Where(x=>x!=e.Client).ToList(),CustomEvents.OnPlayerDied,e.Client.Username);
             });
+            API.Events.OnChatMessage+=(s,e) =>
+            Server.Logger?.Info((e.Client?.Username ?? e.ClaimedSender ?? "Unknown") + ": " + e.Message);
         }
         public override void OnStop()
         {

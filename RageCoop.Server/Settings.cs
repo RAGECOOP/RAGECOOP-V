@@ -104,6 +104,11 @@
         /// The zerotier network id to join, default value is zerotier's public Earth network.
         /// </summary>
         public string ZeroTierNetworkID { get; set; } = "8056c2e21c000001";
+
+        /// <summary>
+        /// Automatically update to nightly build when an update is avalible, check is performed every 10 minutes.
+        /// </summary>
+        public bool AutoUpdate { get; set; } = false;
         /*
         /// <summary>
         /// Kick godmode and spamming idiots

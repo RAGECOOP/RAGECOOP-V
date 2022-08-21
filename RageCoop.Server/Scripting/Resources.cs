@@ -50,11 +50,11 @@ namespace RageCoop.Server.Scripting
 								zip.BeginUpdate();
 								foreach (var dir in Directory.GetDirectories(resourceFolder, "*", SearchOption.AllDirectories))
 								{
-									zip.AddDirectory(dir.Substring(resourceFolder.Length+1));
+									zip.AddDirectory(dir[(resourceFolder.Length + 1)..]);
 								}
 								foreach (var file in Directory.GetFiles(resourceFolder, "*", SearchOption.AllDirectories))
 								{
-									zip.Add(file, file.Substring(resourceFolder.Length+1));
+									zip.Add(file, file[(resourceFolder.Length + 1)..]);
 								}
 								zip.CommitUpdate();
 								zip.Close();

@@ -209,14 +209,13 @@ namespace RageCoop.Server.Scripting
             raiseEvent ??= targets==null;
             try
             {
-                if (Server.MainNetServer.ConnectionsCount == 0)
+                if (Server.MainNetServer.ConnectionsCount != 0)
                 {
-                    return;
-                }
-                targets ??= new(Server.ClientsByNetHandle.Values);
-                foreach(Client client in targets)
-                {
-                    Server.SendChatMessage(username, message, client);
+                    targets ??= new(Server.ClientsByNetHandle.Values);
+                    foreach (Client client in targets)
+                    {
+                        Server.SendChatMessage(username, message, client);
+                    }
                 }
             }
             catch (Exception e)
