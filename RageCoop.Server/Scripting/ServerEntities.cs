@@ -211,10 +211,19 @@ namespace RageCoop.Server.Scripting
             ped.Owner=sender;
             ped.Health=p.Health;
             ped._rot=p.Rotation;
-            ped.Owner=sender;
             if (p.Speed>=4 && Vehicles.TryGetValue(p.VehicleID,out var v))
             {
                 ped.LastVehicle=v;
+            }
+
+            if (ped.Owner != sender)
+            {
+                if (ped.Owner != null)
+                {
+                    ped.Owner.EntitiesCount--;
+                }
+                ped.Owner = sender;
+                sender.EntitiesCount++;
             }
         }
         internal void Update(Packets.VehicleSync p, Client sender)
@@ -226,8 +235,16 @@ namespace RageCoop.Server.Scripting
                 veh.ID=p.ID;
             }
             veh._pos = p.Position+p.Velocity*sender.Latency;
-            veh.Owner=sender;
             veh._quat=p.Quaternion;
+            if(veh.Owner != sender)
+            {
+                if (veh.Owner != null)
+                {
+                    veh.Owner.EntitiesCount--;
+                }
+                veh.Owner = sender;
+                sender.EntitiesCount++;
+            }
         }
         internal void CleanUp(Client left)
         {
@@ -252,7 +269,11 @@ namespace RageCoop.Server.Scripting
         }
         internal void RemoveVehicle(int id)
         {
-            Vehicles.TryRemove(id, out _);
+            Vehicles.TryRemove(id, out var veh);
+            if (veh.Owner != null)
+            {
+                veh.Owner.EntitiesCount--;
+            }
         }
 
         internal void RemoveProp(int id)
@@ -265,7 +286,11 @@ namespace RageCoop.Server.Scripting
         }
         internal void RemovePed(int id)
         {
-            Peds.TryRemove(id, out _);
+            Peds.TryRemove(id, out var ped);
+            if (ped.Owner != null)
+            {
+                ped.Owner.EntitiesCount--;
+            }
         }
 
         internal void Add(ServerPed ped)

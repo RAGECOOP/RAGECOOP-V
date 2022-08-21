@@ -20,6 +20,11 @@ namespace RageCoop.Server
         {
             Server=server;
         }
+
+        /// <summary>
+        /// Gets the total number of entities owned by this client
+        /// </summary>
+        public int EntitiesCount { get; internal set; }
         /// <summary>
         /// Th client's IP address and port.
         /// </summary>

@@ -27,6 +27,8 @@ namespace RageCoop.Server.Scripting
             {
                 if (Server.Settings.WeatherTimeSync)
                 {
+                    if (e.Client != API.Host) { e.Client.SendCustomEvent(CustomEvents.IsHost, false); return; }
+
                     foreach (var c in API.GetAllClients().Values)
                     {
                         if (c==e.Client)
