@@ -138,7 +138,12 @@ namespace RageCoop.Server
                 var end = versionLine.LastIndexOf('\"');
                 var latest = Version.Parse(versionLine.AsSpan(start, end - start));
                 if (latest <= Version) { return; }
-                API.SendChatMessage($"New server version found: {latest}, downloading update...");
+                
+                // wait ten minutes for the build to complete
+                API.SendChatMessage($"New server version found: {latest}, server will update in 10 minutes");
+                Thread.Sleep(10 * 60 * 1000);
+                
+                API.SendChatMessage("downloading update...");
                 var downloadURL = $"https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Server-{GetRID()}.zip";
                 if (Directory.Exists("Update")) { Directory.Delete("Update", true); }
                 HttpHelper.DownloadFile(downloadURL, "Update.zip", null);
