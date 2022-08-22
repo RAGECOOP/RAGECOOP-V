@@ -34,8 +34,6 @@ namespace RageCoop.Client
             }
 
             Game.DisableControlThisFrame(Control.FrontendPause);
-            Game.DisableControlThisFrame(Control.VehicleExit);
-            Game.DisableControlThisFrame(Control.Enter);
 
             if (Main.Settings.DisableAlternatePause)
             {

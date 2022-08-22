@@ -273,25 +273,6 @@ namespace RageCoop.Client
                     PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                 }
             }
-            else if (Game.IsControlJustPressed(GTA.Control.VehicleExit))
-            {
-                if (P.IsInVehicle())
-                {
-                    P.Task.LeaveVehicle();
-                }
-                else if (P.IsTaskActive(TaskType.CTaskMoveGoToVehicleDoor))
-                {
-                    P.Task.ClearAll();
-                }
-                else
-                {
-                    var v = World.GetClosestVehicle(P.Position, 10);
-                    if (v!=null)
-                    {
-                        P.Task.EnterVehicle(v, VehicleSeat.Driver, -1, 5, EnterVehicleFlags.AllowJacking);
-                    }
-                }
-            }
             else if (e.KeyCode==Settings.PassengerKey)
             {
                 var P = Game.Player.Character;
