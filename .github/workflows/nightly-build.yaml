@@ -32,7 +32,8 @@ jobs:
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-x64 -o bin/Release/Server/linux-x64 -c Release
     - name: Build server linux-arm
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-arm -o bin/Release/Server/linux-arm -c Release
-    
+    - name: Build installer
+      run: dotnet build RageCoop.Client.Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client.Publish
     - uses: vimtor/action-zip@v1
       with:
         files: bin/Release/Client.Publish
