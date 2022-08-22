@@ -22,7 +22,6 @@ using System.Windows.Forms;
 using Path = System.IO.Path;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace RageCoop.Client.Installer
 {
@@ -71,7 +70,7 @@ namespace RageCoop.Client.Installer
             var scriptsPath = Path.Combine(root, "Scripts");
             var lemonPath = Path.Combine(scriptsPath, "LemonUI.SHVDN3.dll");
             var installPath = Path.Combine(scriptsPath, "RageCoop");
-            if(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == scriptsPath)
+            if(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == installPath)
             {
                 throw new InvalidOperationException("The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
             }
@@ -90,7 +89,7 @@ namespace RageCoop.Client.Installer
             if (shvdnVer<new Version(3,5,1))
             {
                 MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
-                    $"\nCurrent version is {shvdnVer.ToString()}, 3.5.1 or higher is required");
+                    $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
                 Environment.Exit(1);
             }
             if (File.Exists(lemonPath))
@@ -116,34 +115,15 @@ namespace RageCoop.Client.Installer
                 File.Delete(f);
             }
 
-            if (Directory.Exists("RageCoop"))
+            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll"))
             {
                 UpdateStatus("Installing...");
-                CoreUtils.CopyFilesRecursively(new DirectoryInfo("RageCoop"),new DirectoryInfo(installPath));
+                CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()), new DirectoryInfo(installPath));
                 Finish();
             }
             else
             {
-                UpdateStatus("Downloading...");
-                var downloadPath = "RageCoop.Client.zip";
-                downloadPath = Path.GetFullPath(downloadPath);
-                WebClient client = new WebClient();
-
-                // TLS only
-                ServicePointManager.Expect100Continue = true;
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
-                ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-
-                client.DownloadProgressChanged += (s, e1) => UpdateStatus($"Downloading {e1.ProgressPercentage}%");
-                client.DownloadFileCompleted += (s, e2) =>
-                {
-
-                    UpdateStatus("Installing...");
-                    Directory.CreateDirectory(installPath);
-                    new FastZip().ExtractZip(downloadPath, scriptsPath, FastZip.Overwrite.Always, null, null, null, true);
-                    Finish();
-                };
-                client.DownloadFileAsync(new Uri("https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Client.zip"), downloadPath);
+                throw new Exception("Required files are missing, please re-download the zip from official website");
             }
 
             void Finish()
@@ -191,7 +171,6 @@ namespace RageCoop.Client.Installer
                     }
                 }
 
-                checkZT:
                 UpdateStatus("Checking ZeroTier");
                 try
                 {
@@ -208,20 +187,6 @@ namespace RageCoop.Client.Installer
                             HttpHelper.DownloadFile(url, "ZeroTier.msi", (p) => UpdateStatus("Downloading ZeroTier " + p + "%"));
                             UpdateStatus("Installing ZeroTier");
                             Process.Start("ZeroTier.msi").WaitForExit();
-                            /*
-                            for (int i = 0; i < 10; i++)
-                            {
-                                Thread.Sleep(1000);
-                                UpdateStatus("Waiting ZeroTier to start... " + i);
-                                try
-                                {
-                                    ZeroTierHelper.Check();
-                                    break;
-                                }
-                                catch(Exception ex) { UpdateStatus(ex.ToString()); }
-                            }
-                            goto checkZT;
-                            */
                         }
                         catch
                         {
