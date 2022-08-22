@@ -84,7 +84,9 @@ namespace RageCoop.Client
                     return;
                 }
             }
-            
+
+
+            DisplayVehicle();
             // Skip update if no new sync message has arrived.
             if (!NeedUpdate)
             {
@@ -97,8 +99,6 @@ namespace RageCoop.Client
             }
             MainVehicle.ThrottlePower=ThrottlePower;
             MainVehicle.BrakePower=BrakePower;
-            var v = Main.P.CurrentVehicle;
-            DisplayVehicle(v != null && MainVehicle.IsTouching(v));
             
             if (IsDead)
             {
@@ -258,7 +258,7 @@ namespace RageCoop.Client
             }
             LastUpdated=Main.Ticked;
         }
-        void DisplayVehicle(bool touching)
+        void DisplayVehicle()
         {
             _elapsed = Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds;
             _predictedPosition = Position + _elapsed * Velocity;
@@ -271,6 +271,10 @@ namespace RageCoop.Client
                 MainVehicle.Position = _predictedPosition;
                 MainVehicle.Velocity = Velocity;
                 MainVehicle.Quaternion = Quaternion;
+                return;
+            }
+            else if (dist <= 0.03)
+            {
                 return;
             }
 
