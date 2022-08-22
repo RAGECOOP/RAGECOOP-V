@@ -684,10 +684,11 @@ namespace RageCoop.Client
         private void SmoothTransition()
         {
             var localRagdoll = MainPed.IsRagdoll;
-            var dist = Position.DistanceTo(MainPed.ReadPosition());
-            if (dist>3)
+            var predicted = Predict(Position);
+            var dist = predicted.DistanceTo(MainPed.ReadPosition());
+            if (IsOff(dist))
             {
-                MainPed.PositionNoOffset=Position;
+                MainPed.PositionNoOffset= predicted;
                 return;
             }
             if (!(localRagdoll || MainPed.IsDead))
@@ -696,12 +697,12 @@ namespace RageCoop.Client
                 {
                     var cur=MainPed.Heading;
                     var diff=Heading-cur;
-                    if (diff > 180) { diff = diff - 360; }
-                    else if (diff < -180) { diff = 360 + diff; }
+                    if (diff > 180) { diff -= 360; }
+                    else if (diff < -180) { diff += 360; }
                     
                     MainPed.Heading=cur+diff/2;
                 }
-                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
+                MainPed.Velocity = Velocity + 5 * dist * (predicted - MainPed.ReadPosition());
             }
             else if (Main.Ticked-_lastRagdollTime<10)
             {
@@ -718,25 +719,25 @@ namespace RageCoop.Client
 
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=20;
-                helper.Impulse=20*(HeadPosition-head.Position);
+                helper.Impulse=20*(Predict(HeadPosition) -head.Position);
                 helper.Start();
                 helper.Stop();
 
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=6;
-                helper.Impulse=20*(RightFootPosition-rightFoot.Position);
+                helper.Impulse=20*(Predict(RightFootPosition) -rightFoot.Position);
                 helper.Start();
                 helper.Stop();
 
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=3;
-                helper.Impulse=20*(LeftFootPosition-leftFoot.Position);
+                helper.Impulse=20*(Predict(LeftFootPosition) -leftFoot.Position);
                 helper.Start();
                 helper.Stop();
             }
             else
             {
-                MainPed.Velocity=Velocity+5*dist*(Position-MainPed.ReadPosition());
+                MainPed.Velocity=Velocity+5*dist*(predicted-MainPed.ReadPosition());
             }
         }
 

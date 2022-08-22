@@ -1,6 +1,8 @@
 ﻿using GTA;
 using GTA.Native;
 using System;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace RageCoop.Client
 {
@@ -9,7 +11,6 @@ namespace RageCoop.Client
     /// </summary>
     public class WorldThread : Script
     {
-        private static bool _lastDisableTraffic = false;
 
         /// <summary>
         /// Don't use it!
@@ -19,15 +20,30 @@ namespace RageCoop.Client
             Tick += OnTick;
             Aborted += (sender, e) =>
             {
-                if (_lastDisableTraffic)
-                {
-                    Traffic(true);
-                }
+                ChangeTraffic(true);
             };
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(5000);
+                    Main.QueueAction(() => { ChangeTraffic(_trafficEnabled); });
+                }
+            });
         }
-
+        static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
+            if (!_trafficEnabled)
+            {
+                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
+                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 0);
+                Function.Call(Hash.SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
+                Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
+            }
             if (Game.IsLoading || !Networking.IsOnServer)
             {
                 return;
@@ -39,13 +55,16 @@ namespace RageCoop.Client
             {
                 Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
             }
-
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
             Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
         }
-
         public static void Traffic(bool enable)
+        {
+            ChangeTraffic(enable);
+            _trafficEnabled = enable;
+        }
+        private static void ChangeTraffic(bool enable)
         {
             if (enable)
             {
@@ -78,35 +97,63 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
 
-
-                foreach (Ped ped in World.GetAllPeds())
+                if (Networking.IsOnServer)
                 {
-                    SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
-                    if ((c==null) || (c.IsLocal && (ped.Handle!=Game.Player.Character.Handle)&&ped.PopulationType!=EntityPopulationType.Mission))
-                    {
-                        if (ped.Handle==Game.Player.Character.Handle) { continue; }
 
-                        // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
-                        ped.CurrentVehicle?.Delete();
-                        ped.Kill();
-                        ped.Delete();
+                    foreach (Ped ped in World.GetAllPeds())
+                    {
+                        SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
+                        if ((c == null) || (c.IsLocal && (ped.Handle != Game.Player.Character.Handle) && ped.PopulationType != EntityPopulationType.Mission))
+                        {
+                            if (ped.Handle == Game.Player.Character.Handle) { continue; }
+
+                            // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                            ped.CurrentVehicle?.Delete();
+                            ped.Kill();
+                            ped.Delete();
+                        }
+
                     }
 
+                    foreach (Vehicle veh in World.GetAllVehicles())
+                    {
+                        SyncedVehicle v = veh.GetSyncEntity();
+                        if (v.MainVehicle == Game.Player.LastVehicle)
+                        {
+                            // Don't delete player's vehicle
+                            continue;
+                        }
+                        if ((v == null) || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
+                        {
+                            // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+
+                            veh.Delete();
+                        }
+                    }
                 }
-
-                foreach (Vehicle veh in World.GetAllVehicles())
+                else
                 {
-                    SyncedVehicle v = veh.GetSyncEntity();
-                    if (v.MainVehicle==Game.Player.LastVehicle)
+                    foreach (Ped ped in World.GetAllPeds())
                     {
-                        // Don't delete player's vehicle
-                        continue;
-                    }
-                    if ((v== null) || (v.IsLocal&&veh.PopulationType!=EntityPopulationType.Mission))
-                    {
-                        // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+                        if ((ped != Game.Player.Character) && (ped.PopulationType != EntityPopulationType.Mission))
+                        {
+                            // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                            ped.CurrentVehicle?.Delete();
+                            ped.Kill();
+                            ped.Delete();
+                        }
 
-                        veh.Delete();
+                    }
+                    var last = Game.Player.Character.LastVehicle;
+                    var current = Game.Player.Character.CurrentVehicle;
+                    foreach (Vehicle veh in World.GetAllVehicles())
+                    {
+                        if (veh.PopulationType != EntityPopulationType.Mission && veh != last && veh!=current)
+                        {
+                            // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+
+                            veh.Delete();
+                        }
                     }
                 }
             }

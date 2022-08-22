@@ -9,7 +9,6 @@ using GTA.Native;
 namespace RageCoop.Client{
     public partial class SyncedVehicle{
         public Vehicle MainVehicle { get; internal set; }
-        public Stopwatch LastSyncedStopWatch = new Stopwatch();
 
 
         #region -- SYNC DATA --

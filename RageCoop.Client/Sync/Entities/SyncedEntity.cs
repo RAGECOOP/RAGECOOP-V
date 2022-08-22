@@ -89,10 +89,27 @@ namespace RageCoop.Client
         internal Vector3 Rotation { get; set; }
         internal Quaternion Quaternion { get; set; }
         internal Vector3 Velocity { get; set; }
+        public Stopwatch LastSyncedStopWatch = new Stopwatch();
         internal abstract void Update();
         internal void PauseUpdate(ulong frames)
         {
             LastUpdated=Main.Ticked+frames;
+        }
+        protected Vector3 Predict(Vector3 input)
+        {
+            return (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Velocity + input;
+        }
+        private float _accumulatedOff=0;
+        protected bool IsOff(float thisOff, float tolerance=3 , float limit = 30)
+        {
+            _accumulatedOff += thisOff - tolerance;
+            if (_accumulatedOff < 0) { _accumulatedOff=0;}
+            else if (_accumulatedOff>=limit)
+            {
+                _accumulatedOff = 0;
+                return true;
+            }
+            return false;
         }
     }
 }

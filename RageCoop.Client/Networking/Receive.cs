@@ -335,6 +335,7 @@ namespace RageCoop.Client
             c.Flags=packet.Flags;
             c.Heading=packet.Heading;
             c.Position = packet.Position;
+            c.LastSyncedStopWatch.Restart();
             if (c.IsRagdoll)
             {
                 c.HeadPosition=packet.HeadPosition;

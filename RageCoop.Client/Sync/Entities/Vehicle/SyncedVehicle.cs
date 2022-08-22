@@ -260,8 +260,7 @@ namespace RageCoop.Client
         }
         void DisplayVehicle()
         {
-            _elapsed = Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds;
-            _predictedPosition = Position + _elapsed * Velocity;
+            _predictedPosition = Predict(Position);
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(_predictedPosition);
             var cali = dist * (_predictedPosition - current);
