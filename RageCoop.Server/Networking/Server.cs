@@ -188,62 +188,6 @@ namespace RageCoop.Server
         {
             _worker.QueueJob(job);
         }
-        private void HandlePacket(PacketType type,byte[] data,Client sender)
-        {
-            try
-            {
-                switch (type)
-                {
-                    case PacketType.PedSync:
-                        PedSync(data.GetPacket<Packets.PedSync>(), sender);
-                        break;
-
-                    case PacketType.VehicleSync:
-                        VehicleSync(data.GetPacket<Packets.VehicleSync>(), sender);
-                        break;
-
-                    case PacketType.ProjectileSync:
-                        ProjectileSync(data.GetPacket<Packets.ProjectileSync>(), sender);
-                        break;
-
-                    case PacketType.ChatMessage:
-                        {
-                            Packets.ChatMessage packet = new((b) =>
-                            {
-                                return Security.Decrypt(b,sender.EndPoint);
-                            });
-                            packet.Deserialize(data);
-                            ChatMessageReceived(packet.Username,packet.Message, sender);
-                        }
-                        break;
-
-                    case PacketType.Voice:
-                        {
-                            if (Settings.UseVoice)
-                            {
-                                Forward(data.GetPacket<Packets.Voice>(), sender, ConnectionChannel.Voice);
-                            }
-                        }
-                        break;
-
-                    case PacketType.CustomEvent:
-                        {
-                            Packets.CustomEvent packet = new Packets.CustomEvent();
-                            packet.Deserialize(data);
-                            _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
-                        }
-                        break;
-                    default:
-                        Logger?.Error("Unhandled Data / Packet type");
-                        break;
-
-                }
-            }
-            catch (Exception e)
-            {
-                DisconnectAndLog(sender.Connection, type, e);
-            }
-        }
 
         // Send a message to targets or all players
         internal void ChatMessageReceived(string name, string message,Client sender=null)
