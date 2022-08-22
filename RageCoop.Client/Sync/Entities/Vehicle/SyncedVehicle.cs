@@ -214,14 +214,13 @@ namespace RageCoop.Client
                 }
 
                 Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
-                MainVehicle.SetDamageModel(DamageModel);
+                
 
             }
             MainVehicle.LockStatus=LockStatus;
 
             if (LastFullSynced>=LastUpdated)
             {
-#region -- SYNC STATE --
                 if (Flags.HasVehFlag(VehicleDataFlags.Repaired))
                 {
                     MainVehicle.Repair();
@@ -255,7 +254,7 @@ namespace RageCoop.Client
                     Function.Call(Hash.SET_VEHICLE_LIVERY, MainVehicle, Livery);
                     _lastLivery=Livery;
                 }
-#endregion
+                MainVehicle.SetDamageModel(DamageModel);
             }
             LastUpdated=Main.Ticked;
         }
