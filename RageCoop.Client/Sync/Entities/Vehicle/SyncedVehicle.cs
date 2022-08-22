@@ -273,13 +273,11 @@ namespace RageCoop.Client
                 MainVehicle.Quaternion = Quaternion;
                 return;
             }
-            else if (dist <= 0.03)
+            else if (dist > 0.03)
             {
-                return;
+                MainVehicle.Velocity = Velocity + cali;
             }
 
-
-            MainVehicle.Velocity = Velocity+cali;
             Vector3 calirot;
             if (IsFlipped || (calirot = GetCalibrationRotation()).Length()>50)
             {
@@ -291,19 +289,6 @@ namespace RageCoop.Client
             {
                 MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
             }
-
-#if DEBUG_VEH
-            if (_orgTrace.Count >= 30)
-            {
-                _orgTrace.RemoveAt(0);
-            }
-            if (_predictedTrace.Count >= 30)
-            {
-                _predictedTrace.RemoveAt(0);
-            }
-            _orgTrace.Add(Position);
-            _predictedTrace.Add(_predictedPos);
-#endif
         }
         private Vector3 GetCalibrationRotation()
         {
