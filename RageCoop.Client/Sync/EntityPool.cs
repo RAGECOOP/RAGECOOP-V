@@ -450,7 +450,7 @@ namespace RageCoop.Client
                 {
                     if (!VehiclesByHandle.ContainsKey(veh.Handle))
                     {
-                        if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit || World.GetNearbyVehicles(veh.Position,2).Length>0)
+                        if (allVehicles.Length>Main.Settings.WorldVehicleSoftLimit)
                         {
                             var type = veh.PopulationType;
                             if (type==EntityPopulationType.RandomAmbient || type==EntityPopulationType.RandomParked)

@@ -138,6 +138,7 @@ namespace RageCoop.Client
             {
 #if !NON_INTERACTIVE
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
+                WorldThread.Traffic(!Settings.DisableTraffic);
 #endif
             }
 
