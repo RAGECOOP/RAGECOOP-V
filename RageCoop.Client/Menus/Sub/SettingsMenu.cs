@@ -109,6 +109,7 @@ namespace RageCoop.Client.Menus
         public static void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
         {
             WorldThread.Traffic(!_disableTrafficItem.Checked);
+            Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
             Util.SaveSettings();
         }
 

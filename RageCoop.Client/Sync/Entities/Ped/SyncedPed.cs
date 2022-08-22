@@ -107,7 +107,7 @@ namespace RageCoop.Client
         internal uint CurrentWeaponHash { get; set; }
         private Dictionary<uint, bool> _lastWeaponComponents = null;
         internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
-        private int _lastWeaponObj = 0;
+        private Entity _weaponObj;
         #endregion
         internal Vector3 AimCoords { get; set; }
 
@@ -207,13 +207,15 @@ namespace RageCoop.Client
                     return;
                 }
             }
+
+            CheckCurrentWeapon();
             if (Speed>=4)
             {
                 DisplayInVehicle();
             }
             else
             {
-                if (MainPed.IsInVehicle()) { MainPed.Task.LeaveVehicle(LeaveVehicleFlags.WarpOut); }
+                if (MainPed.IsInVehicle()) { MainPed.Task.LeaveVehicle(LeaveVehicleFlags.WarpOut);return; }
                 DisplayOnFoot();
             }
 
@@ -346,7 +348,6 @@ namespace RageCoop.Client
         private void DisplayOnFoot()
         {
 
-            CheckCurrentWeapon();
             if (IsInParachuteFreeFall)
             {
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
@@ -582,14 +583,12 @@ namespace RageCoop.Client
         #region WEAPON
         private void CheckCurrentWeapon()
         {
-            if (!WeaponAsset.IsLoaded) { WeaponAsset.Request(); }
-            if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents))
+            if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash || !WeaponComponents.Compare(_lastWeaponComponents) || (Speed <=3 && _weaponObj?.IsVisible != true))
             {
-                if (WeaponAsset!=null) { WeaponAsset.MarkAsNoLongerNeeded(); }
                 WeaponAsset=new WeaponAsset(CurrentWeaponHash);
-                MainPed.Weapons.RemoveAll();
-                _lastWeaponObj = Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0);
-
+                MainPed.Weapons.RemoveAll(); 
+                _weaponObj = Entity.FromHandle(Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1, Position.X, Position.Y, Position.Z, true, 0, 0));
+                if (_weaponObj == null) { return; }
                 if (CurrentWeaponHash != (uint)WeaponHash.Unarmed)
                 {
                     if (WeaponComponents != null && WeaponComponents.Count != 0)
@@ -598,11 +597,11 @@ namespace RageCoop.Client
                         {
                             if (comp.Value)
                             {
-                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _lastWeaponObj, comp.Key);
+                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _weaponObj, comp.Key);
                             }
                         }
                     }
-                    Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _lastWeaponObj, MainPed.Handle);
+                    Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _weaponObj, MainPed.Handle);
                 }
                 _lastWeaponComponents = WeaponComponents;
             }
@@ -750,7 +749,7 @@ namespace RageCoop.Client
             switch (Speed)
             {
                 case 4:
-                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle || MainPed.SeatIndex!=Seat)
+                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle || !MainPed.IsSittingInVehicle() || MainPed.SeatIndex!=Seat)
                     {
                         MainPed.SetIntoVehicle(CurrentVehicle.MainVehicle, Seat);
                     }
@@ -762,7 +761,6 @@ namespace RageCoop.Client
                     if (MainPed.VehicleWeapon==VehicleWeaponHash.Invalid)
                     {
                         // World.DrawMarker(MarkerType.DebugSphere,AimCoords,default,default,new Vector3(0.2f,0.2f,0.2f),Color.AliceBlue);
-                        CheckCurrentWeapon();
                         if (IsAiming)
                         {
                             Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z);
