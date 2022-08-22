@@ -172,10 +172,15 @@ namespace RageCoop.Server
         {
             foreach(var c in ClientsByNetHandle.Values.ToArray())
             {
-                if (c.EntitiesCount > 100 || c.Player.IsInvincible)
+                if (c.EntitiesCount > 100 && Settings.KickSpamming)
                 {
-                    c.Kick("Bye bye asshole~");
-                    API.SendChatMessage($"Asshole {c.Username} was kicked!");
+                    c.Kick("Bye bye asshole: spamming");
+                    API.SendChatMessage($"Asshole {c.Username} was kicked: Spamming");
+                }
+                else if (Settings.KickGodMode && c.Player.IsInvincible)
+                {
+                    c.Kick("Bye bye asshole: godmode");
+                    API.SendChatMessage($"Asshole {c.Username} was kicked: GodMode");
                 }
             }
         }

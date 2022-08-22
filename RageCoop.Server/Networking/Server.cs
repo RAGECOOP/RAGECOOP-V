@@ -166,10 +166,8 @@ namespace RageCoop.Server
             {
                 _updateTimer.Enabled = true;
             }
-            if (Settings.AntiAssholes)
-            {
-                _antiAssholesTimer.Enabled = true;
-            }
+            _antiAssholesTimer.Enabled = true;
+
 
             Logger?.Info("Listening for clients");
         }

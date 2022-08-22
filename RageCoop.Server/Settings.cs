@@ -111,8 +111,13 @@
         public bool AutoUpdate { get; set; } = false;
 
         /// <summary>
-        /// Kick godmode and spamming assholes
+        /// Kick godmode assholes
         /// </summary>
-        public bool AntiAssholes { get; set; } = true;
+        public bool KickGodMode { get; set; } = false;
+
+        /// <summary>
+        /// Kick spamming assholes
+        /// </summary>
+        public bool KickSpamming { get; set; } = true;
     }
 }
