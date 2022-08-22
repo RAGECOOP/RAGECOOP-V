@@ -180,6 +180,8 @@ namespace RageCoop.Client
                 {
                     SetClothes();
                 }
+
+                CheckCurrentWeapon();
             }
 
             if (MainPed.IsDead)
@@ -208,7 +210,6 @@ namespace RageCoop.Client
                 }
             }
 
-            CheckCurrentWeapon();
             if (Speed>=4)
             {
                 DisplayInVehicle();
