@@ -634,7 +634,7 @@ namespace RageCoop.Client
         {
             MainPed.Task.ClearAll();
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
-            Vector3 predictPosition = Position + (Position - MainPed.ReadPosition()) + Velocity * 0.5f;
+            Vector3 predictPosition = Predict(Position);
             float range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
 
             switch (Speed)
@@ -714,30 +714,39 @@ namespace RageCoop.Client
                 var head = MainPed.Bones[Bone.SkelHead];
                 var rightFoot = MainPed.Bones[Bone.SkelRightFoot];
                 var leftFoot = MainPed.Bones[Bone.SkelLeftFoot];
-
+                Vector3 amount;
                 // 20:head, 3:left foot, 6:right foot, 17:right hand, 
 
+                amount= 20 * (Predict(HeadPosition) - head.Position);
+                if (amount.Length() > 50) { amount = amount.Normalized * 50; }
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=20;
-                helper.Impulse=20*(Predict(HeadPosition) -head.Position);
+                helper.Impulse = amount;
                 helper.Start();
                 helper.Stop();
 
+                amount = 20 * (Predict(RightFootPosition) - rightFoot.Position);
+                if (amount.Length() > 50) { amount = amount.Normalized * 50; }
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=6;
-                helper.Impulse=20*(Predict(RightFootPosition) -rightFoot.Position);
+                helper.Impulse = amount;
                 helper.Start();
                 helper.Stop();
 
+                amount = 20 * (Predict(LeftFootPosition) - leftFoot.Position);
+                if (amount.Length() > 50) { amount = amount.Normalized * 50; }
                 helper.EqualizeAmount = 1;
                 helper.PartIndex=3;
-                helper.Impulse=20*(Predict(LeftFootPosition) -leftFoot.Position);
+                helper.Impulse = amount;
                 helper.Start();
                 helper.Stop();
             }
             else
             {
-                MainPed.Velocity=Velocity+5*dist*(predicted-MainPed.ReadPosition());
+                // localRagdoll
+                var force = Velocity - MainPed.Velocity+5 * dist * (predicted - MainPed.ReadPosition());
+                if (force.Length() > 20) { force = force.Normalized*20; }
+                MainPed.ApplyForce(force);
             }
         }
 
@@ -751,7 +760,7 @@ namespace RageCoop.Client
             switch (Speed)
             {
                 case 4:
-                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle || !MainPed.IsSittingInVehicle() || MainPed.SeatIndex!=Seat)
+                    if (MainPed.CurrentVehicle!=CurrentVehicle.MainVehicle || MainPed.SeatIndex != Seat || (!MainPed.IsSittingInVehicle() && !MainPed.IsBeingJacked))
                     {
                         MainPed.SetIntoVehicle(CurrentVehicle.MainVehicle, Seat);
                     }
