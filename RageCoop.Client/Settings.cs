@@ -71,5 +71,10 @@ namespace RageCoop.Client
         /// The directory where log and resources downloaded from server will be placed.
         /// </summary>
         public string DataDirectory { get; set; } = "Scripts\\RageCoop\\Data";
+
+        /// <summary>
+        /// Show the owner name of the entity you're aiming at
+        /// </summary>
+        public bool ShowEntityOwnerName { get; set; } = false;
     }
 }

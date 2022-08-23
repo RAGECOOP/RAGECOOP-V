@@ -18,6 +18,7 @@ namespace RageCoop.Client
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
+        public static NativeCheckboxItem ShowOwnerItem = new NativeCheckboxItem("Show entity owner", "Show the owner name of the entity you're aiming at", false);
         private static readonly NativeCheckboxItem ShowNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
 
         static DebugMenu()
@@ -43,9 +44,11 @@ namespace RageCoop.Client
                 }
                 catch(Exception ex) { Main.Logger.Error(ex); }
             };
-            ShowNetworkInfoItem.CheckboxChanged += (s,e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
+            ShowNetworkInfoItem.CheckboxChanged += (s, e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
+            ShowOwnerItem.CheckboxChanged += (s, e) => { Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked; Util.SaveSettings(); };
             Menu.Add(SimulatedLatencyItem);
-            Menu.Add(ShowNetworkInfoItem);
+            Menu.Add(ShowNetworkInfoItem); 
+            Menu.Add(ShowOwnerItem);
             Menu.AddSubMenu(DiagnosticMenu);
 
         }

@@ -58,6 +58,32 @@ namespace RageCoop.Client
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
             Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
+
+            if (Main.Settings.ShowEntityOwnerName)
+            {
+                unsafe
+                {
+                    int handle;
+                    if (Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, 0, &handle))
+                    {
+                        var entity = Entity.FromHandle(handle);
+                        if (entity != null)
+                        {
+                            var owner = "invalid";
+                            if (entity.EntityType == EntityType.Vehicle)
+                            {
+                                owner = (entity as Vehicle).GetSyncEntity()?.Owner?.Username ?? "unknown";
+                            }
+                            if (entity.EntityType == EntityType.Ped)
+                            {
+                                owner = (entity as Ped).GetSyncEntity()?.Owner?.Username ?? "unknown";
+                            }
+                            GTA.UI.Screen.ShowHelpTextThisFrame("Entity owner: " + owner);
+                        }
+
+                    }
+                }
+            }
         }
         public static void Traffic(bool enable)
         {
