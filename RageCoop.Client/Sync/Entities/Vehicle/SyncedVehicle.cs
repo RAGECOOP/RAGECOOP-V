@@ -206,9 +206,11 @@ namespace RageCoop.Client
                         Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
                     }
                 }
-                else if(IsDeluxo && IsDeluxoHovering!=MainVehicle.IsDeluxoHovering()){
+                else if(IsDeluxo)
+                {
                     MainVehicle.SetDeluxoHoverState(IsDeluxoHovering);
-                    if(IsDeluxoHovering){
+                    if (IsDeluxoHovering)
+                    {
                         MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
                     }
                 }
