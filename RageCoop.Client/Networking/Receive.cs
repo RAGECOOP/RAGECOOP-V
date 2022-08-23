@@ -5,6 +5,7 @@ using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using GTA.Native;
 
 namespace RageCoop.Client
 {
@@ -76,6 +77,7 @@ namespace RageCoop.Client
                                 Main.QueueAction(() =>
                                 {
                                     WorldThread.Traffic(!Main.Settings.DisableTraffic);
+                                    Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
                                     CoopMenu.ConnectedMenuSetting();
                                     Main.MainChat.Init();
                                     if (Main.Settings.Voice && !Voice.WasInitialized())

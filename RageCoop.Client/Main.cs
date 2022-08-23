@@ -317,6 +317,7 @@ namespace RageCoop.Client
             PlayerList.Cleanup();
             LocalPlayerID=default;
             WorldThread.Traffic(!Settings.DisableTraffic);
+            Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
         }
         private static void DoQueuedActions()
         {
