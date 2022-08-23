@@ -299,7 +299,10 @@ namespace RageCoop.Server
         }
         internal void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {
-            SendFile(File.OpenRead(path), name,client,NewFileID(),updateCallback);
+            var fs = File.OpenRead(path);
+            SendFile(fs, name,client,NewFileID(),updateCallback);
+            fs.Close();
+            fs.Dispose();
         }
         internal void SendFile(Stream stream, string name, Client client,int id=default, Action<float> updateCallback = null)
         {
@@ -317,8 +320,8 @@ namespace RageCoop.Server
             }, ConnectionChannel.File)?.Response!=FileResponse.NeedToDownload)
             {
                 Logger?.Info($"Skipping file transfer \"{name}\" to {client.Username}");
-                stream.Close();
-                stream.Dispose();
+                // stream.Close();
+                // stream.Dispose();
                 return;
             }
             Logger?.Debug($"Initiating file transfer:{name}, {total}");
@@ -359,8 +362,8 @@ namespace RageCoop.Server
             {
                 Logger.Warning($"File trasfer to {client.Username} failed: "+name);
             }
-            stream.Close();
-            stream.Dispose();
+            // stream.Close();
+            // stream.Dispose();
             Logger?.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }
