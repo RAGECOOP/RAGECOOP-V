@@ -634,7 +634,7 @@ namespace RageCoop.Client
         {
             MainPed.Task.ClearAll();
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
-            Vector3 predictPosition = Predict(Position);
+            Vector3 predictPosition = Predict(Position)+Velocity;
             float range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
 
             switch (Speed)
