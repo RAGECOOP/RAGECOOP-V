@@ -245,6 +245,7 @@ namespace RageCoop.Client.Scripting
                 Networking.ToggleConnection(null);
             }
         }
+        
         /// <summary>
         /// Send a local chat message to this player
         /// </summary>
@@ -253,6 +254,15 @@ namespace RageCoop.Client.Scripting
         public static void LocalChatMessage(string from, string message)
         {
             Main.MainChat.AddMessage(from, message);
+        }
+
+        /// <summary>
+        /// Send a chat message or command to server/other players
+        /// </summary>
+        /// <param name="message"></param>
+        public static void SendChatMessage(string message)
+        {
+            Networking.SendChatMessage(message);
         }
 
         /// <summary>
