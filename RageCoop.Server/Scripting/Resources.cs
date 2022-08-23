@@ -33,7 +33,7 @@ namespace RageCoop.Server.Scripting
 				Directory.CreateDirectory(path);
 				foreach (var pkg in Directory.GetFiles(path,"*.respkg",SearchOption.AllDirectories))
                 {
-					Logger?.Debug($"Adding resourece from package \"{Path.GetFileNameWithoutExtension(pkg)}\"");
+					Logger?.Debug($"Adding resources from package \"{Path.GetFileNameWithoutExtension(pkg)}\"");
 					var pkgZip = new ZipFile(pkg);
 					foreach (ZipEntry e in pkgZip)
 					{
