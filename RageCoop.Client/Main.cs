@@ -129,7 +129,6 @@ namespace RageCoop.Client
             PlayerPosition=P.ReadPosition();
             FPS=Game.FPS;
             // World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
-
             if (Game.IsLoading)
             {
                 return;
@@ -317,7 +316,7 @@ namespace RageCoop.Client
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             LocalPlayerID=default;
-            WorldThread.Traffic(true);
+            WorldThread.Traffic(!Settings.DisableTraffic);
         }
         private static void DoQueuedActions()
         {

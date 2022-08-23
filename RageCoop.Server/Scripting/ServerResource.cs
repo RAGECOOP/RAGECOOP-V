@@ -81,10 +81,10 @@ namespace RageCoop.Server.Scripting
 			}
 			return r;
 		}
-		internal static ServerResource LoadFromZip(string zipPath, string tmpDir, string dataFolder, Logger logger = null)
+		internal static ServerResource LoadFrom(Stream input,string name, string tmpDir, string dataFolder, Logger logger = null)
 		{
-			tmpDir=Path.Combine(tmpDir, Path.GetFileNameWithoutExtension(zipPath));
-			new FastZip().ExtractZip(zipPath, tmpDir, null);
+			tmpDir=Path.Combine(tmpDir, name);
+			new FastZip().ExtractZip(input, tmpDir, FastZip.Overwrite.Always,null,null,null,true,true);
 			return LoadFrom(tmpDir, dataFolder, logger, true);
 		}
 		/// <summary>

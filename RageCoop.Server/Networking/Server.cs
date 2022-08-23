@@ -303,10 +303,12 @@ namespace RageCoop.Server
         }
         internal void SendFile(Stream stream, string name, Client client,int id=default, Action<float> updateCallback = null)
         {
-
-            id = id ==default? NewFileID(): id ;
             stream.Seek(0, SeekOrigin.Begin);
+            // Logger.Debug("1");
+            id = id ==default? NewFileID(): id ;
+            // Logger.Debug("2");
             var total = stream.Length;
+            // Logger.Debug("3");
             if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferRequest()
             {
                 FileLength= total,

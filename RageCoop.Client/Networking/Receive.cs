@@ -75,6 +75,7 @@ namespace RageCoop.Client
                                 }
                                 Main.QueueAction(() =>
                                 {
+                                    WorldThread.Traffic(!Main.Settings.DisableTraffic);
                                     CoopMenu.ConnectedMenuSetting();
                                     Main.MainChat.Init();
                                     if (Main.Settings.Voice && !Voice.WasInitialized())

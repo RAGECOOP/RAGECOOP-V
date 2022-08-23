@@ -418,6 +418,12 @@ namespace RageCoop.Core
                 return memoryStream.ToArray();
             }
         }
+        public static MemoryStream ToMemStream(this Stream stream)
+        {
+            var memoryStream = new MemoryStream();
+            stream.CopyTo(memoryStream);
+            return memoryStream;
+        }
         public static byte[] Join(this List<byte[]> arrays,int lengthPerArray=-1)
         {
             if (arrays.Count==1) { return arrays[0]; }

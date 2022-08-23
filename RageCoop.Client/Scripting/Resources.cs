@@ -106,13 +106,6 @@ namespace RageCoop.Client.Scripting
             }
             LoadedResources.Clear();
         }
-        private List<string> ToIgnore = new List<string>
-        {
-            "RageCoop.Client.dll",
-            "RageCoop.Core.dll",
-            "RageCoop.Server.dll",
-            "ScriptHookVDotNet3.dll"
-        };
         private List<ClientResource> LoadedResources = new List<ClientResource>();
         private string BaseScriptType;
         public Logger Logger { get; set; }
