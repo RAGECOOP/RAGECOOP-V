@@ -4,6 +4,7 @@ using LemonUI.Elements;
 using LemonUI.Menus;
 using LemonUI.Scaleform;
 using System.Drawing;
+using GTA.Native;
 
 namespace RageCoop.Client.Menus
 {
@@ -96,6 +97,16 @@ namespace RageCoop.Client.Menus
             {
                 Game.DisableAllControlsThisFrame();
                 MenuPool.Process();
+
+                var scaleform = new Scaleform("instructional_buttons");
+                scaleform.CallFunction("CLEAR_ALL");
+                scaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
+                scaleform.CallFunction("CREATE_CONTAINER");
+
+                scaleform.CallFunction("SET_DATA_SLOT", 0, Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
+                scaleform.CallFunction("SET_DATA_SLOT", 1, Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
+                scaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
+                scaleform.Render2D();
                 if (Game.IsControlJustPressed(Control.FrontendAccept))
                 {
                     PopUp.Visible=false;
