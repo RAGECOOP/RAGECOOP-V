@@ -34,16 +34,6 @@ namespace RageCoop.Client
         static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
-            if (!_trafficEnabled)
-            {
-                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
-                Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
-            }
             if (Game.IsLoading || !Networking.IsOnServer)
             {
                 return;
@@ -84,9 +74,20 @@ namespace RageCoop.Client
                     }
                 }
             }
+            if (!_trafficEnabled)
+            {
+                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
+                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 0);
+                Function.Call(Hash.SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Function.Call(Hash.SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
+                Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
+            }
         }
         public static void Traffic(bool enable)
         {
+            GTA.UI.Notification.Show(enable.ToString());
             ChangeTraffic(enable);
             _trafficEnabled = enable;
         }
@@ -107,7 +108,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, true);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, false);
             }
-            else
+            else if(Networking.IsOnServer)
             {
                //  Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f, 1000.0f, 0, 1, 1, 1);
                 Function.Call(Hash.SET_CREATE_RANDOM_COPS, false);

@@ -137,7 +137,6 @@ namespace RageCoop.Client
             {
 #if !NON_INTERACTIVE
                 GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
-                WorldThread.Traffic(!Settings.DisableTraffic);
 #endif
             }
 
@@ -316,7 +315,7 @@ namespace RageCoop.Client
             EntityPool.Cleanup();
             PlayerList.Cleanup();
             LocalPlayerID=default;
-            WorldThread.Traffic(!Settings.DisableTraffic);
+            WorldThread.Traffic(true);
             Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
         }
         private static void DoQueuedActions()
