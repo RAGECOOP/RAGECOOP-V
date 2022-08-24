@@ -87,7 +87,6 @@ namespace RageCoop.Client
         }
         public static void Traffic(bool enable)
         {
-            GTA.UI.Notification.Show(enable.ToString());
             ChangeTraffic(enable);
             _trafficEnabled = enable;
         }
