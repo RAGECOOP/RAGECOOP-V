@@ -1,5 +1,6 @@
 ﻿using GTA;
 using LemonUI;
+using LemonUI.Elements;
 using LemonUI.Menus;
 using LemonUI.Scaleform;
 using System.Drawing;
@@ -69,7 +70,6 @@ namespace RageCoop.Client.Menus
             Menu.AddSubMenu(DebugMenu.Menu);
             Menu.AddSubMenu(UpdateMenu.Menu);
 
-
             MenuPool.Add(Menu);
             MenuPool.Add(SettingsMenu.Menu);
             MenuPool.Add(DevToolMenu.Menu);
@@ -106,7 +106,9 @@ namespace RageCoop.Client.Menus
                     PopUp.Visible = false;
                     return false;
                 }
-                Script.Yield();
+                Script.Yield(); 
+                Game.DisableAllControlsThisFrame();
+
             }
         }
         public static void UsernameActivated(object a, System.EventArgs b)

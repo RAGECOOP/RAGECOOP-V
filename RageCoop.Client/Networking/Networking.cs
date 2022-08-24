@@ -78,7 +78,7 @@ namespace RageCoop.Client
 
                 PlayerList.Cleanup();
                 EntityPool.AddPlayer();
-                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
+                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("Press Enter to confirm, Esc to Cancel", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
                 {
                     IsConnecting=false;
                     return;
