@@ -55,6 +55,7 @@
     <Compile Include="Scripting\Resources.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Sync\Entities\Ped\SyncedPed.Members.cs" />
     <Compile Include="Sync\Entities\Ped\SyncedPed.Animations.cs" />
     <Compile Include="Sync\Entities\SyncedEntity.cs" />
     <Compile Include="Sync\Entities\Ped\SyncedPed.cs" />

@@ -99,7 +99,7 @@ namespace RageCoop.Server
 
         private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            mainLogger.Error($"Unhandled exception thrown from user thread:",e.ExceptionObject as Exception);
+            mainLogger.Error($"Unhandled exception thrown from user thread",e.ExceptionObject as Exception);
             mainLogger.Flush();
         }
 

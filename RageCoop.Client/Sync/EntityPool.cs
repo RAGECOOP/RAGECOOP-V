@@ -441,9 +441,8 @@ namespace RageCoop.Client
                 Debug.TimeStamps[TimeStamp.PedTotal]=PerfCounter.ElapsedTicks;
 #endif
             }
-
+            var check = Main.Ticked % 100 == 0;
             i=-1;
-
             lock (VehiclesLock)
             {
                 foreach (Vehicle veh in allVehicles)
@@ -488,10 +487,13 @@ namespace RageCoop.Client
                     i++;
                     if ((v.MainVehicle!=null)&&(!v.MainVehicle.Exists()))
                     {
-                        EntityPool.RemoveVehicle(v.ID, "non-existent");
+                        RemoveVehicle(v.ID, "non-existent");
                         continue;
                     }
-
+                    if (check)
+                    {
+                        v.SetUpFixedData();
+                    }
                     // Outgoing sync
                     if (v.IsLocal)
                     {
