@@ -144,7 +144,7 @@ namespace RageCoop.Server
                 Thread.Sleep(10 * 60 * 1000);
                 
                 API.SendChatMessage("downloading update...");
-                var downloadURL = $"https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Server-{GetRID()}.zip";
+                var downloadURL = $"https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Server-{CoreUtils.GetInvariantRID()}.zip";
                 if (Directory.Exists("Update")) { Directory.Delete("Update", true); }
                 HttpHelper.DownloadFile(downloadURL, "Update.zip", null);
                 Logger?.Info("Installing update");
@@ -160,18 +160,6 @@ namespace RageCoop.Server
             {
                 Logger?.Error("Update",ex);
             }
-        }
-        static string GetRID()
-        {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                return "win-"+RuntimeInformation.OSArchitecture.ToString().ToLower();
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                return "linux-"+RuntimeInformation.OSArchitecture.ToString().ToLower();
-            }
-            return "unknown";
         }
         private void KickAssholes()
         {

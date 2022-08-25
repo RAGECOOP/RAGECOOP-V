@@ -7,6 +7,7 @@ using McMaster.NETCore.Plugins;
 using System.IO;
 using RageCoop.Core.Scripting;
 using ICSharpCode.SharpZipLib.Zip;
+using System.Runtime.InteropServices;
 
 namespace RageCoop.Server.Scripting
 {
@@ -17,8 +18,22 @@ namespace RageCoop.Server.Scripting
 	{
 		
 		internal ServerResource(PluginConfig config) : base(config) { }
-		internal static ServerResource LoadFrom(string resDir, string dataFolder, Logger logger = null, bool isTemp = false)
+		internal static ServerResource LoadFrom(string resDir, string dataFolder, Logger logger = null)
 		{
+			var runtimeLibs = Path.Combine(resDir, "RuntimeLibs", CoreUtils.GetInvariantRID());
+			if (Directory.Exists(runtimeLibs))
+            {
+				logger?.Debug("Applying runtime libraries from "+ CoreUtils.GetInvariantRID());
+				CoreUtils.CopyFilesRecursively(new(runtimeLibs), new(resDir));
+            }
+
+			runtimeLibs = Path.Combine(resDir, "RuntimeLibs", RuntimeInformation.RuntimeIdentifier);
+			if (Directory.Exists(runtimeLibs))
+			{
+				logger?.Debug("Applying runtime libraries from " + CoreUtils.GetInvariantRID());
+				CoreUtils.CopyFilesRecursively(new(runtimeLibs), new(resDir));
+			}
+			
 			var conf = new PluginConfig(Path.GetFullPath(Path.Combine(resDir, Path.GetFileName(resDir)+".dll")))
 			{
 				PreferSharedTypes = true,
@@ -85,7 +100,7 @@ namespace RageCoop.Server.Scripting
 		{
 			tmpDir=Path.Combine(tmpDir, name);
 			new FastZip().ExtractZip(input, tmpDir, FastZip.Overwrite.Always,null,null,null,true,true);
-			return LoadFrom(tmpDir, dataFolder, logger, true);
+			return LoadFrom(tmpDir, dataFolder, logger);
 		}
 		/// <summary>
 		/// Name of the resource

@@ -12,6 +12,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Lidgren.Network;
 using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -189,6 +190,23 @@ namespace RageCoop.Core
                 CopyFilesRecursively(dir, target.CreateSubdirectory(dir.Name));
             foreach (FileInfo file in source.GetFiles())
                 file.CopyTo(Path.Combine(target.FullName, file.Name), true);
+        }
+        public
+        static string GetInvariantRID()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return "win-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return "linux-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return "osx-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
+            }
+            return "unknown";
         }
 
     }
