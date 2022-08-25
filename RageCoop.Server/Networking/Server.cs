@@ -121,6 +121,7 @@ namespace RageCoop.Server
             Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
             Logger?.Info($"Server version: {Version}");
             Logger?.Info($"Compatible RAGECOOP versions: {Version.ToString(3)}");
+            Logger?.Info($"Runtime: {CoreUtils.GetInvariantRID()} => {System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier}");
             Logger?.Info("================");
 
             if (Settings.UseZeroTier)
