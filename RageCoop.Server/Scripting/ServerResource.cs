@@ -81,16 +81,20 @@ namespace RageCoop.Server.Scripting
 			}
 			foreach(var a in assemblies)
             {
-				try
-				{
-					r.LoadScriptsFromAssembly(a.Key,a.Value);
-				}
-				catch (FileLoadException ex)
-				{
-					if (!ex.Message.EndsWith("Assembly with same name is already loaded"))
+				if(a.Key.Name.ToLower() == r.Name.ToLower()+".dll")
+                {
+
+					try
 					{
-						logger?.Warning("Failed to load assembly: "+a.Key.Name);
-						logger?.Trace(ex.Message);
+						r.LoadScriptsFromAssembly(a.Key, a.Value);
+					}
+					catch (FileLoadException ex)
+					{
+						if (!ex.Message.EndsWith("Assembly with same name is already loaded"))
+						{
+							logger?.Warning("Failed to load assembly: " + a.Key.Name);
+							logger?.Trace(ex.Message);
+						}
 					}
 				}
 			}
