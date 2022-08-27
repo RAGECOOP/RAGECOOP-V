@@ -22,14 +22,6 @@ namespace RageCoop.Client
             {
                 ChangeTraffic(true);
             };
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(5000);
-                    Main.QueueAction(() => { ChangeTraffic(_trafficEnabled); });
-                }
-            });
         }
         static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
@@ -94,7 +86,7 @@ namespace RageCoop.Client
         {
             if (enable)
             {
-                // Function.Call(Hash.REMOVE_SCENARIO_BLOCKING_AREAS);
+                Function.Call(Hash.REMOVE_SCENARIO_BLOCKING_AREAS);
                 Function.Call(Hash.SET_CREATE_RANDOM_COPS, true);
                 Function.Call(Hash.SET_RANDOM_TRAINS, true);
                 Function.Call(Hash.SET_RANDOM_BOATS, true);
@@ -109,7 +101,7 @@ namespace RageCoop.Client
             }
             else if(Networking.IsOnServer)
             {
-               //  Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f, 1000.0f, 0, 1, 1, 1);
+                Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f, 1000.0f, 0, 1, 1, 1);
                 Function.Call(Hash.SET_CREATE_RANDOM_COPS, false);
                 Function.Call(Hash.SET_RANDOM_TRAINS, false);
                 Function.Call(Hash.SET_RANDOM_BOATS, false);
