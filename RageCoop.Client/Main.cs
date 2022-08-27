@@ -46,7 +46,7 @@ namespace RageCoop.Client
         /// Don't use it!
         /// </summary>
         public Main()
-        {Game.Player.Character.Task.LeaveVehicle()
+        {
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {

@@ -38,34 +38,36 @@ namespace RageCoop.Core
         {
             switch (obj)
             {
-                case byte _:
-                    return (0x01, new byte[] { (byte)obj });
-                case short _:
-                    return (0x02, BitConverter.GetBytes((short)obj));
-                case ushort _:
-                    return (0x03, BitConverter.GetBytes((ushort)obj));
-                case int _:
-                    return (0x04, BitConverter.GetBytes((int)obj));
-                case uint _:
-                    return (0x05, BitConverter.GetBytes((uint)obj));
-                case long _:
-                    return (0x06, BitConverter.GetBytes((long)obj));
-                case ulong _:
-                    return (0x07, BitConverter.GetBytes((ulong)obj));
-                case float _:
-                    return (0x08, BitConverter.GetBytes((float)obj));
-                case bool _:
-                    return (0x09, BitConverter.GetBytes((bool)obj));
-                case string _:
-                    return (0x10, ((string)obj).GetBytesWithLength());
-                case Vector3 _:
-                    return (0x11,((Vector3)obj).GetBytes());
-                case Quaternion _:
-                    return (0x12, ((Quaternion)obj).GetBytes());
-                case GTA.Model _:
-                    return (0x13, BitConverter.GetBytes((GTA.Model)obj));
-                case Vector2 _:
-                    return (0x14, ((Vector2)obj).GetBytes());
+                case byte value:
+                    return (0x01, new byte[] { value });
+                case short value:
+                    return (0x02, BitConverter.GetBytes(value));
+                case ushort value:
+                    return (0x03, BitConverter.GetBytes(value));
+                case int value:
+                    return (0x04, BitConverter.GetBytes(value));
+                case uint value:
+                    return (0x05, BitConverter.GetBytes(value));
+                case long value:
+                    return (0x06, BitConverter.GetBytes(value));
+                case ulong value:
+                    return (0x07, BitConverter.GetBytes(value));
+                case float value:
+                    return (0x08, BitConverter.GetBytes(value));
+                case bool value:
+                    return (0x09, BitConverter.GetBytes(value));
+                case string value:
+                    return (0x10, value.GetBytesWithLength());
+                case Vector3 value:
+                    return (0x11, value.GetBytes());
+                case Quaternion value:
+                    return (0x12, value.GetBytes());
+                case GTA.Model value:
+                    return (0x13, BitConverter.GetBytes(value));
+                case Vector2 value:
+                    return (0x14, value.GetBytes());
+                case byte[] value:
+                    return (0x15, value);
                 case Tuple<byte, byte[]> _:
                     var tup = (Tuple<byte, byte[]>)obj;
                     return (tup.Item1, tup.Item2);
