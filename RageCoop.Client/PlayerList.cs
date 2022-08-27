@@ -67,12 +67,12 @@ namespace RageCoop.Client
             if (Players.TryGetValue(id, out p))
             {
                 p.Username=username;
-                p.PedID=id;
+                p.ID=id;
                 p._latencyToServer=latency;
             }
             else
             {
-                p = new Player { PedID=id, Username=username, _latencyToServer=latency };
+                p = new Player { ID=id, Username=username, _latencyToServer=latency };
                 Players.Add(id, p);
             }
         }
@@ -90,7 +90,7 @@ namespace RageCoop.Client
                     {
                         p.FakeBlip=World.CreateBlip(p.Position);
                     }
-                    if (EntityPool.PedExists(p.PedID))
+                    if (EntityPool.PedExists(p.ID))
                     {
                         p.FakeBlip.DisplayType = BlipDisplayType.NoDisplay;
                     }
@@ -139,32 +139,32 @@ namespace RageCoop.Client
         }
     }
 
-    internal class Player
+    public class Player
     {
-        public byte HolePunchStatus { get; set; } = 1;
-        public bool IsHost;
+        public byte HolePunchStatus { get; internal set; } = 1;
+        public bool IsHost { get; internal set; }
         public string Username { get; internal set; }
         /// <summary>
-        /// Universal character ID.
+        /// Universal ped ID.
         /// </summary>
-        public int PedID
+        public int ID
         {
             get; internal set;
         }
-        public IPEndPoint InternalEndPoint { get; set; }
-        public IPEndPoint ExternalEndPoint { get; set; }
-        public bool ConnectWhenPunched { get; set; }
-        public Blip FakeBlip { get; set; }
-        public Vector3 Position { get; set; }
-        public SyncedPed Character { get; set; }
+        public IPEndPoint InternalEndPoint { get; internal set; }
+        public IPEndPoint ExternalEndPoint { get; internal set; }
+        internal bool ConnectWhenPunched { get; set; }
+        public Blip FakeBlip { get; internal set; }
+        public Vector3 Position { get; internal set; }
+        public SyncedPed Character { get; internal set; }
         /// <summary>
-        /// Player round-trip time in seconds, will be the latency to server if not using P2P connection.
+        /// Player round-trip time in seconds, will be the rtt to server if not using P2P connection.
         /// </summary>
-        public float Ping => Main.LocalPlayerID==PedID ? Networking.Latency*2 : (HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer*2);
+        public float Ping => Main.LocalPlayerID==ID ? Networking.Latency*2 : (HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer*2);
         public float PacketTravelTime => HasDirectConnection ? Connection.AverageRoundtripTime/2 : Networking.Latency+_latencyToServer;
-        public float _latencyToServer = 0;
+        internal float _latencyToServer = 0;
         public bool DisplayNameTag { get; set; } = true;
-        public NetConnection Connection { get; set; }
-        public bool HasDirectConnection => Connection?.Status==NetConnectionStatus.Connected;
+        public NetConnection Connection { get; internal set; }
+        public bool HasDirectConnection => Connection?.Status == NetConnectionStatus.Connected;
     }
 }

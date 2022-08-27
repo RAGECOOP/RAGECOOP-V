@@ -141,7 +141,7 @@ namespace RageCoop.Client
         {
             var p = new Player
             {
-                PedID = packet.PedID,
+                ID = packet.PedID,
                 Username= packet.Username,
             };
             PlayerList.SetPlayer(packet.PedID, packet.Username);

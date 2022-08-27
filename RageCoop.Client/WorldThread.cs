@@ -114,64 +114,34 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, 0);
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
-
-                if (Networking.IsOnServer)
+                foreach (Ped ped in World.GetAllPeds())
                 {
-
-                    foreach (Ped ped in World.GetAllPeds())
+                    SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
+                    if ((c == null) || (c.IsLocal && (ped.Handle != Game.Player.Character.Handle) && ped.PopulationType != EntityPopulationType.Mission))
                     {
-                        SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
-                        if ((c == null) || (c.IsLocal && (ped.Handle != Game.Player.Character.Handle) && ped.PopulationType != EntityPopulationType.Mission))
-                        {
-                            if (ped.Handle == Game.Player.Character.Handle) { continue; }
+                        if (ped.Handle == Game.Player.Character.Handle) { continue; }
 
-                            // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
-                            ped.CurrentVehicle?.Delete();
-                            ped.Kill();
-                            ped.Delete();
-                        }
-
+                        // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        ped.CurrentVehicle?.Delete();
+                        ped.Kill();
+                        ped.Delete();
                     }
 
-                    foreach (Vehicle veh in World.GetAllVehicles())
-                    {
-                        SyncedVehicle v = veh.GetSyncEntity();
-                        if (v.MainVehicle == Game.Player.LastVehicle || v.MainVehicle==Game.Player.Character.CurrentVehicle)
-                        {
-                            // Don't delete player's vehicle
-                            continue;
-                        }
-                        if ((v == null) || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
-                        {
-                            // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
-
-                            veh.Delete();
-                        }
-                    }
                 }
-                else
+
+                foreach (Vehicle veh in World.GetAllVehicles())
                 {
-                    foreach (Ped ped in World.GetAllPeds())
+                    SyncedVehicle v = veh.GetSyncEntity();
+                    if (v.MainVehicle == Game.Player.LastVehicle || v.MainVehicle == Game.Player.Character.CurrentVehicle)
                     {
-                        if ((ped != Game.Player.Character) && (ped.PopulationType != EntityPopulationType.Mission))
-                        {
-                            // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
-                            ped.CurrentVehicle?.Delete();
-                            ped.Kill();
-                            ped.Delete();
-                        }
-
+                        // Don't delete player's vehicle
+                        continue;
                     }
-                    var last = Game.Player.Character.LastVehicle;
-                    var current = Game.Player.Character.CurrentVehicle;
-                    foreach (Vehicle veh in World.GetAllVehicles())
+                    if ((v == null) || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
                     {
-                        if (veh.PopulationType != EntityPopulationType.Mission && veh != last && veh!=current)
-                        {
-                            // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+                        // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 
-                            veh.Delete();
-                        }
+                        veh.Delete();
                     }
                 }
             }

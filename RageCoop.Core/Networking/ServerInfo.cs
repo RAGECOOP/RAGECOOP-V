@@ -5,9 +5,12 @@ using Newtonsoft.Json;
 
 namespace RageCoop.Core
 {
-
-    internal class ServerInfo
+    /// <summary>
+    /// A json object representing a server's information as annouced to master server.
+    /// </summary>
+    public class ServerInfo
     {
+#pragma warning disable 1591
         public string address { get; set; }
         public string port { get; set; }
         public string name { get; set; }

@@ -29,7 +29,7 @@ namespace RageCoop.Client
                 {
                     if (p.InternalEndPoint!=null && p.ExternalEndPoint!=null && (p.Connection==null || p.Connection.Status==NetConnectionStatus.Disconnected))
                     {
-                        Main.Logger.Trace($"Sending HolePunch message to {p.InternalEndPoint},{p.ExternalEndPoint}. {p.Username}:{p.PedID}");
+                        Main.Logger.Trace($"Sending HolePunch message to {p.InternalEndPoint},{p.ExternalEndPoint}. {p.Username}:{p.ID}");
                         var msg = Networking.Peer.CreateMessage();
                         new Packets.HolePunch
                         {
@@ -69,7 +69,7 @@ namespace RageCoop.Client
                 puncher.HolePunchStatus=(byte)(p.Status+1);
                 if (p.Status>=3)
                 {
-                    Main.Logger.Debug("HolePunch sucess: "+from+", "+puncher.PedID);
+                    Main.Logger.Debug("HolePunch sucess: "+from+", "+puncher.ID);
                     if (puncher.ConnectWhenPunched && (puncher.Connection==null || puncher.Connection.Status==NetConnectionStatus.Disconnected))
                     {
                         Main.Logger.Debug("Connecting to peer: "+from);

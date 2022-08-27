@@ -4,6 +4,7 @@ using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace RageCoop.Client.Scripting
 {
@@ -212,13 +213,12 @@ namespace RageCoop.Client.Scripting
         /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
         /// </summary>
         /// <returns></returns>
-        public static Logger Logger
-        {
-            get
-            {
-                return Main.Logger;
-            }
-        }
+        public static Logger Logger => Main.Logger;
+        /// <summary>
+        /// Get all players indexed by their ID
+        /// </summary>
+        public static Dictionary<int,Player> Players => new Dictionary<int, Player>(PlayerList.Players);
+
         #endregion
 
         #region FUNCTIONS
@@ -244,6 +244,15 @@ namespace RageCoop.Client.Scripting
             {
                 Networking.ToggleConnection(null);
             }
+        }
+
+        /// <summary>
+        /// List all servers from master server address
+        /// </summary>
+        /// <returns></returns>
+        public static List<ServerInfo> ListServers()
+        {
+            return JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Main.Settings.MasterServer));
         }
         
         /// <summary>
