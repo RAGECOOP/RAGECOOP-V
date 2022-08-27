@@ -136,7 +136,7 @@ namespace RageCoop.Client
                     foreach (Vehicle veh in World.GetAllVehicles())
                     {
                         SyncedVehicle v = veh.GetSyncEntity();
-                        if (v.MainVehicle == Game.Player.LastVehicle)
+                        if (v.MainVehicle == Game.Player.LastVehicle || v.MainVehicle==Game.Player.Character.CurrentVehicle)
                         {
                             // Don't delete player's vehicle
                             continue;

@@ -46,10 +46,7 @@ namespace RageCoop.Client
         /// Don't use it!
         /// </summary>
         public Main()
-        {
-#if DEBUG_HIGH_PING
-            Networking.SimulatedLatency=0.3f;
-#endif
+        {Game.Player.Character.Task.LeaveVehicle()
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             try
             {
