@@ -149,8 +149,6 @@ namespace RageCoop.Client
                 MainVehicle.AreHighBeamsOn = HighBeamsOn;
             }
 
-            
-
             if (IsAircraft)
             {
                 if (LandingGear != (byte)MainVehicle.LandingGearState)
@@ -274,7 +272,7 @@ namespace RageCoop.Client
                 MainVehicle.Quaternion = Quaternion;
                 return;
             }
-            else if (dist > 0.03)
+            if (dist > 0.03)
             {
                 MainVehicle.Velocity = Velocity + cali;
             }
@@ -286,10 +284,7 @@ namespace RageCoop.Client
                 MainVehicle.RotationVelocity = RotationVelocity;
                 return;
             }
-            else
-            {
-                MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
-            }
+            MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
         }
         private Vector3 GetCalibrationRotation()
         {
@@ -316,7 +311,7 @@ namespace RageCoop.Client
                 // GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
                 return false;
             }
-            else if (MainVehicle==null)
+            if (MainVehicle==null)
             {
                 Model.Request();
                 return false;
@@ -339,7 +334,7 @@ namespace RageCoop.Client
             Model.MarkAsNoLongerNeeded();
             return true;
         }
-#region -- PEDALING --
+        #region -- PEDALING --
         /*
          * Thanks to @oldnapalm.
          */
@@ -375,7 +370,5 @@ namespace RageCoop.Client
             MainVehicle.Driver.Task.ClearAnimation(PedalingAnimDict(), PedalingAnimName(fast));
         }
 #endregion
-
-
     }
 }

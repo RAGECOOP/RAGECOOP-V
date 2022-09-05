@@ -54,30 +54,35 @@ namespace RageCoop.Client
             {
                 flags |= VehicleDataFlags.IsTransformed;
             }
+
             if (v.IsAircraft)
             {
                 flags |= VehicleDataFlags.IsAircraft;
             }
+
             if (v.IsDeluxo && veh.IsDeluxoHovering())
             {
-                flags|= VehicleDataFlags.IsDeluxoHovering;
+                flags |= VehicleDataFlags.IsDeluxoHovering;
             }
+
             if (v.HasRoof)
             {
-                flags|=VehicleDataFlags.HasRoof;
+                flags |= VehicleDataFlags.HasRoof;
             }
+
             if (v.HasRocketBoost && veh.IsRocketBoostActive())
             {
-                flags|=VehicleDataFlags.IsRocketBoostActive;
+                flags |= VehicleDataFlags.IsRocketBoostActive;
             }
+
             if(v.HasParachute && veh.IsParachuteActive()){
-                flags|=VehicleDataFlags.IsParachuteActive;
+                flags |= VehicleDataFlags.IsParachuteActive;
             }
+
             if (veh.IsOnFire)
             {
                 flags|=VehicleDataFlags.IsOnFire;
             }
-
 
             return flags;
         }
@@ -132,7 +137,6 @@ namespace RageCoop.Client
                     openedDoors |= (byte)(1 << (byte)door.Index);
                 }
             }
-
 
             // Bursted tires
             short burstedTires = 0;
@@ -234,7 +238,6 @@ namespace RageCoop.Client
             return ps;
         }
 
-
         public static void SetDeluxoHoverState(this Vehicle deluxo, bool hover)
         {
             Function.Call(Hash._SET_VEHICLE_HOVER_TRANSFORM_PERCENTAGE, deluxo, hover ? 1f : 0f);
@@ -283,8 +286,6 @@ namespace RageCoop.Client
         {
             Function.Call(Hash.SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
         }
-
-        
         #endregion
     }
 }

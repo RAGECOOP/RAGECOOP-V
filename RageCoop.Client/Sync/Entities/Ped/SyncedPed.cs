@@ -433,22 +433,18 @@ namespace RageCoop.Client
                 }
                 return;
             }
-            else
+            if (MainPed.IsRagdoll)
             {
-                if (MainPed.IsRagdoll)
+                if (Speed == 0)
                 {
-                    if (Speed==0)
-                    {
-                        MainPed.CancelRagdoll();
-                    }
-                    else
-                    {
-                        MainPed.Task.ClearAllImmediately();
-                    }
-                    return;
+                    MainPed.CancelRagdoll();
                 }
-
+                else
+                {
+                    MainPed.Task.ClearAllImmediately();
+                }
                 _lastRagdoll = false;
+                return;
             }
 
             if (IsReloading)

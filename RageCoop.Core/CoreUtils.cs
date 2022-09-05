@@ -200,11 +200,11 @@ namespace RageCoop.Core
             {
                 return "win-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return "linux-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
                 return "osx-" + RuntimeInformation.OSArchitecture.ToString().ToLower();
             }
@@ -419,7 +419,7 @@ namespace RageCoop.Core
         }
         public static string Dump<T>(this IEnumerable<T> objects)
         {
-            return "{"+string.Join(",",objects)+"}";
+            return $"{{{string.Join(",", objects)}}}";
         }
         public static void ForEach<T>(this IEnumerable<T> objects,Action<T> action)
         {

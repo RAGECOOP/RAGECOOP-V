@@ -126,7 +126,6 @@ namespace RageCoop.Client
                         ped.Kill();
                         ped.Delete();
                     }
-
                 }
 
                 foreach (Vehicle veh in World.GetAllVehicles())

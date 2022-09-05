@@ -371,17 +371,11 @@ namespace RageCoop.Client
             var type = Function.Call<int>(Hash.GET_WEAPON_DAMAGE_TYPE, vp);
             if (vp!=VehicleWeaponHash.Invalid)
             {
-                if (type==3)
-                {
-                    return false;
-                }
-                return VehicleProjectileWeapons.Contains(vp) || (type==5 && !ExplosiveBullets.Contains((uint)vp));
+                return type == 3 ? false : VehicleProjectileWeapons.Contains(vp) || (type==5 && !ExplosiveBullets.Contains((uint)vp));
             }
-            else
-            {
-                var w = p.Weapons.Current;
-                return w.Group==WeaponGroup.Thrown || ProjectileWeapons.Contains(w.Hash);
-            }
+
+            var w = p.Weapons.Current;
+            return w.Group == WeaponGroup.Thrown || ProjectileWeapons.Contains(w.Hash);
         }
 
         public static readonly HashSet<uint> ExplosiveBullets = new HashSet<uint>
@@ -459,7 +453,6 @@ namespace RageCoop.Client
             {WeaponHash.PumpShotgunMk2,7},
 
         };
-
 
         public static readonly HashSet<WeaponHash> ProjectileWeapons = new HashSet<WeaponHash> {
             WeaponHash.HomingLauncher,

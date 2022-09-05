@@ -128,8 +128,6 @@ namespace RageCoop.Core
                         byteArray.Add(0x00);
                     }
 
-
-
                     // Write LockStatus
                     byteArray.Add((byte)LockStatus);
 

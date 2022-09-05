@@ -64,7 +64,6 @@ namespace RageCoop.Server
                     {
                         continue;
                     }
-
                 }
                 else if ((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
                 {
@@ -77,7 +76,6 @@ namespace RageCoop.Server
         }
         private void ProjectileSync(Packets.ProjectileSync packet, Client client)
         {
-
             if (Settings.UseP2P) { return; }
             Forward(packet, client, ConnectionChannel.ProjectileSync);
         }

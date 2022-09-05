@@ -43,6 +43,7 @@ namespace RageCoop.Server
                 connection.Deny("Username is already taken!");
                 return;
             }
+
             try
             {
                 Security.AddConnection(connection.RemoteEndPoint, packet.AesKeyCrypted, packet.AesIVCrypted);
@@ -68,6 +69,7 @@ namespace RageCoop.Server
                 connection.Deny("Malformed handshak packet!");
                 return;
             }
+
             var handshakeSuccess = MainNetServer.CreateMessage();
             var currentClients = ClientsByID.Values.ToArray();
             var players = new Packets.PlayerData[currentClients.Length];
@@ -79,6 +81,7 @@ namespace RageCoop.Server
                     Username=currentClients[i].Username,
                 };
             }
+
             new Packets.HandshakeSuccess()
             {
                 Players=players
@@ -145,8 +148,6 @@ namespace RageCoop.Server
 
             // Send all blips to this player
             BaseScript.SendServerBlipsTo(new(Entities.Blips.Values), new() { newClient });
-
-
 
             // Create P2P connection
             if (Settings.UseP2P)

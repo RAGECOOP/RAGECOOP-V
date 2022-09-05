@@ -18,10 +18,9 @@ namespace RageCoop.Server
             if (args.Length>=2 && args[0]=="update")
             {
                 var target = args[1];
-                int i =0;
-                while (i < 10)
+                int i = 0;
+                while (i++ < 10)
                 {
-                    i++;
                     try
                     {
                         Console.WriteLine("Applying update to "+target);

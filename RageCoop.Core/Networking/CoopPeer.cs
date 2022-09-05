@@ -57,6 +57,5 @@ namespace RageCoop.Core
             p.Pack(outgoingMessage);
             SendMessage(outgoingMessage, cons, method, (int)channel);
         }
-
     }
 }

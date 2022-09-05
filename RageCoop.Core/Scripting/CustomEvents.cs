@@ -49,16 +49,12 @@ namespace RageCoop.Core.Scripting
                     {
                         throw new ArgumentException($"Hashed value has collision with another name:{name}, hashed value:{hash}");
                     }
-                    else
-                    {
-                        return hash;
-                    }
-                }
-                else
-                {
-                    Hashed.Add(hash, s);
+
                     return hash;
                 }
+
+                Hashed.Add(hash, s);
+                return hash;
             }
         }
     }

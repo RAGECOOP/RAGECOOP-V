@@ -32,7 +32,9 @@ namespace RageCoop.Core
         {
             // TLS only
             ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 |
+                                                   SecurityProtocolType.Tls11 |
+                                                   SecurityProtocolType.Tls;
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
             WebClient client = new WebClient();

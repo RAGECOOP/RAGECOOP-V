@@ -33,68 +33,28 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ServerPed GetPedByID(int id)
-        {
-            if(Peds.TryGetValue(id,out var ped))
-            {
-                return ped;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public ServerPed GetPedByID(int id) => Peds.TryGetValue(id, out var ped) ? ped : null;
 
         /// <summary>
         /// Get a <see cref="ServerVehicle"/> by it's id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ServerVehicle GetVehicleByID(int id)
-        {
-            if (Vehicles.TryGetValue(id, out var veh))
-            {
-                return veh;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public ServerVehicle GetVehicleByID(int id) => Vehicles.TryGetValue(id, out var veh) ? veh : null;
 
         /// <summary>
         /// Get a <see cref="ServerProp"/> owned by server from it's ID.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ServerProp GetPropByID(int id)
-        {
-            if (ServerProps.TryGetValue(id, out var obj))
-            {
-                return obj;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public ServerProp GetPropByID(int id) => ServerProps.TryGetValue(id, out var obj) ? obj : null;
 
         /// <summary>
         /// Get a <see cref="ServerBlip"/> by it's id.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public ServerBlip GetBlipByID(int id)
-        {
-            if (Blips.TryGetValue(id, out var obj))
-            {
-                return obj;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        public ServerBlip GetBlipByID(int id) => Blips.TryGetValue(id, out var obj) ? obj : null;
 
         /// <summary>
         /// Create a static prop owned by server.
@@ -164,45 +124,32 @@ namespace RageCoop.Server.Scripting
         /// Get all peds on this server
         /// </summary>
         /// <returns></returns>
-        public ServerPed[] GetAllPeds()
-        {
-            return Peds.Values.ToArray();
-        }
+        public ServerPed[] GetAllPeds() => Peds.Values.ToArray();
 
         /// <summary>
         /// Get all vehicles on this server
         /// </summary>
         /// <returns></returns>
-        public ServerVehicle[] GetAllVehicles()
-        {
-            return Vehicles.Values.ToArray();
-        }
+        public ServerVehicle[] GetAllVehicles() => Vehicles.Values.ToArray();
 
         /// <summary>
         /// Get all static prop objects owned by server
         /// </summary>
         /// <returns></returns>
-        public ServerProp[] GetAllProps()
-        {
-            return ServerProps.Values.ToArray();
-        }
+        public ServerProp[] GetAllProps() => ServerProps.Values.ToArray();
 
         /// <summary>
         /// Get all blips owned by server
         /// </summary>
         /// <returns></returns>
-        public ServerBlip[] GetAllBlips()
-        {
-            return Blips.Values.ToArray();
-        }
+        public ServerBlip[] GetAllBlips() => Blips.Values.ToArray();
 
         /// <summary>
         /// Not thread safe
         /// </summary>
         internal void Update(Packets.PedSync p,Client sender)
         {
-            ServerPed ped;
-            if(!Peds.TryGetValue(p.ID,out ped))
+            if(!Peds.TryGetValue(p.ID,out ServerPed ped))
             {
                 Peds.TryAdd(p.ID,ped=new ServerPed(Server));
                 ped.ID=p.ID;
@@ -229,8 +176,7 @@ namespace RageCoop.Server.Scripting
         }
         internal void Update(Packets.VehicleSync p, Client sender)
         {
-            ServerVehicle veh;
-            if (!Vehicles.TryGetValue(p.ID, out veh))
+            if (!Vehicles.TryGetValue(p.ID, out ServerVehicle veh))
             {
                 Vehicles.TryAdd(p.ID, veh=new ServerVehicle(Server));
                 veh.ID=p.ID;
@@ -277,14 +223,8 @@ namespace RageCoop.Server.Scripting
             }
         }
 
-        internal void RemoveProp(int id)
-        {
-            ServerProps.TryRemove(id, out _);
-        }
-        internal void RemoveServerBlip(int id)
-        {
-            Blips.TryRemove(id, out _);
-        }
+        internal void RemoveProp(int id) => ServerProps.TryRemove(id, out _);
+        internal void RemoveServerBlip(int id) => Blips.TryRemove(id, out _);
         internal void RemovePed(int id)
         {
             Peds.TryRemove(id, out var ped);
@@ -299,11 +239,10 @@ namespace RageCoop.Server.Scripting
             if (Peds.ContainsKey(ped.ID))
             {
                 Peds[ped.ID]=ped;
+                return;
             }
-            else
-            {
-                Peds.TryAdd(ped.ID, ped);
-            }
+
+            Peds.TryAdd(ped.ID, ped);
         }
         internal int RequestNetworkID()
         {

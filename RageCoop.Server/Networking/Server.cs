@@ -293,10 +293,8 @@ namespace RageCoop.Server
                 p.Deserialize(response);
                 return p;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
         internal void SendFile(string path,string name,Client client,Action<float> updateCallback=null)
         {

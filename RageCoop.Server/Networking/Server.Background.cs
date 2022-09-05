@@ -54,7 +54,10 @@ namespace RageCoop.Server
                 {
                     // TLS only
                     ServicePointManager.Expect100Continue = true;
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 |
+                                                           SecurityProtocolType.Tls12 |
+                                                           SecurityProtocolType.Tls11 |
+                                                           SecurityProtocolType.Tls;
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
                     try
@@ -77,6 +80,7 @@ namespace RageCoop.Server
                     Logger?.Error($"MasterServer: {ex.Message}");
                 }
             }
+
             try
             {
                 Security.GetPublicKey(out var pModulus, out var pExpoenet);
@@ -161,6 +165,7 @@ namespace RageCoop.Server
                 Logger?.Error("Update",ex);
             }
         }
+
         private void KickAssholes()
         {
             foreach(var c in ClientsByNetHandle.Values.ToArray())

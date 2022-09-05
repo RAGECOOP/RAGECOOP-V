@@ -3,7 +3,6 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-
     internal static class MathExtensions
     {
         public const float Deg2Rad=(float)(Math.PI* 2) / 360;
@@ -146,16 +145,12 @@ namespace RageCoop.Core
         }
         private static float CopySign(double x, double y)
         {
-            bool isPositive = y>=0;
-            if (isPositive)
+            if (y >= 0)
             {
-                if (x>=0) { return (float)x; } else { return (float)-x; }
+                return x >= 0 ? (float)x : (float)-x;
             }
-            else
-            {
-                if (x>=0) { return (float)-x; } else { return (float)x; }
 
-            }
+            return x >= 0 ? (float)-x : (float)x;
         }
         public static double AngelTo(this Vector3 v1, Vector3 v2)
         {
@@ -163,7 +158,6 @@ namespace RageCoop.Core
         }
         public static float GetCosTheta(this Vector3 v1, Vector3 v2)
         {
-
             return Vector3.Dot(v1, v2)/(v1.Length()*v2.Length());
         }
 
