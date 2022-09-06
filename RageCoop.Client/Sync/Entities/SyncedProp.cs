@@ -9,7 +9,7 @@ namespace RageCoop.Client
     {
         internal SyncedProp(int id)
         {
-            ID= id;
+            ID = id;
         }
         /// <summary>
         /// The real entity
@@ -27,15 +27,15 @@ namespace RageCoop.Client
         {
 
             if (!NeedUpdate) { return; }
-            if (MainProp== null || !MainProp.Exists())
+            if (MainProp == null || !MainProp.Exists())
             {
-                MainProp=World.CreateProp(Model, Position, Rotation, false, false);
-                MainProp.IsInvincible=true;
+                MainProp = World.CreateProp(Model, Position, Rotation, false, false);
+                MainProp.IsInvincible = true;
             }
-            MainProp.Position=Position;
-            MainProp.Rotation=Rotation;
+            MainProp.Position = Position;
+            MainProp.Rotation = Rotation;
             MainProp.SetFrozen(true);
-            LastUpdated=Main.Ticked;
+            LastUpdated = Main.Ticked;
         }
     }
 }

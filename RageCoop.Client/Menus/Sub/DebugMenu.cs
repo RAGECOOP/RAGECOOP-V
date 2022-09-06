@@ -1,7 +1,7 @@
 ﻿using GTA;
 using LemonUI.Menus;
-using System.Drawing;
 using System;
+using System.Drawing;
 
 namespace RageCoop.Client
 {
@@ -27,7 +27,7 @@ namespace RageCoop.Client
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
 
-            DiagnosticMenu.Opening+=(sender, e) =>
+            DiagnosticMenu.Opening += (sender, e) =>
             {
                 DiagnosticMenu.Clear();
                 DiagnosticMenu.Add(new NativeItem("EntityPool", EntityPool.DumpDebug()));
@@ -36,18 +36,18 @@ namespace RageCoop.Client
                     DiagnosticMenu.Add(new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
                 }
             };
-            SimulatedLatencyItem.Activated+=(s, e) =>
+            SimulatedLatencyItem.Activated += (s, e) =>
             {
                 try
                 {
-                    SimulatedLatencyItem.AltTitle=((Networking.SimulatedLatency=int.Parse(Game.GetUserInput(SimulatedLatencyItem.AltTitle))*0.002f)*500).ToString();
+                    SimulatedLatencyItem.AltTitle = ((Networking.SimulatedLatency = int.Parse(Game.GetUserInput(SimulatedLatencyItem.AltTitle)) * 0.002f) * 500).ToString();
                 }
-                catch(Exception ex) { Main.Logger.Error(ex); }
+                catch (Exception ex) { Main.Logger.Error(ex); }
             };
             ShowNetworkInfoItem.CheckboxChanged += (s, e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
             ShowOwnerItem.CheckboxChanged += (s, e) => { Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked; Util.SaveSettings(); };
             Menu.Add(SimulatedLatencyItem);
-            Menu.Add(ShowNetworkInfoItem); 
+            Menu.Add(ShowNetworkInfoItem);
             Menu.Add(ShowOwnerItem);
             Menu.AddSubMenu(DiagnosticMenu);
 

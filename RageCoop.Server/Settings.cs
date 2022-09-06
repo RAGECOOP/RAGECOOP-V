@@ -119,5 +119,10 @@
         /// Kick spamming assholes
         /// </summary>
         public bool KickSpamming { get; set; } = true;
+
+        /// <summary>
+        /// Player that spawned entities more than this amount will be kicked if <see cref="KickSpamming"/> is enabled.
+        /// </summary>
+        public int SpamLimit { get;set; } = 100;
     }
 }

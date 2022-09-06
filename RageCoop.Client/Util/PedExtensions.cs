@@ -2,8 +2,8 @@
 using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
@@ -80,9 +80,9 @@ namespace RageCoop.Client
             var result = new byte[36];
             for (byte i = 0; i < 12; i++)
             {
-                result[i]=(byte)Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
-                result[i+12]=(byte)Function.Call<short>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
-                result[i+24]=(byte)Function.Call<short>(Hash.GET_PED_PALETTE_VARIATION, ped.Handle, i);
+                result[i] = (byte)Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                result[i + 12] = (byte)Function.Call<short>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
+                result[i + 24] = (byte)Function.Call<short>(Hash.GET_PED_PALETTE_VARIATION, ped.Handle, i);
             }
             return result;
         }
@@ -108,7 +108,7 @@ namespace RageCoop.Client
             }
 
             // Fake death
-            if (ped.IsRagdoll || (ped.Health==1 && ped.IsPlayer))
+            if (ped.IsRagdoll || (ped.Health == 1 && ped.IsPlayer))
             {
                 flags |= PedDataFlags.IsRagdoll;
             }
@@ -144,14 +144,15 @@ namespace RageCoop.Client
                 flags |= PedDataFlags.IsInCover;
                 if (ped.IsInCoverFacingLeft)
                 {
-                    flags |=PedDataFlags.IsInCover;
+                    flags |= PedDataFlags.IsInCover;
                 }
-                if (!Function.Call<bool>(Hash.IS_PED_IN_HIGH_COVER, ped)){
-                    flags|=PedDataFlags.IsInLowCover;
+                if (!Function.Call<bool>(Hash.IS_PED_IN_HIGH_COVER, ped))
+                {
+                    flags |= PedDataFlags.IsInLowCover;
                 }
                 if (ped.IsTaskActive(TaskType.CTaskAimGunBlindFire))
                 {
-                    flags|=PedDataFlags.IsBlindFiring;
+                    flags |= PedDataFlags.IsBlindFiring;
                 }
             }
 
@@ -276,7 +277,7 @@ namespace RageCoop.Client
                         veh,
                         veh.Bones[text].Index
                     }));
-                    bool flag2 = (num2 < distanceToignoreDoors) && (num2 < num)&& IsSeatUsableByPed(ped, veh, dictionary[text]);
+                    bool flag2 = (num2 < distanceToignoreDoors) && (num2 < num) && IsSeatUsableByPed(ped, veh, dictionary[text]);
                     if (flag2)
                     {
                         num = num2;
@@ -330,29 +331,29 @@ namespace RageCoop.Client
 
             var v = p.CurrentVehicle;
             // Rhino
-            if (v!=null && v.Model.Hash==782665360)
+            if (v != null && v.Model.Hash == 782665360)
             {
-                return v.Bones[35].Position+v.Bones[35].ForwardVector*100;
+                return v.Bones[35].Position + v.Bones[35].ForwardVector * 100;
             }
             if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
-            if (weapon!=null)
+            if (weapon != null)
             {
                 // Not very accurate, but doesn't matter
                 Vector3 dir = weapon.RightVector;
-                return weapon.Position+dir*20;
+                return weapon.Position + dir * 20;
 
             }
             return GetLookingCoord(p);
         }
         public static Vector3 GetLookingCoord(this Ped p)
         {
-            if (p==Main.P && Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE)==4)
+            if (p == Main.P && Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE) == 4)
             {
                 return RaycastEverything(default);
             }
             EntityBone b = p.Bones[Bone.FacialForehead];
             Vector3 v = b.UpVector.Normalized;
-            return b.Position+200*v;
+            return b.Position + 200 * v;
         }
         public static VehicleSeat GetSeatTryingToEnter(this Ped p)
         {
@@ -475,7 +476,7 @@ namespace RageCoop.Client
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus3;
                 case 0:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Apc
-                        || (VehicleHash)veh.Model.Hash==VehicleHash.Dune3;
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Dune3;
                 case 1:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Valkyrie2

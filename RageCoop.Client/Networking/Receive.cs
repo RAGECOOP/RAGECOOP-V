@@ -3,9 +3,7 @@ using Lidgren.Network;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using GTA.Native;
 
 namespace RageCoop.Client
 {
@@ -15,7 +13,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Reduce GC pressure by reusing frequently used packets
         /// </summary>
-        static class ReceivedPackets
+        private static class ReceivedPackets
         {
             public static Packets.PedSync PedPacket = new Packets.PedSync();
             public static Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
@@ -38,7 +36,7 @@ namespace RageCoop.Client
                    case 60:
                        return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
                    default:
-                       throw new ArgumentException("Cannot resolve server side argument: "+t);
+                       throw new ArgumentException("Cannot resolve server side argument: " + t);
                }
            };
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
@@ -54,50 +52,36 @@ namespace RageCoop.Client
                     switch (status)
                     {
                         case NetConnectionStatus.InitiatedConnect:
-                            if (message.SenderConnection==ServerConnection)
+                            if (message.SenderConnection == ServerConnection)
                             {
                                 CoopMenu.InitiateConnectionMenuSetting();
                             }
                             break;
                         case NetConnectionStatus.Connected:
-                            if (message.SenderConnection==ServerConnection)
+                            if (message.SenderConnection == ServerConnection)
                             {
-                                Memory.ApplyPatches();
                                 var response = message.SenderConnection.RemoteHailMessage;
-                                if ((PacketType)response.ReadByte()!=PacketType.HandshakeSuccess)
+                                if ((PacketType)response.ReadByte() != PacketType.HandshakeSuccess)
                                 {
                                     throw new Exception("Invalid handshake response!");
                                 }
                                 var p = new Packets.HandshakeSuccess();
                                 p.Deserialize(response.ReadBytes(response.ReadInt32()));
-                                foreach(var player in p.Players)
+                                foreach (var player in p.Players)
                                 {
-                                    PlayerList.SetPlayer(player.ID,player.Username);
+                                    PlayerList.SetPlayer(player.ID, player.Username);
                                 }
-                                Main.QueueAction(() =>
-                                {
-                                    WorldThread.Traffic(!Main.Settings.DisableTraffic);
-                                    Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
-                                    CoopMenu.ConnectedMenuSetting();
-                                    Main.MainChat.Init();
-                                    if (Main.Settings.Voice && !Voice.WasInitialized())
-                                    {
-                                        Voice.Init();
-                                    }
-                                    GTA.UI.Notification.Show("~g~Connected!");
-                                });
-                                
-                                Main.Logger.Info(">> Connected <<");
+                                Main.Connected();
                             }
                             else
                             {
                                 // Self-initiated connection
-                                if (message.SenderConnection.RemoteHailMessage==null) { return; }
-                                
+                                if (message.SenderConnection.RemoteHailMessage == null) { return; }
+
                                 var p = message.SenderConnection.RemoteHailMessage.GetPacket<Packets.P2PConnect>();
-                                if (PlayerList.Players.TryGetValue(p.ID,out var player))
+                                if (PlayerList.Players.TryGetValue(p.ID, out var player))
                                 {
-                                    player.Connection=message.SenderConnection;
+                                    player.Connection = message.SenderConnection;
                                     Main.Logger.Debug($"Direct connection to {player.Username} established");
                                 }
                                 else
@@ -108,28 +92,16 @@ namespace RageCoop.Client
                             }
                             break;
                         case NetConnectionStatus.Disconnected:
-                            if (message.SenderConnection==ServerConnection)
+                            if (message.SenderConnection == ServerConnection)
                             {
-                                Memory.RestorePatches();
-                                DownloadManager.Cleanup();
-
-                                if (Main.MainChat.Focused)
-                                {
-                                    Main.MainChat.Focused = false;
-                                }
-
-                                Main.QueueAction(() => Main.CleanUp());
-                                CoopMenu.DisconnectedMenuSetting();
-                                Main.Logger.Info($">> Disconnected << reason: {reason}");
-                                Main.QueueAction(() => GTA.UI.Notification.Show("~r~Disconnected: " + reason));
-                                Main.Resources.Unload();
+                                Main.Disconnected(reason);
                             }
                             break;
                     }
                     break;
                 case NetIncomingMessageType.Data:
                     {
-                        if (message.LengthBytes==0) { break; }
+                        if (message.LengthBytes == 0) { break; }
                         var packetType = PacketType.Unknown;
                         try
                         {
@@ -158,7 +130,7 @@ namespace RageCoop.Client
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
                                             handler(message.ReadBytes(len)).Pack(response);
-                                            Peer.SendMessage(response,ServerConnection, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
+                                            Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
                                             Peer.FlushSendQueue();
                                         }
                                         break;
@@ -167,7 +139,7 @@ namespace RageCoop.Client
                                     {
                                         byte[] data = message.ReadBytes(message.ReadInt32());
 
-                                        HandlePacket(packetType, data,message.SenderConnection);
+                                        HandlePacket(packetType, data, message.SenderConnection);
                                         break;
                                     }
                             }
@@ -199,8 +171,8 @@ namespace RageCoop.Client
                                     break;
                                 }
                             case PacketType.PublicKeyResponse:
-                                { 
-                                    if(message.SenderEndPoint.ToString()!=_targetServerEP.ToString() ||!IsConnecting){break;}
+                                {
+                                    if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) { break; }
                                     var packet = data.GetPacket<Packets.PublicKeyResponse>();
                                     Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
                                     _publicKeyReceived.Set();
@@ -323,34 +295,34 @@ namespace RageCoop.Client
         private static void PedSync(Packets.PedSync packet)
         {
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
-            if (c==null)
+            if (c == null)
             {
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                EntityPool.ThreadSafe.Add(c=new SyncedPed(packet.ID));
+                EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
             }
             PedDataFlags flags = packet.Flags;
-            c.ID=packet.ID;
-            c.OwnerID=packet.OwnerID;
+            c.ID = packet.ID;
+            c.OwnerID = packet.OwnerID;
             c.Health = packet.Health;
             c.Rotation = packet.Rotation;
             c.Velocity = packet.Velocity;
             c.Speed = packet.Speed;
-            c.Flags=packet.Flags;
-            c.Heading=packet.Heading;
+            c.Flags = packet.Flags;
+            c.Heading = packet.Heading;
             c.Position = packet.Position;
             c.LastSyncedStopWatch.Restart();
             if (c.IsRagdoll)
             {
-                c.HeadPosition=packet.HeadPosition;
-                c.RightFootPosition=packet.RightFootPosition;
-                c.LeftFootPosition=packet.LeftFootPosition;
+                c.HeadPosition = packet.HeadPosition;
+                c.RightFootPosition = packet.RightFootPosition;
+                c.LeftFootPosition = packet.LeftFootPosition;
             }
-            else if (c.Speed>=4)
+            else if (c.Speed >= 4)
             {
-                c.VehicleID=packet.VehicleID;
-                c.Seat=packet.Seat;
+                c.VehicleID = packet.VehicleID;
+                c.Seat = packet.Seat;
             }
-            c.LastSynced =  Main.Ticked;
+            c.LastSynced = Main.Ticked;
             if (c.IsAiming)
             {
                 c.AimCoords = packet.AimCoords;
@@ -358,13 +330,13 @@ namespace RageCoop.Client
             if (packet.Flags.HasPedFlag(PedDataFlags.IsFullSync))
             {
                 c.CurrentWeaponHash = packet.CurrentWeaponHash;
-                c.Clothes=packet.Clothes;
-                c.WeaponComponents=packet.WeaponComponents;
-                c.WeaponTint=packet.WeaponTint;
-                c.Model=packet.ModelHash;
-                c.BlipColor=packet.BlipColor;
-                c.BlipSprite=packet.BlipSprite;
-                c.BlipScale=packet.BlipScale;
+                c.Clothes = packet.Clothes;
+                c.WeaponComponents = packet.WeaponComponents;
+                c.WeaponTint = packet.WeaponTint;
+                c.Model = packet.ModelHash;
+                c.BlipColor = packet.BlipColor;
+                c.BlipSprite = packet.BlipSprite;
+                c.BlipScale = packet.BlipScale;
                 c.LastFullSynced = Main.Ticked;
             }
 
@@ -372,58 +344,58 @@ namespace RageCoop.Client
         private static void VehicleSync(Packets.VehicleSync packet)
         {
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-            if (v==null)
+            if (v == null)
             {
-                EntityPool.ThreadSafe.Add(v=new SyncedVehicle(packet.ID));
+                EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
             }
             if (v.IsLocal) { return; }
-            v.ID= packet.ID;
-            v.OwnerID= packet.OwnerID;
-            v.Flags=packet.Flags;
-            v.Position=packet.Position;
-            v.Quaternion=packet.Quaternion;
-            v.SteeringAngle=packet.SteeringAngle;
-            v.ThrottlePower=packet.ThrottlePower;
-            v.BrakePower=packet.BrakePower;
-            v.Velocity=packet.Velocity;
-            v.RotationVelocity=packet.RotationVelocity;
-            v.DeluxoWingRatio=packet.DeluxoWingRatio;
-            v.LastSynced=Main.Ticked;
+            v.ID = packet.ID;
+            v.OwnerID = packet.OwnerID;
+            v.Flags = packet.Flags;
+            v.Position = packet.Position;
+            v.Quaternion = packet.Quaternion;
+            v.SteeringAngle = packet.SteeringAngle;
+            v.ThrottlePower = packet.ThrottlePower;
+            v.BrakePower = packet.BrakePower;
+            v.Velocity = packet.Velocity;
+            v.RotationVelocity = packet.RotationVelocity;
+            v.DeluxoWingRatio = packet.DeluxoWingRatio;
+            v.LastSynced = Main.Ticked;
             v.LastSyncedStopWatch.Restart();
             if (packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
             {
-                v.DamageModel=packet.DamageModel;
-                v.EngineHealth=packet.EngineHealth;
-                v.Mods=packet.Mods;
-                v.Model=packet.ModelHash;
-                v.Colors=packet.Colors;
-                v.LandingGear=packet.LandingGear;
-                v.RoofState=(VehicleRoofState)packet.RoofState;
-                v.LockStatus=packet.LockStatus;
-                v.RadioStation=packet.RadioStation;
-                v.LicensePlate=packet.LicensePlate;
-                v.Livery=packet.Livery;
-                v.LastFullSynced= Main.Ticked;
+                v.DamageModel = packet.DamageModel;
+                v.EngineHealth = packet.EngineHealth;
+                v.Mods = packet.Mods;
+                v.Model = packet.ModelHash;
+                v.Colors = packet.Colors;
+                v.LandingGear = packet.LandingGear;
+                v.RoofState = (VehicleRoofState)packet.RoofState;
+                v.LockStatus = packet.LockStatus;
+                v.RadioStation = packet.RadioStation;
+                v.LicensePlate = packet.LicensePlate;
+                v.Livery = packet.Livery;
+                v.LastFullSynced = Main.Ticked;
             }
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {
 
             var p = EntityPool.GetProjectileByID(packet.ID);
-            if (p==null)
+            if (p == null)
             {
                 if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) { return; }
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
-                EntityPool.ThreadSafe.Add(p=new SyncedProjectile(packet.ID));
+                EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
             }
-            p.Flags=packet.Flags;
-            p.Position=packet.Position;
-            p.Rotation=packet.Rotation;
-            p.Velocity=packet.Velocity;
-            p.WeaponHash=(WeaponHash)packet.WeaponHash;
-            p.Shooter= packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle) ?
+            p.Flags = packet.Flags;
+            p.Position = packet.Position;
+            p.Rotation = packet.Rotation;
+            p.Velocity = packet.Velocity;
+            p.WeaponHash = (WeaponHash)packet.WeaponHash;
+            p.Shooter = packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle) ?
                 (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID) : EntityPool.GetPedByID(packet.ShooterID);
-            p.LastSynced=Main.Ticked;
+            p.LastSynced = Main.Ticked;
         }
     }
 }

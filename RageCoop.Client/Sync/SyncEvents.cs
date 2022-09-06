@@ -1,10 +1,8 @@
 ﻿using GTA;
 using GTA.Math;
+using Lidgren.Network;
 using RageCoop.Core;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Lidgren.Network;
 
 namespace RageCoop.Client
 {
@@ -13,7 +11,7 @@ namespace RageCoop.Client
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
-            Networking.SendSync(new Packets.PedKilled() { VictimID=victim.ID }, ConnectionChannel.SyncEvents);
+            Networking.SendSync(new Packets.PedKilled() { VictimID = victim.ID }, ConnectionChannel.SyncEvents);
         }
 
         public static void TriggerChangeOwner(int vehicleID, int newOwnerID)
@@ -21,9 +19,9 @@ namespace RageCoop.Client
 
             Networking.SendSync(new Packets.OwnerChanged()
             {
-                ID= vehicleID,
-                NewOwnerID= newOwnerID,
-            }, ConnectionChannel.SyncEvents,NetDeliveryMethod.ReliableOrdered);
+                ID = vehicleID,
+                NewOwnerID = newOwnerID,
+            }, ConnectionChannel.SyncEvents, NetDeliveryMethod.ReliableOrdered);
 
         }
 
@@ -33,11 +31,11 @@ namespace RageCoop.Client
 
 
             var start = owner.MainPed.GetMuzzlePosition();
-            if (owner.MainPed.IsOnTurretSeat()) { start=owner.MainPed.Bones[Bone.SkelHead].Position; }
-            if (start.DistanceTo(impactPosition)>10)
+            if (owner.MainPed.IsOnTurretSeat()) { start = owner.MainPed.Bones[Bone.SkelHead].Position; }
+            if (start.DistanceTo(impactPosition) > 10)
             {
                 // Reduce latency
-                start=impactPosition-(impactPosition-start).Normalized*10;
+                start = impactPosition - (impactPosition - start).Normalized * 10;
             }
             Networking.SendBullet(start, impactPosition, hash, owner.ID);
         }
@@ -47,14 +45,14 @@ namespace RageCoop.Client
 
             int i;
             // ANNIHL
-            if (veh.Model.Hash==837858166)
+            if (veh.Model.Hash == 837858166)
             {
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[35]);
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[36]);
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[37]);
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[38]);
             }
-            else if((i = veh.GetMuzzleIndex())!=-1)
+            else if ((i = veh.GetMuzzleIndex()) != -1)
             {
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[i]);
             }
@@ -65,7 +63,7 @@ namespace RageCoop.Client
         }
         public static void TriggerNozzleTransform(int vehID, bool hover)
         {
-            Networking.SendSync(new Packets.NozzleTransform() { VehicleID=vehID, Hover=hover }, ConnectionChannel.SyncEvents);
+            Networking.SendSync(new Packets.NozzleTransform() { VehicleID = vehID, Hover = hover }, ConnectionChannel.SyncEvents);
         }
 
         #endregion
@@ -73,9 +71,8 @@ namespace RageCoop.Client
         #region HANDLE
 
         public static ParticleEffectAsset CorePFXAsset = new ParticleEffectAsset("core");
-
-        static WeaponAsset _weaponAsset = default;
-        static uint _lastWeaponHash;
+        private static WeaponAsset _weaponAsset = default;
+        private static uint _lastWeaponHash;
 
         private static void HandlePedKilled(Packets.PedKilled p)
         {
@@ -84,11 +81,11 @@ namespace RageCoop.Client
         private static void HandleOwnerChanged(Packets.OwnerChanged p)
         {
             var v = EntityPool.GetVehicleByID(p.ID);
-            if (v==null) { return; }
-            v.OwnerID=p.NewOwnerID;
-            v.LastSynced=Main.Ticked;
-            v.Position=v.MainVehicle.Position;
-            v.Quaternion=v.MainVehicle.Quaternion;
+            if (v == null) { return; }
+            v.OwnerID = p.NewOwnerID;
+            v.LastSynced = Main.Ticked;
+            v.Position = v.MainVehicle.Position;
+            v.Quaternion = v.MainVehicle.Quaternion;
         }
         private static void HandleNozzleTransform(Packets.NozzleTransform p)
         {
@@ -100,47 +97,47 @@ namespace RageCoop.Client
             {
                 // Minigun, not working for some reason
                 case (uint)WeaponHash.Minigun:
-                    weaponHash=1176362416;
+                    weaponHash = 1176362416;
                     break;
 
                 // Valkyire, not working for some reason
                 case 2756787765:
-                    weaponHash=1176362416;
+                    weaponHash = 1176362416;
                     break;
 
                 // Tampa3, not working for some reason
                 case 3670375085:
-                    weaponHash=1176362416;
+                    weaponHash = 1176362416;
                     break;
 
                 // Ruiner2, not working for some reason
                 case 50118905:
-                    weaponHash=1176362416;
+                    weaponHash = 1176362416;
                     break;
 
                 // SAVAGE
                 case 1638077257:
-                    weaponHash=(uint)VehicleWeaponHash.PlayerLazer;
+                    weaponHash = (uint)VehicleWeaponHash.PlayerLazer;
                     break;
 
                 case (uint)VehicleWeaponHash.PlayerBuzzard:
-                    weaponHash=1176362416;
+                    weaponHash = 1176362416;
                     break;
             }
 
             var p = EntityPool.GetPedByID(ownerID)?.MainPed;
-            if (p == null) { p=Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
+            if (p == null) { p = Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
             if (!CorePFXAsset.IsLoaded) { CorePFXAsset.Request(); }
-            if (_lastWeaponHash!=weaponHash)
+            if (_lastWeaponHash != weaponHash)
             {
                 _weaponAsset.MarkAsNoLongerNeeded();
-                _weaponAsset=new WeaponAsset(weaponHash);
-                _lastWeaponHash=weaponHash;
+                _weaponAsset = new WeaponAsset(weaponHash);
+                _lastWeaponHash = weaponHash;
             }
             if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
             World.ShootBullet(start, end, p, _weaponAsset, (int)p.GetWeaponDamage(weaponHash));
             Prop w;
-            if (((w = p.Weapons.CurrentWeaponObject) != null)&&(p.VehicleWeapon==VehicleWeaponHash.Invalid))
+            if (((w = p.Weapons.CurrentWeaponObject) != null) && (p.VehicleWeapon == VehicleWeaponHash.Invalid))
             {
                 if (p.Weapons.Current.Components.GetSuppressorComponent().Active)
                 {
@@ -154,13 +151,13 @@ namespace RageCoop.Client
         }
         public static void HandleVehicleBulletShot(Packets.VehicleBulletShot p)
         {
-            HandleBulletShot(p.StartPosition,p.EndPosition,p.WeaponHash,p.OwnerID);
+            HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
             var v = EntityPool.GetPedByID(p.OwnerID)?.MainPed.CurrentVehicle;
-            if(v == null) { return; }
+            if (v == null) { return; }
             var b = v.Bones[p.Bone];
-            World.CreateParticleEffectNonLooped(CorePFXAsset, 
+            World.CreateParticleEffectNonLooped(CorePFXAsset,
                 WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash),
-                b.Position,b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector),1);
+                b.Position, b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
         }
         public static void HandleEvent(PacketType type, byte[] data)
         {
@@ -220,9 +217,9 @@ namespace RageCoop.Client
                     Func<bool> getBulletImpact = (() =>
                     {
                         Vector3 endPos = subject.LastWeaponImpactPosition;
-                        if (endPos==default)
+                        if (endPos == default)
                         {
-                            if (++i<=5) { return false; }
+                            if (++i <= 5) { return false; }
 
                             endPos = subject.GetAimCoord();
                             if (subject.IsInVehicle() && subject.VehicleWeapon != VehicleWeaponHash.Invalid)
@@ -267,7 +264,7 @@ namespace RageCoop.Client
                         Main.QueueAction(getBulletImpact);
                     }
                 }
-                else if (subject.VehicleWeapon==VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition!=default)
+                else if (subject.VehicleWeapon == VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition != default)
                 {
                     TriggerBulletShot((uint)VehicleWeaponHash.Tank, c, subject.LastWeaponImpactPosition);
                 }
@@ -276,7 +273,7 @@ namespace RageCoop.Client
 
         public static void Check(SyncedVehicle v)
         {
-            if (v.MainVehicle==null||!v.MainVehicle.HasNozzle())
+            if (v.MainVehicle == null || !v.MainVehicle.HasNozzle())
             {
                 return;
             }

@@ -21,8 +21,8 @@ namespace RageCoop.Client
                 }
                 return new Packets.FileTransferResponse()
                 {
-                    ID= fr.ID,
-                    Response=AddFile(fr.ID, fr.Name, fr.FileLength) ? FileResponse.NeedToDownload : FileResponse.AlreadyExists
+                    ID = fr.ID,
+                    Response = AddFile(fr.ID, fr.Name, fr.FileLength) ? FileResponse.NeedToDownload : FileResponse.AlreadyExists
                 };
             });
             Networking.RequestHandlers.Add(PacketType.FileTransferComplete, (data) =>
@@ -36,8 +36,8 @@ namespace RageCoop.Client
                 // Inform the server that the download is completed
                 return new Packets.FileTransferResponse()
                 {
-                    ID= packet.ID,
-                    Response=FileResponse.Completed
+                    ID = packet.ID,
+                    Response = FileResponse.Completed
                 };
             });
             Networking.RequestHandlers.Add(PacketType.AllResourcesSent, (data) =>
@@ -45,13 +45,13 @@ namespace RageCoop.Client
                 try
                 {
                     Main.Resources.Load(ResourceFolder, _resources.ToArray());
-                    return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.Loaded };
+                    return new Packets.FileTransferResponse() { ID = 0, Response = FileResponse.Loaded };
                 }
                 catch (Exception ex)
                 {
                     Main.Logger.Error("Error occurred when loading server resource:");
                     Main.Logger.Error(ex);
-                    return new Packets.FileTransferResponse() { ID=0, Response=FileResponse.LoadFailed };
+                    return new Packets.FileTransferResponse() { ID = 0, Response = FileResponse.LoadFailed };
                 }
             });
         }
@@ -176,7 +176,7 @@ namespace RageCoop.Client
         public FileStream Stream { get; set; }
         public void Dispose()
         {
-            if (Stream!= null)
+            if (Stream != null)
             {
                 Stream.Flush();
                 Stream.Close();

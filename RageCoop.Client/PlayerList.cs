@@ -1,11 +1,11 @@
 ﻿using GTA;
 using GTA.Math;
 using GTA.Native;
+using Lidgren.Network;
 using RageCoop.Core;
 using System.Collections.Generic;
-using Lidgren.Network;
-using System.Net;
 using System.Linq;
+using System.Net;
 
 namespace RageCoop.Client
 {
@@ -49,12 +49,12 @@ namespace RageCoop.Client
             _lastUpdate = Util.GetTickCount64();
 
             _mainScaleform.CallFunction("SET_DATA_SLOT_EMPTY", 0);
-            
-            int i=0;
+
+            int i = 0;
 
             foreach (var player in Players.Values)
             {
-                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Ping * 1000:N0}ms", player.Username+(player.IsHost ? " (Host)" : ""), 116, 0, i - 1, "", "", 2, "", "", ' ');
+                _mainScaleform.CallFunction("SET_DATA_SLOT", i++, $"{player.Ping * 1000:N0}ms", player.Username + (player.IsHost ? " (Host)" : ""), 116, 0, i - 1, "", "", 2, "", "", ' ');
             }
 
             _mainScaleform.CallFunction("SET_TITLE", "Player list", $"{Players.Count} players");
@@ -66,29 +66,29 @@ namespace RageCoop.Client
             Player p;
             if (Players.TryGetValue(id, out p))
             {
-                p.Username=username;
-                p.ID=id;
-                p._latencyToServer=latency;
+                p.Username = username;
+                p.ID = id;
+                p._latencyToServer = latency;
             }
             else
             {
-                p = new Player { ID=id, Username=username, _latencyToServer=latency };
+                p = new Player { ID = id, Username = username, _latencyToServer = latency };
                 Players.Add(id, p);
             }
         }
         public static void UpdatePlayer(Packets.PlayerInfoUpdate packet)
         {
             var p = GetPlayer(packet.PedID);
-            if (p!=null)
+            if (p != null)
             {
                 p._latencyToServer = packet.Latency;
                 p.Position = packet.Position;
-                p.IsHost= packet.IsHost;
+                p.IsHost = packet.IsHost;
                 Main.QueueAction(() =>
                 {
-                    if (p.FakeBlip?.Exists()!=true)
+                    if (p.FakeBlip?.Exists() != true)
                     {
-                        p.FakeBlip=World.CreateBlip(p.Position);
+                        p.FakeBlip = World.CreateBlip(p.Position);
                     }
                     if (EntityPool.PedExists(p.ID))
                     {
@@ -101,9 +101,9 @@ namespace RageCoop.Client
                         p.FakeBlip.Sprite = Scripting.API.Config.BlipSprite;
                         p.FakeBlip.DisplayType = BlipDisplayType.Default;
                         p.FakeBlip.Position = p.Position;
-                    }          
+                    }
                 });
-                
+
             }
         }
         public static Player GetPlayer(int id)
@@ -115,15 +115,15 @@ namespace RageCoop.Client
         public static Player GetPlayer(SyncedPed p)
         {
             var player = GetPlayer(p.ID);
-            if (player!=null)
+            if (player != null)
             {
-                player.Character=p;
+                player.Character = p;
             }
             return player;
         }
         public static void RemovePlayer(int id)
         {
-            if (Players.TryGetValue(id,out var player))
+            if (Players.TryGetValue(id, out var player))
             {
                 Players.Remove(id);
                 Main.QueueAction(() => player.FakeBlip?.Delete());
@@ -131,11 +131,11 @@ namespace RageCoop.Client
         }
         public static void Cleanup()
         {
-            foreach(var p in Players.Values.ToArray())
+            foreach (var p in Players.Values.ToArray())
             {
                 p.FakeBlip?.Delete();
             }
-            Players=new Dictionary<int, Player> { };
+            Players = new Dictionary<int, Player> { };
         }
     }
 
@@ -160,8 +160,8 @@ namespace RageCoop.Client
         /// <summary>
         /// Player round-trip time in seconds, will be the rtt to server if not using P2P connection.
         /// </summary>
-        public float Ping => Main.LocalPlayerID==ID ? Networking.Latency*2 : (HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer*2);
-        public float PacketTravelTime => HasDirectConnection ? Connection.AverageRoundtripTime/2 : Networking.Latency+_latencyToServer;
+        public float Ping => Main.LocalPlayerID == ID ? Networking.Latency * 2 : (HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer * 2);
+        public float PacketTravelTime => HasDirectConnection ? Connection.AverageRoundtripTime / 2 : Networking.Latency + _latencyToServer;
         internal float _latencyToServer = 0;
         public bool DisplayNameTag { get; set; } = true;
         public NetConnection Connection { get; internal set; }

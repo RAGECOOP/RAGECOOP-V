@@ -28,7 +28,7 @@ namespace RageCoop.Server
         /// <summary>
         /// Th client's IP address and port.
         /// </summary>
-        public IPEndPoint EndPoint { get { return Connection?.RemoteEndPoint; } }
+        public IPEndPoint EndPoint => Connection?.RemoteEndPoint;
 
         /// <summary>
         /// Internal(LAN) address of this client, used for NAT hole-punching
@@ -62,8 +62,8 @@ namespace RageCoop.Server
         /// <summary>
         /// Gets or sets whether to enable automatic respawn for this client's main ped.
         /// </summary>
-        public bool EnableAutoRespawn { 
-            get { return _autoRespawn; } 
+        public bool EnableAutoRespawn {
+            get => _autoRespawn; 
             set {
                 BaseScript.SetAutoRespawn(this,value);
                 _autoRespawn=value;
@@ -78,7 +78,7 @@ namespace RageCoop.Server
         /// </summary>
         public bool DisplayNameTag
         {
-            get { return _displayNameTag; }
+            get => _displayNameTag;
             set
             {
                 Server.BaseScript.SetNameTag(this,value);

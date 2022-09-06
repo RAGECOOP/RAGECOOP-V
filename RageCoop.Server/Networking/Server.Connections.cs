@@ -182,7 +182,7 @@ namespace RageCoop.Server
                 MainNetServer.SendMessage(outgoingMessage, cons, NetDeliveryMethod.ReliableOrdered, 0);
             }
             Entities.CleanUp(localClient);
-            _worker.QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
+            QueueJob(() => API.Events.InvokePlayerDisconnected(localClient));
             Logger?.Info($"Player {localClient.Username} disconnected! ID:{localClient.Player.ID}");
             if (ClientsByNetHandle.ContainsKey(localClient.NetHandle)) { ClientsByNetHandle.Remove(localClient.NetHandle); }
             if (ClientsByName.ContainsKey(localClient.Username.ToLower())) { ClientsByName.Remove(localClient.Username.ToLower()); }

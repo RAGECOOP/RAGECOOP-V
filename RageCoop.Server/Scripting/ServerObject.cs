@@ -70,7 +70,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public virtual Vector3 Position
         {
-            get { return _pos; }
+            get => _pos;
             set { _pos=value; Owner.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z,1, 1,1 ); }
         }
         internal Vector3 _pos;
@@ -80,7 +80,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public virtual Vector3 Rotation
         {
-            get { return _rot; }
+            get => _rot;
             set { _rot=value; Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z ,2,1); }
         }
         internal Vector3 _rot;
@@ -137,7 +137,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public override Vector3 Position
         {
-            get { return _pos; }
+            get => _pos;
             set { _pos=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z, 1, 1, 1); }
         }
 
@@ -146,7 +146,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public override Vector3 Rotation
         {
-            get { return _rot; }
+            get => _rot;
             set { _rot=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z, 2, 1); }
         }
 
@@ -215,7 +215,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public override Vector3 Rotation
         {
-            get { return _quat.ToEulerAngles().ToDegree(); }
+            get => _quat.ToEulerAngles().ToDegree();
             set { Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION,  Handle ,value.X, value.Y ,value.Z); }
         }
 
@@ -225,7 +225,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public Quaternion Quaternion
         {
-            get { return _quat; }
+            get => _quat;
             set { _quat = value ;Owner.SendNativeCall(Hash.SET_ENTITY_QUATERNION, Handle, value.X, value.Y, value.Z, value.W); }
         }
     }
@@ -264,7 +264,7 @@ namespace RageCoop.Server.Scripting
         /// Color of this blip
         /// </summary>
         public BlipColor Color { 
-            get { return _color; } 
+            get => _color; 
             set { _color=value; Update(); } 
         }
 
@@ -273,7 +273,7 @@ namespace RageCoop.Server.Scripting
         /// Sprite of this blip
         /// </summary>
         public BlipSprite Sprite {
-            get { return _sprite; }
+            get => _sprite;
             set { _sprite=value; Update();}
         }
 
@@ -283,7 +283,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public float Scale
         {
-            get { return _scale; }
+            get => _scale;
             set { _scale=value;Update(); }
         }
 
@@ -293,7 +293,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public Vector3 Position
         {
-            get { return _pos; }
+            get => _pos;
             set { _pos=value; Update(); }
         }
 
@@ -303,7 +303,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public int Rotation
         {
-            get { return _rot; }
+            get => _rot;
             set { _rot=value; Update(); }
         }
 
@@ -313,7 +313,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public string Name
         {
-            get { return _name;}
+            get => _name;
             set { _name=value; Update(); }
         }
 
@@ -372,7 +372,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public BlipColor Color
         {
-            get { return _color; }
+            get => _color;
             set { _color=value; Update(); }
         }
 
@@ -382,7 +382,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public BlipSprite Sprite
         {
-            get { return _sprite; }
+            get => _sprite;
             set { _sprite=value; Update(); }
         }
 
@@ -392,7 +392,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public float Scale
         {
-            get { return _scale; }
+            get => _scale;
             set { _scale=value; Update(); }
         }
 

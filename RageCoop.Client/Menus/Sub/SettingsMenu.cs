@@ -18,10 +18,10 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableAlternatePause);
         private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable voice", "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends", Main.Settings.Voice);
-        
-        private static NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
-        private static NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
-        private static NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
+
+        private static readonly NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
+        private static readonly NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
+        private static readonly NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
 
         static SettingsMenu()
         {
@@ -29,12 +29,12 @@ namespace RageCoop.Client.Menus
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
-            _disablePauseAlt.CheckboxChanged+= DisablePauseAltCheckboxChanged;
+            _disablePauseAlt.CheckboxChanged += DisablePauseAltCheckboxChanged;
             _disableVoice.CheckboxChanged += DisableVoiceCheckboxChanged;
             _flipMenuItem.CheckboxChanged += FlipMenuCheckboxChanged;
-            _menuKey.Activated+= ChaneMenuKey;
-            _passengerKey.Activated+= ChangePassengerKey;
-            _vehicleSoftLimit.Activated+= VehicleSoftLimitActivated;
+            _menuKey.Activated += ChaneMenuKey;
+            _passengerKey.Activated += ChangePassengerKey;
+            _vehicleSoftLimit.Activated += VehicleSoftLimitActivated;
 
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);
@@ -53,7 +53,9 @@ namespace RageCoop.Client.Menus
                 {
                     Voice.Init();
                 }
-            } else {
+            }
+            else
+            {
                 Voice.ClearAll();
             }
 
@@ -63,17 +65,17 @@ namespace RageCoop.Client.Menus
 
         private static void DisablePauseAltCheckboxChanged(object sender, EventArgs e)
         {
-            Main.Settings.DisableAlternatePause=_disablePauseAlt.Checked;
+            Main.Settings.DisableAlternatePause = _disablePauseAlt.Checked;
             Util.SaveSettings();
         }
         private static void VehicleSoftLimitActivated(object sender, EventArgs e)
         {
             try
             {
-                Main.Settings.WorldVehicleSoftLimit =int.Parse(
+                Main.Settings.WorldVehicleSoftLimit = int.Parse(
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.WorldVehicleSoftLimit.ToString(), 20));
-                _menuKey.AltTitle=Main.Settings.WorldVehicleSoftLimit.ToString();
+                _menuKey.AltTitle = Main.Settings.WorldVehicleSoftLimit.ToString();
                 Util.SaveSettings();
             }
             catch { }
@@ -82,11 +84,11 @@ namespace RageCoop.Client.Menus
         {
             try
             {
-                Main.Settings.MenuKey =(Keys)Enum.Parse(
+                Main.Settings.MenuKey = (Keys)Enum.Parse(
                     typeof(Keys),
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.MenuKey.ToString(), 20));
-                _menuKey.AltTitle=Main.Settings.MenuKey.ToString();
+                _menuKey.AltTitle = Main.Settings.MenuKey.ToString();
                 Util.SaveSettings();
             }
             catch { }
@@ -96,11 +98,11 @@ namespace RageCoop.Client.Menus
         {
             try
             {
-                Main.Settings.PassengerKey =(Keys)Enum.Parse(
+                Main.Settings.PassengerKey = (Keys)Enum.Parse(
                     typeof(Keys),
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.PassengerKey.ToString(), 20));
-                _passengerKey.AltTitle=Main.Settings.PassengerKey.ToString();
+                _passengerKey.AltTitle = Main.Settings.PassengerKey.ToString();
                 Util.SaveSettings();
             }
             catch { }

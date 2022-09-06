@@ -14,12 +14,12 @@ namespace RageCoop.Server
     {
         private void PedSync(Packets.PedSync packet, Client client)
         {
-            _worker.QueueJob(() => Entities.Update(packet, client));
+            QueueJob(() => Entities.Update(packet, client));
 
             bool isPlayer = packet.ID==client.Player.ID;
             if (isPlayer)
             {
-                _worker.QueueJob(() => API.Events.InvokePlayerUpdate(client));
+                QueueJob(() => API.Events.InvokePlayerUpdate(client));
             }
 
             if (Settings.UseP2P) { return; }
@@ -49,7 +49,7 @@ namespace RageCoop.Server
         }
         private void VehicleSync(Packets.VehicleSync packet, Client client)
         {
-            _worker.QueueJob(() => Entities.Update(packet, client));
+            QueueJob(() => Entities.Update(packet, client));
             bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
 
 

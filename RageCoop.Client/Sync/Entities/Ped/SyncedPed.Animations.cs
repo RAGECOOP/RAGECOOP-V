@@ -116,10 +116,10 @@ namespace RageCoop.Client
 
                 case unchecked((uint)-1357824103):
                 case unchecked((uint)-1074790547):
-                case unchecked((uint)2132975508):
+                case unchecked(2132975508):
                 case unchecked((uint)-2084633992):
                 case unchecked((uint)-952879014):
-                case unchecked((uint)100416529):
+                case unchecked(100416529):
                 case unchecked((uint)WeaponHash.Gusenberg):
                 case unchecked((uint)WeaponHash.MG):
                 case unchecked((uint)WeaponHash.CombatMG):

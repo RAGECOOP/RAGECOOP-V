@@ -1,6 +1,5 @@
-﻿using System.Threading;
-
-using NAudio.Wave;
+﻿using NAudio.Wave;
+using System.Threading;
 
 namespace RageCoop.Client
 {

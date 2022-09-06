@@ -16,14 +16,14 @@ namespace RageCoop.Client
         public static MuzzleDir Direction = MuzzleDir.Forward;
         public DevTool()
         {
-            Tick+=OnTick;
-            KeyDown+=OnKeyDown;
+            Tick += OnTick;
+            KeyDown += OnKeyDown;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (ToMark==null||(!ToMark.Exists())) { return; }
-            if (DevToolMenu.Menu.SelectedItem==DevToolMenu.boneIndexItem)
+            if (ToMark == null || (!ToMark.Exists())) { return; }
+            if (DevToolMenu.Menu.SelectedItem == DevToolMenu.boneIndexItem)
             {
 
                 switch (e.KeyCode)
@@ -36,7 +36,7 @@ namespace RageCoop.Client
                         break;
                 }
             }
-            else if (DevToolMenu.Menu.SelectedItem==DevToolMenu.secondaryBoneIndexItem)
+            else if (DevToolMenu.Menu.SelectedItem == DevToolMenu.secondaryBoneIndexItem)
             {
 
                 switch (e.KeyCode)
@@ -54,24 +54,24 @@ namespace RageCoop.Client
         private static void Update()
         {
 
-            if (Current>ToMark.Bones.Count-1)
+            if (Current > ToMark.Bones.Count - 1)
             {
-                Current=0;
+                Current = 0;
             }
-            else if (Current< 0)
+            else if (Current < 0)
             {
-                Current=ToMark.Bones.Count-1;
+                Current = ToMark.Bones.Count - 1;
             }
-            DevToolMenu.boneIndexItem.AltTitle= Current.ToString();
-            if (Secondary>ToMark.Bones.Count-1)
+            DevToolMenu.boneIndexItem.AltTitle = Current.ToString();
+            if (Secondary > ToMark.Bones.Count - 1)
             {
-                Secondary=0;
+                Secondary = 0;
             }
-            else if (Secondary< 0)
+            else if (Secondary < 0)
             {
-                Secondary=ToMark.Bones.Count-1;
+                Secondary = ToMark.Bones.Count - 1;
             }
-            DevToolMenu.secondaryBoneIndexItem.AltTitle= Secondary.ToString();
+            DevToolMenu.secondaryBoneIndexItem.AltTitle = Secondary.ToString();
         }
         private static void OnTick(object sender, EventArgs e)
         {
@@ -87,44 +87,44 @@ namespace RageCoop.Client
         private static void Draw(int boneindex)
         {
             var bone = ToMark.Bones[boneindex];
-            World.DrawLine(bone.Position, bone.Position+2*bone.ForwardVector, Color.Blue);
-            World.DrawLine(bone.Position, bone.Position+2*bone.UpVector, Color.Green);
-            World.DrawLine(bone.Position, bone.Position+2*bone.RightVector, Color.Yellow);
+            World.DrawLine(bone.Position, bone.Position + 2 * bone.ForwardVector, Color.Blue);
+            World.DrawLine(bone.Position, bone.Position + 2 * bone.UpVector, Color.Green);
+            World.DrawLine(bone.Position, bone.Position + 2 * bone.RightVector, Color.Yellow);
             Vector3 todraw = bone.ForwardVector;
             switch ((byte)Direction)
             {
                 case 0:
-                    todraw=bone.ForwardVector;
+                    todraw = bone.ForwardVector;
                     break;
                 case 1:
-                    todraw=bone.RightVector;
+                    todraw = bone.RightVector;
                     break;
                 case 2:
-                    todraw=bone.UpVector;
+                    todraw = bone.UpVector;
                     break;
                 case 3:
-                    todraw=bone.ForwardVector*-1;
+                    todraw = bone.ForwardVector * -1;
                     break;
                 case 4:
-                    todraw=bone.RightVector*-1;
+                    todraw = bone.RightVector * -1;
                     break;
                 case 5:
-                    todraw=bone.UpVector*-1;
+                    todraw = bone.UpVector * -1;
                     break;
             }
-            World.DrawLine(bone.Position, bone.Position+10*todraw, Color.Red);
+            World.DrawLine(bone.Position, bone.Position + 10 * todraw, Color.Red);
         }
         public static void CopyToClipboard(MuzzleDir dir)
         {
 
-            if (ToMark!=null)
+            if (ToMark != null)
             {
                 string s;
                 if (UseSecondary)
                 {
-                    if ((byte)dir<3)
+                    if ((byte)dir < 3)
                     {
-                        s=$@"
+                        s = $@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
                             return BulletsShot%2==0 ? {Current} : {Secondary};
@@ -132,7 +132,7 @@ namespace RageCoop.Client
                     }
                     else
                     {
-                        s=$@"
+                        s = $@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
                             return BulletsShot%2==0 ? {Current} : {Secondary};
@@ -141,9 +141,9 @@ namespace RageCoop.Client
                 }
                 else
                 {
-                    if ((byte)dir<3)
+                    if ((byte)dir < 3)
                     {
-                        s=$@"
+                        s = $@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
                             return {Current};
@@ -151,7 +151,7 @@ namespace RageCoop.Client
                     }
                     else
                     {
-                        s=$@"
+                        s = $@"
                         // {ToMark.DisplayName}
                         case {ToMark.Model.Hash}:
                             return {Current};

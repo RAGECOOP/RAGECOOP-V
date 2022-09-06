@@ -86,7 +86,7 @@ namespace RageCoop.Server
                         else if (status == NetConnectionStatus.Connected)
                         {
                             PlayerConnected(sender);
-                            _worker.QueueJob(() => API.Events.InvokePlayerConnected(sender));
+                            QueueJob(() => API.Events.InvokePlayerConnected(sender));
                             Resources.SendTo(sender);
                         }
                         break;
@@ -233,7 +233,7 @@ namespace RageCoop.Server
                         {
                             Packets.CustomEvent packet = new Packets.CustomEvent();
                             packet.Deserialize(data);
-                            _worker.QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
+                            QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                         }
                         break;
                     default:

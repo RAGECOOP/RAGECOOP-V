@@ -38,9 +38,11 @@ namespace RageCoop.Client.Scripting
     }
     internal class Resources
     {
+        private readonly List<ClientResource> LoadedResources = new List<ClientResource>();
+        private const string BaseScriptType = "RageCoop.Client.Scripting.ClientScript";
+        private Logger Logger { get; set; }
         public Resources()
         {
-            BaseScriptType = "RageCoop.Client.Scripting.ClientScript";
             Logger = Main.Logger;
         }
         private void StartAll()
@@ -53,12 +55,12 @@ namespace RageCoop.Client.Scripting
                     {
                         try
                         {
-                            s.CurrentResource=d;
+                            s.CurrentResource = d;
                             s.OnStart();
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error("Error occurred when starting script:"+s.GetType().FullName);
+                            Logger.Error("Error occurred when starting script:" + s.GetType().FullName);
                             Logger?.Error(ex);
                         }
                     }
@@ -79,7 +81,7 @@ namespace RageCoop.Client.Scripting
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error("Error occurred when stopping script:"+s.GetType().FullName);
+                            Logger.Error("Error occurred when stopping script:" + s.GetType().FullName);
                             Logger?.Error(ex);
                         }
                     }
@@ -106,9 +108,6 @@ namespace RageCoop.Client.Scripting
             }
             LoadedResources.Clear();
         }
-        private List<ClientResource> LoadedResources = new List<ClientResource>();
-        private string BaseScriptType;
-        public Logger Logger { get; set; }
 
         private void LoadResource(ZipFile file, string dataFolderRoot)
         {
@@ -117,22 +116,22 @@ namespace RageCoop.Client.Scripting
             {
                 Logger = Main.Logger,
                 Scripts = new List<ClientScript>(),
-                Name=Path.GetFileNameWithoutExtension(file.Name),
-                DataFolder=Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(file.Name))
+                Name = Path.GetFileNameWithoutExtension(file.Name),
+                DataFolder = Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(file.Name))
             };
             Directory.CreateDirectory(r.DataFolder);
 
             foreach (ZipEntry entry in file)
             {
                 ResourceFile rFile;
-                r.Files.Add(entry.Name, rFile=new ResourceFile()
+                r.Files.Add(entry.Name, rFile = new ResourceFile()
                 {
-                    Name=entry.Name,
-                    IsDirectory=entry.IsDirectory,
+                    Name = entry.Name,
+                    IsDirectory = entry.IsDirectory,
                 });
                 if (!entry.IsDirectory)
                 {
-                    rFile.GetStream=() => { return file.GetInputStream(entry); };
+                    rFile.GetStream = () => { return file.GetInputStream(entry); };
                     if (entry.Name.EndsWith(".dll") && !entry.Name.Contains("/"))
                     {
                         // Don't load API assembly
@@ -145,12 +144,12 @@ namespace RageCoop.Client.Scripting
                         {
                             continue;
                         }
-                        var asm=Assembly.LoadFrom(tmp);
-                        toLoad.Add(() => LoadScriptsFromAssembly(rFile,asm, entry.Name,r));
+                        var asm = Assembly.LoadFrom(tmp);
+                        toLoad.Add(() => LoadScriptsFromAssembly(rFile, asm, entry.Name, r));
                     }
                 }
             }
-            foreach(var a in toLoad)
+            foreach (var a in toLoad)
             {
                 a();
             }
@@ -174,8 +173,8 @@ namespace RageCoop.Client.Scripting
                             // Invoke script constructor
                             var script = constructor.Invoke(null) as ClientScript;
                             // script.CurrentResource = toload;
-                            script.CurrentFile=rfile;
-                            script.CurrentResource=toload;
+                            script.CurrentFile = rfile;
+                            script.CurrentResource = toload;
                             toload.Scripts.Add(script);
                             count++;
                         }

@@ -36,14 +36,14 @@ namespace RageCoop.Client
             string s = "";
             foreach (KeyValuePair<TimeStamp, long> kvp in d)
             {
-                s+=kvp.Key+":"+kvp.Value+"\n";
+                s += kvp.Key + ":" + kvp.Value + "\n";
             }
             return s;
         }
         public static void ShowTimeStamps()
         {
             GTA.UI.Notification.Hide(_lastNfHandle);
-            _lastNfHandle=GTA.UI.Notification.Show(Debug.TimeStamps.Dump());
+            _lastNfHandle = GTA.UI.Notification.Show(Debug.TimeStamps.Dump());
 
         }
     }

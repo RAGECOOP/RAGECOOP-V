@@ -33,11 +33,12 @@ namespace RageCoop.Client
             get => _ownerID;
             internal set
             {
-                if (value==_ownerID && Owner!=null) { return; }
+                if (value == _ownerID && Owner != null) { return; }
                 _ownerID = value;
-                Owner=PlayerList.GetPlayer(value);
-                if(this is SyncedPed && Owner!=null){
-                    Owner.Character=((SyncedPed)this);
+                Owner = PlayerList.GetPlayer(value);
+                if (this is SyncedPed && Owner != null)
+                {
+                    Owner.Character = ((SyncedPed)this);
                 }
             }
         }
@@ -83,7 +84,7 @@ namespace RageCoop.Client
         /// <summary>
         /// 
         /// </summary>
-        internal protected bool _lastFrozen = false;
+        protected internal bool _lastFrozen = false;
         internal Model Model { get; set; }
         internal Vector3 Position { get; set; }
         internal Vector3 Rotation { get; set; }
@@ -93,18 +94,18 @@ namespace RageCoop.Client
         internal abstract void Update();
         internal void PauseUpdate(ulong frames)
         {
-            LastUpdated=Main.Ticked+frames;
+            LastUpdated = Main.Ticked + frames;
         }
         protected Vector3 Predict(Vector3 input)
         {
             return (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Velocity + input;
         }
-        private float _accumulatedOff=0;
-        protected bool IsOff(float thisOff, float tolerance=3 , float limit = 30)
+        private float _accumulatedOff = 0;
+        protected bool IsOff(float thisOff, float tolerance = 3, float limit = 30)
         {
             _accumulatedOff += thisOff - tolerance;
-            if (_accumulatedOff < 0) { _accumulatedOff=0;}
-            else if (_accumulatedOff>=limit)
+            if (_accumulatedOff < 0) { _accumulatedOff = 0; }
+            else if (_accumulatedOff >= limit)
             {
                 _accumulatedOff = 0;
                 return true;

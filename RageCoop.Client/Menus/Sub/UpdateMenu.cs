@@ -11,10 +11,10 @@ namespace RageCoop.Client.Menus
     internal class UpdateMenu
     {
         public static bool IsUpdating { get; private set; } = false;
-        private static NativeItem _updatingItem = new NativeItem("Updating...");
-        private static NativeItem _downloadItem = new NativeItem("Download", "Download and update to latest nightly");
+        private static readonly NativeItem _updatingItem = new NativeItem("Updating...");
+        private static readonly NativeItem _downloadItem = new NativeItem("Download", "Download and update to latest nightly");
 
-        private static string _downloadPath = Path.Combine(Main.Settings.DataDirectory, "RageCoop.Client.zip");
+        private static readonly string _downloadPath = Path.Combine(Main.Settings.DataDirectory, "RageCoop.Client.zip");
         public static NativeMenu Menu = new NativeMenu("Update", "Update", "Download and install latest nightly build from GitHub")
         {
             UseMouse = false,
@@ -24,13 +24,13 @@ namespace RageCoop.Client.Menus
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
-            Menu.Opening+=Opening;
-            _downloadItem.Activated+=StartUpdate;
+            Menu.Opening += Opening;
+            _downloadItem.Activated += StartUpdate;
         }
 
         private static void StartUpdate(object sender, EventArgs e)
         {
-            IsUpdating=true;
+            IsUpdating = true;
             Menu.Clear();
             Menu.Add(_updatingItem);
             Task.Run(() =>
@@ -45,8 +45,8 @@ namespace RageCoop.Client.Menus
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                    client.DownloadProgressChanged += (s, e1) => { Main.QueueAction(() => { _updatingItem.AltTitle=$"{e1.ProgressPercentage}%"; }); };
-                    client.DownloadFileCompleted +=(s, e2) => { Install(); };
+                    client.DownloadProgressChanged += (s, e1) => { Main.QueueAction(() => { _updatingItem.AltTitle = $"{e1.ProgressPercentage}%"; }); };
+                    client.DownloadFileCompleted += (s, e2) => { Install(); };
                     client.DownloadFileAsync(new Uri("https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Client.zip"), _downloadPath);
                 }
                 catch (Exception ex)
@@ -62,21 +62,21 @@ namespace RageCoop.Client.Menus
             {
                 Main.QueueAction(() =>
                 {
-                    _updatingItem.AltTitle="Installing...";
+                    _updatingItem.AltTitle = "Installing...";
                 });
                 Directory.CreateDirectory(@"Scripts\RageCoop");
-                foreach(var f in Directory.GetFiles(@"Scripts\RageCoop", "*.dll", SearchOption.AllDirectories))
+                foreach (var f in Directory.GetFiles(@"Scripts\RageCoop", "*.dll", SearchOption.AllDirectories))
                 {
                     try { File.Delete(f); }
                     catch { }
                 }
                 new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
                 try { File.Delete(_downloadPath); } catch { }
-                try { File.Delete(Path.Combine("Scripts","RageCoop.Client.Installer.exe")); } catch { }
+                try { File.Delete(Path.Combine("Scripts", "RageCoop.Client.Installer.exe")); } catch { }
                 Main.QueueAction(() =>
                 {
                     Util.Reload();
-                    IsUpdating=false;
+                    IsUpdating = false;
                 });
             }
             catch (Exception ex)

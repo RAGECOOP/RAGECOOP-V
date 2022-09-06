@@ -22,9 +22,8 @@ namespace RageCoop.Server.Scripting
 			Server = server;
 			Logger=server.Logger;
 		}
-		private Dictionary<string,Func<Stream>> ClientResources=new();
-		private Dictionary<string,Func<Stream>> ResourceStreams=new();
-		private List<MemoryStream> MemStreams = new();
+		private Dictionary<string,Stream> ClientResources=new();
+		private Dictionary<string,Stream> ResourceStreams=new();
 		public void LoadAll()
 		{
 			// Packages
@@ -41,15 +40,13 @@ namespace RageCoop.Server.Scripting
 						if (e.Name.StartsWith("Client") && e.Name.EndsWith(".res"))
 						{
 							var stream = pkgZip.GetInputStream(e).ToMemStream();
-							MemStreams.Add(stream);
-							ClientResources.Add(Path.GetFileNameWithoutExtension(e.Name), () => stream);
+							ClientResources.Add(Path.GetFileNameWithoutExtension(e.Name), stream);
 							Logger?.Debug("Resource added: "+ Path.GetFileNameWithoutExtension(e.Name));
 						}
 						else if (e.Name.StartsWith("Server") && e.Name.EndsWith(".res"))
 						{
 							var stream = pkgZip.GetInputStream(e).ToMemStream();
-							MemStreams.Add(stream);
-							ResourceStreams.Add(Path.GetFileNameWithoutExtension(e.Name), () => stream);
+							ResourceStreams.Add(Path.GetFileNameWithoutExtension(e.Name), stream);
 							Logger?.Debug("Resource added: " + Path.GetFileNameWithoutExtension(e.Name));
 						}
 					}
@@ -91,7 +88,7 @@ namespace RageCoop.Server.Scripting
                             }
                             zip.CommitUpdate();
                             zip.Close();
-                            ClientResources.Add(Path.GetFileNameWithoutExtension(zipPath), () => File.OpenRead(zipPath));
+                            ClientResources.Add(Path.GetFileNameWithoutExtension(zipPath), File.OpenRead(zipPath));
                         }
 						catch (Exception ex)
 						{
@@ -105,7 +102,7 @@ namespace RageCoop.Server.Scripting
 				{
 					foreach(var file in packed)
                     {
-						ClientResources.Add(Path.GetFileNameWithoutExtension(file),()=>File.OpenRead(file));
+						ClientResources.Add(Path.GetFileNameWithoutExtension(file),File.OpenRead(file));
                     }
 				}
 			}
@@ -138,7 +135,7 @@ namespace RageCoop.Server.Scripting
 				}
 				foreach (var res in Directory.GetFiles(path, "*.res", SearchOption.TopDirectoryOnly))
 				{
-					if (!ResourceStreams.TryAdd(Path.GetFileNameWithoutExtension(res),()=>File.OpenRead(res)))
+					if (!ResourceStreams.TryAdd(Path.GetFileNameWithoutExtension(res),File.OpenRead(res)))
 					{
 						Logger?.Warning($"Resource \"{res}\" cannot be loaded, ignoring...");
 						continue;
@@ -155,7 +152,7 @@ namespace RageCoop.Server.Scripting
 							continue;
 						}
 						Logger?.Info($"Loading resource: "+name);
-						var r = ServerResource.LoadFrom(res.Value(),name, Path.Combine("Resources", "Temp", "Server"), dataFolder, Logger);
+						var r = ServerResource.LoadFrom(res.Value, name, Path.Combine("Resources", "Temp", "Server"), dataFolder, Logger);
 						LoadedResources.Add(r.Name, r);
 					}
 					catch(Exception ex)
@@ -215,7 +212,7 @@ namespace RageCoop.Server.Scripting
 				}
 				LoadedResources.Clear();
 			}
-			foreach(var s in MemStreams)
+			foreach(var s in ResourceStreams.Values)
             {
                 try
                 {
@@ -224,10 +221,22 @@ namespace RageCoop.Server.Scripting
                 }
 				catch(Exception ex)
                 {
-					Logger?.Error("[Resources.CloseMemStream]",ex);
+					Logger?.Error("[Resources.CloseStream]",ex);
                 }
             }
-		}
+            foreach (var s in ClientResources.Values)
+            {
+                try
+                {
+                    s.Close();
+                    s.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error("[Resources.CloseStream]", ex);
+                }
+            }
+        }
 		public void SendTo(Client client)
 		{
 			Task.Run(() =>
@@ -239,7 +248,7 @@ namespace RageCoop.Server.Scripting
 					foreach (var rs in ClientResources)
 					{
 						Logger?.Debug(rs.Key);
-						Server.SendFile(rs.Value(),rs.Key+".res", client);
+						Server.SendFile(rs.Value,rs.Key+".res", client);
 					}
 
 					Logger?.Info($"Resources sent to:{client.Username}");

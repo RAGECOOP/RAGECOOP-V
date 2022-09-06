@@ -13,7 +13,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Reduce GC pressure by reusing frequently used packets
         /// </summary>
-        static class SendPackets
+        private static class SendPackets
         {
             public static Packets.PedSync PedPacket = new Packets.PedSync();
             public static Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
@@ -25,53 +25,53 @@ namespace RageCoop.Client
         {
             Peer.SendTo(p, Targets, channel, method);
         }
-        
+
         public static void SendPed(SyncedPed sp, bool full)
         {
-            if (sp.LastSentStopWatch.ElapsedMilliseconds<SyncInterval)
+            if (sp.LastSentStopWatch.ElapsedMilliseconds < SyncInterval)
             {
                 return;
             }
             Ped ped = sp.MainPed;
             var p = SendPackets.PedPacket;
-            p.ID =sp.ID;
-            p.OwnerID=sp.OwnerID;
+            p.ID = sp.ID;
+            p.OwnerID = sp.OwnerID;
             p.Health = ped.Health;
             p.Rotation = ped.ReadRotation();
             p.Velocity = ped.ReadVelocity();
             p.Speed = ped.GetPedSpeed();
             p.Flags = ped.GetPedFlags();
-            p.Heading=ped.Heading;
+            p.Heading = ped.Heading;
             if (p.Flags.HasPedFlag(PedDataFlags.IsAiming))
             {
                 p.AimCoords = ped.GetAimCoord();
             }
             if (p.Flags.HasPedFlag(PedDataFlags.IsRagdoll))
             {
-                p.HeadPosition=ped.Bones[Bone.SkelHead].Position;
-                p.RightFootPosition=ped.Bones[Bone.SkelRightFoot].Position;
-                p.LeftFootPosition=ped.Bones[Bone.SkelLeftFoot].Position;
+                p.HeadPosition = ped.Bones[Bone.SkelHead].Position;
+                p.RightFootPosition = ped.Bones[Bone.SkelRightFoot].Position;
+                p.LeftFootPosition = ped.Bones[Bone.SkelLeftFoot].Position;
             }
             else
             {
                 // Seat sync
-                if (p.Speed>=4)
+                if (p.Speed >= 4)
                 {
                     var veh = ped.CurrentVehicle?.GetSyncEntity() ?? ped.VehicleTryingToEnter?.GetSyncEntity() ?? ped.LastVehicle?.GetSyncEntity();
                     p.VehicleID = veh?.ID ?? 0;
-                    if (p.VehicleID==0) { Main.Logger.Error("Invalid vehicle"); }
-                    if (p.Speed==5)
+                    if (p.VehicleID == 0) { Main.Logger.Error("Invalid vehicle"); }
+                    if (p.Speed == 5)
                     {
-                        p.Seat=ped.GetSeatTryingToEnter();
+                        p.Seat = ped.GetSeatTryingToEnter();
                     }
                     else
                     {
-                        p.Seat=ped.SeatIndex;
+                        p.Seat = ped.SeatIndex;
                     }
-                    if (!veh.IsLocal && p.Speed==4 && p.Seat==VehicleSeat.Driver)
+                    if (!veh.IsLocal && p.Speed == 4 && p.Seat == VehicleSeat.Driver)
                     {
-                        veh.OwnerID=Main.LocalPlayerID;
-                        SyncEvents.TriggerChangeOwner(veh.ID,Main.LocalPlayerID);
+                        veh.OwnerID = Main.LocalPlayerID;
+                        SyncEvents.TriggerChangeOwner(veh.ID, Main.LocalPlayerID);
                     }
                 }
                 p.Position = ped.ReadPosition();
@@ -80,57 +80,57 @@ namespace RageCoop.Client
             if (full)
             {
                 var w = ped.VehicleWeapon;
-                p.CurrentWeaponHash = (w!=VehicleWeaponHash.Invalid)? (uint)w:(uint)ped.Weapons.Current.Hash;
+                p.CurrentWeaponHash = (w != VehicleWeaponHash.Invalid) ? (uint)w : (uint)ped.Weapons.Current.Hash;
                 p.Flags |= PedDataFlags.IsFullSync;
-                p.Clothes=ped.GetPedClothes();
-                p.ModelHash=ped.Model.Hash;
-                p.WeaponComponents=ped.Weapons.Current.GetWeaponComponents();
-                p.WeaponTint=(byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
+                p.Clothes = ped.GetPedClothes();
+                p.ModelHash = ped.Model.Hash;
+                p.WeaponComponents = ped.Weapons.Current.GetWeaponComponents();
+                p.WeaponTint = (byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
 
                 Blip b;
                 if (sp.IsPlayer)
                 {
-                    p.BlipColor=Scripting.API.Config.BlipColor;
-                    p.BlipSprite=Scripting.API.Config.BlipSprite;
-                    p.BlipScale=Scripting.API.Config.BlipScale;
+                    p.BlipColor = Scripting.API.Config.BlipColor;
+                    p.BlipSprite = Scripting.API.Config.BlipSprite;
+                    p.BlipScale = Scripting.API.Config.BlipScale;
                 }
-                else if ((b = ped.AttachedBlip) !=null)
+                else if ((b = ped.AttachedBlip) != null)
                 {
-                    p.BlipColor=b.Color;
-                    p.BlipSprite=b.Sprite;
+                    p.BlipColor = b.Color;
+                    p.BlipSprite = b.Sprite;
 
-                    if (p.BlipSprite==BlipSprite.PoliceOfficer || p.BlipSprite==BlipSprite.PoliceOfficer2)
+                    if (p.BlipSprite == BlipSprite.PoliceOfficer || p.BlipSprite == BlipSprite.PoliceOfficer2)
                     {
-                        p.BlipScale=0.5f;
+                        p.BlipScale = 0.5f;
                     }
                 }
                 else
                 {
-                    p.BlipColor=(BlipColor)255;
+                    p.BlipColor = (BlipColor)255;
                 }
             }
             SendSync(p, ConnectionChannel.PedSync);
         }
         public static void SendVehicle(SyncedVehicle v, bool full)
         {
-            if (v.LastSentStopWatch.ElapsedMilliseconds<SyncInterval)
+            if (v.LastSentStopWatch.ElapsedMilliseconds < SyncInterval)
             {
                 return;
             }
             Vehicle veh = v.MainVehicle;
             var packet = SendPackets.VehicelPacket;
-            packet.ID =v.ID;
-            packet.OwnerID=v.OwnerID;
+            packet.ID = v.ID;
+            packet.OwnerID = v.OwnerID;
             packet.Flags = v.GetVehicleFlags();
             packet.SteeringAngle = veh.SteeringAngle;
             packet.Position = veh.ReadPosition();
-            packet.Velocity=veh.Velocity;
-            packet.Quaternion=veh.ReadQuaternion();
-            packet.RotationVelocity=veh.RotationVelocity;
+            packet.Velocity = veh.Velocity;
+            packet.Quaternion = veh.ReadQuaternion();
+            packet.RotationVelocity = veh.RotationVelocity;
             packet.ThrottlePower = veh.ThrottlePower;
             packet.BrakePower = veh.BrakePower;
             v.LastSentStopWatch.Restart();
-            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio=v.MainVehicle.GetDeluxoWingRatio(); }
+            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) { packet.DeluxoWingRatio = v.MainVehicle.GetDeluxoWingRatio(); }
             if (full)
             {
                 byte primaryColor = 0;
@@ -141,24 +141,24 @@ namespace RageCoop.Client
                 }
                 packet.Flags |= VehicleDataFlags.IsFullSync;
                 packet.Colors = new byte[] { primaryColor, secondaryColor };
-                packet.DamageModel=veh.GetVehicleDamageModel();
+                packet.DamageModel = veh.GetVehicleDamageModel();
                 packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
-                packet.RoofState=(byte)veh.RoofState;
+                packet.RoofState = (byte)veh.RoofState;
                 packet.Mods = veh.Mods.GetVehicleMods();
-                packet.ModelHash=veh.Model.Hash;
-                packet.EngineHealth=veh.EngineHealth;
-                packet.LockStatus=veh.LockStatus;
-                packet.LicensePlate=Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
-                packet.Livery=Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh);
-                if (v.MainVehicle==Game.Player.LastVehicle)
+                packet.ModelHash = veh.Model.Hash;
+                packet.EngineHealth = veh.EngineHealth;
+                packet.LockStatus = veh.LockStatus;
+                packet.LicensePlate = Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
+                packet.Livery = Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh);
+                if (v.MainVehicle == Game.Player.LastVehicle)
                 {
-                    packet.RadioStation=Util.GetPlayerRadioIndex();
+                    packet.RadioStation = Util.GetPlayerRadioIndex();
                 }
-                if (packet.EngineHealth>v.LastEngineHealth)
+                if (packet.EngineHealth > v.LastEngineHealth)
                 {
                     packet.Flags |= VehicleDataFlags.Repaired;
                 }
-                v.LastEngineHealth=packet.EngineHealth;
+                v.LastEngineHealth = packet.EngineHealth;
             }
             SendSync(packet, ConnectionChannel.VehicleSync);
         }
@@ -178,25 +178,25 @@ namespace RageCoop.Client
                 StartPosition = start,
                 EndPosition = end,
                 OwnerID = ownerID,
-                WeaponHash=weapon,
+                WeaponHash = weapon,
             }, ConnectionChannel.SyncEvents);
         }
-        public static void SendVehicleBullet(uint hash,SyncedPed owner,EntityBone b)
+        public static void SendVehicleBullet(uint hash, SyncedPed owner, EntityBone b)
         {
             SendSync(new Packets.VehicleBulletShot
             {
                 StartPosition = b.Position,
-                EndPosition = b.Position+b.ForwardVector,
-                OwnerID=owner.ID,
-                Bone=(ushort)b.Index,
-                WeaponHash=hash
+                EndPosition = b.Position + b.ForwardVector,
+                OwnerID = owner.ID,
+                Bone = (ushort)b.Index,
+                WeaponHash = hash
             });
         }
         #endregion
         public static void SendChatMessage(string message)
         {
             Peer.SendTo(new Packets.ChatMessage(new Func<string, byte[]>((s) => Security.Encrypt(s.GetBytes())))
-            { Username = Main.Settings.Username, Message = message },ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
+            { Username = Main.Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat, NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
         public static void SendVoiceMessage(byte[] buffer, int recorded)

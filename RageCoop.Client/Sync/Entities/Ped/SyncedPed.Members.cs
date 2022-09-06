@@ -1,12 +1,7 @@
 ﻿using GTA;
 using GTA.Math;
-using GTA.Native;
-using LemonUI.Elements;
 using RageCoop.Core;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 
 namespace RageCoop.Client
 {
@@ -26,7 +21,7 @@ namespace RageCoop.Client
             {
                 if (CurrentVehicle == null || value != CurrentVehicle?.ID)
                 {
-                    CurrentVehicle=EntityPool.GetVehicleByID(value);
+                    CurrentVehicle = EntityPool.GetVehicleByID(value);
                 }
             }
         }

@@ -1,13 +1,12 @@
-using System;
-using RageCoop.Core;
 using GTA;
-using System.Diagnostics;
-using System.Collections.Generic;
 using GTA.Math;
-using GTA.Native;
+using RageCoop.Core;
+using System.Collections.Generic;
 
-namespace RageCoop.Client{
-    public partial class SyncedVehicle{
+namespace RageCoop.Client
+{
+    public partial class SyncedVehicle
+    {
         public Vehicle MainVehicle { get; internal set; }
 
 
@@ -68,11 +67,10 @@ namespace RageCoop.Client{
         private bool _lastHornActive = false;
         private bool _lastTransformed = false;
         internal int _lastLivery = -1;
-        List<Vector3> _predictedTrace = new List<Vector3>();
-        List<Vector3> _orgTrace = new List<Vector3>();
+        private readonly List<Vector3> _predictedTrace = new List<Vector3>();
+        private readonly List<Vector3> _orgTrace = new List<Vector3>();
         private Vector3 _predictedPosition;
-
-        float _elapsed;
+        private readonly float _elapsed;
         #endregion
 
         #region OUTGOING

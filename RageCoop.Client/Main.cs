@@ -6,12 +6,11 @@ using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using System.Threading.Tasks;
+using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace RageCoop.Client
 {
@@ -21,7 +20,7 @@ namespace RageCoop.Client
     internal class Main : Script
     {
         private bool _gameLoaded = false;
-        internal static Version Version=typeof(Main).Assembly.GetName().Version;
+        internal static Version Version = typeof(Main).Assembly.GetName().Version;
 
         internal static int LocalPlayerID = 0;
 
@@ -39,7 +38,7 @@ namespace RageCoop.Client
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
         internal static Scripting.Resources Resources = null;
-        private static List<Func<bool>> QueuedActions = new List<Func<bool>>();
+        private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
         public static Worker Worker;
 
         /// <summary>
@@ -55,14 +54,14 @@ namespace RageCoop.Client
             catch
             {
                 GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
-                Settings=new Settings();
+                Settings = new Settings();
                 Util.SaveSettings();
             }
             Directory.CreateDirectory(Settings.DataDirectory);
-            Logger=new Logger()
+            Logger = new Logger()
             {
-                LogPath=$"{Settings.DataDirectory}\\RageCoop.Client.log",
-                UseConsole=false,
+                LogPath = $"{Settings.DataDirectory}\\RageCoop.Client.log",
+                UseConsole = false,
 #if DEBUG
                 LogLevel = 0,
 #else
@@ -87,7 +86,7 @@ namespace RageCoop.Client
                 return;
             }
             BaseScript.OnStart();
-            SyncedPedsGroup=World.AddRelationshipGroup("SYNCPED");
+            SyncedPedsGroup = World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral, true);
 #if !NON_INTERACTIVE
 #endif
@@ -95,9 +94,9 @@ namespace RageCoop.Client
             Tick += OnTick;
             Tick += (s, e) => { Scripting.API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
-            KeyDown+=(s, e) => { Scripting.API.Events.InvokeKeyDown(s, e); };
-            KeyUp+=(s, e) => { Scripting.API.Events.InvokeKeyUp(s, e); };
-            Aborted += (object sender, EventArgs e) => CleanUp();
+            KeyDown += (s, e) => { Scripting.API.Events.InvokeKeyDown(s, e); };
+            KeyUp += (s, e) => { Scripting.API.Events.InvokeKeyUp(s, e); };
+            Aborted += (object sender, EventArgs e) => Disconnected("Abort");
 
             Util.NativeMemory();
             Counter.Restart();
@@ -122,9 +121,9 @@ namespace RageCoop.Client
                 return $"{h1},{h2},{s},{s1}";
             }
             */
-            P= Game.Player.Character;
-            PlayerPosition=P.ReadPosition();
-            FPS=Game.FPS;
+            P = Game.Player.Character;
+            PlayerPosition = P.ReadPosition();
+            FPS = Game.FPS;
             // World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
             if (Game.IsLoading)
             {
@@ -147,9 +146,9 @@ namespace RageCoop.Client
             {
                 return;
             }
-            if (Game.TimeScale!=1)
+            if (Game.TimeScale != 1)
             {
-                Game.TimeScale=1;
+                Game.TimeScale = 1;
             }
             try
             {
@@ -179,10 +178,10 @@ namespace RageCoop.Client
                 {
                     Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
 
-                    if (P.Health!=1)
+                    if (P.Health != 1)
                     {
-                        P.Health=1;
-                        Game.Player.WantedLevel=0;
+                        P.Health = 1;
+                        Game.Player.WantedLevel = 0;
                         Main.Logger.Debug("Player died.");
                         Scripting.API.Events.InvokePlayerDied();
                     }
@@ -197,8 +196,8 @@ namespace RageCoop.Client
             {
                 Scripting.API.Events.InvokePlayerDied();
             }
-            
-            _lastDead=P.IsDead;
+
+            _lastDead = P.IsDead;
             Ticked++;
         }
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -223,13 +222,13 @@ namespace RageCoop.Client
                         return;
                     }
                 }
-                
+
                 if (Game.IsControlPressed(GTA.Control.FrontendPause))
                 {
                     Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
                 }
-                if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate)&&Settings.DisableAlternatePause)
+                if (Game.IsControlPressed(GTA.Control.FrontendPauseAlternate) && Settings.DisableAlternatePause)
                 {
                     Function.Call(Hash.ACTIVATE_FRONTEND_MENU, Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
@@ -243,8 +242,8 @@ namespace RageCoop.Client
                     {
                         if (x.Visible)
                         {
-                            CoopMenu.LastMenu=x;
-                            x.Visible=false;
+                            CoopMenu.LastMenu = x;
+                            x.Visible = false;
                         }
                     });
                 }
@@ -269,7 +268,7 @@ namespace RageCoop.Client
                     PlayerList.Pressed = (currentTimestamp - PlayerList.Pressed) < 5000 ? (currentTimestamp - 6000) : currentTimestamp;
                 }
             }
-            else if (e.KeyCode==Settings.PassengerKey)
+            else if (e.KeyCode == Settings.PassengerKey)
             {
                 var P = Game.Player.Character;
 
@@ -283,13 +282,13 @@ namespace RageCoop.Client
                     {
                         var V = World.GetClosestVehicle(P.ReadPosition(), 50);
 
-                        if (V!=null)
+                        if (V != null)
                         {
                             var seat = P.GetNearestSeat(V);
                             var p = V.GetPedOnSeat(seat);
                             if (p != null && !p.IsDead)
                             {
-                                for(int i = -1; i < V.PassengerCapacity; i++)
+                                for (int i = -1; i < V.PassengerCapacity; i++)
                                 {
                                     seat = (VehicleSeat)i;
                                     p = V.GetPedOnSeat(seat);
@@ -299,21 +298,54 @@ namespace RageCoop.Client
                                     }
                                 }
                             }
-                            P.Task.EnterVehicle(V, seat,-1,5,EnterVehicleFlags.None);
+                            P.Task.EnterVehicle(V, seat, -1, 5, EnterVehicleFlags.None);
                         }
                     }
                 }
             }
         }
-        public static void CleanUp()
+        internal static void Connected()
         {
-            MainChat.Clear();
+            Memory.ApplyPatches();
+            if (Settings.Voice && !Voice.WasInitialized())
+            {
+                Voice.Init();
+            }
+            QueueAction(() =>
+            {
+                WorldThread.Traffic(!Settings.DisableTraffic);
+                Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
+                CoopMenu.ConnectedMenuSetting();
+                MainChat.Init();
+                GTA.UI.Notification.Show("~g~Connected!");
+            });
+
+            Logger.Info(">> Connected <<");
+        }
+        public static void Disconnected(string reason)
+        {
+
+            Memory.RestorePatches();
+            DownloadManager.Cleanup();
             Voice.ClearAll();
-            EntityPool.Cleanup();
             PlayerList.Cleanup();
-            LocalPlayerID=default;
-            WorldThread.Traffic(true);
-            Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
+            LocalPlayerID = default;
+
+            Logger.Info($">> Disconnected << reason: {reason}");
+            QueueAction(() =>
+            {
+                if (MainChat.Focused)
+                {
+                    MainChat.Focused = false;
+                }
+                MainChat.Clear();
+                EntityPool.Cleanup();
+                WorldThread.Traffic(true);
+                Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
+                CoopMenu.DisconnectedMenuSetting();
+                GTA.UI.Notification.Show("~r~Disconnected: " + reason);
+            });
+            Resources.Unload();
         }
         private static void DoQueuedActions()
         {
@@ -371,5 +403,6 @@ namespace RageCoop.Client
                 QueueAction(a);
             });
         }
+
     }
 }

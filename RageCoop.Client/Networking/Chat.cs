@@ -16,7 +16,7 @@ namespace RageCoop.Client
         private bool CurrentFocused { get; set; }
         public bool Focused
         {
-            get { return CurrentFocused; }
+            get => CurrentFocused;
             set
             {
                 if (value && Hidden)
@@ -35,7 +35,7 @@ namespace RageCoop.Client
         private bool CurrentHidden { get; set; }
         private bool Hidden
         {
-            get { return CurrentHidden; }
+            get => CurrentHidden;
             set
             {
                 if (value)

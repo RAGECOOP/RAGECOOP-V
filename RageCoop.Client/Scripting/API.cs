@@ -1,10 +1,10 @@
 ﻿#undef DEBUG
 using GTA;
+using Newtonsoft.Json;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 namespace RageCoop.Client.Scripting
 {
@@ -40,7 +40,7 @@ namespace RageCoop.Client.Scripting
             /// </summary>
             public static string Username
             {
-                get { return Main.Settings.Username; }
+                get => Main.Settings.Username;
                 set
                 {
                     if (Networking.IsOnServer || string.IsNullOrEmpty(value))
@@ -142,7 +142,7 @@ namespace RageCoop.Client.Scripting
 
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
-                var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args };
+                var args = new CustomEventReceivedArgs() { Hash = p.Hash, Args = p.Args };
 
                 // Main.Logger.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
 
@@ -161,53 +161,37 @@ namespace RageCoop.Client.Scripting
         /// Get the local player's ID
         /// </summary>
         /// <returns>PlayerID</returns>
-        public static int LocalPlayerID
-        {
-            get { return Main.LocalPlayerID; }
-        }
+        public static int LocalPlayerID => Main.LocalPlayerID;
 
         /// <summary>
         /// Check if player is connected to a server
         /// </summary>
-        public static bool IsOnServer { get { return Networking.IsOnServer; } }
+        public static bool IsOnServer => Networking.IsOnServer;
 
         /// <summary>
         /// Get an <see cref="System.Net.IPEndPoint"/> that the player is currently connected to, or null if not connected to the server
         /// </summary>
-        public static System.Net.IPEndPoint ServerEndPoint { get { return Networking.IsOnServer ? Networking.ServerConnection?.RemoteEndPoint : null; } }
+        public static System.Net.IPEndPoint ServerEndPoint => Networking.IsOnServer ? Networking.ServerConnection?.RemoteEndPoint : null;
 
         /// <summary>
         /// Check if a RAGECOOP menu is visible
         /// </summary>
-        public static bool IsMenuVisible
-        {
-            get { return Menus.CoopMenu.MenuPool.AreAnyVisible; }
-        }
+        public static bool IsMenuVisible => Menus.CoopMenu.MenuPool.AreAnyVisible;
 
         /// <summary>
         /// Check if the RAGECOOP chat is visible
         /// </summary>
-        public static bool IsChatFocused
-        {
-            get { return Main.MainChat.Focused; }
-        }
+        public static bool IsChatFocused => Main.MainChat.Focused;
 
         /// <summary>
         /// Check if the RAGECOOP list of players is visible
         /// </summary>
-        public static bool IsPlayerListVisible
-        {
-            get { return Util.GetTickCount64() - PlayerList.Pressed < 5000; }
-        }
+        public static bool IsPlayerListVisible => Util.GetTickCount64() - PlayerList.Pressed < 5000;
 
         /// <summary>
         /// Get the version of RAGECOOP
         /// </summary>
-        public static Version CurrentVersion
-        {
-            get { return Main.Version; }
-        }
-
+        public static Version CurrentVersion => Main.Version;
 
         /// <summary>
         /// Get a <see cref="Core.Logger"/> that RAGECOOP is currently using.
@@ -217,7 +201,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Get all players indexed by their ID
         /// </summary>
-        public static Dictionary<int,Player> Players => new Dictionary<int, Player>(PlayerList.Players);
+        public static Dictionary<int, Player> Players => new Dictionary<int, Player>(PlayerList.Players);
 
         #endregion
 
@@ -254,7 +238,7 @@ namespace RageCoop.Client.Scripting
         {
             return JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Main.Settings.MasterServer));
         }
-        
+
         /// <summary>
         /// Send a local chat message to this player
         /// </summary>
@@ -299,12 +283,12 @@ namespace RageCoop.Client.Scripting
         /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
         public static void SendCustomEvent(int eventHash, params object[] args)
         {
-            
+
             Networking.Peer.SendTo(new Packets.CustomEvent()
             {
-                Args=args,
-                Hash=eventHash
-            },Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
+                Args = args,
+                Hash = eventHash
+            }, Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
         }
 
         /// <summary>
@@ -337,17 +321,17 @@ namespace RageCoop.Client.Scripting
                     callback(e);
                 }
             };
-            DownloadManager.DownloadCompleted+=handler;
+            DownloadManager.DownloadCompleted += handler;
             Networking.GetResponse<Packets.FileTransferResponse>(new Packets.FileTransferRequest()
             {
-                Name=name,
+                Name = name,
             },
             (p) =>
             {
                 if (p.Response != FileResponse.Loaded)
                 {
-                    DownloadManager.DownloadCompleted-=handler;
-                    throw new ArgumentException("Requested file was not found on the server: "+name);
+                    DownloadManager.DownloadCompleted -= handler;
+                    throw new ArgumentException("Requested file was not found on the server: " + name);
                 }
             });
         }

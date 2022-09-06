@@ -12,7 +12,7 @@ namespace RageCoop.Client
 
         public static VehicleDataFlags GetVehicleFlags(this SyncedVehicle v)
         {
-            var veh=v.MainVehicle;
+            var veh = v.MainVehicle;
             VehicleDataFlags flags = 0;
 
             if (veh.IsEngineRunning)
@@ -75,31 +75,33 @@ namespace RageCoop.Client
                 flags |= VehicleDataFlags.IsRocketBoostActive;
             }
 
-            if(v.HasParachute && veh.IsParachuteActive()){
+            if (v.HasParachute && veh.IsParachuteActive())
+            {
                 flags |= VehicleDataFlags.IsParachuteActive;
             }
 
             if (veh.IsOnFire)
             {
-                flags|=VehicleDataFlags.IsOnFire;
+                flags |= VehicleDataFlags.IsOnFire;
             }
 
             return flags;
         }
         public static bool IsRocketBoostActive(this Vehicle veh)
         {
-            return Function.Call<bool>(Hash._IS_VEHICLE_ROCKET_BOOST_ACTIVE,veh);
+            return Function.Call<bool>(Hash._IS_VEHICLE_ROCKET_BOOST_ACTIVE, veh);
         }
-        public static bool IsParachuteActive(this Vehicle veh){
-            return Function.Call<bool>((Hash)0x3DE51E9C80B116CF,veh);
-        }
-        public static void SetRocketBoostActive(this Vehicle veh,bool toggle)
+        public static bool IsParachuteActive(this Vehicle veh)
         {
-            Function.Call(Hash._SET_VEHICLE_ROCKET_BOOST_ACTIVE,veh,toggle);
+            return Function.Call<bool>((Hash)0x3DE51E9C80B116CF, veh);
         }
-        public static void SetParachuteActive(this Vehicle veh,bool toggle)
+        public static void SetRocketBoostActive(this Vehicle veh, bool toggle)
         {
-            Function.Call((Hash)0x0BFFB028B3DD0A97,veh,toggle);
+            Function.Call(Hash._SET_VEHICLE_ROCKET_BOOST_ACTIVE, veh, toggle);
+        }
+        public static void SetParachuteActive(this Vehicle veh, bool toggle)
+        {
+            Function.Call((Hash)0x0BFFB028B3DD0A97, veh, toggle);
         }
         public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
         {
@@ -180,7 +182,7 @@ namespace RageCoop.Client
                 }
                 if ((model.OpenedDoors & (byte)(1 << i)) != 0)
                 {
-                    if ((!door.IsOpen)&&(!door.IsBroken))
+                    if ((!door.IsOpen) && (!door.IsBroken))
                     {
                         door.Open();
                     }
@@ -224,7 +226,7 @@ namespace RageCoop.Client
         {
             Dictionary<int, int> ps = new Dictionary<int, int>();
             var d = veh.Driver;
-            if (d!=null&&d.IsSittingInVehicle())
+            if (d != null && d.IsSittingInVehicle())
             {
                 ps.Add(-1, d.GetSyncEntity().ID);
             }
@@ -232,7 +234,7 @@ namespace RageCoop.Client
             {
                 if (p.IsSittingInVehicle())
                 {
-                    ps.Add((int)p.SeatIndex, (int)p.GetSyncEntity().ID);
+                    ps.Add((int)p.SeatIndex, p.GetSyncEntity().ID);
                 }
             }
             return ps;
@@ -244,7 +246,7 @@ namespace RageCoop.Client
         }
         public static bool IsDeluxoHovering(this Vehicle deluxo)
         {
-            return Math.Abs(deluxo.Bones[27].ForwardVector.GetCosTheta(deluxo.ForwardVector)-1)>0.05;
+            return Math.Abs(deluxo.Bones[27].ForwardVector.GetCosTheta(deluxo.ForwardVector) - 1) > 0.05;
         }
         public static void SetDeluxoWingRatio(this Vehicle v, float ratio)
         {
@@ -252,7 +254,7 @@ namespace RageCoop.Client
         }
         public static float GetDeluxoWingRatio(this Vehicle v)
         {
-            return v.Bones[99].Position.DistanceTo(v.Bones[92].Position)-1.43f;
+            return v.Bones[99].Position.DistanceTo(v.Bones[92].Position) - 1.43f;
         }
         public static float GetNozzleAngel(this Vehicle plane)
         {

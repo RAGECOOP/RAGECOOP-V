@@ -1,12 +1,12 @@
-﻿using LemonUI.Menus;
+﻿using GTA.UI;
+using LemonUI.Menus;
 using Newtonsoft.Json;
+using RageCoop.Core;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Net;
 using System.Threading;
-using RageCoop.Core;
-using GTA.UI;
 
 namespace RageCoop.Client.Menus
 {
@@ -38,7 +38,7 @@ namespace RageCoop.Client.Menus
                 Menu.Add(ResultItem = new NativeItem("Loading..."));
 
                 // Prevent freezing
-                GetServersThread=new Thread(() => GetAllServers());
+                GetServersThread = new Thread(() => GetAllServers());
                 GetServersThread.Start();
             };
             Menu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
@@ -84,14 +84,14 @@ namespace RageCoop.Client.Menus
                             Menu.Visible = false;
                             if (server.useZT)
                             {
-                                address=$"{server.ztAddress}:{server.port}";
+                                address = $"{server.ztAddress}:{server.port}";
                                 Notification.Show($"~y~Joining ZeroTier network... {server.ztID}");
-                                if (ZeroTierHelper.Join(server.ztID)==null)
+                                if (ZeroTierHelper.Join(server.ztID) == null)
                                 {
                                     throw new Exception("Failed to obtain ZeroTier network IP");
                                 }
                             }
-                            Networking.ToggleConnection(address,null,null,PublicKey.FromServerInfo(server));
+                            Networking.ToggleConnection(address, null, null, PublicKey.FromServerInfo(server));
 #if !NON_INTERACTIVE
                             CoopMenu.ServerIpItem.AltTitle = address;
 

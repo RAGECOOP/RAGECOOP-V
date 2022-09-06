@@ -1,41 +1,42 @@
-﻿using Lidgren.Network;
+﻿using GTA.UI;
+using Lidgren.Network;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using GTA.UI;
-using System.Net;
 
 namespace RageCoop.Client
 {
     internal static partial class Networking
     {
         public static CoopPeer Peer;
-        public static float Latency => ServerConnection.AverageRoundtripTime/2;
+        public static float Latency => ServerConnection.AverageRoundtripTime / 2;
         public static bool ShowNetworkInfo = false;
         public static Security Security;
         public static NetConnection ServerConnection;
         private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
         internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
-        internal static float SimulatedLatency=0;
+        internal static float SimulatedLatency = 0;
         public static bool IsConnecting { get; private set; }
         public static IPEndPoint _targetServerEP;
         static Networking()
         {
-            Security=new Security(Main.Logger);
+            Security = new Security(Main.Logger);
         }
 
-        public static void ToggleConnection(string address, string username = null, string password = null,PublicKey publicKey=null)
+        public static void ToggleConnection(string address, string username = null, string password = null, PublicKey publicKey = null)
         {
-            Menus.CoopMenu.Menu.Visible=false;
+            Menus.CoopMenu.Menu.Visible = false;
             Peer?.Shutdown("Bye");
             if (IsOnServer)
             {
                 // ?
             }
-            else if (IsConnecting) {
+            else if (IsConnecting)
+            {
                 _publicKeyReceived.Set();
                 IsConnecting = false;
                 Notification.Show("Connection has been canceled");
@@ -46,14 +47,14 @@ namespace RageCoop.Client
 
                 IsConnecting = true;
                 password = password ?? Main.Settings.Password;
-                username=username ?? Main.Settings.Username;
+                username = username ?? Main.Settings.Username;
 
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
                     AutoFlushSendQueue = false,
-                    SimulatedMinimumLatency =SimulatedLatency,
-                    SimulatedRandomLatency=0,
+                    SimulatedMinimumLatency = SimulatedLatency,
+                    SimulatedRandomLatency = 0,
                     AcceptIncomingConnections = true,
                     MaximumConnections = 32,
                     PingInterval = 5
@@ -78,45 +79,47 @@ namespace RageCoop.Client
 
                 PlayerList.Cleanup();
                 EntityPool.AddPlayer();
-                if (publicKey==null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
+                if (publicKey == null && !string.IsNullOrEmpty(password) && !Menus.CoopMenu.ShowPopUp("", "WARNING", "Server's IP can be spoofed when using direct connection, do you wish to continue?", "", true))
                 {
-                    IsConnecting=false;
+                    IsConnecting = false;
                     return;
                 }
                 Task.Run(() =>
                 {
                     try
                     {
-                        _targetServerEP=CoreUtils.StringToEndPoint(address);
+                        _targetServerEP = CoreUtils.StringToEndPoint(address);
                         DownloadManager.Cleanup();
                         Peer = new CoopPeer(config);
-                        Peer.OnMessageReceived+= (s, m) =>
+                        Peer.OnMessageReceived += (s, m) =>
                         {
                             try { ProcessMessage(m); }
                             catch (Exception ex) { Main.Logger.Error(ex); }
                         };
                         Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
-                        Menus.CoopMenu._serverConnectItem.Enabled=false;
+                        Menus.CoopMenu._serverConnectItem.Enabled = false;
                         Security.Regen();
-                        if(publicKey==null){
-                            if (!GetServerPublicKey(ip[0],int.Parse(ip[1])))
+                        if (publicKey == null)
+                        {
+                            if (!GetServerPublicKey(ip[0], int.Parse(ip[1])))
                             {
-                                Menus.CoopMenu._serverConnectItem.Enabled=true;
+                                Menus.CoopMenu._serverConnectItem.Enabled = true;
                                 throw new TimeoutException("Failed to retrive server's public key");
                             }
                         }
-                        else{
-                            Security.SetServerPublicKey(publicKey.Modulus,publicKey.Exponent);
+                        else
+                        {
+                            Security.SetServerPublicKey(publicKey.Modulus, publicKey.Exponent);
                         }
 
                         // Send handshake packet
                         NetOutgoingMessage outgoingMessage = Peer.CreateMessage();
                         var handshake = new Packets.Handshake()
                         {
-                            PedID =  Main.LocalPlayerID,
-                            Username =username,
+                            PedID = Main.LocalPlayerID,
+                            Username = username,
                             ModVersion = Main.Version.ToString(),
-                            PasswordEncrypted=Security.Encrypt(password.GetBytes()),
+                            PasswordEncrypted = Security.Encrypt(password.GetBytes()),
                             InternalEndPoint = new System.Net.IPEndPoint(CoreUtils.GetLocalAddress(ip[0]), Peer.Port)
                         };
 
@@ -128,9 +131,9 @@ namespace RageCoop.Client
                     catch (Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server: ", ex);
-                        Main.QueueAction(() => Notification.Show("Cannot connect to server: "+ex.Message));
+                        Main.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
                     }
-                    IsConnecting=false;
+                    IsConnecting = false;
                 });
             }
         }
@@ -142,7 +145,7 @@ namespace RageCoop.Client
             var p = new Player
             {
                 ID = packet.PedID,
-                Username= packet.Username,
+                Username = packet.Username,
             };
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
@@ -153,9 +156,10 @@ namespace RageCoop.Client
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
             var player = PlayerList.GetPlayer(packet.PedID);
-            if (player==null) { return; }
+            if (player == null) { return; }
             PlayerList.RemovePlayer(packet.PedID);
-            Main.QueueAction(() => {
+            Main.QueueAction(() =>
+            {
                 EntityPool.RemoveAllFromPlayer(packet.PedID);
                 GTA.UI.Notification.Show($"~h~{player.Username}~h~ left.");
             });
@@ -163,13 +167,13 @@ namespace RageCoop.Client
 
         #endregion // -- PLAYER --
         #region -- GET --
-        private static bool GetServerPublicKey(string host,int port, int timeout = 10000)
+        private static bool GetServerPublicKey(string host, int port, int timeout = 10000)
         {
-            Security.ServerRSA=null;
+            Security.ServerRSA = null;
             var msg = Peer.CreateMessage();
             new Packets.PublicKeyRequest().Pack(msg);
             Peer.SendUnconnectedMessage(msg, host, port);
-            return _publicKeyReceived.WaitOne(timeout) && Security.ServerRSA!=null;
+            return _publicKeyReceived.WaitOne(timeout) && Security.ServerRSA != null;
         }
 
         public static void GetResponse<T>(Packet request, Action<T> callback, ConnectionChannel channel = ConnectionChannel.RequestResponse) where T : Packet, new()
@@ -186,14 +190,14 @@ namespace RageCoop.Client
             msg.Write((byte)PacketType.Request);
             msg.Write(id);
             request.Pack(msg);
-            Peer.SendMessage(msg,ServerConnection, NetDeliveryMethod.ReliableOrdered, (int)channel);
+            Peer.SendMessage(msg, ServerConnection, NetDeliveryMethod.ReliableOrdered, (int)channel);
         }
 
         #endregion
         private static int NewRequestID()
         {
             int ID = 0;
-            while ((ID==0) || PendingResponses.ContainsKey(ID))
+            while ((ID == 0) || PendingResponses.ContainsKey(ID))
             {
                 byte[] rngBytes = new byte[4];
 

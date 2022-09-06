@@ -1,8 +1,6 @@
 ﻿using GTA;
 using GTA.Native;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace RageCoop.Client
 {
@@ -23,7 +21,8 @@ namespace RageCoop.Client
                 ChangeTraffic(true);
             };
         }
-        static bool _trafficEnabled;
+
+        private static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
             if (Game.IsLoading || !Networking.IsOnServer)
@@ -99,7 +98,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, true);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, false);
             }
-            else if(Networking.IsOnServer)
+            else if (Networking.IsOnServer)
             {
                 Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f, 1000.0f, 0, 1, 1, 1);
                 Function.Call(Hash.SET_CREATE_RANDOM_COPS, false);

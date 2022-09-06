@@ -7,7 +7,7 @@ namespace RageCoop.Client
     {
         public RSA ServerRSA { get; set; }
         public Aes ClientAes { get; set; } = Aes.Create();
-        private Logger Logger;
+        private readonly Logger Logger;
         public Security(Logger logger)
         {
             Logger = logger;
@@ -17,8 +17,8 @@ namespace RageCoop.Client
         public void GetSymmetricKeysCrypted(out byte[] cryptedKey, out byte[] cryptedIV)
         {
             // Logger?.Debug($"Aes.Key:{ClientAes.Key.Dump()}, Aes.IV:{ClientAes.IV.Dump()}");
-            cryptedKey =ServerRSA.Encrypt(ClientAes.Key, RSAEncryptionPadding.Pkcs1);
-            cryptedIV =ServerRSA.Encrypt(ClientAes.IV, RSAEncryptionPadding.Pkcs1);
+            cryptedKey = ServerRSA.Encrypt(ClientAes.Key, RSAEncryptionPadding.Pkcs1);
+            cryptedIV = ServerRSA.Encrypt(ClientAes.IV, RSAEncryptionPadding.Pkcs1);
         }
         public byte[] Encrypt(byte[] data)
         {
@@ -33,11 +33,11 @@ namespace RageCoop.Client
             var para = new RSAParameters();
             para.Modulus = modulus;
             para.Exponent = exponent;
-            ServerRSA=RSA.Create(para);
+            ServerRSA = RSA.Create(para);
         }
         public void Regen()
         {
-            ClientAes=Aes.Create();
+            ClientAes = Aes.Create();
             ClientAes.GenerateKey();
             ClientAes.GenerateIV();
         }

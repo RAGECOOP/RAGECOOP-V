@@ -30,12 +30,12 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Get the <see cref="ResourceFile"/> that the script belongs to.
         /// </summary>
-        public ResourceFile CurrentFile { get; internal set; } 
+        public ResourceFile CurrentFile { get; internal set; }
 
         /// <summary>
         /// Eqivalent of <see cref="ServerResource.Logger"/> in <see cref="CurrentResource"/>
         /// </summary>
-        public Core.Logger Logger { get { return CurrentResource.Logger; } }
+        public Core.Logger Logger => CurrentResource.Logger;
     }
     /// <summary>
     /// Decorate your method with this attribute and use <see cref="API.RegisterCommands{T}"/> or <see cref="API.RegisterCommands(object)"/> to register commands.

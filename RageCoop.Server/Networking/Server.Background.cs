@@ -170,7 +170,7 @@ namespace RageCoop.Server
         {
             foreach(var c in ClientsByNetHandle.Values.ToArray())
             {
-                if (c.EntitiesCount > 100 && Settings.KickSpamming)
+                if (c.EntitiesCount > Settings.SpamLimit && Settings.KickSpamming)
                 {
                     c.Kick("Bye bye asshole: spamming");
                     API.SendChatMessage($"Asshole {c.Username} was kicked: Spamming");

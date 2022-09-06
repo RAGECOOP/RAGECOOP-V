@@ -2,7 +2,6 @@
 using GTA.Math;
 using GTA.Native;
 using System.Collections.Generic;
-using System.Xml;
 
 namespace RageCoop.Client
 {
@@ -11,7 +10,7 @@ namespace RageCoop.Client
         public MuzzleInfo(Vector3 pos, Vector3 forward)
         {
             Position = pos;
-            ForawardVector=forward;
+            ForawardVector = forward;
         }
         public Vector3 Position;
         public Vector3 ForawardVector;
@@ -38,7 +37,7 @@ namespace RageCoop.Client
         public static Vector3 GetMuzzlePosition(this Ped p)
         {
             var w = p.Weapons.CurrentWeaponObject;
-            if (w!=null)
+            if (w != null)
             {
                 var hash = p.Weapons.Current.Hash;
                 if (MuzzleBoneIndexes.ContainsKey(hash)) { return w.Bones[MuzzleBoneIndexes[hash]].Position; }
@@ -46,7 +45,8 @@ namespace RageCoop.Client
             }
             return p.Bones[Bone.SkelRightHand].Position;
         }
-        static long BulletsShot = 0;
+
+        private static long BulletsShot = 0;
 
         public static float GetWeaponDamage(this Ped P, uint hash)
         {
@@ -103,49 +103,49 @@ namespace RageCoop.Client
 
                 // ISSI6
                 case 1239571361:
-                    return BulletsShot%2==0 ? 12 : 14;
+                    return BulletsShot % 2 == 0 ? 12 : 14;
 
 
                 // ISSI5
                 case 1537277726:
-                    return BulletsShot%2==0 ? 30 : 32;
+                    return BulletsShot % 2 == 0 ? 30 : 32;
 
 
                 // ISSI4
                 case 628003514:
-                    return BulletsShot%2==0 ? 14 : 12;
+                    return BulletsShot % 2 == 0 ? 14 : 12;
 
 
                 // DOMINATOR6
                 case -1293924613:
-                    return BulletsShot%2==0 ? 51 : 55;
+                    return BulletsShot % 2 == 0 ? 51 : 55;
 
 
                 // IMPALER4
                 case -1744505657:
-                    return BulletsShot%2==0 ? 64 : 63;
+                    return BulletsShot % 2 == 0 ? 64 : 63;
 
 
 
                 // IMPERATOR3
                 case -755532233:
-                    return BulletsShot%2==0 ? 86 : 88;
+                    return BulletsShot % 2 == 0 ? 86 : 88;
 
 
 
                 // SLAMVAN6
                 case 1742022738:
-                    return BulletsShot%2==0 ? 78 : 76;
+                    return BulletsShot % 2 == 0 ? 78 : 76;
 
 
                 // CHAMPION
                 case -915234475:
-                    return BulletsShot%2==0 ? 60 : 61;
+                    return BulletsShot % 2 == 0 ? 60 : 61;
 
 
                 // MONSTER4
                 case 840387324:
-                    return BulletsShot%2==0 ? 63 : 65;
+                    return BulletsShot % 2 == 0 ? 63 : 65;
 
 
                 // BRUTUS2
@@ -154,7 +154,7 @@ namespace RageCoop.Client
 
                 // BRUISER2
                 case -1694081890:
-                    return BulletsShot%2==0 ? 45 : 51;
+                    return BulletsShot % 2 == 0 ? 45 : 51;
 
 
                 // TECHNICAL3
@@ -171,11 +171,11 @@ namespace RageCoop.Client
 
                 // PATRIOT3
                 case -670086588:
-                    return BulletsShot%2==0 ? 87 : 89;
+                    return BulletsShot % 2 == 0 ? 87 : 89;
 
                 // NIGHTSHARK
                 case 433954513:
-                    return BulletsShot%2==0 ? 1 : 2;
+                    return BulletsShot % 2 == 0 ? 1 : 2;
 
                 /*
                 // NIGHTSHARK (second)
@@ -185,7 +185,7 @@ namespace RageCoop.Client
 
                 // MENACER
                 case 2044532910:
-                    return BulletsShot%2==0 ? 91 : 90;
+                    return BulletsShot % 2 == 0 ? 91 : 90;
                 /*
                 // MENACER
                 case 2044532910:
@@ -222,11 +222,11 @@ namespace RageCoop.Client
 
                 // BLAZER5
                 case -1590337689:
-                    return BulletsShot%2==0 ? 17 : 18;
+                    return BulletsShot % 2 == 0 ? 17 : 18;
 
                 // BRUISER
                 case 668439077:
-                    return BulletsShot%2==0 ? 66 : 68;
+                    return BulletsShot % 2 == 0 ? 66 : 68;
 
 
                 // BRUTUS
@@ -236,12 +236,12 @@ namespace RageCoop.Client
 
                 // MONSTER3
                 case 1721676810:
-                    return BulletsShot%2==0 ? 53 : 55;
+                    return BulletsShot % 2 == 0 ? 53 : 55;
 
 
                 // BRUISER3
                 case -2042350822:
-                    return BulletsShot%2==0 ? 52 : 50;
+                    return BulletsShot % 2 == 0 ? 52 : 50;
 
                 // BRUTUS3
                 case 2038858402:
@@ -249,34 +249,34 @@ namespace RageCoop.Client
 
                 // MONSTER5
                 case -715746948:
-                    return BulletsShot%2==0 ? 63 : 65;
+                    return BulletsShot % 2 == 0 ? 63 : 65;
 
                 // JB7002
                 case 394110044:
-                    return BulletsShot%2==0 ? 54 : 53;
+                    return BulletsShot % 2 == 0 ? 54 : 53;
 
                 // DOMINATOR5
                 case -1375060657:
-                    return BulletsShot%2==0 ? 35 : 36;
+                    return BulletsShot % 2 == 0 ? 35 : 36;
 
                 // IMPALER3
                 case -1924800695:
-                    return BulletsShot%2==0 ? 75 : 76;
+                    return BulletsShot % 2 == 0 ? 75 : 76;
 
 
                 // IMPERATOR2
                 case 1637620610:
-                    return BulletsShot%2==0 ? 97 : 99;
+                    return BulletsShot % 2 == 0 ? 97 : 99;
 
 
                 // SLAMVAN5
                 case 373261600:
-                    return BulletsShot%2==0 ? 51 : 53;
+                    return BulletsShot % 2 == 0 ? 51 : 53;
 
 
                 // RUINER2
                 case 941494461:
-                    return BulletsShot%2==0 ? 65 : 66;
+                    return BulletsShot % 2 == 0 ? 65 : 66;
 
 
                 // TAMPA3
@@ -285,52 +285,52 @@ namespace RageCoop.Client
 
                 // SCRAMJET
                 case -638562243:
-                    return BulletsShot%2==0 ? 44 : 45;
+                    return BulletsShot % 2 == 0 ? 44 : 45;
 
 
                 // VIGILANTE
                 case -1242608589:
-                    return BulletsShot%2==0 ? 42 : 43;
+                    return BulletsShot % 2 == 0 ? 42 : 43;
 
 
                 // ZR380
                 case 540101442:
-                    return BulletsShot%2==0 ? 57 : 63;
+                    return BulletsShot % 2 == 0 ? 57 : 63;
 
 
                 // ZR3802
                 case -1106120762:
-                    return BulletsShot%2==0 ? 57 : 63;
+                    return BulletsShot % 2 == 0 ? 57 : 63;
 
 
                 // ZR3803
                 case -1478704292:
-                    return BulletsShot%2==0 ? 53 : 59;
+                    return BulletsShot % 2 == 0 ? 53 : 59;
 
 
                 // STROMBERG
                 case 886810209:
-                    return BulletsShot%2==0 ? 85 : 84;
+                    return BulletsShot % 2 == 0 ? 85 : 84;
 
 
                 // SLAMVAN4
                 case -2061049099:
-                    return BulletsShot%2==0 ? 76 : 78;
+                    return BulletsShot % 2 == 0 ? 76 : 78;
 
 
                 // IMPERATOR
                 case 444994115:
-                    return BulletsShot%2==0 ? 88 : 86;
+                    return BulletsShot % 2 == 0 ? 88 : 86;
 
 
                 // IMPALER2
                 case 1009171724:
-                    return BulletsShot%2==0 ? 63 : 64;
+                    return BulletsShot % 2 == 0 ? 63 : 64;
 
 
                 // DOMINATOR4
                 case -688189648:
-                    return BulletsShot%2==0 ? 59 : 60;
+                    return BulletsShot % 2 == 0 ? 59 : 60;
 
 
                 // SAVAGE
@@ -339,22 +339,22 @@ namespace RageCoop.Client
 
                 // BUZZARD
                 case 788747387:
-                    return BulletsShot%2==0 ? 28 : 23;
+                    return BulletsShot % 2 == 0 ? 28 : 23;
 
 
                 // ANNIHL
                 case 837858166:
-                    return (int)BulletsShot%4+35;
+                    return (int)BulletsShot % 4 + 35;
 
 
                 // HYDRA
                 case 970385471:
-                    return BulletsShot%2==0 ? 29 : 28;
+                    return BulletsShot % 2 == 0 ? 29 : 28;
 
 
                 // STARLING
                 case -1700874274:
-                    return BulletsShot%2==0 ? 24 : 12;
+                    return BulletsShot % 2 == 0 ? 24 : 12;
 
 
                 // RHINO
@@ -369,9 +369,9 @@ namespace RageCoop.Client
         {
             var vp = p.VehicleWeapon;
             var type = Function.Call<int>(Hash.GET_WEAPON_DAMAGE_TYPE, vp);
-            if (vp!=VehicleWeaponHash.Invalid)
+            if (vp != VehicleWeaponHash.Invalid)
             {
-                return type == 3 ? false : VehicleProjectileWeapons.Contains(vp) || (type==5 && !ExplosiveBullets.Contains((uint)vp));
+                return type == 3 ? false : VehicleProjectileWeapons.Contains(vp) || (type == 5 && !ExplosiveBullets.Contains((uint)vp));
             }
 
             var w = p.Weapons.Current;

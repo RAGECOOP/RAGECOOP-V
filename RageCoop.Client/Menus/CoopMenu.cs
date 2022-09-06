@@ -1,10 +1,9 @@
 ﻿using GTA;
+using GTA.Native;
 using LemonUI;
-using LemonUI.Elements;
 using LemonUI.Menus;
 using LemonUI.Scaleform;
 using System.Drawing;
-using GTA.Native;
 
 namespace RageCoop.Client.Menus
 {
@@ -21,12 +20,12 @@ namespace RageCoop.Client.Menus
         };
         public static PopUp PopUp = new PopUp()
         {
-            Title="",
-            Prompt="",
+            Title = "",
+            Prompt = "",
             Subtitle = "",
-            Error="",
+            Error = "",
             ShowBackground = true,
-            Visible=false,
+            Visible = false,
         };
         public static NativeMenu LastMenu { get; set; } = Menu;
         #region ITEMS
@@ -54,7 +53,7 @@ namespace RageCoop.Client.Menus
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _usernameItem.Activated += UsernameActivated;
-            _passwordItem.Activated+=_passwordActivated;
+            _passwordItem.Activated += _passwordActivated;
             ServerIpItem.Activated += ServerIpActivated;
             _serverConnectItem.Activated += (sender, item) => { Networking.ToggleConnection(Main.Settings.LastServerAddress); };
 
@@ -86,12 +85,12 @@ namespace RageCoop.Client.Menus
 
         public static bool ShowPopUp(string prompt, string title, string subtitle, string error, bool showbackground)
         {
-            PopUp.Prompt=prompt;
-            PopUp.Title=title;
-            PopUp.Subtitle=subtitle;
-            PopUp.Error=error;
-            PopUp.ShowBackground=showbackground;
-            PopUp.Visible=true;
+            PopUp.Prompt = prompt;
+            PopUp.Title = title;
+            PopUp.Subtitle = subtitle;
+            PopUp.Error = error;
+            PopUp.ShowBackground = showbackground;
+            PopUp.Visible = true;
             Script.Yield();
             while (true)
             {
@@ -109,7 +108,7 @@ namespace RageCoop.Client.Menus
                 scaleform.Render2D();
                 if (Game.IsControlJustPressed(Control.FrontendAccept))
                 {
-                    PopUp.Visible=false;
+                    PopUp.Visible = false;
                     return true;
                 }
                 else if (Game.IsControlJustPressed(Control.FrontendCancel))
@@ -117,7 +116,7 @@ namespace RageCoop.Client.Menus
                     PopUp.Visible = false;
                     return false;
                 }
-                Script.Yield(); 
+                Script.Yield();
                 Game.DisableAllControlsThisFrame();
 
             }

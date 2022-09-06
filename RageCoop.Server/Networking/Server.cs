@@ -197,12 +197,12 @@ namespace RageCoop.Server
             {
                 string[] cmdArgs = message.Split(" ");
                 string cmdName = cmdArgs[0].Remove(0, 1);
-                _worker.QueueJob(()=>API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender));
+                QueueJob(()=>API.Events.InvokeOnCommandReceived(cmdName, cmdArgs, sender));
                 return;
             }
             message = message.Replace("~", "");
  
-            _worker.QueueJob(() => API.Events.InvokeOnChatMessage(message, sender));
+            QueueJob(() => API.Events.InvokeOnChatMessage(message, sender));
                             
             foreach(var c in ClientsByNetHandle.Values)
             {
@@ -306,11 +306,8 @@ namespace RageCoop.Server
         internal void SendFile(Stream stream, string name, Client client,int id=default, Action<float> updateCallback = null)
         {
             stream.Seek(0, SeekOrigin.Begin);
-            // Logger.Debug("1");
             id = id ==default? NewFileID(): id ;
-            // Logger.Debug("2");
             var total = stream.Length;
-            // Logger.Debug("3");
             if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferRequest()
             {
                 FileLength= total,
@@ -319,8 +316,6 @@ namespace RageCoop.Server
             }, ConnectionChannel.File)?.Response!=FileResponse.NeedToDownload)
             {
                 Logger?.Info($"Skipping file transfer \"{name}\" to {client.Username}");
-                // stream.Close();
-                // stream.Dispose();
                 return;
             }
             Logger?.Debug($"Initiating file transfer:{name}, {total}");
@@ -361,8 +356,6 @@ namespace RageCoop.Server
             {
                 Logger.Warning($"File trasfer to {client.Username} failed: "+name);
             }
-            // stream.Close();
-            // stream.Dispose();
             Logger?.Debug($"All file chunks sent:{name}");
             InProgressFileTransfers.Remove(id);
         }

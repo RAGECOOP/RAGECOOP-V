@@ -14,9 +14,9 @@ namespace RageCoop.Client.Scripting
         private bool _isHost = false;
         public override void OnStart()
         {
-            API.Events.OnPedDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
-            API.Events.OnVehicleDeleted+=(s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
-            API.Events.OnPlayerDied+=() => { API.SendCustomEvent(CustomEvents.OnPlayerDied); };
+            API.Events.OnPedDeleted += (s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
+            API.Events.OnVehicleDeleted += (s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
+            API.Events.OnPlayerDied += () => { API.SendCustomEvent(CustomEvents.OnPlayerDied); };
 
             API.RegisterCustomEventHandler(CustomEvents.SetAutoRespawn, SetAutoRespawn);
             API.RegisterCustomEventHandler(CustomEvents.SetDisplayNameTag, SetDisplayNameTag);
@@ -29,7 +29,7 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.DeleteServerBlip, DeleteServerBlip);
             API.RegisterCustomEventHandler(CustomEvents.CreateVehicle, CreateVehicle);
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
-            API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost=(bool)e.Args[0]; });
+            API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost = (bool)e.Args[0]; });
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
             API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) => { GTA.UI.Notification.Show($"~h~{e.Args[0]}~h~ died."); });
             Task.Run(() =>
@@ -59,33 +59,33 @@ namespace RageCoop.Client.Scripting
 
         private void WeatherTimeSync(CustomEventReceivedArgs e)
         {
-            World.CurrentTimeOfDay=new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
+            World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
             Function.Call(Hash._SET_WEATHER_TYPE_TRANSITION, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 
         private void SetDisplayNameTag(CustomEventReceivedArgs e)
         {
             var p = PlayerList.GetPlayer((int)e.Args[0]);
-            if (p != null) { p.DisplayNameTag=(bool)e.Args[1]; }
+            if (p != null) { p.DisplayNameTag = (bool)e.Args[1]; }
         }
 
         private void UpdatePedBlip(CustomEventReceivedArgs e)
         {
             var p = Entity.FromHandle((int)e.Args[0]);
             if (p == null) { return; }
-            if (p.Handle==Game.Player.Character.Handle)
+            if (p.Handle == Game.Player.Character.Handle)
             {
-                API.Config.BlipColor=(BlipColor)(byte)e.Args[1];
-                API.Config.BlipSprite=(BlipSprite)(ushort)e.Args[2];
-                API.Config.BlipScale=(float)e.Args[3];
+                API.Config.BlipColor = (BlipColor)(byte)e.Args[1];
+                API.Config.BlipSprite = (BlipSprite)(ushort)e.Args[2];
+                API.Config.BlipScale = (float)e.Args[3];
             }
             else
             {
                 var b = p.AttachedBlip;
-                if (b == null) { b=p.AddBlip(); }
-                b.Color=(BlipColor)(byte)e.Args[1];
-                b.Sprite=(BlipSprite)(ushort)e.Args[2];
-                b.Scale=(float)e.Args[3];
+                if (b == null) { b = p.AddBlip(); }
+                b.Color = (BlipColor)(byte)e.Args[1];
+                b.Sprite = (BlipSprite)(ushort)e.Args[2];
+                b.Scale = (float)e.Args[3];
             }
         }
 
@@ -94,17 +94,17 @@ namespace RageCoop.Client.Scripting
             var vehicleModel = (Model)e.Args[1];
             vehicleModel.Request(1000);
             Vehicle veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
-            while (veh==null)
+            while (veh == null)
             {
-                veh  = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
+                veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
                 Thread.Sleep(10);
             }
-            veh.CanPretendOccupants=false;
+            veh.CanPretendOccupants = false;
             var v = new SyncedVehicle()
             {
-                ID=(int)e.Args[0],
-                MainVehicle=veh,
-                OwnerID=Main.LocalPlayerID,
+                ID = (int)e.Args[0],
+                MainVehicle = veh,
+                OwnerID = Main.LocalPlayerID,
             };
             EntityPool.Add(v);
         }
@@ -130,7 +130,7 @@ namespace RageCoop.Client.Scripting
             Blip blip;
             if (!EntityPool.ServerBlips.TryGetValue(id, out blip))
             {
-                EntityPool.ServerBlips.Add(id, blip=World.CreateBlip(pos));
+                EntityPool.ServerBlips.Add(id, blip = World.CreateBlip(pos));
             }
             blip.Sprite = sprite;
             blip.Color = color;
@@ -152,14 +152,14 @@ namespace RageCoop.Client.Scripting
         private void SetNameTag(CustomEventReceivedArgs e)
         {
             var p = PlayerList.GetPlayer((int)e.Args[0]);
-            if (p!= null)
+            if (p != null)
             {
-                p.DisplayNameTag=(bool)e.Args[1];
+                p.DisplayNameTag = (bool)e.Args[1];
             }
         }
         private void SetAutoRespawn(CustomEventReceivedArgs args)
         {
-            API.Config.EnableAutoRespawn=(bool)args.Args[0];
+            API.Config.EnableAutoRespawn = (bool)args.Args[0];
         }
         private void DeleteServerProp(CustomEventReceivedArgs e)
         {
@@ -179,13 +179,13 @@ namespace RageCoop.Client.Scripting
             {
                 if (!EntityPool.ServerProps.TryGetValue(id, out prop))
                 {
-                    EntityPool.ServerProps.Add(id, prop=new SyncedProp(id));
+                    EntityPool.ServerProps.Add(id, prop = new SyncedProp(id));
                 }
             }
-            prop.LastSynced=Main.Ticked+1;
-            prop.Model= (Model)e.Args[1];
-            prop.Position=(Vector3)e.Args[2];
-            prop.Rotation=(Vector3)e.Args[3];
+            prop.LastSynced = Main.Ticked + 1;
+            prop.Model = (Model)e.Args[1];
+            prop.Position = (Vector3)e.Args[2];
+            prop.Rotation = (Vector3)e.Args[3];
             prop.Update();
         }
         private void NativeCall(CustomEventReceivedArgs e)
@@ -194,14 +194,14 @@ namespace RageCoop.Client.Scripting
             int i;
             var ty = (byte)e.Args[0];
             TypeCode returnType = (TypeCode)ty;
-            i = returnType==TypeCode.Empty ? 1 : 2;
+            i = returnType == TypeCode.Empty ? 1 : 2;
             var hash = (Hash)e.Args[i++];
-            for (; i<e.Args.Length; i++)
+            for (; i < e.Args.Length; i++)
             {
                 arguments.Add(GetInputArgument(e.Args[i]));
             }
 
-            if (returnType==TypeCode.Empty)
+            if (returnType == TypeCode.Empty)
             {
                 Function.Call(hash, arguments.ToArray());
                 return;

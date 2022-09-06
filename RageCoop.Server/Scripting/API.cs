@@ -173,7 +173,7 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// All synchronized entities on this server.
         /// </summary>
-        public ServerEntities Entities { get { return Server.Entities; } }
+        public ServerEntities Entities => Server.Entities;
 
         #region FUNCTIONS
         /// <summary>
@@ -415,7 +415,7 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Get a <see cref="Core.Logger"/> that the server is currently using, you should use <see cref="ServerResource.Logger"/> to display resource-specific information.
         /// </summary>
-        public Logger Logger { get { return Server.Logger; } }
+        public Logger Logger => Server.Logger;
 
 
         /// <summary>
@@ -423,7 +423,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public Client Host
         {
-            get { return Server._hostClient; }
+            get => Server._hostClient;
             set { 
                 if (Server._hostClient != value) 
                 {

@@ -30,7 +30,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         /// Eqivalent of <see cref="ClientResource.Logger"/> in <see cref="CurrentResource"/>
         /// </summary>
-        public Core.Logger Logger { get { return CurrentResource.Logger; } }
+        public Core.Logger Logger => CurrentResource.Logger;
 
     }
 }

@@ -6,13 +6,10 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
@@ -42,7 +39,7 @@ namespace RageCoop.Client
                 var res = ResolutionMaintainRatio;
                 if (Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
                 {
-                    screenPos =new Point((int)(res.Width*x), (int)(y*1080));
+                    screenPos = new Point((int)(res.Width * x), (int)(y * 1080));
                     return true;
                 }
             }
@@ -114,7 +111,7 @@ namespace RageCoop.Client
 
         #endregion
         public static string SettingsPath = "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
-        public static Settings ReadSettings(string path=null)
+        public static Settings ReadSettings(string path = null)
         {
             path = path ?? SettingsPath;
             XmlSerializer ser = new XmlSerializer(typeof(Settings));
@@ -139,7 +136,7 @@ namespace RageCoop.Client
 
             return settings;
         }
-        public static bool SaveSettings(string path = null,Settings settings=null)
+        public static bool SaveSettings(string path = null, Settings settings = null)
         {
             try
             {
@@ -192,7 +189,7 @@ namespace RageCoop.Client
         {
             if (p == null) { return null; }
             var c = EntityPool.GetPedByHandle(p.Handle);
-            if (c==null) { EntityPool.Add(c=new SyncedPed(p)); }
+            if (c == null) { EntityPool.Add(c = new SyncedPed(p)); }
             return c;
         }
 
@@ -200,7 +197,7 @@ namespace RageCoop.Client
         {
             if (veh == null) { return null; }
             var v = EntityPool.GetVehicleByHandle(veh.Handle);
-            if (v==null) { EntityPool.Add(v=new SyncedVehicle(veh)); }
+            if (v == null) { EntityPool.Add(v = new SyncedVehicle(veh)); }
             return v;
         }
 
@@ -219,7 +216,7 @@ namespace RageCoop.Client
 
         #region WIN32
 
-        const UInt32 WM_KEYDOWN = 0x0100;
+        private const UInt32 WM_KEYDOWN = 0x0100;
         public static void Reload()
         {
             string reloadKey = "None";
@@ -227,18 +224,18 @@ namespace RageCoop.Client
             foreach (var l in lines)
             {
                 var ss = l.Split('=');
-                if (ss.Length > 0 && ss[0]=="ReloadKey")
+                if (ss.Length > 0 && ss[0] == "ReloadKey")
                 {
                     reloadKey = ss[1];
                 }
             }
             var lineList = lines.ToList();
-            if (reloadKey=="None")
+            if (reloadKey == "None")
             {
                 foreach (var l in lines)
                 {
                     var ss = l.Split('=');
-                    if (ss.Length > 0 && ss[0]=="ReloadKey")
+                    if (ss.Length > 0 && ss[0] == "ReloadKey")
                     {
                         reloadKey = ss[1];
                         lineList.Remove(l);
@@ -253,7 +250,7 @@ namespace RageCoop.Client
             // Move log file so it doesn't get deleted 
             Main.Logger.Dispose();
 
-            var path = Main.Logger.LogPath+".last.log";
+            var path = Main.Logger.LogPath + ".last.log";
             try
             {
                 if (File.Exists(path)) { File.Delete(path); }
@@ -268,7 +265,7 @@ namespace RageCoop.Client
         }
 
         [DllImport("user32.dll")]
-        static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
+        private static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
 
 
         [DllImport("kernel32.dll")]
