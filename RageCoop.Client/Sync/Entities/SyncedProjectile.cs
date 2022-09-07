@@ -101,7 +101,7 @@ namespace RageCoop.Client
                 CreateProjectile();
                 return;
             }
-            MainProjectile.Velocity = Velocity + (Position + Shooter.Owner.PacketTravelTime * Velocity - MainProjectile.Position);
+            MainProjectile.Velocity = Velocity + (Predict(Position) - MainProjectile.Position);
             MainProjectile.Rotation = Rotation;
             LastUpdated = Main.Ticked;
         }
@@ -113,6 +113,7 @@ namespace RageCoop.Client
             if (Shooter == null) { return; }
             Entity owner;
             owner = (Shooter as SyncedPed)?.MainPed ?? (Entity)(Shooter as SyncedVehicle)?.MainVehicle;
+            Position = (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Shooter.Velocity + Position;
             var end = Position + Velocity;
             Function.Call(Hash.SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z, end.X, end.Y, end.Z, 0, 1, WeaponHash, owner?.Handle ?? 0, 1, 0, -1, owner);
             var ps = World.GetAllProjectiles();

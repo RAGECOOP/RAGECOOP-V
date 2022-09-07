@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using Lidgren.Network;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
+using System.Net.NetworkInformation;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -193,8 +194,7 @@ namespace RageCoop.Core
             foreach (FileInfo file in source.GetFiles())
                 file.CopyTo(Path.Combine(target.FullName, file.Name), true);
         }
-        public
-        static string GetInvariantRID()
+        public static string GetInvariantRID()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -211,6 +211,23 @@ namespace RageCoop.Core
             return "unknown";
         }
 
+        /// <summary>
+        /// Get local ip addresses on all network interfaces 
+        /// </summary>
+        /// <returns></returns>
+        public static List<IPAddress> GetLocalAddress()
+        {
+            var addresses = new List<IPAddress>();
+            foreach (NetworkInterface netInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                IPInterfaceProperties ipProps = netInterface.GetIPProperties();
+                foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+                {
+                    addresses.Add(addr.Address);
+                }
+            }
+            return addresses;
+        }
     }
     internal class IpInfo
     {
@@ -502,5 +519,6 @@ namespace RageCoop.Core
         {
             return IPAddress.Parse(ip);
         }
+
     }
 }

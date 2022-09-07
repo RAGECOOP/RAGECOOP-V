@@ -396,6 +396,7 @@ namespace RageCoop.Client
             p.Shooter = packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle) ?
                 (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID) : EntityPool.GetPedByID(packet.ShooterID);
             p.LastSynced = Main.Ticked;
+            p.LastSyncedStopWatch.Restart();
         }
     }
 }

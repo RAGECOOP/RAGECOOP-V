@@ -31,6 +31,7 @@ namespace RageCoop.Client
         }
         internal void SetUpFixedData()
         {
+            if (MainVehicle == null) { return; }
 
             IsAircraft = MainVehicle.IsAircraft;
             IsMotorcycle = MainVehicle.IsMotorcycle;

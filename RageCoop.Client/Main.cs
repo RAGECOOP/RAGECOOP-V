@@ -325,11 +325,6 @@ namespace RageCoop.Client
         public static void Disconnected(string reason)
         {
 
-            Memory.RestorePatches();
-            DownloadManager.Cleanup();
-            Voice.ClearAll();
-            PlayerList.Cleanup();
-            LocalPlayerID = default;
 
             Logger.Info($">> Disconnected << reason: {reason}");
             QueueAction(() =>
@@ -338,13 +333,18 @@ namespace RageCoop.Client
                 {
                     MainChat.Focused = false;
                 }
+                PlayerList.Cleanup();
                 MainChat.Clear();
                 EntityPool.Cleanup();
                 WorldThread.Traffic(true);
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
+                LocalPlayerID = default;
             });
+            Memory.RestorePatches();
+            DownloadManager.Cleanup();
+            Voice.ClearAll();
             Resources.Unload();
         }
         private static void DoQueuedActions()

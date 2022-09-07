@@ -43,10 +43,10 @@ namespace RageCoop.Client
         #endregion
         public static void Cleanup(bool keepPlayer = true, bool keepMine = true)
         {
-            foreach (int id in new List<int>(PedsByID.Keys))
+            foreach (var ped in PedsByID.Values)
             {
-                if (keepPlayer && (id == Main.LocalPlayerID) || keepMine && (PedsByID[id].OwnerID == Main.LocalPlayerID)) { continue; }
-                RemovePed(id);
+                if ((keepPlayer && (ped.ID == Main.LocalPlayerID)) || (keepMine && (ped.OwnerID == Main.LocalPlayerID))) { continue; }
+                RemovePed(ped.ID);
             }
             PedsByID.Clear();
             PedsByHandle.Clear();
@@ -333,7 +333,7 @@ namespace RageCoop.Client
                         if (p.MainProjectile.AttachedEntity == null)
                         {
                             // Prevent projectiles from exploding next to vehicle
-                            if (p.WeaponHash == (WeaponHash)VehicleWeaponHash.Tank || p.MainProjectile.Position.DistanceTo(p.Origin) < 2)
+                            if (p.WeaponHash == (WeaponHash)VehicleWeaponHash.Tank || (p.MainProjectile.OwnerEntity?.EntityType==EntityType.Vehicle && p.MainProjectile.Position.DistanceTo(p.Origin) < 2))
                             {
                                 continue;
                             }

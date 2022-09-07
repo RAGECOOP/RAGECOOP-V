@@ -18,6 +18,7 @@ using Timer = System.Timers.Timer;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using RageCoop.Core.Scripting;
+using System.Net.NetworkInformation;
 
 namespace RageCoop.Server
 {
@@ -117,13 +118,23 @@ namespace RageCoop.Server
         /// </summary>
         public void Start()
         {
-            Logger?.Info("================");
-            Logger?.Info($"Server bound to: 0.0.0.0:{Settings.Port}");
+            Logger?.Info("================"); 
+            Logger?.Info($"Listening port: {Settings.Port}");
             Logger?.Info($"Server version: {Version}");
-            Logger?.Info($"Compatible RAGECOOP versions: {Version.ToString(3)}");
+            Logger?.Info($"Compatible client version: {Version.ToString(3)}");
             Logger?.Info($"Runtime: {CoreUtils.GetInvariantRID()} => {System.Runtime.InteropServices.RuntimeInformation.RuntimeIdentifier}");
             Logger?.Info("================");
-
+            Logger?.Info($"Listening addresses:");
+            foreach (NetworkInterface netInterface in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                Logger?.Info($"[{netInterface.Description}]:");
+                IPInterfaceProperties ipProps = netInterface.GetIPProperties();
+                foreach (UnicastIPAddressInformation addr in ipProps.UnicastAddresses)
+                {
+                    Logger.Info(string.Join(", ", addr.Address));
+                }
+                Logger.Info("");
+            }
             if (Settings.UseZeroTier)
             {
                 Logger?.Info($"Joining ZeroTier network: "+Settings.ZeroTierNetworkID);
@@ -152,12 +163,12 @@ namespace RageCoop.Server
 
             MainNetServer = new NetServer(config);
             MainNetServer.Start();
-            Logger?.Info(string.Format("Server listening on {0}:{1}", config.LocalAddress.ToString(), config.Port));
-            
             BaseScript.API=API;
             BaseScript.OnStart();
             Resources.LoadAll();
             _listenerThread.Start();
+            Logger?.Info("Listening for clients");
+
             _playerUpdateTimer.Enabled=true;
             if (Settings.AnnounceSelf)
             {
@@ -170,7 +181,6 @@ namespace RageCoop.Server
             _antiAssholesTimer.Enabled = true;
 
 
-            Logger?.Info("Listening for clients");
         }
         /// <summary>
         /// Terminate threads and stop the server
