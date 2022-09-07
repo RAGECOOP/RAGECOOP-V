@@ -19,12 +19,11 @@ namespace RageCoop.Client
         public SyncedEntity Shooter { get; set; }
         public bool Exploded => Flags.HasProjDataFlag(ProjectileDataFlags.Exploded);
 
+        internal override Player Owner => Shooter.Owner;
         /// <summary>
         /// Invalid property for projectile.
         /// </summary>
         private new int OwnerID { set { } }
-
-        internal override Player Owner => Shooter.Owner;
         public WeaponHash WeaponHash { get; set; }
         private WeaponAsset Asset { get; set; }
         public void ExtractData(ref Packets.ProjectileSync p)
@@ -101,7 +100,7 @@ namespace RageCoop.Client
                 CreateProjectile();
                 return;
             }
-            MainProjectile.Velocity = Velocity + (Predict(Position) - MainProjectile.Position);
+            MainProjectile.Velocity = Velocity + 10*(Predict(Position) - MainProjectile.Position);
             MainProjectile.Rotation = Rotation;
             LastUpdated = Main.Ticked;
         }
@@ -115,14 +114,12 @@ namespace RageCoop.Client
             owner = (Shooter as SyncedPed)?.MainPed ?? (Entity)(Shooter as SyncedVehicle)?.MainVehicle;
             Position = (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Shooter.Velocity + Position;
             var end = Position + Velocity;
-            Function.Call(Hash.SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z, end.X, end.Y, end.Z, 0, 1, WeaponHash, owner?.Handle ?? 0, 1, 0, -1, owner);
+            Function.Call(Hash.SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z, end.X, end.Y, end.Z, 0, 1, WeaponHash, owner?.Handle ?? 0, 1, 0, -1);
             var ps = World.GetAllProjectiles();
             MainProjectile = ps[ps.Length - 1];
-            MainProjectile.IsCollisionEnabled = false;
             MainProjectile.Position = Position;
             MainProjectile.Rotation = Rotation;
             MainProjectile.Velocity = Velocity;
-            Main.Delay(() => MainProjectile.IsCollisionEnabled = true, 100);
             EntityPool.Add(this);
         }
     }
