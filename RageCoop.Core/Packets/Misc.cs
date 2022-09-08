@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -12,16 +13,15 @@ namespace RageCoop.Core
         {
             public int TargetID { get; set; }
             public override PacketType Type => PacketType.ConnectionRequest;
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
                 var data=new List<byte>(10);
-                data.AddInt(TargetID);
-                return data.ToArray();
+                m.Write(TargetID);
             }
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                var reader=new BitReader(array);
-                TargetID = reader.ReadInt32();
+
+                TargetID = m.ReadInt32();
             }
         }
 
@@ -33,16 +33,16 @@ namespace RageCoop.Core
         {
             public int ID { get; set; }
             public override PacketType Type => PacketType.P2PConnect;
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
                 var data = new List<byte>(10);
-                data.AddInt(ID);
-                return data.ToArray();
+                m.Write(ID);
+
             }
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                var reader = new BitReader(array);
-                ID = reader.ReadInt32();
+
+                ID = m.ReadInt32();
             }
         }
     }

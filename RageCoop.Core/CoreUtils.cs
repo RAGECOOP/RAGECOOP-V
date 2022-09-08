@@ -14,6 +14,7 @@ using Lidgren.Network;
 using Newtonsoft.Json;
 using System.Runtime.InteropServices;
 using System.Net.NetworkInformation;
+using Newtonsoft.Json.Linq;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -35,45 +36,44 @@ namespace RageCoop.Core
         {
             return ToIgnore.Contains(name);
         }
-        public static (byte, byte[]) GetBytesFromObject(object obj)
+        public static void GetBytesFromObject(object obj,NetOutgoingMessage m)
         {
             switch (obj)
             {
                 case byte value:
-                    return (0x01, new byte[] { value });
+                    m.Write((byte)0x01);m.Write(value);break;
                 case short value:
-                    return (0x02, BitConverter.GetBytes(value));
+                    m.Write((byte)0x02); m.Write(value); break;
                 case ushort value:
-                    return (0x03, BitConverter.GetBytes(value));
+                    m.Write((byte)0x03); m.Write(value); break;
                 case int value:
-                    return (0x04, BitConverter.GetBytes(value));
+                    m.Write((byte)0x04); m.Write(value); break;
                 case uint value:
-                    return (0x05, BitConverter.GetBytes(value));
+                    m.Write((byte)0x05); m.Write(value); break;
                 case long value:
-                    return (0x06, BitConverter.GetBytes(value));
+                    m.Write((byte)0x06); m.Write(value); break;
                 case ulong value:
-                    return (0x07, BitConverter.GetBytes(value));
+                    m.Write((byte)0x07); m.Write(value); break;
                 case float value:
-                    return (0x08, BitConverter.GetBytes(value));
+                    m.Write((byte)0x08); m.Write(value); break;
                 case bool value:
-                    return (0x09, BitConverter.GetBytes(value));
+                    m.Write((byte)0x09); m.Write(value); break;
                 case string value:
-                    return (0x10, value.GetBytesWithLength());
+                    m.Write((byte)0x10); m.Write(value); break;
                 case Vector3 value:
-                    return (0x11, value.GetBytes());
+                    m.Write((byte)0x11); m.Write(value); break;
                 case Quaternion value:
-                    return (0x12, value.GetBytes());
+                    m.Write((byte)0x12); m.Write(value); break;
                 case GTA.Model value:
-                    return (0x13, BitConverter.GetBytes(value));
+                    m.Write((byte)0x13); m.Write(value); break;
                 case Vector2 value:
-                    return (0x14, value.GetBytes());
+                    m.Write((byte)0x14); m.Write(value); break;
                 case byte[] value:
-                    return (0x15, value);
-                case Tuple<byte, byte[]> _:
-                    var tup = (Tuple<byte, byte[]>)obj;
-                    return (tup.Item1, tup.Item2);
+                    m.Write((byte)0x15); m.WriteByteArray(value); break;
+                case Tuple<byte, byte[]> value:
+                    m.Write(value.Item1); m.Write(value.Item2); break;
                 default:
-                    return (0x0, null);
+                    throw new Exception("Unsupported object type: " + obj.GetType());
             }
         }
         public static IPEndPoint StringToEndPoint(string endpointstring)
@@ -239,62 +239,6 @@ namespace RageCoop.Core
     }
     internal static class Extensions
     {
-        public static void AddVector3(this List<byte> bytes, Vector3 vec3)
-        {
-            bytes.AddRange(BitConverter.GetBytes(vec3.X));
-            bytes.AddRange(BitConverter.GetBytes(vec3.Y));
-            bytes.AddRange(BitConverter.GetBytes(vec3.Z));
-        }
-        public static void AddQuaternion(this List<byte> bytes, Quaternion quat)
-        {
-            bytes.AddRange(BitConverter.GetBytes(quat.X));
-            bytes.AddRange(BitConverter.GetBytes(quat.Y));
-            bytes.AddRange(BitConverter.GetBytes(quat.Z));
-            bytes.AddRange(BitConverter.GetBytes(quat.W));
-        }
-        public static void AddInt(this List<byte> bytes,int i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddUint(this List<byte> bytes, uint i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddShort(this List<byte> bytes, short i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddUshort(this List<byte> bytes, ushort i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddLong(this List<byte> bytes, long i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddUlong(this List<byte> bytes, ulong i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddFloat(this List<byte> bytes, float i)
-        {
-            bytes.AddRange(BitConverter.GetBytes(i));
-        }
-        public static void AddBool(this List<byte> bytes, bool b)
-        {
-            bytes.Add(b? (byte)1 :(byte)0);
-        }
-        public static void AddString(this List<byte> bytes, string s)
-        {
-            var sb = Encoding.UTF8.GetBytes(s);
-            bytes.AddInt(sb.Length);
-            bytes.AddRange(sb);
-        }
-        public static void AddArray(this List<byte> bytes, byte[] toadd)
-        {
-            bytes.AddInt(toadd.Length);
-            bytes.AddRange(toadd);
-        }
         public static byte[] GetBytes(this string s)
         {
             return Encoding.UTF8.GetBytes(s);
@@ -333,17 +277,10 @@ namespace RageCoop.Core
             // 16 bytes
             return new List<byte[]>() { BitConverter.GetBytes(qua.X), BitConverter.GetBytes(qua.Y), BitConverter.GetBytes(qua.Z), BitConverter.GetBytes(qua.W) }.Join(4);
         }
-
-
-        public static T GetPacket<T>(this NetIncomingMessage msg, T existingPacket = null) where T : Packet, new()
+        public static T GetPacket<T>(this NetIncomingMessage msg) where T: Packet, new()
         {
-            msg.ReadByte();
-            return GetPacket<T>(msg.ReadBytes(msg.ReadInt32()),existingPacket);
-        }
-        public static T GetPacket<T>(this byte[] data, T existingPacket=null) where T : Packet, new()
-        {
-            var p = existingPacket??new T();
-            p.Deserialize(data);
+            var p = new T();
+            p.Deserialize(msg);
             return p;
         }
         public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)

@@ -14,26 +14,26 @@ namespace RageCoop.Core
             public string TargetInternal { get; set; }
             public string TargetExternal { get; set; }
             public bool Connect { get; set; }
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
-                byteArray.AddInt(TargetID);
-                byteArray.AddString(TargetInternal);
-                byteArray.AddString(TargetExternal);
-                byteArray.AddBool(Connect);
-                return byteArray.ToArray();
+
+                m.Write(TargetID);
+                m.Write(TargetInternal);
+                m.Write(TargetExternal);
+                m.Write(Connect);
+                
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-                TargetID = reader.ReadInt32();
-                TargetInternal = reader.ReadString();
-                TargetExternal = reader.ReadString();
-                Connect=reader.ReadBoolean();
+
+                TargetID = m.ReadInt32();
+                TargetInternal = m.ReadString();
+                TargetExternal = m.ReadString();
+                Connect=m.ReadBoolean();
                 #endregion
             }
         }
@@ -46,22 +46,22 @@ namespace RageCoop.Core
             /// 1:initial, 2:acknowledged, 3:confirmed
             /// </summary>
             public byte Status { get;set;}
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
-                byteArray.AddInt(Puncher);
-                byteArray.Add(Status);
-                return byteArray.ToArray();
+
+                m.Write(Puncher);
+                m.Write(Status);
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-                Puncher = reader.ReadInt32();
-                Status = reader.ReadByte();
+
+                Puncher = m.ReadInt32();
+                Status = m.ReadByte();
                 #endregion
             }
         }

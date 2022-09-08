@@ -241,27 +241,35 @@ namespace RageCoop.Server.Scripting
 		{
 			Task.Run(() =>
 			{
-
-				if (ClientResources.Count!=0)
+				try
 				{
-					Logger?.Info($"Sending resources to client:{client.Username}");
-					foreach (var rs in ClientResources)
-					{
-						Logger?.Debug(rs.Key);
-						Server.SendFile(rs.Value,rs.Key+".res", client);
-					}
 
-					Logger?.Info($"Resources sent to:{client.Username}");
-				}
-				if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent())?.Response==FileResponse.Loaded)
-				{
-					client.IsReady=true;
-					Server.API.Events.InvokePlayerReady(client);
-				}
-                else
-                {
-					Logger?.Warning($"Client {client.Username} failed to load resource.");
+                    if (ClientResources.Count != 0)
+                    {
+                        Logger?.Info($"Sending resources to client:{client.Username}");
+                        foreach (var rs in ClientResources)
+                        {
+                            Logger?.Debug(rs.Key);
+                            Server.SendFile(rs.Value, rs.Key + ".res", client);
+                        }
+
+                        Logger?.Info($"Resources sent to:{client.Username}");
+                    }
+                    if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent())?.Response == FileResponse.Loaded)
+                    {
+                        client.IsReady = true;
+                        Server.API.Events.InvokePlayerReady(client);
+                    }
+                    else
+                    {
+                        Logger?.Warning($"Client {client.Username} failed to load resource.");
+                    }
                 }
+				catch(Exception ex)
+				{
+					Logger.Error("Failed to send resource to client: " + client.Username, ex);
+					client.Kick("Resource error!");
+				}
 			});
 		}
 	}

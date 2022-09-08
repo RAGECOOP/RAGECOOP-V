@@ -56,9 +56,7 @@ namespace RageCoop.Server
                         {
                             try
                             {
-                                int len = message.ReadInt32();
-                                byte[] data = message.ReadBytes(len);
-                                GetHandshake(message.SenderConnection, data.GetPacket<Packets.Handshake>());
+                                GetHandshake(message.SenderConnection, message.GetPacket<Packets.Handshake>());
                             }
                             catch (Exception e)
                             {
@@ -106,7 +104,7 @@ namespace RageCoop.Server
                                         int id = message.ReadInt32();
                                         if (PendingResponses.TryGetValue(id, out var callback))
                                         {
-                                            callback((PacketType)message.ReadByte(), message.ReadBytes(message.ReadInt32()));
+                                            callback((PacketType)message.ReadByte(), message);
                                             PendingResponses.Remove(id);
                                         }
                                         break;
@@ -114,19 +112,23 @@ namespace RageCoop.Server
                                 case PacketType.Request:
                                     {
                                         int id = message.ReadInt32();
-                                        if (RequestHandlers.TryGetValue((PacketType)message.ReadByte(), out var handler))
+                                        var reqType = (PacketType)message.ReadByte();
+                                        if (RequestHandlers.TryGetValue(reqType, out var handler))
                                         {
                                             var response = MainNetServer.CreateMessage();
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
-                                            handler(message.ReadBytes(message.ReadInt32()), sender).Pack(response);
+                                            handler(message, sender).Pack(response);
                                             MainNetServer.SendMessage(response, message.SenderConnection, NetDeliveryMethod.ReliableOrdered);
+                                        }
+                                        else
+                                        {
+                                            Logger.Warning("Did not find a request handler of type: " + reqType);
                                         }
                                         break;
                                     }
                                 default:
                                     {
-                                        byte[] data = message.ReadBytes(message.ReadInt32());
                                         if (type.IsSyncEvent())
                                         {
                                             // Sync Events
@@ -139,8 +141,7 @@ namespace RageCoop.Server
                                                 {
                                                     var outgoingMessage = MainNetServer.CreateMessage();
                                                     outgoingMessage.Write((byte)type);
-                                                    outgoingMessage.Write(data.Length);
-                                                    outgoingMessage.Write(data);
+                                                    outgoingMessage.Write(message.ReadBytes(message.LengthBytes-1));
                                                     MainNetServer.SendMessage(outgoingMessage, toSend, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.SyncEvents);
                                                 }
                                             }
@@ -151,7 +152,7 @@ namespace RageCoop.Server
                                         }
                                         else
                                         {
-                                            HandlePacket(type, data, sender);
+                                            HandlePacket(type, message, sender);
                                         }
                                         break;
                                     }
@@ -191,22 +192,22 @@ namespace RageCoop.Server
             MainNetServer.Recycle(message);
         }
 
-        private void HandlePacket(PacketType type, byte[] data, Client sender)
+        private void HandlePacket(PacketType type, NetIncomingMessage msg, Client sender)
         {
             try
             {
                 switch (type)
                 {
                     case PacketType.PedSync:
-                        PedSync(data.GetPacket<Packets.PedSync>(), sender);
+                        PedSync(msg.GetPacket<Packets.PedSync>(), sender);
                         break;
 
                     case PacketType.VehicleSync:
-                        VehicleSync(data.GetPacket<Packets.VehicleSync>(), sender);
+                        VehicleSync(msg.GetPacket<Packets.VehicleSync>(), sender);
                         break;
 
                     case PacketType.ProjectileSync:
-                        ProjectileSync(data.GetPacket<Packets.ProjectileSync>(), sender);
+                        ProjectileSync(msg.GetPacket<Packets.ProjectileSync>(), sender);
                         break;
 
                     case PacketType.ChatMessage:
@@ -215,7 +216,7 @@ namespace RageCoop.Server
                             {
                                 return Security.Decrypt(b, sender.EndPoint);
                             });
-                            packet.Deserialize(data);
+                            packet.Deserialize(msg);
                             ChatMessageReceived(packet.Username, packet.Message, sender);
                         }
                         break;
@@ -224,7 +225,7 @@ namespace RageCoop.Server
                         {
                             if (Settings.UseVoice && !Settings.UseP2P)
                             {
-                                Forward(data.GetPacket<Packets.Voice>(), sender, ConnectionChannel.Voice);
+                                Forward(msg.GetPacket<Packets.Voice>(), sender, ConnectionChannel.Voice);
                             }
                         }
                         break;
@@ -232,7 +233,7 @@ namespace RageCoop.Server
                     case PacketType.CustomEvent:
                         {
                             Packets.CustomEvent packet = new Packets.CustomEvent();
-                            packet.Deserialize(data);
+                            packet.Deserialize(msg);
                             QueueJob(() => API.Events.InvokeCustomEventReceived(packet, sender));
                         }
                         break;

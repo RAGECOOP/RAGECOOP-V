@@ -55,14 +55,6 @@ namespace RageCoop.Core
 
         Unknown=255
     }
-    internal static class PacketExtensions
-    {
-        internal static bool IsSyncEvent(this PacketType p)
-        {
-            return (30<=(byte)p)&&((byte)p<=40);
-        }
-    }
-
     internal enum ConnectionChannel
     {
         Default = 0,
@@ -153,25 +145,19 @@ namespace RageCoop.Core
     internal interface IPacket
     {
         PacketType Type { get; }
-        byte[] Serialize();
 
-        void Deserialize(byte[] data);
+        void Deserialize(NetIncomingMessage m);
     }
 
     internal abstract class Packet : IPacket
     {
         public abstract PacketType Type { get; }
-        public virtual byte[] Serialize()
+        public void Pack(NetOutgoingMessage m)
         {
-            return new byte[0];
+            m.Write((byte)Type);
+            Serialize(m);
         }
-        public virtual void Deserialize(byte[] array) { }
-        public void Pack(NetOutgoingMessage message)
-        {
-            var d=Serialize();
-            message.Write((byte)Type);
-            message.Write(d.Length);
-            message.Write(d);
-        }
+        protected virtual void Serialize(NetOutgoingMessage m) { }
+        public virtual void Deserialize(NetIncomingMessage m) { }
     }
 }

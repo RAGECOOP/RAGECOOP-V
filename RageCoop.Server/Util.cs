@@ -35,22 +35,6 @@ namespace RageCoop.Server
                 return "";
             }
         }
-        public static (byte, byte[]) GetBytesFromObject(object obj)
-        {
-            return obj switch
-            {
-                byte _ => (0x01, BitConverter.GetBytes((byte)obj)),
-                short _ => (0x02, BitConverter.GetBytes((short)obj)),
-                ushort _ => (0x03, BitConverter.GetBytes((ushort)obj)),
-                int _ => (0x04, BitConverter.GetBytes((int)obj)),
-                uint _ => (0x05, BitConverter.GetBytes((uint)obj)),
-                long _ => (0x06, BitConverter.GetBytes((long)obj)),
-                ulong _ => (0x07, BitConverter.GetBytes((ulong)obj)),
-                float _ => (0x08, BitConverter.GetBytes((float)obj)),
-                bool _ => (0x09, BitConverter.GetBytes((bool)obj)),
-                _ => (0x0, null),
-            };
-        }
         public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections,NetConnection toExclude)
         {
             return new(connections.Where(e => e != toExclude));

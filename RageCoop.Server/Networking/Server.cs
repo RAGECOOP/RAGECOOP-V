@@ -55,8 +55,8 @@ namespace RageCoop.Server
         private readonly Timer _updateTimer = new();
         private readonly Worker _worker;
         private readonly HashSet<char> _allowedCharacterSet;
-        private Dictionary<int,Action<PacketType,byte[]>> PendingResponses=new();
-        internal Dictionary<PacketType, Func<byte[],Client,Packet>> RequestHandlers=new();
+        private Dictionary<int,Action<PacketType,NetIncomingMessage>> PendingResponses=new();
+        internal Dictionary<PacketType, Func<NetIncomingMessage,Client,Packet>> RequestHandlers=new();
         /// <summary>
         /// Get the current server version
         /// </summary>
@@ -284,12 +284,13 @@ namespace RageCoop.Server
             {
                 throw new InvalidOperationException("Cannot wait for response from the listener thread!");
             }
-            var received=new AutoResetEvent(false);
-            byte[] response=null;
+
+            var received =new AutoResetEvent(false);
+            T response=new T();
             var id = NewRequestID();
-            PendingResponses.Add(id, (type,p) =>
+            PendingResponses.Add(id, (type,m) =>
             {
-                response=p;
+                response.Deserialize(m);
                 received.Set();
             });
             var msg = MainNetServer.CreateMessage();
@@ -299,9 +300,7 @@ namespace RageCoop.Server
             MainNetServer.SendMessage(msg,client.Connection,NetDeliveryMethod.ReliableOrdered,(int)channel);
             if (received.WaitOne(timeout))
             {
-                var p = new T();
-                p.Deserialize(response);
-                return p;
+                return response;
             }
 
             return null;
@@ -318,6 +317,7 @@ namespace RageCoop.Server
             stream.Seek(0, SeekOrigin.Begin);
             id = id ==default? NewFileID(): id ;
             var total = stream.Length;
+            Logger?.Debug($"Requesting file transfer:{name}, {total}");
             if (GetResponse<Packets.FileTransferResponse>(client, new Packets.FileTransferRequest()
             {
                 FileLength= total,

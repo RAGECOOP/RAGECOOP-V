@@ -19,44 +19,44 @@ namespace RageCoop.Core
             public Vector3 StartPosition { get; set; }
             public Vector3 EndPosition { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+
 
                 // Write OwnerID 
-                byteArray.AddRange(BitConverter.GetBytes(OwnerID));
+                m.Write(OwnerID);
 
                 // Write weapon hash
-                byteArray.AddRange(BitConverter.GetBytes(WeaponHash));
+                m.Write(WeaponHash);
 
                 // Write StartPosition
-                byteArray.AddVector3(StartPosition);
+                m.Write(StartPosition);
 
                 // Write EndPosition
-                byteArray.AddVector3(EndPosition);
+                m.Write(EndPosition);
 
 
-                return byteArray.ToArray();
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
+
 
                 // Read OwnerID
-                OwnerID=reader.ReadInt32();
+                OwnerID=m.ReadInt32();
 
                 // Read WeponHash
-                WeaponHash=reader.ReadUInt32();
+                WeaponHash=m.ReadUInt32();
 
                 // Read StartPosition
-                StartPosition=reader.ReadVector3();
+                StartPosition=m.ReadVector3();
 
                 // Read EndPosition
-                EndPosition=reader.ReadVector3();
+                EndPosition=m.ReadVector3();
                 #endregion
             }
         }

@@ -14,22 +14,22 @@ namespace RageCoop.Core
             public override PacketType Type  => PacketType.PedKilled;
             public int VictimID { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
 
-                byteArray.AddInt(VictimID);
-                return byteArray.ToArray();
+
+                m.Write(VictimID);
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                VictimID=reader.ReadInt32();
+
+                VictimID=m.ReadInt32();
 
                 #endregion
             }

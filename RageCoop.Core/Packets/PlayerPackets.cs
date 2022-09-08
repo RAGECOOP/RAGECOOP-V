@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using GTA.Math;
 using System.Net;
+using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -38,62 +39,55 @@ namespace RageCoop.Core
             public byte[] PasswordEncrypted { get; set; }
 
             public IPEndPoint InternalEndPoint { get; set; }
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
-
                 // Write Player Ped ID
-                byteArray.AddRange(BitConverter.GetBytes(PedID));
+                m.Write(PedID);
 
                 // Write Username
-                byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
-                byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
-                byteArray.AddRange(usernameBytes);
+                m.Write(Username);
 
                 // Write ModVersion
-                byte[] modVersionBytes = Encoding.UTF8.GetBytes(ModVersion);
-                byteArray.AddRange(BitConverter.GetBytes(modVersionBytes.Length));
-                byteArray.AddRange(modVersionBytes);
+                m.Write(ModVersion);
 
-                byteArray.AddString(InternalEndPoint.ToString());
+                m.Write(InternalEndPoint.ToString());
 
                 // Write AesKeyCrypted
-                byteArray.AddArray(AesKeyCrypted);
+                m.WriteByteArray(AesKeyCrypted);
 
                 // Write AesIVCrypted
-                byteArray.AddArray(AesIVCrypted);
+                m.WriteByteArray(AesIVCrypted);
 
 
                 // Write PassHash
-                byteArray.AddArray(PasswordEncrypted);
+                m.WriteByteArray(PasswordEncrypted);
 
-                return byteArray.ToArray();
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
+
 
                 // Read player netHandle
-                PedID = reader.ReadInt32();
+                PedID = m.ReadInt32();
 
                 // Read Username
-                Username = reader.ReadString();
+                Username = m.ReadString();
 
                 // Read ModVersion
-                ModVersion = reader.ReadString();
+                ModVersion = m.ReadString();
 
-                InternalEndPoint=CoreUtils.StringToEndPoint(reader.ReadString());
+                InternalEndPoint=CoreUtils.StringToEndPoint(m.ReadString());
 
-                AesKeyCrypted=reader.ReadByteArray();
+                AesKeyCrypted=m.ReadByteArray();
 
-                AesIVCrypted=reader.ReadByteArray();
+                AesIVCrypted=m.ReadByteArray();
 
 
-                PasswordEncrypted=reader.ReadByteArray();
+                PasswordEncrypted=m.ReadByteArray();
                 #endregion
             }
         }
@@ -101,27 +95,25 @@ namespace RageCoop.Core
         {
             public PlayerData[] Players { get; set; }
             public override PacketType Type => PacketType.HandshakeSuccess;
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-                var data = new List<byte>();
-                data.AddInt(Players.Length);
+                m.Write(Players.Length);
                 foreach(var p in Players)
                 {
-                    data.AddInt(p.ID);
-                    data.AddString(p.Username);
+                    m.Write(p.ID);
+                    m.Write(p.Username);
                 }
-                return data.ToArray();
             }
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                var reader = new BitReader(array);
-                Players=new PlayerData[reader.ReadInt32()];
+
+                Players=new PlayerData[m.ReadInt32()];
                 for(int i = 0; i<Players.Length; i++)
                 {
                     Players[i]=new PlayerData()
                     {
-                        ID=reader.ReadInt32(),
-                        Username=reader.ReadString(),
+                        ID=m.ReadInt32(),
+                        Username=m.ReadString(),
                     };
                 }
             }
@@ -133,36 +125,24 @@ namespace RageCoop.Core
 
             public string Username { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-
-                List<byte> byteArray = new List<byte>();
 
                 // Write NetHandle
-                byteArray.AddRange(BitConverter.GetBytes(PedID));
+                m.Write(PedID);
 
-                // Get Username bytes
-                byte[] usernameBytes = Encoding.UTF8.GetBytes(Username);
-
-                // Write UsernameLength
-                byteArray.AddRange(BitConverter.GetBytes(usernameBytes.Length));
-
-                // Write Username
-                byteArray.AddRange(usernameBytes);
-
-                return byteArray.ToArray();
+                m.Write(Username);
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
                 // Read player netHandle
-                PedID = reader.ReadInt32();
+                PedID = m.ReadInt32();
 
                 // Read Username
-                Username = reader.ReadString();
+                Username = m.ReadString();
                 #endregion
             }
         }
@@ -172,22 +152,18 @@ namespace RageCoop.Core
             public override PacketType Type  => PacketType.PlayerDisconnect;
             public int PedID { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+                m.Write(PedID);
 
-                byteArray.AddRange(BitConverter.GetBytes(PedID));
-
-                return byteArray.ToArray();
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                PedID = reader.ReadInt32();
+                PedID = m.ReadInt32();
                 #endregion
             }
         }
@@ -203,42 +179,38 @@ namespace RageCoop.Core
             public float Latency { get; set; }
             public Vector3 Position { get; set; }
             public bool IsHost;
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-
-                List<byte> byteArray = new List<byte>();
 
                 // Write ID
-                byteArray.AddRange(BitConverter.GetBytes(PedID));
+                m.Write(PedID);
 
                 // Write Username
-                byteArray.AddString(Username);
+                m.Write(Username);
 
                 // Write Latency
-                byteArray.AddFloat(Latency);
+                m.Write(Latency);
 
-                byteArray.AddVector3(Position);
+                m.Write(Position);
 
-                byteArray.AddBool(IsHost);
-
-                return byteArray.ToArray();
+                m.Write(IsHost);
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
+
 
                 // Read player ID
-                PedID = reader.ReadInt32();
+                PedID = m.ReadInt32();
 
                 // Read Username
-                Username = reader.ReadString();
+                Username = m.ReadString();
 
-                Latency=reader.ReadSingle();
+                Latency=m.ReadFloat();
 
-                Position=reader.ReadVector3();
+                Position=m.ReadVector3();
 
-                IsHost=reader.ReadBoolean();
+                IsHost=m.ReadBoolean();
             }
         }
 
@@ -249,24 +221,24 @@ namespace RageCoop.Core
             public byte[] Modulus;
             public byte[] Exponent;
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
-
-                byteArray.AddArray(Modulus);
-
-                byteArray.AddArray(Exponent);
 
 
-                return byteArray.ToArray();
+                m.WriteByteArray(Modulus);
+
+                m.WriteByteArray(Exponent);
+
+
+
             }
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                var reader=new BitReader(array);
-                Modulus=reader.ReadByteArray();
-                Exponent=reader.ReadByteArray();
+
+                Modulus=m.ReadByteArray();
+                Exponent=m.ReadByteArray();
 
                 #endregion
             }

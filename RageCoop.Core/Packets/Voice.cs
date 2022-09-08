@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -10,20 +11,19 @@ namespace RageCoop.Core
             public byte[] Buffer { get; set; }
             public int Recorded { get; set; }
             public override PacketType Type => PacketType.Voice;
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-                var data = new List<byte>();
-                data.AddInt(ID);
-                data.AddArray(Buffer);
-                data.AddInt(Recorded);
-                return data.ToArray();
+                m.Write(ID);
+                m.Write(Buffer);
+                m.Write(Recorded);
+
             }
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                var reader = new BitReader(array);
-                ID = reader.ReadInt32();
-                Buffer = reader.ReadByteArray();
-                Recorded = reader.ReadInt32();
+
+                ID = m.ReadInt32();
+                Buffer = m.ReadByteArray();
+                Recorded = m.ReadInt32();
             }
         }
     }

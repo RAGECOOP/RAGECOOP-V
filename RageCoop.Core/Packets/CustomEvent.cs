@@ -10,85 +10,78 @@ namespace RageCoop.Core
         internal class CustomEvent : Packet
         {
             public override PacketType Type  => (_queued ? PacketType.CustomEventQueued : PacketType.CustomEvent);
-            public CustomEvent(Func<byte,BitReader,object> onResolve = null,bool queued=false)
+            public CustomEvent(Func<byte,NetIncomingMessage,object> onResolve = null,bool queued=false)
             {
                 _resolve= onResolve;
                 _queued= queued;
             }
             private bool _queued;
-            private Func<byte, BitReader, object> _resolve { get; set; }
+            private Func<byte, NetIncomingMessage, object> _resolve { get; set; }
             public int Hash { get; set; }
             public object[] Args { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
                 Args= Args ?? new object[] { };
 
-                List<byte> result = new List<byte>();
-                result.AddInt(Hash);
-                result.AddInt(Args.Length);
-                (byte, byte[]) tup;
+                m.Write(Hash);
+                m.Write(Args.Length);
                 foreach (var arg in Args)
                 {
-                    tup=CoreUtils.GetBytesFromObject(arg);
-                    if (tup.Item1==0||tup.Item2==null)
-                    {
-                        throw new ArgumentException($"Object of type {arg.GetType()} is not supported");
-                    }
-                    result.Add(tup.Item1);
-                    result.AddRange(tup.Item2);
+                    CoreUtils.GetBytesFromObject(arg,m);
                 }
-                return result.ToArray();
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
 
-                Hash = reader.ReadInt32();
-                var len=reader.ReadInt32();
+
+                Hash = m.ReadInt32();
+                var len=m.ReadInt32();
                 Args=new object[len];
                 for (int i = 0; i < len; i++)
                 {
-                    byte type = reader.ReadByte();
+                    byte type = m.ReadByte();
                     switch (type)
                     {
                         case 0x01:
-                            Args[i]=reader.ReadByte(); break;
+                            Args[i]=m.ReadByte(); break;
                         case 0x02:
-                            Args[i]=reader.ReadInt32(); break;
+                            Args[i]=m.ReadInt32(); break;
                         case 0x03:
-                            Args[i]=reader.ReadUInt16(); break;
+                            Args[i]=m.ReadUInt16(); break;
                         case 0x04:
-                            Args[i]=reader.ReadInt32(); break;
+                            Args[i]=m.ReadInt32(); break;
                         case 0x05:
-                            Args[i]=reader.ReadUInt32(); break;
+                            Args[i]=m.ReadUInt32(); break;
                         case 0x06:
-                            Args[i]=reader.ReadInt64(); break;
+                            Args[i]=m.ReadInt64(); break;
                         case 0x07:
-                            Args[i]=reader.ReadUInt64(); break;
+                            Args[i]=m.ReadUInt64(); break;
                         case 0x08:
-                            Args[i]=reader.ReadSingle(); break;
+                            Args[i]=m.ReadFloat(); break;
                         case 0x09:
-                            Args[i]=reader.ReadBoolean(); break;
+                            Args[i]=m.ReadBoolean(); break;
                         case 0x10:
-                            Args[i]=reader.ReadString(); break;
+                            Args[i]=m.ReadString(); break;
                         case 0x11: 
-                            Args[i]=reader.ReadVector3(); break;
+                            Args[i]=m.ReadVector3(); break;
                         case 0x12:
-                            Args[i]=reader.ReadQuaternion(); break;
+                            Args[i]=m.ReadQuaternion(); break;
                         case 0x13:
-                            Args[i]=(GTA.Model)reader.ReadInt32(); break;
+                            Args[i]=(GTA.Model)m.ReadInt32(); break;
                         case 0x14:
-                            Args[i]=reader.ReadVector2(); break;
+                            Args[i]=m.ReadVector2(); break;
+                        case 0x15:
+                            Args[i] = m.ReadByteArray(); break;
                         default:
                             if (_resolve==null)
                             {
-                                throw new InvalidOperationException($"Unexpected type:{type}\r\n{array.Dump()}");
+                                throw new InvalidOperationException($"Unexpected type: {type}");
                             }
                             else
                             {
-                                Args[i]=_resolve(type, reader); break;
+                                Args[i]=_resolve(type, m); break;
                             }
                     }
                 }

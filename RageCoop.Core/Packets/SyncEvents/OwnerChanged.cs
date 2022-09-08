@@ -16,24 +16,19 @@ namespace RageCoop.Core
 
             public int NewOwnerID { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-
-                List<byte> byteArray = new List<byte>();
-
-                byteArray.AddInt(ID);
-                byteArray.AddInt(NewOwnerID);
-
-               return byteArray.ToArray();
+                m.Write(ID);
+                m.Write(NewOwnerID);
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                ID=reader.ReadInt32();
-                NewOwnerID=reader.ReadInt32();
+
+                ID=m.ReadInt32();
+                NewOwnerID=m.ReadInt32();
                 
                 #endregion
             }

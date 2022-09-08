@@ -58,198 +58,170 @@ namespace RageCoop.Core
             public string LicensePlate { get; set; }
             #endregion
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>(100);
 
-                byteArray.AddInt(ID);
-                byteArray.AddInt(OwnerID);
-                byteArray.AddUshort((ushort)Flags);
-                byteArray.AddVector3(Position);
-                byteArray.AddQuaternion(Quaternion);
-                byteArray.AddVector3(Velocity);
-                byteArray.AddVector3(RotationVelocity);
-                byteArray.AddFloat(ThrottlePower);
-                byteArray.AddFloat(BrakePower);
-                byteArray.AddFloat(SteeringAngle);
+                m.Write(ID);
+                m.Write(OwnerID);
+                m.Write((ushort)Flags);
+                m.Write(Position);
+                m.Write(Quaternion);
+                m.Write(Velocity);
+                m.Write(RotationVelocity);
+                m.Write(ThrottlePower);
+                m.Write(BrakePower);
+                m.Write(SteeringAngle);
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
-                    byteArray.AddFloat(DeluxoWingRatio);
+                    m.Write(DeluxoWingRatio);
                 }
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
-                    byteArray.AddInt(ModelHash);
-                    byteArray.AddFloat(EngineHealth);
+                    m.Write(ModelHash);
+                    m.Write(EngineHealth);
 
                     // Check
                     if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
                     {
                         // Write the vehicle landing gear
-                        byteArray.Add(LandingGear);
+                        m.Write(LandingGear);
                     }
                     if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
                     {
-                        byteArray.Add(RoofState);
+                        m.Write(RoofState);
                     }
 
                     // Write vehicle colors
-                    byteArray.Add(Colors[0]);
-                    byteArray.Add(Colors[1]);
+                    m.Write(Colors[0]);
+                    m.Write(Colors[1]);
 
                     // Write vehicle mods
                     // Write the count of mods
-                    byteArray.AddRange(BitConverter.GetBytes((short)Mods.Count));
+                    m.Write((short)Mods.Count);
                     // Loop the dictionary and add the values
                     foreach (KeyValuePair<int, int> mod in Mods)
                     {
                         // Write the mod value
-                        byteArray.AddRange(BitConverter.GetBytes(mod.Key));
-                        byteArray.AddRange(BitConverter.GetBytes(mod.Value));
+                        m.Write(mod.Key);
+                        m.Write(mod.Value);
                     }
 
                     if (!DamageModel.Equals(default(VehicleDamageModel)))
                     {
                         // Write boolean = true
-                        byteArray.Add(0x01);
+                        m.Write(true);
                         // Write vehicle damage model
-                        byteArray.Add(DamageModel.BrokenDoors);
-                        byteArray.Add(DamageModel.OpenedDoors);
-                        byteArray.Add(DamageModel.BrokenWindows);
-                        byteArray.AddRange(BitConverter.GetBytes(DamageModel.BurstedTires));
-                        byteArray.Add(DamageModel.LeftHeadLightBroken);
-                        byteArray.Add(DamageModel.RightHeadLightBroken);
+                        m.Write(DamageModel.BrokenDoors);
+                        m.Write(DamageModel.OpenedDoors);
+                        m.Write(DamageModel.BrokenWindows);
+                        m.Write(DamageModel.BurstedTires);
+                        m.Write(DamageModel.LeftHeadLightBroken);
+                        m.Write(DamageModel.RightHeadLightBroken);
                     }
                     else
                     {
                         // Write boolean = false
-                        byteArray.Add(0x00);
+                        m.Write(false);
                     }
 
                     // Write LockStatus
-                    byteArray.Add((byte)LockStatus);
+                    m.Write((byte)LockStatus);
 
                     // Write RadioStation
-                    byteArray.Add(RadioStation);
+                    m.Write(RadioStation);
 
                     //　Write LicensePlate
-                    while (LicensePlate.Length<8)
-                    {
-                        LicensePlate+=" ";
-                    }
-                    if (LicensePlate.Length>8)
-                    {
-                        LicensePlate=new string(LicensePlate.Take(8).ToArray());
-                    }
-                    byteArray.AddRange(Encoding.ASCII.GetBytes(LicensePlate));
+                    m.Write(LicensePlate);
 
-                    byteArray.Add((byte)(Livery+1));
+                    m.Write((byte)(Livery+1));
                 }
-                return byteArray.ToArray();
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                // Read vehicle id
-                ID = reader.ReadInt32();
-
-                OwnerID = reader.ReadInt32();
-
-                Flags=(VehicleDataFlags)reader.ReadUInt16();
-
-                // Read position
-                Position = reader.ReadVector3();
-
-                // Read quaternion
-                Quaternion=reader.ReadQuaternion();
-
-                // Read velocity
-                Velocity =reader.ReadVector3();
-
-                // Read rotation velocity
-                RotationVelocity=reader.ReadVector3();
-
-                // Read throttle power
-                ThrottlePower=reader.ReadSingle();
-
-                // Read brake power
-                BrakePower=reader.ReadSingle();
-
-                // Read steering angle
-                SteeringAngle = reader.ReadSingle();
+                ID = m.ReadInt32();
+                OwnerID = m.ReadInt32();
+                Flags=(VehicleDataFlags)m.ReadUInt16();
+                Position = m.ReadVector3();
+                Quaternion=m.ReadQuaternion();
+                Velocity =m.ReadVector3();
+                RotationVelocity=m.ReadVector3();
+                ThrottlePower=m.ReadFloat();
+                BrakePower=m.ReadFloat();
+                SteeringAngle = m.ReadFloat();
 
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
                 {
-                    DeluxoWingRatio = reader.ReadSingle();
+                    DeluxoWingRatio = m.ReadFloat();
                 }
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
                     // Read vehicle model hash
-                    ModelHash = reader.ReadInt32();
+                    ModelHash = m.ReadInt32();
 
                     // Read vehicle engine health
-                    EngineHealth = reader.ReadSingle();
+                    EngineHealth = m.ReadFloat();
 
 
                     // Check
                     if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
                     {
                         // Read vehicle landing gear
-                        LandingGear = reader.ReadByte();
+                        LandingGear = m.ReadByte();
                     }
                     if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
                     {
-                        RoofState=reader.ReadByte();
+                        RoofState=m.ReadByte();
                     }
 
                     // Read vehicle colors
-                    byte vehColor1 = reader.ReadByte();
-                    byte vehColor2 = reader.ReadByte();
+                    byte vehColor1 = m.ReadByte();
+                    byte vehColor2 = m.ReadByte();
                     Colors = new byte[] { vehColor1, vehColor2 };
 
                     // Read vehicle mods
                     // Create new Dictionary
                     Mods = new Dictionary<int, int>();
                     // Read count of mods
-                    short vehModCount = reader.ReadInt16();
+                    short vehModCount = m.ReadInt16();
                     // Loop
                     for (int i = 0; i < vehModCount; i++)
                     {
                         // Read the mod value
-                        Mods.Add(reader.ReadInt32(), reader.ReadInt32());
+                        Mods.Add(m.ReadInt32(), m.ReadInt32());
                     }
 
-                    if (reader.ReadBoolean())
+                    if (m.ReadBoolean())
                     {
                         // Read vehicle damage model
                         DamageModel = new VehicleDamageModel()
                         {
-                            BrokenDoors = reader.ReadByte(),
-                            OpenedDoors=reader.ReadByte(),
-                            BrokenWindows = reader.ReadByte(),
-                            BurstedTires = reader.ReadInt16(),
-                            LeftHeadLightBroken = reader.ReadByte(),
-                            RightHeadLightBroken = reader.ReadByte()
+                            BrokenDoors = m.ReadByte(),
+                            OpenedDoors=m.ReadByte(),
+                            BrokenWindows = m.ReadByte(),
+                            BurstedTires = m.ReadInt16(),
+                            LeftHeadLightBroken = m.ReadByte(),
+                            RightHeadLightBroken = m.ReadByte()
                         };
                     }
 
 
                     // Read LockStatus
-                    LockStatus=(VehicleLockStatus)reader.ReadByte();
+                    LockStatus=(VehicleLockStatus)m.ReadByte();
 
                     // Read RadioStation
-                    RadioStation=reader.ReadByte();
+                    RadioStation=m.ReadByte();
 
-                    LicensePlate=Encoding.ASCII.GetString(reader.ReadBytes(8));
+                    LicensePlate=m.ReadString();
 
-                    Livery=(int)(reader.ReadByte()-1);
+                    Livery=(int)(m.ReadByte()-1);
                 }
                 #endregion
             }

@@ -25,33 +25,31 @@ namespace RageCoop.Core
 
             public string Message { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+
 
 
 
                 // Write Username
-                byteArray.AddString(Username);
+                m.Write(Username);
 
 
                 // Write Message
-                byteArray.AddArray(crypt(Message));
-
-                return byteArray.ToArray();
+                m.WriteByteArray(crypt(Message));
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
+
 
                 // Read username
-                Username = reader.ReadString();
+                Username = m.ReadString();
 
-                Message = decrypt(reader.ReadByteArray()).GetString();
+                Message = decrypt(m.ReadByteArray()).GetString();
                 #endregion
             }
         }

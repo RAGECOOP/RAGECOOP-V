@@ -61,92 +61,92 @@ namespace RageCoop.Core
             public float BlipScale { get; set; } = 1;
 #endregion
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
                 
-                List<byte> byteArray = new List<byte>();
-                byteArray.AddInt(ID);
-                byteArray.AddInt(OwnerID);
-                byteArray.AddRange(BitConverter.GetBytes((ushort)Flags));
-                byteArray.AddRange(BitConverter.GetBytes(Health));
-                byteArray.Add(Speed);
+
+                m.Write(ID);
+                m.Write(OwnerID);
+                m.Write((ushort)Flags);
+                m.Write(Health);
+                m.Write(Speed);
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
-                    byteArray.AddVector3(HeadPosition);
-                    byteArray.AddVector3(RightFootPosition);
-                    byteArray.AddVector3(LeftFootPosition);
+                    m.Write(HeadPosition);
+                    m.Write(RightFootPosition);
+                    m.Write(LeftFootPosition);
 
                 }
                 else
                 {
                     if (Speed>=4)
                     {
-                        byteArray.AddInt(VehicleID);
-                        byteArray.Add((byte)(Seat+3));
+                        m.Write(VehicleID);
+                        m.Write((byte)(Seat+3));
                     }
-                    byteArray.AddVector3(Position);
+                    m.Write(Position);
                 }
-                byteArray.AddVector3(Rotation);
-                byteArray.AddVector3(Velocity);
+                m.Write(Rotation);
+                m.Write(Velocity);
 
 
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
-                    byteArray.AddVector3(AimCoords);
+                    m.Write(AimCoords);
                 }
 
-                byteArray.AddFloat(Heading);
+                m.Write(Heading);
 
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
-                    byteArray.AddInt(ModelHash);
-                    byteArray.AddUint(CurrentWeaponHash);
-                    byteArray.AddRange(Clothes);
+                    m.Write(ModelHash);
+                    m.Write(CurrentWeaponHash);
+                    m.Write(Clothes);
                     if (WeaponComponents != null)
                     {
-                        byteArray.Add(0x01);
-                        byteArray.AddRange(BitConverter.GetBytes((ushort)WeaponComponents.Count));
+                        m.Write(true);
+                        m.Write((ushort)WeaponComponents.Count);
                         foreach (KeyValuePair<uint, bool> component in WeaponComponents)
                         {
-                            byteArray.AddRange(BitConverter.GetBytes(component.Key));
-                            byteArray.AddRange(BitConverter.GetBytes(component.Value));
+                            m.Write(component.Key);
+                            m.Write(component.Value);
                         }
                     }
                     else
                     {
                         // Player weapon doesn't have any components
-                        byteArray.Add(0x00);
+                        m.Write(false);
                     }
 
-                    byteArray.Add(WeaponTint);
+                    m.Write(WeaponTint);
 
-                    byteArray.Add((byte)BlipColor);
+                    m.Write((byte)BlipColor);
                     if ((byte)BlipColor!=255)
                     {
-                        byteArray.AddUshort((ushort)BlipSprite);
-                        byteArray.AddFloat(BlipScale);
+                        m.Write((ushort)BlipSprite);
+                        m.Write(BlipScale);
                     }
                 }
 
-                return byteArray.ToArray();
+
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt32();
-                OwnerID=reader.ReadInt32();
-                Flags = (PedDataFlags)reader.ReadUInt16();
-                Health = reader.ReadInt32();
-                Speed = reader.ReadByte();
+
+                ID = m.ReadInt32();
+                OwnerID=m.ReadInt32();
+                Flags = (PedDataFlags)m.ReadUInt16();
+                Health = m.ReadInt32();
+                Speed = m.ReadByte();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
-                    HeadPosition=reader.ReadVector3();
-                    RightFootPosition=reader.ReadVector3();
-                    LeftFootPosition=reader.ReadVector3();
+                    HeadPosition=m.ReadVector3();
+                    RightFootPosition=m.ReadVector3();
+                    LeftFootPosition=m.ReadVector3();
                     Position=HeadPosition;
                 }
                 else
@@ -154,54 +154,54 @@ namespace RageCoop.Core
                     // Vehicle related
                     if (Speed>=4)
                     {
-                        VehicleID=reader.ReadInt32();
-                        Seat=(VehicleSeat)(reader.ReadByte()-3);
+                        VehicleID=m.ReadInt32();
+                        Seat=(VehicleSeat)(m.ReadByte()-3);
                     }
 
                     // Read player position
-                    Position = reader.ReadVector3();
+                    Position = m.ReadVector3();
                 }
 
-                Rotation = reader.ReadVector3();
-                Velocity = reader.ReadVector3();
+                Rotation = m.ReadVector3();
+                Velocity = m.ReadVector3();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
                 {
                     // Read player aim coords
-                    AimCoords = reader.ReadVector3();
+                    AimCoords = m.ReadVector3();
                 }
 
-                Heading=reader.ReadSingle();
+                Heading=m.ReadFloat();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
                     // Read player model hash
-                    ModelHash = reader.ReadInt32();
+                    ModelHash = m.ReadInt32();
 
                     // Read player weapon hash
-                    CurrentWeaponHash = reader.ReadUInt32();
+                    CurrentWeaponHash = m.ReadUInt32();
 
                     // Read player clothes
-                    Clothes =reader.ReadBytes(36);
+                    Clothes =m.ReadBytes(36);
 
                     // Read player weapon components
-                    if (reader.ReadBoolean())
+                    if (m.ReadBoolean())
                     {
                         WeaponComponents = new Dictionary<uint, bool>();
-                        ushort comCount = reader.ReadUInt16();
+                        ushort comCount = m.ReadUInt16();
                         for (ushort i = 0; i < comCount; i++)
                         {
-                            WeaponComponents.Add(reader.ReadUInt32(), reader.ReadBoolean());
+                            WeaponComponents.Add(m.ReadUInt32(), m.ReadBoolean());
                         }
                     }
-                    WeaponTint=reader.ReadByte();
+                    WeaponTint=m.ReadByte();
 
-                    BlipColor=(BlipColor)reader.ReadByte();
+                    BlipColor=(BlipColor)m.ReadByte();
 
                     if ((byte)BlipColor!=255)
                     {
-                        BlipSprite=(BlipSprite)reader.ReadUInt16();
-                        BlipScale=reader.ReadSingle();
+                        BlipSprite=(BlipSprite)m.ReadUInt16();
+                        BlipScale=m.ReadFloat();
                     }
                 }
                 #endregion
