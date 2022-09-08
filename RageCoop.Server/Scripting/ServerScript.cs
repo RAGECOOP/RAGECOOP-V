@@ -1,5 +1,5 @@
-﻿using System;
-using RageCoop.Core.Scripting;
+﻿using RageCoop.Core.Scripting;
+using System;
 
 namespace RageCoop.Server.Scripting
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -10,30 +7,30 @@ namespace RageCoop.Core
     {
         internal class NozzleTransform : Packet
         {
-            public override PacketType Type  => PacketType.NozzleTransform;
+            public override PacketType Type => PacketType.NozzleTransform;
             public int VehicleID { get; set; }
 
             public bool Hover { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
 
-                byteArray.AddInt(VehicleID);
-                byteArray.AddBool(Hover);
 
-                return byteArray.ToArray();
+                m.Write(VehicleID);
+                m.Write(Hover);
+
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
-                VehicleID=reader.ReadInt32();
-                Hover=reader.ReadBoolean();
-                
+
+                VehicleID = m.ReadInt32();
+                Hover = m.ReadBoolean();
+
                 #endregion
             }
         }

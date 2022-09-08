@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Threading;
 using System.Collections.Concurrent;
+using System.Threading;
 
 namespace RageCoop.Core
 {
     /// <summary>
     /// A worker that constantly execute jobs in a background thread.
     /// </summary>
-    public class Worker:IDisposable
+    public class Worker : IDisposable
     {
-        private SemaphoreSlim _semaphoreSlim;
-        private Thread _workerThread;
-        private bool _stopping=false;
+        private readonly SemaphoreSlim _semaphoreSlim;
+        private readonly Thread _workerThread;
+        private bool _stopping = false;
         /// <summary>
         /// Name of the worker
         /// </summary>
@@ -19,37 +19,37 @@ namespace RageCoop.Core
         /// <summary>
         /// Whether this worker is busy executing job(s).
         /// </summary>
-        public bool IsBusy { get;private set; }
-        internal Worker(string name,Logger logger,int maxJobs = Int32.MaxValue)
+        public bool IsBusy { get; private set; }
+        internal Worker(string name, Logger logger, int maxJobs = Int32.MaxValue)
         {
             Name = name;
-            _semaphoreSlim = new SemaphoreSlim(0,maxJobs);
-            _workerThread=new Thread(() =>
-            {
-                while (!_stopping)
-                {
-                    IsBusy=false;
-                    _semaphoreSlim.Wait();
-                    if(Jobs.TryDequeue(out var job))
-                    {
-                        IsBusy=true;
-                        try
-                        {
-                            job.Invoke();
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Error("Error occurred when executing queued job:");
-                            logger.Error(ex);
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Hmm... that's unexpected.");
-                    }
-                }
-                IsBusy=false;
-            });
+            _semaphoreSlim = new SemaphoreSlim(0, maxJobs);
+            _workerThread = new Thread(() =>
+              {
+                  while (!_stopping)
+                  {
+                      IsBusy = false;
+                      _semaphoreSlim.Wait();
+                      if (Jobs.TryDequeue(out var job))
+                      {
+                          IsBusy = true;
+                          try
+                          {
+                              job.Invoke();
+                          }
+                          catch (Exception ex)
+                          {
+                              logger.Error("Error occurred when executing queued job:");
+                              logger.Error(ex);
+                          }
+                      }
+                      else
+                      {
+                          throw new InvalidOperationException("Hmm... that's unexpected.");
+                      }
+                  }
+                  IsBusy = false;
+              });
             _workerThread.Start();
         }
         /// <summary>
@@ -66,7 +66,7 @@ namespace RageCoop.Core
         /// </summary>
         public void Stop()
         {
-            _stopping=true;
+            _stopping = true;
             QueueJob(() => { });
             if (_workerThread.IsAlive)
             {
@@ -81,6 +81,6 @@ namespace RageCoop.Core
             Stop();
             _semaphoreSlim.Dispose();
         }
-        private ConcurrentQueue<Action> Jobs=new ConcurrentQueue<Action>();
+        private readonly ConcurrentQueue<Action> Jobs = new ConcurrentQueue<Action>();
     }
 }

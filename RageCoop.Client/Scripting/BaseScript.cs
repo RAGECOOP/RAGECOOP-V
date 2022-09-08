@@ -127,8 +127,7 @@ namespace RageCoop.Client.Scripting
             var pos = (Vector3)obj.Args[4];
             int rot = (int)obj.Args[5];
             var name = (string)obj.Args[6];
-            Blip blip;
-            if (!EntityPool.ServerBlips.TryGetValue(id, out blip))
+            if (!EntityPool.ServerBlips.TryGetValue(id, out Blip blip))
             {
                 EntityPool.ServerBlips.Add(id, blip = World.CreateBlip(pos));
             }

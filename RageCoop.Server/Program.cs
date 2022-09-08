@@ -1,21 +1,19 @@
-﻿using System;
+﻿using RageCoop.Core;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
-using RageCoop.Core;
-using Newtonsoft.Json;
-using System.Linq;
 
 namespace RageCoop.Server
 {
-    class Program
+    internal class Program
     {
         private static bool Stopping = false;
-        static Logger mainLogger;
-        static void Main(string[] args)
+        private static Logger mainLogger;
+
+        private static void Main(string[] args)
         {
-            if (args.Length>=2 && args[0]=="update")
+            if (args.Length >= 2 && args[0] == "update")
             {
                 var target = args[1];
                 int i = 0;
@@ -23,13 +21,13 @@ namespace RageCoop.Server
                 {
                     try
                     {
-                        Console.WriteLine("Applying update to "+target);
+                        Console.WriteLine("Applying update to " + target);
 
                         CoreUtils.CopyFilesRecursively(new(AppDomain.CurrentDomain.BaseDirectory), new(target));
                         Process.Start(Path.Combine(target, "RageCoop.Server"));
                         Environment.Exit(0);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.ToString());
                         Thread.Sleep(3000);
@@ -37,22 +35,22 @@ namespace RageCoop.Server
                 }
                 Environment.Exit(i);
             }
-            AppDomain.CurrentDomain.UnhandledException+=UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             mainLogger = new Logger()
             {
-                LogPath="RageCoop.Server.log",
-                UseConsole=true,
-                Name="Server"
+                LogPath = "RageCoop.Server.log",
+                UseConsole = true,
+                Name = "Server"
             };
             try
             {
                 Console.Title = "RAGECOOP";
                 var setting = Util.Read<Settings>("Settings.xml");
 #if DEBUG
-                setting.LogLevel=0;
+                setting.LogLevel = 0;
 #endif
                 var server = new Server(setting, mainLogger);
-                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs e)
+                Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
                 {
                     mainLogger.Info("Initiating shutdown sequence...");
                     mainLogger.Info("Press Ctrl+C again to commence an emergency shutdown.");
@@ -81,9 +79,9 @@ namespace RageCoop.Server
                 mainLogger?.Flush();
                 while (true)
                 {
-                    
-                    var s=Console.ReadLine();
-                    if (!Stopping && s!=null)
+
+                    var s = Console.ReadLine();
+                    if (!Stopping && s != null)
                     {
                         server.ChatMessageReceived("Server", s, null);
                     }
@@ -98,11 +96,11 @@ namespace RageCoop.Server
 
         private static void UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            mainLogger.Error($"Unhandled exception thrown from user thread",e.ExceptionObject as Exception);
+            mainLogger.Error($"Unhandled exception thrown from user thread", e.ExceptionObject as Exception);
             mainLogger.Flush();
         }
 
-        static void Fatal(Exception e)
+        private static void Fatal(Exception e)
         {
             mainLogger.Error(e);
             mainLogger.Error($"Fatal error occurred, server shutting down.");

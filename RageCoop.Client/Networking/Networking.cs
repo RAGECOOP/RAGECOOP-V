@@ -17,8 +17,8 @@ namespace RageCoop.Client
         public static bool ShowNetworkInfo = false;
         public static Security Security;
         public static NetConnection ServerConnection;
-        private static readonly Dictionary<int, Action<PacketType, byte[]>> PendingResponses = new Dictionary<int, Action<PacketType, byte[]>>();
-        internal static readonly Dictionary<PacketType, Func<byte[], Packet>> RequestHandlers = new Dictionary<PacketType, Func<byte[], Packet>>();
+        private static readonly Dictionary<int, Action<PacketType, NetIncomingMessage>> PendingResponses = new Dictionary<int, Action<PacketType, NetIncomingMessage>>();
+        internal static readonly Dictionary<PacketType, Func<NetIncomingMessage, Packet>> RequestHandlers = new Dictionary<PacketType, Func<NetIncomingMessage, Packet>>();
         internal static float SimulatedLatency = 0;
         public static bool IsConnecting { get; private set; }
         public static IPEndPoint _targetServerEP;
@@ -89,6 +89,8 @@ namespace RageCoop.Client
                     try
                     {
                         _targetServerEP = CoreUtils.StringToEndPoint(address);
+
+                        // Ensure static constructor invocation
                         DownloadManager.Cleanup();
                         Peer = new CoopPeer(config);
                         Peer.OnMessageReceived += (s, m) =>

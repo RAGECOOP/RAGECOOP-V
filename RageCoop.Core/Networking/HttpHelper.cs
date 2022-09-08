@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Net;
 using System.Threading;
-using System.IO;
 
 namespace RageCoop.Core
 {
     internal static class HttpHelper
     {
-        public static void DownloadFile(string url,string destination,Action<int> progressCallback)
+        public static void DownloadFile(string url, string destination, Action<int> progressCallback)
         {
             if (File.Exists(destination)) { File.Delete(destination); }
-            AutoResetEvent ae=new AutoResetEvent(false);
+            AutoResetEvent ae = new AutoResetEvent(false);
             WebClient client = new WebClient();
 
             // TLS only

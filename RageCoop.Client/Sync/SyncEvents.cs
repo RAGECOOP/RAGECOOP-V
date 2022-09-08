@@ -159,44 +159,39 @@ namespace RageCoop.Client
                 WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash),
                 b.Position, b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
         }
-        public static void HandleEvent(PacketType type, byte[] data)
+        public static void HandleEvent(PacketType type, NetIncomingMessage msg)
         {
             switch (type)
             {
                 case PacketType.BulletShot:
                     {
                         Packets.BulletShot p = new Packets.BulletShot();
-                        p.Deserialize(data);
+                        p.Deserialize(msg);
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }
                 case PacketType.VehicleBulletShot:
                     {
-                        HandleVehicleBulletShot(data.GetPacket<Packets.VehicleBulletShot>());
+                        HandleVehicleBulletShot(msg.GetPacket<Packets.VehicleBulletShot>());
                         break;
                     }
                 case PacketType.OwnerChanged:
                     {
-                        Packets.OwnerChanged packet = new Packets.OwnerChanged();
-                        packet.Deserialize(data);
-                        HandleOwnerChanged(packet);
+                        HandleOwnerChanged(msg.GetPacket<Packets.OwnerChanged>());
                     }
                     break;
                 case PacketType.PedKilled:
                     {
-                        var packet = new Packets.PedKilled();
-                        packet.Deserialize(data);
-                        HandlePedKilled(packet);
+                        HandlePedKilled(msg.GetPacket<Packets.PedKilled>());
                     }
                     break;
                 case PacketType.NozzleTransform:
                     {
-                        var packet = new Packets.NozzleTransform();
-                        packet.Deserialize(data);
-                        HandleNozzleTransform(packet);
+                        HandleNozzleTransform(msg.GetPacket<Packets.NozzleTransform>());
                         break;
                     }
             }
+            Networking.Peer.Recycle(msg);
         }
 
         #endregion

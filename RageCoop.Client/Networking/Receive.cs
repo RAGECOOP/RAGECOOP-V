@@ -23,7 +23,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Used to reslove entity handle in a <see cref="Packets.CustomEvent"/>
         /// </summary>
-        private static readonly Func<byte, BitReader, object> _resolveHandle = (t, reader) =>
+        private static readonly Func<byte, NetIncomingMessage, object> _resolveHandle = (t, reader) =>
            {
                switch (t)
                {
@@ -40,10 +40,11 @@ namespace RageCoop.Client
                }
            };
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
+        private static bool _recycle;
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if (message == null) { return; }
-
+            _recycle = true;
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.StatusChanged:
@@ -66,7 +67,7 @@ namespace RageCoop.Client
                                     throw new Exception("Invalid handshake response!");
                                 }
                                 var p = new Packets.HandshakeSuccess();
-                                p.Deserialize(response.ReadBytes(response.ReadInt32()));
+                                p.Deserialize(response);
                                 foreach (var player in p.Players)
                                 {
                                     PlayerList.SetPlayer(player.ID, player.Username);
@@ -114,7 +115,7 @@ namespace RageCoop.Client
                                         int id = message.ReadInt32();
                                         if (PendingResponses.TryGetValue(id, out var callback))
                                         {
-                                            callback((PacketType)message.ReadByte(), message.ReadBytes(message.ReadInt32()));
+                                            callback((PacketType)message.ReadByte(), message);
                                             PendingResponses.Remove(id);
                                         }
                                         break;
@@ -123,23 +124,25 @@ namespace RageCoop.Client
                                     {
                                         int id = message.ReadInt32();
                                         var realType = (PacketType)message.ReadByte();
-                                        int len = message.ReadInt32();
                                         if (RequestHandlers.TryGetValue(realType, out var handler))
                                         {
                                             var response = Peer.CreateMessage();
                                             response.Write((byte)PacketType.Response);
                                             response.Write(id);
-                                            handler(message.ReadBytes(len)).Pack(response);
+                                            handler(message).Pack(response);
                                             Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
                                             Peer.FlushSendQueue();
+                                        }
+                                        else
+                                        {
+                                            Main.Logger.Debug("Did not find a request handler of type: " + realType);
                                         }
                                         break;
                                     }
                                 default:
                                     {
-                                        byte[] data = message.ReadBytes(message.ReadInt32());
 
-                                        HandlePacket(packetType, data, message.SenderConnection);
+                                        HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
                                         break;
                                     }
                             }
@@ -148,7 +151,7 @@ namespace RageCoop.Client
                         {
                             Main.QueueAction(() =>
                             {
-                                GTA.UI.Notification.Show("~r~~h~Packet Error");
+                                GTA.UI.Notification.Show($"~r~~h~Packet Error {ex.Message}");
                                 return true;
                             });
                             Main.Logger.Error($"[{packetType}] {ex.Message}");
@@ -160,20 +163,18 @@ namespace RageCoop.Client
                 case NetIncomingMessageType.UnconnectedData:
                     {
                         var packetType = (PacketType)message.ReadByte();
-                        int len = message.ReadInt32();
-                        byte[] data = message.ReadBytes(len);
                         switch (packetType)
                         {
 
                             case PacketType.HolePunch:
                                 {
-                                    HolePunch.Punched(data.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
+                                    HolePunch.Punched(message.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
                                     break;
                                 }
                             case PacketType.PublicKeyResponse:
                                 {
                                     if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) { break; }
-                                    var packet = data.GetPacket<Packets.PublicKeyResponse>();
+                                    var packet = message.GetPacket<Packets.PublicKeyResponse>();
                                     Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
                                     _publicKeyReceived.Set();
                                     break;
@@ -190,41 +191,42 @@ namespace RageCoop.Client
                 default:
                     break;
             }
-
-            Peer.Recycle(message);
+            if (_recycle)
+            {
+                Peer.Recycle(message);
+            }
         }
-        private static void HandlePacket(PacketType packetType, byte[] data, NetConnection senderConnection)
+        private static void HandlePacket(PacketType packetType, NetIncomingMessage msg, NetConnection senderConnection, ref bool recycle)
         {
-
             switch (packetType)
             {
                 case PacketType.HolePunchInit:
-                    HolePunch.Add(data.GetPacket<Packets.HolePunchInit>());
+                    HolePunch.Add(msg.GetPacket<Packets.HolePunchInit>());
                     break;
 
                 case PacketType.PlayerConnect:
-                    PlayerConnect(data.GetPacket<Packets.PlayerConnect>());
+                    PlayerConnect(msg.GetPacket<Packets.PlayerConnect>());
                     break;
 
                 case PacketType.PlayerDisconnect:
-                    PlayerDisconnect(data.GetPacket<Packets.PlayerDisconnect>());
+                    PlayerDisconnect(msg.GetPacket<Packets.PlayerDisconnect>());
                     break;
 
                 case PacketType.PlayerInfoUpdate:
-                    PlayerList.UpdatePlayer(data.GetPacket<Packets.PlayerInfoUpdate>());
+                    PlayerList.UpdatePlayer(msg.GetPacket<Packets.PlayerInfoUpdate>());
                     break;
 
                 case PacketType.VehicleSync:
-                    ReceivedPackets.VehicelPacket.Deserialize(data);
+                    ReceivedPackets.VehicelPacket.Deserialize(msg);
                     VehicleSync(ReceivedPackets.VehicelPacket);
                     break;
 
                 case PacketType.PedSync:
-                    ReceivedPackets.PedPacket.Deserialize(data);
+                    ReceivedPackets.PedPacket.Deserialize(msg);
                     PedSync(ReceivedPackets.PedPacket);
                     break;
                 case PacketType.ProjectileSync:
-                    ReceivedPackets.ProjectilePacket.Deserialize(data);
+                    ReceivedPackets.ProjectilePacket.Deserialize(msg);
                     ProjectileSync(ReceivedPackets.ProjectilePacket);
                     break;
 
@@ -232,7 +234,7 @@ namespace RageCoop.Client
                     {
 
                         Packets.ChatMessage packet = new Packets.ChatMessage((b) => Security.Decrypt(b));
-                        packet.Deserialize(data);
+                        packet.Deserialize(msg);
 
                         Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
                     }
@@ -243,7 +245,7 @@ namespace RageCoop.Client
                         if (Main.Settings.Voice)
                         {
                             Packets.Voice packet = new Packets.Voice();
-                            packet.Deserialize(data);
+                            packet.Deserialize(msg);
 
 
                             SyncedPed player = EntityPool.GetPedByID(packet.ID);
@@ -258,18 +260,20 @@ namespace RageCoop.Client
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
-                        packet.Deserialize(data);
+                        packet.Deserialize(msg);
                         Scripting.API.Events.InvokeCustomEventReceived(packet);
                     }
                     break;
 
                 case PacketType.CustomEventQueued:
                     {
+                        recycle = false;
                         Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
                         Main.QueueAction(() =>
                         {
-                            packet.Deserialize(data);
+                            packet.Deserialize(msg);
                             Scripting.API.Events.InvokeCustomEventReceived(packet);
+                            Peer.Recycle(msg);
                         });
                     }
                     break;
@@ -277,7 +281,7 @@ namespace RageCoop.Client
                 case PacketType.FileTransferChunk:
                     {
                         Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
-                        packet.Deserialize(data);
+                        packet.Deserialize(msg);
                         DownloadManager.Write(packet.ID, packet.FileChunk);
                     }
                     break;
@@ -285,8 +289,9 @@ namespace RageCoop.Client
                 default:
                     if (packetType.IsSyncEvent())
                     {
+                        recycle = false;
                         // Dispatch to script thread
-                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, data); return true; });
+                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
                     }
                     break;
             }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
+﻿using GTA.Math;
+using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -18,31 +16,31 @@ namespace RageCoop.Core
             public Vector3 StartPosition { get; set; }
             public Vector3 EndPosition { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
 
-                byteArray.AddInt(OwnerID);
-                byteArray.AddUshort(Bone);
-                byteArray.AddUint(WeaponHash);
-                byteArray.AddVector3(StartPosition);
-                byteArray.AddVector3(EndPosition);
 
-                return byteArray.ToArray();
+                m.Write(OwnerID);
+                m.Write(Bone);
+                m.Write(WeaponHash);
+                m.Write(StartPosition);
+                m.Write(EndPosition);
+
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
 
-                OwnerID=reader.ReadInt32();
-                Bone=reader.ReadUInt16();
-                WeaponHash=reader.ReadUInt32();
-                StartPosition=reader.ReadVector3();
-                EndPosition=reader.ReadVector3();
+
+                OwnerID = m.ReadInt32();
+                Bone = m.ReadUInt16();
+                WeaponHash = m.ReadUInt32();
+                StartPosition = m.ReadVector3();
+                EndPosition = m.ReadVector3();
                 #endregion
             }
         }

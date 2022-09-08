@@ -107,24 +107,9 @@ namespace RageCoop.Client
         private bool _lastDead;
         private void OnTick(object sender, EventArgs e)
         {
-            /*
-            unsafe
-            {
-                var stationName = Function.Call<string>(Hash.GET_RADIO_STATION_NAME, Game.RadioStation);
-
-                //_GET_CURRENT_RADIO_TRACK_NAME
-                var currentTrack = Function.Call<int>((Hash)0x34D66BC058019CE0, stationName);
-                Function.Call(Hash.SET_RADIO_TRACK, "RADIO_03_HIPHOP_NEW", "ARM1_RADIO_STARTS");
-                return currentTrack;
-
-                var h1 = Function.Call<int>(Hash._GET_CURRENT_RADIO_STATION_HASH);
-                return $"{h1},{h2},{s},{s1}";
-            }
-            */
             P = Game.Player.Character;
             PlayerPosition = P.ReadPosition();
             FPS = Game.FPS;
-            // World.DrawMarker(MarkerType.DebugSphere, PedExtensions.RaycastEverything(default), default, default, new Vector3(0.2f, 0.2f, 0.2f), Color.AliceBlue);
             if (Game.IsLoading)
             {
                 return;

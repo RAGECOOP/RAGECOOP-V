@@ -146,8 +146,7 @@ namespace RageCoop.Client.Scripting
 
                 // Main.Logger.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
 
-                List<Action<CustomEventReceivedArgs>> handlers;
-                if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
+                if (CustomEventHandlers.TryGetValue(p.Hash, out List<Action<CustomEventReceivedArgs>> handlers))
                 {
                     handlers.ForEach((x) => { x.Invoke(args); });
                 }

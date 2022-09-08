@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
+﻿using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -10,7 +7,7 @@ namespace RageCoop.Core
     {
         internal class ProjectileSync : Packet
         {
-            public override PacketType Type  => PacketType.ProjectileSync;
+            public override PacketType Type => PacketType.ProjectileSync;
             public int ID { get; set; }
 
             public int ShooterID { get; set; }
@@ -26,57 +23,57 @@ namespace RageCoop.Core
 
 
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+
 
                 // Write id
-                byteArray.AddInt(ID);
+                m.Write(ID);
 
                 // Write ShooterID
-                byteArray.AddInt(ShooterID);
+                m.Write(ShooterID);
 
-                byteArray.AddUint(WeaponHash);
+                m.Write(WeaponHash);
 
                 // Write position
-                byteArray.AddVector3(Position);
+                m.Write(Position);
 
 
                 // Write rotation
-                byteArray.AddVector3(Rotation);
+                m.Write(Rotation);
 
                 // Write velocity
-                byteArray.AddVector3(Velocity);
-                byteArray.Add((byte)Flags);
+                m.Write(Velocity);
+                m.Write((byte)Flags);
 
-                return byteArray.ToArray();
+
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
+
 
                 // Read id
-                ID = reader.ReadInt32();
+                ID = m.ReadInt32();
 
                 // Read ShooterID
-                ShooterID= reader.ReadInt32();
+                ShooterID = m.ReadInt32();
 
-                WeaponHash= reader.ReadUInt32();
+                WeaponHash = m.ReadUInt32();
 
                 // Read position
-                Position = reader.ReadVector3();
+                Position = m.ReadVector3();
 
                 // Read rotation
-                Rotation = reader.ReadVector3();
+                Rotation = m.ReadVector3();
 
                 // Read velocity
-                Velocity =reader.ReadVector3();
+                Velocity = m.ReadVector3();
 
-                Flags=(ProjectileDataFlags)reader.ReadByte();
+                Flags = (ProjectileDataFlags)m.ReadByte();
 
                 #endregion
             }

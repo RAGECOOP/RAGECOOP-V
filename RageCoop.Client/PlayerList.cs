@@ -63,8 +63,7 @@ namespace RageCoop.Client
         public static void SetPlayer(int id, string username, float latency = 0)
         {
             Main.Logger.Debug($"{id},{username},{latency}");
-            Player p;
-            if (Players.TryGetValue(id, out p))
+            if (Players.TryGetValue(id, out Player p))
             {
                 p.Username = username;
                 p.ID = id;
@@ -108,8 +107,7 @@ namespace RageCoop.Client
         }
         public static Player GetPlayer(int id)
         {
-            Player p;
-            Players.TryGetValue(id, out p);
+            Players.TryGetValue(id, out Player p);
             return p;
         }
         public static Player GetPlayer(SyncedPed p)

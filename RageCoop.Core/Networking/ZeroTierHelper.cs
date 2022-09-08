@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.IO;
-using System.Diagnostics;
-using System.Net;
-using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 
 namespace RageCoop.Core
@@ -15,13 +13,13 @@ namespace RageCoop.Core
         public ZeroTierNetwork(string line)
         {
             // <nwid> <name> <mac> <status> <type> <dev> <ZT assigned ips>
-            var v = Regex.Split(line," ").Skip(2).ToArray();
-            ID=v[0];
-            Name=v[1];
-            Mac=v[2];
-            Status=v[3];
-            Type=v[4];
-            Device=v[5];
+            var v = Regex.Split(line, " ").Skip(2).ToArray();
+            ID = v[0];
+            Name = v[1];
+            Mac = v[2];
+            Status = v[3];
+            Type = v[4];
+            Device = v[5];
             foreach (var i in v[6].Split(','))
             {
                 Addresses.Add(i.Split('/')[0]);
@@ -33,43 +31,43 @@ namespace RageCoop.Core
         public string Status;
         public string Type;
         public string Device;
-        public List<string> Addresses=new List<string>();
+        public List<string> Addresses = new List<string>();
 
     }
     internal static class ZeroTierHelper
     {
-        private static readonly string _path="zerotier-cli";
+        private static readonly string _path = "zerotier-cli";
         private static readonly string _arg = "";
         static ZeroTierHelper()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                var batpath= Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "ZeroTier", "One", "zerotier-cli.bat");
-                _arg=$"/c \"{batpath}\" ";
-                _path="cmd.exe";
+                var batpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "ZeroTier", "One", "zerotier-cli.bat");
+                _arg = $"/c \"{batpath}\" ";
+                _path = "cmd.exe";
             }
             var status = RunCommand("status");
             if (!status.StartsWith("200"))
             {
-                throw new Exception("ZeroTier not ready: "+status);
+                throw new Exception("ZeroTier not ready: " + status);
             }
         }
-        public static ZeroTierNetwork Join(string networkId, int timeout=10000)
+        public static ZeroTierNetwork Join(string networkId, int timeout = 10000)
         {
-            var p = Run("join "+networkId);
+            var p = Run("join " + networkId);
             var o = p.StandardOutput.ReadToEnd();
             if (!o.StartsWith("200 join OK"))
             {
-                throw new Exception(o+p.StandardError.ReadToEnd());
+                throw new Exception(o + p.StandardError.ReadToEnd());
             }
-            if (timeout==0) { return Networks[networkId]; }
+            if (timeout == 0) { return Networks[networkId]; }
             int i = 0;
-            while (i<=timeout)
+            while (i <= timeout)
             {
-                i+=100;
-                if(Networks.TryGetValue(networkId,out var n))
+                i += 100;
+                if (Networks.TryGetValue(networkId, out var n))
                 {
-                    if (n.Addresses.Count!=0 && (!n.Addresses.Where(x=>x=="-").Any()))
+                    if (n.Addresses.Count != 0 && (!n.Addresses.Where(x => x == "-").Any()))
                     {
                         return n;
                     }
@@ -84,16 +82,17 @@ namespace RageCoop.Core
         }
         public static void Leave(string networkId)
         {
-            var p = Run("leave "+networkId);
+            var p = Run("leave " + networkId);
             var o = p.StandardOutput.ReadToEnd();
             if (!o.StartsWith("200 leave OK"))
             {
-                throw new Exception(o+p.StandardError.ReadToEnd());
+                throw new Exception(o + p.StandardError.ReadToEnd());
             }
         }
         public static Dictionary<string, ZeroTierNetwork> Networks
         {
-            get {
+            get
+            {
                 Dictionary<string, ZeroTierNetwork> networks = new Dictionary<string, ZeroTierNetwork>();
                 var p = Run("listnetworks");
                 var lines = Regex.Split(p.StandardOutput.ReadToEnd(), "\n").Skip(1);
@@ -113,14 +112,14 @@ namespace RageCoop.Core
         private static Process Run(string args)
         {
             var p = new Process();
-            p.StartInfo=new ProcessStartInfo()
+            p.StartInfo = new ProcessStartInfo()
             {
                 FileName = _path,
-                Arguments =_arg+args,
+                Arguments = _arg + args,
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow=true,
+                CreateNoWindow = true,
             };
             p.Start();
             p.WaitForExit();
@@ -129,7 +128,7 @@ namespace RageCoop.Core
         private static string RunCommand(string command)
         {
             var p = Run(command);
-            return p.StandardOutput.ReadToEnd()+p.StandardError.ReadToEnd();
+            return p.StandardOutput.ReadToEnd() + p.StandardError.ReadToEnd();
         }
         public static void Check()
         {

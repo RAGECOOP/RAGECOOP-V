@@ -1,12 +1,7 @@
-﻿using System;
+﻿using RageCoop.Core;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using System.IO;
-using RageCoop.Core;
-using System.Runtime.Serialization;
+using System.Net;
 using System.Security.Cryptography;
 namespace RageCoop.Server
 {
@@ -15,10 +10,10 @@ namespace RageCoop.Server
         private readonly Logger Logger;
         public Security(Logger logger)
         {
-            Logger= logger;
+            Logger = logger;
         }
-        public RSA RSA=RSA.Create(2048);
-        private Dictionary<IPEndPoint, Aes> SecuredConnections = new Dictionary<IPEndPoint, Aes>();
+        public RSA RSA = RSA.Create(2048);
+        private readonly Dictionary<IPEndPoint, Aes> SecuredConnections = new Dictionary<IPEndPoint, Aes>();
 
         public bool HasSecuredConnection(IPEndPoint target)
         {
@@ -27,7 +22,7 @@ namespace RageCoop.Server
 
         public byte[] Encrypt(byte[] data, IPEndPoint target)
         {
-            var ms=new MemoryStream();
+            var ms = new MemoryStream();
             using (var cs = new CryptoStream(ms, SecuredConnections[target].CreateEncryptor(), CryptoStreamMode.Write))
             {
                 cs.Write(data, 0, data.Length);
@@ -39,7 +34,7 @@ namespace RageCoop.Server
             return new CryptoStream(new MemoryStream(data), SecuredConnections[target].CreateDecryptor(), CryptoStreamMode.Read).ReadToEnd();
         }
 
-        public void AddConnection(IPEndPoint endpoint, byte[] cryptedKey,byte[] cryptedIV)
+        public void AddConnection(IPEndPoint endpoint, byte[] cryptedKey, byte[] cryptedIV)
         {
             var key = RSA.Decrypt(cryptedKey, RSAEncryptionPadding.Pkcs1);
             var iv = RSA.Decrypt(cryptedIV, RSAEncryptionPadding.Pkcs1);
@@ -49,7 +44,7 @@ namespace RageCoop.Server
             conAes.IV = iv;
             if (!SecuredConnections.ContainsKey(endpoint))
             {
-                SecuredConnections.Add(endpoint,conAes);
+                SecuredConnections.Add(endpoint, conAes);
             }
             else
             {
@@ -73,6 +68,6 @@ namespace RageCoop.Server
         {
             SecuredConnections.Clear();
         }
-        
+
     }
 }

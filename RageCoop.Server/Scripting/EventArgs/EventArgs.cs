@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 
 namespace RageCoop.Server.Scripting
@@ -97,10 +94,10 @@ namespace RageCoop.Server.Scripting
         /// <param name="reason"></param>
         public void Deny(string reason)
         {
-            DenyReason=reason;
-            Cancel=true;
+            DenyReason = reason;
+            Cancel = true;
         }
         internal string DenyReason { get; set; }
-        internal bool Cancel { get; set; }=false;
+        internal bool Cancel { get; set; } = false;
     }
 }

@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace RageCoop.Server.Scripting
 {
@@ -54,14 +53,14 @@ namespace RageCoop.Server.Scripting
         public event EventHandler<Client> OnPlayerUpdate;
         internal void ClearHandlers()
         {
-            OnChatMessage=null;
-            OnPlayerHandshake=null;
-            OnPlayerConnected=null;
-            OnPlayerReady=null;
-            OnPlayerDisconnected=null;
+            OnChatMessage = null;
+            OnPlayerHandshake = null;
+            OnPlayerConnected = null;
+            OnPlayerReady = null;
+            OnPlayerDisconnected = null;
             // OnCustomEventReceived=null;
-            OnCommandReceived=null;
-            OnPlayerUpdate=null;
+            OnCommandReceived = null;
+            OnPlayerUpdate = null;
         }
         #region INVOKE
         internal void InvokePlayerHandshake(HandshakeEventArgs args)
@@ -70,9 +69,9 @@ namespace RageCoop.Server.Scripting
         {
             var args = new OnCommandEventArgs()
             {
-                Name=cmdName,
-                Args=cmdArgs,
-                Client=sender
+                Name = cmdName,
+                Args = cmdArgs,
+                Client = sender
             };
             OnCommandReceived?.Invoke(this, args);
             if (args.Cancel)
@@ -99,27 +98,26 @@ namespace RageCoop.Server.Scripting
             }
         }
 
-        internal void InvokeOnChatMessage(string msg, Client sender, string clamiedSender=null)
+        internal void InvokeOnChatMessage(string msg, Client sender, string clamiedSender = null)
         {
             OnChatMessage?.Invoke(this, new ChatEventArgs()
             {
-                Client=sender,
-                Message=msg,
-                ClaimedSender=clamiedSender
+                Client = sender,
+                Message = msg,
+                ClaimedSender = clamiedSender
             });
         }
         internal void InvokePlayerConnected(Client client)
-        { OnPlayerConnected?.Invoke(this,client); }
+        { OnPlayerConnected?.Invoke(this, client); }
         internal void InvokePlayerReady(Client client)
         { OnPlayerReady?.Invoke(this, client); }
         internal void InvokePlayerDisconnected(Client client)
-        { OnPlayerDisconnected?.Invoke(this,client); }
+        { OnPlayerDisconnected?.Invoke(this, client); }
 
         internal void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
         {
-            var args = new CustomEventReceivedArgs() { Hash=p.Hash, Args=p.Args, Client=sender };
-            List<Action<CustomEventReceivedArgs>> handlers;
-            if (CustomEventHandlers.TryGetValue(p.Hash, out handlers))
+            var args = new CustomEventReceivedArgs() { Hash = p.Hash, Args = p.Args, Client = sender };
+            if (CustomEventHandlers.TryGetValue(p.Hash, out List<Action<CustomEventReceivedArgs>> handlers))
             {
                 handlers.ForEach((x) => { x.Invoke(args); });
             }
@@ -136,32 +134,32 @@ namespace RageCoop.Server.Scripting
     public class API
     {
         internal readonly Server Server;
-        internal readonly Dictionary<string, Func<Stream>> RegisteredFiles=new Dictionary<string, Func<System.IO.Stream>>();
+        internal readonly Dictionary<string, Func<Stream>> RegisteredFiles = new Dictionary<string, Func<System.IO.Stream>>();
         internal API(Server server)
         {
-            Server=server;
-            Events=new(server);
-            Server.RequestHandlers.Add(PacketType.FileTransferRequest, (data,client) =>
+            Server = server;
+            Events = new(server);
+            Server.RequestHandlers.Add(PacketType.FileTransferRequest, (data, client) =>
             {
                 var p = new Packets.FileTransferRequest();
                 p.Deserialize(data);
-                var id=Server.NewFileID();
-                if(RegisteredFiles.TryGetValue(p.Name,out var s))
+                var id = Server.NewFileID();
+                if (RegisteredFiles.TryGetValue(p.Name, out var s))
                 {
                     Task.Run(() =>
                     {
-                        Server.SendFile(s(), p.Name, client,id);
+                        Server.SendFile(s(), p.Name, client, id);
                     });
                     return new Packets.FileTransferResponse()
                     {
-                        ID=id,
-                        Response=FileResponse.Loaded
+                        ID = id,
+                        Response = FileResponse.Loaded
                     };
                 }
                 return new Packets.FileTransferResponse()
                 {
-                    ID=id,
-                    Response=FileResponse.LoadFailed
+                    ID = id,
+                    Response = FileResponse.LoadFailed
                 };
             });
         }
@@ -204,9 +202,9 @@ namespace RageCoop.Server.Scripting
         /// <param name="username">The username which send this message (default = "Server")</param>
         /// <param name="raiseEvent">Weather to raise the <see cref="ServerEvents.OnChatMessage"/> event defined in <see cref="API.Events"/></param>
         /// <remarks>When <paramref name="raiseEvent"/> is unspecified and <paramref name="targets"/> is null or unspecified, <paramref name="raiseEvent"/> will be set to true</remarks>
-        public void SendChatMessage(string message, List<Client> targets = null, string username = "Server",bool? raiseEvent=null)
+        public void SendChatMessage(string message, List<Client> targets = null, string username = "Server", bool? raiseEvent = null)
         {
-            raiseEvent ??= targets==null;
+            raiseEvent ??= targets == null;
             try
             {
                 if (Server.MainNetServer.ConnectionsCount != 0)
@@ -233,7 +231,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="name">name of this file</param>
         /// <param name="path">path to this file</param>
-        public void RegisterSharedFile(string name,string path)
+        public void RegisterSharedFile(string name, string path)
         {
             RegisteredFiles.Add(name, () => { return File.OpenRead(path); });
         }
@@ -300,7 +298,7 @@ namespace RageCoop.Server.Scripting
         /// <param name="hash"></param>
         /// <param name="args"></param>
         /// /// <param name="clients">Clients to send, null for all clients</param>
-        public void SendNativeCall(List<Client> clients , GTA.Native.Hash hash, params object[] args)
+        public void SendNativeCall(List<Client> clients, GTA.Native.Hash hash, params object[] args)
         {
             var argsList = new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
@@ -314,14 +312,14 @@ namespace RageCoop.Server.Scripting
         /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
         /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
-        public void SendCustomEvent(List<Client> targets, int eventHash,  params object[] args)
+        public void SendCustomEvent(List<Client> targets, int eventHash, params object[] args)
         {
 
             targets ??= new(Server.ClientsByNetHandle.Values);
             var p = new Packets.CustomEvent()
             {
-                Args=args,
-                Hash=eventHash
+                Args = args,
+                Hash = eventHash
             };
             foreach (var c in targets)
             {
@@ -339,10 +337,10 @@ namespace RageCoop.Server.Scripting
         {
 
             targets ??= new(Server.ClientsByNetHandle.Values);
-            var p = new Packets.CustomEvent(null,true)
+            var p = new Packets.CustomEvent(null, true)
             {
-                Args=args,
-                Hash=eventHash
+                Args = args,
+                Hash = eventHash
             };
             foreach (var c in targets)
             {
@@ -354,12 +352,11 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="CustomEvents.Hash(string)"/></param>
         /// <param name="handler">An handler to be invoked when the event is received from the server.</param>
-        public void RegisterCustomEventHandler(int hash,Action<CustomEventReceivedArgs> handler)
+        public void RegisterCustomEventHandler(int hash, Action<CustomEventReceivedArgs> handler)
         {
-            List<Action<CustomEventReceivedArgs>> handlers;
             lock (Events.CustomEventHandlers)
             {
-                if (!Events.CustomEventHandlers.TryGetValue(hash,out handlers))
+                if (!Events.CustomEventHandlers.TryGetValue(hash, out List<Action<CustomEventReceivedArgs>> handlers))
                 {
                     Events.CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
                 }
@@ -385,11 +382,11 @@ namespace RageCoop.Server.Scripting
         /// <returns>A <see langword="dynamic"/> object reprensenting the script, or <see langword="null"/> if not found.</returns>
         /// <remarks>Explicitly casting the return value to orginal type will case a exception to be thrown due to the dependency isolation mechanism in resource system. 
         /// You shouldn't reference the target resource assemblies either, since it causes the referenced assembly to be loaded and started in your resource.</remarks>
-        public dynamic FindScript(string scriptFullName,string resourceName=null)
+        public dynamic FindScript(string scriptFullName, string resourceName = null)
         {
-            if (resourceName==null)
+            if (resourceName == null)
             {
-                foreach(var res in LoadedResources.Values)
+                foreach (var res in LoadedResources.Values)
                 {
                     if (res.Scripts.TryGetValue(scriptFullName, out var script))
                     {
@@ -399,10 +396,10 @@ namespace RageCoop.Server.Scripting
             }
             else if (LoadedResources.TryGetValue(resourceName, out var res))
             {
-                if(res.Scripts.TryGetValue(scriptFullName, out var script))
+                if (res.Scripts.TryGetValue(scriptFullName, out var script))
                 {
                     return script;
-                }    
+                }
             }
             return null;
         }
@@ -424,13 +421,14 @@ namespace RageCoop.Server.Scripting
         public Client Host
         {
             get => Server._hostClient;
-            set { 
-                if (Server._hostClient != value) 
+            set
+            {
+                if (Server._hostClient != value)
                 {
                     Server._hostClient?.SendCustomEvent(CustomEvents.IsHost, false);
                     value.SendCustomEvent(CustomEvents.IsHost, true);
-                    Server._hostClient = value; 
-                } 
+                    Server._hostClient = value;
+                }
             }
         }
 
@@ -440,7 +438,7 @@ namespace RageCoop.Server.Scripting
         /// <remarks>Accessing this property from script constructor is stronly discouraged since other scripts and resources might have yet been loaded.
         /// Accessing from <see cref="ServerScript.OnStart"/> is not recommended either. Although all script assemblies will have been loaded to memory and instantiated, <see cref="ServerScript.OnStart"/> invocation of other scripts are not guaranteed.
         /// </remarks>
-        public Dictionary<string,ServerResource> LoadedResources
+        public Dictionary<string, ServerResource> LoadedResources
         {
             get
             {

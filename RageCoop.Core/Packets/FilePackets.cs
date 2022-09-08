@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    internal enum FileResponse:byte
+    internal enum FileResponse : byte
     {
-        NeedToDownload=0,
-        AlreadyExists=1,
-        Completed=2,
-        Loaded=3,
-        LoadFailed=4,
+        NeedToDownload = 0,
+        AlreadyExists = 1,
+        Completed = 2,
+        Loaded = 3,
+        LoadFailed = 4,
     }
     internal partial class Packets
     {
@@ -25,34 +22,30 @@ namespace RageCoop.Core
 
             public long FileLength { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+
 
                 // The ID from the download
-                byteArray.AddInt(ID);
+                m.Write(ID);
 
 
                 // The name of the file
-                byte[] nameBytes = Encoding.UTF8.GetBytes(Name);
-                byteArray.AddRange(BitConverter.GetBytes(nameBytes.Length));
-                byteArray.AddRange(nameBytes);
+                m.Write(Name);
 
                 // The length of the file
-                byteArray.AddRange(BitConverter.GetBytes(FileLength));
-
-                return byteArray.ToArray();
+                m.Write(FileLength);
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt32();
-                Name = reader.ReadString();
-                FileLength = reader.ReadInt64();
+
+                ID = m.ReadInt32();
+                Name = m.ReadString();
+                FileLength = m.ReadInt64();
             }
         }
 
@@ -61,86 +54,74 @@ namespace RageCoop.Core
             public override PacketType Type => PacketType.FileTransferResponse;
             public int ID { get; set; }
             public FileResponse Response { get; set; }
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-
-                List<byte> byteArray = new List<byte>();
 
                 // The ID from the download
-                byteArray.AddInt(ID);
+                m.Write(ID);
 
-                byteArray.Add((byte)Response);
+                m.Write((byte)Response);
 
-                return byteArray.ToArray();
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt32();
-                Response = (FileResponse)reader.ReadByte();
+                ID = m.ReadInt32();
+                Response = (FileResponse)m.ReadByte();
             }
         }
 
         internal class FileTransferChunk : Packet
         {
-            public override PacketType Type  => PacketType.FileTransferChunk;
+            public override PacketType Type => PacketType.FileTransferChunk;
             public int ID { get; set; }
 
             public byte[] FileChunk { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-                List<byte> byteArray = new List<byte>();
+
 
                 // The ID from the download
-                byteArray.AddInt(ID);
-
-                // The chunk of the file
-                byteArray.AddInt(FileChunk.Length);
-                byteArray.AddRange(FileChunk);
-
-                return byteArray.ToArray();
+                m.Write(ID);
+                m.WriteByteArray(FileChunk);
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt32();
-                FileChunk = reader.ReadByteArray();
+                ID = m.ReadInt32();
+                FileChunk = m.ReadByteArray();
             }
         }
 
         internal class FileTransferComplete : Packet
         {
-            public override PacketType Type  => PacketType.FileTransferComplete;
+            public override PacketType Type => PacketType.FileTransferComplete;
             public int ID { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
-                List<byte> byteArray = new List<byte>();
+
 
                 // The ID for the download
-                byteArray.AddInt(ID);
-
-                return byteArray.ToArray();
+                m.Write(ID);
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
-                BitReader reader = new BitReader(array);
 
-                ID = reader.ReadInt32();
+
+                ID = m.ReadInt32();
             }
         }
         internal class AllResourcesSent : Packet
         {
 
-            public override PacketType Type  => PacketType.AllResourcesSent;
+            public override PacketType Type => PacketType.AllResourcesSent;
         }
     }
 }

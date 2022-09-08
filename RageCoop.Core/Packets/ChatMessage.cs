@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Lidgren.Network;
+﻿using Lidgren.Network;
+using System;
 
 namespace RageCoop.Core
 {
@@ -10,9 +9,9 @@ namespace RageCoop.Core
 
         internal class ChatMessage : Packet
         {
-            public override PacketType Type  => PacketType.ChatMessage;
-            private Func<string, byte[]> crypt;
-            private Func<byte[], byte[]> decrypt;
+            public override PacketType Type => PacketType.ChatMessage;
+            private readonly Func<string, byte[]> crypt;
+            private readonly Func<byte[], byte[]> decrypt;
             public ChatMessage(Func<string, byte[]> crypter)
             {
                 crypt = crypter;
@@ -25,33 +24,31 @@ namespace RageCoop.Core
 
             public string Message { get; set; }
 
-            public override byte[] Serialize()
+            protected override void Serialize(NetOutgoingMessage m)
             {
 
-                List<byte> byteArray = new List<byte>();
+
 
 
 
                 // Write Username
-                byteArray.AddString(Username);
+                m.Write(Username);
 
 
                 // Write Message
-                byteArray.AddArray(crypt(Message));
-
-                return byteArray.ToArray();
+                m.WriteByteArray(crypt(Message));
 
             }
 
-            public override void Deserialize(byte[] array)
+            public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-                BitReader reader = new BitReader(array);
+
 
                 // Read username
-                Username = reader.ReadString();
+                Username = m.ReadString();
 
-                Message = decrypt(reader.ReadByteArray()).GetString();
+                Message = decrypt(m.ReadByteArray()).GetString();
                 #endregion
             }
         }

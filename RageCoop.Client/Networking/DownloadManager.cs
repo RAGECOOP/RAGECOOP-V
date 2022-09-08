@@ -122,8 +122,7 @@ namespace RageCoop.Client
         {
             lock (InProgressDownloads)
             {
-                DownloadFile file;
-                if (InProgressDownloads.TryGetValue(id, out file))
+                if (InProgressDownloads.TryGetValue(id, out DownloadFile file))
                 {
 
                     file.Stream.Write(chunk, 0, chunk.Length);
@@ -137,9 +136,8 @@ namespace RageCoop.Client
 
         public static void Complete(int id)
         {
-            DownloadFile f;
 
-            if (InProgressDownloads.TryGetValue(id, out f))
+            if (InProgressDownloads.TryGetValue(id, out DownloadFile f))
             {
                 InProgressDownloads.Remove(id);
                 f.Dispose();
