@@ -42,6 +42,7 @@ namespace RageCoop.Server
             }
         }
         private IpInfo IpInfo = null;
+        private bool CanAnnounce = false;
         private void Announce()
         {
             HttpResponseMessage response = null;
@@ -78,7 +79,19 @@ namespace RageCoop.Server
                     Logger?.Error($"MasterServer: {ex.Message}");
                 }
             }
-
+            if (!CanAnnounce)
+            {
+                var existing = JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer))).Where(x => x.address == IpInfo.Address).FirstOrDefault();
+                if(existing != null)
+                {
+                    Logger.Warning("Server info already present in master server, waiting for 10 seconds...");
+                    return;
+                }
+                else
+                {
+                    CanAnnounce = true;
+                }
+            }
             try
             {
                 Security.GetPublicKey(out var pModulus, out var pExpoenet);
