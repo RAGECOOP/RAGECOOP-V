@@ -235,6 +235,7 @@ namespace RageCoop.Client
                 foreach (var l in lines)
                 {
                     var ss = l.Split('=');
+                    ss.ForEach(s => s.Replace(" ", ""));
                     if (ss.Length > 0 && ss[0] == "ReloadKey")
                     {
                         reloadKey = ss[1];
