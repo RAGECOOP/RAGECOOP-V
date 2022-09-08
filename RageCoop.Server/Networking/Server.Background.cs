@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using ICSharpCode.SharpZipLib.Zip;
 using Lidgren.Network;
+using Newtonsoft.Json;
 using RageCoop.Core;
+using RageCoop.Server.Scripting;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Newtonsoft.Json;
-using RageCoop.Core.Scripting;
-using RageCoop.Server.Scripting;
-using System.Threading;
 using System.Runtime.InteropServices;
-using System.IO;
-using ICSharpCode.SharpZipLib.Zip;
-using System.Diagnostics;
+using System.Text;
+using System.Threading;
 
 namespace RageCoop.Server
 {
     public partial class Server
     {
-        const string _versionURL = "https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/main/RageCoop.Server/Properties/AssemblyInfo.cs";
+        private const string _versionURL = "https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/main/RageCoop.Server/Properties/AssemblyInfo.cs";
         private void SendPlayerUpdate()
         {
             foreach (var c in ClientsByNetHandle.Values.ToArray())
@@ -142,11 +140,11 @@ namespace RageCoop.Server
                 var end = versionLine.LastIndexOf('\"');
                 var latest = Version.Parse(versionLine.AsSpan(start, end - start));
                 if (latest <= Version) { return; }
-                
+
                 // wait ten minutes for the build to complete
                 API.SendChatMessage($"New server version found: {latest}, server will update in 10 minutes");
                 Thread.Sleep(10 * 60 * 1000);
-                
+
                 API.SendChatMessage("downloading update...");
                 var downloadURL = $"https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Server-{CoreUtils.GetInvariantRID()}.zip";
                 if (Directory.Exists("Update")) { Directory.Delete("Update", true); }
@@ -157,18 +155,18 @@ namespace RageCoop.Server
                 MainNetServer.Shutdown("Server updating");
                 Logger.Info("Server shutting down!");
                 Logger.Flush();
-                Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe": "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory[0..^1] + "\"");
+                Process.Start(Path.Combine("Update", RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "RageCoop.Server.exe" : "RageCoop.Server"), "update \"" + AppDomain.CurrentDomain.BaseDirectory[0..^1] + "\"");
                 Environment.Exit(0);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Logger?.Error("Update",ex);
+                Logger?.Error("Update", ex);
             }
         }
 
         private void KickAssholes()
         {
-            foreach(var c in ClientsByNetHandle.Values.ToArray())
+            foreach (var c in ClientsByNetHandle.Values.ToArray())
             {
                 if (c.EntitiesCount > Settings.SpamLimit && Settings.KickSpamming)
                 {

@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Lidgren.Network;
 using System.Collections.Generic;
-using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -15,7 +14,7 @@ namespace RageCoop.Core
             public override PacketType Type => PacketType.ConnectionRequest;
             protected override void Serialize(NetOutgoingMessage m)
             {
-                var data=new List<byte>(10);
+                var data = new List<byte>(10);
                 m.Write(TargetID);
             }
             public override void Deserialize(NetIncomingMessage m)

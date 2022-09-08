@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -11,7 +8,7 @@ namespace RageCoop.Core
 
         internal class PedKilled : Packet
         {
-            public override PacketType Type  => PacketType.PedKilled;
+            public override PacketType Type => PacketType.PedKilled;
             public int VictimID { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
@@ -29,7 +26,7 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
 
 
-                VictimID=m.ReadInt32();
+                VictimID = m.ReadInt32();
 
                 #endregion
             }

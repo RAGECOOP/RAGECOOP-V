@@ -1,31 +1,30 @@
-﻿using System;
+﻿using Lidgren.Network;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using Lidgren.Network;
 using System.Threading;
 
 namespace RageCoop.Core
 {
-    internal class CoopPeer : NetPeer, IDisposable 
+    internal class CoopPeer : NetPeer, IDisposable
     {
         public EventHandler<NetIncomingMessage> OnMessageReceived;
         private readonly Thread ListenerThread;
-        private bool _stopping=false;
-        public CoopPeer(NetPeerConfiguration config):base(config)
+        private bool _stopping = false;
+        public CoopPeer(NetPeerConfiguration config) : base(config)
         {
             Start();
             NetIncomingMessage msg;
-            ListenerThread=new Thread(() =>
-            {
-                while (!_stopping)
-                {
-                    msg=WaitMessage(200);
-                    if (msg!=null)
-                    {
-                        OnMessageReceived?.Invoke(this,msg);
-                    }
-                }
-            });
+            ListenerThread = new Thread(() =>
+              {
+                  while (!_stopping)
+                  {
+                      msg = WaitMessage(200);
+                      if (msg != null)
+                      {
+                          OnMessageReceived?.Invoke(this, msg);
+                      }
+                  }
+              });
             ListenerThread.Start();
         }
 
@@ -34,7 +33,7 @@ namespace RageCoop.Core
         /// </summary>
         public void Dispose()
         {
-            _stopping=true;
+            _stopping = true;
             Shutdown("Bye!");
             ListenerThread.Join();
         }
@@ -51,7 +50,7 @@ namespace RageCoop.Core
             p.Pack(outgoingMessage);
             SendMessage(outgoingMessage, connections, method, (int)channel);
         }
-        public void Send(Packet p,IList<NetConnection> cons, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
+        public void Send(Packet p, IList<NetConnection> cons, ConnectionChannel channel = ConnectionChannel.Default, NetDeliveryMethod method = NetDeliveryMethod.UnreliableSequenced)
         {
             NetOutgoingMessage outgoingMessage = CreateMessage();
             p.Pack(outgoingMessage);

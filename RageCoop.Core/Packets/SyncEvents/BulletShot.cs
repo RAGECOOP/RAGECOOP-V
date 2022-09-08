@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
+﻿using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -11,7 +8,7 @@ namespace RageCoop.Core
 
         internal class BulletShot : Packet
         {
-            public override PacketType Type  => PacketType.BulletShot;
+            public override PacketType Type => PacketType.BulletShot;
             public int OwnerID { get; set; }
 
             public uint WeaponHash { get; set; }
@@ -47,16 +44,16 @@ namespace RageCoop.Core
 
 
                 // Read OwnerID
-                OwnerID=m.ReadInt32();
+                OwnerID = m.ReadInt32();
 
                 // Read WeponHash
-                WeaponHash=m.ReadUInt32();
+                WeaponHash = m.ReadUInt32();
 
                 // Read StartPosition
-                StartPosition=m.ReadVector3();
+                StartPosition = m.ReadVector3();
 
                 // Read EndPosition
-                EndPosition=m.ReadVector3();
+                EndPosition = m.ReadVector3();
                 #endregion
             }
         }

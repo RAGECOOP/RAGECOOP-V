@@ -1,17 +1,14 @@
-﻿using System;
+﻿using RageCoop.Core.Scripting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RageCoop.Core.Scripting;
-using RageCoop.Core;
 
 namespace RageCoop.Server.Scripting
 {
-    internal class BaseScript:ServerScript
+    internal class BaseScript : ServerScript
     {
         private readonly Server Server;
-        public BaseScript(Server server) { Server=server; }
+        public BaseScript(Server server) { Server = server; }
         public override void OnStart()
         {
             API.RegisterCustomEventHandler(CustomEvents.NativeResponse, NativeResponse);
@@ -31,7 +28,7 @@ namespace RageCoop.Server.Scripting
 
                     foreach (var c in API.GetAllClients().Values)
                     {
-                        if (c==e.Client)
+                        if (c == e.Client)
                         {
                             continue;
                         }
@@ -41,49 +38,49 @@ namespace RageCoop.Server.Scripting
             });
             API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) =>
             {
-                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x=>x!=e.Client).ToList(),CustomEvents.OnPlayerDied,e.Client.Username);
+                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x => x != e.Client).ToList(), CustomEvents.OnPlayerDied, e.Client.Username);
             });
-            API.Events.OnChatMessage+=(s,e) =>
-            Server.Logger?.Info((e.Client?.Username ?? e.ClaimedSender ?? "Unknown") + ": " + e.Message);
+            API.Events.OnChatMessage += (s, e) =>
+              Server.Logger?.Info((e.Client?.Username ?? e.ClaimedSender ?? "Unknown") + ": " + e.Message);
         }
         public override void OnStop()
         {
         }
-        public static void SetAutoRespawn(Client c,bool toggle)
+        public static void SetAutoRespawn(Client c, bool toggle)
         {
-            c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle );
+            c.SendCustomEvent(CustomEvents.SetAutoRespawn, toggle);
         }
         public void SetNameTag(Client c, bool toggle)
         {
-            foreach(var other in API.GetAllClients().Values)
+            foreach (var other in API.GetAllClients().Values)
             {
-                if (c==other) { continue; }
-                other.SendCustomEvent(CustomEvents.SetDisplayNameTag,c.Player.ID, toggle);
+                if (c == other) { continue; }
+                other.SendCustomEvent(CustomEvents.SetDisplayNameTag, c.Player.ID, toggle);
             }
         }
-        public void SendServerPropsTo(List<ServerProp> objects,List<Client> clients=null)
+        public void SendServerPropsTo(List<ServerProp> objects, List<Client> clients = null)
         {
-            foreach(var obj in objects)
+            foreach (var obj in objects)
             {
-                API.SendCustomEventQueued(clients, CustomEvents.ServerPropSync,obj.ID,  obj.Model ,obj.Position,obj.Rotation );
+                API.SendCustomEventQueued(clients, CustomEvents.ServerPropSync, obj.ID, obj.Model, obj.Position, obj.Rotation);
             }
         }
         public void SendServerBlipsTo(List<ServerBlip> objects, List<Client> clients = null)
         {
             foreach (var obj in objects)
             {
-                API.SendCustomEventQueued(clients, CustomEvents.ServerBlipSync,   obj.ID, (ushort)obj.Sprite, (byte)obj.Color, obj.Scale,obj.Position,obj.Rotation,obj.Name  );
+                API.SendCustomEventQueued(clients, CustomEvents.ServerBlipSync, obj.ID, (ushort)obj.Sprite, (byte)obj.Color, obj.Scale, obj.Position, obj.Rotation, obj.Name);
             }
         }
-        void NativeResponse(CustomEventReceivedArgs e)
+
+        private void NativeResponse(CustomEventReceivedArgs e)
         {
             try
             {
                 int id = (int)e.Args[0];
-                Action<object> callback;
                 lock (e.Client.Callbacks)
                 {
-                    if (e.Client.Callbacks.TryGetValue(id, out callback))
+                    if (e.Client.Callbacks.TryGetValue(id, out Action<object> callback))
                     {
                         callback(e.Args[1]);
                         e.Client.Callbacks.Remove(id);

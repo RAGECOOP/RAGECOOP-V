@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GTA.Math;
-using System.Security.Cryptography;
-using System.Net;
-using System.Net.Http;
-using System.Net.Sockets;
-using System.IO;
-using System.Runtime.CompilerServices;
+﻿using GTA.Math;
 using Lidgren.Network;
 using Newtonsoft.Json;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
-using Newtonsoft.Json.Linq;
+using System.Net.Sockets;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -36,12 +34,12 @@ namespace RageCoop.Core
         {
             return ToIgnore.Contains(name);
         }
-        public static void GetBytesFromObject(object obj,NetOutgoingMessage m)
+        public static void GetBytesFromObject(object obj, NetOutgoingMessage m)
         {
             switch (obj)
             {
                 case byte value:
-                    m.Write((byte)0x01);m.Write(value);break;
+                    m.Write((byte)0x01); m.Write(value); break;
                 case short value:
                     m.Write((byte)0x02); m.Write(value); break;
                 case ushort value:
@@ -140,9 +138,8 @@ namespace RageCoop.Core
 
         private static int getPort(string p)
         {
-            int port;
 
-            if (!int.TryParse(p, out port)
+            if (!int.TryParse(p, out int port)
              || port < IPEndPoint.MinPort
              || port > IPEndPoint.MaxPort)
             {
@@ -151,7 +148,7 @@ namespace RageCoop.Core
 
             return port;
         }
-        public static IPAddress GetLocalAddress(string target= "8.8.8.8")
+        public static IPAddress GetLocalAddress(string target = "8.8.8.8")
         {
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
             {
@@ -277,7 +274,7 @@ namespace RageCoop.Core
             // 16 bytes
             return new List<byte[]>() { BitConverter.GetBytes(qua.X), BitConverter.GetBytes(qua.Y), BitConverter.GetBytes(qua.Z), BitConverter.GetBytes(qua.W) }.Join(4);
         }
-        public static T GetPacket<T>(this NetIncomingMessage msg) where T: Packet, new()
+        public static T GetPacket<T>(this NetIncomingMessage msg) where T : Packet, new()
         {
             var p = new T();
             p.Deserialize(msg);
@@ -285,20 +282,20 @@ namespace RageCoop.Core
         }
         public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
         {
-            return (flagToCheck & flag)!=0;
+            return (flagToCheck & flag) != 0;
         }
         public static bool HasProjDataFlag(this ProjectileDataFlags flagToCheck, ProjectileDataFlags flag)
         {
-            return (flagToCheck & flag)!=0;
+            return (flagToCheck & flag) != 0;
         }
 
         public static bool HasVehFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
         {
-            return (flagToCheck & flag)!=0;
+            return (flagToCheck & flag) != 0;
         }
         public static bool HasConfigFlag(this PlayerConfigFlags flagToCheck, PlayerConfigFlags flag)
         {
-            return (flagToCheck & flag)!=0;
+            return (flagToCheck & flag) != 0;
         }
         public static Type GetActualType(this TypeCode code)
         {
@@ -365,9 +362,9 @@ namespace RageCoop.Core
         public static string DumpWithType(this IEnumerable<object> objects)
         {
             StringBuilder sb = new StringBuilder();
-            foreach(var obj in objects)
+            foreach (var obj in objects)
             {
-                sb.Append(obj.GetType()+":"+obj.ToString()+"\n");
+                sb.Append(obj.GetType() + ":" + obj.ToString() + "\n");
             }
             return sb.ToString();
         }
@@ -375,9 +372,9 @@ namespace RageCoop.Core
         {
             return $"{{{string.Join(",", objects)}}}";
         }
-        public static void ForEach<T>(this IEnumerable<T> objects,Action<T> action)
+        public static void ForEach<T>(this IEnumerable<T> objects, Action<T> action)
         {
-            foreach(var obj in objects)
+            foreach (var obj in objects)
             {
                 action(obj);
             }
@@ -399,10 +396,10 @@ namespace RageCoop.Core
             stream.CopyTo(memoryStream);
             return memoryStream;
         }
-        public static byte[] Join(this List<byte[]> arrays,int lengthPerArray=-1)
+        public static byte[] Join(this List<byte[]> arrays, int lengthPerArray = -1)
         {
-            if (arrays.Count==1) { return arrays[0]; }
-            var output = lengthPerArray== -1 ? new byte[arrays.Sum(arr => arr.Length)] : new byte[arrays.Count*lengthPerArray];
+            if (arrays.Count == 1) { return arrays[0]; }
+            var output = lengthPerArray == -1 ? new byte[arrays.Sum(arr => arr.Length)] : new byte[arrays.Count * lengthPerArray];
             int writeIdx = 0;
             foreach (var byteArr in arrays)
             {

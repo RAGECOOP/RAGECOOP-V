@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Lidgren.Network;
+﻿using Lidgren.Network;
+using System;
 
 namespace RageCoop.Core
 {
@@ -10,9 +9,9 @@ namespace RageCoop.Core
 
         internal class ChatMessage : Packet
         {
-            public override PacketType Type  => PacketType.ChatMessage;
-            private Func<string, byte[]> crypt;
-            private Func<byte[], byte[]> decrypt;
+            public override PacketType Type => PacketType.ChatMessage;
+            private readonly Func<string, byte[]> crypt;
+            private readonly Func<byte[], byte[]> decrypt;
             public ChatMessage(Func<string, byte[]> crypter)
             {
                 crypt = crypter;

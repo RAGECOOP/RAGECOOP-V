@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
-using RageCoop.Core.Scripting;
 using RageCoop.Server.Scripting;
+using System;
 
 namespace RageCoop.Server
 {
@@ -141,7 +136,7 @@ namespace RageCoop.Server
                                                 {
                                                     var outgoingMessage = MainNetServer.CreateMessage();
                                                     outgoingMessage.Write((byte)type);
-                                                    outgoingMessage.Write(message.ReadBytes(message.LengthBytes-1));
+                                                    outgoingMessage.Write(message.ReadBytes(message.LengthBytes - 1));
                                                     MainNetServer.SendMessage(outgoingMessage, toSend, NetDeliveryMethod.UnreliableSequenced, (byte)ConnectionChannel.SyncEvents);
                                                 }
                                             }

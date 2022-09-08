@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA;
+﻿using GTA;
 using GTA.Math;
 using Lidgren.Network;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace RageCoop.Core
 {
@@ -13,7 +10,7 @@ namespace RageCoop.Core
 
         public class VehicleSync : Packet
         {
-            public override PacketType Type  => PacketType.VehicleSync;
+            public override PacketType Type => PacketType.VehicleSync;
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
@@ -136,7 +133,7 @@ namespace RageCoop.Core
                     //　Write LicensePlate
                     m.Write(LicensePlate);
 
-                    m.Write((byte)(Livery+1));
+                    m.Write((byte)(Livery + 1));
                 }
             }
 
@@ -146,13 +143,13 @@ namespace RageCoop.Core
 
                 ID = m.ReadInt32();
                 OwnerID = m.ReadInt32();
-                Flags=(VehicleDataFlags)m.ReadUInt16();
+                Flags = (VehicleDataFlags)m.ReadUInt16();
                 Position = m.ReadVector3();
-                Quaternion=m.ReadQuaternion();
-                Velocity =m.ReadVector3();
-                RotationVelocity=m.ReadVector3();
-                ThrottlePower=m.ReadFloat();
-                BrakePower=m.ReadFloat();
+                Quaternion = m.ReadQuaternion();
+                Velocity = m.ReadVector3();
+                RotationVelocity = m.ReadVector3();
+                ThrottlePower = m.ReadFloat();
+                BrakePower = m.ReadFloat();
                 SteeringAngle = m.ReadFloat();
 
 
@@ -178,7 +175,7 @@ namespace RageCoop.Core
                     }
                     if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
                     {
-                        RoofState=m.ReadByte();
+                        RoofState = m.ReadByte();
                     }
 
                     // Read vehicle colors
@@ -204,7 +201,7 @@ namespace RageCoop.Core
                         DamageModel = new VehicleDamageModel()
                         {
                             BrokenDoors = m.ReadByte(),
-                            OpenedDoors=m.ReadByte(),
+                            OpenedDoors = m.ReadByte(),
                             BrokenWindows = m.ReadByte(),
                             BurstedTires = m.ReadInt16(),
                             LeftHeadLightBroken = m.ReadByte(),
@@ -214,14 +211,14 @@ namespace RageCoop.Core
 
 
                     // Read LockStatus
-                    LockStatus=(VehicleLockStatus)m.ReadByte();
+                    LockStatus = (VehicleLockStatus)m.ReadByte();
 
                     // Read RadioStation
-                    RadioStation=m.ReadByte();
+                    RadioStation = m.ReadByte();
 
-                    LicensePlate=m.ReadString();
+                    LicensePlate = m.ReadString();
 
-                    Livery=(int)(m.ReadByte()-1);
+                    Livery = m.ReadByte() - 1;
                 }
                 #endregion
             }

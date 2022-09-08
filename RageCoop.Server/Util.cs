@@ -1,16 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Linq;
+﻿using Lidgren.Network;
+using System;
 using System.Collections.Generic;
-using Lidgren.Network;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace RageCoop.Server
 {
-    static partial class Util
+    internal static partial class Util
     {
 
         public static string DownloadString(string url)
@@ -35,11 +35,11 @@ namespace RageCoop.Server
                 return "";
             }
         }
-        public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections,NetConnection toExclude)
+        public static List<NetConnection> Exclude(this IEnumerable<NetConnection> connections, NetConnection toExclude)
         {
             return new(connections.Where(e => e != toExclude));
         }
-        
+
         public static T Read<T>(string file) where T : new()
         {
             XmlSerializer ser = new(typeof(T));
@@ -89,7 +89,7 @@ namespace RageCoop.Server
 
         public static T Next<T>(this T[] values)
         {
-            return values[new Random().Next(values.Length-1)];
+            return values[new Random().Next(values.Length - 1)];
         }
 
         public static string GetFinalRedirect(string url)

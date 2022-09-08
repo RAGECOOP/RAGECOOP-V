@@ -142,7 +142,7 @@ namespace RageCoop.Client
                                 default:
                                     {
 
-                                        HandlePacket(packetType, message, message.SenderConnection,ref _recycle);
+                                        HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
                                         break;
                                     }
                             }

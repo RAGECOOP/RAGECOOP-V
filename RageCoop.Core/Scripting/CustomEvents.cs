@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace RageCoop.Core.Scripting
 {
@@ -10,8 +10,8 @@ namespace RageCoop.Core.Scripting
     /// </summary>
     public static class CustomEvents
     {
-        static MD5 Hasher = MD5.Create();
-        static Dictionary<int,string> Hashed=new Dictionary<int,string>();
+        private static readonly MD5 Hasher = MD5.Create();
+        private static readonly Dictionary<int, string> Hashed = new Dictionary<int, string>();
         internal static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
         internal static readonly int SetWeather = Hash("RageCoop.SetWeather");
         internal static readonly int OnPedDeleted = Hash("RageCoop.OnPedDeleted");
@@ -40,12 +40,11 @@ namespace RageCoop.Core.Scripting
         public static int Hash(string s)
         {
             var hash = BitConverter.ToInt32(Hasher.ComputeHash(Encoding.UTF8.GetBytes(s)), 0);
-            string name;
             lock (Hashed)
             {
-                if (Hashed.TryGetValue(hash, out name))
+                if (Hashed.TryGetValue(hash, out string name))
                 {
-                    if (name!=s)
+                    if (name != s)
                     {
                         throw new ArgumentException($"Hashed value has collision with another name:{name}, hashed value:{hash}");
                     }

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using GTA;
-using GTA.Native;
+﻿using GTA;
 using GTA.Math;
+using GTA.Native;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace RageCoop.Server.Scripting
 {
@@ -22,8 +19,8 @@ namespace RageCoop.Server.Scripting
         /// Server that this object belongs to
         /// </summary>
         internal readonly Server Server;
-        internal ServerObject(Server server) { Server=server; }
-        
+        internal ServerObject(Server server) { Server = server; }
+
         /// <summary>
         /// Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
         /// </summary>
@@ -71,7 +68,7 @@ namespace RageCoop.Server.Scripting
         public virtual Vector3 Position
         {
             get => _pos;
-            set { _pos=value; Owner.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z,1, 1,1 ); }
+            set { _pos = value; Owner.SendNativeCall(Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z, 1, 1, 1); }
         }
         internal Vector3 _pos;
 
@@ -81,14 +78,14 @@ namespace RageCoop.Server.Scripting
         public virtual Vector3 Rotation
         {
             get => _rot;
-            set { _rot=value; Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z ,2,1); }
+            set { _rot = value; Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z, 2, 1); }
         }
         internal Vector3 _rot;
 
         /// <summary>
         /// Send updated information to clients, would be called automatically.
         /// </summary>
-        
+
 
         /// <summary>
         /// Delete this object
@@ -105,7 +102,7 @@ namespace RageCoop.Server.Scripting
         /// <exception cref="InvalidOperationException"></exception>
         public virtual void Freeze(bool toggle)
         {
-            if (GetTypeByte()==50)
+            if (GetTypeByte() == 50)
             {
                 throw new InvalidOperationException("Can't freeze or unfreeze static server object");
             }
@@ -128,7 +125,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public override void Delete()
         {
-            Server.API.SendCustomEventQueued(null,CustomEvents.DeleteServerProp,ID);
+            Server.API.SendCustomEventQueued(null, CustomEvents.DeleteServerProp, ID);
             Server.API.Entities.RemoveProp(ID);
         }
 
@@ -138,7 +135,7 @@ namespace RageCoop.Server.Scripting
         public override Vector3 Position
         {
             get => _pos;
-            set { _pos=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z, 1, 1, 1); }
+            set { _pos = value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_COORDS_NO_OFFSET, Handle, value.X, value.Y, value.Z, 1, 1, 1); }
         }
 
         /// <summary>
@@ -147,7 +144,7 @@ namespace RageCoop.Server.Scripting
         public override Vector3 Rotation
         {
             get => _rot;
-            set { _rot=value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z, 2, 1); }
+            set { _rot = value; Server.API.SendNativeCall(null, Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z, 2, 1); }
         }
 
 
@@ -156,7 +153,7 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         internal void Update()
         {
-             Server.API.Server.BaseScript.SendServerPropsTo(new() { this });
+            Server.API.Server.BaseScript.SendServerPropsTo(new() { this });
         }
 
     }
@@ -198,9 +195,10 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Get or set whether this ped is invincible
         /// </summary>
-        public bool IsInvincible {
+        public bool IsInvincible
+        {
             get => _isInvincible;
-            set => Owner.SendNativeCall(Hash.SET_ENTITY_INVINCIBLE,Handle,value);
+            set => Owner.SendNativeCall(Hash.SET_ENTITY_INVINCIBLE, Handle, value);
         }
     }
     /// <summary>
@@ -216,7 +214,7 @@ namespace RageCoop.Server.Scripting
         public override Vector3 Rotation
         {
             get => _quat.ToEulerAngles().ToDegree();
-            set { Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION,  Handle ,value.X, value.Y ,value.Z); }
+            set { Owner.SendNativeCall(Hash.SET_ENTITY_ROTATION, Handle, value.X, value.Y, value.Z); }
         }
 
         internal Quaternion _quat;
@@ -226,7 +224,7 @@ namespace RageCoop.Server.Scripting
         public Quaternion Quaternion
         {
             get => _quat;
-            set { _quat = value ;Owner.SendNativeCall(Hash.SET_ENTITY_QUATERNION, Handle, value.X, value.Y, value.Z, value.W); }
+            set { _quat = value; Owner.SendNativeCall(Hash.SET_ENTITY_QUATERNION, Handle, value.X, value.Y, value.Z, value.W); }
         }
     }
 
@@ -263,28 +261,30 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Color of this blip
         /// </summary>
-        public BlipColor Color { 
-            get => _color; 
-            set { _color=value; Update(); } 
+        public BlipColor Color
+        {
+            get => _color;
+            set { _color = value; Update(); }
         }
 
-        internal BlipSprite _sprite=BlipSprite.Standard;
+        internal BlipSprite _sprite = BlipSprite.Standard;
         /// <summary>
         /// Sprite of this blip
         /// </summary>
-        public BlipSprite Sprite {
+        public BlipSprite Sprite
+        {
             get => _sprite;
-            set { _sprite=value; Update();}
+            set { _sprite = value; Update(); }
         }
 
-        internal float _scale =1;
+        internal float _scale = 1;
         /// <summary>
         /// Scale of this blip
         /// </summary>
         public float Scale
         {
             get => _scale;
-            set { _scale=value;Update(); }
+            set { _scale = value; Update(); }
         }
 
         internal Vector3 _pos = new();
@@ -294,7 +294,7 @@ namespace RageCoop.Server.Scripting
         public Vector3 Position
         {
             get => _pos;
-            set { _pos=value; Update(); }
+            set { _pos = value; Update(); }
         }
 
         internal int _rot;
@@ -304,17 +304,17 @@ namespace RageCoop.Server.Scripting
         public int Rotation
         {
             get => _rot;
-            set { _rot=value; Update(); }
+            set { _rot = value; Update(); }
         }
 
-        internal string _name="Beeeeeee";
+        internal string _name = "Beeeeeee";
         /// <summary>
         /// Name of this blip
         /// </summary>
         public string Name
         {
             get => _name;
-            set { _name=value; Update(); }
+            set { _name = value; Update(); }
         }
 
         /// <summary>
@@ -322,23 +322,23 @@ namespace RageCoop.Server.Scripting
         /// </summary>
         public void Delete()
         {
-            Server.API.SendCustomEventQueued(null, CustomEvents.DeleteServerBlip,ID);
+            Server.API.SendCustomEventQueued(null, CustomEvents.DeleteServerBlip, ID);
             Server.Entities.RemoveServerBlip(ID);
         }
 
 
-        private bool _bouncing=false;
+        private bool _bouncing = false;
         internal void Update()
         {
             // 5ms debounce
             if (!_bouncing)
             {
-                _bouncing=true;
+                _bouncing = true;
                 Task.Run(() =>
                 {
                     Thread.Sleep(5);
                     DoUpdate();
-                    _bouncing=false;
+                    _bouncing = false;
                 });
             }
         }
@@ -350,7 +350,7 @@ namespace RageCoop.Server.Scripting
 
         }
     }
-    
+
     /// <summary>
     /// Represent a blip attached to ped.
     /// </summary>
@@ -359,7 +359,7 @@ namespace RageCoop.Server.Scripting
         /// <summary>
         /// Get the <see cref="ServerPed"/> that this blip attached to.
         /// </summary>
-        public ServerPed Ped { get;internal set; }
+        public ServerPed Ped { get; internal set; }
         internal PedBlip(ServerPed ped)
         {
             Ped = ped;
@@ -373,17 +373,17 @@ namespace RageCoop.Server.Scripting
         public BlipColor Color
         {
             get => _color;
-            set { _color=value; Update(); }
+            set { _color = value; Update(); }
         }
 
-        internal BlipSprite _sprite=BlipSprite.Standard;
+        internal BlipSprite _sprite = BlipSprite.Standard;
         /// <summary>
         /// Sprite of this blip
         /// </summary>
         public BlipSprite Sprite
         {
             get => _sprite;
-            set { _sprite=value; Update(); }
+            set { _sprite = value; Update(); }
         }
 
         internal float _scale = 1;
@@ -393,7 +393,7 @@ namespace RageCoop.Server.Scripting
         public float Scale
         {
             get => _scale;
-            set { _scale=value; Update(); }
+            set { _scale = value; Update(); }
         }
 
         private bool _bouncing = false;
@@ -402,19 +402,19 @@ namespace RageCoop.Server.Scripting
             // 5ms debounce
             if (!_bouncing)
             {
-                _bouncing=true;
+                _bouncing = true;
                 Task.Run(() =>
                 {
                     Thread.Sleep(5);
                     DoUpdate();
-                    _bouncing=false;
+                    _bouncing = false;
                 });
             }
         }
         private void DoUpdate()
         {
-            Ped.Owner.SendCustomEventQueued(CustomEvents.UpdatePedBlip,Ped.Handle,(byte)Color,(ushort)Sprite,Scale);
-            
+            Ped.Owner.SendCustomEventQueued(CustomEvents.UpdatePedBlip, Ped.Handle, (byte)Color, (ushort)Sprite, Scale);
+
         }
     }
 }

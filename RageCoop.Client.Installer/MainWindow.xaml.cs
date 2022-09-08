@@ -1,27 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using System.Diagnostics;
-using System.Reflection;
-using RageCoop.Core;
-using System.Threading;
-using System.Net;
 using System.Windows.Forms;
-using Path = System.IO.Path;
+using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
+using Path = System.IO.Path;
+using RageCoop.Core;
 
 namespace RageCoop.Client.Installer
 {
@@ -41,11 +31,12 @@ namespace RageCoop.Client.Installer
             var od = new OpenFileDialog()
             {
                 Filter = "GTA 5 executable |GTA5.exe;PlayGTAV.exe",
-                Title="Select you GTAV executable"
+                Title = "Select you GTAV executable"
             };
             if (od.ShowDialog() ?? false == true)
             {
-                Task.Run(() => {
+                Task.Run(() =>
+                {
                     try
                     {
                         Install(Directory.GetParent(od.FileName).FullName);
@@ -62,7 +53,8 @@ namespace RageCoop.Client.Installer
                 Environment.Exit(0);
             }
         }
-        void Install(string root)
+
+        private void Install(string root)
         {
             UpdateStatus("Checking requirements");
             var shvPath = Path.Combine(root, "ScriptHookV.dll");
@@ -70,7 +62,7 @@ namespace RageCoop.Client.Installer
             var scriptsPath = Path.Combine(root, "Scripts");
             var lemonPath = Path.Combine(scriptsPath, "LemonUI.SHVDN3.dll");
             var installPath = Path.Combine(scriptsPath, "RageCoop");
-            if(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == installPath)
+            if (Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == installPath)
             {
                 throw new InvalidOperationException("The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
             }
@@ -86,7 +78,7 @@ namespace RageCoop.Client.Installer
                 Environment.Exit(1);
             }
             var shvdnVer = GetVer(shvdnPath);
-            if (shvdnVer<new Version(3,5,1))
+            if (shvdnVer < new Version(3, 5, 1))
             {
                 MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
                     $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
@@ -94,11 +86,11 @@ namespace RageCoop.Client.Installer
             }
             if (File.Exists(lemonPath))
             {
-                var lemonVer=GetVer(lemonPath);
-                if(lemonVer<new Version(1, 7))
+                var lemonVer = GetVer(lemonPath);
+                if (lemonVer < new Version(1, 7))
                 {
                     UpdateStatus("Updating LemonUI");
-                    File.WriteAllBytes(lemonPath,getLemon());
+                    File.WriteAllBytes(lemonPath, getLemon());
                 }
             }
 
@@ -129,7 +121,7 @@ namespace RageCoop.Client.Installer
             void Finish()
             {
 
-                checkKeys:
+            checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
                 var settingsPath = Path.Combine(installPath, @"Data\RageCoop.Client.Settings.xml");
@@ -144,28 +136,28 @@ namespace RageCoop.Client.Installer
                 }
                 if (File.Exists(menyooConfig))
                 {
-                    var lines = File.ReadAllLines(menyooConfig).Where(x => !x.StartsWith(";") && x.EndsWith(" = " +(int)settings.MenuKey));
+                    var lines = File.ReadAllLines(menyooConfig).Where(x => !x.StartsWith(";") && x.EndsWith(" = " + (int)settings.MenuKey));
                     if (lines.Any())
                     {
-                        if(MessageBox.Show("Following menyoo config value will conflict with RAGECOOP menu key\n" +
+                        if (MessageBox.Show("Following menyoo config value will conflict with RAGECOOP menu key\n" +
                             string.Join("\n", lines)
                             + "\nDo you wish to change the Menu Key?", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
-                            var ae=new AutoResetEvent(false);
+                            var ae = new AutoResetEvent(false);
                             UpdateStatus("Press the key you wish to change to");
                             Dispatcher.BeginInvoke(new Action(() =>
-                            KeyDown += (s,e) =>
+                            KeyDown += (s, e) =>
                             {
                                 settings.MenuKey = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
                                 ae.Set();
                             }));
                             ae.WaitOne();
-                            if (!Util.SaveSettings(settingsPath,settings))
+                            if (!Util.SaveSettings(settingsPath, settings))
                             {
                                 MessageBox.Show("Error occurred when saving settings");
                                 Environment.Exit(1);
                             }
-                            MessageBox.Show("Menu key changed to "+settings.MenuKey);
+                            MessageBox.Show("Menu key changed to " + settings.MenuKey);
                             goto checkKeys;
                         }
                     }
@@ -178,10 +170,10 @@ namespace RageCoop.Client.Installer
                 }
                 catch
                 {
-                    if (MessageBox.Show("You can't join ZeroTier server unless ZeroTier is installed, do you want to download and install it?","Install ZeroTier",MessageBoxButton.YesNo)==MessageBoxResult.Yes)
+                    if (MessageBox.Show("You can't join ZeroTier server unless ZeroTier is installed, do you want to download and install it?", "Install ZeroTier", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         var url = "https://download.zerotier.com/dist/ZeroTier%20One.msi";
-                        UpdateStatus("Downloading ZeroTier from "+url);
+                        UpdateStatus("Downloading ZeroTier from " + url);
                         try
                         {
                             HttpHelper.DownloadFile(url, "ZeroTier.msi", (p) => UpdateStatus("Downloading ZeroTier " + p + "%"));
@@ -201,18 +193,21 @@ namespace RageCoop.Client.Installer
                 Environment.Exit(0);
             }
         }
-        void UpdateStatus(string status)
+
+        private void UpdateStatus(string status)
         {
             Dispatcher.BeginInvoke(new Action(() => Status.Content = status));
         }
-        Version GetVer(string location)
+
+        private Version GetVer(string location)
         {
             return Version.Parse(FileVersionInfo.GetVersionInfo(location).FileVersion);
         }
-        byte[] getLemon()
+
+        private byte[] getLemon()
         {
             return (byte[])Resource.ResourceManager.GetObject("LemonUI_SHVDN3");
         }
-        
+
     }
 }

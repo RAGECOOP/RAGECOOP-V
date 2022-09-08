@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
-using System.Net;
+﻿using GTA.Math;
 using Lidgren.Network;
+using System.Net;
 
 namespace RageCoop.Core
 {
@@ -16,7 +13,7 @@ namespace RageCoop.Core
         }
         public class Handshake : Packet
         {
-            public override PacketType Type  => PacketType.Handshake;
+            public override PacketType Type => PacketType.Handshake;
             public int PedID { get; set; }
 
             public string Username { get; set; }
@@ -80,14 +77,14 @@ namespace RageCoop.Core
                 // Read ModVersion
                 ModVersion = m.ReadString();
 
-                InternalEndPoint=CoreUtils.StringToEndPoint(m.ReadString());
+                InternalEndPoint = CoreUtils.StringToEndPoint(m.ReadString());
 
-                AesKeyCrypted=m.ReadByteArray();
+                AesKeyCrypted = m.ReadByteArray();
 
-                AesIVCrypted=m.ReadByteArray();
+                AesIVCrypted = m.ReadByteArray();
 
 
-                PasswordEncrypted=m.ReadByteArray();
+                PasswordEncrypted = m.ReadByteArray();
                 #endregion
             }
         }
@@ -98,7 +95,7 @@ namespace RageCoop.Core
             protected override void Serialize(NetOutgoingMessage m)
             {
                 m.Write(Players.Length);
-                foreach(var p in Players)
+                foreach (var p in Players)
                 {
                     m.Write(p.ID);
                     m.Write(p.Username);
@@ -107,20 +104,20 @@ namespace RageCoop.Core
             public override void Deserialize(NetIncomingMessage m)
             {
 
-                Players=new PlayerData[m.ReadInt32()];
-                for(int i = 0; i<Players.Length; i++)
+                Players = new PlayerData[m.ReadInt32()];
+                for (int i = 0; i < Players.Length; i++)
                 {
-                    Players[i]=new PlayerData()
+                    Players[i] = new PlayerData()
                     {
-                        ID=m.ReadInt32(),
-                        Username=m.ReadString(),
+                        ID = m.ReadInt32(),
+                        Username = m.ReadString(),
                     };
                 }
             }
         }
         public class PlayerConnect : Packet
         {
-            public override PacketType Type  => PacketType.PlayerConnect;
+            public override PacketType Type => PacketType.PlayerConnect;
             public int PedID { get; set; }
 
             public string Username { get; set; }
@@ -149,7 +146,7 @@ namespace RageCoop.Core
 
         public class PlayerDisconnect : Packet
         {
-            public override PacketType Type  => PacketType.PlayerDisconnect;
+            public override PacketType Type => PacketType.PlayerDisconnect;
             public int PedID { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
@@ -169,7 +166,7 @@ namespace RageCoop.Core
         }
         public class PlayerInfoUpdate : Packet
         {
-            public override PacketType Type  => PacketType.PlayerInfoUpdate;
+            public override PacketType Type => PacketType.PlayerInfoUpdate;
 
             /// <summary>
             /// Ped ID for this Player
@@ -206,17 +203,17 @@ namespace RageCoop.Core
                 // Read Username
                 Username = m.ReadString();
 
-                Latency=m.ReadFloat();
+                Latency = m.ReadFloat();
 
-                Position=m.ReadVector3();
+                Position = m.ReadVector3();
 
-                IsHost=m.ReadBoolean();
+                IsHost = m.ReadBoolean();
             }
         }
 
         public class PublicKeyResponse : Packet
         {
-            public override PacketType Type  => PacketType.PublicKeyResponse;
+            public override PacketType Type => PacketType.PublicKeyResponse;
 
             public byte[] Modulus;
             public byte[] Exponent;
@@ -237,8 +234,8 @@ namespace RageCoop.Core
             {
                 #region NetIncomingMessageToPacket
 
-                Modulus=m.ReadByteArray();
-                Exponent=m.ReadByteArray();
+                Modulus = m.ReadByteArray();
+                Exponent = m.ReadByteArray();
 
                 #endregion
             }
@@ -246,7 +243,7 @@ namespace RageCoop.Core
 
         public class PublicKeyRequest : Packet
         {
-            public override PacketType Type  => PacketType.PublicKeyRequest;
+            public override PacketType Type => PacketType.PublicKeyRequest;
         }
     }
 }

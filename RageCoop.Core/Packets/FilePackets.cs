@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Lidgren.Network;
 
 namespace RageCoop.Core
 {
-    internal enum FileResponse:byte
+    internal enum FileResponse : byte
     {
-        NeedToDownload=0,
-        AlreadyExists=1,
-        Completed=2,
-        Loaded=3,
-        LoadFailed=4,
+        NeedToDownload = 0,
+        AlreadyExists = 1,
+        Completed = 2,
+        Loaded = 3,
+        LoadFailed = 4,
     }
     internal partial class Packets
     {
@@ -77,7 +74,7 @@ namespace RageCoop.Core
 
         internal class FileTransferChunk : Packet
         {
-            public override PacketType Type  => PacketType.FileTransferChunk;
+            public override PacketType Type => PacketType.FileTransferChunk;
             public int ID { get; set; }
 
             public byte[] FileChunk { get; set; }
@@ -102,7 +99,7 @@ namespace RageCoop.Core
 
         internal class FileTransferComplete : Packet
         {
-            public override PacketType Type  => PacketType.FileTransferComplete;
+            public override PacketType Type => PacketType.FileTransferComplete;
             public int ID { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
@@ -124,7 +121,7 @@ namespace RageCoop.Core
         internal class AllResourcesSent : Packet
         {
 
-            public override PacketType Type  => PacketType.AllResourcesSent;
+            public override PacketType Type => PacketType.AllResourcesSent;
         }
     }
 }

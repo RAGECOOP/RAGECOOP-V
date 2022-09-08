@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -22,7 +20,7 @@ namespace RageCoop.Core
                 m.Write(TargetInternal);
                 m.Write(TargetExternal);
                 m.Write(Connect);
-                
+
 
             }
 
@@ -33,7 +31,7 @@ namespace RageCoop.Core
                 TargetID = m.ReadInt32();
                 TargetInternal = m.ReadString();
                 TargetExternal = m.ReadString();
-                Connect=m.ReadBoolean();
+                Connect = m.ReadBoolean();
                 #endregion
             }
         }
@@ -45,7 +43,7 @@ namespace RageCoop.Core
             /// <summary>
             /// 1:initial, 2:acknowledged, 3:confirmed
             /// </summary>
-            public byte Status { get;set;}
+            public byte Status { get; set; }
             protected override void Serialize(NetOutgoingMessage m)
             {
 

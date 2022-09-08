@@ -159,7 +159,7 @@ namespace RageCoop.Client
                 WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash),
                 b.Position, b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
         }
-        public static void HandleEvent(PacketType type,NetIncomingMessage msg)
+        public static void HandleEvent(PacketType type, NetIncomingMessage msg)
         {
             switch (type)
             {

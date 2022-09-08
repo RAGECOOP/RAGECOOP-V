@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Lidgren.Network;
 using RageCoop.Core;
-using Lidgren.Network;
-using System.Diagnostics;
 using RageCoop.Core.Scripting;
-using System.Security.Cryptography;
 using RageCoop.Server.Scripting;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace RageCoop.Server
 {
@@ -18,7 +18,7 @@ namespace RageCoop.Server
         private readonly Server Server;
         internal Client(Server server)
         {
-            Server=server;
+            Server = server;
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace RageCoop.Server
         public IPEndPoint InternalEndPoint { get; internal set; }
 
         internal long NetHandle = 0;
-        internal NetConnection Connection { get;set; }
+        internal NetConnection Connection { get; set; }
         /// <summary>
         /// The <see cref="ServerPed"/> instance representing the client's main character.
         /// </summary>
@@ -44,34 +44,36 @@ namespace RageCoop.Server
         /// <summary>
         /// The client's latency in seconds.
         /// </summary>
-        public float Latency => Connection.AverageRoundtripTime/2;
+        public float Latency => Connection.AverageRoundtripTime / 2;
         internal readonly Dictionary<int, Action<object>> Callbacks = new();
         internal byte[] PublicKey { get; set; }
         /// <summary>
         /// Indicates whether the client has succefully loaded all resources.
         /// </summary>
-        public bool IsReady { get; internal set; }=false;
+        public bool IsReady { get; internal set; } = false;
         /// <summary>
         /// The client's username.
         /// </summary>
-        public string Username { get;internal set; } = "N/A";
+        public string Username { get; internal set; } = "N/A";
 
 
-        private bool _autoRespawn=true;
+        private bool _autoRespawn = true;
 
         /// <summary>
         /// Gets or sets whether to enable automatic respawn for this client's main ped.
         /// </summary>
-        public bool EnableAutoRespawn {
-            get => _autoRespawn; 
-            set {
-                BaseScript.SetAutoRespawn(this,value);
-                _autoRespawn=value;
+        public bool EnableAutoRespawn
+        {
+            get => _autoRespawn;
+            set
+            {
+                BaseScript.SetAutoRespawn(this, value);
+                _autoRespawn = value;
             }
         }
 
-        private bool _displayNameTag=true;
-        private Stopwatch _latencyWatch = new Stopwatch();
+        private bool _displayNameTag = true;
+        private readonly Stopwatch _latencyWatch = new Stopwatch();
 
         /// <summary>
         /// Gets or sets whether to enable automatic respawn for this client's main ped.
@@ -81,8 +83,8 @@ namespace RageCoop.Server
             get => _displayNameTag;
             set
             {
-                Server.BaseScript.SetNameTag(this,value);
-                _displayNameTag=value;
+                Server.BaseScript.SetNameTag(this, value);
+                _displayNameTag = value;
             }
         }
         #region FUNCTIONS
@@ -90,7 +92,7 @@ namespace RageCoop.Server
         /// Kick this client
         /// </summary>
         /// <param name="reason"></param>
-        public void Kick(string reason="You have been kicked!")
+        public void Kick(string reason = "You have been kicked!")
         {
             Connection?.Disconnect(reason);
         }
@@ -129,7 +131,7 @@ namespace RageCoop.Server
         /// <param name="args"></param>
         public void SendNativeCall<T>(Action<object> callBack, GTA.Native.Hash hash, params object[] args)
         {
-            var argsList= new List<object>(args);
+            var argsList = new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)Type.GetTypeCode(typeof(T)), RequestNativeCallID<T>(callBack), (ulong)hash });
 
             SendCustomEventQueued(CustomEvents.NativeCall, argsList.ToArray());
@@ -142,7 +144,7 @@ namespace RageCoop.Server
         public void SendNativeCall(GTA.Native.Hash hash, params object[] args)
         {
             var argsList = new List<object>(args);
-            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty,(ulong)hash });
+            argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
             // Server.Logger?.Debug(argsList.DumpWithType());
             SendCustomEventQueued(CustomEvents.NativeCall, argsList.ToArray());
         }
@@ -151,7 +153,7 @@ namespace RageCoop.Server
             int ID = 0;
             lock (Callbacks)
             {
-                while ((ID==0)
+                while ((ID == 0)
                     || Callbacks.ContainsKey(ID))
                 {
                     byte[] rngBytes = new byte[4];
@@ -170,7 +172,7 @@ namespace RageCoop.Server
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
         /// <param name="args">Arguments</param>
-        public void SendCustomEvent(int hash,params object[] args)
+        public void SendCustomEvent(int hash, params object[] args)
         {
             if (!IsReady)
             {
@@ -183,8 +185,8 @@ namespace RageCoop.Server
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
                 new Packets.CustomEvent()
                 {
-                    Hash=hash,
-                    Args=args
+                    Hash = hash,
+                    Args = args
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
 
@@ -211,10 +213,10 @@ namespace RageCoop.Server
             {
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.CustomEvent(null,true)
+                new Packets.CustomEvent(null, true)
                 {
-                    Hash=hash,
-                    Args=args
+                    Hash = hash,
+                    Args = args
                 }.Pack(outgoingMessage);
                 Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
 

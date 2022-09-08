@@ -1,8 +1,8 @@
-﻿using System;
+﻿using GTA.Math;
+using Lidgren.Network;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using GTA.Math;
-using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -43,7 +43,7 @@ namespace RageCoop.Core
         #endregion
 
         #region MESSAGE-WRITE
-        public static void Write(this NetOutgoingMessage m,Vector3 v)
+        public static void Write(this NetOutgoingMessage m, Vector3 v)
         {
             m.Write(v.X);
             m.Write(v.Y);
@@ -120,7 +120,7 @@ namespace RageCoop.Core
             bytes.AddInt(toadd.Length);
             bytes.AddRange(toadd);
         }
-#endregion
+        #endregion
 
         internal static bool IsSyncEvent(this PacketType p)
         {

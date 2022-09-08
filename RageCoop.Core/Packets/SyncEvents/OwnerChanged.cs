@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -11,7 +8,7 @@ namespace RageCoop.Core
 
         internal class OwnerChanged : Packet
         {
-            public override PacketType Type  => PacketType.OwnerChanged;
+            public override PacketType Type => PacketType.OwnerChanged;
             public int ID { get; set; }
 
             public int NewOwnerID { get; set; }
@@ -27,9 +24,9 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
 
 
-                ID=m.ReadInt32();
-                NewOwnerID=m.ReadInt32();
-                
+                ID = m.ReadInt32();
+                NewOwnerID = m.ReadInt32();
+
                 #endregion
             }
         }

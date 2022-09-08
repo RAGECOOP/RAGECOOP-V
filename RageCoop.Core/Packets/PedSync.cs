@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using GTA;
 using GTA.Math;
-using GTA;
 using Lidgren.Network;
+using System.Collections.Generic;
 
 namespace RageCoop.Core
 {
@@ -13,7 +11,7 @@ namespace RageCoop.Core
 
         internal class PedSync : Packet
         {
-            public override PacketType Type  => PacketType.PedSync;
+            public override PacketType Type => PacketType.PedSync;
             public int ID { get; set; }
 
             public int OwnerID { get; set; }
@@ -43,7 +41,7 @@ namespace RageCoop.Core
 
 
             public float Heading { get; set; }
-            
+
             #region FULL
 
             public int ModelHash { get; set; }
@@ -59,11 +57,11 @@ namespace RageCoop.Core
 
             public BlipSprite BlipSprite { get; set; } = 0;
             public float BlipScale { get; set; } = 1;
-#endregion
+            #endregion
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-                
+
 
                 m.Write(ID);
                 m.Write(OwnerID);
@@ -79,10 +77,10 @@ namespace RageCoop.Core
                 }
                 else
                 {
-                    if (Speed>=4)
+                    if (Speed >= 4)
                     {
                         m.Write(VehicleID);
-                        m.Write((byte)(Seat+3));
+                        m.Write((byte)(Seat + 3));
                     }
                     m.Write(Position);
                 }
@@ -121,7 +119,7 @@ namespace RageCoop.Core
                     m.Write(WeaponTint);
 
                     m.Write((byte)BlipColor);
-                    if ((byte)BlipColor!=255)
+                    if ((byte)BlipColor != 255)
                     {
                         m.Write((ushort)BlipSprite);
                         m.Write(BlipScale);
@@ -137,25 +135,25 @@ namespace RageCoop.Core
 
 
                 ID = m.ReadInt32();
-                OwnerID=m.ReadInt32();
+                OwnerID = m.ReadInt32();
                 Flags = (PedDataFlags)m.ReadUInt16();
                 Health = m.ReadInt32();
                 Speed = m.ReadByte();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsRagdoll))
                 {
-                    HeadPosition=m.ReadVector3();
-                    RightFootPosition=m.ReadVector3();
-                    LeftFootPosition=m.ReadVector3();
-                    Position=HeadPosition;
+                    HeadPosition = m.ReadVector3();
+                    RightFootPosition = m.ReadVector3();
+                    LeftFootPosition = m.ReadVector3();
+                    Position = HeadPosition;
                 }
                 else
                 {
                     // Vehicle related
-                    if (Speed>=4)
+                    if (Speed >= 4)
                     {
-                        VehicleID=m.ReadInt32();
-                        Seat=(VehicleSeat)(m.ReadByte()-3);
+                        VehicleID = m.ReadInt32();
+                        Seat = (VehicleSeat)(m.ReadByte() - 3);
                     }
 
                     // Read player position
@@ -171,7 +169,7 @@ namespace RageCoop.Core
                     AimCoords = m.ReadVector3();
                 }
 
-                Heading=m.ReadFloat();
+                Heading = m.ReadFloat();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
@@ -182,7 +180,7 @@ namespace RageCoop.Core
                     CurrentWeaponHash = m.ReadUInt32();
 
                     // Read player clothes
-                    Clothes =m.ReadBytes(36);
+                    Clothes = m.ReadBytes(36);
 
                     // Read player weapon components
                     if (m.ReadBoolean())
@@ -194,14 +192,14 @@ namespace RageCoop.Core
                             WeaponComponents.Add(m.ReadUInt32(), m.ReadBoolean());
                         }
                     }
-                    WeaponTint=m.ReadByte();
+                    WeaponTint = m.ReadByte();
 
-                    BlipColor=(BlipColor)m.ReadByte();
+                    BlipColor = (BlipColor)m.ReadByte();
 
-                    if ((byte)BlipColor!=255)
+                    if ((byte)BlipColor != 255)
                     {
-                        BlipSprite=(BlipSprite)m.ReadUInt16();
-                        BlipScale=m.ReadFloat();
+                        BlipSprite = (BlipSprite)m.ReadUInt16();
+                        BlipScale = m.ReadFloat();
                     }
                 }
                 #endregion

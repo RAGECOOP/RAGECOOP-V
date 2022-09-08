@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using RageCoop.Server.Scripting;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace RageCoop.Server
 {
@@ -50,10 +48,10 @@ namespace RageCoop.Server
 
                 var args = new HandshakeEventArgs()
                 {
-                    EndPoint=connection.RemoteEndPoint,
-                    ID=packet.PedID,
-                    Username=packet.Username,
-                    PasswordHash=Security.Decrypt(packet.PasswordEncrypted, connection.RemoteEndPoint).GetString().GetSHA256Hash().ToHexString(),
+                    EndPoint = connection.RemoteEndPoint,
+                    ID = packet.PedID,
+                    Username = packet.Username,
+                    PasswordHash = Security.Decrypt(packet.PasswordEncrypted, connection.RemoteEndPoint).GetString().GetSHA256Hash().ToHexString(),
                 };
                 API.Events.InvokePlayerHandshake(args);
                 if (args.Cancel)
@@ -73,18 +71,18 @@ namespace RageCoop.Server
             var handshakeSuccess = MainNetServer.CreateMessage();
             var currentClients = ClientsByID.Values.ToArray();
             var players = new Packets.PlayerData[currentClients.Length];
-            for (int i = 0; i<players.Length; i++)
+            for (int i = 0; i < players.Length; i++)
             {
-                players[i]=new Packets.PlayerData()
+                players[i] = new Packets.PlayerData()
                 {
-                    ID=currentClients[i].Player.ID,
-                    Username=currentClients[i].Username,
+                    ID = currentClients[i].Player.ID,
+                    Username = currentClients[i].Username,
                 };
             }
 
             new Packets.HandshakeSuccess()
             {
-                Players=players
+                Players = players
             }.Pack(handshakeSuccess);
             connection.Approve(handshakeSuccess);
             Client tmpClient;
@@ -94,25 +92,25 @@ namespace RageCoop.Server
             {
                 var player = new ServerPed(this)
                 {
-                    ID= packet.PedID,
+                    ID = packet.PedID,
                 };
                 Entities.Add(player);
                 ClientsByNetHandle.Add(connection.RemoteUniqueIdentifier,
                     tmpClient = new Client(this)
                     {
                         NetHandle = connection.RemoteUniqueIdentifier,
-                        Connection=connection,
-                        Username=packet.Username,
+                        Connection = connection,
+                        Username = packet.Username,
                         Player = player,
-                        InternalEndPoint=packet.InternalEndPoint,
+                        InternalEndPoint = packet.InternalEndPoint,
                     }
                 );
-                player.Owner=tmpClient;
+                player.Owner = tmpClient;
                 ClientsByName.Add(packet.Username.ToLower(), tmpClient);
                 ClientsByID.Add(player.ID, tmpClient);
-                if (ClientsByNetHandle.Count==1)
+                if (ClientsByNetHandle.Count == 1)
                 {
-                    _hostClient=tmpClient;
+                    _hostClient = tmpClient;
                 }
             }
 
@@ -123,19 +121,19 @@ namespace RageCoop.Server
         // The connection has been approved, now we need to send all other players to the new player and the new player to all players
         private void PlayerConnected(Client newClient)
         {
-            if (newClient==_hostClient)
+            if (newClient == _hostClient)
             {
                 API.SendCustomEvent(new() { newClient }, CustomEvents.IsHost, true);
             }
 
             // Send new client to all players
             var cons = MainNetServer.Connections.Exclude(newClient.Connection);
-            if (cons.Count!=0)
+            if (cons.Count != 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerConnect()
                 {
-                    PedID=newClient.Player.ID,
+                    PedID = newClient.Player.ID,
                     Username = newClient.Username
                 }.Pack(outgoingMessage);
 
@@ -154,8 +152,8 @@ namespace RageCoop.Server
             {
                 ClientsByNetHandle.Values.ForEach(target =>
                 {
-                    if (target==newClient) { return; }
-                    HolePunch(target,newClient);
+                    if (target == newClient) { return; }
+                    HolePunch(target, newClient);
                 });
             }
 
@@ -171,12 +169,12 @@ namespace RageCoop.Server
         private void PlayerDisconnected(Client localClient)
         {
             var cons = MainNetServer.Connections.Exclude(localClient.Connection);
-            if (cons.Count!=0)
+            if (cons.Count != 0)
             {
                 NetOutgoingMessage outgoingMessage = MainNetServer.CreateMessage();
                 new Packets.PlayerDisconnect()
                 {
-                    PedID=localClient.Player.ID,
+                    PedID = localClient.Player.ID,
 
                 }.Pack(outgoingMessage);
                 MainNetServer.SendMessage(outgoingMessage, cons, NetDeliveryMethod.ReliableOrdered, 0);
@@ -187,7 +185,7 @@ namespace RageCoop.Server
             if (ClientsByNetHandle.ContainsKey(localClient.NetHandle)) { ClientsByNetHandle.Remove(localClient.NetHandle); }
             if (ClientsByName.ContainsKey(localClient.Username.ToLower())) { ClientsByName.Remove(localClient.Username.ToLower()); }
             if (ClientsByID.ContainsKey(localClient.Player.ID)) { ClientsByID.Remove(localClient.Player.ID); }
-            if (localClient==_hostClient)
+            if (localClient == _hostClient)
             {
 
                 _hostClient = ClientsByNetHandle.Values.FirstOrDefault();

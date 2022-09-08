@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 
 namespace RageCoop.Core
 {

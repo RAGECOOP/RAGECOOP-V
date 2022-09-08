@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Lidgren.Network;
+﻿using Lidgren.Network;
 using RageCoop.Core;
-using RageCoop.Core.Scripting;
 using RageCoop.Server.Scripting;
 
 namespace RageCoop.Server
@@ -16,7 +10,7 @@ namespace RageCoop.Server
         {
             QueueJob(() => Entities.Update(packet, client));
 
-            bool isPlayer = packet.ID==client.Player.ID;
+            bool isPlayer = packet.ID == client.Player.ID;
             if (isPlayer)
             {
                 QueueJob(() => API.Events.InvokePlayerUpdate(client));
@@ -27,17 +21,17 @@ namespace RageCoop.Server
             {
 
                 // Don't send data back
-                if (c.NetHandle==client.NetHandle) { continue; }
+                if (c.NetHandle == client.NetHandle) { continue; }
 
                 // Check streaming distance
                 if (isPlayer)
                 {
-                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
+                    if ((Settings.PlayerStreamingDistance != -1) && (packet.Position.DistanceTo(c.Player.Position) > Settings.PlayerStreamingDistance))
                     {
                         continue;
                     }
                 }
-                else if ((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
+                else if ((Settings.NpcStreamingDistance != -1) && (packet.Position.DistanceTo(c.Player.Position) > Settings.NpcStreamingDistance))
                 {
                     continue;
                 }
@@ -50,22 +44,22 @@ namespace RageCoop.Server
         private void VehicleSync(Packets.VehicleSync packet, Client client)
         {
             QueueJob(() => Entities.Update(packet, client));
-            bool isPlayer = packet.ID==client.Player?.LastVehicle?.ID;
+            bool isPlayer = packet.ID == client.Player?.LastVehicle?.ID;
 
 
             if (Settings.UseP2P) { return; }
             foreach (var c in ClientsByNetHandle.Values)
             {
-                if (c.NetHandle==client.NetHandle) { continue; }
+                if (c.NetHandle == client.NetHandle) { continue; }
                 if (isPlayer)
                 {
                     // Player's vehicle
-                    if ((Settings.PlayerStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.PlayerStreamingDistance))
+                    if ((Settings.PlayerStreamingDistance != -1) && (packet.Position.DistanceTo(c.Player.Position) > Settings.PlayerStreamingDistance))
                     {
                         continue;
                     }
                 }
-                else if ((Settings.NpcStreamingDistance!=-1)&&(packet.Position.DistanceTo(c.Player.Position)>Settings.NpcStreamingDistance))
+                else if ((Settings.NpcStreamingDistance != -1) && (packet.Position.DistanceTo(c.Player.Position) > Settings.NpcStreamingDistance))
                 {
                     continue;
                 }

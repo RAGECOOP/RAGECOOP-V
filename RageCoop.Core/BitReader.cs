@@ -1,15 +1,13 @@
-﻿using System;
-using System.Text;
-using System.Linq;
-using GTA.Math;
+﻿using GTA.Math;
 using System.IO;
+using System.Text;
 
 namespace RageCoop.Core
 {
-    internal class BitReader:BinaryReader
+    internal class BitReader : BinaryReader
     {
 
-        public BitReader(byte[] array):base(new MemoryStream(array))
+        public BitReader(byte[] array) : base(new MemoryStream(array))
         {
         }
 

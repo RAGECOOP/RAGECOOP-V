@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
+﻿using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -39,11 +36,11 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
 
 
-                OwnerID=m.ReadInt32();
-                Bone=m.ReadUInt16();
-                WeaponHash=m.ReadUInt32();
-                StartPosition=m.ReadVector3();
-                EndPosition=m.ReadVector3();
+                OwnerID = m.ReadInt32();
+                Bone = m.ReadUInt16();
+                WeaponHash = m.ReadUInt32();
+                StartPosition = m.ReadVector3();
+                EndPosition = m.ReadVector3();
                 #endregion
             }
         }

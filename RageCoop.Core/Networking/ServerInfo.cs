@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace RageCoop.Core
+﻿namespace RageCoop.Core
 {
     /// <summary>
     /// A json object representing a server's information as annouced to master server.
@@ -30,8 +25,8 @@ namespace RageCoop.Core
         public string ztID { get; set; }
 
         public string ztAddress { get; set; }
-        public string publicKeyModulus{get;set;}
-        public string publicKeyExponent{get;set;}
+        public string publicKeyModulus { get; set; }
+        public string publicKeyExponent { get; set; }
 
     }
 }

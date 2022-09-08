@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using GTA.Math;
+﻿using GTA.Math;
 using Lidgren.Network;
 
 namespace RageCoop.Core
@@ -10,7 +7,7 @@ namespace RageCoop.Core
     {
         internal class ProjectileSync : Packet
         {
-            public override PacketType Type  => PacketType.ProjectileSync;
+            public override PacketType Type => PacketType.ProjectileSync;
             public int ID { get; set; }
 
             public int ShooterID { get; set; }
@@ -63,9 +60,9 @@ namespace RageCoop.Core
                 ID = m.ReadInt32();
 
                 // Read ShooterID
-                ShooterID= m.ReadInt32();
+                ShooterID = m.ReadInt32();
 
-                WeaponHash= m.ReadUInt32();
+                WeaponHash = m.ReadUInt32();
 
                 // Read position
                 Position = m.ReadVector3();
@@ -74,9 +71,9 @@ namespace RageCoop.Core
                 Rotation = m.ReadVector3();
 
                 // Read velocity
-                Velocity =m.ReadVector3();
+                Velocity = m.ReadVector3();
 
-                Flags=(ProjectileDataFlags)m.ReadByte();
+                Flags = (ProjectileDataFlags)m.ReadByte();
 
                 #endregion
             }

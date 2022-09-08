@@ -1,11 +1,11 @@
-﻿using System;
-using GTA.Math;
+﻿using GTA.Math;
+using System;
 
 namespace RageCoop.Core
 {
     internal static class MathExtensions
     {
-        public const float Deg2Rad=(float)(Math.PI* 2) / 360;
+        public const float Deg2Rad = (float)(Math.PI * 2) / 360;
         public const float Rad2Deg = 360 / (float)(Math.PI * 2);
 
         public static Vector3 ToDirection(this Vector3 rotation)
@@ -81,14 +81,14 @@ namespace RageCoop.Core
             vect = vect.ToRadians();
 
             float rollOver2 = vect.Z * 0.5f;
-            float sinRollOver2 = (float)Math.Sin((double)rollOver2);
-            float cosRollOver2 = (float)Math.Cos((double)rollOver2);
+            float sinRollOver2 = (float)Math.Sin(rollOver2);
+            float cosRollOver2 = (float)Math.Cos(rollOver2);
             float pitchOver2 = vect.Y * 0.5f;
-            float sinPitchOver2 = (float)Math.Sin((double)pitchOver2);
-            float cosPitchOver2 = (float)Math.Cos((double)pitchOver2);
+            float sinPitchOver2 = (float)Math.Sin(pitchOver2);
+            float cosPitchOver2 = (float)Math.Cos(pitchOver2);
             float yawOver2 = vect.X * 0.5f; // pitch
-            float sinYawOver2 = (float)Math.Sin((double)yawOver2);
-            float cosYawOver2 = (float)Math.Cos((double)yawOver2);
+            float sinYawOver2 = (float)Math.Sin(yawOver2);
+            float cosYawOver2 = (float)Math.Cos(yawOver2);
             Quaternion result = new Quaternion()
             {
                 X = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2,
@@ -110,7 +110,7 @@ namespace RageCoop.Core
         }
         public static Vector3 ToDegree(this Vector3 radian)
         {
-            return radian*(float)(180/Math.PI);
+            return radian * (float)(180 / Math.PI);
         }
         public static Vector3 ToEulerDegrees(this Quaternion q)
         {
@@ -158,7 +158,7 @@ namespace RageCoop.Core
         }
         public static float GetCosTheta(this Vector3 v1, Vector3 v2)
         {
-            return Vector3.Dot(v1, v2)/(v1.Length()*v2.Length());
+            return Vector3.Dot(v1, v2) / (v1.Length() * v2.Length());
         }
 
     }

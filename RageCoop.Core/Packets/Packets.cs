@@ -1,59 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Lidgren.Network;
-using Newtonsoft.Json;
-using GTA.Math;
+﻿using Lidgren.Network;
+using System;
 
 namespace RageCoop.Core
 {
-    internal enum PacketType:byte
+    internal enum PacketType : byte
     {
-        Handshake=0,
-        PlayerConnect=1,
-        PlayerDisconnect=2,
-        PlayerInfoUpdate=3,
-        PublicKeyRequest=4,
-        PublicKeyResponse=5,
-        Request=6,
-        Response=7,
+        Handshake = 0,
+        PlayerConnect = 1,
+        PlayerDisconnect = 2,
+        PlayerInfoUpdate = 3,
+        PublicKeyRequest = 4,
+        PublicKeyResponse = 5,
+        Request = 6,
+        Response = 7,
         PingPong = 8,
         HandshakeSuccess = 9,
-        ChatMessage =10,
-       
-        FileTransferChunk=11,
-        FileTransferRequest=12,
+        ChatMessage = 10,
+
+        FileTransferChunk = 11,
+        FileTransferRequest = 12,
         FileTransferResponse = 13,
-        FileTransferComplete =14,
-        AllResourcesSent=15,
-        
+        FileTransferComplete = 14,
+        AllResourcesSent = 15,
+
         CustomEvent = 16,
         CustomEventQueued = 17,
 
-        ConnectionRequest=18,
+        ConnectionRequest = 18,
         P2PConnect = 19,
-        HolePunchInit=20,
-        HolePunch=21,
+        HolePunchInit = 20,
+        HolePunch = 21,
 
         Voice = 22,
 
         #region Sync
         PedSync = 23,
         VehicleSync = 24,
-        ProjectileSync =25,
+        ProjectileSync = 25,
         #endregion
 
         #region EVENT
 
-        PedKilled=30,
-        BulletShot=31,
+        PedKilled = 30,
+        BulletShot = 31,
         VehicleBulletShot = 32,
-        OwnerChanged =35,
-        NozzleTransform=37,
+        OwnerChanged = 35,
+        NozzleTransform = 37,
 
         #endregion
 
-        Unknown=255
+        Unknown = 255
     }
     internal enum ConnectionChannel
     {
@@ -64,18 +60,18 @@ namespace RageCoop.Core
         Mod = 4,
         File = 5,
         Event = 6,
-        RequestResponse=7,
+        RequestResponse = 7,
         PingPong = 8,
         VehicleSync = 9,
-        PedSync= 10,
+        PedSync = 10,
         ProjectileSync = 11,
         SyncEvents = 12,
     }
 
     [Flags]
-    internal enum PedDataFlags:ushort
+    internal enum PedDataFlags : ushort
     {
-        None=0,
+        None = 0,
         IsAiming = 1 << 0,
         IsInStealthMode = 1 << 1,
         IsReloading = 1 << 2,
@@ -91,10 +87,10 @@ namespace RageCoop.Core
         IsInCoverFacingLeft = 1 << 12,
         IsBlindFiring = 1 << 13,
         IsInvincible = 1 << 14,
-        IsFullSync = 1<<15 ,
+        IsFullSync = 1 << 15,
     }
 
-    internal enum ProjectileDataFlags:byte
+    internal enum ProjectileDataFlags : byte
     {
         None = 0,
         Exploded = 1 << 0,
@@ -103,9 +99,9 @@ namespace RageCoop.Core
         IsShotByVehicle = 1 << 3,
     }
     #region ===== VEHICLE DATA =====
-    internal enum VehicleDataFlags:ushort
+    internal enum VehicleDataFlags : ushort
     {
-        None=0,
+        None = 0,
         IsEngineRunning = 1 << 0,
         AreLightsOn = 1 << 1,
         AreBrakeLightsOn = 1 << 2,
@@ -117,18 +113,18 @@ namespace RageCoop.Core
         IsParachuteActive = 1 << 8,
         IsRocketBoostActive = 1 << 9,
         IsAircraft = 1 << 10,
-        IsDeluxoHovering=1 << 11, 
-        HasRoof=1 << 12,
-        IsFullSync = 1<<13,
-        IsOnFire = 1<<14,
-        Repaired = 1<<15,
+        IsDeluxoHovering = 1 << 11,
+        HasRoof = 1 << 12,
+        IsFullSync = 1 << 13,
+        IsOnFire = 1 << 14,
+        Repaired = 1 << 15,
     }
 
     internal enum PlayerConfigFlags : byte
     {
         None = 0,
-        ShowBlip= 1 << 0,
-        ShowNameTag= 1 << 1
+        ShowBlip = 1 << 0,
+        ShowNameTag = 1 << 1
     }
 
     internal struct VehicleDamageModel
