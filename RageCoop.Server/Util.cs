@@ -1,13 +1,12 @@
-﻿using Lidgren.Network;
+﻿global using System.Collections.Generic;
+using Lidgren.Network;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Xml;
 using System.Xml.Serialization;
-
 namespace RageCoop.Server
 {
     internal static partial class Util
