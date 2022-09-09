@@ -1,4 +1,4 @@
-name: Buld test
+name: Build test
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - '!main'     # excludes main
 
   pull_request:
-    branches: [ "main","dev-nightly" ]
+    branches: [ "main", "dev-nightly" ]
 
 jobs:
   build:
@@ -34,12 +34,12 @@ jobs:
     - name: Build server win-x64
       run: dotnet build RageCoop.Server/RageCoop.Server.csproj -o bin/Release/Server
     - name: Upload server
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Server
         path: bin/Release/Server
     - name: Upload Client
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Client
         path: bin/Release/Client/RageCoop

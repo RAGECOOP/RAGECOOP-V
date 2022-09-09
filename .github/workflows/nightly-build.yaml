@@ -21,7 +21,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Restore nuget packages
-      run: nuget restore`
+      run: nuget restore
     - name: Build client and installer
       run: dotnet build RageCoop.Client.Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client/RageCoop
     - name: Build server win-x64
