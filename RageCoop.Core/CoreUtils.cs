@@ -240,14 +240,6 @@ namespace RageCoop.Core
         {
             return Encoding.UTF8.GetBytes(s);
         }
-        public static byte[] GetBytesWithLength(this string s)
-        {
-            var data = new List<byte>(100);
-            var sb = Encoding.UTF8.GetBytes(s);
-            data.AddInt(sb.Length);
-            data.AddRange(sb);
-            return data.ToArray();
-        }
         public static string GetString(this byte[] data)
         {
             return Encoding.UTF8.GetString(data);
