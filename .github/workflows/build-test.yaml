@@ -1,0 +1,47 @@
+name: Buld test
+
+on:
+  push:
+    branches:    
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!main'     # excludes main
+
+  pull_request:
+    branches: [ "main","dev-nightly" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0.x']
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version:  ${{ matrix.dotnet-version }}
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Restore nuget packages
+      run: nuget restore
+    - name: Build client and installer
+      run: dotnet build RageCoop.Client.Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client/RageCoop
+    - name: Build server win-x64
+      run: dotnet build RageCoop.Server/RageCoop.Server.csproj -o bin/Release/Server
+    - name: Upload server
+    - uses: actions/upload-artifact@v3
+      with:
+        name: RageCoop.Server
+        path: bin/Release/Server
+    - name: Upload Client
+    - uses: actions/upload-artifact@v3
+      with:
+        name: RageCoop.Client
+        path: bin/Release/Client/RageCoop
+    - uses: actions/checkout@v2
+      
