@@ -67,6 +67,7 @@
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Voice.cs" />
+    <Compile Include="Util\AddOnDataProvider.cs" />
     <Compile Include="Util\Memory.cs" />
     <Compile Include="Util\NativeCaller.cs" />
     <Compile Include="Util\PedConfigFlags.cs" />
