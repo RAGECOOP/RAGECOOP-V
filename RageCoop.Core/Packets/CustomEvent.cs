@@ -35,9 +35,8 @@ namespace RageCoop.Core
 
                 Flags = (CustomEventFlags)m.ReadByte();
                 Hash = m.ReadInt32();
-                var len = m.ReadInt32();
-                Args = new object[len];
-                for (int i = 0; i < len; i++)
+                Args = new object[m.ReadInt32()];
+                for (int i = 0; i < Args.Length; i++)
                 {
                     byte type = m.ReadByte();
                     switch (type)

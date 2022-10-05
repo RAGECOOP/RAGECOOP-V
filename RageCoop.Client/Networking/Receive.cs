@@ -266,7 +266,6 @@ namespace RageCoop.Client
                             recycle = false;
                             Main.QueueAction(() =>
                             {
-                                packet.Deserialize(msg);
                                 Scripting.API.Events.InvokeCustomEventReceived(packet);
                                 Peer.Recycle(msg);
                             });
