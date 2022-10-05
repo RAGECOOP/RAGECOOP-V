@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GTA.Native;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,38 +7,59 @@ using System.Text;
 namespace RageCoop.Core.Scripting
 {
     /// <summary>
-    /// 
+    /// Describes how the event should be sent or processed
     /// </summary>
-    public static class CustomEvents
+    public enum CustomEventFlags : byte
+    {
+        None=0,
+        
+        /// <summary>
+        /// Data will be encrypted and decrypted on target client
+        /// </summary>
+        Encrypted=1,
+
+        /// <summary>
+        /// Event will be queued and fired in script thread, specify this flag if your handler will call native functions.
+        /// </summary>
+        Queued=2,
+
+    }
+
+    /// <summary>
+    /// Struct to identify different event using hash
+    /// </summary>
+    public struct CustomEventHash
     {
         private static readonly MD5 Hasher = MD5.Create();
         private static readonly Dictionary<int, string> Hashed = new Dictionary<int, string>();
-        internal static readonly int OnPlayerDied = Hash("RageCoop.OnPlayerDied");
-        internal static readonly int SetWeather = Hash("RageCoop.SetWeather");
-        internal static readonly int OnPedDeleted = Hash("RageCoop.OnPedDeleted");
-        internal static readonly int OnVehicleDeleted = Hash("RageCoop.OnVehicleDeleted");
-        internal static readonly int SetAutoRespawn = Hash("RageCoop.SetAutoRespawn");
-        internal static readonly int SetDisplayNameTag = Hash("RageCoop.SetDisplayNameTag");
-        internal static readonly int NativeCall = Hash("RageCoop.NativeCall");
-        internal static readonly int NativeResponse = Hash("RageCoop.NativeResponse");
-        internal static readonly int AllResourcesSent = Hash("RageCoop.AllResourcesSent");
-        internal static readonly int ServerPropSync = Hash("RageCoop.ServerPropSync");
-        internal static readonly int ServerBlipSync = Hash("RageCoop.ServerBlipSync");
-        internal static readonly int SetEntity = Hash("RageCoop.SetEntity");
-        internal static readonly int DeleteServerProp = Hash("RageCoop.DeleteServerProp");
-        internal static readonly int UpdatePedBlip = Hash("RageCoop.UpdatePedBlip");
-        internal static readonly int DeleteEntity = Hash("RageCoop.DeleteEntity");
-        internal static readonly int DeleteServerBlip = Hash("RageCoop.DeleteServerBlip");
-        internal static readonly int CreateVehicle = Hash("RageCoop.CreateVehicle");
-        internal static readonly int WeatherTimeSync = Hash("RageCoop.WeatherTimeSync");
-        internal static readonly int IsHost = Hash("RageCoop.IsHost");
+        /// <summary>
+        /// Hash value
+        /// </summary>
+        public int Hash;
+        /// <summary>
+        /// Create from hash
+        /// </summary>
+        /// <param name="hash"></param>
+        public static implicit operator CustomEventHash(int hash)
+        {
+            return new CustomEventHash() { Hash = hash };
+        }
+        /// <summary>
+        /// Create from string
+        /// </summary>
+        /// <param name="name"></param>
+        public static implicit operator CustomEventHash(string name)
+        {
+            return new CustomEventHash() { Hash = FromString(name) };
+
+        }
         /// <summary>
         /// Get a Int32 hash of a string.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException">The exception is thrown when the name did not match a previously computed one and the hash was the same.</exception>
-        public static int Hash(string s)
+        public static int FromString(string s)
         {
             var hash = BitConverter.ToInt32(Hasher.ComputeHash(Encoding.UTF8.GetBytes(s)), 0);
             lock (Hashed)
@@ -56,5 +78,39 @@ namespace RageCoop.Core.Scripting
                 return hash;
             }
         }
+        /// <summary>
+        /// To int
+        /// </summary>
+        /// <param name="h"></param>
+        public static implicit operator int(CustomEventHash h)
+        {
+            return h.Hash;
+        }
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class CustomEvents
+    {
+        internal static readonly CustomEventHash OnPlayerDied = "RageCoop.OnPlayerDied";
+        internal static readonly CustomEventHash SetWeather = "RageCoop.SetWeather";
+        internal static readonly CustomEventHash OnPedDeleted = "RageCoop.OnPedDeleted";
+        internal static readonly CustomEventHash OnVehicleDeleted = "RageCoop.OnVehicleDeleted";
+        internal static readonly CustomEventHash SetAutoRespawn = "RageCoop.SetAutoRespawn";
+        internal static readonly CustomEventHash SetDisplayNameTag = "RageCoop.SetDisplayNameTag";
+        internal static readonly CustomEventHash NativeCall = "RageCoop.NativeCall";
+        internal static readonly CustomEventHash NativeResponse = "RageCoop.NativeResponse";
+        internal static readonly CustomEventHash AllResourcesSent = "RageCoop.AllResourcesSent";
+        internal static readonly CustomEventHash ServerPropSync = "RageCoop.ServerPropSync";
+        internal static readonly CustomEventHash ServerBlipSync = "RageCoop.ServerBlipSync";
+        internal static readonly CustomEventHash SetEntity = "RageCoop.SetEntity";
+        internal static readonly CustomEventHash DeleteServerProp = "RageCoop.DeleteServerProp";
+        internal static readonly CustomEventHash UpdatePedBlip = "RageCoop.UpdatePedBlip";
+        internal static readonly CustomEventHash DeleteEntity = "RageCoop.DeleteEntity";
+        internal static readonly CustomEventHash DeleteServerBlip = "RageCoop.DeleteServerBlip";
+        internal static readonly CustomEventHash CreateVehicle = "RageCoop.CreateVehicle";
+        internal static readonly CustomEventHash WeatherTimeSync = "RageCoop.WeatherTimeSync";
+        internal static readonly CustomEventHash IsHost = "RageCoop.IsHost";
+
     }
 }

@@ -302,57 +302,50 @@ namespace RageCoop.Server.Scripting
         {
             var argsList = new List<object>(args);
             argsList.InsertRange(0, new object[] { (byte)TypeCode.Empty, (ulong)hash });
-            SendCustomEventQueued(clients, CustomEvents.NativeCall, argsList.ToArray());
+            SendCustomEvent(CustomEventFlags.Queued, clients, CustomEvents.NativeCall, argsList.ToArray());
         }
 
 
         /// <summary>
-        /// Send an event and data to the specified clients. Use <see cref="Client.SendCustomEvent(int,object[])"/> if you want to send event to individual client.
+        /// Send an event and data to the specified clients.
         /// </summary>
-        /// <param name="eventHash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
+        /// <param name="flags"></param>
+        /// <param name="eventHash">An unique identifier of the event/> to get it from a string</param>
         /// <param name="args">The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args"/> for supported types.</param>
         /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>
-        public void SendCustomEvent(List<Client> targets, int eventHash, params object[] args)
+        public void SendCustomEvent(CustomEventFlags flags, List<Client> targets, CustomEventHash eventHash, params object[] args)
         {
-
-            targets ??= new(Server.ClientsByNetHandle.Values);
-            var p = new Packets.CustomEvent()
+            var p = new Packets.CustomEvent(flags)
             {
                 Args = args,
                 Hash = eventHash
             };
-            foreach (var c in targets)
+            if (targets == null)
             {
-                Server.Send(p, c, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
+                Server.SendToAll(p, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
+            }
+            else
+            {
+                foreach (var c in targets)
+                {
+                    Server.Send(p, c, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
+                }
             }
         }
-
-        /// <summary>
-        /// Send a CustomEvent that'll be queued at client side and invoked from script thread
-        /// </summary>
-        /// <param name="targets"></param>
-        /// <param name="eventHash"></param>
-        /// <param name="args"></param>
-        public void SendCustomEventQueued(List<Client> targets, int eventHash, params object[] args)
+        public void SendCustomEvent(List<Client> targets, CustomEventHash eventHash, params object[] args)
         {
-
-            targets ??= new(Server.ClientsByNetHandle.Values);
-            var p = new Packets.CustomEvent(null, true)
-            {
-                Args = args,
-                Hash = eventHash
-            };
-            foreach (var c in targets)
-            {
-                Server.Send(p, c, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
-            }
+            SendCustomEvent(CustomEventFlags.None, targets, eventHash, args);
+        }
+        public void SendCustomEventQueued(List<Client> targets, CustomEventHash eventHash, params object[] args)
+        {
+            SendCustomEvent(CustomEventFlags.Queued, targets, eventHash, args);
         }
         /// <summary>
         /// Register an handler to the specifed event hash, one event can have multiple handlers.
         /// </summary>
-        /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="CustomEvents.Hash(string)"/></param>
+        /// <param name="hash">An unique identifier of the event></param>
         /// <param name="handler">An handler to be invoked when the event is received from the server.</param>
-        public void RegisterCustomEventHandler(int hash, Action<CustomEventReceivedArgs> handler)
+        public void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
         {
             lock (Events.CustomEventHandlers)
             {
@@ -362,15 +355,6 @@ namespace RageCoop.Server.Scripting
                 }
                 handlers.Add(handler);
             }
-        }
-        /// <summary>
-        /// Register an event handler for specified event name.
-        /// </summary>
-        /// <param name="name">This value will be hashed to an int to reduce overhead</param>
-        /// <param name="handler">The handler to be invoked when the event is received</param>
-        public void RegisterCustomEventHandler(string name, Action<CustomEventReceivedArgs> handler)
-        {
-            RegisterCustomEventHandler(CustomEvents.Hash(name), handler);
         }
 
 

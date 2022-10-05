@@ -259,22 +259,22 @@ namespace RageCoop.Client
 
                 case PacketType.CustomEvent:
                     {
-                        Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
+                        Packets.CustomEvent packet = new Packets.CustomEvent();
                         packet.Deserialize(msg);
-                        Scripting.API.Events.InvokeCustomEventReceived(packet);
-                    }
-                    break;
-
-                case PacketType.CustomEventQueued:
-                    {
-                        recycle = false;
-                        Packets.CustomEvent packet = new Packets.CustomEvent(_resolveHandle);
-                        Main.QueueAction(() =>
+                        if (packet.Flags.HasEventFlag(Core.Scripting.CustomEventFlags.Queued))
                         {
-                            packet.Deserialize(msg);
+                            recycle = false;
+                            Main.QueueAction(() =>
+                            {
+                                packet.Deserialize(msg);
+                                Scripting.API.Events.InvokeCustomEventReceived(packet);
+                                Peer.Recycle(msg);
+                            });
+                        }
+                        else
+                        {
                             Scripting.API.Events.InvokeCustomEventReceived(packet);
-                            Peer.Recycle(msg);
-                        });
+                        }
                     }
                     break;
 

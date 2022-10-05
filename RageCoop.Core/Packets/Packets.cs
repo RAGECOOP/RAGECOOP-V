@@ -24,7 +24,6 @@ namespace RageCoop.Core
         AllResourcesSent = 15,
 
         CustomEvent = 16,
-        CustomEventQueued = 17,
 
         ConnectionRequest = 18,
         P2PConnect = 19,

@@ -25,6 +25,7 @@ namespace RageCoop.Client
         static Networking()
         {
             Security = new Security(Main.Logger);
+            Packets.CustomEvent.ResolveHandle = _resolveHandle;
         }
 
         public static void ToggleConnection(string address, string username = null, string password = null, PublicKey publicKey = null)

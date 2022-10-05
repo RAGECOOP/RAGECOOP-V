@@ -1,6 +1,7 @@
 ﻿using GTA.Math;
 using Lidgren.Network;
 using Newtonsoft.Json;
+using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -272,22 +274,27 @@ namespace RageCoop.Core
             p.Deserialize(msg);
             return p;
         }
-        public static bool HasPedFlag(this PedDataFlags flagToCheck, PedDataFlags flag)
+        public static bool HasPedFlag(this PedDataFlags flags, PedDataFlags flag)
         {
-            return (flagToCheck & flag) != 0;
+            return (flags & flag) != 0;
         }
-        public static bool HasProjDataFlag(this ProjectileDataFlags flagToCheck, ProjectileDataFlags flag)
+        public static bool HasProjDataFlag(this ProjectileDataFlags flags, ProjectileDataFlags flag)
         {
-            return (flagToCheck & flag) != 0;
+            return (flags & flag) != 0;
         }
 
-        public static bool HasVehFlag(this VehicleDataFlags flagToCheck, VehicleDataFlags flag)
+        public static bool HasVehFlag(this VehicleDataFlags flags, VehicleDataFlags flag)
         {
-            return (flagToCheck & flag) != 0;
+            return (flags & flag) != 0;
         }
-        public static bool HasConfigFlag(this PlayerConfigFlags flagToCheck, PlayerConfigFlags flag)
+        public static bool HasConfigFlag(this PlayerConfigFlags flags, PlayerConfigFlags flag)
         {
-            return (flagToCheck & flag) != 0;
+            return (flags & flag) != 0;
+        }
+        public static bool HasEventFlag(this CustomEventFlags flags,CustomEventFlags flag)
+        {
+            return (flags & flag) != 0;
+
         }
         public static Type GetActualType(this TypeCode code)
         {

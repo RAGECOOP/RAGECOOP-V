@@ -2,6 +2,7 @@
 using GTA;
 using Newtonsoft.Json;
 using RageCoop.Core;
+using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -280,10 +281,24 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         /// <param name="eventHash">An unique identifier of the event</param>
         /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
-        public static void SendCustomEvent(int eventHash, params object[] args)
+        public static void SendCustomEvent(CustomEventHash eventHash, params object[] args)
         {
 
             Networking.Peer.SendTo(new Packets.CustomEvent()
+            {
+                Args = args,
+                Hash = eventHash
+            }, Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
+        }
+        /// <summary>
+        /// Send an event and data to the server
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <param name="eventHash">An unique identifier of the event</param>
+        /// <param name="args">The objects conataing your data, see <see cref="CustomEventReceivedArgs"/> for a list of supported types</param>
+        public static void SendCustomEvent(CustomEventFlags flags,CustomEventHash eventHash, params object[] args)
+        {
+            Networking.Peer.SendTo(new Packets.CustomEvent(flags)
             {
                 Args = args,
                 Hash = eventHash
@@ -295,7 +310,7 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
         /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
-        public static void RegisterCustomEventHandler(int hash, Action<CustomEventReceivedArgs> handler)
+        public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
         {
             lock (CustomEventHandlers)
             {

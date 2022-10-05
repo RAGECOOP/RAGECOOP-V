@@ -1,4 +1,5 @@
 ﻿using Lidgren.Network;
+using RageCoop.Core.Scripting;
 using System;
 namespace RageCoop.Core
 {
@@ -7,21 +8,20 @@ namespace RageCoop.Core
 
         internal class CustomEvent : Packet
         {
-            public override PacketType Type => (_queued ? PacketType.CustomEventQueued : PacketType.CustomEvent);
-            public CustomEvent(Func<byte, NetIncomingMessage, object> onResolve = null, bool queued = false)
+            public static Func<byte, NetIncomingMessage, object> ResolveHandle = null;
+            public CustomEventFlags Flags;
+            public override PacketType Type => PacketType.CustomEvent;
+            public CustomEvent(CustomEventFlags flags = CustomEventFlags.None)
             {
-                _resolve = onResolve;
-                _queued = queued;
+                Flags = flags;
             }
-            private readonly bool _queued;
-            private Func<byte, NetIncomingMessage, object> _resolve { get; set; }
             public int Hash { get; set; }
             public object[] Args { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
             {
                 Args = Args ?? new object[] { };
-
+                m.Write((byte)Flags);
                 m.Write(Hash);
                 m.Write(Args.Length);
                 foreach (var arg in Args)
@@ -33,7 +33,7 @@ namespace RageCoop.Core
             public override void Deserialize(NetIncomingMessage m)
             {
 
-
+                Flags = (CustomEventFlags)m.ReadByte();
                 Hash = m.ReadInt32();
                 var len = m.ReadInt32();
                 Args = new object[len];
@@ -73,13 +73,13 @@ namespace RageCoop.Core
                         case 0x15:
                             Args[i] = m.ReadByteArray(); break;
                         default:
-                            if (_resolve == null)
+                            if (ResolveHandle == null)
                             {
                                 throw new InvalidOperationException($"Unexpected type: {type}");
                             }
                             else
                             {
-                                Args[i] = _resolve(type, m); break;
+                                Args[i] = ResolveHandle(type, m); break;
                             }
                     }
                 }

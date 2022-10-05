@@ -170,9 +170,10 @@ namespace RageCoop.Server
         /// <summary>
         /// Trigger a CustomEvent for this client
         /// </summary>
-        /// <param name="hash">An unique identifier of the event, you can use <see cref="CustomEvents.Hash(string)"/> to get it from a string</param>
+        /// <param name="flags"></param>
+        /// <param name="hash">An unique identifier of the event</param>
         /// <param name="args">Arguments</param>
-        public void SendCustomEvent(int hash, params object[] args)
+        public void SendCustomEvent(CustomEventFlags flags,CustomEventHash hash, params object[] args)
         {
             if (!IsReady)
             {
@@ -183,7 +184,7 @@ namespace RageCoop.Server
             {
 
                 NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.CustomEvent()
+                new Packets.CustomEvent(flags)
                 {
                     Hash = hash,
                     Args = args
@@ -196,37 +197,13 @@ namespace RageCoop.Server
                 Server.Logger?.Error(ex);
             }
         }
-
-        /// <summary>
-        /// Send a CustomEvent that'll be queued at client side and invoked from script thread
-        /// </summary>
-        /// <param name="hash"></param>
-        /// <param name="args"></param>
-        public void SendCustomEventQueued(int hash, params object[] args)
-        {
-            if (!IsReady)
-            {
-                Server.Logger?.Warning($"Player \"{Username}\" is not ready!");
-            }
-
-            try
-            {
-
-                NetOutgoingMessage outgoingMessage = Server.MainNetServer.CreateMessage();
-                new Packets.CustomEvent(null, true)
-                {
-                    Hash = hash,
-                    Args = args
-                }.Pack(outgoingMessage);
-                Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered, (byte)ConnectionChannel.Event);
-
-            }
-            catch (Exception ex)
-            {
-                Server.Logger?.Error(ex);
-            }
+        public void SendCustomEventQueued(CustomEventHash hash, params object[] args) { 
+            SendCustomEvent(CustomEventFlags.Queued, hash, args);
         }
-
+        public void SendCustomEvent(CustomEventHash hash, params object[] args)
+        {
+            SendCustomEvent(CustomEventFlags.None, hash, args);
+        }
         #endregion
     }
 }
