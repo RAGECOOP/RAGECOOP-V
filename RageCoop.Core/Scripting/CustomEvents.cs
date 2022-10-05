@@ -111,6 +111,15 @@ namespace RageCoop.Core.Scripting
         internal static readonly CustomEventHash CreateVehicle = "RageCoop.CreateVehicle";
         internal static readonly CustomEventHash WeatherTimeSync = "RageCoop.WeatherTimeSync";
         internal static readonly CustomEventHash IsHost = "RageCoop.IsHost";
-
+        /// <summary>
+        /// Get event hash from string.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>This method is obsoete, you should use implicit operator or <see cref="CustomEventHash.FromString(string)"/></remarks>
+        [Obsolete]
+        public static int Hash(string s)
+        {
+            return CustomEventHash.FromString(s);
+        }
     }
 }
