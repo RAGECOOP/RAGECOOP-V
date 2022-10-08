@@ -73,8 +73,9 @@ namespace RageCoop.Client
             }
             DevToolMenu.secondaryBoneIndexItem.AltTitle = Secondary.ToString();
         }
-        private static void OnTick(object sender, EventArgs e)
+        private void OnTick(object sender, EventArgs e)
         {
+            if (!Util.ShouldBeRunning) { Abort(); }
             if (ToMark == null || !ToMark.Exists()) { return; }
             Update();
             Draw(Current);

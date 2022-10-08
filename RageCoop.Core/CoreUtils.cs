@@ -26,15 +26,16 @@ namespace RageCoop.Core
     {
         private static readonly HashSet<string> ToIgnore = new HashSet<string>()
         {
-            "RageCoop.Client.dll",
-            "RageCoop.Core.dll",
-            "RageCoop.Server.dll",
-            "ScriptHookVDotNet3.dll",
-            "ScriptHookVDotNet.dll"
+            "RageCoop.Client",
+            "RageCoop.Core",
+            "RageCoop.Server",
+            "ScriptHookVDotNet2",
+            "ScriptHookVDotNet3",
+            "ScriptHookVDotNet"
         };
         public static bool CanBeIgnored(this string name)
         {
-            return ToIgnore.Contains(name);
+            return ToIgnore.Contains(Path.GetFileNameWithoutExtension(name));
         }
         public static void GetBytesFromObject(object obj, NetOutgoingMessage m)
         {

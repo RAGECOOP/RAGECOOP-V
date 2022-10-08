@@ -25,6 +25,7 @@ namespace RageCoop.Client
         private static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
+            if (!Util.ShouldBeRunning) { Abort(); }
             if (Game.IsLoading || !Networking.IsOnServer)
             {
                 return;

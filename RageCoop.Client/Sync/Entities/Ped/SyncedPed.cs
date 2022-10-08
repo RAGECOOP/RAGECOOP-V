@@ -283,7 +283,10 @@ namespace RageCoop.Client
 
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@base", "free_idle", 3))
                 {
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed.Handle, LoadAnim("skydive@base"), "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                    // Skip update if animation is not loaded
+                    var dict = LoadAnim("skydive@base");
+                    if (dict == null) { return; }
+                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed.Handle, dict, "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
                 }
                 return;
             }
@@ -312,7 +315,9 @@ namespace RageCoop.Client
 
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@parachute@first_person", "chute_idle_right", 3))
                 {
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, LoadAnim("skydive@parachute@first_person"), "chute_idle_right", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                    var dict = LoadAnim("skydive@parachute@first_person");
+                    if (dict == null) { return; }
+                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, dict, "chute_idle_right", 8f, 10f, -1, 0, -8f, 1, 1, 1);
                 }
 
                 return;

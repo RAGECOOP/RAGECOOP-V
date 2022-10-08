@@ -93,10 +93,9 @@ namespace RageCoop.Client.Scripting
         {
             var vehicleModel = (Model)e.Args[1];
             vehicleModel.Request(1000);
-            Vehicle veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
-            while (veh == null)
+            Vehicle veh;
+            while ((veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3])) == null)
             {
-                veh = World.CreateVehicle(vehicleModel, (Vector3)e.Args[2], (float)e.Args[3]);
                 Thread.Sleep(10);
             }
             veh.CanPretendOccupants = false;

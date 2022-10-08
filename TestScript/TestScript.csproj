@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<OutDir>..\bin\Debug</OutDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="ScriptHookVDotNet">
+		  <HintPath>..\libs\ScriptHookVDotNet.dll</HintPath>
+		</Reference>
+		<Reference Include="ScriptHookVDotNet3">
+			<HintPath>..\libs\ScriptHookVDotNet3.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>

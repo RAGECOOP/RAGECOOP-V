@@ -2,8 +2,10 @@
 using GTA.Math;
 using GTA.Native;
 using RageCoop.Client.Menus;
+using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -19,7 +21,7 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
-        private bool _gameLoaded = false;
+        private static bool _gameLoaded = false;
         internal static Version Version = typeof(Main).Assembly.GetName().Version;
 
         internal static int LocalPlayerID = 0;
@@ -34,26 +36,27 @@ namespace RageCoop.Client
         internal static Chat MainChat = null;
         internal static Stopwatch Counter = new Stopwatch();
         internal static Logger Logger = null;
-
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
         internal static Scripting.Resources Resources = null;
+        private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
         private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
         public static Worker Worker;
-
+        public static string ScriptPath;
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
-            Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
+            ScriptPath = Filename;
+            if (!Util.ShouldBeRunning) { return; }
             try
             {
                 Settings = Util.ReadSettings();
             }
             catch
             {
-                GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
+                // GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
                 Settings = new Settings();
                 Util.SaveSettings();
             }
@@ -68,7 +71,9 @@ namespace RageCoop.Client
                 LogLevel=Settings.LogLevel,
 #endif
             };
-            Resources = new Scripting.Resources();
+            Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
+            SHVDN.ScriptDomain.CurrentDomain.Tick += DomainTick;
+            Resources = new Resources();
             if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
                 Tick += (object sender, EventArgs e) =>
@@ -91,21 +96,66 @@ namespace RageCoop.Client
 #if !NON_INTERACTIVE
 #endif
             MainChat = new Chat();
+            Aborted += OnAborted;
             Tick += OnTick;
-            Tick += (s, e) => { Scripting.API.Events.InvokeTick(); };
+            Tick += (s, e) => { API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
-            KeyDown += (s, e) => { Scripting.API.Events.InvokeKeyDown(s, e); };
-            KeyUp += (s, e) => { Scripting.API.Events.InvokeKeyUp(s, e); };
+            KeyDown += (s, e) => { API.Events.InvokeKeyDown(s, e); };
+            KeyUp += (s, e) => { API.Events.InvokeKeyUp(s, e); };
             Aborted += (object sender, EventArgs e) => Disconnected("Abort");
 
             Util.NativeMemory();
             Counter.Restart();
         }
 
+        private static void OnAborted(object sender, EventArgs e)
+        {
+            try
+            {
+                ResourceDomain.Unload();
+                SHVDN.ScriptDomain.CurrentDomain.Tick -= DomainTick;
+            }
+            catch(Exception ex)
+            {
+                Logger.Error(ex);
+            }
+        }
+
+        private static void DomainTick(object sender, EventArgs e)
+        {
+            while(TaskQueue.TryDequeue(out var task))
+            {
+                try
+                {
+                    task.Invoke();
+                }
+                catch(Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+            }
+
+            if (Networking.IsOnServer)
+            {
+                try
+                {
+                    EntityPool.DoSync();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+            }
+        }
+        internal static void QueueToMainThread(Action task)
+        {
+            TaskQueue.Enqueue(task);
+        }
+
         public static Ped P;
         public static float FPS;
-        private bool _lastDead;
-        private void OnTick(object sender, EventArgs e)
+        private static bool _lastDead;
+        private static void OnTick(object sender, EventArgs e)
         {
             P = Game.Player.Character;
             PlayerPosition = P.ReadPosition();
@@ -135,14 +185,6 @@ namespace RageCoop.Client
             {
                 Game.TimeScale = 1;
             }
-            try
-            {
-                EntityPool.DoSync();
-            }
-            catch (Exception ex)
-            {
-                Main.Logger.Error(ex);
-            }
 
             if (Networking.ShowNetworkInfo)
             {
@@ -153,7 +195,7 @@ namespace RageCoop.Client
 
             MainChat.Tick();
             PlayerList.Tick();
-            if (!Scripting.API.Config.EnableAutoRespawn)
+            if (!API.Config.EnableAutoRespawn)
             {
                 Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
                 Function.Call(Hash.IGNORE_NEXT_RESTART, true);
@@ -167,8 +209,8 @@ namespace RageCoop.Client
                     {
                         P.Health = 1;
                         Game.Player.WantedLevel = 0;
-                        Main.Logger.Debug("Player died.");
-                        Scripting.API.Events.InvokePlayerDied();
+                        Logger.Debug("Player died.");
+                        API.Events.InvokePlayerDied();
                     }
                     GTA.UI.Screen.StopEffects();
                 }
@@ -185,8 +227,16 @@ namespace RageCoop.Client
             _lastDead = P.IsDead;
             Ticked++;
         }
-        private void OnKeyDown(object sender, KeyEventArgs e)
+        private static void OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.U)
+            {
+                ResourceDomain.Unload();
+            }
+            if (e.KeyCode == Keys.L)
+            {
+                ResourceDomain.Load();
+            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);

@@ -3,6 +3,7 @@ using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -10,12 +11,44 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using mscoree;
+using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
     {
+        public static bool ShouldBeRunning => Main.ScriptPath == null || Main.ScriptPath.ToLower() == Path.Combine(Directory.GetCurrentDirectory(), @"Scripts\RageCoop\RageCoop.Client.dll").ToLower();
+        public static IList<AppDomain> GetAppDomains()
+        {
+            IList<AppDomain> _IList = new List<AppDomain>();
+            IntPtr enumHandle = IntPtr.Zero;
+            ICorRuntimeHost host = new CorRuntimeHost();
+            try
+            {
+                host.EnumDomains(out enumHandle);
+                object domain = null;
+                while (true)
+                {
+                    host.NextDomain(enumHandle, out domain);
+                    if (domain == null) break;
+                    AppDomain appDomain = (AppDomain)domain;
+                    _IList.Add(appDomain);
+                }
+                return _IList;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                return null;
+            }
+            finally
+            {
+                host.CloseEnum(enumHandle);
+                Marshal.ReleaseComObject(host);
+            }
+        }
         public static SizeF ResolutionMaintainRatio
         {
             get

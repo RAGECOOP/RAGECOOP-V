@@ -40,8 +40,10 @@ namespace RageCoop.Client
                 var flag = AnimationFlags.Loop;
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed, animDict, ourAnim, 3))
                 {
+                    if (LoadAnim(animDict) == null) { return; }
+
                     MainPed.Task.ClearAll();
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, LoadAnim(animDict), ourAnim, 8f, 10f, -1, flag, -8f, 1, 1, 1);
+                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, animDict, ourAnim, 8f, 10f, -1, flag, -8f, 1, 1, 1);
                 }
             }
         }
@@ -143,18 +145,11 @@ namespace RageCoop.Client
 
         private string LoadAnim(string anim)
         {
-            ulong startTime = Util.GetTickCount64();
-
-            while (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
+            if(!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
             {
-                Script.Yield();
                 Function.Call(Hash.REQUEST_ANIM_DICT, anim);
-                if (Util.GetTickCount64() - startTime >= 1000)
-                {
-                    break;
-                }
+                return null;
             }
-
             return anim;
         }
     }
