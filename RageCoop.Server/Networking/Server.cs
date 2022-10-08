@@ -2,7 +2,6 @@
 using RageCoop.Core;
 using RageCoop.Server.Scripting;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;

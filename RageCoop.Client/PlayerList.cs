@@ -2,6 +2,7 @@
 using GTA.Math;
 using GTA.Native;
 using Lidgren.Network;
+using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace RageCoop.Client
 {
     internal static class PlayerList
     {
+        static readonly API API = Main.API;
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;
         private static readonly Scaleform _mainScaleform = new Scaleform("mp_mm_card_freemode");
@@ -95,9 +97,9 @@ namespace RageCoop.Client
                     }
                     else
                     {
-                        p.FakeBlip.Color = Scripting.API.Config.BlipColor;
-                        p.FakeBlip.Scale = Scripting.API.Config.BlipScale;
-                        p.FakeBlip.Sprite = Scripting.API.Config.BlipSprite;
+                        p.FakeBlip.Color = API.Config.BlipColor;
+                        p.FakeBlip.Scale = API.Config.BlipScale;
+                        p.FakeBlip.Sprite = API.Config.BlipSprite;
                         p.FakeBlip.DisplayType = BlipDisplayType.Default;
                         p.FakeBlip.Position = p.Position;
                     }

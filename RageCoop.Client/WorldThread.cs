@@ -1,5 +1,6 @@
 ﻿using GTA;
 using GTA.Native;
+using RageCoop.Client.Scripting;
 using System;
 
 namespace RageCoop.Client
@@ -7,7 +8,7 @@ namespace RageCoop.Client
     /// <summary>
     /// Don't use it!
     /// </summary>
-    public class WorldThread : Script
+    internal class WorldThread : Script
     {
 
         /// <summary>
@@ -15,6 +16,7 @@ namespace RageCoop.Client
         /// </summary>
         public WorldThread()
         {
+            if (!Main.IsPrimaryDomain) { return; }
             Tick += OnTick;
             Aborted += (sender, e) =>
             {
@@ -25,7 +27,6 @@ namespace RageCoop.Client
         private static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
-            if (!Util.ShouldBeRunning) { Abort(); }
             if (Game.IsLoading || !Networking.IsOnServer)
             {
                 return;

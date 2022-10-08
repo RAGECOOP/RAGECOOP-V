@@ -3,7 +3,6 @@ using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using RageCoop.Server.Scripting;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
@@ -173,7 +172,7 @@ namespace RageCoop.Server
         /// <param name="flags"></param>
         /// <param name="hash">An unique identifier of the event</param>
         /// <param name="args">Arguments</param>
-        public void SendCustomEvent(CustomEventFlags flags,CustomEventHash hash, params object[] args)
+        public void SendCustomEvent(CustomEventFlags flags, CustomEventHash hash, params object[] args)
         {
             if (!IsReady)
             {
@@ -197,7 +196,8 @@ namespace RageCoop.Server
                 Server.Logger?.Error(ex);
             }
         }
-        public void SendCustomEventQueued(CustomEventHash hash, params object[] args) { 
+        public void SendCustomEventQueued(CustomEventHash hash, params object[] args)
+        {
             SendCustomEvent(CustomEventFlags.Queued, hash, args);
         }
         public void SendCustomEvent(CustomEventHash hash, params object[] args)

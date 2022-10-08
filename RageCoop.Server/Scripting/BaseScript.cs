@@ -1,6 +1,5 @@
 ﻿using RageCoop.Core.Scripting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace RageCoop.Server.Scripting

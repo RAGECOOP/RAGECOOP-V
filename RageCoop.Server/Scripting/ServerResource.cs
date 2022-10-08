@@ -3,7 +3,6 @@ using McMaster.NETCore.Plugins;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;

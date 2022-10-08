@@ -266,13 +266,13 @@ namespace RageCoop.Client
                             recycle = false;
                             Main.QueueAction(() =>
                             {
-                                Scripting.API.Events.InvokeCustomEventReceived(packet);
+                                API.Events.InvokeCustomEventReceived(packet);
                                 Peer.Recycle(msg);
                             });
                         }
                         else
                         {
-                            Scripting.API.Events.InvokeCustomEventReceived(packet);
+                            API.Events.InvokeCustomEventReceived(packet);
                         }
                     }
                     break;

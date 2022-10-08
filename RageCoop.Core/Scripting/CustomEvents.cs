@@ -1,5 +1,4 @@
-﻿using GTA.Native;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -11,17 +10,17 @@ namespace RageCoop.Core.Scripting
     /// </summary>
     public enum CustomEventFlags : byte
     {
-        None=0,
-        
+        None = 0,
+
         /// <summary>
         /// Data will be encrypted and decrypted on target client
         /// </summary>
-        Encrypted=1,
+        Encrypted = 1,
 
         /// <summary>
         /// Event will be queued and fired in script thread, specify this flag if your handler will call native functions.
         /// </summary>
-        Queued=2,
+        Queued = 2,
 
     }
 

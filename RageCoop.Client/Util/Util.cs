@@ -1,6 +1,7 @@
 ﻿using GTA;
 using GTA.Math;
 using GTA.Native;
+using mscoree;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using mscoree;
-using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
     {
-        public static bool ShouldBeRunning => Main.ScriptPath == null || Main.ScriptPath.ToLower() == Path.Combine(Directory.GetCurrentDirectory(), @"Scripts\RageCoop\RageCoop.Client.dll").ToLower();
         public static IList<AppDomain> GetAppDomains()
         {
             IList<AppDomain> _IList = new List<AppDomain>();
@@ -186,8 +184,8 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
+                Main.Logger?.Error(ex);
                 return false;
-                // GTA.UI.Notification.Show("Error saving player settings: " + ex.Message);
             }
         }
 

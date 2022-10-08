@@ -90,9 +90,9 @@ namespace RageCoop.Client
                 Blip b;
                 if (sp.IsPlayer)
                 {
-                    p.BlipColor = Scripting.API.Config.BlipColor;
-                    p.BlipSprite = Scripting.API.Config.BlipSprite;
-                    p.BlipScale = Scripting.API.Config.BlipScale;
+                    p.BlipColor = API.Config.BlipColor;
+                    p.BlipSprite = API.Config.BlipSprite;
+                    p.BlipScale = API.Config.BlipScale;
                 }
                 else if ((b = ped.AttachedBlip) != null)
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RageCoop.Core;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,6 @@ using System.Windows.Input;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 using Path = System.IO.Path;
-using RageCoop.Core;
 
 namespace RageCoop.Client.Installer
 {

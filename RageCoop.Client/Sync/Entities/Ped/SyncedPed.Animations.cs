@@ -145,7 +145,7 @@ namespace RageCoop.Client
 
         private string LoadAnim(string anim)
         {
-            if(!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
+            if (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
             {
                 Function.Call(Hash.REQUEST_ANIM_DICT, anim);
                 return null;

@@ -1,5 +1,6 @@
 ﻿using GTA;
 using GTA.Math;
+using RageCoop.Client.Scripting;
 using System;
 using System.Drawing;
 using System.Threading;
@@ -16,6 +17,7 @@ namespace RageCoop.Client
         public static MuzzleDir Direction = MuzzleDir.Forward;
         public DevTool()
         {
+            if (!Main.IsPrimaryDomain) { return; }
             Tick += OnTick;
             KeyDown += OnKeyDown;
         }
@@ -75,7 +77,6 @@ namespace RageCoop.Client
         }
         private void OnTick(object sender, EventArgs e)
         {
-            if (!Util.ShouldBeRunning) { Abort(); }
             if (ToMark == null || !ToMark.Exists()) { return; }
             Update();
             Draw(Current);

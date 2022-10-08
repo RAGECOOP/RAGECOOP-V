@@ -14,7 +14,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
@@ -292,7 +291,7 @@ namespace RageCoop.Core
         {
             return (flags & flag) != 0;
         }
-        public static bool HasEventFlag(this CustomEventFlags flags,CustomEventFlags flag)
+        public static bool HasEventFlag(this CustomEventFlags flags, CustomEventFlags flag)
         {
             return (flags & flag) != 0;
 

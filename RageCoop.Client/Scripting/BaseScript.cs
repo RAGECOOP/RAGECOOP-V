@@ -11,6 +11,7 @@ namespace RageCoop.Client.Scripting
 {
     internal class BaseScript : ClientScript
     {
+        readonly API API = Main.API;
         private bool _isHost = false;
         public override void OnStart()
         {

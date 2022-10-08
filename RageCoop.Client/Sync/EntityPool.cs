@@ -11,6 +11,7 @@ namespace RageCoop.Client
 {
     internal class EntityPool
     {
+        static readonly API API = Main.API;
         public static object PedsLock = new object();
 #if BENCHMARK
         private static Stopwatch PerfCounter=new Stopwatch();

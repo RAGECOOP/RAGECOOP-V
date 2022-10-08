@@ -1,5 +1,4 @@
 ﻿using RageCoop.Core;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;

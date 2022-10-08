@@ -38,6 +38,7 @@ namespace RageCoop.Client.Scripting
     }
     internal class Resources
     {
+        static readonly API API = Main.API;
         private readonly List<ClientResource> LoadedResources = new List<ClientResource>();
         private const string BaseScriptType = "RageCoop.Client.Scripting.ClientScript";
         private Logger Logger { get; set; }

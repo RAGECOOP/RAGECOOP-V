@@ -1,7 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using RageCoop.Core;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 namespace RageCoop.Server.Scripting

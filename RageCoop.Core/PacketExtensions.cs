@@ -1,8 +1,5 @@
 ﻿using GTA.Math;
 using Lidgren.Network;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RageCoop.Core
 {

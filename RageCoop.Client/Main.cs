@@ -21,6 +21,8 @@ namespace RageCoop.Client
     /// </summary>
     internal class Main : Script
     {
+        public static bool IsPrimaryDomain => (AppDomain.CurrentDomain.GetData("Primary") as bool?) != false;
+        public static API API = API.GetInstance();
         private static bool _gameLoaded = false;
         internal static Version Version = typeof(Main).Assembly.GetName().Version;
 
@@ -29,7 +31,7 @@ namespace RageCoop.Client
         internal static RelationshipGroup SyncedPedsGroup;
 
         internal static new Settings Settings = null;
-        internal static Scripting.BaseScript BaseScript = new Scripting.BaseScript();
+        internal static BaseScript BaseScript = new BaseScript();
 
 #if !NON_INTERACTIVE
 #endif
@@ -38,18 +40,18 @@ namespace RageCoop.Client
         internal static Logger Logger = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Scripting.Resources Resources = null;
+        internal static Resources Resources = null;
         private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
         private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
         public static Worker Worker;
-        public static string ScriptPath;
+        internal static SHVDN.Console Console => AppDomain.CurrentDomain.GetData("Console") as SHVDN.Console;
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
-            ScriptPath = Filename;
-            if (!Util.ShouldBeRunning) { return; }
+            Console.PrintInfo($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id}, {IsPrimaryDomain}");
+            if (!IsPrimaryDomain) { Console.PrintInfo("Ignored loading in scondary domain"); return; }
             try
             {
                 Settings = Util.ReadSettings();
@@ -106,6 +108,7 @@ namespace RageCoop.Client
 
             Util.NativeMemory();
             Counter.Restart();
+
         }
 
         private static void OnAborted(object sender, EventArgs e)
@@ -115,7 +118,7 @@ namespace RageCoop.Client
                 ResourceDomain.Unload();
                 SHVDN.ScriptDomain.CurrentDomain.Tick -= DomainTick;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error(ex);
             }
@@ -123,13 +126,13 @@ namespace RageCoop.Client
 
         private static void DomainTick(object sender, EventArgs e)
         {
-            while(TaskQueue.TryDequeue(out var task))
+            while (TaskQueue.TryDequeue(out var task))
             {
                 try
                 {
                     task.Invoke();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.Error(ex);
                 }
@@ -221,7 +224,7 @@ namespace RageCoop.Client
             }
             else if (P.IsDead && !_lastDead)
             {
-                Scripting.API.Events.InvokePlayerDied();
+                API.Events.InvokePlayerDied();
             }
 
             _lastDead = P.IsDead;
