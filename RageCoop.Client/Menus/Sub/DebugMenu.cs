@@ -1,12 +1,15 @@
 ﻿using GTA;
 using LemonUI.Menus;
+using RageCoop.Client.Scripting;
 using System;
 using System.Drawing;
+using System.IO;
 
 namespace RageCoop.Client
 {
     internal static class DebugMenu
     {
+        public static string DebugLocation => Path.Combine(Main.Settings.DataDirectory, @"Debug");
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Debug", "Debug settings")
         {
             UseMouse = false,
@@ -17,6 +20,7 @@ namespace RageCoop.Client
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
+        public static NativeItem DebugScriptsItem = new NativeItem("Load debug scripts", $"Load scripts from {DebugLocation}");
         public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
         public static NativeCheckboxItem ShowOwnerItem = new NativeCheckboxItem("Show entity owner", "Show the owner name of the entity you're aiming at", false);
         private static readonly NativeCheckboxItem ShowNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
@@ -46,13 +50,29 @@ namespace RageCoop.Client
             };
             ShowNetworkInfoItem.CheckboxChanged += (s, e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
             ShowOwnerItem.CheckboxChanged += (s, e) => { Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked; Util.SaveSettings(); };
+            DebugScriptsItem.Activated += ToggleScripts;
             Menu.Add(SimulatedLatencyItem);
             Menu.Add(ShowNetworkInfoItem);
             Menu.Add(ShowOwnerItem);
+            Menu.Add(DebugScriptsItem);
             Menu.AddSubMenu(DiagnosticMenu);
 
         }
 
-
+        private static void ToggleScripts(object sender, EventArgs e)
+        {
+            if (ResourceDomain.IsLoaded(DebugLocation))
+            {
+                ResourceDomain.Unload(DebugLocation);
+                DebugScriptsItem.Title = "Load debug scripts";
+                DebugScriptsItem.Description = $"Load scripts from {DebugLocation}";
+            }
+            else
+            {
+                ResourceDomain.Load(DebugLocation);
+                DebugScriptsItem.Title = "Unload debug scripts";
+                DebugScriptsItem.Description = $"Unload scripts from {DebugLocation}";
+            }
+        }
     }
 }

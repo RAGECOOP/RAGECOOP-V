@@ -73,10 +73,12 @@ namespace RageCoop.Client
         {
             if (enableItem.Checked)
             {
+                DevTool.Instance.Resume();
                 DevTool.ToMark = Game.Player.Character.CurrentVehicle;
             }
             else
             {
+                DevTool.Instance.Pause();
                 DevTool.ToMark = null;
             }
         }

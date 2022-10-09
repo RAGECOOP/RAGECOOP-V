@@ -142,7 +142,7 @@ namespace RageCoop.Client
                 });
             }
         }
-        public static bool IsOnServer { get => ServerConnection?.Status == NetConnectionStatus.Connected; }
+        public static bool IsOnServer => ServerConnection?.Status == NetConnectionStatus.Connected;
 
         #region -- PLAYER --
         private static void PlayerConnect(Packets.PlayerConnect packet)

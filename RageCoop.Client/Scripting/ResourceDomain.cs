@@ -1,97 +1,136 @@
-﻿using SHVDN;
+﻿using RageCoop.Core;
+using Console = GTA.Console;
+using SHVDN;
 using System;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Linq;
+using System.Collections.Concurrent;
 
 namespace RageCoop.Client.Scripting
 {
     internal class ResourceDomain : MarshalByRefObject, IDisposable
     {
-        public static ResourceDomain Instance;
+        public static ConcurrentDictionary<string, ResourceDomain> LoadedDomains => new ConcurrentDictionary<string, ResourceDomain>(_loadedDomains);
+        static readonly ConcurrentDictionary<string, ResourceDomain> _loadedDomains = new ConcurrentDictionary<string, ResourceDomain>();
         public static ScriptDomain PrimaryDomain;
-        public static string blah = "blah";
+        public string BaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
         private ScriptDomain CurrentDomain => ScriptDomain.CurrentDomain;
-        private ResourceDomain(ScriptDomain primary)
+        private ResourceDomain(ScriptDomain primary, string[] apiPaths)
         {
+            foreach (var apiPath in apiPaths)
+            {
+                try
+                {
+                    Assembly.LoadFrom(apiPath);
+                }
+                catch
+                {
+
+                }
+            }
             PrimaryDomain = primary;
 
             // Bridge to current ScriptDomain
             primary.Tick += Tick;
             primary.KeyEvent += KeyEvent;
-            AppDomain.CurrentDomain.SetData("Primary",false);
-            Main.Console.PrintInfo("Loaded scondary domain: " + AppDomain.CurrentDomain.Id + " " + Main.IsPrimaryDomain);
+            AppDomain.CurrentDomain.SetData("Primary", false);
+            Console.WriteLine("Loaded scondary domain: " + AppDomain.CurrentDomain.Id + " " + Util.IsPrimaryDomain);
         }
-        public static void Load(string dir = @"RageCoop\Scripts")
+        public static bool IsLoaded(string dir)
         {
-            if (Instance != null)
+            return _loadedDomains.ContainsKey(Path.GetFullPath(dir).ToLower());
+        }
+        public void SetupScripts()
+        {
+            foreach(var s in ScriptDomain.CurrentDomain.RunningScripts)
             {
-                throw new Exception("Already loaded");
             }
-            else if (!Main.IsPrimaryDomain)
+        }
+        public static ResourceDomain Load(string dir = @"RageCoop\Scripts\Debug")
+        {
+            lock (_loadedDomains)
             {
-                throw new InvalidOperationException("Cannot load in another domain");
-            }
-            ScriptDomain domain = null;
-            try
-            {
-                dir = Path.GetFullPath(dir);
-
-                if (Directory.Exists(dir))
+                dir = Path.GetFullPath(dir).ToLower();
+                if (!Util.IsPrimaryDomain)
                 {
-                    Directory.Delete(dir, true);
+                    throw new InvalidOperationException("Cannot load in another domain");
                 }
-                Directory.CreateDirectory(dir);
-
-                // Copy API assemblies
-                var api = typeof(ResourceDomain).Assembly;
-                File.Copy(api.Location, Path.Combine(dir, Path.GetFileName(api.Location)), true);
-                foreach (var a in api.GetReferencedAssemblies())
+                if (IsLoaded(dir))
                 {
-                    var asm = Assembly.Load(a.FullName);
-                    if (string.IsNullOrEmpty(asm.Location))
+                    throw new Exception("Already loaded");
+                }
+                ScriptDomain domain = null;
+                try
+                {
+                    dir = Path.GetFullPath(dir);
+                    Directory.CreateDirectory(dir);
+
+                    // Copy test script
+                    // File.Copy(@"M:\SandBox-Shared\repos\RAGECOOP\RAGECOOP-V\bin\Debug\TestScript.dll", Path.Combine(dir, Path.GetFileName("TestScript.dll")), true);
+
+                    // Load domain in main thread
+                    Main.QueueToMainThread(() =>
                     {
-                        continue;
-                    }
-                    File.Copy(asm.Location, Path.Combine(dir, Path.GetFileName(asm.Location)), true);
+
+                        var api = new List<string>();
+                        api.Add(typeof(ResourceDomain).Assembly.Location);
+                        api.AddRange(typeof(ResourceDomain).Assembly.GetReferencedAssemblies()
+                            .Select(x => Assembly.Load(x.FullName).Location)
+                            .Where(x => !string.IsNullOrEmpty(x)));
+
+                        domain = ScriptDomain.Load(Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName, dir);
+                        domain.AppDomain.SetData("Console", ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
+                        domain.AppDomain.SetData("RageCoop.Client.API", API.GetInstance());
+                        _loadedDomains.TryAdd(dir, (ResourceDomain)domain.AppDomain.CreateInstanceFromAndUnwrap(typeof(ResourceDomain).Assembly.Location, typeof(ResourceDomain).FullName, false, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { ScriptDomain.CurrentDomain, api.ToArray() }, null, null));
+                        domain.Start();
+                    });
+
+                    // Wait till next tick
+                    GTA.Script.Yield();
+                    return _loadedDomains[dir];
                 }
+                catch (Exception ex)
+                {
+                    GTA.UI.Notification.Show(ex.ToString());
+                    Main.Logger.Error(ex);
+                    if (domain != null)
+                    {
+                        ScriptDomain.Unload(domain);
+                    }
+                    throw;
+                }
+            }
+        }
 
-                // Copy test script
-                // File.Copy(@"M:\SandBox-Shared\repos\RAGECOOP\RAGECOOP-V\bin\Debug\TestScript.dll", Path.Combine(dir, Path.GetFileName("TestScript.dll")), true);
-
-                // Load domain in main thread
+        public static void Unload(ResourceDomain domain)
+        {
+            lock (_loadedDomains)
+            {
                 Main.QueueToMainThread(() =>
                 {
-                    domain = ScriptDomain.Load(Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName, dir);
-                    domain.AppDomain.SetData("Console", ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
-                    domain.AppDomain.SetData("RageCoop.Client.API", API.GetInstance());
-                    Instance = (ResourceDomain)domain.AppDomain.CreateInstanceFromAndUnwrap(typeof(ResourceDomain).Assembly.Location, typeof(ResourceDomain).FullName, false, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { ScriptDomain.CurrentDomain }, null, null);
-                    domain.Start();
+                    domain.Dispose();
+                    ScriptDomain.Unload(domain.CurrentDomain);
+                    _loadedDomains.TryRemove(domain.BaseDirectory, out _);
                 });
-
-                // Wait till next tick
                 GTA.Script.Yield();
             }
-            catch (Exception ex)
+        }
+        public static void Unload(string dir)
+        {
+            Unload(_loadedDomains[Path.GetFullPath(dir).ToLower()]);
+        }
+        public static void UnloadAll()
+        {
+            lock (_loadedDomains)
             {
-                GTA.UI.Notification.Show(ex.ToString());
-                Main.Logger.Error(ex);
-                if (domain != null)
+                foreach (var d in _loadedDomains.Values.ToArray())
                 {
-                    ScriptDomain.Unload(domain);
+                    Unload(d);
                 }
             }
-        }
-
-        public static void Unload()
-        {
-            if (Instance == null)
-            {
-                return;
-            }
-            Instance.Dispose();
-            ScriptDomain.Unload(Instance.CurrentDomain);
-            Instance = null;
         }
 
         private void Tick(object sender, EventArgs args)

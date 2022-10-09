@@ -8,7 +8,6 @@ namespace RageCoop.Client
 {
     internal static class SyncEvents
     {
-
         static readonly Scripting.API API = Main.API;
 
         #region TRIGGER

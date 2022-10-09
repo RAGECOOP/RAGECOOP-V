@@ -1,7 +1,7 @@
 ﻿using GTA;
+using Console = GTA.Console;
 using GTA.Math;
 using GTA.Native;
-using mscoree;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
@@ -12,41 +12,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
     {
-        public static IList<AppDomain> GetAppDomains()
-        {
-            IList<AppDomain> _IList = new List<AppDomain>();
-            IntPtr enumHandle = IntPtr.Zero;
-            ICorRuntimeHost host = new CorRuntimeHost();
-            try
-            {
-                host.EnumDomains(out enumHandle);
-                object domain = null;
-                while (true)
-                {
-                    host.NextDomain(enumHandle, out domain);
-                    if (domain == null) break;
-                    AppDomain appDomain = (AppDomain)domain;
-                    _IList.Add(appDomain);
-                }
-                return _IList;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                return null;
-            }
-            finally
-            {
-                host.CloseEnum(enumHandle);
-                Marshal.ReleaseComObject(host);
-            }
-        }
+        public static bool IsPrimaryDomain => (AppDomain.CurrentDomain?.GetData("Primary") as bool?) != false;
         public static SizeF ResolutionMaintainRatio
         {
             get
@@ -141,28 +114,21 @@ namespace RageCoop.Client
 
 
         #endregion
-        public static string SettingsPath = "Scripts\\RageCoop\\Data\\RageCoop.Client.Settings.xml";
+        public static string SettingsPath = "RageCoop\\Settings.json";
         public static Settings ReadSettings(string path = null)
         {
             path = path ?? SettingsPath;
-            XmlSerializer ser = new XmlSerializer(typeof(Settings));
 
             Directory.CreateDirectory(Directory.GetParent(path).FullName);
-            Settings settings = null;
-
-            if (File.Exists(path))
+            Settings settings;
+            try
             {
-                using (FileStream stream = File.OpenRead(path))
-                {
-                    settings = (Settings)ser.Deserialize(stream);
-                }
+                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
             }
-            else
+            catch (Exception ex)
             {
-                using (FileStream stream = File.OpenWrite(path))
-                {
-                    ser.Serialize(stream, settings = new Settings());
-                }
+                Main.Logger?.Error(ex);
+                File.WriteAllText(path, JsonConvert.SerializeObject(settings = new Settings(), Formatting.Indented));
             }
 
             return settings;
@@ -175,11 +141,7 @@ namespace RageCoop.Client
                 settings = settings ?? Main.Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
-                using (FileStream stream = new FileStream(path, File.Exists(path) ? FileMode.Truncate : FileMode.Create, FileAccess.ReadWrite))
-                {
-                    XmlSerializer ser = new XmlSerializer(typeof(Settings));
-                    ser.Serialize(stream, settings);
-                }
+                File.WriteAllText(path, JsonConvert.SerializeObject(settings,Formatting.Indented));
                 return true;
             }
             catch (Exception ex)
@@ -266,7 +228,6 @@ namespace RageCoop.Client
                 foreach (var l in lines)
                 {
                     var ss = l.Split('=');
-                    ss.ForEach(s => s.Replace(" ", ""));
                     if (ss.Length > 0 && ss[0] == "ReloadKey")
                     {
                         reloadKey = ss[1];

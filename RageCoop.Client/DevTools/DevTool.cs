@@ -8,6 +8,7 @@ using System.Windows.Forms;
 
 namespace RageCoop.Client
 {
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class DevTool : Script
     {
         public static Vehicle ToMark;
@@ -15,11 +16,14 @@ namespace RageCoop.Client
         public static int Current = 0;
         public static int Secondary = 0;
         public static MuzzleDir Direction = MuzzleDir.Forward;
+        public static Script Instance;
         public DevTool()
         {
-            if (!Main.IsPrimaryDomain) { return; }
+            Instance = this;
+            if (!Util.IsPrimaryDomain) { Abort(); return; }
             Tick += OnTick;
             KeyDown += OnKeyDown;
+            Pause();
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)

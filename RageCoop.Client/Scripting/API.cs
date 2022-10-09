@@ -112,32 +112,12 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         public event EventHandler<SyncedPed> OnPedDeleted;
 
-        /// <summary>
-        /// This is equivalent of <see cref="GTA.Script.Tick"/>.
-        /// </summary>
-        public event EmptyEvent OnTick;
-
-        /// <summary>
-        /// This is equivalent of <see cref="Script.KeyDown"/>
-        /// </summary>
-        public KeyEventHandler OnKeyDown;
-
-        /// <summary>
-        /// This is equivalent of <see cref="Script.KeyUp"/>
-        /// </summary>
-        public KeyEventHandler OnKeyUp;
-
         #region INVOKE
         internal void InvokeVehicleSpawned(SyncedVehicle v) { OnVehicleSpawned?.Invoke(null, v); }
         internal void InvokeVehicleDeleted(SyncedVehicle v) { OnVehicleDeleted?.Invoke(null, v); }
         internal void InvokePedSpawned(SyncedPed p) { OnPedSpawned?.Invoke(null, p); }
         internal void InvokePedDeleted(SyncedPed p) { OnPedDeleted?.Invoke(null, p); }
         internal void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
-        internal void InvokeTick() { OnTick?.Invoke(); }
-
-        internal void InvokeKeyDown(object s, KeyEventArgs e) { OnKeyDown?.Invoke(s, e); }
-
-        internal void InvokeKeyUp(object s, KeyEventArgs e) { OnKeyUp?.Invoke(s, e); }
 
         internal void InvokeCustomEventReceived(Packets.CustomEvent p)
         {
@@ -169,7 +149,7 @@ namespace RageCoop.Client.Scripting
         public static API GetInstance()
         {
             if (Instance != null) { return Instance; }
-            if (Main.IsPrimaryDomain)
+            if (Util.IsPrimaryDomain)
             {
                 Instance = new API();
             }

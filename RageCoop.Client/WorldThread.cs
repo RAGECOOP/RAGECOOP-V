@@ -12,71 +12,18 @@ namespace RageCoop.Client
     /// <summary>
     /// Don't use it!
     /// </summary>
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class WorldThread : Script
     {
+        public static Script Instance;
         private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
-
-        public static void Delay(Action a, int time)
-        {
-            Task.Run(() =>
-            {
-                Thread.Sleep(time);
-                QueueAction(a);
-            });
-        }
-        private static void DoQueuedActions()
-        {
-            lock (QueuedActions)
-            {
-                foreach (var action in QueuedActions.ToArray())
-                {
-                    try
-                    {
-                        if (action())
-                        {
-                            QueuedActions.Remove(action);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Main.Logger.Error(ex);
-                        QueuedActions.Remove(action);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
-        /// </summary>
-        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
-        internal static void QueueAction(Func<bool> a)
-        {
-            lock (QueuedActions)
-            {
-                QueuedActions.Add(a);
-            }
-        }
-        internal static void QueueAction(Action a)
-        {
-            lock (QueuedActions)
-            {
-                QueuedActions.Add(() => { a(); return true; });
-            }
-        }
-        /// <summary>
-        /// Clears all queued actions
-        /// </summary>
-        internal static void ClearQueuedActions()
-        {
-            lock (QueuedActions) { QueuedActions.Clear(); }
-        }
         /// <summary>
         /// Don't use it!
         /// </summary>
         public WorldThread()
         {
-            if (!Main.IsPrimaryDomain) { return; }
+            Instance = this; 
+            if (!Util.IsPrimaryDomain) { Abort(); return; }
             Tick += OnTick;
             Aborted += (sender, e) =>
             {
@@ -206,6 +153,62 @@ namespace RageCoop.Client
                     }
                 }
             }
+        }
+
+        public static void Delay(Action a, int time)
+        {
+            Task.Run(() =>
+            {
+                Thread.Sleep(time);
+                QueueAction(a);
+            });
+        }
+        internal static void DoQueuedActions()
+        {
+            lock (QueuedActions)
+            {
+                foreach (var action in QueuedActions.ToArray())
+                {
+                    try
+                    {
+                        if (action())
+                        {
+                            QueuedActions.Remove(action);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Main.Logger.Error(ex);
+                        QueuedActions.Remove(action);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
+        /// </summary>
+        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
+        internal static void QueueAction(Func<bool> a)
+        {
+            lock (QueuedActions)
+            {
+                QueuedActions.Add(a);
+            }
+        }
+        internal static void QueueAction(Action a)
+        {
+            lock (QueuedActions)
+            {
+                QueuedActions.Add(() => { a(); return true; });
+            }
+        }
+        /// <summary>
+        /// Clears all queued actions
+        /// </summary>
+        internal static void ClearQueuedActions()
+        {
+            lock (QueuedActions) { QueuedActions.Clear(); }
         }
     }
 }

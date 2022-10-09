@@ -4,6 +4,8 @@ using GTA.Native;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
+using SHVDN;
+using Script = GTA.Script;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,15 +15,16 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Console = GTA.Console;
 
 namespace RageCoop.Client
 {
     /// <summary>
     /// Don't use it!
     /// </summary>
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class Main : Script
     {
-        public static bool IsPrimaryDomain => (AppDomain.CurrentDomain.GetData("Primary") as bool?) != false;
         public static API API = API.GetInstance();
         private static bool _gameLoaded = false;
         internal static Version Version = typeof(Main).Assembly.GetName().Version;
@@ -43,17 +46,28 @@ namespace RageCoop.Client
         internal static Resources Resources = null;
         private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
         public static Worker Worker;
-        internal static SHVDN.Console Console => AppDomain.CurrentDomain.GetData("Console") as SHVDN.Console;
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
-            Console.PrintInfo($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id}, {IsPrimaryDomain}");
-            if (!IsPrimaryDomain) { Console.PrintInfo("Ignored loading in scondary domain"); return; }
+            Console.WriteLine($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id}, {Util.IsPrimaryDomain}");
+            if (!Util.IsPrimaryDomain) { Console.WriteLine("Ignored loading in scondary domain"); Abort(); return; }
             try
             {
                 Settings = Util.ReadSettings();
+                if (Settings.DataDirectory.StartsWith("Scripts"))
+                {
+                    var defaultDir = new Settings().DataDirectory;
+                    Console.Warning.WriteLine("Data directory must be outside scripts folder, migrating to default direcoty: "+defaultDir);
+                    if (Directory.Exists(Settings.DataDirectory))
+                    {
+                        CoreUtils.CopyFilesRecursively(new DirectoryInfo(Settings.DataDirectory), new DirectoryInfo(defaultDir));
+                        Directory.Delete(Settings.DataDirectory, true);
+                    }
+                    Settings.DataDirectory = defaultDir;
+                    Util.SaveSettings();
+                }
             }
             catch
             {
@@ -73,7 +87,7 @@ namespace RageCoop.Client
 #endif
             };
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
-            SHVDN.ScriptDomain.CurrentDomain.Tick += DomainTick;
+            ScriptDomain.CurrentDomain.Tick += DomainTick;
             Resources = new Resources();
             if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
@@ -99,10 +113,7 @@ namespace RageCoop.Client
             MainChat = new Chat();
             Aborted += OnAborted;
             Tick += OnTick;
-            Tick += (s, e) => { API.Events.InvokeTick(); };
             KeyDown += OnKeyDown;
-            KeyDown += (s, e) => { API.Events.InvokeKeyDown(s, e); };
-            KeyUp += (s, e) => { API.Events.InvokeKeyUp(s, e); };
             Aborted += (object sender, EventArgs e) => Disconnected("Abort");
 
             Util.NativeMemory();
@@ -114,8 +125,11 @@ namespace RageCoop.Client
         {
             try
             {
-                ResourceDomain.Unload();
-                SHVDN.ScriptDomain.CurrentDomain.Tick -= DomainTick;
+                WorldThread.DoQueuedActions();
+                WorldThread.Instance?.Abort();
+                DevTool.Instance?.Abort();
+                ResourceDomain.UnloadAll();
+                ScriptDomain.CurrentDomain.Tick -= DomainTick;
             }
             catch (Exception ex)
             {
@@ -230,14 +244,6 @@ namespace RageCoop.Client
         }
         private static void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.U)
-            {
-                ResourceDomain.Unload();
-            }
-            if (e.KeyCode == Keys.L)
-            {
-                ResourceDomain.Load();
-            }
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);

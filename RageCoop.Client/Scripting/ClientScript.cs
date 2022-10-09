@@ -5,8 +5,14 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded, you should use <see cref="OnStart"/>. to initiate your script.
     /// </summary>
-    public abstract class ClientScript
+    [GTA.ScriptAttributes(Author = "RageCoop", NoDefaultInstance = true, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    public abstract class ClientScript : GTA.Script
     {
+        /// <summary>
+        /// An <see cref="Scripting.API"/> instance to communicate with RageCoop
+        /// </summary>
+        protected static API API => Main.API;
+
         /// <summary>
         /// This method would be called from background thread, call <see cref="API.QueueAction(System.Action)"/> to dispatch it to main thread.
         /// </summary>

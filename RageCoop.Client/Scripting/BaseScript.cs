@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
 {
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = true, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class BaseScript : ClientScript
     {
-        readonly API API = Main.API;
         private bool _isHost = false;
         public override void OnStart()
         {
@@ -185,6 +185,7 @@ namespace RageCoop.Client.Scripting
             prop.Model = (Model)e.Args[1];
             prop.Position = (Vector3)e.Args[2];
             prop.Rotation = (Vector3)e.Args[3];
+            Main.Logger.Debug("Prop: "+ prop.Model.Request(1000));
             prop.Update();
         }
         private void NativeCall(CustomEventReceivedArgs e)

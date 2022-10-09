@@ -103,11 +103,7 @@ namespace RageCoop.Client.Scripting
         public void Unload()
         {
             StopAll();
-            if (LoadedResources.Count > 0)
-            {
-                API.QueueAction(() => Util.Reload());
-            }
-            LoadedResources.Clear();
+            ResourceDomain.UnloadAll();
         }
 
         private void LoadResource(ZipFile file, string dataFolderRoot)
