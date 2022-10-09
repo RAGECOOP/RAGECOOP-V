@@ -14,12 +14,12 @@ namespace RageCoop.Client.Scripting
         protected static API API => Main.API;
 
         /// <summary>
-        /// This method would be called from background thread, call <see cref="API.QueueAction(System.Action)"/> to dispatch it to main thread.
+        /// This method would be called from main thread, right after the constructor.
         /// </summary>
         public abstract void OnStart();
 
         /// <summary>
-        /// This method would be called from background thread when the client disconnected from the server, you MUST terminate all background jobs/threads in this method.
+        /// This method would be called from main thread right before the whole <see cref="System.AppDomain"/> is unloded but prior to <see cref="GTA.Script.Aborted"/>.
         /// </summary>
         public abstract void OnStop();
 

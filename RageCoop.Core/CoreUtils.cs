@@ -36,6 +36,10 @@ namespace RageCoop.Core
         {
             return ToIgnore.Contains(Path.GetFileNameWithoutExtension(name));
         }
+        public static string ToFullPath(this string path)
+        {
+            return Path.GetFullPath(path);
+        }
         public static void GetBytesFromObject(object obj, NetOutgoingMessage m)
         {
             switch (obj)

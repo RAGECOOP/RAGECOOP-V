@@ -49,7 +49,7 @@ namespace RageCoop.Client
                 }
                 catch (Exception ex)
                 {
-                    Main.Logger.Error("Error occurred when loading server resource:");
+                    Main.Logger.Error("Error occurred when loading server resource");
                     Main.Logger.Error(ex);
                     return new Packets.FileTransferResponse() { ID = 0, Response = FileResponse.LoadFailed };
                 }

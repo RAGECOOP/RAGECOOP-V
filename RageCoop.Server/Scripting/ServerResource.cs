@@ -59,7 +59,7 @@ namespace RageCoop.Server.Scripting
                 {
                     IsDirectory = true,
                     Name = dir.Substring(resDir.Length + 1).Replace('\\', '/')
-                }); ;
+                });
             }
             var assemblies = new Dictionary<ResourceFile, Assembly>();
             foreach (var file in Directory.GetFiles(resDir, "*", SearchOption.AllDirectories))

@@ -5,6 +5,7 @@ using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace RageCoop.Client.Scripting
@@ -214,6 +215,13 @@ namespace RageCoop.Client.Scripting
         #endregion
 
         #region FUNCTIONS
+        public ClientResource GetResource(string name)
+        {
+            if(Main.Resources.LoadedResources.TryGetValue(name.ToLower(), out var res)){
+                return res;
+            }
+            return null;
+        }
         /// <summary>
         /// Connect to a server
         /// </summary>

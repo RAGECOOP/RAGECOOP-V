@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Concurrent;
+using static System.Net.WebRequestMethods;
 
 namespace RageCoop.Client.Scripting
 {
@@ -36,6 +37,8 @@ namespace RageCoop.Client.Scripting
             // Bridge to current ScriptDomain
             primary.Tick += Tick;
             primary.KeyEvent += KeyEvent;
+            CurrentDomain.Start();
+            SetupScripts();
             AppDomain.CurrentDomain.SetData("Primary", false);
             Console.WriteLine("Loaded scondary domain: " + AppDomain.CurrentDomain.Id + " " + Util.IsPrimaryDomain);
         }
@@ -45,9 +48,30 @@ namespace RageCoop.Client.Scripting
         }
         public void SetupScripts()
         {
-            foreach(var s in ScriptDomain.CurrentDomain.RunningScripts)
+            foreach (var s in GetClientScripts())
             {
+
+                try
+                {
+                    var script = (ClientScript)s;
+                    var res = Main.API.GetResource(Path.GetFileName(Directory.GetParent(script.Filename).FullName));
+                    if (res == null) { Main.API.Logger.Warning("Failed to locate resource for script: " + script.Filename); continue; }
+                    script.CurrentResource = res;
+                    script.CurrentFile = res.Files.Values.Where(x => x.Name.ToLower() == script.Filename.Substring(res.BaseDirectory.Length + 1).Replace('\\', '/')).FirstOrDefault();
+                    res.Scripts.Add(script);
+                    script.OnStart();
+                }
+                catch (Exception ex)
+                {
+                    Main.API.Logger.Error($"Failed to start {s.GetType().FullName}", ex);
+                }
             }
+        }
+        public object[] GetClientScripts()
+        {
+            return ScriptDomain.CurrentDomain.RunningScripts.Where(x =>
+            x.ScriptInstance.GetType().IsAssignableFrom(typeof(ClientScript)) &&
+            !x.ScriptInstance.GetType().IsAbstract).Select(x => x.ScriptInstance).ToArray();
         }
         public static ResourceDomain Load(string dir = @"RageCoop\Scripts\Debug")
         {
@@ -62,7 +86,7 @@ namespace RageCoop.Client.Scripting
                 {
                     throw new Exception("Already loaded");
                 }
-                ScriptDomain domain = null;
+                ScriptDomain sDomain = null;
                 try
                 {
                     dir = Path.GetFullPath(dir);
@@ -81,11 +105,10 @@ namespace RageCoop.Client.Scripting
                             .Select(x => Assembly.Load(x.FullName).Location)
                             .Where(x => !string.IsNullOrEmpty(x)));
 
-                        domain = ScriptDomain.Load(Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName, dir);
-                        domain.AppDomain.SetData("Console", ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
-                        domain.AppDomain.SetData("RageCoop.Client.API", API.GetInstance());
-                        _loadedDomains.TryAdd(dir, (ResourceDomain)domain.AppDomain.CreateInstanceFromAndUnwrap(typeof(ResourceDomain).Assembly.Location, typeof(ResourceDomain).FullName, false, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { ScriptDomain.CurrentDomain, api.ToArray() }, null, null));
-                        domain.Start();
+                        sDomain = ScriptDomain.Load(Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName, dir);
+                        sDomain.AppDomain.SetData("Console", ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
+                        sDomain.AppDomain.SetData("RageCoop.Client.API", API.GetInstance());
+                        _loadedDomains.TryAdd(dir, (ResourceDomain)sDomain.AppDomain.CreateInstanceFromAndUnwrap(typeof(ResourceDomain).Assembly.Location, typeof(ResourceDomain).FullName, false, BindingFlags.NonPublic | BindingFlags.Instance, null, new object[] { ScriptDomain.CurrentDomain, api.ToArray() }, null, null));
                     });
 
                     // Wait till next tick
@@ -96,9 +119,9 @@ namespace RageCoop.Client.Scripting
                 {
                     GTA.UI.Notification.Show(ex.ToString());
                     Main.Logger.Error(ex);
-                    if (domain != null)
+                    if (sDomain != null)
                     {
-                        ScriptDomain.Unload(domain);
+                        ScriptDomain.Unload(sDomain);
                     }
                     throw;
                 }
@@ -109,13 +132,19 @@ namespace RageCoop.Client.Scripting
         {
             lock (_loadedDomains)
             {
+                Exception ex=null;
                 Main.QueueToMainThread(() =>
                 {
-                    domain.Dispose();
-                    ScriptDomain.Unload(domain.CurrentDomain);
-                    _loadedDomains.TryRemove(domain.BaseDirectory, out _);
+                    try
+                    {
+                        domain.Dispose();
+                        ScriptDomain.Unload(domain.CurrentDomain);
+                        _loadedDomains.TryRemove(domain.BaseDirectory, out _);
+                    }
+                    catch(Exception e) { ex = e; }
                 });
                 GTA.Script.Yield();
+                if(ex != null) { throw ex; }
             }
         }
         public static void Unload(string dir)
@@ -145,6 +174,17 @@ namespace RageCoop.Client.Scripting
 
         public void Dispose()
         {
+            foreach(var s in GetClientScripts())
+            {
+                try
+                {
+                    ((ClientScript)s).OnStop();
+                }
+                catch(Exception ex)
+                {
+                    Main.API.Logger.Error($"Failed to stop {s.GetType().FullName}",ex);
+                }
+            }
             PrimaryDomain.Tick -= Tick;
             PrimaryDomain.KeyEvent -= KeyEvent;
         }
