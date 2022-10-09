@@ -85,7 +85,7 @@ namespace RageCoop.Client
                 p._latencyToServer = packet.Latency;
                 p.Position = packet.Position;
                 p.IsHost = packet.IsHost;
-                Main.QueueAction(() =>
+                API.QueueAction(() =>
                 {
                     if (p.FakeBlip?.Exists() != true)
                     {
@@ -126,7 +126,7 @@ namespace RageCoop.Client
             if (Players.TryGetValue(id, out var player))
             {
                 Players.Remove(id);
-                Main.QueueAction(() => player.FakeBlip?.Delete());
+                API.QueueAction(() => player.FakeBlip?.Delete());
             }
         }
         public static void Cleanup()

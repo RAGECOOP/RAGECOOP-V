@@ -1,5 +1,6 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using LemonUI.Menus;
+using RageCoop.Client.Scripting;
 using System;
 using System.Drawing;
 using System.IO;
@@ -10,6 +11,7 @@ namespace RageCoop.Client.Menus
 {
     internal class UpdateMenu
     {
+        static readonly API API = Main.API;
         public static bool IsUpdating { get; private set; } = false;
         private static readonly NativeItem _updatingItem = new NativeItem("Updating...");
         private static readonly NativeItem _downloadItem = new NativeItem("Download", "Download and update to latest nightly");
@@ -45,7 +47,7 @@ namespace RageCoop.Client.Menus
                     ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                     ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                    client.DownloadProgressChanged += (s, e1) => { Main.QueueAction(() => { _updatingItem.AltTitle = $"{e1.ProgressPercentage}%"; }); };
+                    client.DownloadProgressChanged += (s, e1) => { API.QueueAction(() => { _updatingItem.AltTitle = $"{e1.ProgressPercentage}%"; }); };
                     client.DownloadFileCompleted += (s, e2) => { Install(); };
                     client.DownloadFileAsync(new Uri("https://github.com/RAGECOOP/RAGECOOP-V/releases/download/nightly/RageCoop.Client.zip"), _downloadPath);
                 }
@@ -60,7 +62,7 @@ namespace RageCoop.Client.Menus
         {
             try
             {
-                Main.QueueAction(() =>
+                API.QueueAction(() =>
                 {
                     _updatingItem.AltTitle = "Installing...";
                 });
@@ -73,7 +75,7 @@ namespace RageCoop.Client.Menus
                 new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
                 try { File.Delete(_downloadPath); } catch { }
                 try { File.Delete(Path.Combine("Scripts", "RageCoop.Client.Installer.exe")); } catch { }
-                Main.QueueAction(() =>
+                API.QueueAction(() =>
                 {
                     Util.Reload();
                     IsUpdating = false;

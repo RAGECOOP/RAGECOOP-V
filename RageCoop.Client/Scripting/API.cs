@@ -292,7 +292,7 @@ namespace RageCoop.Client.Scripting
         /// <param name="a"></param>
         public void QueueAction(Action a)
         {
-            Main.QueueAction(a);
+            WorldThread.QueueAction(a);
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace RageCoop.Client.Scripting
         /// <param name="a"> An <see cref="Func{T, TResult}"/> to be executed with a return value indicating whether it can be removed after execution.</param>
         public void QueueAction(Func<bool> a)
         {
-            Main.QueueAction(a);
+            WorldThread.QueueAction(a);
         }
 
         /// <summary>

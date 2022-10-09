@@ -113,7 +113,7 @@ namespace RageCoop.Client
             {
                 if (MainVehicle.IsDead)
                 {
-                    Main.Delay(() =>
+                    WorldThread.Delay(() =>
                     {
                         if (MainVehicle.IsDead && !IsDead)
                         {

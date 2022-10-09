@@ -27,6 +27,7 @@ namespace RageCoop.Client
         {
 
             if (!NeedUpdate) { return; }
+            if (!Model.IsLoaded) { Model.Request(); return; }
             if (MainProp == null || !MainProp.Exists())
             {
                 MainProp = World.CreateProp(Model, Position, Rotation, false, false);

@@ -149,7 +149,7 @@ namespace RageCoop.Client
                         }
                         catch (Exception ex)
                         {
-                            Main.QueueAction(() =>
+                            API.QueueAction(() =>
                             {
                                 GTA.UI.Notification.Show($"~r~~h~Packet Error {ex.Message}");
                                 return true;
@@ -236,7 +236,7 @@ namespace RageCoop.Client
                         Packets.ChatMessage packet = new Packets.ChatMessage((b) => Security.Decrypt(b));
                         packet.Deserialize(msg);
 
-                        Main.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
+                        API.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
                     }
                     break;
 
@@ -264,7 +264,7 @@ namespace RageCoop.Client
                         if (packet.Flags.HasEventFlag(Core.Scripting.CustomEventFlags.Queued))
                         {
                             recycle = false;
-                            Main.QueueAction(() =>
+                            API.QueueAction(() =>
                             {
                                 API.Events.InvokeCustomEventReceived(packet);
                                 Peer.Recycle(msg);
@@ -290,7 +290,7 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
+                        API.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
                     }
                     break;
             }

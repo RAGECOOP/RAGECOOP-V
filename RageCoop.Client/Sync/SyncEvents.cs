@@ -8,6 +8,9 @@ namespace RageCoop.Client
 {
     internal static class SyncEvents
     {
+
+        static readonly Scripting.API API = Main.API;
+
         #region TRIGGER
         public static void TriggerPedKilled(SyncedPed victim)
         {
@@ -256,7 +259,7 @@ namespace RageCoop.Client
 
                     if (!getBulletImpact())
                     {
-                        Main.QueueAction(getBulletImpact);
+                        API.QueueAction(getBulletImpact);
                     }
                 }
                 else if (subject.VehicleWeapon == VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition != default)

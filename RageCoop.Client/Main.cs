@@ -42,7 +42,6 @@ namespace RageCoop.Client
         internal static Vector3 PlayerPosition;
         internal static Resources Resources = null;
         private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
-        private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
         public static Worker Worker;
         internal static SHVDN.Console Console => AppDomain.CurrentDomain.GetData("Console") as SHVDN.Console;
         /// <summary>
@@ -179,7 +178,6 @@ namespace RageCoop.Client
 #endif
 
 
-            DoQueuedActions();
             if (!Networking.IsOnServer)
             {
                 return;
@@ -349,7 +347,7 @@ namespace RageCoop.Client
             {
                 Voice.Init();
             }
-            QueueAction(() =>
+            API.QueueAction(() =>
             {
                 WorldThread.Traffic(!Settings.DisableTraffic);
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
@@ -365,7 +363,7 @@ namespace RageCoop.Client
 
 
             Logger.Info($">> Disconnected << reason: {reason}");
-            QueueAction(() =>
+            API.QueueAction(() =>
             {
                 if (MainChat.Focused)
                 {
@@ -385,62 +383,7 @@ namespace RageCoop.Client
             Voice.ClearAll();
             Resources.Unload();
         }
-        private static void DoQueuedActions()
-        {
-            lock (QueuedActions)
-            {
-                foreach (var action in QueuedActions.ToArray())
-                {
-                    try
-                    {
-                        if (action())
-                        {
-                            QueuedActions.Remove(action);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex);
-                        QueuedActions.Remove(action);
-                    }
-                }
-            }
-        }
 
-        /// <summary>
-        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
-        /// </summary>
-        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
-        internal static void QueueAction(Func<bool> a)
-        {
-            lock (QueuedActions)
-            {
-                QueuedActions.Add(a);
-            }
-        }
-        internal static void QueueAction(Action a)
-        {
-            lock (QueuedActions)
-            {
-                QueuedActions.Add(() => { a(); return true; });
-            }
-        }
-        /// <summary>
-        /// Clears all queued actions
-        /// </summary>
-        internal static void ClearQueuedActions()
-        {
-            lock (QueuedActions) { QueuedActions.Clear(); }
-        }
-
-        public static void Delay(Action a, int time)
-        {
-            Task.Run(() =>
-            {
-                Thread.Sleep(time);
-                QueueAction(a);
-            });
-        }
 
     }
 }

@@ -101,7 +101,7 @@ namespace RageCoop.Client
                             try { ProcessMessage(m); }
                             catch (Exception ex) { Main.Logger.Error(ex); }
                         };
-                        Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
+                        API.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled = false;
                         Security.Regen();
                         if (publicKey == null)
@@ -136,7 +136,7 @@ namespace RageCoop.Client
                     catch (Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server: ", ex);
-                        Main.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
+                        API.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
                     }
                     IsConnecting = false;
                 });
@@ -155,7 +155,7 @@ namespace RageCoop.Client
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
             Main.Logger.Debug($"player connected:{p.Username}");
-            Main.QueueAction(() =>
+            API.QueueAction(() =>
             GTA.UI.Notification.Show($"~h~{p.Username}~h~ connected."));
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
@@ -163,7 +163,7 @@ namespace RageCoop.Client
             var player = PlayerList.GetPlayer(packet.PedID);
             if (player == null) { return; }
             PlayerList.RemovePlayer(packet.PedID);
-            Main.QueueAction(() =>
+            API.QueueAction(() =>
             {
                 EntityPool.RemoveAllFromPlayer(packet.PedID);
                 GTA.UI.Notification.Show($"~h~{player.Username}~h~ left.");

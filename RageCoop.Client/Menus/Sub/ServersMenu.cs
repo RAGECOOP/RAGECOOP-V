@@ -1,6 +1,7 @@
 ﻿using GTA.UI;
 using LemonUI.Menus;
 using Newtonsoft.Json;
+using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace RageCoop.Client.Menus
     /// </summary>
     internal static class ServersMenu
     {
+        static API API = Main.API;
         private static Thread GetServersThread;
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
@@ -60,7 +62,7 @@ namespace RageCoop.Client.Menus
             serverList = JsonConvert.DeserializeObject<List<ServerInfo>>(DownloadString(realUrl));
 
             // Need to be processed in main thread
-            Main.QueueAction(() =>
+            API.QueueAction(() =>
             {
                 if (serverList == null)
                 {
@@ -127,7 +129,7 @@ namespace RageCoop.Client.Menus
             }
             catch (Exception ex)
             {
-                Main.QueueAction(() =>
+                API.QueueAction(() =>
                 {
                     ResultItem.Title = "Download failed!";
                     ResultItem.Description = ex.Message;
