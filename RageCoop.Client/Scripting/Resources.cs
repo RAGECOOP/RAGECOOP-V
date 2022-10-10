@@ -7,23 +7,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace RageCoop.Client.Scripting
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ClientResource
+    public class ClientResource : MarshalByRefObject
     {
         /// <summary>
         /// Name of the resource
         /// </summary>
         public string Name { get; internal set; }
-        public string BaseDirectory { get; internal set; }
+        /// <summary>
+        /// Directory where the scripts is loaded from
+        /// </summary>
+        public string ScriptsDirectory { get; internal set; }
         /// <summary>
         /// A resource-specific folder that can be used to store your files.
         /// </summary>
-        public string DataFolder => Path.Combine(BaseDirectory, "Data");
+        public string DataFolder { get; internal set; }
         /// <summary>
         /// Get all <see cref="ClientScript"/> instance in this resource.
         /// </summary>
@@ -40,9 +44,7 @@ namespace RageCoop.Client.Scripting
     }
     internal class Resources
     {
-        static readonly API API = Main.API;
         internal readonly ConcurrentDictionary<string, ClientResource> LoadedResources = new ConcurrentDictionary<string, ClientResource>();
-        private const string BaseScriptType = "RageCoop.Client.Scripting.ClientScript";
         private Logger Logger { get; set; }
         public Resources()
         {
@@ -57,11 +59,12 @@ namespace RageCoop.Client.Scripting
                 Logger?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
                 Unpack(zipPath, Path.Combine(path, "Data"));
             }
-            ResourceDomain.Load(path);
+            Main.API.QueueActionAndWait(() => ResourceDomain.Load(path));
         }
         public void Unload()
         {
             ResourceDomain.UnloadAll();
+            LoadedResources.Clear();
         }
 
         private void Unpack(string zipPath, string dataFolderRoot)
@@ -71,30 +74,31 @@ namespace RageCoop.Client.Scripting
                 Logger = Main.API.Logger,
                 Scripts = new List<ClientScript>(),
                 Name = Path.GetFileNameWithoutExtension(zipPath),
-                BaseDirectory = Path.Combine(Directory.GetParent(zipPath).FullName, Path.GetFileNameWithoutExtension(zipPath))
+                DataFolder = Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(zipPath)),
+                ScriptsDirectory = Path.Combine(Directory.GetParent(zipPath).FullName, Path.GetFileNameWithoutExtension(zipPath))
             };
             Directory.CreateDirectory(r.DataFolder);
-            var resDir = r.BaseDirectory;
-            if (Directory.Exists(resDir)) { Directory.Delete(resDir, true); }
-            else if (File.Exists(resDir)) { File.Delete(resDir); }
-            Directory.CreateDirectory(resDir);
+            var scriptsDir = r.ScriptsDirectory;
+            if (Directory.Exists(scriptsDir)) { Directory.Delete(scriptsDir, true); }
+            else if (File.Exists(scriptsDir)) { File.Delete(scriptsDir); }
+            Directory.CreateDirectory(scriptsDir);
 
-            new FastZip().ExtractZip(zipPath, resDir, null);
+            new FastZip().ExtractZip(zipPath, scriptsDir, null);
 
 
-            foreach (var dir in Directory.GetDirectories(resDir, "*", SearchOption.AllDirectories))
+            foreach (var dir in Directory.GetDirectories(scriptsDir, "*", SearchOption.AllDirectories))
             {
                 r.Files.Add(dir, new ResourceFile()
                 {
                     IsDirectory = true,
-                    Name = dir.Substring(resDir.Length + 1).Replace('\\', '/')
+                    Name = dir.Substring(scriptsDir.Length + 1).Replace('\\', '/')
                 });
             }
             var assemblies = new Dictionary<ResourceFile, Assembly>();
-            foreach (var file in Directory.GetFiles(resDir, "*", SearchOption.AllDirectories))
+            foreach (var file in Directory.GetFiles(scriptsDir, "*", SearchOption.AllDirectories))
             {
                 if (Path.GetFileName(file).CanBeIgnored()) { try { File.Delete(file); } catch { } continue; }
-                var relativeName = file.Substring(resDir.Length + 1).Replace('\\', '/');
+                var relativeName = file.Substring(scriptsDir.Length + 1).Replace('\\', '/');
                 var rfile = new ResourceFile()
                 {
                     GetStream = () => { return new FileStream(file, FileMode.Open, FileAccess.Read); },

@@ -13,13 +13,19 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
+using SHVDN;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
     {
-        public static bool IsPrimaryDomain => (AppDomain.CurrentDomain?.GetData("Primary") as bool?) != false;
+        public static bool IsPrimaryDomain => AppDomain.CurrentDomain.GetData("Primary") == null;
+        public static ScriptDomain GetPrimaryDomain()
+        {
+            if (IsPrimaryDomain) { return ScriptDomain.CurrentDomain; }
+            else { return AppDomain.CurrentDomain.GetData("Primary") as ScriptDomain; }
+        }
         public static SizeF ResolutionMaintainRatio
         {
             get
@@ -141,7 +147,7 @@ namespace RageCoop.Client
                 settings = settings ?? Main.Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
-                File.WriteAllText(path, JsonConvert.SerializeObject(settings,Formatting.Indented));
+                File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
                 return true;
             }
             catch (Exception ex)

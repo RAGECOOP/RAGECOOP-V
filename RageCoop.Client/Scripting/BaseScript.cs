@@ -185,7 +185,7 @@ namespace RageCoop.Client.Scripting
             prop.Model = (Model)e.Args[1];
             prop.Position = (Vector3)e.Args[2];
             prop.Rotation = (Vector3)e.Args[3];
-            Main.Logger.Debug("Prop: "+ prop.Model.Request(1000));
+            prop.Model.Request(1000);
             prop.Update();
         }
         private void NativeCall(CustomEventReceivedArgs e)

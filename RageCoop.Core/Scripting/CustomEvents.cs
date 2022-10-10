@@ -27,7 +27,7 @@ namespace RageCoop.Core.Scripting
     /// <summary>
     /// Struct to identify different event using hash
     /// </summary>
-    public struct CustomEventHash
+    public class CustomEventHash : MarshalByRefObject
     {
         private static readonly MD5 Hasher = MD5.Create();
         private static readonly Dictionary<int, string> Hashed = new Dictionary<int, string>();

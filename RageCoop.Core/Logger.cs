@@ -9,7 +9,7 @@ namespace RageCoop.Core
     /// <summary>
     /// 
     /// </summary>
-    public class Logger : IDisposable
+    public class Logger : MarshalByRefObject,IDisposable
     {
 
         /// <summary>
@@ -34,6 +34,7 @@ namespace RageCoop.Core
         private readonly Thread LoggerThread;
         private bool Stopping = false;
         private readonly bool FlushImmediately;
+        public event EventHandler<string> OnFlush;
 
         internal Logger(bool flushImmediately = false, bool overwrite = true)
         {
@@ -195,7 +196,7 @@ namespace RageCoop.Core
 
         private string Date()
         {
-            return DateTime.Now.ToString();
+            return DateTime.Now.ToString("HH:mm:ss");
         }
         /// <summary>
         /// 
@@ -218,6 +219,7 @@ namespace RageCoop.Core
                             logWriter = new StreamWriter(LogPath, true, Encoding.UTF8);
                             logWriter.Write(Buffer);
                             logWriter.Close();
+                            OnFlush?.Invoke(this,Buffer);
                             Buffer = "";
                         }
                         catch { }

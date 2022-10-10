@@ -59,7 +59,7 @@ namespace RageCoop.Client
                 if (Settings.DataDirectory.StartsWith("Scripts"))
                 {
                     var defaultDir = new Settings().DataDirectory;
-                    Console.Warning.WriteLine("Data directory must be outside scripts folder, migrating to default direcoty: "+defaultDir);
+                    Console.Warning.WriteLine("Data directory must be outside scripts folder, migrating to default direcoty: " + defaultDir);
                     if (Directory.Exists(Settings.DataDirectory))
                     {
                         CoreUtils.CopyFilesRecursively(new DirectoryInfo(Settings.DataDirectory), new DirectoryInfo(defaultDir));
@@ -83,9 +83,10 @@ namespace RageCoop.Client
 #if DEBUG
                 LogLevel = 0,
 #else
-                LogLevel=Settings.LogLevel,
+                LogLevel = Settings.LogLevel,
 #endif
             };
+            Logger.OnFlush += (s, d) => Console.WriteLine(d);
             Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
             ScriptDomain.CurrentDomain.Tick += DomainTick;
             Resources = new Resources();
@@ -114,7 +115,6 @@ namespace RageCoop.Client
             Aborted += OnAborted;
             Tick += OnTick;
             KeyDown += OnKeyDown;
-            Aborted += (object sender, EventArgs e) => Disconnected("Abort");
 
             Util.NativeMemory();
             Counter.Restart();
@@ -125,11 +125,11 @@ namespace RageCoop.Client
         {
             try
             {
-                WorldThread.DoQueuedActions();
                 WorldThread.Instance?.Abort();
                 DevTool.Instance?.Abort();
-                ResourceDomain.UnloadAll();
                 ScriptDomain.CurrentDomain.Tick -= DomainTick;
+                Disconnected("Abort");
+                WorldThread.DoQueuedActions();
             }
             catch (Exception ex)
             {
@@ -383,11 +383,11 @@ namespace RageCoop.Client
                 CoopMenu.DisconnectedMenuSetting();
                 GTA.UI.Notification.Show("~r~Disconnected: " + reason);
                 LocalPlayerID = default;
+                Resources.Unload();
             });
             Memory.RestorePatches();
             DownloadManager.Cleanup();
             Voice.ClearAll();
-            Resources.Unload();
         }
 
 

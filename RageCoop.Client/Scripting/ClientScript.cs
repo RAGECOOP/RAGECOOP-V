@@ -1,11 +1,11 @@
 ﻿using RageCoop.Core.Scripting;
+using System;
 
 namespace RageCoop.Client.Scripting
 {
     /// <summary>
     /// Inherit from this class, constructor will be called automatically, but other scripts might have yet been loaded, you should use <see cref="OnStart"/>. to initiate your script.
     /// </summary>
-    [GTA.ScriptAttributes(Author = "RageCoop", NoDefaultInstance = true, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     public abstract class ClientScript : GTA.Script
     {
         /// <summary>

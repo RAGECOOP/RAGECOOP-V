@@ -1,8 +1,11 @@
-﻿namespace RageCoop.Core
+﻿using System;
+
+namespace RageCoop.Core
 {
     /// <summary>
     /// A json object representing a server's information as annouced to master server.
     /// </summary>
+    [Serializable]
     public class ServerInfo
     {
 #pragma warning disable 1591

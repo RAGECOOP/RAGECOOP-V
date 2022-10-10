@@ -2,6 +2,7 @@
 using Lidgren.Network;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
+using RageCoop.Core.Scripting;
 using System;
 using System.Threading;
 
@@ -260,19 +261,20 @@ namespace RageCoop.Client
                 case PacketType.CustomEvent:
                     {
                         Packets.CustomEvent packet = new Packets.CustomEvent();
-                        packet.Deserialize(msg);
-                        if (packet.Flags.HasEventFlag(Core.Scripting.CustomEventFlags.Queued))
+                        if (((CustomEventFlags)msg.PeekByte()).HasEventFlag(CustomEventFlags.Queued))
                         {
                             recycle = false;
                             API.QueueAction(() =>
                             {
-                                API.Events.InvokeCustomEventReceived(packet);
+                                packet.Deserialize(msg);
+                                Scripting.API.Events.InvokeCustomEventReceived(packet);
                                 Peer.Recycle(msg);
                             });
                         }
                         else
                         {
-                            API.Events.InvokeCustomEventReceived(packet);
+                            packet.Deserialize(msg);
+                            Scripting.API.Events.InvokeCustomEventReceived(packet);
                         }
                     }
                     break;

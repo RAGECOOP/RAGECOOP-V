@@ -258,7 +258,7 @@ namespace RageCoop.Client
 
                     if (!getBulletImpact())
                     {
-                        API.QueueAction(getBulletImpact);
+                        Scripting.API.QueueAction(getBulletImpact);
                     }
                 }
                 else if (subject.VehicleWeapon == VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition != default)

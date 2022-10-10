@@ -3,9 +3,11 @@ using GTA;
 using Newtonsoft.Json;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using SHVDN;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace RageCoop.Client.Scripting
@@ -29,7 +31,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     /// Client configuration, this will conflict with server-side config.
     /// </summary>
-    public class ClientConfig
+    public class ClientConfig : MarshalByRefObject
     {
         /// <summary>
         /// Get or set local player's username, set won't be effective if already connected to a server.
@@ -72,7 +74,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     /// Base events for RageCoop
     /// </summary>
-    public class ClientEvents
+    public class ClientEvents : MarshalByRefObject
     {
         internal Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new Dictionary<int, List<Action<CustomEventReceivedArgs>>>();
 
@@ -130,6 +132,11 @@ namespace RageCoop.Client.Scripting
             {
                 handlers.ForEach((x) => { x.Invoke(args); });
             }
+
+            if (Util.IsPrimaryDomain)
+            {
+                ResourceDomain.DoCallBack("CustomEvent",p);
+            }
         }
         #endregion
     }
@@ -139,6 +146,16 @@ namespace RageCoop.Client.Scripting
     /// </summary>
     public class API : MarshalByRefObject
     {
+        static API()
+        {
+            if (!Util.IsPrimaryDomain)
+            {
+                ResourceDomain.RegisterCallBackForCurrentDomain("CustomEvent",
+                    (data) => {
+                        Events.InvokeCustomEventReceived(data as Packets.CustomEvent);
+                    });
+            }
+        }
         static API Instance;
         private API() { }
 
@@ -161,7 +178,7 @@ namespace RageCoop.Client.Scripting
             return Instance;
         }
 
-        public ClientEvents Events = new ClientEvents();
+        public static ClientEvents Events = new ClientEvents();
         public ClientConfig Config = new ClientConfig();
 
         #region PROPERTIES
@@ -217,7 +234,8 @@ namespace RageCoop.Client.Scripting
         #region FUNCTIONS
         public ClientResource GetResource(string name)
         {
-            if(Main.Resources.LoadedResources.TryGetValue(name.ToLower(), out var res)){
+            if (Main.Resources.LoadedResources.TryGetValue(name.ToLower(), out var res))
+            {
                 return res;
             }
             return null;
@@ -282,12 +300,28 @@ namespace RageCoop.Client.Scripting
         {
             WorldThread.QueueAction(a);
         }
+        public void QueueActionAndWait(Action a, int timeout = 15000)
+        {
+            var done = new AutoResetEvent(false);
+            Exception e = null;
+            QueueAction(() =>
+            {
+                try
+                {
+                    a();
+                    done.Set();
+                }
+                catch (Exception ex) { e = ex; }
+            });
+            if (e != null) { throw e; }
+            else if (!done.WaitOne(timeout)) { throw new TimeoutException(); }
+        }
 
         /// <summary>
         /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
         /// </summary>
         /// <param name="a"> An <see cref="Func{T, TResult}"/> to be executed with a return value indicating whether it can be removed after execution.</param>
-        public void QueueAction(Func<bool> a)
+        public static void QueueAction(Func<bool> a)
         {
             WorldThread.QueueAction(a);
         }
@@ -321,22 +355,6 @@ namespace RageCoop.Client.Scripting
             }, Networking.ServerConnection, ConnectionChannel.Event, Lidgren.Network.NetDeliveryMethod.ReliableOrdered);
         }
 
-        /// <summary>
-        /// Register an handler to the specifed event hash, one event can have multiple handlers. This will be invoked from backgound thread, use <see cref="QueueAction(Action)"/> in the handler to dispatch code to script thread.
-        /// </summary>
-        /// <param name="hash">An unique identifier of the event, you can hash your event name with <see cref="Core.Scripting.CustomEvents.Hash(string)"/></param>
-        /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
-        public void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
-        {
-            lock (Events.CustomEventHandlers)
-            {
-                if (!Events.CustomEventHandlers.TryGetValue(hash, out List<Action<CustomEventReceivedArgs>> handlers))
-                {
-                    Events.CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
-                }
-                handlers.Add(handler);
-            }
-        }
 
         /// <summary>
         /// 
@@ -364,6 +382,17 @@ namespace RageCoop.Client.Scripting
                     throw new ArgumentException("Requested file was not found on the server: " + name);
                 }
             });
+        }
+        public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
+        {
+            lock (Events.CustomEventHandlers)
+            {
+                if (!Events.CustomEventHandlers.TryGetValue(hash, out List<Action<CustomEventReceivedArgs>> handlers))
+                {
+                    Events.CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
+                }
+                handlers.Add(handler);
+            }
         }
         #endregion
     }
