@@ -151,7 +151,7 @@ namespace RageCoop.Client
             }
         }
 
-        private static void DomainTick(object sender, EventArgs e)
+        private static void DomainTick()
         {
             while (TaskQueue.TryDequeue(out var task))
             {

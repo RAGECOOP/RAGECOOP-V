@@ -50,7 +50,7 @@ namespace RageCoop.Client.Loader
             }
         }
 
-        private static void DomainTick(object sender, EventArgs e)
+        private static void DomainTick()
         {
             if (MainThreadID == default) { MainThreadID = Thread.CurrentThread.ManagedThreadId; }
             while (TaskQueue.TryDequeue(out var task))

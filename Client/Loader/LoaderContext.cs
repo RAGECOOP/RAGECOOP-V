@@ -180,7 +180,7 @@ namespace RageCoop.Client.Loader
             }
             CurrentContext.UnloadRequested = true;
         }
-        private void Tick(object sender, EventArgs args)
+        private void Tick()
         {
             CurrentDomain.DoTick();
         }
