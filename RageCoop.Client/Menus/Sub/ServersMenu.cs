@@ -17,7 +17,6 @@ namespace RageCoop.Client.Menus
     /// </summary>
     internal static class ServersMenu
     {
-        static API API = Main.API;
         private static Thread GetServersThread;
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {

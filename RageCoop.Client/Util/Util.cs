@@ -20,12 +20,6 @@ namespace RageCoop.Client
 {
     internal static class Util
     {
-        public static bool IsPrimaryDomain => AppDomain.CurrentDomain.GetData("Primary") == null;
-        public static ScriptDomain GetPrimaryDomain()
-        {
-            if (IsPrimaryDomain) { return ScriptDomain.CurrentDomain; }
-            else { return AppDomain.CurrentDomain.GetData("Primary") as ScriptDomain; }
-        }
         public static SizeF ResolutionMaintainRatio
         {
             get
@@ -249,11 +243,11 @@ namespace RageCoop.Client
             // Move log file so it doesn't get deleted 
             Main.Logger.Dispose();
 
-            var path = Main.Logger.LogPath + ".last.log";
+            var path = Main.LogPath + ".last.log";
             try
             {
                 if (File.Exists(path)) { File.Delete(path); }
-                if (File.Exists(Main.Logger.LogPath)) { File.Move(Main.Logger.LogPath, path); }
+                if (File.Exists(Main.LogPath)) { File.Move(Main.LogPath, path); }
             }
             catch (Exception ex)
             {

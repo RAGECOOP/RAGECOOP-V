@@ -3,6 +3,7 @@ using GTA.Math;
 using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Core;
+using RageCoop.Client.Scripting;
 using System;
 using System.Collections.Generic;
 

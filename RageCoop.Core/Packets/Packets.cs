@@ -144,7 +144,7 @@ namespace RageCoop.Core
         void Deserialize(NetIncomingMessage m);
     }
 
-    internal abstract class Packet : MarshalByRefObject, IPacket
+    internal abstract class Packet : IPacket
     {
         public abstract PacketType Type { get; }
         public void Pack(NetOutgoingMessage m)

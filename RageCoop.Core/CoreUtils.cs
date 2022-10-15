@@ -231,6 +231,11 @@ namespace RageCoop.Core
             }
             return addresses;
         }
+
+        public static StreamWriter OpenWriter(string path, FileMode mode = FileMode.Create, FileAccess access = FileAccess.Write, FileShare share = FileShare.ReadWrite)
+        {
+            return new StreamWriter(File.Open(path, mode, access, share));
+        }
     }
     internal class IpInfo
     {
@@ -412,13 +417,11 @@ namespace RageCoop.Core
             return output;
         }
 
-        public static bool IsSubclassOf(this Type type, string baseTypeName)
+        public static bool IsScript(this Type type,Type scriptType)
         {
-            for (Type t = type.BaseType; t != null; t = t.BaseType)
-                if (t.FullName == baseTypeName)
-                    return true;
-            return false;
+            return !type.IsAbstract && type.IsSubclassOf(scriptType);
         }
+
     }
 
     /// <summary>

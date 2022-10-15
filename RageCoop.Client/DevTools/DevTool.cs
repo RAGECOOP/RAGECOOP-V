@@ -20,7 +20,6 @@ namespace RageCoop.Client
         public DevTool()
         {
             Instance = this;
-            if (!Util.IsPrimaryDomain) { Abort(); return; }
             Tick += OnTick;
             KeyDown += OnKeyDown;
             Pause();

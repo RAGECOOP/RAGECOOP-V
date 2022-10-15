@@ -11,7 +11,6 @@ namespace RageCoop.Client.Menus
 {
     internal class UpdateMenu
     {
-        static readonly API API = Main.API;
         public static bool IsUpdating { get; private set; } = false;
         private static readonly NativeItem _updatingItem = new NativeItem("Updating...");
         private static readonly NativeItem _downloadItem = new NativeItem("Download", "Download and update to latest nightly");

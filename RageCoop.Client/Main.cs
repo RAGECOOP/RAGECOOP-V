@@ -25,7 +25,6 @@ namespace RageCoop.Client
     [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class Main : Script
     {
-        public static API API = API.GetInstance();
         private static bool _gameLoaded = false;
         internal static Version Version = typeof(Main).Assembly.GetName().Version;
 
@@ -45,21 +44,20 @@ namespace RageCoop.Client
         internal static Vector3 PlayerPosition;
         internal static Resources Resources = null;
         private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
-        public static Worker Worker;
+        public static string LogPath => $"{Settings.DataDirectory}\\RageCoop.Client.log";
         /// <summary>
         /// Don't use it!
         /// </summary>
         public Main()
         {
-            Console.WriteLine($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id}, {Util.IsPrimaryDomain}");
-            if (!Util.IsPrimaryDomain) { Console.WriteLine("Ignored loading in scondary domain"); Abort(); return; }
+            Console.Info($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
             try
             {
                 Settings = Util.ReadSettings();
                 if (Settings.DataDirectory.StartsWith("Scripts"))
                 {
                     var defaultDir = new Settings().DataDirectory;
-                    Console.Warning.WriteLine("Data directory must be outside scripts folder, migrating to default direcoty: " + defaultDir);
+                    Console.Warning("Data directory must be outside scripts folder, migrating to default direcoty: " + defaultDir);
                     if (Directory.Exists(Settings.DataDirectory))
                     {
                         CoreUtils.CopyFilesRecursively(new DirectoryInfo(Settings.DataDirectory), new DirectoryInfo(defaultDir));
@@ -78,16 +76,34 @@ namespace RageCoop.Client
             Directory.CreateDirectory(Settings.DataDirectory);
             Logger = new Logger()
             {
-                LogPath = $"{Settings.DataDirectory}\\RageCoop.Client.log",
-                UseConsole = false,
+                Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath)},
 #if DEBUG
                 LogLevel = 0,
 #else
                 LogLevel = Settings.LogLevel,
 #endif
             };
-            Logger.OnFlush += (s, d) => Console.WriteLine(d);
-            Worker = new Worker("RageCoop.Client.Main.Worker", Logger);
+            Logger.OnFlush += (line, formatted) =>
+            {
+                switch (line.LogLevel)
+                {
+#if DEBUG
+                    // case LogLevel.Trace:
+                    case LogLevel.Debug:
+                        Console.Info(line.Message);
+                        break;
+#endif
+                    case LogLevel.Info:
+                        Console.Info(line.Message);
+                        break;
+                    case LogLevel.Warning:
+                        Console.Warning(line.Message);
+                        break;
+                    case LogLevel.Error:
+                        Console.Error(line.Message);
+                        break;
+                }
+            };
             ScriptDomain.CurrentDomain.Tick += DomainTick;
             Resources = new Resources();
             if (Game.Version < GameVersion.v1_0_1290_1_Steam)
@@ -163,9 +179,17 @@ namespace RageCoop.Client
                 }
             }
         }
-        internal static void QueueToMainThread(Action task)
+
+        /// <summary>
+        /// Queue an action to main thread and wait for execution to complete, must be called from script thread.
+        /// </summary>
+        /// <param name="task"></param>
+        internal static void QueueToMainThreadAndWait(Action task)
         {
-            TaskQueue.Enqueue(task);
+            Exception e = null;
+            TaskQueue.Enqueue(() => { try { task(); } catch (Exception ex) { e = ex; } });
+            Yield();
+            if (e != null) { throw e; }
         }
 
         public static Ped P;

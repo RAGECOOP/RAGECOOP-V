@@ -8,13 +8,9 @@ namespace RageCoop.Client.Scripting
     /// </summary>
     public abstract class ClientScript : GTA.Script
     {
-        /// <summary>
-        /// An <see cref="Scripting.API"/> instance to communicate with RageCoop
-        /// </summary>
-        protected static API API => Main.API;
 
         /// <summary>
-        /// This method would be called from main thread, right after the constructor.
+        /// This method would be called from main thread, right after all script constructors are invoked.
         /// </summary>
         public abstract void OnStart();
 

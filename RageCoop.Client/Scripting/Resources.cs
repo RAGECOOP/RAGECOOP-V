@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using SHVDN;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     /// 
     /// </summary>
-    public class ClientResource : MarshalByRefObject
+    public class ClientResource
     {
         /// <summary>
         /// Name of the resource
@@ -59,19 +60,31 @@ namespace RageCoop.Client.Scripting
                 Logger?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
                 Unpack(zipPath, Path.Combine(path, "Data"));
             }
-            Main.API.QueueActionAndWait(() => ResourceDomain.Load(path));
+            Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).Where(x => x.CanBeIgnored()).ForEach(x => File.Delete(x));
+
+            // Load it in main thread
+            API.QueueActionAndWait(() =>
+            {
+                Main.QueueToMainThreadAndWait(() =>
+                {
+                    Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).ForEach(x => ScriptDomain.CurrentDomain.StartScripts(x));
+                    SetupScripts();
+                });
+            });
         }
         public void Unload()
         {
-            ResourceDomain.UnloadAll();
+
+            StopScripts();
             LoadedResources.Clear();
+            Loader.DomainContext.RequestUnload();
         }
 
         private void Unpack(string zipPath, string dataFolderRoot)
         {
             var r = new ClientResource()
             {
-                Logger = Main.API.Logger,
+                Logger = API.Logger,
                 Scripts = new List<ClientScript>(),
                 Name = Path.GetFileNameWithoutExtension(zipPath),
                 DataFolder = Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(zipPath)),
@@ -108,7 +121,58 @@ namespace RageCoop.Client.Scripting
                 r.Files.Add(relativeName, rfile);
             }
 
-            LoadedResources.TryAdd(r.Name.ToLower(), r);
+            LoadedResources.TryAdd(r.Name, r);
+        }
+
+        void SetupScripts()
+        {
+            foreach (var s in GetClientScripts())
+            {
+
+                try
+                {
+                    API.Logger.Debug("Starting script: " + s.GetType().FullName);
+                    var script = (ClientScript)s;
+                    if (LoadedResources.TryGetValue(Directory.GetParent(script.Filename).Name, out var r))
+                    {
+                        script.CurrentResource = r;
+                    }
+                    else
+                    {
+                        API.Logger.Warning("Failed to locate resource for script: " + script.Filename);
+                    }
+                    var res = script.CurrentResource;
+                    script.CurrentFile = res?.Files.Values.Where(x => x.Name.ToLower() == script.Filename.Substring(res.ScriptsDirectory.Length + 1).Replace('\\', '/')).FirstOrDefault();
+                    res?.Scripts.Add(script);
+                    script.OnStart();
+                }
+                catch (Exception ex)
+                {
+                    API.Logger.Error($"Failed to start {s.GetType().FullName}", ex);
+                }
+
+                API.Logger.Debug("Started script: " + s.GetType().FullName);
+            }
+        }
+        void StopScripts()
+        {
+            foreach (var s in GetClientScripts())
+            {
+                try
+                {
+                    API.Logger.Debug("Stopping script: " + s.GetType().FullName);
+                    ((ClientScript)s).OnStop();
+                }
+                catch (Exception ex)
+                {
+                    API.Logger.Error($"Failed to stop {s.GetType().FullName}", ex);
+                }
+            }
+        }
+        public static object[] GetClientScripts()
+        {
+            return ScriptDomain.CurrentDomain.RunningScripts.Where(x =>
+            x.ScriptInstance.GetType().IsScript(typeof(ClientScript))).Select(x => x.ScriptInstance).ToArray();
         }
     }
 

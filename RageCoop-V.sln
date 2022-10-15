@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RageCoop.Client", "RageCoop
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RageCoop.Client.Installer", "RageCoop.Client.Installer\RageCoop.Client.Installer.csproj", "{576D8610-0C28-4B60-BE2B-8657EA7CEE1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RageCoop.Client.Loader", "RageCoop.Client.Loader\RageCoop.Client.Loader.csproj", "{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{576D8610-0C28-4B60-BE2B-8657EA7CEE1B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{576D8610-0C28-4B60-BE2B-8657EA7CEE1B}.Release|x64.ActiveCfg = Release|Any CPU
 		{576D8610-0C28-4B60-BE2B-8657EA7CEE1B}.Release|x64.Build.0 = Release|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Debug|x64.Build.0 = Debug|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Release|x64.ActiveCfg = Release|Any CPU
+		{D2A39C1C-2454-4411-8BA1-BE34EEB9042F}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

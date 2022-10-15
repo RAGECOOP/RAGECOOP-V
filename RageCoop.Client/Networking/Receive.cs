@@ -1,6 +1,7 @@
 ﻿using GTA;
 using Lidgren.Network;
 using RageCoop.Client.Menus;
+using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;

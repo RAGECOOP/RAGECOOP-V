@@ -13,7 +13,6 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        static API API = Main.API;
         public static CoopPeer Peer;
         public static float Latency => ServerConnection.AverageRoundtripTime / 2;
         public static bool ShowNetworkInfo = false;

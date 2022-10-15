@@ -23,7 +23,6 @@ namespace RageCoop.Client
         public WorldThread()
         {
             Instance = this; 
-            if (!Util.IsPrimaryDomain) { Abort(); return; }
             Tick += OnTick;
             Aborted += (sender, e) =>
             {

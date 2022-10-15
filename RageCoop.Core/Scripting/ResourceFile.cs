@@ -6,7 +6,7 @@ namespace RageCoop.Core.Scripting
     /// <summary>
     /// 
     /// </summary>
-    public class ResourceFile : MarshalByRefObject
+    public class ResourceFile
     {
         /// <summary>
         /// Full name with relative path of this file

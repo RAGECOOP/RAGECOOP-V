@@ -38,10 +38,9 @@ namespace RageCoop.Server
             AppDomain.CurrentDomain.UnhandledException += UnhandledException;
             mainLogger = new Logger()
             {
-                LogPath = "RageCoop.Server.log",
-                UseConsole = true,
                 Name = "Server"
             };
+            mainLogger.Writers.Add(CoreUtils.OpenWriter("RageCoop.Server.log"));
             try
             {
                 Console.Title = "RAGECOOP";
