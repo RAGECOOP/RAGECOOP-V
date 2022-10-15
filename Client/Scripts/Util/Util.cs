@@ -1,20 +1,13 @@
 ﻿using GTA;
-using Console = GTA.Console;
 using GTA.Math;
 using GTA.Native;
+using Newtonsoft.Json;
 using RageCoop.Core;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Xml.Serialization;
-using Newtonsoft.Json;
-using SHVDN;
-using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client

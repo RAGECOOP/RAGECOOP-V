@@ -1,8 +1,10 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
+﻿using DiscUtils.Iso9660;
+using ICSharpCode.SharpZipLib.Zip;
 using RageCoop.Core;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+
 namespace RageCoop.Server.Scripting
 {
     internal class Resources
@@ -16,6 +18,7 @@ namespace RageCoop.Server.Scripting
             Server = server;
             Logger = server.Logger;
         }
+        private readonly Dictionary<CDReader, Stream> Packages = new();
         private readonly Dictionary<string, Stream> ClientResources = new();
         private readonly Dictionary<string, Stream> ResourceStreams = new();
         public void LoadAll()
@@ -26,25 +29,37 @@ namespace RageCoop.Server.Scripting
                 Directory.CreateDirectory(path);
                 foreach (var pkg in Directory.GetFiles(path, "*.respkg", SearchOption.AllDirectories))
                 {
-                    Logger?.Debug($"Adding resources from package \"{Path.GetFileNameWithoutExtension(pkg)}\"");
-                    var pkgZip = new ZipFile(pkg);
-                    foreach (ZipEntry e in pkgZip)
+                    try
                     {
-                        if (!e.IsFile) { continue; }
-                        if (e.Name.StartsWith("Client") && e.Name.EndsWith(".res"))
+                        Logger?.Debug($"Adding resources from package \"{Path.GetFileNameWithoutExtension(pkg)}\"");
+                        var pkgStream = File.Open(pkg, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        var reader = new CDReader(pkgStream, true);
+                        foreach (var e in reader.Root.GetDirectories("Client")[0].GetFiles())
                         {
-                            var stream = pkgZip.GetInputStream(e).ToMemStream();
-                            ClientResources.Add(Path.GetFileNameWithoutExtension(e.Name), stream);
-                            Logger?.Debug("Resource added: " + Path.GetFileNameWithoutExtension(e.Name));
+                            var name = Path.GetFileNameWithoutExtension(e.Name);
+                            if (!ClientResources.TryAdd(name, e.Open(FileMode.Open)))
+                            {
+                                Logger?.Warning($"Resource \"{name}\" already added, ignoring");
+                                continue;
+                            }
+                            Logger?.Debug("Resource added: " + name);
                         }
-                        else if (e.Name.StartsWith("Server") && e.Name.EndsWith(".res"))
+                        foreach (var e in reader.Root.GetDirectories("Server")[0].GetFiles())
                         {
-                            var stream = pkgZip.GetInputStream(e).ToMemStream();
-                            ResourceStreams.Add(Path.GetFileNameWithoutExtension(e.Name), stream);
-                            Logger?.Debug("Resource added: " + Path.GetFileNameWithoutExtension(e.Name));
+                            var name = Path.GetFileNameWithoutExtension(e.Name);
+                            if (!ResourceStreams.TryAdd(name, e.Open(FileMode.Open)))
+                            {
+                                Logger?.Warning($"Resource \"{name}\" already loaded, ignoring");
+                                continue;
+                            }
+                            Logger?.Debug("Resource added: " + name);
                         }
+                        Packages.Add(reader, pkgStream);
                     }
-                    pkgZip.Close();
+                    catch (Exception ex)
+                    {
+                        Logger?.Error("Failed to read resources from package: " + pkg, ex);
+                    }
                 }
             }
 
@@ -64,9 +79,16 @@ namespace RageCoop.Server.Scripting
                 {
                     foreach (var resourceFolder in resourceFolders)
                     {
+                        var zipPath = Path.Combine(tmpDir, Path.GetFileName(resourceFolder)) + ".res";
+                        var name = Path.GetFileNameWithoutExtension(zipPath);
+                        if (ClientResources.ContainsKey(name))
+                        {
+                            Logger?.Warning($"Client resource \"{name}\" already loaded, ignoring");
+                            continue;
+                        }
+
                         // Pack client side resource as a zip file
                         Logger?.Info("Packing client-side resource: " + resourceFolder);
-                        var zipPath = Path.Combine(tmpDir, Path.GetFileName(resourceFolder)) + ".res";
                         try
                         {
                             using ZipFile zip = ZipFile.Create(zipPath);
@@ -82,21 +104,13 @@ namespace RageCoop.Server.Scripting
                             }
                             zip.CommitUpdate();
                             zip.Close();
-                            ClientResources.Add(Path.GetFileNameWithoutExtension(zipPath), File.OpenRead(zipPath));
+                            ClientResources.Add(name, File.OpenRead(zipPath));
                         }
                         catch (Exception ex)
                         {
                             Logger?.Error($"Failed to pack client resource:{resourceFolder}");
                             Logger?.Error(ex);
                         }
-                    }
-                }
-                var packed = Directory.GetFiles(path, "*.res", SearchOption.TopDirectoryOnly);
-                if (packed.Length > 0)
-                {
-                    foreach (var file in packed)
-                    {
-                        ClientResources.Add(Path.GetFileNameWithoutExtension(file), File.OpenRead(file));
                     }
                 }
             }
@@ -125,14 +139,6 @@ namespace RageCoop.Server.Scripting
                     {
                         Logger?.Error($"Failed to load resource: {Path.GetFileName(resource)}");
                         Logger?.Error(ex);
-                    }
-                }
-                foreach (var res in Directory.GetFiles(path, "*.res", SearchOption.TopDirectoryOnly))
-                {
-                    if (!ResourceStreams.TryAdd(Path.GetFileNameWithoutExtension(res), File.OpenRead(res)))
-                    {
-                        Logger?.Warning($"Resource \"{res}\" cannot be loaded, ignoring...");
-                        continue;
                     }
                 }
                 foreach (var res in ResourceStreams)
@@ -206,6 +212,18 @@ namespace RageCoop.Server.Scripting
                 }
                 LoadedResources.Clear();
             }
+            foreach (var s in ClientResources.Values)
+            {
+                try
+                {
+                    s.Close();
+                    s.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Logger?.Error("[Resources.CloseStream]", ex);
+                }
+            }
             foreach (var s in ResourceStreams.Values)
             {
                 try
@@ -218,17 +236,10 @@ namespace RageCoop.Server.Scripting
                     Logger?.Error("[Resources.CloseStream]", ex);
                 }
             }
-            foreach (var s in ClientResources.Values)
+            foreach (var r in Packages)
             {
-                try
-                {
-                    s.Close();
-                    s.Dispose();
-                }
-                catch (Exception ex)
-                {
-                    Logger?.Error("[Resources.CloseStream]", ex);
-                }
+                r.Key.Dispose();
+                r.Value.Dispose();
             }
         }
         public void SendTo(Client client)

@@ -1,20 +1,17 @@
-﻿using System;
+﻿using GTA;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
-using GTA;
-using SHVDN;
 using Console = GTA.Console;
 namespace RageCoop.Client.Loader
 {
     public class Main : GTA.Script
     {
-        static readonly string GameDir = Directory.GetParent(typeof(SHVDN.ScriptDomain).Assembly.Location).FullName;
-
-        static readonly string ScriptsLocation = Path.Combine(GameDir, "RageCoop", "Scripts");
+        private static readonly string GameDir = Directory.GetParent(typeof(SHVDN.ScriptDomain).Assembly.Location).FullName;
+        private static readonly string ScriptsLocation = Path.Combine(GameDir, "RageCoop", "Scripts");
         private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
-        static int MainThreadID;
+        private static int MainThreadID;
         public Main()
         {
             if (LoaderContext.PrimaryDomain != null) { throw new InvalidOperationException("Improperly placed loader assembly, please re-install to fix this issue"); }
@@ -55,7 +52,7 @@ namespace RageCoop.Client.Loader
 
         private static void DomainTick(object sender, EventArgs e)
         {
-            if (MainThreadID == default) { MainThreadID=Thread.CurrentThread.ManagedThreadId;}
+            if (MainThreadID == default) { MainThreadID = Thread.CurrentThread.ManagedThreadId; }
             while (TaskQueue.TryDequeue(out var task))
             {
                 try

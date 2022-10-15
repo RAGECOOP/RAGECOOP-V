@@ -1,6 +1,5 @@
 ﻿using GTA;
 using GTA.Math;
-using RageCoop.Client.Scripting;
 using System;
 using System.Drawing;
 using System.Threading;

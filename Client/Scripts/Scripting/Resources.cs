@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 namespace RageCoop.Client.Scripting
 {
@@ -135,7 +134,7 @@ namespace RageCoop.Client.Scripting
             LoadedResources.TryAdd(r.Name, r);
         }
 
-        void SetupScripts()
+        private void SetupScripts()
         {
             foreach (var s in GetClientScripts())
             {
@@ -165,7 +164,8 @@ namespace RageCoop.Client.Scripting
                 API.Logger.Debug("Started script: " + s.GetType().FullName);
             }
         }
-        void StopScripts()
+
+        private void StopScripts()
         {
             foreach (var s in GetClientScripts())
             {

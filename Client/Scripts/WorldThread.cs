@@ -1,11 +1,9 @@
 ﻿using GTA;
 using GTA.Native;
-using RageCoop.Client.Scripting;
-using RageCoop.Core;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RageCoop.Client
 {
@@ -23,7 +21,7 @@ namespace RageCoop.Client
         public WorldThread()
         {
             Util.StartUpCheck();
-            Instance = this; 
+            Instance = this;
             Tick += OnTick;
             Aborted += (sender, e) =>
             {

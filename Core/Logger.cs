@@ -1,10 +1,8 @@
-﻿using GTA.NaturalMotion;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 namespace RageCoop.Core
@@ -142,7 +140,8 @@ namespace RageCoop.Core
                 Flush();
             }
         }
-        string Format(LogLine line)
+
+        private string Format(LogLine line)
         {
             return string.Format("[{0}][{2}] [{3}] {1}", line.TimeStamp.ToString(DateTimeFormat), line.Message, Name, line.LogLevel.ToString());
         }

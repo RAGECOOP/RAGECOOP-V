@@ -37,7 +37,7 @@ namespace RageCoop.Core
         public static Version GetLatestVersion(string branch = "dev-nightly")
         {
             var url = $"https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/{branch}/RageCoop.Server/Properties/AssemblyInfo.cs";
-            var versionLine = HttpHelper.DownloadString(url).Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains("[assembly: AssemblyVersion(")).First();
+            var versionLine = HttpHelper.DownloadString(url).Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains("[assembly: AssemblyVersion(")).First();
             var start = versionLine.IndexOf('\"') + 1;
             var end = versionLine.LastIndexOf('\"');
             return Version.Parse(versionLine.Substring(start, end - start));
@@ -427,7 +427,7 @@ namespace RageCoop.Core
             return output;
         }
 
-        public static bool IsScript(this Type type,Type scriptType)
+        public static bool IsScript(this Type type, Type scriptType)
         {
             return !type.IsAbstract && type.IsSubclassOf(scriptType);
         }

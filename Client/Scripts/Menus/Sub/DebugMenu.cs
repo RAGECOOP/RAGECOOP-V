@@ -1,9 +1,7 @@
 ﻿using GTA;
 using LemonUI.Menus;
-using RageCoop.Client.Scripting;
 using System;
 using System.Drawing;
-using System.IO;
 
 namespace RageCoop.Client
 {
@@ -19,7 +17,7 @@ namespace RageCoop.Client
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
-        public static NativeItem ReloadItem = new NativeItem("Reload","Reload RAGECOOP and associated scripts");
+        public static NativeItem ReloadItem = new NativeItem("Reload", "Reload RAGECOOP and associated scripts");
         public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
         public static NativeCheckboxItem ShowOwnerItem = new NativeCheckboxItem("Show entity owner", "Show the owner name of the entity you're aiming at", false);
         private static readonly NativeCheckboxItem ShowNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);

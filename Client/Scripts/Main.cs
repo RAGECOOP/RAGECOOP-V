@@ -5,17 +5,15 @@ using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using SHVDN;
-using Script = GTA.Script;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Console = GTA.Console;
+using Script = GTA.Script;
 
 namespace RageCoop.Client
 {
@@ -33,7 +31,6 @@ namespace RageCoop.Client
         internal static RelationshipGroup SyncedPedsGroup;
 
         internal static new Settings Settings = null;
-        internal static BaseScript BaseScript = new BaseScript();
 
 #if !NON_INTERACTIVE
 #endif

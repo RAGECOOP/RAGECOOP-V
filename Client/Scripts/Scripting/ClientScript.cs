@@ -1,5 +1,4 @@
 ﻿using RageCoop.Core.Scripting;
-using System;
 
 namespace RageCoop.Client.Scripting
 {

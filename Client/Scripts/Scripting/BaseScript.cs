@@ -9,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
 {
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = true, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
-    internal class BaseScript : ClientScript
+    internal static class BaseScript
     {
-        private bool _isHost = false;
-        public override void OnStart()
+        private static bool _isHost = false;
+        public static void OnStart()
         {
             API.Events.OnPedDeleted += (s, p) => { API.SendCustomEvent(CustomEvents.OnPedDeleted, p.ID); };
             API.Events.OnVehicleDeleted += (s, p) => { API.SendCustomEvent(CustomEvents.OnVehicleDeleted, p.ID); };
@@ -58,19 +57,19 @@ namespace RageCoop.Client.Scripting
             });
         }
 
-        private void WeatherTimeSync(CustomEventReceivedArgs e)
+        private static void WeatherTimeSync(CustomEventReceivedArgs e)
         {
             World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
             Function.Call(Hash._SET_WEATHER_TYPE_TRANSITION, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 
-        private void SetDisplayNameTag(CustomEventReceivedArgs e)
+        private static void SetDisplayNameTag(CustomEventReceivedArgs e)
         {
             var p = PlayerList.GetPlayer((int)e.Args[0]);
             if (p != null) { p.DisplayNameTag = (bool)e.Args[1]; }
         }
 
-        private void UpdatePedBlip(CustomEventReceivedArgs e)
+        private static void UpdatePedBlip(CustomEventReceivedArgs e)
         {
             var p = Entity.FromHandle((int)e.Args[0]);
             if (p == null) { return; }
@@ -90,7 +89,7 @@ namespace RageCoop.Client.Scripting
             }
         }
 
-        private void CreateVehicle(CustomEventReceivedArgs e)
+        private static void CreateVehicle(CustomEventReceivedArgs e)
         {
             var vehicleModel = (Model)e.Args[1];
             vehicleModel.Request(1000);
@@ -109,7 +108,7 @@ namespace RageCoop.Client.Scripting
             EntityPool.Add(v);
         }
 
-        private void DeleteServerBlip(CustomEventReceivedArgs e)
+        private static void DeleteServerBlip(CustomEventReceivedArgs e)
         {
             if (EntityPool.ServerBlips.TryGetValue((int)e.Args[0], out var blip))
             {
@@ -118,7 +117,7 @@ namespace RageCoop.Client.Scripting
             }
         }
 
-        private void ServerBlipSync(CustomEventReceivedArgs obj)
+        private static void ServerBlipSync(CustomEventReceivedArgs obj)
         {
             int id = (int)obj.Args[0];
             var sprite = (BlipSprite)(ushort)obj.Args[1];
@@ -140,15 +139,12 @@ namespace RageCoop.Client.Scripting
         }
 
 
-        private void DeleteEntity(CustomEventReceivedArgs e)
+        private static void DeleteEntity(CustomEventReceivedArgs e)
         {
             Entity.FromHandle((int)e.Args[0])?.Delete();
         }
 
-        public override void OnStop()
-        {
-        }
-        private void SetNameTag(CustomEventReceivedArgs e)
+        private static void SetNameTag(CustomEventReceivedArgs e)
         {
             var p = PlayerList.GetPlayer((int)e.Args[0]);
             if (p != null)
@@ -156,11 +152,11 @@ namespace RageCoop.Client.Scripting
                 p.DisplayNameTag = (bool)e.Args[1];
             }
         }
-        private void SetAutoRespawn(CustomEventReceivedArgs args)
+        private static void SetAutoRespawn(CustomEventReceivedArgs args)
         {
             API.Config.EnableAutoRespawn = (bool)args.Args[0];
         }
-        private void DeleteServerProp(CustomEventReceivedArgs e)
+        private static void DeleteServerProp(CustomEventReceivedArgs e)
         {
             var id = (int)e.Args[0];
             if (EntityPool.ServerProps.TryGetValue(id, out var prop))
@@ -170,7 +166,7 @@ namespace RageCoop.Client.Scripting
             }
 
         }
-        private void ServerObjectSync(CustomEventReceivedArgs e)
+        private static void ServerObjectSync(CustomEventReceivedArgs e)
         {
             SyncedProp prop;
             var id = (int)e.Args[0];
@@ -188,7 +184,7 @@ namespace RageCoop.Client.Scripting
             prop.Model.Request(1000);
             prop.Update();
         }
-        private void NativeCall(CustomEventReceivedArgs e)
+        private static void NativeCall(CustomEventReceivedArgs e)
         {
             List<InputArgument> arguments = new List<InputArgument>();
             int i;
@@ -272,7 +268,7 @@ namespace RageCoop.Client.Scripting
             }
 
         }
-        private InputArgument GetInputArgument(object obj)
+        private static InputArgument GetInputArgument(object obj)
         {
             // Implicit conversion
             switch (obj)

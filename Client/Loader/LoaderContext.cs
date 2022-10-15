@@ -1,14 +1,11 @@
-﻿using System;
+﻿using SHVDN;
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Console = GTA.Console;
-using SHVDN;
 using System.Windows.Forms;
+using Console = GTA.Console;
 
 namespace RageCoop.Client.Loader
 {
@@ -17,7 +14,8 @@ namespace RageCoop.Client.Loader
     {
         #region PRIMARY-LOADING-LOGIC
         public static ConcurrentDictionary<string, LoaderContext> LoadedDomains => new ConcurrentDictionary<string, LoaderContext>(_loadedDomains);
-        static readonly ConcurrentDictionary<string, LoaderContext> _loadedDomains = new ConcurrentDictionary<string, LoaderContext>();
+
+        private static readonly ConcurrentDictionary<string, LoaderContext> _loadedDomains = new ConcurrentDictionary<string, LoaderContext>();
 
         public bool UnloadRequested;
         public string BaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
@@ -129,7 +127,8 @@ namespace RageCoop.Client.Loader
                         domain.Dispose();
                         ScriptDomain.Unload(domain.CurrentDomain);
                     }
-                    catch (Exception e) { 
+                    catch (Exception e)
+                    {
                         ex = e;
                         GTA.UI.Notification.Show(ex.ToString());
                     }
