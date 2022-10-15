@@ -260,7 +260,7 @@ namespace RageCoop.Server.Scripting
 
                         Logger?.Info($"Resources sent to:{client.Username}");
                     }
-                    if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent())?.Response == FileResponse.Loaded)
+                    if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent(), ConnectionChannel.RequestResponse, 30000)?.Response == FileResponse.Loaded)
                     {
                         client.IsReady = true;
                         Server.API.Events.InvokePlayerReady(client);
