@@ -59,15 +59,5 @@ namespace RageCoop.Client.Installer {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] LemonUI_SHVDN3 {
-            get {
-                object obj = ResourceManager.GetObject("LemonUI_SHVDN3", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

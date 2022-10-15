@@ -65,20 +65,18 @@ namespace RageCoop.Client.Menus
                 {
                     _updatingItem.AltTitle = "Installing...";
                 });
-                Directory.CreateDirectory(@"Scripts\RageCoop");
-                foreach (var f in Directory.GetFiles(@"Scripts\RageCoop", "*.dll", SearchOption.AllDirectories))
+                var insatllPath = @"RageCoop\Scripts";
+                Directory.CreateDirectory(insatllPath);
+                foreach (var f in Directory.GetFiles(insatllPath, "*.dll", SearchOption.AllDirectories))
                 {
                     try { File.Delete(f); }
                     catch { }
                 }
-                new FastZip().ExtractZip(_downloadPath, "Scripts", FastZip.Overwrite.Always, null, null, null, true);
+                new FastZip().ExtractZip(_downloadPath, insatllPath, FastZip.Overwrite.Always, null, null, null, true);
                 try { File.Delete(_downloadPath); } catch { }
-                try { File.Delete(Path.Combine("Scripts", "RageCoop.Client.Installer.exe")); } catch { }
-                API.QueueAction(() =>
-                {
-                    Loader.LoaderContext.RequestUnload();
-                    IsUpdating = false;
-                });
+                try { File.Delete(Path.Combine(insatllPath, "RageCoop.Client.Installer.exe")); } catch { }
+                Loader.LoaderContext.RequestUnload();
+                IsUpdating = false;
             }
             catch (Exception ex)
             {

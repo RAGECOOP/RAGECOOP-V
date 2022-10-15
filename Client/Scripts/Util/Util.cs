@@ -25,7 +25,13 @@ namespace RageCoop.Client
         {
             if (AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") == null)
             {
-                throw new Exception($"Client not loaded with loader, please re-install using the installer to fix this issue");
+                var error = $"Client not loaded with loader, please re-install using the installer to fix this issue";
+                try
+                {
+                    GTA.UI.Notification.Show("~r~" + error);
+                }
+                catch { }
+                throw new Exception(error);
             }
         }
         public static SizeF ResolutionMaintainRatio

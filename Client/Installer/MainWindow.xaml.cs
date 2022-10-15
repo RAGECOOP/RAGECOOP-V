@@ -58,64 +58,53 @@ namespace RageCoop.Client.Installer
         {
             UpdateStatus("Checking requirements");
             var shvPath = Path.Combine(root, "ScriptHookV.dll");
-            var shvdnPath = Path.Combine(root, "ScriptHookVDotNet3.dll");
             var scriptsPath = Path.Combine(root, "Scripts");
-            var lemonPath = Path.Combine(scriptsPath, "LemonUI.SHVDN3.dll");
-            var installPath = Path.Combine(scriptsPath, "RageCoop");
-            if (Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName == installPath)
+            var installPath = Path.Combine(root, "RageCoop", "Scripts");
+            var legacyPath = Path.Combine(scriptsPath, "RageCoop");
+            if (Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName.StartsWith(installPath))
             {
                 throw new InvalidOperationException("The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
             }
-            Directory.CreateDirectory(installPath);
             if (!File.Exists(shvPath))
             {
                 MessageBox.Show("Please install ScriptHookV first!");
                 Environment.Exit(1);
             }
-            if (!File.Exists(shvdnPath))
-            {
-                MessageBox.Show("Please install ScriptHookVDotNet first!");
-                Environment.Exit(1);
-            }
-            var shvdnVer = GetVer(shvdnPath);
-            if (shvdnVer < new Version(3, 5, 1))
-            {
-                MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
-                    $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
-                Environment.Exit(1);
-            }
-            if (File.Exists(lemonPath))
-            {
-                var lemonVer = GetVer(lemonPath);
-                if (lemonVer < new Version(1, 7))
-                {
-                    UpdateStatus("Updating LemonUI");
-                    File.WriteAllBytes(lemonPath, getLemon());
-                }
-            }
+
+            Directory.CreateDirectory(installPath);
+
+            File.Copy("ScriptHookVDotNet.dll", Path.Combine(root, "ScriptHookVDotNet.asi"), true);
+            File.Copy("ScriptHookVDotNet3.dll", Path.Combine(root, "ScriptHookVDotNet3.dll"), true);
 
 
             UpdateStatus("Removing old versions");
 
             foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
             {
-                if (f.EndsWith("RageCoop.Client.Settings.xml")) { continue; }
                 File.Delete(f);
             }
+
+            // 1.5 installation check
+            if (Directory.Exists(legacyPath))
+            {
+                Directory.Delete(legacyPath, true);
+            }
+
             foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories))
             {
                 File.Delete(f);
             }
 
-            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll"))
+            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll") && File.Exists("RageCoop.Client.Loader.dll"))
             {
                 UpdateStatus("Installing...");
                 CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()), new DirectoryInfo(installPath));
+                File.Copy("RageCoop.Client.Loader.dll", Path.Combine(scriptsPath, "RageCoop.Client.Loader.dll"), true);
                 Finish();
             }
             else
             {
-                throw new Exception("Required files are missing, please re-download the zip from official website");
+                throw new Exception("Required files are missing, please re-download the installer from official website");
             }
 
             void Finish()
@@ -124,7 +113,7 @@ namespace RageCoop.Client.Installer
             checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
-                var settingsPath = Path.Combine(installPath, @"Data\RageCoop.Client.Settings.xml");
+                var settingsPath = Path.Combine(root, Util.SettingsPath);
                 Settings settings = null;
                 try
                 {
@@ -197,16 +186,6 @@ namespace RageCoop.Client.Installer
         private void UpdateStatus(string status)
         {
             Dispatcher.BeginInvoke(new Action(() => Status.Content = status));
-        }
-
-        private Version GetVer(string location)
-        {
-            return Version.Parse(FileVersionInfo.GetVersionInfo(location).FileVersion);
-        }
-
-        private byte[] getLemon()
-        {
-            return (byte[])Resource.ResourceManager.GetObject("LemonUI_SHVDN3");
         }
 
     }
