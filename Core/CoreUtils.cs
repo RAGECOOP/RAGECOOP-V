@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -34,6 +35,25 @@ namespace RageCoop.Core
             "ScriptHookVDotNet3",
             "ScriptHookVDotNet"
         };
+        public static void GetDependencies(Assembly assembly, ref HashSet<string> existing)
+        {
+            if (assembly.FullName.StartsWith("System")) { return; }
+            foreach(var name in assembly.GetReferencedAssemblies())
+            {
+                if (name.FullName.StartsWith("System")) { continue; }
+                try
+                {
+                    var asm = Assembly.Load(name);
+                    GetDependencies(asm,ref existing);
+                }
+                catch { }
+            }
+            if (!existing.Contains(assembly.FullName))
+            {
+                Console.WriteLine(assembly.FullName);
+                existing.Add(assembly.FullName);
+            }
+        }
         public static Version GetLatestVersion(string branch = "dev-nightly")
         {
             var url = $"https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/{branch}/RageCoop.Server/Properties/AssemblyInfo.cs";
