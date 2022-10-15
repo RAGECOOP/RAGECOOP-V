@@ -34,6 +34,14 @@ namespace RageCoop.Core
             "ScriptHookVDotNet3",
             "ScriptHookVDotNet"
         };
+        public static Version GetLatestVersion(string branch = "dev-nightly")
+        {
+            var url = $"https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/{branch}/RageCoop.Server/Properties/AssemblyInfo.cs";
+            var versionLine = HttpHelper.DownloadString(url).Split(new char[] {'\n'}, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains("[assembly: AssemblyVersion(")).First();
+            var start = versionLine.IndexOf('\"') + 1;
+            var end = versionLine.LastIndexOf('\"');
+            return Version.Parse(versionLine.Substring(start, end - start));
+        }
         public static bool CanBeIgnored(this string name)
         {
             return ToIgnore.Contains(Path.GetFileNameWithoutExtension(name));

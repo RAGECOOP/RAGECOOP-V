@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.SharpZipLib.Zip;
 using LemonUI.Menus;
 using RageCoop.Client.Scripting;
+using RageCoop.Core;
 using System;
 using System.Drawing;
 using System.IO;
@@ -31,6 +32,11 @@ namespace RageCoop.Client.Menus
 
         private static void StartUpdate(object sender, EventArgs e)
         {
+            if (CoreUtils.GetLatestVersion() < Main.Version)
+            {
+                GTA.UI.Notification.Show("Local version is newer than remote version, update can't continue");
+                return;
+            }
             IsUpdating = true;
             Menu.Clear();
             Menu.Add(_updatingItem);

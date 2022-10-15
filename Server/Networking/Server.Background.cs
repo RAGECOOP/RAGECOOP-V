@@ -17,7 +17,6 @@ namespace RageCoop.Server
 {
     public partial class Server
     {
-        private const string _versionURL = "https://raw.githubusercontent.com/RAGECOOP/RAGECOOP-V/main/RageCoop.Server/Properties/AssemblyInfo.cs";
         private void SendPlayerUpdate()
         {
             foreach (var c in ClientsByNetHandle.Values.ToArray())
@@ -148,10 +147,7 @@ namespace RageCoop.Server
         {
             try
             {
-                var versionLine = HttpHelper.DownloadString(_versionURL).Split('\n', StringSplitOptions.RemoveEmptyEntries).Where(x => x.Contains("[assembly: AssemblyVersion(")).First();
-                var start = versionLine.IndexOf('\"') + 1;
-                var end = versionLine.LastIndexOf('\"');
-                var latest = Version.Parse(versionLine.AsSpan(start, end - start));
+                var latest = CoreUtils.GetLatestVersion();
                 if (latest <= Version) { return; }
 
                 // wait ten minutes for the build to complete
