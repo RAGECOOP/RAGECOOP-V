@@ -31,9 +31,9 @@ jobs:
     - name: Restore nuget packages
       run: nuget restore
     - name: Build client and installer
-      run: dotnet build RageCoop.Client.Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client/RageCoop
+      run: dotnet build Client/Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client
     - name: Build server win-x64
-      run: dotnet build RageCoop.Server/RageCoop.Server.csproj -o bin/Release/Server
+      run: dotnet build Server/RageCoop.Server.csproj -o bin/Release/Server
     - name: Upload server
       uses: actions/upload-artifact@v3
       with:
