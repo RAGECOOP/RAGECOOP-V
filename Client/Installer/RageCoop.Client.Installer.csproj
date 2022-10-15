@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Remove="bg.png" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<OutDir>..\..\bin\Debug\Client</OutDir>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<DefineConstants>DEBUG</DefineConstants>
+		<WarningLevel>4</WarningLevel>
+		<NoWarn>1591</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<OutDir>..\..\bin\Release\Client</OutDir>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Core\RageCoop.Core.csproj" />
+	  <ProjectReference Include="..\Loader\RageCoop.Client.Loader.csproj" />
+	  <ProjectReference Include="..\Scripts\RageCoop.Client.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="bg.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Resource.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

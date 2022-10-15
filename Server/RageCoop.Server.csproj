@@ -64,7 +64,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RageCoop.Core\RageCoop.Core.csproj" />
+    <ProjectReference Include="..\Core\RageCoop.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
