@@ -365,7 +365,7 @@ namespace RageCoop.Client
                     SyncedPed c = GetPedByHandle(p.Handle);
                     if (c == null && (p != Game.Player.Character))
                     {
-                        if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient)
+                        if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
                         {
                             p.Delete();
                             continue;
