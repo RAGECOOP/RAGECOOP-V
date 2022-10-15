@@ -76,7 +76,7 @@ namespace RageCoop.Client.Menus
                 try { File.Delete(Path.Combine("Scripts", "RageCoop.Client.Installer.exe")); } catch { }
                 API.QueueAction(() =>
                 {
-                    Util.Reload();
+                    Loader.LoaderContext.RequestUnload();
                     IsUpdating = false;
                 });
             }

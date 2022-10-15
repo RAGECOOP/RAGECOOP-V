@@ -77,7 +77,7 @@ namespace RageCoop.Client.Scripting
 
             StopScripts();
             LoadedResources.Clear();
-            Loader.DomainContext.RequestUnload();
+            Loader.LoaderContext.RequestUnload();
         }
 
         private void Unpack(string zipPath, string dataFolderRoot)
@@ -110,7 +110,18 @@ namespace RageCoop.Client.Scripting
             var assemblies = new Dictionary<ResourceFile, Assembly>();
             foreach (var file in Directory.GetFiles(scriptsDir, "*", SearchOption.AllDirectories))
             {
-                if (Path.GetFileName(file).CanBeIgnored()) { try { File.Delete(file); } catch { } continue; }
+                if (Path.GetFileName(file).CanBeIgnored())
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        API.Logger.Warning($"Failed to delete API assembly: {file}. This may or may cause some unexpected behaviours.\n{ex}");
+                    }
+                    continue;
+                }
                 var relativeName = file.Substring(scriptsDir.Length + 1).Replace('\\', '/');
                 var rfile = new ResourceFile()
                 {

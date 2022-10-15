@@ -22,6 +22,7 @@ namespace RageCoop.Client
         /// </summary>
         public WorldThread()
         {
+            Util.StartUpCheck();
             Instance = this; 
             Tick += OnTick;
             Aborted += (sender, e) =>

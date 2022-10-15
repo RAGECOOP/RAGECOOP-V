@@ -50,6 +50,7 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
+            Util.StartUpCheck();
             Console.Info($"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
             try
             {
@@ -76,7 +77,7 @@ namespace RageCoop.Client
             Directory.CreateDirectory(Settings.DataDirectory);
             Logger = new Logger()
             {
-                Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath)},
+                Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath) },
 #if DEBUG
                 LogLevel = 0,
 #else

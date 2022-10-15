@@ -26,6 +26,8 @@ namespace RageCoop.Core
         private static readonly HashSet<string> ToIgnore = new HashSet<string>()
         {
             "RageCoop.Client",
+            "RageCoop.Client.Loader",
+            "RageCoop.Client.Installer",
             "RageCoop.Core",
             "RageCoop.Server",
             "ScriptHookVDotNet2",

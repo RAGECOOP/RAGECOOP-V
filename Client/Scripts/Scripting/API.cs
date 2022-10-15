@@ -120,16 +120,22 @@ namespace RageCoop.Client.Scripting
             /// <summary>
             /// This is equivalent of <see cref="GTA.Script.Tick"/>.
             /// </summary>
+            /// <remarks>Calling <see cref="GTA.Script.Yield"/> in the handler will interfer other scripts, subscribe to <see cref="GTA.Script.Tick"/> instead.</remarks>
+            [Obsolete]
             public static event EmptyEvent OnTick;
 
             /// <summary>
             /// This is equivalent of <see cref="Script.KeyDown"/>
             /// </summary>
+            /// <remarks>Calling <see cref="GTA.Script.Yield"/> in the handler will interfer other scripts, subscribe to <see cref="GTA.Script.KeyDown"/> instead.</remarks>
+            [Obsolete]
             public static KeyEventHandler OnKeyDown;
 
             /// <summary>
             /// This is equivalent of <see cref="Script.KeyUp"/>
             /// </summary>
+            /// <remarks>Calling <see cref="GTA.Script.Yield"/> in the handler will interfer other scripts, subscribe to <see cref="GTA.Script.KeyUp"/> instead.</remarks>
+            [Obsolete]
             public static KeyEventHandler OnKeyUp;
 
             #region INVOKE

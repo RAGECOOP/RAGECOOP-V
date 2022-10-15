@@ -60,7 +60,7 @@ namespace RageCoop.Client
 
         private static void ReloadDomain(object sender, EventArgs e)
         {
-            Loader.DomainContext.RequestUnload();
+            Loader.LoaderContext.RequestUnload();
         }
     }
 }

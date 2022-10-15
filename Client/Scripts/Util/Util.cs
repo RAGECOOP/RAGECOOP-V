@@ -14,12 +14,20 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using SHVDN;
+using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 namespace RageCoop.Client
 {
     internal static class Util
     {
+        public static void StartUpCheck()
+        {
+            if (AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") == null)
+            {
+                throw new Exception($"Client not loaded with loader, please re-install using the installer to fix this issue");
+            }
+        }
         public static SizeF ResolutionMaintainRatio
         {
             get
@@ -207,62 +215,8 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
         }
 
-        #region WIN32
-
-        private const UInt32 WM_KEYDOWN = 0x0100;
-        public static void Reload()
-        {
-            string reloadKey = "None";
-            var lines = File.ReadAllLines("ScriptHookVDotNet.ini");
-            foreach (var l in lines)
-            {
-                var ss = l.Split('=');
-                if (ss.Length > 0 && ss[0] == "ReloadKey")
-                {
-                    reloadKey = ss[1];
-                }
-            }
-            var lineList = lines.ToList();
-            if (reloadKey == "None")
-            {
-                foreach (var l in lines)
-                {
-                    var ss = l.Split('=');
-                    if (ss.Length > 0 && ss[0] == "ReloadKey")
-                    {
-                        reloadKey = ss[1];
-                        lineList.Remove(l);
-                    }
-                }
-                lineList.Add("ReloadKey=Insert");
-                File.WriteAllLines("ScriptHookVDotNet.ini", lineList.ToArray());
-                GTA.UI.Notification.Show("Reload cannot be performed automatically, please type \"Reload()\" manually in the SHVDN console.");
-            }
-            Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
-
-            // Move log file so it doesn't get deleted 
-            Main.Logger.Dispose();
-
-            var path = Main.LogPath + ".last.log";
-            try
-            {
-                if (File.Exists(path)) { File.Delete(path); }
-                if (File.Exists(Main.LogPath)) { File.Move(Main.LogPath, path); }
-            }
-            catch (Exception ex)
-            {
-                GTA.UI.Notification.Show(ex.Message);
-            }
-
-            PostMessage(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, WM_KEYDOWN, (int)key, 0);
-        }
-
-        [DllImport("user32.dll")]
-        private static extern bool PostMessage(IntPtr hWnd, UInt32 Msg, int wParam, int lParam);
-
 
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();
-        #endregion
     }
 }

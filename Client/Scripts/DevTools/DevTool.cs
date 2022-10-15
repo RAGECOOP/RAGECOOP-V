@@ -19,6 +19,7 @@ namespace RageCoop.Client
         public static Script Instance;
         public DevTool()
         {
+            Util.StartUpCheck();
             Instance = this;
             Tick += OnTick;
             KeyDown += OnKeyDown;
