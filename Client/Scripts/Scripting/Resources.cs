@@ -44,8 +44,16 @@ namespace RageCoop.Client.Scripting
     }
     internal class Resources
     {
+        public static string TempPath;
         internal readonly ConcurrentDictionary<string, ClientResource> LoadedResources = new ConcurrentDictionary<string, ClientResource>();
         private Logger Logger { get; set; }
+        static Resources()
+        {
+            TempPath = Path.Combine(Path.GetTempPath(), "RageCoop");
+            if (Directory.Exists(TempPath)) { try { Directory.Delete(TempPath, true); } catch { } }
+            TempPath = CoreUtils.GetTempDirectory(TempPath);
+            Directory.CreateDirectory(TempPath);
+        }
         public Resources()
         {
             Logger = Main.Logger;
@@ -66,7 +74,10 @@ namespace RageCoop.Client.Scripting
             {
                 Main.QueueToMainThreadAndWait(() =>
                 {
-                    Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).ForEach(x => ScriptDomain.CurrentDomain.StartScripts(x));
+                    foreach (var res in LoadedResources)
+                    {
+                        Directory.GetFiles(res.Value.ScriptsDirectory, "*.dll", SearchOption.AllDirectories).ForEach(x => ScriptDomain.CurrentDomain.StartScripts(x));
+                    }
                     SetupScripts();
                 });
             });
@@ -79,7 +90,7 @@ namespace RageCoop.Client.Scripting
             Loader.LoaderContext.RequestUnload();
         }
 
-        private void Unpack(string zipPath, string dataFolderRoot)
+        private ClientResource Unpack(string zipPath, string dataFolderRoot)
         {
             var r = new ClientResource()
             {
@@ -87,7 +98,7 @@ namespace RageCoop.Client.Scripting
                 Scripts = new List<ClientScript>(),
                 Name = Path.GetFileNameWithoutExtension(zipPath),
                 DataFolder = Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(zipPath)),
-                ScriptsDirectory = Path.Combine(Directory.GetParent(zipPath).FullName, Path.GetFileNameWithoutExtension(zipPath))
+                ScriptsDirectory = Path.Combine(TempPath, Path.GetFileNameWithoutExtension(zipPath)),
             };
             Directory.CreateDirectory(r.DataFolder);
             var scriptsDir = r.ScriptsDirectory;
@@ -96,7 +107,7 @@ namespace RageCoop.Client.Scripting
             Directory.CreateDirectory(scriptsDir);
 
             new FastZip().ExtractZip(zipPath, scriptsDir, null);
-
+            
 
             foreach (var dir in Directory.GetDirectories(scriptsDir, "*", SearchOption.AllDirectories))
             {
@@ -132,6 +143,7 @@ namespace RageCoop.Client.Scripting
             }
 
             LoadedResources.TryAdd(r.Name, r);
+            return r;
         }
 
         private void SetupScripts()
