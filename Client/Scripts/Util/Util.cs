@@ -1,6 +1,7 @@
 ﻿using GTA;
 using GTA.Math;
 using GTA.Native;
+using LemonUI.Elements;
 using Newtonsoft.Json;
 using RageCoop.Core;
 using System;
@@ -14,6 +15,10 @@ namespace RageCoop.Client
 {
     internal static class Util
     {
+        public static Vector3 GetRotation(this EntityBone b)
+        {
+            return b.ForwardVector.ToEulerRotation(b.UpVector);
+        }
         public static void StartUpCheck()
         {
             if (AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") == null)
@@ -40,6 +45,21 @@ namespace RageCoop.Client
                 float width = 1080f * ratio;
                 // Finally, return a SizeF
                 return new SizeF(width, 1080f);
+            }
+        }
+        public static void DrawTextFromCoord(Vector3 coord, string text, float scale = 0.5f, Point offset = default)
+        {
+            Point toDraw = default;
+            if (WorldToScreen(coord, ref toDraw))
+            {
+                toDraw.X += offset.X;
+                toDraw.Y += offset.Y;
+                new ScaledText(toDraw, text, scale, GTA.UI.Font.ChaletLondon)
+                {
+                    Outline = true,
+                    Alignment = GTA.UI.Alignment.Center,
+                    Color = Color.White,
+                }.Draw();
             }
         }
         public static bool WorldToScreen(Vector3 pos, ref Point screenPos)

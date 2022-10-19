@@ -3,6 +3,7 @@ using GTA.Math;
 using Lidgren.Network;
 using RageCoop.Core;
 using System;
+using System.Runtime.InteropServices;
 
 namespace RageCoop.Client
 {
@@ -30,9 +31,7 @@ namespace RageCoop.Client
         {
             // Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
 
-
             var start = owner.MainPed.GetMuzzlePosition();
-            if (owner.MainPed.IsOnTurretSeat()) { start = owner.MainPed.Bones[Bone.SkelHead].Position; }
             if (start.DistanceTo(impactPosition) > 10)
             {
                 // Reduce latency
@@ -43,17 +42,8 @@ namespace RageCoop.Client
 
         public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
         {
-
             int i;
-            // ANNIHL
-            if (veh.Model.Hash == 837858166)
-            {
-                Networking.SendVehicleBullet(hash, owner, veh.Bones[35]);
-                Networking.SendVehicleBullet(hash, owner, veh.Bones[36]);
-                Networking.SendVehicleBullet(hash, owner, veh.Bones[37]);
-                Networking.SendVehicleBullet(hash, owner, veh.Bones[38]);
-            }
-            else if ((i = veh.GetMuzzleIndex()) != -1)
+            if ((i = veh.GetMuzzleIndex(owner.MainPed.VehicleWeapon)) != -1)
             {
                 Networking.SendVehicleBullet(hash, owner, veh.Bones[i]);
             }
@@ -72,8 +62,6 @@ namespace RageCoop.Client
         #region HANDLE
 
         public static ParticleEffectAsset CorePFXAsset = new ParticleEffectAsset("core");
-        private static WeaponAsset _weaponAsset = default;
-        private static uint _lastWeaponHash;
 
         private static void HandlePedKilled(Packets.PedKilled p)
         {
@@ -94,60 +82,21 @@ namespace RageCoop.Client
         }
         private static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
         {
-            switch (weaponHash)
-            {
-                // Minigun, not working for some reason
-                case (uint)WeaponHash.Minigun:
-                    weaponHash = 1176362416;
-                    break;
-
-                // Valkyire, not working for some reason
-                case 2756787765:
-                    weaponHash = 1176362416;
-                    break;
-
-                // Tampa3, not working for some reason
-                case 3670375085:
-                    weaponHash = 1176362416;
-                    break;
-
-                // Ruiner2, not working for some reason
-                case 50118905:
-                    weaponHash = 1176362416;
-                    break;
-
-                // SAVAGE
-                case 1638077257:
-                    weaponHash = (uint)VehicleWeaponHash.PlayerLazer;
-                    break;
-
-                case (uint)VehicleWeaponHash.PlayerBuzzard:
-                    weaponHash = 1176362416;
-                    break;
-            }
-
             var p = EntityPool.GetPedByID(ownerID)?.MainPed;
             if (p == null) { p = Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
+
+            var damage = (int)p.GetWeaponDamage(weaponHash);
+            weaponHash = WeaponUtil.GetWeaponFix(weaponHash);
+
             if (!CorePFXAsset.IsLoaded) { CorePFXAsset.Request(); }
-            if (_lastWeaponHash != weaponHash)
-            {
-                _weaponAsset.MarkAsNoLongerNeeded();
-                _weaponAsset = new WeaponAsset(weaponHash);
-                _lastWeaponHash = weaponHash;
-            }
-            if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
-            World.ShootBullet(start, end, p, _weaponAsset, (int)p.GetWeaponDamage(weaponHash));
+            var asset = new WeaponAsset(weaponHash);
+            if (!asset.IsLoaded) { asset.Request(); }
+            World.ShootBullet(start, end, p, asset, damage);
             Prop w;
-            if (((w = p.Weapons.CurrentWeaponObject) != null) && (p.VehicleWeapon == VehicleWeaponHash.Invalid))
+            var turret = false;
+            if ((((w = p.Weapons.CurrentWeaponObject) != null) && (p.VehicleWeapon == VehicleWeaponHash.Invalid)) || (turret = p.IsOnTurretSeat()))
             {
-                if (p.Weapons.Current.Components.GetSuppressorComponent().Active)
-                {
-                    World.CreateParticleEffectNonLooped(CorePFXAsset, "muz_pistol_silencer", p.GetMuzzlePosition(), w.Rotation, 1);
-                }
-                else
-                {
-                    World.CreateParticleEffectNonLooped(CorePFXAsset, WeaponUtil.GetFlashFX((WeaponHash)weaponHash), p.GetMuzzlePosition(), w.Rotation, 1);
-                }
+                World.CreateParticleEffectNonLooped(CorePFXAsset, p.Weapons.Current.Components.GetSuppressorComponent().Active ? "muz_pistol_silencer" : WeaponUtil.GetFlashFX((WeaponHash)weaponHash, turret), p.GetMuzzlePosition(), turret ? p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon).GetRotation() : w.Rotation, 1);
             }
         }
         public static void HandleVehicleBulletShot(Packets.VehicleBulletShot p)
@@ -157,8 +106,8 @@ namespace RageCoop.Client
             if (v == null) { return; }
             var b = v.Bones[p.Bone];
             World.CreateParticleEffectNonLooped(CorePFXAsset,
-                WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash),
-                b.Position, b.ForwardVector.ToEulerRotation(v.Bones[35].UpVector), 1);
+                WeaponUtil.GetFlashFX((WeaponHash)p.WeaponHash, true),
+                b.Position, b.GetRotation(), 1);
         }
         public static void HandleEvent(PacketType type, NetIncomingMessage msg)
         {
@@ -166,8 +115,7 @@ namespace RageCoop.Client
             {
                 case PacketType.BulletShot:
                     {
-                        Packets.BulletShot p = new Packets.BulletShot();
-                        p.Deserialize(msg);
+                        var p = msg.GetPacket<Packets.BulletShot>();
                         HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
                         break;
                     }

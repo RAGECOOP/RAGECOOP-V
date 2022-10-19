@@ -19,11 +19,33 @@ using System.Text;
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
+[assembly: InternalsVisibleTo("RageCoop.Client.DataDumper")]
 [assembly: InternalsVisibleTo("RageCoop.ResourceBuilder")]
 namespace RageCoop.Core
 {
     internal static class CoreUtils
     {
+        private static Random random = new Random();
+        public static string FormatToSharpStyle(string input,int offset=14)
+        {
+            var ss = input.Substring(offset).Split("_".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            // Replace first character with upper case
+            for (int i = 0; i < ss.Length; i++)
+            {
+                var sec = ss[i].ToLower();
+                var head = sec[0];
+                ss[i] = head.ToString().ToUpper() + sec.Remove(0, 1);
+            }
+            return string.Join("", ss);
+        }
+        public static string ToHex(this int value)
+        {
+            return String.Format("0x{0:X}", value);
+        }
+        public static string ToHex(this uint value)
+        {
+            return String.Format("0x{0:X}", value);
+        }
         private static readonly HashSet<string> ToIgnore = new HashSet<string>()
         {
             "RageCoop.Client",
@@ -35,16 +57,37 @@ namespace RageCoop.Core
             "ScriptHookVDotNet3",
             "ScriptHookVDotNet"
         };
+        public static int RandInt(int start,int end)
+        {
+            return random.Next(start, end);
+        }
+        public static string GetTempDirectory(string dir = null)
+        {
+            dir = dir ?? Path.GetTempPath();
+            string path;
+            do
+            {
+                path = Path.Combine(dir, RandomString(10));
+            } while (Directory.Exists(path) || File.Exists(path));
+
+            return path;
+        }
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
         public static void GetDependencies(Assembly assembly, ref HashSet<string> existing)
         {
             if (assembly.FullName.StartsWith("System")) { return; }
-            foreach(var name in assembly.GetReferencedAssemblies())
+            foreach (var name in assembly.GetReferencedAssemblies())
             {
                 if (name.FullName.StartsWith("System")) { continue; }
                 try
                 {
                     var asm = Assembly.Load(name);
-                    GetDependencies(asm,ref existing);
+                    GetDependencies(asm, ref existing);
                 }
                 catch { }
             }

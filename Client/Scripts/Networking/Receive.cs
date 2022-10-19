@@ -42,11 +42,10 @@ namespace RageCoop.Client
                }
            };
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
-        private static bool _recycle;
         public static void ProcessMessage(NetIncomingMessage message)
         {
             if (message == null) { return; }
-            _recycle = true;
+            var _recycle = true;
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.StatusChanged:
@@ -293,7 +292,7 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        API.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
+                        API.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); return true; });
                     }
                     break;
             }

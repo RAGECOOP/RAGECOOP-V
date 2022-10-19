@@ -43,7 +43,7 @@ namespace RageCoop.Client
         #endregion
         public static void Cleanup(bool keepPlayer = true, bool keepMine = true)
         {
-            foreach (var ped in PedsByID.Values)
+            foreach (var ped in PedsByID.Values.ToArray())
             {
                 if ((keepPlayer && (ped.ID == Main.LocalPlayerID)) || (keepMine && (ped.OwnerID == Main.LocalPlayerID))) { continue; }
                 RemovePed(ped.ID);
@@ -51,7 +51,7 @@ namespace RageCoop.Client
             PedsByID.Clear();
             PedsByHandle.Clear();
 
-            foreach (int id in new List<int>(VehiclesByID.Keys))
+            foreach (int id in VehiclesByID.Keys.ToArray())
             {
                 if (keepMine && (VehiclesByID[id].OwnerID == Main.LocalPlayerID)) { continue; }
                 RemoveVehicle(id);
@@ -59,7 +59,7 @@ namespace RageCoop.Client
             VehiclesByID.Clear();
             VehiclesByHandle.Clear();
 
-            foreach (var p in ProjectilesByID.Values)
+            foreach (var p in ProjectilesByID.Values.ToArray())
             {
                 if (p.Shooter.ID != Main.LocalPlayerID && p.MainProjectile != null && p.MainProjectile.Exists())
                 {

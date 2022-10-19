@@ -175,7 +175,7 @@ namespace RageCoop.Client
                 return;
             }
 
-            Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position;
+            Vector3 targetPos = MainPed.Bones[Bone.IKHead].Position + Vector3.WorldUp * 0.5f;
             Point toDraw = default;
             if (Util.WorldToScreen(targetPos, ref toDraw))
             {
@@ -688,7 +688,6 @@ namespace RageCoop.Client
                     }
                     if (MainPed.IsOnTurretSeat())
                     {
-                        // Function.Call(Hash.SET_VEHICLE_TURRET_SPEED_THIS_FRAME, MainPed.CurrentVehicle, 100);
                         Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y, AimCoords.Z);
                     }
                     if (MainPed.VehicleWeapon == VehicleWeaponHash.Invalid)

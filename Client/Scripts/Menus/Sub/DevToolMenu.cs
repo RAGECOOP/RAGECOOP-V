@@ -1,24 +1,37 @@
 ﻿using GTA;
 using LemonUI.Menus;
 using System;
+using System.Threading.Tasks;
 using System.Drawing;
+using RageCoop.Client.Scripting;
+using Console = GTA.Console;
+using System.IO;
+using Newtonsoft.Json;
+using GTA.Native;
 
 namespace RageCoop.Client
 {
+    class AnimDic
+    {
+        public string DictionaryName;
+        public string[] Animations;
+    }
     internal static class DevToolMenu
     {
-        public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Help with the development")
+        const string AnimationsPath = @"RageCoop\Data\animDictsCompact.json";
+        public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
             UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         private static readonly NativeCheckboxItem enableItem = new NativeCheckboxItem("Enable");
+        public static readonly NativeItem dumpItem = new NativeItem("Dump vehicle weapons");
+        public static readonly NativeItem dumpFixItem = new NativeItem("Dump weapon fixes");
+        public static readonly NativeItem dumpWHashItem = new NativeItem("Dump WeaponHash.cs");
+        public static readonly NativeItem getAnimItem = new NativeItem("Get current animation");
 
-        private static readonly NativeCheckboxItem enableSecondaryItem = new NativeCheckboxItem("Secondary", "Enable if this vehicle have two muzzles");
-        public static NativeItem boneIndexItem = new NativeItem("Current bone index");
-        public static NativeItem secondaryBoneIndexItem = new NativeItem("Secondary bone index");
-        public static NativeItem clipboardItem = new NativeItem("Copy to clipboard");
-        public static NativeListItem<MuzzleDir> dirItem = new NativeListItem<MuzzleDir>("Direction");
+        public static readonly NativeItem dumpVWHashItem = new NativeItem("Dump VehicleWeaponHash.cs");
+
         static DevToolMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
@@ -26,55 +39,70 @@ namespace RageCoop.Client
 
             enableItem.Activated += enableItem_Activated;
             enableItem.Checked = false;
-            enableSecondaryItem.CheckboxChanged += EnableSecondaryItem_Changed;
 
-            secondaryBoneIndexItem.Enabled = false;
-            clipboardItem.Activated += ClipboardItem_Activated;
-            dirItem.ItemChanged += DirItem_ItemChanged;
-            foreach (var d in Enum.GetValues(typeof(MuzzleDir)))
+            dumpItem.Activated += DumpItem_Activated;
+            dumpVWHashItem.Activated += (s,e)=> WeaponUtil.DumpVehicleWeaponHashes();
+            dumpWHashItem.Activated += (s, e) => WeaponUtil.DumpWeaponHashes();
+            dumpFixItem.Activated += (s, e) => WeaponUtil.DumpWeaponFix();
+            getAnimItem.Activated += (s, e) =>
             {
-                dirItem.Items.Add((MuzzleDir)d);
-            }
-            dirItem.SelectedIndex = 0;
+                if (File.Exists(AnimationsPath))
+                {
+                    var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(AnimationsPath));
+                    foreach(var anim in anims)
+                    {
+                        foreach(var a in anim.Animations)
+                        {
+                            if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Main.P,anim.DictionaryName,a,3))
+                            {
+                                Console.Info(anim.DictionaryName + " : " + a);
+                                GTA.UI.Notification.Show(anim.DictionaryName+" : "+a);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    GTA.UI.Notification.Show($"~r~{AnimationsPath} not found");
+                }
+            };
 
             Menu.Add(enableItem);
-            Menu.Add(boneIndexItem);
-            Menu.Add(enableSecondaryItem);
-            Menu.Add(secondaryBoneIndexItem);
-            Menu.Add(dirItem);
-            Menu.Add(clipboardItem);
+            Menu.Add(dumpItem);
+            Menu.Add(dumpVWHashItem);
+            Menu.Add(dumpWHashItem);
+            Menu.Add(dumpFixItem);
+            Menu.Add(getAnimItem);
         }
 
-        private static void EnableSecondaryItem_Changed(object sender, EventArgs e)
+        private static void DumpItem_Activated(object sender, EventArgs e)
         {
-            if (enableSecondaryItem.Checked)
+            dumpItem.Enabled = false;
+            Directory.CreateDirectory(@"RageCoop\Data\tmp");
+            var input = @"RageCoop\Data\tmp\vehicles.json";
+            var dumpLocation = @"RageCoop\Data\VehicleWeapons.json";
+            try
             {
-                DevTool.UseSecondary = true;
-                secondaryBoneIndexItem.Enabled = true;
+
+                VehicleWeaponInfo.Dump(input, dumpLocation);
+                Console.Info($"Weapon info dumped to " + dumpLocation);
             }
-            else
+            catch (Exception ex)
             {
-                DevTool.UseSecondary = false;
-                secondaryBoneIndexItem.Enabled = false;
+                Console.Error($"~r~" + ex.ToString());
             }
-        }
-
-        private static void DirItem_ItemChanged(object sender, ItemChangedEventArgs<MuzzleDir> e)
-        {
-            DevTool.Direction = dirItem.SelectedItem;
-        }
-
-        private static void ClipboardItem_Activated(object sender, EventArgs e)
-        {
-            DevTool.CopyToClipboard(dirItem.SelectedItem);
+            finally
+            {
+                dumpItem.Enabled = true;
+            }
         }
 
         private static void enableItem_Activated(object sender, EventArgs e)
         {
             if (enableItem.Checked)
             {
-                DevTool.Instance.Resume();
                 DevTool.ToMark = Game.Player.Character.CurrentVehicle;
+                DevTool.Instance.Resume();
             }
             else
             {

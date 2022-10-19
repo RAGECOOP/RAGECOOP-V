@@ -335,7 +335,11 @@ namespace RageCoop.Client
             {
                 return v.Bones[35].Position + v.Bones[35].ForwardVector * 100;
             }
-            if (p.IsOnTurretSeat()) { return p.GetLookingCoord(); }
+            if (p.IsOnTurretSeat())
+            {
+                var b = p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon);
+                return b.Position + b.ForwardVector * 50;
+            }
             if (weapon != null)
             {
                 // Not very accurate, but doesn't matter
@@ -459,6 +463,7 @@ namespace RageCoop.Client
 
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
+            if (Function.Call<bool>(Hash.IS_TURRET_SEAT, veh, seat)) { return true; }
             if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle))
             {
                 return false;

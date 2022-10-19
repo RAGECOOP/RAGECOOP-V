@@ -189,7 +189,11 @@ namespace RageCoop.Client.Loader
         {
             CurrentDomain.DoKeyEvent(keys, status);
         }
-
+        public override object InitializeLifetimeService()
+        {
+            // Return null to avoid lifetime restriction on the marshaled object.
+            return null;
+        }
         public void Dispose()
         {
             lock (this)

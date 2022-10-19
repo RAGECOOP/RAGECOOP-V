@@ -7,7 +7,7 @@ namespace RageCoop.Core
 {
     internal static class HttpHelper
     {
-        public static void DownloadFile(string url, string destination, Action<int> progressCallback)
+        public static void DownloadFile(string url, string destination, Action<int> progressCallback = null)
         {
             if (File.Exists(destination)) { File.Delete(destination); }
             AutoResetEvent ae = new AutoResetEvent(false);
