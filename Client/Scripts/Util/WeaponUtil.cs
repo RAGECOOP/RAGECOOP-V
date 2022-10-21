@@ -281,6 +281,7 @@ namespace RageCoop.Client
         }
         public static EntityBone GetMuzzleBone(this Vehicle v, VehicleWeaponHash hash)
         {
+            if ((uint)hash == 1422046295) { hash = VehicleWeaponHash.WaterCannon; } // Weird...
             var i = v.GetMuzzleIndex(hash);
             if (i == -1) { return null; }
             return v.Bones[i];

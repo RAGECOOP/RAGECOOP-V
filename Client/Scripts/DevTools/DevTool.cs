@@ -5,6 +5,7 @@ using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using RageCoop.Core;
 
 namespace RageCoop.Client
 {
@@ -28,15 +29,22 @@ namespace RageCoop.Client
                 World.DrawLine(wb.Position, wb.Position + wb.RightVector, Color.Blue);
             }
             if (ToMark == null) return;
+
             if (WeaponUtil.VehicleWeapons.TryGetValue((uint)(int)ToMark.Model, out var info))
             {
                 foreach (var ws in info.Weapons)
                 {
                     foreach (var w in ws.Value.Bones)
                     {
-                        DrawBone(w.BoneName, ws.Value.Name);
+                        DrawBone(w.BoneName, ws.Value.Name+":"+ws.Key.ToHex());
                     }
                 }
+            }
+            var P = Game.Player.Character;
+            var b = ToMark.GetMuzzleBone(P.VehicleWeapon);
+            if (b != null)
+            {
+                World.DrawLine(b.Position, b.Position + b.ForwardVector * 5, Color.Brown);
             }
         }
         void FindAndDraw()

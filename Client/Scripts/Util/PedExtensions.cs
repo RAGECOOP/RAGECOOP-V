@@ -327,20 +327,18 @@ namespace RageCoop.Client
         }
         public static Vector3 GetAimCoord(this Ped p)
         {
-            var weapon = p.Weapons.CurrentWeaponObject;
+            Prop weapon;
 
-            var v = p.CurrentVehicle;
-            // Rhino
-            if (v != null && v.Model.Hash == 782665360)
-            {
-                return v.Bones[35].Position + v.Bones[35].ForwardVector * 100;
-            }
+            EntityBone b;
             if (p.IsOnTurretSeat())
             {
-                var b = p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon);
-                return b.Position + b.ForwardVector * 50;
+                if((b = p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon)) != null)
+                {
+                    return b.Position + b.ForwardVector * 50;
+                }
+                return GetLookingCoord(p);
             }
-            if (weapon != null)
+            if ((weapon= p.Weapons.CurrentWeaponObject) != null)
             {
                 // Not very accurate, but doesn't matter
                 Vector3 dir = weapon.RightVector;
