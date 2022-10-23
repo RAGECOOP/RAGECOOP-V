@@ -3,7 +3,7 @@
 namespace RageCoop.Core
 {
     /// <summary>
-    /// A json object representing a server's information as annouced to master server.
+    ///     A json object representing a server's information as annouced to master server.
     /// </summary>
     [Serializable]
     public class ServerInfo
@@ -30,6 +30,5 @@ namespace RageCoop.Core
         public string ztAddress { get; set; }
         public string publicKeyModulus { get; set; }
         public string publicKeyExponent { get; set; }
-
     }
 }

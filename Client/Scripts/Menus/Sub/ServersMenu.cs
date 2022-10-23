@@ -1,39 +1,41 @@
-﻿using GTA.UI;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Net;
+using System.Threading;
+using GTA.UI;
 using LemonUI.Menus;
 using Newtonsoft.Json;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Net;
-using System.Threading;
 
 namespace RageCoop.Client.Menus
 {
-
     /// <summary>
-    /// Don't use it!
+    ///     Don't use it!
     /// </summary>
     internal static class ServersMenu
     {
         private static Thread GetServersThread;
+
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
+
         internal static NativeItem ResultItem = null;
 
         /// <summary>
-        /// Don't use it!
+        ///     Don't use it!
         /// </summary>
         static ServersMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
-            Menu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
+            Menu.Opening += (object sender, CancelEventArgs e) =>
             {
                 CleanUpList();
                 Menu.Add(ResultItem = new NativeItem("Loading..."));
@@ -42,10 +44,7 @@ namespace RageCoop.Client.Menus
                 GetServersThread = new Thread(() => GetAllServers());
                 GetServersThread.Start();
             };
-            Menu.Closing += (object sender, System.ComponentModel.CancelEventArgs e) =>
-            {
-                CleanUpList();
-            };
+            Menu.Closing += (object sender, CancelEventArgs e) => { CleanUpList(); };
         }
 
         private static void CleanUpList()
@@ -68,16 +67,21 @@ namespace RageCoop.Client.Menus
                     ResultItem.Title = "Something went wrong!";
                     return;
                 }
+
                 if (serverList.Count == 0)
                 {
                     ResultItem.Title = "No server was found!";
                     return;
                 }
+
                 CleanUpList();
                 foreach (ServerInfo server in serverList)
                 {
                     string address = $"{server.address}:{server.port}";
-                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}.x~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
+                    NativeItem tmpItem =
+                        new NativeItem($"[{server.country}] {server.name}",
+                                $"~b~{address}~s~~n~~g~Version {server.version}.x~s~")
+                            { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try
@@ -92,6 +96,7 @@ namespace RageCoop.Client.Menus
                                     throw new Exception("Failed to obtain ZeroTier network IP");
                                 }
                             }
+
                             Networking.ToggleConnection(address, null, null, PublicKey.FromServerInfo(server));
 #if !NON_INTERACTIVE
                             CoopMenu.ServerIpItem.AltTitle = address;
@@ -106,7 +111,8 @@ namespace RageCoop.Client.Menus
                             Notification.Show($"~r~{ex.Message}");
                             if (server.useZT)
                             {
-                                Notification.Show($"Make sure ZeroTier is correctly installed, download it from https://www.zerotier.com/");
+                                Notification.Show(
+                                    $"Make sure ZeroTier is correctly installed, download it from https://www.zerotier.com/");
                             }
                         }
                     };
@@ -114,6 +120,7 @@ namespace RageCoop.Client.Menus
                 }
             });
         }
+
         private static string DownloadString(string url)
         {
             try

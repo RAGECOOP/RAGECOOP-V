@@ -1,6 +1,6 @@
-﻿using GTA.Math;
+﻿using System.Net;
+using GTA.Math;
 using Lidgren.Network;
-using System.Net;
 
 namespace RageCoop.Core
 {
@@ -11,8 +11,19 @@ namespace RageCoop.Core
             public int ID;
             public string Username;
         }
+
         public class Handshake : Packet
         {
+            /// <summary>
+            ///     The asymetrically crypted Aes IV
+            /// </summary>
+            public byte[] AesIVCrypted;
+
+            /// <summary>
+            ///     The asymetrically crypted Aes key
+            /// </summary>
+            public byte[] AesKeyCrypted;
+
             public override PacketType Type => PacketType.Handshake;
             public int PedID { get; set; }
 
@@ -21,24 +32,14 @@ namespace RageCoop.Core
             public string ModVersion { get; set; }
 
             /// <summary>
-            /// The asymetrically crypted Aes key
-            /// </summary>
-            public byte[] AesKeyCrypted;
-
-            /// <summary>
-            /// The asymetrically crypted Aes IV
-            /// </summary>
-            public byte[] AesIVCrypted;
-
-            /// <summary>
-            /// The password hash with client Aes
+            ///     The password hash with client Aes
             /// </summary>
             public byte[] PasswordEncrypted { get; set; }
 
             public IPEndPoint InternalEndPoint { get; set; }
+
             protected override void Serialize(NetOutgoingMessage m)
             {
-
                 // Write Player Ped ID
                 m.Write(PedID);
 
@@ -59,14 +60,11 @@ namespace RageCoop.Core
 
                 // Write PassHash
                 m.WriteByteArray(PasswordEncrypted);
-
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-
 
                 // Read player netHandle
                 PedID = m.ReadInt32();
@@ -85,13 +83,16 @@ namespace RageCoop.Core
 
 
                 PasswordEncrypted = m.ReadByteArray();
+
                 #endregion
             }
         }
+
         public class HandshakeSuccess : Packet
         {
             public PlayerData[] Players { get; set; }
             public override PacketType Type => PacketType.HandshakeSuccess;
+
             protected override void Serialize(NetOutgoingMessage m)
             {
                 m.Write(Players.Length);
@@ -101,20 +102,19 @@ namespace RageCoop.Core
                     m.Write(p.Username);
                 }
             }
+
             public override void Deserialize(NetIncomingMessage m)
             {
-
                 Players = new PlayerData[m.ReadInt32()];
-                for (int i = 0; i < Players.Length; i++)
-                {
-                    Players[i] = new PlayerData()
+                for (var i = 0; i < Players.Length; i++)
+                    Players[i] = new PlayerData
                     {
                         ID = m.ReadInt32(),
-                        Username = m.ReadString(),
+                        Username = m.ReadString()
                     };
-                }
             }
         }
+
         public class PlayerConnect : Packet
         {
             public override PacketType Type => PacketType.PlayerConnect;
@@ -124,7 +124,6 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
                 // Write NetHandle
                 m.Write(PedID);
 
@@ -140,6 +139,7 @@ namespace RageCoop.Core
 
                 // Read Username
                 Username = m.ReadString();
+
                 #endregion
             }
         }
@@ -151,9 +151,7 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
                 m.Write(PedID);
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
@@ -161,24 +159,27 @@ namespace RageCoop.Core
                 #region NetIncomingMessageToPacket
 
                 PedID = m.ReadInt32();
+
                 #endregion
             }
         }
+
         public class PlayerInfoUpdate : Packet
         {
+            public bool IsHost;
             public override PacketType Type => PacketType.PlayerInfoUpdate;
 
             /// <summary>
-            /// Ped ID for this Player
+            ///     Ped ID for this Player
             /// </summary>
             public int PedID { get; set; }
+
             public string Username { get; set; }
             public float Latency { get; set; }
             public Vector3 Position { get; set; }
-            public bool IsHost;
+
             protected override void Serialize(NetOutgoingMessage m)
             {
-
                 // Write ID
                 m.Write(PedID);
 
@@ -195,8 +196,6 @@ namespace RageCoop.Core
 
             public override void Deserialize(NetIncomingMessage m)
             {
-
-
                 // Read player ID
                 PedID = m.ReadInt32();
 
@@ -213,23 +212,18 @@ namespace RageCoop.Core
 
         public class PublicKeyResponse : Packet
         {
-            public override PacketType Type => PacketType.PublicKeyResponse;
+            public byte[] Exponent;
 
             public byte[] Modulus;
-            public byte[] Exponent;
+            public override PacketType Type => PacketType.PublicKeyResponse;
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
-
                 m.WriteByteArray(Modulus);
 
                 m.WriteByteArray(Exponent);
-
-
-
             }
+
             public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket

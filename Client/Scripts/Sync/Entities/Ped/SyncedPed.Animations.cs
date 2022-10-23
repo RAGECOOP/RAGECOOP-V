@@ -19,13 +19,16 @@ namespace RageCoop.Client
             switch (MainPed.Gender)
             {
                 case Gender.Male:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@gen_male@variations@normal");
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                        "facials@gen_male@variations@normal");
                     break;
                 case Gender.Female:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@gen_female@variations@normal");
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                        "facials@gen_female@variations@normal");
                     break;
                 default:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1", "facials@mime@variations@normal");
+                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                        "facials@mime@variations@normal");
                     break;
             }
         }
@@ -40,7 +43,7 @@ namespace RageCoop.Client
                 var flag = AnimationFlags.Loop;
                 if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed, animDict, ourAnim, 3))
                 {
-                    if (LoadAnim(animDict) == null) { return; }
+                    if (LoadAnim(animDict) == null) return;
 
                     MainPed.Task.ClearAll();
                     Function.Call(Hash.TASK_PLAY_ANIM, MainPed, animDict, ourAnim, 8f, 10f, -1, flag, -8f, 1, 1, 1);
@@ -61,6 +64,7 @@ namespace RageCoop.Client
 
                 return IsInCoverFacingLeft ? "idle_l_corner" : "idle_r_corner";
             }
+
             return null;
         }
 
@@ -86,31 +90,31 @@ namespace RageCoop.Client
         {
             switch (weapon)
             {
-                case unchecked((uint)WeaponHash.Unarmed):
+                case (uint)WeaponHash.Unarmed:
                     return 0;
 
-                case unchecked((uint)WeaponHash.RPG):
-                case unchecked((uint)WeaponHash.HomingLauncher):
-                case unchecked((uint)WeaponHash.Firework):
+                case (uint)WeaponHash.RPG:
+                case (uint)WeaponHash.HomingLauncher:
+                case (uint)WeaponHash.Firework:
                     return 5;
 
-                case unchecked((uint)WeaponHash.Minigun):
+                case (uint)WeaponHash.Minigun:
                     return 5;
 
-                case unchecked((uint)WeaponHash.GolfClub):
-                case unchecked((uint)WeaponHash.PoolCue):
-                case unchecked((uint)WeaponHash.Bat):
+                case (uint)WeaponHash.GolfClub:
+                case (uint)WeaponHash.PoolCue:
+                case (uint)WeaponHash.Bat:
                     return 4;
 
-                case unchecked((uint)WeaponHash.Knife):
-                case unchecked((uint)WeaponHash.Nightstick):
-                case unchecked((uint)WeaponHash.Hammer):
-                case unchecked((uint)WeaponHash.Crowbar):
-                case unchecked((uint)WeaponHash.Wrench):
-                case unchecked((uint)WeaponHash.BattleAxe):
-                case unchecked((uint)WeaponHash.Dagger):
-                case unchecked((uint)WeaponHash.Hatchet):
-                case unchecked((uint)WeaponHash.KnuckleDuster):
+                case (uint)WeaponHash.Knife:
+                case (uint)WeaponHash.Nightstick:
+                case (uint)WeaponHash.Hammer:
+                case (uint)WeaponHash.Crowbar:
+                case (uint)WeaponHash.Wrench:
+                case (uint)WeaponHash.BattleAxe:
+                case (uint)WeaponHash.Dagger:
+                case (uint)WeaponHash.Hatchet:
+                case (uint)WeaponHash.KnuckleDuster:
                 case unchecked((uint)-581044007):
                 case unchecked((uint)-102323637):
                 case unchecked((uint)-538741184):
@@ -118,25 +122,25 @@ namespace RageCoop.Client
 
                 case unchecked((uint)-1357824103):
                 case unchecked((uint)-1074790547):
-                case unchecked(2132975508):
+                case 2132975508:
                 case unchecked((uint)-2084633992):
                 case unchecked((uint)-952879014):
-                case unchecked(100416529):
-                case unchecked((uint)WeaponHash.Gusenberg):
-                case unchecked((uint)WeaponHash.MG):
-                case unchecked((uint)WeaponHash.CombatMG):
-                case unchecked((uint)WeaponHash.CombatPDW):
-                case unchecked((uint)WeaponHash.AssaultSMG):
-                case unchecked((uint)WeaponHash.SMG):
-                case unchecked((uint)WeaponHash.HeavySniper):
-                case unchecked((uint)WeaponHash.PumpShotgun):
-                case unchecked((uint)WeaponHash.HeavyShotgun):
-                case unchecked((uint)WeaponHash.Musket):
-                case unchecked((uint)WeaponHash.AssaultShotgun):
-                case unchecked((uint)WeaponHash.BullpupShotgun):
-                case unchecked((uint)WeaponHash.SawnOffShotgun):
-                case unchecked((uint)WeaponHash.SweeperShotgun):
-                case unchecked((uint)WeaponHash.CompactRifle):
+                case 100416529:
+                case (uint)WeaponHash.Gusenberg:
+                case (uint)WeaponHash.MG:
+                case (uint)WeaponHash.CombatMG:
+                case (uint)WeaponHash.CombatPDW:
+                case (uint)WeaponHash.AssaultSMG:
+                case (uint)WeaponHash.SMG:
+                case (uint)WeaponHash.HeavySniper:
+                case (uint)WeaponHash.PumpShotgun:
+                case (uint)WeaponHash.HeavyShotgun:
+                case (uint)WeaponHash.Musket:
+                case (uint)WeaponHash.AssaultShotgun:
+                case (uint)WeaponHash.BullpupShotgun:
+                case (uint)WeaponHash.SawnOffShotgun:
+                case (uint)WeaponHash.SweeperShotgun:
+                case (uint)WeaponHash.CompactRifle:
                     return 2;
             }
 
@@ -150,6 +154,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.REQUEST_ANIM_DICT, anim);
                 return null;
             }
+
             return anim;
         }
     }

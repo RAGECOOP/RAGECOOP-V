@@ -3,7 +3,7 @@
 namespace RageCoop.Client
 {
     /// <summary>
-    /// Class providing support for addon mods
+    ///     Class providing support for addon mods
     /// </summary>
     internal class AddOnDataProvider
     {

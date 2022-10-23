@@ -1,56 +1,49 @@
-﻿using GTA;
-using GTA.Native;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
+using GTA;
+using GTA.Native;
+using GTA.UI;
 
 namespace RageCoop.Client
 {
     /// <summary>
-    /// Don't use it!
+    ///     Don't use it!
     /// </summary>
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false,
+        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class WorldThread : Script
     {
         public static Script Instance;
         private static readonly List<Func<bool>> QueuedActions = new List<Func<bool>>();
+
+        private static bool _trafficEnabled;
+
         /// <summary>
-        /// Don't use it!
+        ///     Don't use it!
         /// </summary>
         public WorldThread()
         {
             Util.StartUpCheck();
             Instance = this;
             Tick += OnTick;
-            Aborted += (sender, e) =>
-            {
-                ChangeTraffic(true);
-            };
+            Aborted += (sender, e) => { ChangeTraffic(true); };
         }
 
-        private static bool _trafficEnabled;
         private void OnTick(object sender, EventArgs e)
         {
             DoQueuedActions();
-            if (Game.IsLoading || !Networking.IsOnServer)
-            {
-                return;
-            }
+            if (Game.IsLoading || !Networking.IsOnServer) return;
 
             Game.DisableControlThisFrame(Control.FrontendPause);
 
-            if (Main.Settings.DisableAlternatePause)
-            {
-                Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
-            }
+            if (Main.Settings.DisableAlternatePause) Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
             Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
 
             if (Main.Settings.ShowEntityOwnerName)
-            {
                 unsafe
                 {
                     int handle;
@@ -61,19 +54,14 @@ namespace RageCoop.Client
                         {
                             var owner = "invalid";
                             if (entity.EntityType == EntityType.Vehicle)
-                            {
                                 owner = (entity as Vehicle).GetSyncEntity()?.Owner?.Username ?? "unknown";
-                            }
                             if (entity.EntityType == EntityType.Ped)
-                            {
                                 owner = (entity as Ped).GetSyncEntity()?.Owner?.Username ?? "unknown";
-                            }
-                            GTA.UI.Screen.ShowHelpTextThisFrame("Entity owner: " + owner);
+                            Screen.ShowHelpTextThisFrame("Entity owner: " + owner);
                         }
-
                     }
                 }
-            }
+
             if (!_trafficEnabled)
             {
                 Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
@@ -85,11 +73,13 @@ namespace RageCoop.Client
                 Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
             }
         }
+
         public static void Traffic(bool enable)
         {
             ChangeTraffic(enable);
             _trafficEnabled = enable;
         }
+
         private static void ChangeTraffic(bool enable)
         {
             if (enable)
@@ -109,7 +99,8 @@ namespace RageCoop.Client
             }
             else if (Networking.IsOnServer)
             {
-                Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f, 1000.0f, 0, 1, 1, 1);
+                Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f,
+                    1000.0f, 0, 1, 1, 1);
                 Function.Call(Hash.SET_CREATE_RANDOM_COPS, false);
                 Function.Call(Hash.SET_RANDOM_TRAINS, false);
                 Function.Call(Hash.SET_RANDOM_BOATS, false);
@@ -122,13 +113,13 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, 0);
                 Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
                 Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
-                foreach (Ped ped in World.GetAllPeds())
+                foreach (var ped in World.GetAllPeds())
                 {
-                    if (ped == Game.Player.Character) { continue; }
-                    SyncedPed c = EntityPool.GetPedByHandle(ped.Handle);
-                    if ((c == null) || (c.IsLocal && (ped.Handle != Game.Player.Character.Handle) && ped.PopulationType != EntityPopulationType.Mission))
+                    if (ped == Game.Player.Character) continue;
+                    var c = EntityPool.GetPedByHandle(ped.Handle);
+                    if (c == null || (c.IsLocal && ped.Handle != Game.Player.Character.Handle &&
+                                      ped.PopulationType != EntityPopulationType.Mission))
                     {
-
                         Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
                         ped.CurrentVehicle?.Delete();
                         ped.Kill();
@@ -136,20 +127,17 @@ namespace RageCoop.Client
                     }
                 }
 
-                foreach (Vehicle veh in World.GetAllVehicles())
+                foreach (var veh in World.GetAllVehicles())
                 {
-                    SyncedVehicle v = veh.GetSyncEntity();
-                    if (v.MainVehicle == Game.Player.LastVehicle || v.MainVehicle == Game.Player.Character.CurrentVehicle)
-                    {
+                    var v = veh.GetSyncEntity();
+                    if (v.MainVehicle == Game.Player.LastVehicle ||
+                        v.MainVehicle == Game.Player.Character.CurrentVehicle)
                         // Don't delete player's vehicle
                         continue;
-                    }
-                    if ((v == null) || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
-                    {
+                    if (v == null || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
                         // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 
                         veh.Delete();
-                    }
                 }
             }
         }
@@ -162,32 +150,31 @@ namespace RageCoop.Client
                 QueueAction(a);
             });
         }
+
         internal static void DoQueuedActions()
         {
             lock (QueuedActions)
             {
                 foreach (var action in QueuedActions.ToArray())
-                {
                     try
                     {
-                        if (action())
-                        {
-                            QueuedActions.Remove(action);
-                        }
+                        if (action()) QueuedActions.Remove(action);
                     }
                     catch (Exception ex)
                     {
                         Main.Logger.Error(ex);
                         QueuedActions.Remove(action);
                     }
-                }
             }
         }
 
         /// <summary>
-        /// Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
+        ///     Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
         /// </summary>
-        /// <param name="a"> An action to be executed with a return value indicating whether the action can be removed after execution.</param>
+        /// <param name="a">
+        ///     An action to be executed with a return value indicating whether the action can be removed after
+        ///     execution.
+        /// </param>
         internal static void QueueAction(Func<bool> a)
         {
             lock (QueuedActions)
@@ -195,19 +182,28 @@ namespace RageCoop.Client
                 QueuedActions.Add(a);
             }
         }
+
         internal static void QueueAction(Action a)
         {
             lock (QueuedActions)
             {
-                QueuedActions.Add(() => { a(); return true; });
+                QueuedActions.Add(() =>
+                {
+                    a();
+                    return true;
+                });
             }
         }
+
         /// <summary>
-        /// Clears all queued actions
+        ///     Clears all queued actions
         /// </summary>
         internal static void ClearQueuedActions()
         {
-            lock (QueuedActions) { QueuedActions.Clear(); }
+            lock (QueuedActions)
+            {
+                QueuedActions.Clear();
+            }
         }
     }
 }

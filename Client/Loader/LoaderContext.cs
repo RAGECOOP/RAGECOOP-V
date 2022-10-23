@@ -1,36 +1,37 @@
-﻿using SHVDN;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using GTA.UI;
+using SHVDN;
 using Console = GTA.Console;
+using Script = GTA.Script;
 
 namespace RageCoop.Client.Loader
 {
-
     public class LoaderContext : MarshalByRefObject, IDisposable
     {
         #region PRIMARY-LOADING-LOGIC
-        public static ConcurrentDictionary<string, LoaderContext> LoadedDomains => new ConcurrentDictionary<string, LoaderContext>(_loadedDomains);
 
-        private static readonly ConcurrentDictionary<string, LoaderContext> _loadedDomains = new ConcurrentDictionary<string, LoaderContext>();
+        public static ConcurrentDictionary<string, LoaderContext> LoadedDomains =>
+            new ConcurrentDictionary<string, LoaderContext>(_loadedDomains);
+
+        private static readonly ConcurrentDictionary<string, LoaderContext> _loadedDomains =
+            new ConcurrentDictionary<string, LoaderContext>();
 
         public bool UnloadRequested;
         public string BaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
         private ScriptDomain CurrentDomain => ScriptDomain.CurrentDomain;
+
         public static void CheckForUnloadRequest()
         {
             lock (_loadedDomains)
             {
                 foreach (var p in _loadedDomains.Values)
-                {
                     if (p.UnloadRequested)
-                    {
                         Unload(p);
-                    }
-                }
             }
         }
 
@@ -38,15 +39,13 @@ namespace RageCoop.Client.Loader
         {
             return _loadedDomains.ContainsKey(Path.GetFullPath(dir).ToLower());
         }
+
         public static LoaderContext Load(string dir)
         {
             lock (_loadedDomains)
             {
                 dir = Path.GetFullPath(dir).ToLower();
-                if (IsLoaded(dir))
-                {
-                    throw new Exception("Already loaded");
-                }
+                if (IsLoaded(dir)) throw new Exception("Already loaded");
                 ScriptDomain newDomain = null;
                 try
                 {
@@ -67,17 +66,19 @@ namespace RageCoop.Client.Loader
                             */
 
                             // Delete API assemblies
-                            Directory.GetFiles(dir, "ScriptHookVDotNet*", SearchOption.AllDirectories).ToList().ForEach(x => File.Delete(x));
+                            Directory.GetFiles(dir, "ScriptHookVDotNet*", SearchOption.AllDirectories).ToList()
+                                .ForEach(x => File.Delete(x));
                             var ctxAsm = Path.Combine(dir, "RageCoop.Client.Loader.dll");
-                            if (File.Exists(ctxAsm)) { File.Delete(ctxAsm); }
+                            if (File.Exists(ctxAsm)) File.Delete(ctxAsm);
 
                             newDomain = ScriptDomain.Load(
                                 Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName, dir);
                             newDomain.AppDomain.SetData("Primary", ScriptDomain.CurrentDomain);
-                            newDomain.AppDomain.SetData("Console", ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
+                            newDomain.AppDomain.SetData("Console",
+                                ScriptDomain.CurrentDomain.AppDomain.GetData("Console"));
                             var context = (LoaderContext)newDomain.AppDomain.CreateInstanceFromAndUnwrap(
                                 typeof(LoaderContext).Assembly.Location,
-                                typeof(LoaderContext).FullName, ignoreCase: false,
+                                typeof(LoaderContext).FullName, false,
                                 BindingFlags.Instance | BindingFlags.NonPublic,
                                 null,
                                 new object[] { }
@@ -92,18 +93,15 @@ namespace RageCoop.Client.Loader
                         }
                     });
                     // Wait till next tick
-                    GTA.Script.Yield();
-                    if (e != null) { throw e; }
+                    Script.Yield();
+                    if (e != null) throw e;
                     return _loadedDomains[dir];
                 }
                 catch (Exception ex)
                 {
-                    GTA.UI.Notification.Show(ex.ToString());
+                    Notification.Show(ex.ToString());
                     Console.Error(ex);
-                    if (newDomain != null)
-                    {
-                        ScriptDomain.Unload(newDomain);
-                    }
+                    if (newDomain != null) ScriptDomain.Unload(newDomain);
                     throw;
                 }
             }
@@ -121,65 +119,64 @@ namespace RageCoop.Client.Loader
                     try
                     {
                         if (!_loadedDomains.TryRemove(domain.BaseDirectory.ToLower(), out _))
-                        {
                             throw new Exception("Failed to remove domain from list");
-                        }
                         domain.Dispose();
                         ScriptDomain.Unload(domain.CurrentDomain);
                     }
                     catch (Exception e)
                     {
                         ex = e;
-                        GTA.UI.Notification.Show(ex.ToString());
+                        Notification.Show(ex.ToString());
                     }
                 });
-                GTA.Script.Yield();
-                if (ex != null)
-                {
-                    throw ex;
-                }
+                Script.Yield();
+                if (ex != null) throw ex;
                 Console.Info("Unloaded domain: " + name);
             }
         }
+
         public static void Unload(string dir)
         {
             Unload(_loadedDomains[Path.GetFullPath(dir).ToLower()]);
         }
+
         public static void UnloadAll()
         {
             lock (_loadedDomains)
             {
-                foreach (var d in _loadedDomains.Values.ToArray())
-                {
-                    Unload(d);
-                }
+                foreach (var d in _loadedDomains.Values.ToArray()) Unload(d);
             }
         }
+
         #endregion
 
-        #region LOAD-CONTEXT        
-
+        #region LOAD-CONTEXT
 
         private LoaderContext()
         {
             AppDomain.CurrentDomain.DomainUnload += (s, e) => Dispose();
             PrimaryDomain.Tick += Tick;
             PrimaryDomain.KeyEvent += KeyEvent;
-            Console.Info($"Loaded domain: {AppDomain.CurrentDomain.FriendlyName}, {AppDomain.CurrentDomain.BaseDirectory}");
+            Console.Info(
+                $"Loaded domain: {AppDomain.CurrentDomain.FriendlyName}, {AppDomain.CurrentDomain.BaseDirectory}");
         }
+
         public static ScriptDomain PrimaryDomain => AppDomain.CurrentDomain.GetData("Primary") as ScriptDomain;
-        public static LoaderContext CurrentContext => AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") as LoaderContext;
+
+        public static LoaderContext CurrentContext =>
+            AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") as LoaderContext;
+
         /// <summary>
-        /// Request the current domain to be unloaded
+        ///     Request the current domain to be unloaded
         /// </summary>
         public static void RequestUnload()
         {
             if (PrimaryDomain == null)
-            {
-                throw new NotSupportedException("Current domain not loaded by the loader therfore cannot be unloaded automatically");
-            }
+                throw new NotSupportedException(
+                    "Current domain not loaded by the loader therfore cannot be unloaded automatically");
             CurrentContext.UnloadRequested = true;
         }
+
         private void Tick()
         {
             CurrentDomain.DoTick();
@@ -189,21 +186,24 @@ namespace RageCoop.Client.Loader
         {
             CurrentDomain.DoKeyEvent(keys, status);
         }
+
         public override object InitializeLifetimeService()
         {
             // Return null to avoid lifetime restriction on the marshaled object.
             return null;
         }
+
         public void Dispose()
         {
             lock (this)
             {
-                if (PrimaryDomain == null) { return; }
+                if (PrimaryDomain == null) return;
                 PrimaryDomain.Tick -= Tick;
                 PrimaryDomain.KeyEvent -= KeyEvent;
                 AppDomain.CurrentDomain.SetData("Primary", null);
             }
         }
+
         #endregion
     }
 }

@@ -1,12 +1,11 @@
-﻿using GTA.Math;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using GTA.Math;
 
 namespace RageCoop.Core
 {
     internal class BitReader : BinaryReader
     {
-
         public BitReader(byte[] array) : base(new MemoryStream(array))
         {
         }
@@ -21,6 +20,7 @@ namespace RageCoop.Core
         {
             return base.ReadBytes(ReadInt32());
         }
+
         public override string ReadString()
         {
             return Encoding.UTF8.GetString(ReadBytes(ReadInt32()));
@@ -28,24 +28,26 @@ namespace RageCoop.Core
 
         public Vector3 ReadVector3()
         {
-            return new Vector3()
+            return new Vector3
             {
                 X = ReadSingle(),
                 Y = ReadSingle(),
                 Z = ReadSingle()
             };
         }
+
         public Vector2 ReadVector2()
         {
-            return new Vector2()
+            return new Vector2
             {
                 X = ReadSingle(),
                 Y = ReadSingle()
             };
         }
+
         public Quaternion ReadQuaternion()
         {
-            return new Quaternion()
+            return new Quaternion
             {
                 X = ReadSingle(),
                 Y = ReadSingle(),

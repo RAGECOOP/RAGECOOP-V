@@ -1,6 +1,7 @@
 ﻿// WARNING: values can change after a game update
 // if R* adds in the middle!
 // This is up-to-date for b2372
+
 internal enum TaskType
 {
     CTaskHandsUp = 0,
@@ -435,4 +436,4 @@ internal enum TaskType
     CTaskVehiclePullAlongside = 528,
     CTaskVehicleTransformToSubmarine = 529,
     CTaskAnimatedFallback = 530
-};
+}

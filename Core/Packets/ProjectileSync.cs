@@ -22,12 +22,8 @@ namespace RageCoop.Core
             public ProjectileDataFlags Flags { get; set; }
 
 
-
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
-
                 // Write id
                 m.Write(ID);
 
@@ -46,15 +42,11 @@ namespace RageCoop.Core
                 // Write velocity
                 m.Write(Velocity);
                 m.Write((byte)Flags);
-
-
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-
 
                 // Read id
                 ID = m.ReadInt32();

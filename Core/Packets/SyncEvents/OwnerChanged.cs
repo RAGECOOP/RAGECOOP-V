@@ -1,11 +1,9 @@
-﻿
-using Lidgren.Network;
+﻿using Lidgren.Network;
 
 namespace RageCoop.Core
 {
     internal partial class Packets
     {
-
         internal class OwnerChanged : Packet
         {
             public override PacketType Type => PacketType.OwnerChanged;
@@ -23,16 +21,11 @@ namespace RageCoop.Core
             {
                 #region NetIncomingMessageToPacket
 
-
                 ID = m.ReadInt32();
                 NewOwnerID = m.ReadInt32();
 
                 #endregion
             }
         }
-
-
-
-
     }
 }

@@ -1,8 +1,9 @@
-﻿using GTA;
-using LemonUI.Menus;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using GTA;
+using GTA.UI;
+using LemonUI.Menus;
 
 namespace RageCoop.Client.Menus
 {
@@ -11,17 +12,32 @@ namespace RageCoop.Client.Menus
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
-        private static readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
-        private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
-        private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableAlternatePause);
-        private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable voice", "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends", Main.Settings.Voice);
+        private static readonly NativeCheckboxItem _disableTrafficItem =
+            new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only",
+                Main.Settings.DisableTraffic);
 
-        private static readonly NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
-        private static readonly NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
-        private static readonly NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
+        private static readonly NativeCheckboxItem _flipMenuItem =
+            new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
+
+        private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause",
+            "Don't freeze game time when Esc pressed", Main.Settings.DisableAlternatePause);
+
+        private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable voice",
+            "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends",
+            Main.Settings.Voice);
+
+        private static readonly NativeItem _menuKey =
+            new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
+
+        private static readonly NativeItem _passengerKey = new NativeItem("Passenger Key",
+            "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
+
+        private static readonly NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)",
+            "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).",
+            Main.Settings.WorldVehicleSoftLimit.ToString());
 
         static SettingsMenu()
         {
@@ -49,10 +65,7 @@ namespace RageCoop.Client.Menus
         {
             if (_disableVoice.Checked)
             {
-                if (Networking.IsOnServer && !Voice.WasInitialized())
-                {
-                    Voice.Init();
-                }
+                if (Networking.IsOnServer && !Voice.WasInitialized()) Voice.Init();
             }
             else
             {
@@ -68,18 +81,22 @@ namespace RageCoop.Client.Menus
             Main.Settings.DisableAlternatePause = _disablePauseAlt.Checked;
             Util.SaveSettings();
         }
+
         private static void VehicleSoftLimitActivated(object sender, EventArgs e)
         {
             try
             {
                 Main.Settings.WorldVehicleSoftLimit = int.Parse(
                     Game.GetUserInput(WindowTitle.EnterMessage20,
-                    Main.Settings.WorldVehicleSoftLimit.ToString(), 20));
+                        Main.Settings.WorldVehicleSoftLimit.ToString(), 20));
                 _menuKey.AltTitle = Main.Settings.WorldVehicleSoftLimit.ToString();
                 Util.SaveSettings();
             }
-            catch { }
+            catch
+            {
+            }
         }
+
         private static void ChaneMenuKey(object sender, EventArgs e)
         {
             try
@@ -87,11 +104,13 @@ namespace RageCoop.Client.Menus
                 Main.Settings.MenuKey = (Keys)Enum.Parse(
                     typeof(Keys),
                     Game.GetUserInput(WindowTitle.EnterMessage20,
-                    Main.Settings.MenuKey.ToString(), 20));
+                        Main.Settings.MenuKey.ToString(), 20));
                 _menuKey.AltTitle = Main.Settings.MenuKey.ToString();
                 Util.SaveSettings();
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         private static void ChangePassengerKey(object sender, EventArgs e)
@@ -101,25 +120,27 @@ namespace RageCoop.Client.Menus
                 Main.Settings.PassengerKey = (Keys)Enum.Parse(
                     typeof(Keys),
                     Game.GetUserInput(WindowTitle.EnterMessage20,
-                    Main.Settings.PassengerKey.ToString(), 20));
+                        Main.Settings.PassengerKey.ToString(), 20));
                 _passengerKey.AltTitle = Main.Settings.PassengerKey.ToString();
                 Util.SaveSettings();
             }
-            catch { }
+            catch
+            {
+            }
         }
 
-        public static void DisableTrafficCheckboxChanged(object a, System.EventArgs b)
+        public static void DisableTrafficCheckboxChanged(object a, EventArgs b)
         {
             WorldThread.Traffic(!_disableTrafficItem.Checked);
             Main.Settings.DisableTraffic = _disableTrafficItem.Checked;
             Util.SaveSettings();
         }
 
-        public static void FlipMenuCheckboxChanged(object a, System.EventArgs b)
+        public static void FlipMenuCheckboxChanged(object a, EventArgs b)
         {
-            CoopMenu.Menu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
+            CoopMenu.Menu.Alignment = _flipMenuItem.Checked ? Alignment.Right : Alignment.Left;
 
-            Menu.Alignment = _flipMenuItem.Checked ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left;
+            Menu.Alignment = _flipMenuItem.Checked ? Alignment.Right : Alignment.Left;
             Main.Settings.FlipMenu = _flipMenuItem.Checked;
             Util.SaveSettings();
         }

@@ -1,61 +1,53 @@
-﻿using GTA;
+﻿using System;
+using System.Drawing;
+using GTA;
 using GTA.Native;
+using GTA.UI;
 using LemonUI;
+using LemonUI.Elements;
 using LemonUI.Menus;
 using LemonUI.Scaleform;
-using System.Drawing;
 
 namespace RageCoop.Client.Menus
 {
     /// <summary>
-    /// Don't use it!
+    ///     Don't use it!
     /// </summary>
     internal static class CoopMenu
     {
         public static ObjectPool MenuPool = new ObjectPool();
+
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "MAIN")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
-        public static PopUp PopUp = new PopUp()
+
+        public static PopUp PopUp = new PopUp
         {
             Title = "",
             Prompt = "",
             Subtitle = "",
             Error = "",
             ShowBackground = true,
-            Visible = false,
+            Visible = false
         };
-        public static NativeMenu LastMenu { get; set; } = Menu;
-        #region ITEMS
-        private static readonly NativeItem _usernameItem = new NativeItem("Username") { AltTitle = Main.Settings.Username };
-        private static readonly NativeItem _passwordItem = new NativeItem("Password") { AltTitle = new string('*', Main.Settings.Password.Length) };
-
-        public static readonly NativeItem ServerIpItem = new NativeItem("Server IP") { AltTitle = Main.Settings.LastServerAddress };
-        internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
-        private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
-            "https://github.com/RAGECOOP~n~" +
-            "~y~VERSION~s~~n~" +
-            Main.Version)
-        { LeftBadge = new LemonUI.Elements.ScaledTexture("commonmenu", "shop_new_star") };
-
-
-        #endregion
 
         /// <summary>
-        /// Don't use it!
+        ///     Don't use it!
         /// </summary>
         static CoopMenu()
         {
-
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
             Menu.Title.Color = Color.FromArgb(255, 165, 0);
 
             _usernameItem.Activated += UsernameActivated;
             _passwordItem.Activated += _passwordActivated;
             ServerIpItem.Activated += ServerIpActivated;
-            _serverConnectItem.Activated += (sender, item) => { Networking.ToggleConnection(Main.Settings.LastServerAddress); };
+            _serverConnectItem.Activated += (sender, item) =>
+            {
+                Networking.ToggleConnection(Main.Settings.LastServerAddress);
+            };
 
 
             Menu.AddSubMenu(ServersMenu.Menu);
@@ -82,6 +74,8 @@ namespace RageCoop.Client.Menus
             Menu.Add(_aboutItem);
         }
 
+        public static NativeMenu LastMenu { get; set; } = Menu;
+
 
         public static bool ShowPopUp(string prompt, string title, string subtitle, string error, bool showbackground)
         {
@@ -102,8 +96,10 @@ namespace RageCoop.Client.Menus
                 scaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
                 scaleform.CallFunction("CREATE_CONTAINER");
 
-                scaleform.CallFunction("SET_DATA_SLOT", 0, Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
-                scaleform.CallFunction("SET_DATA_SLOT", 1, Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
+                scaleform.CallFunction("SET_DATA_SLOT", 0,
+                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
+                scaleform.CallFunction("SET_DATA_SLOT", 1,
+                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
                 scaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
                 scaleform.Render2D();
                 if (Game.IsControlJustPressed(Control.FrontendAccept))
@@ -111,19 +107,21 @@ namespace RageCoop.Client.Menus
                     PopUp.Visible = false;
                     return true;
                 }
-                else if (Game.IsControlJustPressed(Control.FrontendCancel))
+
+                if (Game.IsControlJustPressed(Control.FrontendCancel))
                 {
                     PopUp.Visible = false;
                     return false;
                 }
+
                 Script.Yield();
                 Game.DisableAllControlsThisFrame();
-
             }
         }
-        public static void UsernameActivated(object a, System.EventArgs b)
+
+        public static void UsernameActivated(object a, EventArgs b)
         {
-            string newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
+            var newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
             if (!string.IsNullOrWhiteSpace(newUsername))
             {
                 Main.Settings.Username = newUsername;
@@ -133,16 +131,17 @@ namespace RageCoop.Client.Menus
             }
         }
 
-        private static void _passwordActivated(object sender, System.EventArgs e)
+        private static void _passwordActivated(object sender, EventArgs e)
         {
-            string newPass = Game.GetUserInput(WindowTitle.EnterMessage20, "", 20);
+            var newPass = Game.GetUserInput(WindowTitle.EnterMessage20, "", 20);
             Main.Settings.Password = newPass;
             Util.SaveSettings();
             _passwordItem.AltTitle = new string('*', newPass.Length);
         }
-        public static void ServerIpActivated(object a, System.EventArgs b)
+
+        public static void ServerIpActivated(object a, EventArgs b)
         {
-            string newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, ServerIpItem.AltTitle, 60);
+            var newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, ServerIpItem.AltTitle, 60);
             if (!string.IsNullOrWhiteSpace(newServerIp) && newServerIp.Contains(":"))
             {
                 Main.Settings.LastServerAddress = newServerIp;
@@ -173,5 +172,26 @@ namespace RageCoop.Client.Menus
             _serverConnectItem.Enabled = true;
             _serverConnectItem.Title = "Connect";
         }
+
+        #region ITEMS
+
+        private static readonly NativeItem _usernameItem = new NativeItem("Username")
+            { AltTitle = Main.Settings.Username };
+
+        private static readonly NativeItem _passwordItem = new NativeItem("Password")
+            { AltTitle = new string('*', Main.Settings.Password.Length) };
+
+        public static readonly NativeItem ServerIpItem = new NativeItem("Server IP")
+            { AltTitle = Main.Settings.LastServerAddress };
+
+        internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
+
+        private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
+                "https://github.com/RAGECOOP~n~" +
+                "~y~VERSION~s~~n~" +
+                Main.Version)
+            { LeftBadge = new ScaledTexture("commonmenu", "shop_new_star") };
+
+        #endregion
     }
 }

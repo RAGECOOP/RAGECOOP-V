@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RageCoop.Client.Installer"
         mc:Ignorable="d"
         Title="MainWindow" Height="376" Width="617" Background="#FFBABABA">
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/bg.png" Opacity="0.2"/>
+            <ImageBrush ImageSource="/bg.png" Opacity="0.2" />
         </Grid.Background>
-        <Label x:Name="Status" FontSize="20" Foreground="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label x:Name="Status" FontSize="20" Foreground="#FF232323" HorizontalAlignment="Center"
+               VerticalAlignment="Center" />
     </Grid>
 </Window>

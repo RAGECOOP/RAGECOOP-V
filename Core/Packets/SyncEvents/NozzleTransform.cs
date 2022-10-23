@@ -1,5 +1,4 @@
-﻿
-using Lidgren.Network;
+﻿using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -14,14 +13,8 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
-
                 m.Write(VehicleID);
                 m.Write(Hover);
-
-
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
@@ -34,9 +27,5 @@ namespace RageCoop.Core
                 #endregion
             }
         }
-
-
-
-
     }
 }

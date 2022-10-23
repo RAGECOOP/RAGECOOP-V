@@ -3,7 +3,7 @@
 namespace RageCoop.Client
 {
     /// <summary>
-    /// Synchronized prop, mostly owned by server
+    ///     Synchronized prop, mostly owned by server
     /// </summary>
     public class SyncedProp : SyncedEntity
     {
@@ -11,28 +11,31 @@ namespace RageCoop.Client
         {
             ID = id;
         }
+
         /// <summary>
-        /// The real entity
+        ///     The real entity
         /// </summary>
         public Prop MainProp { get; set; }
-        internal new int OwnerID
-        {
-            get
-            {
-                // alwayse owned by server
-                return 0;
-            }
-        }
+
+        internal new int OwnerID =>
+            // alwayse owned by server
+            0;
+
         internal override void Update()
         {
+            if (!NeedUpdate) return;
+            if (!Model.IsLoaded)
+            {
+                Model.Request();
+                return;
+            }
 
-            if (!NeedUpdate) { return; }
-            if (!Model.IsLoaded) { Model.Request(); return; }
             if (MainProp == null || !MainProp.Exists())
             {
                 MainProp = World.CreateProp(Model, Position, Rotation, false, false);
                 MainProp.IsInvincible = true;
             }
+
             MainProp.Position = Position;
             MainProp.Rotation = Rotation;
             MainProp.SetFrozen(true);

@@ -16,17 +16,13 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <OutPutPath>..\..\bin\$(Configuration)\Client\Scripts</OutPutPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <OutPutPath>..\..\bin\Debug\Client</OutPutPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>DEBUG</DefineConstants>
-    <WarningLevel>4</WarningLevel>
-    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutPutPath>..\..\bin\Release\Client</OutPutPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Debug.cs" />

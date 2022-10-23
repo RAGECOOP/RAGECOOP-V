@@ -1,9 +1,9 @@
-﻿using GTA;
-using GTA.Native;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using GTA;
+using GTA.Native;
 
 namespace RageCoop.Client
 {
@@ -11,18 +11,21 @@ namespace RageCoop.Client
     {
         private readonly Scaleform MainScaleForm;
 
+        public Chat()
+        {
+            MainScaleForm = new Scaleform("multiplayer_chat");
+        }
+
         public string CurrentInput { get; set; }
 
         private bool CurrentFocused { get; set; }
+
         public bool Focused
         {
             get => CurrentFocused;
             set
             {
-                if (value && Hidden)
-                {
-                    Hidden = false;
-                }
+                if (value && Hidden) Hidden = false;
 
                 MainScaleForm.CallFunction("SET_FOCUS", value ? 2 : 1, 2, "ALL");
 
@@ -33,6 +36,7 @@ namespace RageCoop.Client
         private ulong LastMessageTime { get; set; }
 
         private bool CurrentHidden { get; set; }
+
         private bool Hidden
         {
             get => CurrentHidden;
@@ -40,10 +44,7 @@ namespace RageCoop.Client
             {
                 if (value)
                 {
-                    if (!CurrentHidden)
-                    {
-                        MainScaleForm.CallFunction("hide");
-                    }
+                    if (!CurrentHidden) MainScaleForm.CallFunction("hide");
                 }
                 else if (CurrentHidden)
                 {
@@ -52,11 +53,6 @@ namespace RageCoop.Client
 
                 CurrentHidden = value;
             }
-        }
-
-        public Chat()
-        {
-            MainScaleForm = new Scaleform("multiplayer_chat");
         }
 
         public void Init()
@@ -72,20 +68,11 @@ namespace RageCoop.Client
 
         public void Tick()
         {
-            if ((Util.GetTickCount64() - LastMessageTime) > 15000 && !Focused && !Hidden)
-            {
-                Hidden = true;
-            }
+            if (Util.GetTickCount64() - LastMessageTime > 15000 && !Focused && !Hidden) Hidden = true;
 
-            if (!Hidden)
-            {
-                MainScaleForm.Render2D();
-            }
+            if (!Hidden) MainScaleForm.Render2D();
 
-            if (!CurrentFocused)
-            {
-                return;
-            }
+            if (!CurrentFocused) return;
 
             Function.Call(Hash.DISABLE_ALL_CONTROL_ACTIONS, 0);
         }
@@ -107,20 +94,12 @@ namespace RageCoop.Client
             }
 
             if (key == Keys.PageUp)
-            {
                 MainScaleForm.CallFunction("PAGE_UP");
-            }
-            else if (key == Keys.PageDown)
-            {
-                MainScaleForm.CallFunction("PAGE_DOWN");
-            }
+            else if (key == Keys.PageDown) MainScaleForm.CallFunction("PAGE_DOWN");
 
-            string keyChar = GetCharFromKey(key, Game.IsKeyPressed(Keys.ShiftKey), false);
+            var keyChar = GetCharFromKey(key, Game.IsKeyPressed(Keys.ShiftKey), false);
 
-            if (keyChar.Length == 0)
-            {
-                return;
-            }
+            if (keyChar.Length == 0) return;
 
             switch (keyChar[0])
             {
@@ -130,14 +109,12 @@ namespace RageCoop.Client
                         CurrentInput = CurrentInput.Remove(CurrentInput.Length - 1);
                         MainScaleForm.CallFunction("DELETE_TEXT");
                     }
+
                     return;
                 case (char)13:
                     MainScaleForm.CallFunction("ADD_TEXT", "ENTER");
 
-                    if (!string.IsNullOrWhiteSpace(CurrentInput))
-                    {
-                        Networking.SendChatMessage(CurrentInput);
-                    }
+                    if (!string.IsNullOrWhiteSpace(CurrentInput)) Networking.SendChatMessage(CurrentInput);
 
                     Focused = false;
                     CurrentInput = "";
@@ -151,19 +128,16 @@ namespace RageCoop.Client
 
         [DllImport("user32.dll")]
         public static extern int ToUnicodeEx(uint virtualKeyCode, uint scanCode, byte[] keyboardState,
-            [Out, MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
+            [Out] [MarshalAs(UnmanagedType.LPWStr, SizeConst = 64)]
             StringBuilder receivingBuffer,
             int bufferSize, uint flags, IntPtr kblayout);
 
         public static string GetCharFromKey(Keys key, bool shift, bool altGr)
         {
-            StringBuilder buf = new StringBuilder(256);
-            byte[] keyboardState = new byte[256];
+            var buf = new StringBuilder(256);
+            var keyboardState = new byte[256];
 
-            if (shift)
-            {
-                keyboardState[(int)Keys.ShiftKey] = 0xff;
-            }
+            if (shift) keyboardState[(int)Keys.ShiftKey] = 0xff;
 
             if (altGr)
             {

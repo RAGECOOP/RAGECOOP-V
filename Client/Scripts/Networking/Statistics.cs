@@ -5,8 +5,6 @@ namespace RageCoop.Client
 {
     internal static class Statistics
     {
-        public static int BytesDownPerSecond { get; private set; }
-        public static int BytesUpPerSecond { get; private set; }
         static Statistics()
         {
             Task.Run(() =>
@@ -21,5 +19,8 @@ namespace RageCoop.Client
                 }
             });
         }
+
+        public static int BytesDownPerSecond { get; private set; }
+        public static int BytesUpPerSecond { get; private set; }
     }
 }

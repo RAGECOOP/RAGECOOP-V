@@ -4,10 +4,9 @@ namespace RageCoop.Core
 {
     internal class PublicKey
     {
-        public PublicKey()
-        {
+        public byte[] Exponent;
+        public byte[] Modulus;
 
-        }
         public static PublicKey FromServerInfo(ServerInfo info)
         {
             return new PublicKey
@@ -16,7 +15,5 @@ namespace RageCoop.Core
                 Exponent = Convert.FromBase64String(info.publicKeyExponent)
             };
         }
-        public byte[] Modulus;
-        public byte[] Exponent;
     }
 }

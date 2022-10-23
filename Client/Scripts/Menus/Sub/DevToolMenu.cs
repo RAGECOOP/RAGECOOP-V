@@ -1,29 +1,31 @@
-﻿using GTA;
-using LemonUI.Menus;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using System.Drawing;
-using RageCoop.Client.Scripting;
-using Console = GTA.Console;
 using System.IO;
-using Newtonsoft.Json;
+using GTA;
 using GTA.Native;
+using GTA.UI;
+using LemonUI.Menus;
+using Newtonsoft.Json;
+using Console = GTA.Console;
 
 namespace RageCoop.Client
 {
-    class AnimDic
+    internal class AnimDic
     {
-        public string DictionaryName;
         public string[] Animations;
+        public string DictionaryName;
     }
+
     internal static class DevToolMenu
     {
-        const string AnimationsPath = @"RageCoop\Data\animDictsCompact.json";
+        private const string AnimationsPath = @"RageCoop\Data\animDictsCompact.json";
+
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
+
         private static readonly NativeCheckboxItem enableItem = new NativeCheckboxItem("Enable");
         public static readonly NativeItem dumpItem = new NativeItem("Dump vehicle weapons");
         public static readonly NativeItem dumpFixItem = new NativeItem("Dump weapon fixes");
@@ -41,7 +43,7 @@ namespace RageCoop.Client
             enableItem.Checked = false;
 
             dumpItem.Activated += DumpItem_Activated;
-            dumpVWHashItem.Activated += (s,e)=> WeaponUtil.DumpVehicleWeaponHashes();
+            dumpVWHashItem.Activated += (s, e) => WeaponUtil.DumpVehicleWeaponHashes();
             dumpWHashItem.Activated += (s, e) => WeaponUtil.DumpWeaponHashes();
             dumpFixItem.Activated += (s, e) => WeaponUtil.DumpWeaponFix();
             getAnimItem.Activated += (s, e) =>
@@ -49,21 +51,17 @@ namespace RageCoop.Client
                 if (File.Exists(AnimationsPath))
                 {
                     var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(AnimationsPath));
-                    foreach(var anim in anims)
-                    {
-                        foreach(var a in anim.Animations)
+                    foreach (var anim in anims)
+                    foreach (var a in anim.Animations)
+                        if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))
                         {
-                            if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Main.P,anim.DictionaryName,a,3))
-                            {
-                                Console.Info(anim.DictionaryName + " : " + a);
-                                GTA.UI.Notification.Show(anim.DictionaryName+" : "+a);
-                            }
+                            Console.Info(anim.DictionaryName + " : " + a);
+                            Notification.Show(anim.DictionaryName + " : " + a);
                         }
-                    }
                 }
                 else
                 {
-                    GTA.UI.Notification.Show($"~r~{AnimationsPath} not found");
+                    Notification.Show($"~r~{AnimationsPath} not found");
                 }
             };
 
@@ -83,13 +81,12 @@ namespace RageCoop.Client
             var dumpLocation = @"RageCoop\Data\VehicleWeapons.json";
             try
             {
-
                 VehicleWeaponInfo.Dump(input, dumpLocation);
-                Console.Info($"Weapon info dumped to " + dumpLocation);
+                Console.Info("Weapon info dumped to " + dumpLocation);
             }
             catch (Exception ex)
             {
-                Console.Error($"~r~" + ex.ToString());
+                Console.Error("~r~" + ex);
             }
             finally
             {

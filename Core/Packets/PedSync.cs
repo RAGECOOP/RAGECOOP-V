@@ -1,14 +1,12 @@
-﻿using GTA;
+﻿using System.Collections.Generic;
+using GTA;
 using GTA.Math;
 using Lidgren.Network;
-using System.Collections.Generic;
 
 namespace RageCoop.Core
 {
     internal partial class Packets
     {
-
-
         internal class PedSync : Packet
         {
             public override PacketType Type => PacketType.PedSync;
@@ -28,13 +26,6 @@ namespace RageCoop.Core
 
             public Vector3 Velocity { get; set; }
 
-            #region RAGDOLL
-            public Vector3 HeadPosition { get; set; }
-            public Vector3 RightFootPosition { get; set; }
-            public Vector3 LeftFootPosition { get; set; }
-
-            #endregion
-
             public byte Speed { get; set; }
 
             public Vector3 AimCoords { get; set; }
@@ -42,27 +33,8 @@ namespace RageCoop.Core
 
             public float Heading { get; set; }
 
-            #region FULL
-
-            public int ModelHash { get; set; }
-
-            public uint CurrentWeaponHash { get; set; }
-
-            public byte[] Clothes { get; set; }
-
-            public Dictionary<uint, bool> WeaponComponents { get; set; }
-
-            public byte WeaponTint { get; set; }
-            public BlipColor BlipColor { get; set; } = (BlipColor)255;
-
-            public BlipSprite BlipSprite { get; set; } = 0;
-            public float BlipScale { get; set; } = 1;
-            #endregion
-
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
                 m.Write(ID);
                 m.Write(OwnerID);
                 m.Write((ushort)Flags);
@@ -73,7 +45,6 @@ namespace RageCoop.Core
                     m.Write(HeadPosition);
                     m.Write(RightFootPosition);
                     m.Write(LeftFootPosition);
-
                 }
                 else
                 {
@@ -82,16 +53,15 @@ namespace RageCoop.Core
                         m.Write(VehicleID);
                         m.Write((byte)(Seat + 3));
                     }
+
                     m.Write(Position);
                 }
+
                 m.Write(Rotation);
                 m.Write(Velocity);
 
 
-                if (Flags.HasPedFlag(PedDataFlags.IsAiming))
-                {
-                    m.Write(AimCoords);
-                }
+                if (Flags.HasPedFlag(PedDataFlags.IsAiming)) m.Write(AimCoords);
 
                 m.Write(Heading);
 
@@ -104,7 +74,7 @@ namespace RageCoop.Core
                     {
                         m.Write(true);
                         m.Write((ushort)WeaponComponents.Count);
-                        foreach (KeyValuePair<uint, bool> component in WeaponComponents)
+                        foreach (var component in WeaponComponents)
                         {
                             m.Write(component.Key);
                             m.Write(component.Value);
@@ -125,14 +95,11 @@ namespace RageCoop.Core
                         m.Write(BlipScale);
                     }
                 }
-
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-
 
                 ID = m.ReadInt32();
                 OwnerID = m.ReadInt32();
@@ -164,10 +131,8 @@ namespace RageCoop.Core
                 Velocity = m.ReadVector3();
 
                 if (Flags.HasPedFlag(PedDataFlags.IsAiming))
-                {
                     // Read player aim coords
                     AimCoords = m.ReadVector3();
-                }
 
                 Heading = m.ReadFloat();
 
@@ -186,12 +151,10 @@ namespace RageCoop.Core
                     if (m.ReadBoolean())
                     {
                         WeaponComponents = new Dictionary<uint, bool>();
-                        ushort comCount = m.ReadUInt16();
-                        for (ushort i = 0; i < comCount; i++)
-                        {
-                            WeaponComponents.Add(m.ReadUInt32(), m.ReadBoolean());
-                        }
+                        var comCount = m.ReadUInt16();
+                        for (ushort i = 0; i < comCount; i++) WeaponComponents.Add(m.ReadUInt32(), m.ReadBoolean());
                     }
+
                     WeaponTint = m.ReadByte();
 
                     BlipColor = (BlipColor)m.ReadByte();
@@ -202,12 +165,35 @@ namespace RageCoop.Core
                         BlipScale = m.ReadFloat();
                     }
                 }
+
                 #endregion
             }
+
+            #region RAGDOLL
+
+            public Vector3 HeadPosition { get; set; }
+            public Vector3 RightFootPosition { get; set; }
+            public Vector3 LeftFootPosition { get; set; }
+
+            #endregion
+
+            #region FULL
+
+            public int ModelHash { get; set; }
+
+            public uint CurrentWeaponHash { get; set; }
+
+            public byte[] Clothes { get; set; }
+
+            public Dictionary<uint, bool> WeaponComponents { get; set; }
+
+            public byte WeaponTint { get; set; }
+            public BlipColor BlipColor { get; set; } = (BlipColor)255;
+
+            public BlipSprite BlipSprite { get; set; } = 0;
+            public float BlipScale { get; set; } = 1;
+
+            #endregion
         }
-
-
-
-
     }
 }

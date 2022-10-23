@@ -1,5 +1,4 @@
-﻿
-using Lidgren.Network;
+﻿using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -9,8 +8,9 @@ namespace RageCoop.Core
         AlreadyExists = 1,
         Completed = 2,
         Loaded = 3,
-        LoadFailed = 4,
+        LoadFailed = 4
     }
+
     internal partial class Packets
     {
         internal class FileTransferRequest : Packet
@@ -24,9 +24,6 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
-
                 // The ID from the download
                 m.Write(ID);
 
@@ -36,13 +33,10 @@ namespace RageCoop.Core
 
                 // The length of the file
                 m.Write(FileLength);
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
-
-
                 ID = m.ReadInt32();
                 Name = m.ReadString();
                 FileLength = m.ReadInt64();
@@ -54,19 +48,17 @@ namespace RageCoop.Core
             public override PacketType Type => PacketType.FileTransferResponse;
             public int ID { get; set; }
             public FileResponse Response { get; set; }
+
             protected override void Serialize(NetOutgoingMessage m)
             {
-
                 // The ID from the download
                 m.Write(ID);
 
                 m.Write((byte)Response);
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
-
                 ID = m.ReadInt32();
                 Response = (FileResponse)m.ReadByte();
             }
@@ -81,17 +73,13 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
                 // The ID from the download
                 m.Write(ID);
                 m.WriteByteArray(FileChunk);
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
-
                 ID = m.ReadInt32();
                 FileChunk = m.ReadByteArray();
             }
@@ -104,23 +92,18 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
                 // The ID for the download
                 m.Write(ID);
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
-
-
                 ID = m.ReadInt32();
             }
         }
+
         internal class AllResourcesSent : Packet
         {
-
             public override PacketType Type => PacketType.AllResourcesSent;
         }
     }

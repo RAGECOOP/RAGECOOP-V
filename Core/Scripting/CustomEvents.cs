@@ -6,69 +6,73 @@ using System.Text;
 namespace RageCoop.Core.Scripting
 {
     /// <summary>
-    /// Describes how the event should be sent or processed
+    ///     Describes how the event should be sent or processed
     /// </summary>
     public enum CustomEventFlags : byte
     {
         None = 0,
 
         /// <summary>
-        /// Data will be encrypted and decrypted on target client
+        ///     Data will be encrypted and decrypted on target client
         /// </summary>
         Encrypted = 1,
 
         /// <summary>
-        /// Event will be queued and fired in script thread, specify this flag if your handler will call native functions.
+        ///     Event will be queued and fired in script thread, specify this flag if your handler will call native functions.
         /// </summary>
-        Queued = 2,
-
+        Queued = 2
     }
 
     /// <summary>
-    /// Struct to identify different event using hash
+    ///     Struct to identify different event using hash
     /// </summary>
     public struct CustomEventHash
     {
         private static readonly MD5 Hasher = MD5.Create();
         private static readonly Dictionary<int, string> Hashed = new Dictionary<int, string>();
+
         /// <summary>
-        /// Hash value
+        ///     Hash value
         /// </summary>
         public int Hash;
+
         /// <summary>
-        /// Create from hash
+        ///     Create from hash
         /// </summary>
         /// <param name="hash"></param>
         public static implicit operator CustomEventHash(int hash)
         {
-            return new CustomEventHash() { Hash = hash };
+            return new CustomEventHash { Hash = hash };
         }
+
         /// <summary>
-        /// Create from string
+        ///     Create from string
         /// </summary>
         /// <param name="name"></param>
         public static implicit operator CustomEventHash(string name)
         {
-            return new CustomEventHash() { Hash = FromString(name) };
-
+            return new CustomEventHash { Hash = FromString(name) };
         }
+
         /// <summary>
-        /// Get a Int32 hash of a string.
+        ///     Get a Int32 hash of a string.
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">The exception is thrown when the name did not match a previously computed one and the hash was the same.</exception>
+        /// <exception cref="ArgumentException">
+        ///     The exception is thrown when the name did not match a previously computed one and
+        ///     the hash was the same.
+        /// </exception>
         public static int FromString(string s)
         {
             var hash = BitConverter.ToInt32(Hasher.ComputeHash(Encoding.UTF8.GetBytes(s)), 0);
             lock (Hashed)
             {
-                if (Hashed.TryGetValue(hash, out string name))
+                if (Hashed.TryGetValue(hash, out var name))
                 {
                     if (name != s)
-                    {
-                        throw new ArgumentException($"Hashed value has collision with another name:{name}, hashed value:{hash}");
-                    }
+                        throw new ArgumentException(
+                            $"Hashed value has collision with another name:{name}, hashed value:{hash}");
 
                     return hash;
                 }
@@ -77,8 +81,9 @@ namespace RageCoop.Core.Scripting
                 return hash;
             }
         }
+
         /// <summary>
-        /// To int
+        ///     To int
         /// </summary>
         /// <param name="h"></param>
         public static implicit operator int(CustomEventHash h)
@@ -86,8 +91,8 @@ namespace RageCoop.Core.Scripting
             return h.Hash;
         }
     }
+
     /// <summary>
-    /// 
     /// </summary>
     public static class CustomEvents
     {
@@ -110,11 +115,14 @@ namespace RageCoop.Core.Scripting
         internal static readonly CustomEventHash CreateVehicle = "RageCoop.CreateVehicle";
         internal static readonly CustomEventHash WeatherTimeSync = "RageCoop.WeatherTimeSync";
         internal static readonly CustomEventHash IsHost = "RageCoop.IsHost";
+
         /// <summary>
-        /// Get event hash from string.
+        ///     Get event hash from string.
         /// </summary>
         /// <returns></returns>
-        /// <remarks>This method is obsoete, you should use implicit operator or <see cref="CustomEventHash.FromString(string)"/></remarks>
+        /// <remarks>
+        ///     This method is obsoete, you should use implicit operator or <see cref="CustomEventHash.FromString(string)" />
+        /// </remarks>
         [Obsolete]
         public static int Hash(string s)
         {

@@ -1,19 +1,17 @@
-﻿using GTA;
-using GTA.Math;
-using GTA.Native;
-using System;
+﻿using System;
 using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
+using GTA;
 using RageCoop.Core;
 
 namespace RageCoop.Client
 {
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false, SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false,
+        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class DevTool : Script
     {
         public static Vehicle ToMark;
         public static Script Instance;
+
         public DevTool()
         {
             Util.StartUpCheck();
@@ -21,33 +19,23 @@ namespace RageCoop.Client
             Tick += OnTick;
             Pause();
         }
+
         private void OnTick(object sender, EventArgs e)
         {
             var wb = Game.Player.Character?.Weapons?.CurrentWeaponObject?.Bones["gun_muzzle"];
-            if (wb?.IsValid==true)
-            {
-                World.DrawLine(wb.Position, wb.Position + wb.RightVector, Color.Blue);
-            }
+            if (wb?.IsValid == true) World.DrawLine(wb.Position, wb.Position + wb.RightVector, Color.Blue);
             if (ToMark == null) return;
 
             if (WeaponUtil.VehicleWeapons.TryGetValue((uint)(int)ToMark.Model, out var info))
-            {
                 foreach (var ws in info.Weapons)
-                {
-                    foreach (var w in ws.Value.Bones)
-                    {
-                        DrawBone(w.BoneName, ws.Value.Name+":"+ws.Key.ToHex());
-                    }
-                }
-            }
+                foreach (var w in ws.Value.Bones)
+                    DrawBone(w.BoneName, ws.Value.Name + ":" + ws.Key.ToHex());
             var P = Game.Player.Character;
             var b = ToMark.GetMuzzleBone(P.VehicleWeapon);
-            if (b != null)
-            {
-                World.DrawLine(b.Position, b.Position + b.ForwardVector * 5, Color.Brown);
-            }
+            if (b != null) World.DrawLine(b.Position, b.Position + b.ForwardVector * 5, Color.Brown);
         }
-        void FindAndDraw()
+
+        private void FindAndDraw()
         {
             DrawBone("weapon_1a");
             DrawBone("weapon_1b");
@@ -82,7 +70,8 @@ namespace RageCoop.Client
             DrawBone("weapon_4g");
             DrawBone("weapon_4h");
         }
-        void DrawBone(string name, string text = null)
+
+        private void DrawBone(string name, string text = null)
         {
             text = text ?? name;
             var b = ToMark.Bones[name];
@@ -94,6 +83,5 @@ namespace RageCoop.Client
                 Util.DrawTextFromCoord(end, text, 0.35f);
             }
         }
-
     }
 }

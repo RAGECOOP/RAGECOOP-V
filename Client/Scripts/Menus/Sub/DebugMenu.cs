@@ -1,7 +1,9 @@
-﻿using GTA;
-using LemonUI.Menus;
-using System;
+﻿using System;
 using System.Drawing;
+using GTA;
+using GTA.UI;
+using LemonUI.Menus;
+using RageCoop.Client.Loader;
 
 namespace RageCoop.Client
 {
@@ -10,17 +12,25 @@ namespace RageCoop.Client
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Debug", "Debug settings")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
+
         public static NativeMenu DiagnosticMenu = new NativeMenu("RAGECOOP", "Diagnostic", "Performence and Diagnostic")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
+            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
+
         public static NativeItem ReloadItem = new NativeItem("Reload", "Reload RAGECOOP and associated scripts");
-        public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
-        public static NativeCheckboxItem ShowOwnerItem = new NativeCheckboxItem("Show entity owner", "Show the owner name of the entity you're aiming at", false);
-        private static readonly NativeCheckboxItem ShowNetworkInfoItem = new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
+
+        public static NativeItem SimulatedLatencyItem =
+            new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
+
+        public static NativeCheckboxItem ShowOwnerItem = new NativeCheckboxItem("Show entity owner",
+            "Show the owner name of the entity you're aiming at", false);
+
+        private static readonly NativeCheckboxItem ShowNetworkInfoItem =
+            new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
 
         static DebugMenu()
         {
@@ -33,32 +43,42 @@ namespace RageCoop.Client
                 DiagnosticMenu.Clear();
                 DiagnosticMenu.Add(new NativeItem("EntityPool", EntityPool.DumpDebug()));
                 foreach (var pair in Debug.TimeStamps)
-                {
-                    DiagnosticMenu.Add(new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
-                }
+                    DiagnosticMenu.Add(
+                        new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
             };
             SimulatedLatencyItem.Activated += (s, e) =>
             {
                 try
                 {
-                    SimulatedLatencyItem.AltTitle = ((Networking.SimulatedLatency = int.Parse(Game.GetUserInput(SimulatedLatencyItem.AltTitle)) * 0.002f) * 500).ToString();
+                    SimulatedLatencyItem.AltTitle =
+                        ((Networking.SimulatedLatency =
+                            int.Parse(Game.GetUserInput(SimulatedLatencyItem.AltTitle)) * 0.002f) * 500).ToString();
                 }
-                catch (Exception ex) { Main.Logger.Error(ex); }
+                catch (Exception ex)
+                {
+                    Main.Logger.Error(ex);
+                }
             };
-            ShowNetworkInfoItem.CheckboxChanged += (s, e) => { Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked; };
-            ShowOwnerItem.CheckboxChanged += (s, e) => { Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked; Util.SaveSettings(); };
+            ShowNetworkInfoItem.CheckboxChanged += (s, e) =>
+            {
+                Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked;
+            };
+            ShowOwnerItem.CheckboxChanged += (s, e) =>
+            {
+                Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
+                Util.SaveSettings();
+            };
             ReloadItem.Activated += ReloadDomain;
             Menu.Add(SimulatedLatencyItem);
             Menu.Add(ShowNetworkInfoItem);
             Menu.Add(ShowOwnerItem);
             Menu.Add(ReloadItem);
             Menu.AddSubMenu(DiagnosticMenu);
-
         }
 
         private static void ReloadDomain(object sender, EventArgs e)
         {
-            Loader.LoaderContext.RequestUnload();
+            LoaderContext.RequestUnload();
         }
     }
 }

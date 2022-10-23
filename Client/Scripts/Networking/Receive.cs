@@ -1,84 +1,68 @@
-﻿using GTA;
+﻿using System;
+using System.Threading;
+using GTA;
+using GTA.UI;
 using Lidgren.Network;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
-using System;
-using System.Threading;
 
 namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-
         /// <summary>
-        /// Reduce GC pressure by reusing frequently used packets
-        /// </summary>
-        private static class ReceivedPackets
-        {
-            public static Packets.PedSync PedPacket = new Packets.PedSync();
-            public static Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
-            public static Packets.ProjectileSync ProjectilePacket = new Packets.ProjectileSync();
-        }
-
-        /// <summary>
-        /// Used to reslove entity handle in a <see cref="Packets.CustomEvent"/>
+        ///     Used to reslove entity handle in a <see cref="Packets.CustomEvent" />
         /// </summary>
         private static readonly Func<byte, NetIncomingMessage, object> _resolveHandle = (t, reader) =>
-           {
-               switch (t)
-               {
-                   case 50:
-                       return EntityPool.ServerProps[reader.ReadInt32()].MainProp?.Handle;
-                   case 51:
-                       return EntityPool.GetPedByID(reader.ReadInt32())?.MainPed?.Handle;
-                   case 52:
-                       return EntityPool.GetVehicleByID(reader.ReadInt32())?.MainVehicle?.Handle;
-                   case 60:
-                       return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
-                   default:
-                       throw new ArgumentException("Cannot resolve server side argument: " + t);
-               }
-           };
+        {
+            switch (t)
+            {
+                case 50:
+                    return EntityPool.ServerProps[reader.ReadInt32()].MainProp?.Handle;
+                case 51:
+                    return EntityPool.GetPedByID(reader.ReadInt32())?.MainPed?.Handle;
+                case 52:
+                    return EntityPool.GetVehicleByID(reader.ReadInt32())?.MainVehicle?.Handle;
+                case 60:
+                    return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
+                default:
+                    throw new ArgumentException("Cannot resolve server side argument: " + t);
+            }
+        };
+
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
+
         public static void ProcessMessage(NetIncomingMessage message)
         {
-            if (message == null) { return; }
+            if (message == null) return;
             var _recycle = true;
             switch (message.MessageType)
             {
                 case NetIncomingMessageType.StatusChanged:
-                    NetConnectionStatus status = (NetConnectionStatus)message.ReadByte();
-                    string reason = message.ReadString();
+                    var status = (NetConnectionStatus)message.ReadByte();
+                    var reason = message.ReadString();
                     switch (status)
                     {
                         case NetConnectionStatus.InitiatedConnect:
-                            if (message.SenderConnection == ServerConnection)
-                            {
-                                CoopMenu.InitiateConnectionMenuSetting();
-                            }
+                            if (message.SenderConnection == ServerConnection) CoopMenu.InitiateConnectionMenuSetting();
                             break;
                         case NetConnectionStatus.Connected:
                             if (message.SenderConnection == ServerConnection)
                             {
                                 var response = message.SenderConnection.RemoteHailMessage;
                                 if ((PacketType)response.ReadByte() != PacketType.HandshakeSuccess)
-                                {
                                     throw new Exception("Invalid handshake response!");
-                                }
                                 var p = new Packets.HandshakeSuccess();
                                 p.Deserialize(response);
-                                foreach (var player in p.Players)
-                                {
-                                    PlayerList.SetPlayer(player.ID, player.Username);
-                                }
+                                foreach (var player in p.Players) PlayerList.SetPlayer(player.ID, player.Username);
                                 Main.Connected();
                             }
                             else
                             {
                                 // Self-initiated connection
-                                if (message.SenderConnection.RemoteHailMessage == null) { return; }
+                                if (message.SenderConnection.RemoteHailMessage == null) return;
 
                                 var p = message.SenderConnection.RemoteHailMessage.GetPacket<Packets.P2PConnect>();
                                 if (PlayerList.Players.TryGetValue(p.ID, out var player))
@@ -88,116 +72,117 @@ namespace RageCoop.Client
                                 }
                                 else
                                 {
-                                    Main.Logger.Info($"Unidentified peer connection from {message.SenderEndPoint} was rejected.");
+                                    Main.Logger.Info(
+                                        $"Unidentified peer connection from {message.SenderEndPoint} was rejected.");
                                     message.SenderConnection.Disconnect("eat poop");
                                 }
                             }
+
                             break;
                         case NetConnectionStatus.Disconnected:
-                            if (message.SenderConnection == ServerConnection)
-                            {
-                                Main.Disconnected(reason);
-                            }
+                            if (message.SenderConnection == ServerConnection) Main.Disconnected(reason);
                             break;
                     }
+
                     break;
                 case NetIncomingMessageType.Data:
+                {
+                    if (message.LengthBytes == 0) break;
+                    var packetType = PacketType.Unknown;
+                    try
                     {
-                        if (message.LengthBytes == 0) { break; }
-                        var packetType = PacketType.Unknown;
-                        try
-                        {
-                            // Get packet type
-                            packetType = (PacketType)message.ReadByte();
-                            switch (packetType)
-                            {
-                                case PacketType.Response:
-                                    {
-                                        int id = message.ReadInt32();
-                                        if (PendingResponses.TryGetValue(id, out var callback))
-                                        {
-                                            callback((PacketType)message.ReadByte(), message);
-                                            PendingResponses.Remove(id);
-                                        }
-                                        break;
-                                    }
-                                case PacketType.Request:
-                                    {
-                                        int id = message.ReadInt32();
-                                        var realType = (PacketType)message.ReadByte();
-                                        if (RequestHandlers.TryGetValue(realType, out var handler))
-                                        {
-                                            var response = Peer.CreateMessage();
-                                            response.Write((byte)PacketType.Response);
-                                            response.Write(id);
-                                            handler(message).Pack(response);
-                                            Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered, message.SequenceChannel);
-                                            Peer.FlushSendQueue();
-                                        }
-                                        else
-                                        {
-                                            Main.Logger.Debug("Did not find a request handler of type: " + realType);
-                                        }
-                                        break;
-                                    }
-                                default:
-                                    {
-
-                                        HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
-                                        break;
-                                    }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            API.QueueAction(() =>
-                            {
-                                GTA.UI.Notification.Show($"~r~~h~Packet Error {ex.Message}");
-                                return true;
-                            });
-                            Main.Logger.Error($"[{packetType}] {ex.Message}");
-                            Main.Logger.Error(ex);
-                            Peer.Shutdown($"Packet Error [{packetType}]");
-                        }
-                        break;
-                    }
-                case NetIncomingMessageType.UnconnectedData:
-                    {
-                        var packetType = (PacketType)message.ReadByte();
+                        // Get packet type
+                        packetType = (PacketType)message.ReadByte();
                         switch (packetType)
                         {
+                            case PacketType.Response:
+                            {
+                                var id = message.ReadInt32();
+                                if (PendingResponses.TryGetValue(id, out var callback))
+                                {
+                                    callback((PacketType)message.ReadByte(), message);
+                                    PendingResponses.Remove(id);
+                                }
 
-                            case PacketType.HolePunch:
+                                break;
+                            }
+                            case PacketType.Request:
+                            {
+                                var id = message.ReadInt32();
+                                var realType = (PacketType)message.ReadByte();
+                                if (RequestHandlers.TryGetValue(realType, out var handler))
                                 {
-                                    HolePunch.Punched(message.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
-                                    break;
+                                    var response = Peer.CreateMessage();
+                                    response.Write((byte)PacketType.Response);
+                                    response.Write(id);
+                                    handler(message).Pack(response);
+                                    Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered,
+                                        message.SequenceChannel);
+                                    Peer.FlushSendQueue();
                                 }
-                            case PacketType.PublicKeyResponse:
+                                else
                                 {
-                                    if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) { break; }
-                                    var packet = message.GetPacket<Packets.PublicKeyResponse>();
-                                    Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
-                                    _publicKeyReceived.Set();
-                                    break;
+                                    Main.Logger.Debug("Did not find a request handler of type: " + realType);
                                 }
+
+                                break;
+                            }
+                            default:
+                            {
+                                HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
+                                break;
+                            }
                         }
-                        break;
                     }
+                    catch (Exception ex)
+                    {
+                        API.QueueAction(() =>
+                        {
+                            Notification.Show($"~r~~h~Packet Error {ex.Message}");
+                            return true;
+                        });
+                        Main.Logger.Error($"[{packetType}] {ex.Message}");
+                        Main.Logger.Error(ex);
+                        Peer.Shutdown($"Packet Error [{packetType}]");
+                    }
+
+                    break;
+                }
+                case NetIncomingMessageType.UnconnectedData:
+                {
+                    var packetType = (PacketType)message.ReadByte();
+                    switch (packetType)
+                    {
+                        case PacketType.HolePunch:
+                        {
+                            HolePunch.Punched(message.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
+                            break;
+                        }
+                        case PacketType.PublicKeyResponse:
+                        {
+                            if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) break;
+                            var packet = message.GetPacket<Packets.PublicKeyResponse>();
+                            Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
+                            _publicKeyReceived.Set();
+                            break;
+                        }
+                    }
+
+                    break;
+                }
                 case NetIncomingMessageType.DebugMessage:
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
                     Main.Logger.Trace(message.ReadString());
                     break;
-                default:
-                    break;
             }
-            if (_recycle)
-            {
-                Peer.Recycle(message);
-            }
+
+            if (_recycle) Peer.Recycle(message);
         }
-        private static void HandlePacket(PacketType packetType, NetIncomingMessage msg, NetConnection senderConnection, ref bool recycle)
+
+        private static void HandlePacket(PacketType packetType, NetIncomingMessage msg, NetConnection senderConnection,
+            ref bool recycle)
         {
             switch (packetType)
             {
@@ -232,59 +217,62 @@ namespace RageCoop.Client
                     break;
 
                 case PacketType.ChatMessage:
+                {
+                    var packet = new Packets.ChatMessage(b => Security.Decrypt(b));
+                    packet.Deserialize(msg);
+
+                    API.QueueAction(() =>
                     {
-
-                        Packets.ChatMessage packet = new Packets.ChatMessage((b) => Security.Decrypt(b));
-                        packet.Deserialize(msg);
-
-                        API.QueueAction(() => { Main.MainChat.AddMessage(packet.Username, packet.Message); return true; });
-                    }
+                        Main.MainChat.AddMessage(packet.Username, packet.Message);
+                        return true;
+                    });
+                }
                     break;
 
                 case PacketType.Voice:
+                {
+                    if (Main.Settings.Voice)
                     {
-                        if (Main.Settings.Voice)
-                        {
-                            Packets.Voice packet = new Packets.Voice();
-                            packet.Deserialize(msg);
+                        var packet = new Packets.Voice();
+                        packet.Deserialize(msg);
 
 
-                            SyncedPed player = EntityPool.GetPedByID(packet.ID);
-                            player.IsSpeaking = true;
-                            player.LastSpeakingTime = Main.Ticked;
+                        var player = EntityPool.GetPedByID(packet.ID);
+                        player.IsSpeaking = true;
+                        player.LastSpeakingTime = Main.Ticked;
 
-                            Voice.AddVoiceData(packet.Buffer, packet.Recorded);
-                        }
+                        Voice.AddVoiceData(packet.Buffer, packet.Recorded);
                     }
+                }
                     break;
 
                 case PacketType.CustomEvent:
+                {
+                    var packet = new Packets.CustomEvent();
+                    if (((CustomEventFlags)msg.PeekByte()).HasEventFlag(CustomEventFlags.Queued))
                     {
-                        Packets.CustomEvent packet = new Packets.CustomEvent();
-                        if (((CustomEventFlags)msg.PeekByte()).HasEventFlag(CustomEventFlags.Queued))
-                        {
-                            recycle = false;
-                            API.QueueAction(() =>
-                            {
-                                packet.Deserialize(msg);
-                                Scripting.API.Events.InvokeCustomEventReceived(packet);
-                                Peer.Recycle(msg);
-                            });
-                        }
-                        else
+                        recycle = false;
+                        API.QueueAction(() =>
                         {
                             packet.Deserialize(msg);
-                            Scripting.API.Events.InvokeCustomEventReceived(packet);
-                        }
+                            API.Events.InvokeCustomEventReceived(packet);
+                            Peer.Recycle(msg);
+                        });
                     }
+                    else
+                    {
+                        packet.Deserialize(msg);
+                        API.Events.InvokeCustomEventReceived(packet);
+                    }
+                }
                     break;
 
                 case PacketType.FileTransferChunk:
-                    {
-                        Packets.FileTransferChunk packet = new Packets.FileTransferChunk();
-                        packet.Deserialize(msg);
-                        DownloadManager.Write(packet.ID, packet.FileChunk);
-                    }
+                {
+                    var packet = new Packets.FileTransferChunk();
+                    packet.Deserialize(msg);
+                    DownloadManager.Write(packet.ID, packet.FileChunk);
+                }
                     break;
 
                 default:
@@ -292,21 +280,24 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        API.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); return true; });
+                        API.QueueAction(() =>
+                        {
+                            SyncEvents.HandleEvent(packetType, msg);
+                            return true;
+                        });
                     }
+
                     break;
             }
         }
 
         private static void PedSync(Packets.PedSync packet)
         {
-            SyncedPed c = EntityPool.GetPedByID(packet.ID);
+            var c = EntityPool.GetPedByID(packet.ID);
             if (c == null)
-            {
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
                 EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
-            }
-            PedDataFlags flags = packet.Flags;
+            var flags = packet.Flags;
             c.ID = packet.ID;
             c.OwnerID = packet.OwnerID;
             c.Health = packet.Health;
@@ -328,11 +319,9 @@ namespace RageCoop.Client
                 c.VehicleID = packet.VehicleID;
                 c.Seat = packet.Seat;
             }
+
             c.LastSynced = Main.Ticked;
-            if (c.IsAiming)
-            {
-                c.AimCoords = packet.AimCoords;
-            }
+            if (c.IsAiming) c.AimCoords = packet.AimCoords;
             if (packet.Flags.HasPedFlag(PedDataFlags.IsFullSync))
             {
                 c.CurrentWeaponHash = packet.CurrentWeaponHash;
@@ -345,16 +334,13 @@ namespace RageCoop.Client
                 c.BlipScale = packet.BlipScale;
                 c.LastFullSynced = Main.Ticked;
             }
-
         }
+
         private static void VehicleSync(Packets.VehicleSync packet)
         {
-            SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
-            if (v == null)
-            {
-                EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
-            }
-            if (v.IsLocal) { return; }
+            var v = EntityPool.GetVehicleByID(packet.ID);
+            if (v == null) EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+            if (v.IsLocal) return;
             v.ID = packet.ID;
             v.OwnerID = packet.OwnerID;
             v.Flags = packet.Flags;
@@ -384,25 +370,37 @@ namespace RageCoop.Client
                 v.LastFullSynced = Main.Ticked;
             }
         }
+
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {
-
             var p = EntityPool.GetProjectileByID(packet.ID);
             if (p == null)
             {
-                if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) { return; }
+                if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) return;
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
             }
+
             p.Flags = packet.Flags;
             p.Position = packet.Position;
             p.Rotation = packet.Rotation;
             p.Velocity = packet.Velocity;
             p.WeaponHash = (WeaponHash)packet.WeaponHash;
-            p.Shooter = packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle) ?
-                (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID) : EntityPool.GetPedByID(packet.ShooterID);
+            p.Shooter = packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle)
+                ? (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID)
+                : EntityPool.GetPedByID(packet.ShooterID);
             p.LastSynced = Main.Ticked;
             p.LastSyncedStopWatch.Restart();
+        }
+
+        /// <summary>
+        ///     Reduce GC pressure by reusing frequently used packets
+        /// </summary>
+        private static class ReceivedPackets
+        {
+            public static readonly Packets.PedSync PedPacket = new Packets.PedSync();
+            public static readonly Packets.VehicleSync VehicelPacket = new Packets.VehicleSync();
+            public static readonly Packets.ProjectileSync ProjectilePacket = new Packets.ProjectileSync();
         }
     }
 }

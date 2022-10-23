@@ -1,17 +1,27 @@
-﻿using NAudio.Wave;
-using System.Threading;
+﻿using System.Threading;
+using NAudio.Wave;
 
 namespace RageCoop.Client
 {
     internal static class Voice
     {
         private static WaveInEvent _waveIn;
-        private static readonly BufferedWaveProvider _waveProvider = new BufferedWaveProvider(new WaveFormat(16000, 16, 1));
+
+        private static readonly BufferedWaveProvider _waveProvider =
+            new BufferedWaveProvider(new WaveFormat(16000, 16, 1));
 
         private static Thread _thread;
 
-        public static bool WasInitialized() => _thread != null;
-        public static bool IsRecording() => _waveIn != null;
+        public static bool WasInitialized()
+        {
+            return _thread != null;
+        }
+
+        public static bool IsRecording()
+        {
+            return _waveIn != null;
+        }
+
         public static void ClearAll()
         {
             _waveProvider.ClearBuffer();
@@ -41,22 +51,17 @@ namespace RageCoop.Client
                 return;
 
             // I tried without thread but the game will lag without
-            _thread = new Thread(new ThreadStart(() =>
+            _thread = new Thread(() =>
             {
                 while (true)
-                {
                     using (var wo = new WaveOutEvent())
                     {
                         wo.Init(_waveProvider);
                         wo.Play();
 
-                        while (wo.PlaybackState == PlaybackState.Playing)
-                        {
-                            Thread.Sleep(100);
-                        }
+                        while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(100);
                     }
-                }
-            }));
+            });
             _thread.Start();
         }
 

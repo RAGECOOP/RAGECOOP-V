@@ -1,7 +1,5 @@
-﻿namespace RageCoop.Server
-{
-    internal class HolePunch
-    {
+﻿namespace RageCoop.Server;
 
-    }
+internal class HolePunch
+{
 }

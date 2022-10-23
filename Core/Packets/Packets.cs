@@ -1,5 +1,5 @@
-﻿using Lidgren.Network;
-using System;
+﻿using System;
+using Lidgren.Network;
 
 namespace RageCoop.Core
 {
@@ -33,9 +33,11 @@ namespace RageCoop.Core
         Voice = 22,
 
         #region Sync
+
         PedSync = 23,
         VehicleSync = 24,
         ProjectileSync = 25,
+
         #endregion
 
         #region EVENT
@@ -50,6 +52,7 @@ namespace RageCoop.Core
 
         Unknown = 255
     }
+
     internal enum ConnectionChannel
     {
         Default = 0,
@@ -64,7 +67,7 @@ namespace RageCoop.Core
         VehicleSync = 9,
         PedSync = 10,
         ProjectileSync = 11,
-        SyncEvents = 12,
+        SyncEvents = 12
     }
 
     [Flags]
@@ -86,7 +89,7 @@ namespace RageCoop.Core
         IsInCoverFacingLeft = 1 << 12,
         IsBlindFiring = 1 << 13,
         IsInvincible = 1 << 14,
-        IsFullSync = 1 << 15,
+        IsFullSync = 1 << 15
     }
 
     internal enum ProjectileDataFlags : byte
@@ -95,9 +98,11 @@ namespace RageCoop.Core
         Exploded = 1 << 0,
         IsAttached = 1 << 1,
         IsOrgin = 1 << 2,
-        IsShotByVehicle = 1 << 3,
+        IsShotByVehicle = 1 << 3
     }
+
     #region ===== VEHICLE DATA =====
+
     internal enum VehicleDataFlags : ushort
     {
         None = 0,
@@ -116,7 +121,7 @@ namespace RageCoop.Core
         HasRoof = 1 << 12,
         IsFullSync = 1 << 13,
         IsOnFire = 1 << 14,
-        Repaired = 1 << 15,
+        Repaired = 1 << 15
     }
 
     internal enum PlayerConfigFlags : byte
@@ -135,6 +140,7 @@ namespace RageCoop.Core
         public byte LeftHeadLightBroken { get; set; }
         public byte RightHeadLightBroken { get; set; }
     }
+
     #endregion
 
     internal interface IPacket
@@ -147,12 +153,19 @@ namespace RageCoop.Core
     internal abstract class Packet : IPacket
     {
         public abstract PacketType Type { get; }
+
+        public virtual void Deserialize(NetIncomingMessage m)
+        {
+        }
+
         public void Pack(NetOutgoingMessage m)
         {
             m.Write((byte)Type);
             Serialize(m);
         }
-        protected virtual void Serialize(NetOutgoingMessage m) { }
-        public virtual void Deserialize(NetIncomingMessage m) { }
+
+        protected virtual void Serialize(NetOutgoingMessage m)
+        {
+        }
     }
 }

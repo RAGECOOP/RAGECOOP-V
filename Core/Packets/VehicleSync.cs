@@ -1,13 +1,12 @@
-﻿using GTA;
+﻿using System.Collections.Generic;
+using GTA;
 using GTA.Math;
 using Lidgren.Network;
-using System.Collections.Generic;
 
 namespace RageCoop.Core
 {
     internal partial class Packets
     {
-
         public class VehicleSync : Packet
         {
             public override PacketType Type => PacketType.VehicleSync;
@@ -31,34 +30,8 @@ namespace RageCoop.Core
             public float SteeringAngle { get; set; }
             public float DeluxoWingRatio { get; set; } = -1;
 
-            #region FULL-SYNC
-            public int ModelHash { get; set; }
-
-            public float EngineHealth { get; set; }
-
-            public byte[] Colors { get; set; }
-
-            public Dictionary<int, int> Mods { get; set; }
-
-            public VehicleDamageModel DamageModel { get; set; }
-
-            public byte LandingGear { get; set; }
-            public byte RoofState { get; set; }
-
-
-
-            public VehicleLockStatus LockStatus { get; set; }
-
-            public int Livery { get; set; } = -1;
-
-            public byte RadioStation { get; set; } = 255;
-            public string LicensePlate { get; set; }
-            #endregion
-
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
                 m.Write(ID);
                 m.Write(OwnerID);
                 m.Write((ushort)Flags);
@@ -70,10 +43,7 @@ namespace RageCoop.Core
                 m.Write(BrakePower);
                 m.Write(SteeringAngle);
 
-                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
-                {
-                    m.Write(DeluxoWingRatio);
-                }
+                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) m.Write(DeluxoWingRatio);
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
@@ -82,14 +52,9 @@ namespace RageCoop.Core
 
                     // Check
                     if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
-                    {
                         // Write the vehicle landing gear
                         m.Write(LandingGear);
-                    }
-                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
-                    {
-                        m.Write(RoofState);
-                    }
+                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof)) m.Write(RoofState);
 
                     // Write vehicle colors
                     m.Write(Colors[0]);
@@ -99,7 +64,7 @@ namespace RageCoop.Core
                     // Write the count of mods
                     m.Write((short)Mods.Count);
                     // Loop the dictionary and add the values
-                    foreach (KeyValuePair<int, int> mod in Mods)
+                    foreach (var mod in Mods)
                     {
                         // Write the mod value
                         m.Write(mod.Key);
@@ -153,10 +118,7 @@ namespace RageCoop.Core
                 SteeringAngle = m.ReadFloat();
 
 
-                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
-                {
-                    DeluxoWingRatio = m.ReadFloat();
-                }
+                if (Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering)) DeluxoWingRatio = m.ReadFloat();
 
                 if (Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
                 {
@@ -169,36 +131,28 @@ namespace RageCoop.Core
 
                     // Check
                     if (Flags.HasVehFlag(VehicleDataFlags.IsAircraft))
-                    {
                         // Read vehicle landing gear
                         LandingGear = m.ReadByte();
-                    }
-                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof))
-                    {
-                        RoofState = m.ReadByte();
-                    }
+                    if (Flags.HasVehFlag(VehicleDataFlags.HasRoof)) RoofState = m.ReadByte();
 
                     // Read vehicle colors
-                    byte vehColor1 = m.ReadByte();
-                    byte vehColor2 = m.ReadByte();
-                    Colors = new byte[] { vehColor1, vehColor2 };
+                    var vehColor1 = m.ReadByte();
+                    var vehColor2 = m.ReadByte();
+                    Colors = new[] { vehColor1, vehColor2 };
 
                     // Read vehicle mods
                     // Create new Dictionary
                     Mods = new Dictionary<int, int>();
                     // Read count of mods
-                    short vehModCount = m.ReadInt16();
+                    var vehModCount = m.ReadInt16();
                     // Loop
-                    for (int i = 0; i < vehModCount; i++)
-                    {
+                    for (var i = 0; i < vehModCount; i++)
                         // Read the mod value
                         Mods.Add(m.ReadInt32(), m.ReadInt32());
-                    }
 
                     if (m.ReadBoolean())
-                    {
                         // Read vehicle damage model
-                        DamageModel = new VehicleDamageModel()
+                        DamageModel = new VehicleDamageModel
                         {
                             BrokenDoors = m.ReadByte(),
                             OpenedDoors = m.ReadByte(),
@@ -207,7 +161,6 @@ namespace RageCoop.Core
                             LeftHeadLightBroken = m.ReadByte(),
                             RightHeadLightBroken = m.ReadByte()
                         };
-                    }
 
 
                     // Read LockStatus
@@ -220,8 +173,34 @@ namespace RageCoop.Core
 
                     Livery = m.ReadByte() - 1;
                 }
+
                 #endregion
             }
+
+            #region FULL-SYNC
+
+            public int ModelHash { get; set; }
+
+            public float EngineHealth { get; set; }
+
+            public byte[] Colors { get; set; }
+
+            public Dictionary<int, int> Mods { get; set; }
+
+            public VehicleDamageModel DamageModel { get; set; }
+
+            public byte LandingGear { get; set; }
+            public byte RoofState { get; set; }
+
+
+            public VehicleLockStatus LockStatus { get; set; }
+
+            public int Livery { get; set; } = -1;
+
+            public byte RadioStation { get; set; } = 255;
+            public string LicensePlate { get; set; }
+
+            #endregion
         }
     }
 }

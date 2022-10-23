@@ -1,64 +1,19 @@
-﻿using GTA;
+﻿using System;
+using GTA;
 using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
-using System;
-using System.Collections.Generic;
 
 namespace RageCoop.Client
 {
     /// <summary>
-    /// A synchronized vehicle instance
+    ///     A synchronized vehicle instance
     /// </summary>
     public partial class SyncedVehicle : SyncedEntity
     {
-
-        #region -- CONSTRUCTORS --
-
         /// <summary>
-        /// Create a local entity (outgoing sync)
+        ///     VehicleSeat,ID
         /// </summary>
-        /// <param name="v"></param>
-        internal SyncedVehicle(Vehicle v)
-        {
-
-            ID = EntityPool.RequestNewID();
-            MainVehicle = v;
-            MainVehicle.CanPretendOccupants = false;
-            OwnerID = Main.LocalPlayerID;
-            SetUpFixedData();
-
-        }
-        internal void SetUpFixedData()
-        {
-            if (MainVehicle == null) { return; }
-
-            IsAircraft = MainVehicle.IsAircraft;
-            IsMotorcycle = MainVehicle.IsMotorcycle;
-            HasRocketBoost = MainVehicle.HasRocketBoost;
-            HasParachute = MainVehicle.HasParachute;
-            HasRoof = MainVehicle.HasRoof;
-            IsSubmarineCar = MainVehicle.IsSubmarineCar;
-            IsDeluxo = MainVehicle.Model == 1483171323;
-        }
-
-        /// <summary>
-        /// Create an empty VehicleEntity
-        /// </summary>
-        internal SyncedVehicle()
-        {
-
-        }
-        internal SyncedVehicle(int id)
-        {
-            ID = id;
-            LastSynced = Main.Ticked;
-        }
-        #endregion
-        /// <summary>
-        /// VehicleSeat,ID
-        /// </summary>
-
         internal override void Update()
         {
 #if DEBUG_VEH
@@ -74,94 +29,62 @@ namespace RageCoop.Client
 
 
             // Check if all data avalible
-            if (!IsReady || Owner == null) { return; }
+            if (!IsReady || Owner == null) return;
 
             // Check existence
-            if ((MainVehicle == null) || (!MainVehicle.Exists()) || (MainVehicle.Model != Model))
-            {
+            if (MainVehicle == null || !MainVehicle.Exists() || MainVehicle.Model != Model)
                 if (!CreateVehicle())
-                {
                     return;
-                }
-            }
 
 
             DisplayVehicle();
             // Skip update if no new sync message has arrived.
-            if (!NeedUpdate)
-            {
-                return;
-            }
+            if (!NeedUpdate) return;
 
             if (SteeringAngle != MainVehicle.SteeringAngle)
-            {
                 MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * SteeringAngle);
-            }
             MainVehicle.ThrottlePower = ThrottlePower;
             MainVehicle.BrakePower = BrakePower;
 
             if (IsDead)
             {
-                if (MainVehicle.IsDead)
-                {
-                    return;
-                }
+                if (MainVehicle.IsDead) return;
 
                 MainVehicle.Explode();
             }
             else
             {
                 if (MainVehicle.IsDead)
-                {
                     WorldThread.Delay(() =>
                     {
-                        if (MainVehicle.IsDead && !IsDead)
-                        {
-                            MainVehicle.Repair();
-                        }
+                        if (MainVehicle.IsDead && !IsDead) MainVehicle.Repair();
                     }, 1000);
-                }
             }
+
             if (MainVehicle.IsOnFire)
             {
-                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
-                {
-                    Function.Call(Hash.STOP_ENTITY_FIRE, MainVehicle);
-                }
+                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire)) Function.Call(Hash.STOP_ENTITY_FIRE, MainVehicle);
             }
             else if (Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
             {
                 Function.Call(Hash.START_ENTITY_FIRE, MainVehicle);
             }
 
-            if (EngineRunning != MainVehicle.IsEngineRunning)
-            {
-                MainVehicle.IsEngineRunning = EngineRunning;
-            }
+            if (EngineRunning != MainVehicle.IsEngineRunning) MainVehicle.IsEngineRunning = EngineRunning;
 
-            if (LightsOn != MainVehicle.AreLightsOn)
-            {
-                MainVehicle.AreLightsOn = LightsOn;
-            }
+            if (LightsOn != MainVehicle.AreLightsOn) MainVehicle.AreLightsOn = LightsOn;
 
-            if (HighBeamsOn != MainVehicle.AreHighBeamsOn)
-            {
-                MainVehicle.AreHighBeamsOn = HighBeamsOn;
-            }
+            if (HighBeamsOn != MainVehicle.AreHighBeamsOn) MainVehicle.AreHighBeamsOn = HighBeamsOn;
 
             if (IsAircraft)
             {
                 if (LandingGear != (byte)MainVehicle.LandingGearState)
-                {
                     MainVehicle.LandingGearState = (VehicleLandingGearState)LandingGear;
-                }
             }
             else
             {
                 if (MainVehicle.HasSiren && SireneActive != MainVehicle.IsSirenActive)
-                {
                     MainVehicle.IsSirenActive = SireneActive;
-                }
 
                 if (HornActive)
                 {
@@ -177,19 +100,14 @@ namespace RageCoop.Client
                     MainVehicle.SoundHorn(1);
                 }
 
-                if (HasRoof && MainVehicle.RoofState != RoofState)
-                {
-                    MainVehicle.RoofState = RoofState;
-                }
+                if (HasRoof && MainVehicle.RoofState != RoofState) MainVehicle.RoofState = RoofState;
 
-                if (HasRocketBoost && Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) != MainVehicle.IsRocketBoostActive())
-                {
+                if (HasRocketBoost && Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) !=
+                    MainVehicle.IsRocketBoostActive())
                     MainVehicle.SetRocketBoostActive(Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive));
-                }
-                if (HasParachute && Flags.HasFlag(VehicleDataFlags.IsParachuteActive) != MainVehicle.IsParachuteActive())
-                {
+                if (HasParachute && Flags.HasFlag(VehicleDataFlags.IsParachuteActive) !=
+                    MainVehicle.IsParachuteActive())
                     MainVehicle.SetParachuteActive(Flags.HasFlag(VehicleDataFlags.IsParachuteActive));
-                }
                 if (IsSubmarineCar)
                 {
                     if (Transformed)
@@ -209,55 +127,46 @@ namespace RageCoop.Client
                 else if (IsDeluxo)
                 {
                     MainVehicle.SetDeluxoHoverState(IsDeluxoHovering);
-                    if (IsDeluxoHovering)
-                    {
-                        MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
-                    }
+                    if (IsDeluxoHovering) MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
                 }
 
                 Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
-
-
             }
+
             MainVehicle.LockStatus = LockStatus;
 
             if (LastFullSynced >= LastUpdated)
             {
-                if (Flags.HasVehFlag(VehicleDataFlags.Repaired))
-                {
-                    MainVehicle.Repair();
-                }
+                if (Flags.HasVehFlag(VehicleDataFlags.Repaired)) MainVehicle.Repair();
                 if (Colors != null && Colors != _lastVehicleColors)
                 {
                     Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, Colors[0], Colors[1]);
 
                     _lastVehicleColors = Colors;
                 }
+
                 MainVehicle.EngineHealth = EngineHealth;
                 if (Mods != null && !Mods.Compare(_lastVehicleMods))
                 {
                     Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
-                    foreach (KeyValuePair<int, int> mod in Mods)
-                    {
-                        MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
-                    }
+                    foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
 
                     _lastVehicleMods = Mods;
                 }
 
                 if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle) != LicensePlate)
-                {
                     Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
-                }
 
                 if (_lastLivery != Livery)
                 {
                     Function.Call(Hash.SET_VEHICLE_LIVERY, MainVehicle, Livery);
                     _lastLivery = Livery;
                 }
+
                 MainVehicle.SetDamageModel(DamageModel);
             }
+
             LastUpdated = Main.Ticked;
         }
 
@@ -267,7 +176,7 @@ namespace RageCoop.Client
             var current = MainVehicle.ReadPosition();
             var dist = current.DistanceTo(_predictedPosition);
             var cali = dist * (_predictedPosition - current);
-            if (Velocity.Length() < 0.1) { cali *= 10; }
+            if (Velocity.Length() < 0.1) cali *= 10;
             if (dist > 10)
             {
                 MainVehicle.Position = _predictedPosition;
@@ -275,10 +184,8 @@ namespace RageCoop.Client
                 MainVehicle.Quaternion = Quaternion;
                 return;
             }
-            if (dist > 0.03)
-            {
-                MainVehicle.Velocity = Velocity + cali;
-            }
+
+            if (dist > 0.03) MainVehicle.Velocity = Velocity + cali;
 
             Vector3 calirot;
             if (IsFlipped || (calirot = GetCalibrationRotation()).Length() > 50)
@@ -287,57 +194,104 @@ namespace RageCoop.Client
                 MainVehicle.RotationVelocity = RotationVelocity;
                 return;
             }
+
             MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
         }
+
         private Vector3 GetCalibrationRotation()
         {
-            var rot = Quaternion.LookRotation(Quaternion * Vector3.RelativeFront, Quaternion * Vector3.RelativeTop).ToEulerAngles();
-            var curRot = Quaternion.LookRotation(MainVehicle.ReadQuaternion() * Vector3.RelativeFront, MainVehicle.ReadQuaternion() * Vector3.RelativeTop).ToEulerAngles();
+            var rot = Quaternion.LookRotation(Quaternion * Vector3.RelativeFront, Quaternion * Vector3.RelativeTop)
+                .ToEulerAngles();
+            var curRot = Quaternion.LookRotation(MainVehicle.ReadQuaternion() * Vector3.RelativeFront,
+                MainVehicle.ReadQuaternion() * Vector3.RelativeTop).ToEulerAngles();
 
             var r = (rot - curRot).ToDegree();
-            if (r.X > 180) { r.X = r.X - 360; }
-            else if (r.X < -180) { r.X = 360 + r.X; }
+            if (r.X > 180)
+                r.X = r.X - 360;
+            else if (r.X < -180) r.X = 360 + r.X;
 
-            if (r.Y > 180) { r.Y = r.Y - 360; }
-            else if (r.Y < -180) { r.Y = 360 + r.Y; }
+            if (r.Y > 180)
+                r.Y = r.Y - 360;
+            else if (r.Y < -180) r.Y = 360 + r.Y;
 
-            if (r.Z > 180) { r.Z = r.Z - 360; }
-            else if (r.Z < -180) { r.Z = 360 + r.Z; }
+            if (r.Z > 180)
+                r.Z = r.Z - 360;
+            else if (r.Z < -180) r.Z = 360 + r.Z;
             return r;
         }
+
         private bool CreateVehicle()
         {
             MainVehicle?.Delete();
             MainVehicle = Util.CreateVehicle(Model, Position);
             if (!Model.IsInCdImage)
-            {
                 // GTA.UI.Notification.Show($"~r~(Vehicle)Model ({CurrentVehicleModelHash}) cannot be loaded!");
                 return false;
-            }
             if (MainVehicle == null)
             {
                 Model.Request();
                 return false;
             }
+
             lock (EntityPool.VehiclesLock)
             {
                 EntityPool.Add(this);
             }
+
             MainVehicle.Quaternion = Quaternion;
-            if (MainVehicle.HasRoof)
-            {
-                MainVehicle.RoofState = RoofState;
-            }
-            foreach (var w in MainVehicle.Wheels)
-            {
-                w.Fix();
-            }
-            if (IsInvincible) { MainVehicle.IsInvincible = true; }
+            if (MainVehicle.HasRoof) MainVehicle.RoofState = RoofState;
+            foreach (var w in MainVehicle.Wheels) w.Fix();
+            if (IsInvincible) MainVehicle.IsInvincible = true;
             SetUpFixedData();
             Model.MarkAsNoLongerNeeded();
             return true;
         }
+
+        #region -- CONSTRUCTORS --
+
+        /// <summary>
+        ///     Create a local entity (outgoing sync)
+        /// </summary>
+        /// <param name="v"></param>
+        internal SyncedVehicle(Vehicle v)
+        {
+            ID = EntityPool.RequestNewID();
+            MainVehicle = v;
+            MainVehicle.CanPretendOccupants = false;
+            OwnerID = Main.LocalPlayerID;
+            SetUpFixedData();
+        }
+
+        internal void SetUpFixedData()
+        {
+            if (MainVehicle == null) return;
+
+            IsAircraft = MainVehicle.IsAircraft;
+            IsMotorcycle = MainVehicle.IsMotorcycle;
+            HasRocketBoost = MainVehicle.HasRocketBoost;
+            HasParachute = MainVehicle.HasParachute;
+            HasRoof = MainVehicle.HasRoof;
+            IsSubmarineCar = MainVehicle.IsSubmarineCar;
+            IsDeluxo = MainVehicle.Model == 1483171323;
+        }
+
+        /// <summary>
+        ///     Create an empty VehicleEntity
+        /// </summary>
+        internal SyncedVehicle()
+        {
+        }
+
+        internal SyncedVehicle(int id)
+        {
+            ID = id;
+            LastSynced = Main.Ticked;
+        }
+
+        #endregion
+
         #region -- PEDALING --
+
         /*
          * Thanks to @oldnapalm.
          */
@@ -364,14 +318,15 @@ namespace RageCoop.Client
 
         private void StartPedalingAnim(bool fast)
         {
-            MainVehicle.Driver?.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1, AnimationFlags.Loop | AnimationFlags.AllowRotation, 1.0f);
-
+            MainVehicle.Driver?.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1,
+                AnimationFlags.Loop | AnimationFlags.AllowRotation, 1.0f);
         }
 
         private void StopPedalingAnim(bool fast)
         {
             MainVehicle.Driver.Task.ClearAnimation(PedalingAnimDict(), PedalingAnimName(fast));
         }
+
         #endregion
     }
 }

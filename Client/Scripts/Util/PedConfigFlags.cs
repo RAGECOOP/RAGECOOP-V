@@ -460,6 +460,6 @@
         _0x1D19C622 = 454,
         _0xB68D3EAB = 455,
         CPED_CONFIG_FLAG_CanBeIncapacitated = 456,
-        _0x4BD5EBAD = 457,
+        _0x4BD5EBAD = 457
     }
 }

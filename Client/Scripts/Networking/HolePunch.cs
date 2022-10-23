@@ -1,14 +1,14 @@
-﻿using Lidgren.Network;
-using RageCoop.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Timers;
+using Lidgren.Network;
+using RageCoop.Core;
 
 namespace RageCoop.Client
 {
-    internal static partial class HolePunch
+    internal static class HolePunch
     {
         static HolePunch()
         {
@@ -22,21 +22,22 @@ namespace RageCoop.Client
         {
             try
             {
-                if (!Networking.IsOnServer) { return; }
+                if (!Networking.IsOnServer) return;
                 foreach (var p in PlayerList.Players.Values.ToArray())
-                {
-                    if (p.InternalEndPoint != null && p.ExternalEndPoint != null && (p.Connection == null || p.Connection.Status == NetConnectionStatus.Disconnected))
+                    if (p.InternalEndPoint != null && p.ExternalEndPoint != null && (p.Connection == null ||
+                            p.Connection.Status == NetConnectionStatus.Disconnected))
                     {
-                        Main.Logger.Trace($"Sending HolePunch message to {p.InternalEndPoint},{p.ExternalEndPoint}. {p.Username}:{p.ID}");
+                        Main.Logger.Trace(
+                            $"Sending HolePunch message to {p.InternalEndPoint},{p.ExternalEndPoint}. {p.Username}:{p.ID}");
                         var msg = Networking.Peer.CreateMessage();
                         new Packets.HolePunch
                         {
                             Puncher = Main.LocalPlayerID,
                             Status = p.HolePunchStatus
                         }.Pack(msg);
-                        Networking.Peer.SendUnconnectedMessage(msg, new List<IPEndPoint> { p.InternalEndPoint, p.ExternalEndPoint });
+                        Networking.Peer.SendUnconnectedMessage(msg,
+                            new List<IPEndPoint> { p.InternalEndPoint, p.ExternalEndPoint });
                     }
-                }
             }
             catch (Exception ex)
             {
@@ -58,6 +59,7 @@ namespace RageCoop.Client
                 Main.Logger.Warning("No player with specified TargetID found for hole punching:" + p.TargetID);
             }
         }
+
         public static void Punched(Packets.HolePunch p, IPEndPoint from)
         {
             Main.Logger.Debug($"HolePunch message received from:{from}, status:{p.Status}");
@@ -68,7 +70,8 @@ namespace RageCoop.Client
                 if (p.Status >= 3)
                 {
                     Main.Logger.Debug("HolePunch sucess: " + from + ", " + puncher.ID);
-                    if (puncher.ConnectWhenPunched && (puncher.Connection == null || puncher.Connection.Status == NetConnectionStatus.Disconnected))
+                    if (puncher.ConnectWhenPunched && (puncher.Connection == null ||
+                                                       puncher.Connection.Status == NetConnectionStatus.Disconnected))
                     {
                         Main.Logger.Debug("Connecting to peer: " + from);
                         var msg = Networking.Peer.CreateMessage();

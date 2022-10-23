@@ -5,7 +5,6 @@ namespace RageCoop.Core
 {
     internal partial class Packets
     {
-
         internal class BulletShot : Packet
         {
             public override PacketType Type => PacketType.BulletShot;
@@ -18,9 +17,6 @@ namespace RageCoop.Core
 
             protected override void Serialize(NetOutgoingMessage m)
             {
-
-
-
                 // Write OwnerID 
                 m.Write(OwnerID);
 
@@ -32,16 +28,11 @@ namespace RageCoop.Core
 
                 // Write EndPosition
                 m.Write(EndPosition);
-
-
-
-
             }
 
             public override void Deserialize(NetIncomingMessage m)
             {
                 #region NetIncomingMessageToPacket
-
 
                 // Read OwnerID
                 OwnerID = m.ReadInt32();
@@ -54,12 +45,9 @@ namespace RageCoop.Core
 
                 // Read EndPosition
                 EndPosition = m.ReadVector3();
+
                 #endregion
             }
         }
-
-
-
-
     }
 }

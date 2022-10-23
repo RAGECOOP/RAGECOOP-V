@@ -1,5 +1,4 @@
-﻿using RageCoop.Core;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,14 +8,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using RageCoop.Core;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
-using Path = System.IO.Path;
 
 namespace RageCoop.Client.Installer
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -28,13 +27,12 @@ namespace RageCoop.Client.Installer
 
         private void Choose()
         {
-            var od = new OpenFileDialog()
+            var od = new OpenFileDialog
             {
                 Filter = "GTA 5 executable |GTA5.exe;PlayGTAV.exe",
                 Title = "Select you GTAV executable"
             };
-            if (od.ShowDialog() ?? false == true)
-            {
+            if (od.ShowDialog() ?? !true)
                 Task.Run(() =>
                 {
                     try
@@ -43,15 +41,12 @@ namespace RageCoop.Client.Installer
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Installation failed: " + ex.ToString());
+                        MessageBox.Show("Installation failed: " + ex);
                         Environment.Exit(1);
                     }
                 });
-            }
             else
-            {
                 Environment.Exit(0);
-            }
         }
 
         private void Install(string root)
@@ -62,9 +57,8 @@ namespace RageCoop.Client.Installer
             var installPath = Path.Combine(root, "RageCoop", "Scripts");
             var legacyPath = Path.Combine(scriptsPath, "RageCoop");
             if (Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName.StartsWith(installPath))
-            {
-                throw new InvalidOperationException("The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
-            }
+                throw new InvalidOperationException(
+                    "The installer is not meant to be run in the game folder, please extract the zip to somewhere else and run again.");
             if (!File.Exists(shvPath))
             {
                 MessageBox.Show("Please install ScriptHookV first!");
@@ -80,37 +74,31 @@ namespace RageCoop.Client.Installer
             UpdateStatus("Removing old versions");
 
             foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
-            {
                 File.Delete(f);
-            }
 
             // 1.5 installation check
-            if (Directory.Exists(legacyPath))
-            {
-                Directory.Delete(legacyPath, true);
-            }
+            if (Directory.Exists(legacyPath)) Directory.Delete(legacyPath, true);
 
-            foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories))
-            {
-                File.Delete(f);
-            }
+            foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories)) File.Delete(f);
 
-            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll") && File.Exists("RageCoop.Client.Loader.dll"))
+            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll") &&
+                File.Exists("RageCoop.Client.Loader.dll"))
             {
                 UpdateStatus("Installing...");
-                CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()), new DirectoryInfo(installPath));
+                CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()),
+                    new DirectoryInfo(installPath));
                 File.Copy("RageCoop.Client.Loader.dll", Path.Combine(scriptsPath, "RageCoop.Client.Loader.dll"), true);
                 Finish();
             }
             else
             {
-                throw new Exception("Required files are missing, please re-download the installer from official website");
+                throw new Exception(
+                    "Required files are missing, please re-download the installer from official website");
             }
 
             void Finish()
             {
-
-            checkKeys:
+                checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
                 var settingsPath = Path.Combine(root, Util.SettingsPath);
@@ -123,33 +111,35 @@ namespace RageCoop.Client.Installer
                 {
                     settings = new Settings();
                 }
+
                 if (File.Exists(menyooConfig))
                 {
-                    var lines = File.ReadAllLines(menyooConfig).Where(x => !x.StartsWith(";") && x.EndsWith(" = " + (int)settings.MenuKey));
+                    var lines = File.ReadAllLines(menyooConfig)
+                        .Where(x => !x.StartsWith(";") && x.EndsWith(" = " + (int)settings.MenuKey));
                     if (lines.Any())
-                    {
                         if (MessageBox.Show("Following menyoo config value will conflict with RAGECOOP menu key\n" +
-                            string.Join("\n", lines)
-                            + "\nDo you wish to change the Menu Key?", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                            string.Join("\n", lines)
+                                            + "\nDo you wish to change the Menu Key?", "Warning!",
+                                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
                             var ae = new AutoResetEvent(false);
                             UpdateStatus("Press the key you wish to change to");
                             Dispatcher.BeginInvoke(new Action(() =>
-                            KeyDown += (s, e) =>
-                            {
-                                settings.MenuKey = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
-                                ae.Set();
-                            }));
+                                KeyDown += (s, e) =>
+                                {
+                                    settings.MenuKey = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
+                                    ae.Set();
+                                }));
                             ae.WaitOne();
                             if (!Util.SaveSettings(settingsPath, settings))
                             {
                                 MessageBox.Show("Error occurred when saving settings");
                                 Environment.Exit(1);
                             }
+
                             MessageBox.Show("Menu key changed to " + settings.MenuKey);
                             goto checkKeys;
                         }
-                    }
                 }
 
                 UpdateStatus("Checking ZeroTier");
@@ -159,13 +149,16 @@ namespace RageCoop.Client.Installer
                 }
                 catch
                 {
-                    if (MessageBox.Show("You can't join ZeroTier server unless ZeroTier is installed, do you want to download and install it?", "Install ZeroTier", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (MessageBox.Show(
+                            "You can't join ZeroTier server unless ZeroTier is installed, do you want to download and install it?",
+                            "Install ZeroTier", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         var url = "https://download.zerotier.com/dist/ZeroTier%20One.msi";
                         UpdateStatus("Downloading ZeroTier from " + url);
                         try
                         {
-                            HttpHelper.DownloadFile(url, "ZeroTier.msi", (p) => UpdateStatus("Downloading ZeroTier " + p + "%"));
+                            HttpHelper.DownloadFile(url, "ZeroTier.msi",
+                                p => UpdateStatus("Downloading ZeroTier " + p + "%"));
                             UpdateStatus("Installing ZeroTier");
                             Process.Start("ZeroTier.msi").WaitForExit();
                         }
@@ -187,6 +180,5 @@ namespace RageCoop.Client.Installer
         {
             Dispatcher.BeginInvoke(new Action(() => Status.Content = status));
         }
-
     }
 }
