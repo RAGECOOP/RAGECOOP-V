@@ -32,7 +32,7 @@ jobs:
       run: nuget restore
 
     - name: Build
-      run: build.cmd
+      run: .\build.cmd
 
     - name: Upload server
       uses: actions/upload-artifact@v3

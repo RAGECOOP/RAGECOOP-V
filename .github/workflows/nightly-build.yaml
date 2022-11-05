@@ -26,10 +26,10 @@ jobs:
       run: nuget restore
 
     - name: Build artifacts
-      run: build.cmd
+      run: .\build.cmd
 
     - name: Build server for different platforms
-      run: publish-server.cmd
+      run: .\publish-server.cmd
 
     - uses: vimtor/action-zip@v1
       with:
