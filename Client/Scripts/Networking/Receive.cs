@@ -80,7 +80,7 @@ namespace RageCoop.Client
 
                             break;
                         case NetConnectionStatus.Disconnected:
-                            if (message.SenderConnection == ServerConnection) Main.Disconnected(reason);
+                            if (message.SenderConnection == ServerConnection) Main.CleanUp(reason);
                             break;
                     }
 

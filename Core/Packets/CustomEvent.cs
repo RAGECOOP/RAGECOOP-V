@@ -86,10 +86,7 @@ namespace RageCoop.Core
                             Args[i] = m.ReadByteArray();
                             break;
                         default:
-                            if (ResolveHandle == null)
-                            {
-                                throw new InvalidOperationException($"Unexpected type: {type}");
-                            }
+                            if (ResolveHandle == null) throw new InvalidOperationException($"Unexpected type: {type}");
 
                             Args[i] = ResolveHandle(type, m);
                             break;

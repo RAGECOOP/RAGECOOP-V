@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BitmapUtil</name>
+    </assembly>
+    <members>
+        <member name="M:BitmapUtil.BitmapInfo.ToBitmap(System.Drawing.Imaging.PixelFormat)">
+            <summary>
+            Get a bitmap that use <see cref="F:BitmapUtil.BitmapInfo.Scan0"/> as the back buffer
+            </summary>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BitmapUtil.Unsafe.UpdateRegion(BitmapUtil.BitmapInfo,BitmapUtil.BitmapInfo,System.Drawing.Rectangle,System.Drawing.Point)">
+            <summary>
+            Copy a region from source and apply to specified point of target bitmap
+            </summary>
+            <param name="src"></param>
+            <param name="target"></param>
+            <param name="sourceRegion">Region to copy from source</param>
+            <param name="targetLocation">Location to apply the region copied from source</param>
+        </member>
+        <member name="M:BitmapUtil.Unsafe.UpdateRegion(BitmapUtil.BitmapInfo,BitmapUtil.BitmapInfo,System.Drawing.Point)">
+            <summary>
+            Copy a entire source bitmap to specified point of target bitmap
+            </summary>
+            <param name="src"></param>
+            <param name="target"></param>
+            <param name="location">The location of the target to apply source bitmap</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:BitmapUtil.Unsafe.CopyRegion(BitmapUtil.BitmapInfo,System.IntPtr,System.Drawing.Rectangle)">
+            <summary>
+            Copy specified region to destination as a continuous region of memory, namely, crop the bitmap
+            </summary>
+            <param name="source">Source image</param>
+            <param name="destination">Pointer to destination buffer</param>
+            <param name="region">The region to copy from source</param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="T:BitmapUtil.GDIPlus">
+            <summary>
+            Common method and extensions for GDI+ (aka System.Drawing) Bitmap.
+            </summary>
+        </member>
+        <member name="M:BitmapUtil.GDIPlus.ToByteArray(System.Drawing.Bitmap)">
+            <summary>
+            Get a byte array from <para>bmp</para>
+            </summary>
+            <param name="bmp"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BitmapUtil.GDIPlus.ToByteArray(System.Drawing.Bitmap,System.Drawing.Rectangle,BitmapUtil.BitmapInfo@)">
+            <summary>
+            Get a byte array from <para>bmp</para>
+            </summary>
+            <param name="bmp"></param>
+            <param name="region">The region to create copy</param>
+            <returns></returns>
+        </member>
+        <member name="M:BitmapUtil.GDIPlus.FromByteArrayUnsafe(System.Byte[],System.Int32,System.Int32,System.Int32,System.Drawing.Imaging.PixelFormat)">
+            <summary>
+            Get a <see cref="T:System.Drawing.Bitmap"/> from specified array
+            </summary>
+            <param name="array"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="bytesPerPixel"></param>
+            <param name="format"></param>
+            <returns>The <see cref="T:System.Drawing.Bitmap"/> that depends on the specified array, note that it must not be collected by GC during the lifetime of this <see cref="T:System.Drawing.Bitmap"/></returns>
+        </member>
+        <member name="M:BitmapUtil.GDIPlus.FromByteArray(System.Byte[],System.Int32,System.Int32,System.Drawing.Imaging.PixelFormat)">
+            <summary>
+            Grab a copy of input array and return a safe <see cref="T:System.Drawing.Bitmap"/> object.
+            </summary>
+            <param name="array"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="format"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -42,10 +42,10 @@ namespace RageCoop.Client
         static Memory()
         {
             // Weapon/radio wheel slow-mo patch
-            // Thanks @CamxxCore, https://github.com/CamxxCore/GTAVWeaponWheelMod
+            // Thanks to @CamxxCore, https://github.com/CamxxCore/GTAVWeaponWheelMod
             var result = NativeMemory.FindPattern("\x38\x51\x64\x74\x19", "xxxxx");
             if (result == null)
-                throw new NotSupportedException("Can't find memory pattern to patch weapon/radio slow-mo");
+                throw new NotSupportedException("Can't find memory pattern to patch weapon/radio slowdown");
             var address = result + 26;
             address = address + *(int*)address + 4u;
             VignettingPatch = new MemPatch(address, new byte[] { RET, 0x90, 0x90, 0x90, 0x90 });

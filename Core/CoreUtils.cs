@@ -21,7 +21,7 @@ using Console = System.Console;
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
-[assembly: InternalsVisibleTo("RageCoop.Client.DataDumper")]
+[assembly: InternalsVisibleTo("DataDumper")]
 [assembly: InternalsVisibleTo("RageCoop.ResourceBuilder")]
 
 namespace RageCoop.Core

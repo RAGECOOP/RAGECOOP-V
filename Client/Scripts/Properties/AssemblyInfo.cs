@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Resources;
 
 // General Information
@@ -13,6 +16,7 @@ using System.Resources;
 
 
 // Version informationr(
-[assembly: AssemblyVersion("1.5.7.118")]
-[assembly: AssemblyFileVersion("1.5.7.118")]
-[assembly: NeutralResourcesLanguageAttribute("en-US")]
+[assembly: AssemblyVersion("1.5.7.351")]
+[assembly: AssemblyFileVersion("1.5.7.351")]
+[assembly: NeutralResourcesLanguageAttribute( "en-US" )]
+

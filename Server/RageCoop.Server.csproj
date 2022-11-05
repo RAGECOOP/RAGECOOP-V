@@ -20,13 +20,15 @@
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <PackageIcon>icon.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Configurations>Debug;Release;API</Configurations>
+	<OutDir>..\bin\$(Configuration)\Server</OutDir>
   </PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutDir>..\bin\Debug\Server</OutDir>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<OutDir>..\bin\Release\Server</OutDir>
+  
+	<PropertyGroup Condition="'$(Configuration)' == 'API'">
+		<OutDir>..\bin\API</OutDir>
+		<Deterministic>true</Deterministic>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<ProduceOnlyReferenceAssembly>true</ProduceOnlyReferenceAssembly>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <NoWarn>1701;1702;1591</NoWarn>

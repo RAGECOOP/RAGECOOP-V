@@ -3,6 +3,7 @@ using System.Drawing;
 using GTA;
 using GTA.UI;
 using LemonUI.Menus;
+using RageCoop.Client.GUI;
 using RageCoop.Client.Loader;
 
 namespace RageCoop.Client
@@ -31,6 +32,14 @@ namespace RageCoop.Client
 
         private static readonly NativeCheckboxItem ShowNetworkInfoItem =
             new NativeCheckboxItem("Show Network Info", Networking.ShowNetworkInfo);
+
+        private static readonly NativeCheckboxItem DxHookTest =
+            new NativeCheckboxItem("Enable D3D11 hook", false);
+
+        private static readonly NativeCheckboxItem CefTest =
+            new NativeCheckboxItem("Test CEF overlay", false);
+
+        private static CefClient _testCef;
 
         static DebugMenu()
         {
@@ -68,12 +77,43 @@ namespace RageCoop.Client
                 Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
                 Util.SaveSettings();
             };
+            DxHookTest.CheckboxChanged += Hook;
+            CefTest.CheckboxChanged += CefTestChange;
+            ;
             ReloadItem.Activated += ReloadDomain;
             Menu.Add(SimulatedLatencyItem);
             Menu.Add(ShowNetworkInfoItem);
             Menu.Add(ShowOwnerItem);
             Menu.Add(ReloadItem);
             Menu.AddSubMenu(DiagnosticMenu);
+            Menu.Add(DxHookTest);
+            Menu.Add(CefTest);
+        }
+
+        private static void CefTestChange(object sender, EventArgs e)
+        {
+            if (CefTest.Checked)
+            {
+                _testCef = CefManager.CreateClient(new Size(640, 480));
+                _testCef.Scale = 0.8f;
+                _testCef.Opacity = 128;
+                Script.Wait(2000);
+                _testCef.Controller.LoadUrl("https://ragecoop.online/");
+                CefManager.ActiveClient = _testCef;
+            }
+            else
+            {
+                CefManager.DestroyClient(_testCef);
+            }
+            DxHookTest.Checked = HookManager.Hooked;
+        }
+
+        private static void Hook(object sender, EventArgs e)
+        {
+            if (DxHookTest.Checked)
+                HookManager.Initialize();
+            else
+                HookManager.CleanUp();
         }
 
         private static void ReloadDomain(object sender, EventArgs e)

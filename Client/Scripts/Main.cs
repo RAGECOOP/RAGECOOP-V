@@ -12,6 +12,7 @@ using GTA.UI;
 using LemonUI.Elements;
 using LemonUI.Menus;
 using Lidgren.Network;
+using RageCoop.Client.GUI;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
@@ -49,6 +50,7 @@ namespace RageCoop.Client
         public static Ped P;
         public static float FPS;
         private static bool _lastDead;
+        public static bool CefRunning;
 
         /// <summary>
         ///     Don't use it!
@@ -145,10 +147,12 @@ namespace RageCoop.Client
             Aborted += OnAborted;
             Tick += OnTick;
             KeyDown += OnKeyDown;
+            KeyUp += OnKeyUp;
 
             Util.NativeMemory();
             Counter.Restart();
         }
+
 
         public static string LogPath => $"{Settings.DataDirectory}\\RageCoop.Client.log";
 
@@ -159,7 +163,7 @@ namespace RageCoop.Client
                 WorldThread.Instance?.Abort();
                 DevTool.Instance?.Abort();
                 ScriptDomain.CurrentDomain.Tick -= DomainTick;
-                Disconnected("Abort");
+                CleanUp("Abort");
                 WorldThread.DoQueuedActions();
             }
             catch (Exception ex)
@@ -241,6 +245,10 @@ namespace RageCoop.Client
             CoopMenu.MenuPool.Process();
 #endif
 
+            if (CefRunning)
+            {
+                CefManager.Tick();
+            }
 
             if (!Networking.IsOnServer)
             {
@@ -255,7 +263,8 @@ namespace RageCoop.Client
             if (Networking.ShowNetworkInfo)
             {
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
-                    $"L: {Networking.Latency * 1000:N0}ms", 0.5f) { Alignment = Alignment.Center }.Draw();
+                        $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
+                    { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
                     { Alignment = Alignment.Center }.Draw();
@@ -300,12 +309,25 @@ namespace RageCoop.Client
             Ticked++;
         }
 
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (CefRunning)
+            {
+                CefManager.KeyUp(e.KeyCode);
+            }
+        }
+
         private static void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
+            }
+
+            if (CefRunning)
+            {
+                CefManager.KeyDown(e.KeyCode);
             }
 
             if (Networking.IsOnServer)
@@ -317,7 +339,8 @@ namespace RageCoop.Client
                         Voice.StartRecording();
                         return;
                     }
-                    else if (Voice.IsRecording())
+
+                    if (Voice.IsRecording())
                     {
                         Voice.StopRecording();
                         return;
@@ -380,37 +403,37 @@ namespace RageCoop.Client
             }
             else if (e.KeyCode == Settings.PassengerKey)
             {
-                var P = Game.Player.Character;
-
-                if (!P.IsInVehicle())
+                if (P == null || P.IsInVehicle())
                 {
-                    if (P.IsTaskActive(TaskType.CTaskEnterVehicle))
-                    {
-                        P.Task.ClearAll();
-                    }
-                    else
-                    {
-                        var V = World.GetClosestVehicle(P.ReadPosition(), 50);
+                    return;
+                }
 
-                        if (V != null)
+                if (P.IsTaskActive(TaskType.CTaskEnterVehicle))
+                {
+                    P.Task.ClearAll();
+                }
+                else
+                {
+                    var V = World.GetClosestVehicle(P.ReadPosition(), 15);
+
+                    if (V != null)
+                    {
+                        var seat = P.GetNearestSeat(V);
+                        var p = V.GetPedOnSeat(seat);
+                        if (p != null && !p.IsDead)
                         {
-                            var seat = P.GetNearestSeat(V);
-                            var p = V.GetPedOnSeat(seat);
-                            if (p != null && !p.IsDead)
+                            for (int i = -1; i < V.PassengerCapacity; i++)
                             {
-                                for (int i = -1; i < V.PassengerCapacity; i++)
+                                seat = (VehicleSeat)i;
+                                p = V.GetPedOnSeat(seat);
+                                if (p == null || p.IsDead)
                                 {
-                                    seat = (VehicleSeat)i;
-                                    p = V.GetPedOnSeat(seat);
-                                    if (p == null || p.IsDead)
-                                    {
-                                        break;
-                                    }
+                                    break;
                                 }
                             }
-
-                            P.Task.EnterVehicle(V, seat, -1, 5, EnterVehicleFlags.None);
                         }
+
+                        P.Task.EnterVehicle(V, seat, -1, 5, EnterVehicleFlags.None);
                     }
                 }
             }
@@ -436,9 +459,14 @@ namespace RageCoop.Client
             Logger.Info(">> Connected <<");
         }
 
-        public static void Disconnected(string reason)
+        public static void CleanUp(string reason)
         {
-            Logger.Info($">> Disconnected << reason: {reason}");
+            if (reason != "Abort")
+            {
+                Logger.Info($">> Disconnected << reason: {reason}");
+                API.QueueAction(() => { Notification.Show("~r~Disconnected: " + reason); });
+            }
+
             API.QueueAction(() =>
             {
                 if (MainChat.Focused)
@@ -452,11 +480,12 @@ namespace RageCoop.Client
                 WorldThread.Traffic(true);
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
-                Notification.Show("~r~Disconnected: " + reason);
                 LocalPlayerID = default;
                 Resources.Unload();
             });
             Memory.RestorePatches();
+            CefManager.CleanUp();
+            HookManager.CleanUp();
             DownloadManager.Cleanup();
             Voice.ClearAll();
         }

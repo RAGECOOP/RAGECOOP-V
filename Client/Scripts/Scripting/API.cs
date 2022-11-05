@@ -42,48 +42,6 @@ namespace RageCoop.Client.Scripting
 
 
         /// <summary>
-        ///     Queue an action to be executed on next tick.
-        /// </summary>
-        /// <param name="a"></param>
-        public static void QueueAction(Action a)
-        {
-            WorldThread.QueueAction(a);
-        }
-
-        public static void QueueActionAndWait(Action a, int timeout = 15000)
-        {
-            var done = new AutoResetEvent(false);
-            Exception e = null;
-            QueueAction(() =>
-            {
-                try
-                {
-                    a();
-                    done.Set();
-                }
-                catch (Exception ex)
-                {
-                    e = ex;
-                }
-            });
-            if (e != null)
-                throw e;
-            if (!done.WaitOne(timeout)) throw new TimeoutException();
-        }
-
-        /// <summary>
-        ///     Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
-        /// </summary>
-        /// <param name="a">
-        ///     An <see cref="Func{T, TResult}" /> to be executed with a return value indicating whether it can be
-        ///     removed after execution.
-        /// </param>
-        public static void QueueAction(Func<bool> a)
-        {
-            WorldThread.QueueAction(a);
-        }
-
-        /// <summary>
         ///     Client configuration, this will conflict with server-side config.
         /// </summary>
         public static class Config
@@ -303,6 +261,49 @@ namespace RageCoop.Client.Scripting
         #endregion
 
         #region FUNCTIONS
+
+        /// <summary>
+        ///     Queue an action to be executed on next tick.
+        /// </summary>
+        /// <param name="a"></param>
+        public static void QueueAction(Action a)
+        {
+            WorldThread.QueueAction(a);
+        }
+
+        public static void QueueActionAndWait(Action a, int timeout = 15000)
+        {
+            var done = new AutoResetEvent(false);
+            Exception e = null;
+            QueueAction(() =>
+            {
+                try
+                {
+                    a();
+                    done.Set();
+                }
+                catch (Exception ex)
+                {
+                    e = ex;
+                }
+            });
+            if (e != null)
+                throw e;
+            if (!done.WaitOne(timeout)) throw new TimeoutException();
+        }
+
+        /// <summary>
+        ///     Queue an action to be executed on next tick, allowing you to call scripting API from another thread.
+        /// </summary>
+        /// <param name="a">
+        ///     An <see cref="Func{T, TResult}" /> to be executed with a return value indicating whether it can be
+        ///     removed after execution.
+        /// </param>
+        public static void QueueAction(Func<bool> a)
+        {
+            WorldThread.QueueAction(a);
+        }
+
 
         /// <summary>
         ///     Connect to a server

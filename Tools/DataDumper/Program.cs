@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using RageCoop.Core;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace RageCoop.Client.DataDumper;
+namespace DataDumper;
 
 internal class WeaponInfo
 {

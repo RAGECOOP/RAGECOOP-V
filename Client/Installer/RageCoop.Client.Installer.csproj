@@ -5,6 +5,10 @@
 		<TargetFramework>net48</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
+		<AllowedReferenceRelatedFileExtensions>
+			-
+		</AllowedReferenceRelatedFileExtensions>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="bg.png" />

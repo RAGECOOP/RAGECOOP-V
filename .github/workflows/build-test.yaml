@@ -2,9 +2,7 @@ name: Build test
 
 on:
   push:
-    branches:    
-      - '*'         # matches every branch that doesn't contain a '/'
-      - '*/*'       # matches every branch containing a single '/'
+    branches:
       - '**'        # matches every branch
       - '!main'     # excludes main
       - '!dev-nightly'     # excludes nightly
@@ -26,23 +24,27 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version:  ${{ matrix.dotnet-version }}
+
     - name: Restore dependencies
       run: dotnet restore
+
     - name: Restore nuget packages
       run: nuget restore
-    - name: Build client and installer
-      run: dotnet build Client/Installer/RageCoop.Client.Installer.csproj --configuration Release -o bin/Release/Client
-    - name: Build server win-x64
-      run: dotnet build Server/RageCoop.Server.csproj -o bin/Release/Server
+
+    - name: Build
+      run: build.cmd
+
     - name: Upload server
       uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Server
         path: bin/Release/Server
+
     - name: Upload Client
       uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Client
         path: bin/Release/Client
+
     - uses: actions/checkout@v2
       

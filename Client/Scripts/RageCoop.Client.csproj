@@ -2,6 +2,7 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -18,6 +19,14 @@
     </NuGetPackageImportStamp>
     <OutPutPath>..\..\bin\$(Configuration)\Client\Scripts</OutPutPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <AllowedReferenceRelatedFileExtensions>
+			.dll
+			.pdb
+		</AllowedReferenceRelatedFileExtensions>
+    <DocumentationFile>..\..\bin\API\RageCoop.Client.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>DEBUG</DefineConstants>
@@ -27,6 +36,9 @@
   <ItemGroup>
     <Compile Include="Debug.cs" />
     <Compile Include="DevTools\DevTool.cs" />
+    <Compile Include="GUI\CefClient.cs" />
+    <Compile Include="GUI\CefManager.cs" />
+    <Compile Include="GUI\HookManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Menus\CoopMenu.cs" />
     <Compile Include="Menus\Sub\DebugMenu.cs" />
@@ -42,11 +54,6 @@
     <Compile Include="Networking\Send.cs" />
     <Compile Include="Networking\Statistics.cs" />
     <Compile Include="PlayerList.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyInfo.tt</DependentUpon>
-    </Compile>
     <Compile Include="Scripting\API.cs" />
     <Compile Include="Scripting\BaseScript.cs" />
     <Compile Include="Scripting\ClientScript.cs" />
@@ -73,9 +80,17 @@
     <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VehicleExtensions.cs" />
     <Compile Include="Util\WeaponUtil.cs" />
+    <Compile Include="Util\Win32.cs" />
     <Compile Include="WorldThread.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="BitmapUtil, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\libs\BitmapUtil.dll</HintPath>
+    </Reference>
+    <Reference Include="DXHook">
+      <HintPath>..\..\libs\DXHook\DXHook.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.4.0.12, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SharpZipLib.1.4.0\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -86,9 +101,6 @@
       <HintPath>..\..\libs\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Extensions.ObjectPool, Version=6.0.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.ObjectPool.6.0.8\lib\net461\Microsoft.Extensions.ObjectPool.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NAudio.2.1.0\lib\net472\NAudio.dll</HintPath>
     </Reference>
@@ -113,6 +125,10 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="RageCoop.Client.CefHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\$(Configuration)\Client\SubProcess\ref\RageCoop.Client.CefHost.dll</HintPath>
+    </Reference>
     <Reference Include="ScriptHookVDotNet">
       <HintPath>..\..\libs\ScriptHookVDotNet.dll</HintPath>
     </Reference>
@@ -121,6 +137,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -131,9 +153,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+    </Content>
+    <Content Include="sharpdx_direct3d11_1_effects_x64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -149,8 +177,14 @@
       <Name>RageCoop.Client.Loader</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup Condition=" '$(DevEnvDir)' != '*Undefined*'">
-    <PostBuildEvent>"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"</PostBuildEvent>
+  <PropertyGroup>
+    <PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
+			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
+		</PostBuildEvent>
+    <PreBuildEvent Condition=" '$(SolutionDir)' != '*Undefined*'">
+			dotnet build -c $(Configuration) "$(SolutionDir)Client\CefHost\RageCoop.Client.CefHost.csproj"
+		</PreBuildEvent>
   </PropertyGroup>
 </Project>

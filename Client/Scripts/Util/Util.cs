@@ -20,6 +20,33 @@ namespace RageCoop.Client
     {
         public static string SettingsPath = "RageCoop\\Settings.json";
 
+        /// <summary>
+        ///     The location of the cursor on screen between 0 and 1.
+        /// </summary>
+        public static PointF CursorPositionRelative
+        {
+            get
+            {
+                var cursorX = Game.IsControlEnabled(Control.CursorX)
+                    ? Game.GetControlValueNormalized(Control.CursorX)
+                    : Game.GetDisabledControlValueNormalized(Control.CursorX);
+                var cursorY = Game.IsControlEnabled(Control.CursorY)
+                    ? Game.GetControlValueNormalized(Control.CursorY)
+                    : Game.GetDisabledControlValueNormalized(Control.CursorY);
+                return new PointF(cursorX, cursorY);
+            }
+        }
+
+        public static Point CursorPosition
+        {
+            get
+            {
+                var p = CursorPositionRelative;
+                var res = Screen.Resolution;
+                return new Point((int)(p.X * res.Width), (int)(p.Y * res.Height));
+            }
+        }
+
         public static SizeF ResolutionMaintainRatio
         {
             get

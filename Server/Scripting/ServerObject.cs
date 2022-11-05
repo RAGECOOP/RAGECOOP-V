@@ -30,7 +30,7 @@ public abstract class ServerObject
     /// <summary>
     ///     Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
     /// </summary>
-    public Tuple<byte, byte[]> Handle => new Tuple<byte, byte[]>(GetTypeByte(), BitConverter.GetBytes(ID));
+    public Tuple<byte, byte[]> Handle => new(GetTypeByte(), BitConverter.GetBytes(ID));
 
     /// <summary>
     ///     The client that owns this object, null if it's owned by server.
@@ -280,7 +280,7 @@ public class ServerBlip
     /// <summary>
     ///     Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
     /// </summary>
-    public Tuple<byte, byte[]> Handle => new Tuple<byte, byte[]>(60, BitConverter.GetBytes(ID));
+    public Tuple<byte, byte[]> Handle => new(60, BitConverter.GetBytes(ID));
 
     /// <summary>
     ///     Network ID (not handle!)
