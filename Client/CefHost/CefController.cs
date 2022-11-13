@@ -6,6 +6,7 @@ using System.IO.MemoryMappedFiles;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Ipc;
+using System.Threading;
 using System.Threading.Tasks;
 using CefSharp;
 using CefSharp.OffScreen;
@@ -35,16 +36,23 @@ namespace RageCoop.Client.CefHost
         private static ActivatedClientTypeEntry _controllerEntry;
         private static IpcChannel _adapterChannel;
         public static Action<string> OnCefMessage;
-        private object _browser;
+        private ChromiumWebBrowser _browser;
         private MemoryMappedFile _mmf;
         private string _mmfName;
+        private CefProcessor _processor;
         private SafeMemoryMappedViewHandle _mmfView;
         private BufferMode _mode;
         public IntPtr PtrBuffer { get; private set; }
 
+        public int FrameRate
+        {
+            get => _browser.GetBrowserHost().WindowlessFrameRate;
+            set => _browser.GetBrowserHost().WindowlessFrameRate = value;
+        }
+
         public void Dispose()
         {
-            (_browser as ChromiumWebBrowser)?.Dispose();
+            _browser?.Dispose();
 
             _mmf?.Dispose();
             if (PtrBuffer != IntPtr.Zero) _mmfView?.ReleasePointer();
@@ -153,28 +161,34 @@ namespace RageCoop.Client.CefHost
 
             var adapter = new CefAdapter();
             adapter.Register(id, mode, _mmfName);
-
             _browser = new ChromiumWebBrowser();
-            ((ChromiumWebBrowser)_browser).RenderHandler = new CefProcessor(size, adapter, PtrBuffer, mode);
+            _browser.RenderHandler = _processor = new CefProcessor(size, adapter, PtrBuffer, mode);
+            while (_browser.GetBrowserHost() == null) Thread.Sleep(20); // Wait till the browser is actually created
             Console.WriteLine("CefController created: " + size);
         }
 
 
         public void LoadUrl(string url)
         {
-            ((ChromiumWebBrowser)_browser).LoadUrl(url);
+            _browser.LoadUrl(url);
         }
-
+        public void Resize(Size size)
+        {
+            _browser.Size = size;
+            _processor.Size = size;
+        }
         public void SendMouseClick(int x, int y, int modifiers, MouseButton button, bool mouseUp, int clicks)
         {
             var e = new MouseEvent(x, y, (CefEventFlags)modifiers);
-            ((ChromiumWebBrowser)_browser).GetBrowserHost()
+            _browser.GetBrowserHost()
                 ?.SendMouseClickEvent(e, (MouseButtonType)button, mouseUp, clicks);
         }
 
-        public void SendMouseMove()
+        public void SendMouseMove(int x, int y,bool leave=false)
         {
-            // _browser.GetBrowserHost() ?.SendMouseMoveEvent(,);
+            var e = new MouseEvent(x, y, 0);
+
+            _browser.GetBrowserHost()?.SendMouseMoveEvent(e,leave);
         }
 
         public DateTime Ping()
@@ -203,7 +217,7 @@ namespace RageCoop.Client.CefHost
         private MemoryMappedFile _mmf;
         private SafeMemoryMappedViewHandle _mmfView;
         public int Id;
-        public Size Size;
+        public Size Size { get; private set; }
 
         public CefAdapter()
         {

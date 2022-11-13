@@ -10,6 +10,13 @@
 		</AllowedReferenceRelatedFileExtensions>
 		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Resources\**" />
+	  <EmbeddedResource Remove="Resources\**" />
+	  <None Remove="Resources\**" />
+	  <Page Remove="Resources\**" />
+	</ItemGroup>
 	<ItemGroup>
 		<None Remove="bg.png" />
 	</ItemGroup>
@@ -49,10 +56,6 @@
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Resources\" />
 	</ItemGroup>
 
 	<ItemGroup>
