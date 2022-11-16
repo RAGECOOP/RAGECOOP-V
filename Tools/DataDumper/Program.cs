@@ -6,7 +6,6 @@ using Formatting = Newtonsoft.Json.Formatting;
 
 namespace DataDumper;
 
-
 [Flags]
 public enum GenFlags
 {
@@ -16,18 +15,18 @@ public enum GenFlags
     Animations = 8,
     All = ~0
 }
+
 public static class Program
 {
     public static GenFlags ToGenerate = GenFlags.All;
+
     public static void Main(string[] args)
     {
-        if (args.Length > 0 && Enum.TryParse<GenFlags>(args[0], true, out var flags))
-        {
-            ToGenerate = flags;
-        }
+        if (args.Length > 0 && Enum.TryParse<GenFlags>(args[0], true, out var flags)) ToGenerate = flags;
         Directory.CreateDirectory("out");
 
         #region META
+
         // Dumps from the game's xml documents, needs to have all *.meta file extracted to "meta" directory. OpenIV is recommended
 
         if (ToGenerate.HasFlag(GenFlags.WeaponInfo))
@@ -35,28 +34,21 @@ public static class Program
             Dictionary<uint, WeaponInfo> weapons = new();
             foreach (var f in Directory.GetFiles("meta", "*.meta")) Parse(f, weapons);
             File.WriteAllText("out/Weapons.json", JsonConvert.SerializeObject(weapons, Formatting.Indented));
-            if (ToGenerate.HasFlag(GenFlags.WeaponHash))
-            {
-                DumpWeaponHash(weapons, true);
-            }
+            if (ToGenerate.HasFlag(GenFlags.WeaponHash)) DumpWeaponHash(weapons, true);
         }
 
         #endregion
 
 
         #region EXTERNAL
+
         // External data from DurtyFree's data dumps: https://github.com/DurtyFree/gta-v-data-dumps
 
         Directory.CreateDirectory("ext");
         if (ToGenerate.HasFlag(GenFlags.VehicleWeaponInfo))
-        {
             VehicleWeaponInfo.Dump("ext/vehicles.json", "out/VehicleWeapons.json");
-        }
 
-        if (ToGenerate.HasFlag(GenFlags.Animations))
-        {
-            AnimDic.Dump("ext/animDictsCompact.json", "out/Animations.json");
-        }
+        if (ToGenerate.HasFlag(GenFlags.Animations)) AnimDic.Dump("ext/animDictsCompact.json", "out/Animations.json");
 
         #endregion
     }
@@ -123,5 +115,4 @@ public static class Program
         foreach (XmlNode n in l) nodes.Add(n);
         return nodes;
     }
-
 }

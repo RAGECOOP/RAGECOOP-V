@@ -12,6 +12,7 @@ namespace RageCoop.Client.GUI
         private static DXHookD3D11 _hook;
         public static Overlay DefaultOverlay = new Overlay();
         public static bool Hooked => _hook != null;
+
         public static void GetOverlays()
         {
             new List<IOverlay>(_hook.Overlays);

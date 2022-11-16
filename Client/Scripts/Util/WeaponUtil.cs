@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using GTA;
 using GTA.Math;
 using GTA.Native;
 using Newtonsoft.Json;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
-using Console = GTA.Console;
 using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client
 {
-
-
     internal class WeaponFix
     {
         public Dictionary<uint, string> Bullet = new Dictionary<uint, string>();
@@ -39,14 +33,11 @@ namespace RageCoop.Client
                 File.ReadAllText(WeaponInfoDataPath));
 
             if (File.Exists(WeaponFixDataPath))
-            {
                 WeaponFix = JsonConvert.DeserializeObject<WeaponFix>(File.ReadAllText(WeaponFixDataPath));
-            }
             else
-            {
                 API.Logger.Warning("Weapon fix data not found");
-            }
         }
+
         public static void DumpWeaponFix(string path)
         {
             var P = Game.Player.Character;
@@ -65,7 +56,6 @@ namespace RageCoop.Client
                     if (!Function.Call<bool>(Hash.IS_BULLET_IN_AREA, pos.X, pos.Y, pos.Z, 10f, true) &&
                         !Function.Call<bool>(Hash.IS_PROJECTILE_IN_AREA, pos.X - 10, pos.Y - 10, pos.Z - 10, pos.X + 10,
                             pos.Y + 10, pos.Z + 10, true))
-                    {
                         switch (w.Value.DamageType)
                         {
                             case "BULLET":
@@ -78,7 +68,7 @@ namespace RageCoop.Client
                                 fix.Others.Add(w.Key, w.Value.Name);
                                 break;
                         }
-                    }
+
                     foreach (var p in World.GetAllProjectiles()) p.Delete();
                     Script.Wait(50);
                 }
@@ -88,9 +78,9 @@ namespace RageCoop.Client
 
             P.IsInvincible = false;
         }
+
         public static uint GetWeaponFix(uint hash)
         {
-
             if (WeaponFix.Bullet.TryGetValue(hash, out _)) return 0x461DDDB0;
             if (WeaponFix.Lazer.TryGetValue(hash, out _)) return 0xE2822A29;
 
@@ -146,10 +136,11 @@ namespace RageCoop.Client
         public static bool IsUsingProjectileWeapon(this Ped p)
         {
             var vp = p.VehicleWeapon;
-            return Weapons.TryGetValue(vp != VehicleWeaponHash.Invalid ?
-                (uint)vp : (uint)p.Weapons.Current.Hash, out var info)
+            return Weapons.TryGetValue(vp != VehicleWeaponHash.Invalid ? (uint)vp : (uint)p.Weapons.Current.Hash,
+                       out var info)
                    && info.FireType == "PROJECTILE";
         }
+
         public static string GetFlashFX(this WeaponHash w, bool veh)
         {
             if (veh)

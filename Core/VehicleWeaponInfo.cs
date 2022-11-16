@@ -1,15 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Console = System.Console;
 using System.Xml;
+using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace RageCoop.Core
 {
-
     internal class AnimDic
     {
         public string[] Animations;
@@ -17,7 +15,6 @@ namespace RageCoop.Core
 
         public static AnimDic[] Dump(string input, string output)
         {
-
             Console.WriteLine("Generating " + output);
             if (!File.Exists(input))
             {
@@ -33,6 +30,7 @@ namespace RageCoop.Core
             return anims;
         }
     }
+
     internal class WeaponInfo
     {
         public string Audio;
@@ -42,7 +40,11 @@ namespace RageCoop.Core
         public bool IsVehicleWeapon;
         public string Name;
         public float Speed;
-        public WeaponInfo() { }
+
+        public WeaponInfo()
+        {
+        }
+
         public WeaponInfo(XmlNode node)
         {
             if (node.Attributes["type"].Value != "CWeaponInfo") throw new Exception("Not a CWeaponInfo node");
@@ -72,6 +74,7 @@ namespace RageCoop.Core
             IsVehicleWeapon = Name.StartsWith("VEHICLE_WEAPON");
         }
     }
+
     internal class VehicleInfo
     {
         public VehicleBone[] Bones;
@@ -92,6 +95,7 @@ namespace RageCoop.Core
         public VehicleBone[] Bones;
         public string Name;
     }
+
     internal class VehicleWeaponInfo
     {
         public uint Hash;
@@ -132,5 +136,4 @@ namespace RageCoop.Core
             return result;
         }
     }
-
 }

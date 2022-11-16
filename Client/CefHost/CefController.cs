@@ -39,9 +39,9 @@ namespace RageCoop.Client.CefHost
         private ChromiumWebBrowser _browser;
         private MemoryMappedFile _mmf;
         private string _mmfName;
-        private CefProcessor _processor;
         private SafeMemoryMappedViewHandle _mmfView;
         private BufferMode _mode;
+        private CefProcessor _processor;
         public IntPtr PtrBuffer { get; private set; }
 
         public int FrameRate
@@ -172,11 +172,13 @@ namespace RageCoop.Client.CefHost
         {
             _browser.LoadUrl(url);
         }
+
         public void Resize(Size size)
         {
             _browser.Size = size;
             _processor.Size = size;
         }
+
         public void SendMouseClick(int x, int y, int modifiers, MouseButton button, bool mouseUp, int clicks)
         {
             var e = new MouseEvent(x, y, (CefEventFlags)modifiers);
@@ -184,11 +186,11 @@ namespace RageCoop.Client.CefHost
                 ?.SendMouseClickEvent(e, (MouseButtonType)button, mouseUp, clicks);
         }
 
-        public void SendMouseMove(int x, int y,bool leave=false)
+        public void SendMouseMove(int x, int y, bool leave = false)
         {
             var e = new MouseEvent(x, y, 0);
 
-            _browser.GetBrowserHost()?.SendMouseMoveEvent(e,leave);
+            _browser.GetBrowserHost()?.SendMouseMoveEvent(e, leave);
         }
 
         public DateTime Ping()
@@ -217,12 +219,13 @@ namespace RageCoop.Client.CefHost
         private MemoryMappedFile _mmf;
         private SafeMemoryMappedViewHandle _mmfView;
         public int Id;
-        public Size Size { get; private set; }
 
         public CefAdapter()
         {
             Console.WriteLine("Adapter created");
         }
+
+        public Size Size { get; private set; }
 
         public IntPtr PtrBuffer { get; private set; }
 

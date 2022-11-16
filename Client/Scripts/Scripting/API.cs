@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
-using System.Windows.Forms;
 using GTA;
 using Lidgren.Network;
 using Newtonsoft.Json;
@@ -150,7 +149,7 @@ namespace RageCoop.Client.Scripting
             {
                 OnPlayerDied?.Invoke();
             }
-            
+
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
                 var args = new CustomEventReceivedArgs { Hash = p.Hash, Args = p.Args };

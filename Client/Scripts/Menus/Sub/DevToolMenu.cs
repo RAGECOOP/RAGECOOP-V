@@ -7,15 +7,13 @@ using GTA.UI;
 using LemonUI.Menus;
 using Newtonsoft.Json;
 using RageCoop.Core;
-using Console = GTA.Console;
 using static RageCoop.Client.Shared;
+using Console = GTA.Console;
 
 namespace RageCoop.Client
 {
-
     internal static class DevToolMenu
     {
-
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
             UseMouse = false,

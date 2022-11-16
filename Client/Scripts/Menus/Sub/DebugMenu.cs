@@ -105,6 +105,7 @@ namespace RageCoop.Client
             {
                 CefManager.DestroyClient(_testCef);
             }
+
             DxHookTest.Checked = HookManager.Hooked;
         }
 

@@ -17,11 +17,11 @@ using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
 using SHVDN;
+using static RageCoop.Client.Shared;
 using Console = GTA.Console;
 using Control = GTA.Control;
 using Screen = System.Windows.Forms.Screen;
 using Script = GTA.Script;
-using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client
 {
@@ -58,7 +58,7 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
-            Util.StartUpCheck(); 
+            Util.StartUpCheck();
 
             Directory.CreateDirectory(DataPath);
             Console.Info(
@@ -248,13 +248,13 @@ namespace RageCoop.Client
             {
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
                         $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60),
                         $"S: {NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
             }
 
             MainChat.Tick();
@@ -472,6 +472,7 @@ namespace RageCoop.Client
             {
                 CefManager.CleanUp();
             }
+
             HookManager.CleanUp();
             DownloadManager.Cleanup();
             Voice.ClearAll();

@@ -363,7 +363,7 @@ namespace RageCoop.Core
         }
 
         /// <summary>
-        /// Generate jenkins one-at-a-time hash from specified string (lower)
+        ///     Generate jenkins one-at-a-time hash from specified string (lower)
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -383,7 +383,6 @@ namespace RageCoop.Core
             hash += hash << 15;
             return hash;
         }
-
     }
 
     internal class IpInfo

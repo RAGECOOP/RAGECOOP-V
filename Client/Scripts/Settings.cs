@@ -73,7 +73,7 @@ namespace RageCoop.Client
         ///     The game won't spawn more NPC traffic if the limit is exceeded. -1 for unlimited (not recommended).
         /// </summary>
         public int WorldPedSoftLimit { get; set; } = 30;
-        
+
 
         /// <summary>
         ///     Show the owner name of the entity you're aiming at
