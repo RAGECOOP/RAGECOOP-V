@@ -1,0 +1,2891 @@
+{
+  "3293463361": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_ARDENT_MG",
+    "Damage": 20.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ARDENT_MG",
+    "Speed": 10000.0
+  },
+  "2861067768": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_INSURGENT_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_INSURGENT_MINIGUN",
+    "Speed": 2000.0
+  },
+  "3846072740": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_OPPRESSOR_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MOBILEOPS_CANNON",
+    "Speed": 2000.0
+  },
+  "2786772340": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_NIGHTSHARK_MG",
+    "Damage": 20.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_NIGHTSHARK_MG",
+    "Speed": 10000.0
+  },
+  "3683206664": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TECHNICAL_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TECHNICAL_MINIGUN",
+    "Speed": 2000.0
+  },
+  "3048454573": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_AKULA_TURRET_SINGLE",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AKULA_TURRET_SINGLE",
+    "Speed": 2000.0
+  },
+  "476907586": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_AKULA_TURRET_DUAL",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AKULA_TURRET_DUAL",
+    "Speed": 2000.0
+  },
+  "431576697": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_AKULA_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AKULA_MINIGUN",
+    "Speed": 2000.0
+  },
+  "2092838988": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_AKULA_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AKULA_MISSILE",
+    "Speed": 2000.0
+  },
+  "2282558706": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_AKULA_BARRAGE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AKULA_BARRAGE",
+    "Speed": 2000.0
+  },
+  "3405172033": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ANNIHILATOR2_MINI",
+    "Speed": 10000.0
+  },
+  "3345729207": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ANNIHILATOR2_MISSILE",
+    "Speed": 2000.0
+  },
+  "903400592": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_BARRAGE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ANNIHILATOR2_BARRAGE",
+    "Speed": 2000.0
+  },
+  "328167896": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_APC_TURRET_CANNON",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_APC_CANNON",
+    "Speed": 2000.0
+  },
+  "1151689097": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_APC_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_APC_MISSILE",
+    "Speed": 2000.0
+  },
+  "190244068": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_APC_MG",
+    "Damage": 25.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_APC_MG",
+    "Speed": 10000.0
+  },
+  "2556895291": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_OPPRESSOR_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_AVENGER_CANNON",
+    "Speed": 2000.0
+  },
+  "4148791700": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_BARRAGE_MG",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BARRAGE_TOP_MG",
+    "Speed": 2000.0
+  },
+  "1000258817": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_BARRAGE_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BARRAGE_TOP_MINIGUN",
+    "Speed": 2000.0
+  },
+  "1200179045": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_BARRAGE_MG",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BARRAGE_REAR_MG",
+    "Speed": 2000.0
+  },
+  "525623141": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_BARRAGE_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BARRAGE_REAR_MINIGUN",
+    "Speed": 2000.0
+  },
+  "2756453005": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_BARRAGE_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BARRAGE_REAR_GL",
+    "Speed": 2000.0
+  },
+  "2599467276": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB",
+    "Speed": 2000.0
+  },
+  "220773539": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB_CLUSTER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB_CLUSTER",
+    "Speed": 2000.0
+  },
+  "1430300958": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB_GAS",
+    "Damage": 0.0,
+    "DamageType": "SMOKE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB_GAS",
+    "Speed": 2000.0
+  },
+  "1794615063": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB_INCENDIARY",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB_INCENDIARY",
+    "Speed": 2000.0
+  },
+  "3628350041": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_BOMBUSHKA_CANNON",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMBUSHKA_CANNON",
+    "Speed": 4000.0
+  },
+  "741027160": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_BOMBUSHKA_DUAL_MG",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMBUSHKA_DUALMG",
+    "Speed": 4000.0
+  },
+  "3611149825": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BRUISER_50CAL",
+    "Speed": 10000.0
+  },
+  "1030357398": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BRUISER2_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "1817275304": {
+    "Audio": "AUDIO_ITEM_TECHNICAL_TURRET",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_CARACARA_MG",
+    "Speed": 2000.0
+  },
+  "1338760315": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TECHNICAL_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_CARACARA_MINIGUN",
+    "Speed": 2000.0
+  },
+  "2722615358": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_CHERNOBORG_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_CHERNO_MISSILE",
+    "Speed": 2000.0
+  },
+  "490982948": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DEATHBIKE_DUALMINIGUN",
+    "Speed": 10000.0
+  },
+  "3909880809": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN_LASER",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DEATHBIKE2_MINIGUN_LASER",
+    "Speed": 10000.0
+  },
+  "2600428406": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_DELUXO_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DELUXO_MG",
+    "Speed": 10000.0
+  },
+  "3036244276": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_DELUXO_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DELUXO_MISSILE",
+    "Speed": 2000.0
+  },
+  "3014743549": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_TURRET",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_DINGHY5_50CAL",
+    "Speed": 2000.0
+  },
+  "1595421922": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_DOGFIGHTER_MG",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DOGFIGHTER_MG",
+    "Speed": 10000.0
+  },
+  "3393648765": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_DOGFIGHTER_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DOGFIGHTER_MISSILE",
+    "Speed": 2000.0
+  },
+  "3507816399": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_DUNE_MG",
+    "Damage": 150.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DUNE_MG",
+    "Speed": 2000.0
+  },
+  "2700898573": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_DUNE_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DUNE_GRENADELAUNCHER",
+    "Speed": 2000.0
+  },
+  "1416047217": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_DUNE_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DUNE_MINIGUN",
+    "Speed": 2000.0
+  },
+  "3003147322": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_FLAMETHROWER",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_FLAMETHROWER",
+    "Speed": 2000.0
+  },
+  "2182329506": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_FLAMETHROWER_SCIFI",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_FLAMETHROWER_SCIFI",
+    "Speed": 2000.0
+  },
+  "1987049393": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HACKER_MISSILE",
+    "Speed": 2000.0
+  },
+  "2011877270": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HACKER_MISSILE_HOMING",
+    "Speed": 2000.0
+  },
+  "1331922171": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_HALFTRACK_TWINMG",
+    "Damage": 75.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HALFTRACK_DUALMG",
+    "Speed": 800.0
+  },
+  "1226518132": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_HALFTRACK_QUADMG",
+    "Damage": 75.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HALFTRACK_QUADMG",
+    "Speed": 800.0
+  },
+  "855547631": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_HAVOK_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HAVOK_MINIGUN",
+    "Speed": 2000.0
+  },
+  "1119518887": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_HUNTER_MG",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HUNTER_MG",
+    "Speed": 2000.0
+  },
+  "153396725": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_HUNTER_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HUNTER_MISSILE",
+    "Speed": 2000.0
+  },
+  "785467445": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_HUNTER_BARRAGE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HUNTER_BARRAGE",
+    "Speed": 2000.0
+  },
+  "704686874": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_HUNTER_CANNON",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_HUNTER_CANNON",
+    "Speed": 2500.0
+  },
+  "1984488269": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ISSI4_50CAL",
+    "Speed": 10000.0
+  },
+  "1988061477": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ISSI5_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "507170720": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_KHANJALI_CANNON",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_KHANJALI_CANNON",
+    "Speed": 2000.0
+  },
+  "2206953837": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_KHANJALI_CANNON_HEAVY",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_KHANJALI_CANNON_HEAVY",
+    "Speed": 2000.0
+  },
+  "711953949": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_KHANJALI_MG",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_KHANJALI_MG",
+    "Speed": 2000.0
+  },
+  "394659298": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_KHANJALI_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_KHANJALI_GL",
+    "Speed": 2000.0
+  },
+  "3754621092": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MENACER_MG",
+    "Speed": 10000.0
+  },
+  "3303022956": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_MICROLIGHT_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MICROLIGHT_MG",
+    "Speed": 2500.0
+  },
+  "1508567460": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE",
+    "Speed": 2000.0
+  },
+  "1007245390": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_KINETIC",
+    "Speed": 2000.0
+  },
+  "1776356704": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_EMP",
+    "Speed": 2000.0
+  },
+  "3647840364": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_SPIKE",
+    "Speed": 2000.0
+  },
+  "1459276487": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_SLICK",
+    "Speed": 2000.0
+  },
+  "4097936288": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_TAR",
+    "Speed": 2000.0
+  },
+  "623572320": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_KINETIC_RC",
+    "Speed": 2000.0
+  },
+  "1414837446": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_EMP_RC",
+    "Speed": 2000.0
+  },
+  "2083192401": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_SPIKE_RC",
+    "Speed": 2000.0
+  },
+  "2229828375": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_SLICK_RC",
+    "Speed": 2000.0
+  },
+  "2100589782": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MINE_TAR_RC",
+    "Speed": 2000.0
+  },
+  "4128808778": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_MOGUL_NOSE",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MOGUL_NOSE",
+    "Speed": 10000.0
+  },
+  "3857952303": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_MOGUL_DUALNOSE",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MOGUL_DUALNOSE",
+    "Speed": 10000.0
+  },
+  "3808236382": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_MOGUL_TURRET",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MOGUL_TURRET",
+    "Speed": 2000.0
+  },
+  "3123149825": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_MOGUL_DUAL_TURRET",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MOGUL_DUALTURRET",
+    "Speed": 2000.0
+  },
+  "3853407197": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MONSTER3_GLKIN",
+    "Speed": 2000.0
+  },
+  "2712194258": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MORTAR_EXPLOSIVE",
+    "Speed": 2000.0
+  },
+  "1663705853": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MORTAR_KINETIC",
+    "Speed": 2000.0
+  },
+  "2220197671": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MULE4_MG",
+    "Speed": 10000.0
+  },
+  "1198717003": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MULE4_MISSILE",
+    "Speed": 2000.0
+  },
+  "3708963429": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_MULE4_TURRET_GL",
+    "Speed": 2000.0
+  },
+  "3643944669": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_OPPRESSOR_MG",
+    "Damage": 15.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_OPPRESSOR_MG",
+    "Speed": 10000.0
+  },
+  "2344076862": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_OPPRESSOR_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_OPPRESSOR_MISSILE",
+    "Speed": 2000.0
+  },
+  "3796180438": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 15.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_OPPRESSOR2_MG",
+    "Speed": 10000.0
+  },
+  "3595383913": {
+    "Audio": "AUDIO_ITEM_VEHICLE_OPPRESSOR2_CANNON",
+    "Damage": 15.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_OPPRESSOR2_CANNON",
+    "Speed": 2000.0
+  },
+  "1966766321": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_OPPRESSOR2_MISSILE",
+    "Speed": 2000.0
+  },
+  "749486726": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PARAGON2_MG",
+    "Speed": 10000.0
+  },
+  "1278194921": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PATROLBOAT_DUALMG",
+    "Speed": 2000.0
+  },
+  "3746472001": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_TURRET",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_PATROLBOAT_50CAL",
+    "Speed": 2000.0
+  },
+  "2263283790": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_POUNDER2_MINI",
+    "Speed": 10000.0
+  },
+  "162065050": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_POUNDER2_MISSILE",
+    "Speed": 2000.0
+  },
+  "2456521956": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_BARRAGE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_POUNDER2_BARRAGE",
+    "Speed": 2000.0
+  },
+  "2467888918": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_POUNDER2_GL",
+    "Speed": 2000.0
+  },
+  "158495693": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_ROGUE_MG",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ROGUE_MG",
+    "Speed": 2000.0
+  },
+  "3878337474": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ROGUE_CANNON",
+    "Speed": 2000.0
+  },
+  "1820910717": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_ROGUE_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ROGUE_MISSILE",
+    "Speed": 2000.0
+  },
+  "562032424": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SCARAB_50CAL",
+    "Speed": 10000.0
+  },
+  "3794660812": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SCARAB2_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "231629074": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SCRAMJET_MG",
+    "Speed": 10000.0
+  },
+  "3169388763": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SCRAMJET_MISSILE",
+    "Speed": 2000.0
+  },
+  "1371067624": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_SEABREEZE_MG",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SEABREEZE_MG",
+    "Speed": 2000.0
+  },
+  "2431961420": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SEASPARROW2_MINIGUN",
+    "Speed": 2000.0
+  },
+  "3940737434": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_GRANGER2_MG",
+    "Speed": 10000.0
+  },
+  "3355244860": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SPEEDO4_MG",
+    "Speed": 10000.0
+  },
+  "3595964737": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_TURRET",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SPEEDO4_TURRET_MG",
+    "Speed": 2000.0
+  },
+  "2667462330": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SPEEDO4_TURRET_MINI",
+    "Speed": 2000.0
+  },
+  "968648323": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_BARRAGE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_STRIKEFORCE_BARRAGE",
+    "Speed": 2000.0
+  },
+  "955522731": {
+    "Audio": "AUDIO_ITEM_VEHICLE_STRIKEFORCE_A10",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_STRIKEFORCE_CANNON",
+    "Speed": 2000.0
+  },
+  "519052682": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_STRIKEFORCE_MISSILE",
+    "Speed": 2000.0
+  },
+  "1176362416": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_STROMBERG_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SUBCAR_MG",
+    "Speed": 10000.0
+  },
+  "3565779982": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_STROMBERG_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SUBCAR_MISSILE",
+    "Speed": 2000.0
+  },
+  "3884172218": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_STROMBERG_TORPEDO",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SUBCAR_TORPEDO",
+    "Speed": 2000.0
+  },
+  "2867284673": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SUB_MISSILE_HOMING",
+    "Speed": 1500.0
+  },
+  "1658983438": {
+    "Audio": "AUDIO_ITEM_H4_VEHICLE_KOSATKA_TORPEDO",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_KOSATKA_TORPEDO",
+    "Speed": 2000.0
+  },
+  "2656583842": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TAMPA_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TAMPA_MISSILE",
+    "Speed": 2000.0
+  },
+  "1015268368": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TAMPA_MORTAR",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TAMPA_MORTAR",
+    "Speed": 2000.0
+  },
+  "3670375085": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TAMPA_FIXEDMINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TAMPA_FIXEDMINIGUN",
+    "Speed": 2000.0
+  },
+  "1744687076": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TAMPA_DUALMINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TAMPA_DUALMINIGUN",
+    "Speed": 2000.0
+  },
+  "1697521053": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_THRUSTER_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_THRUSTER_MG",
+    "Speed": 2000.0
+  },
+  "1177935125": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_THRUSTER_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_THRUSTER_MISSILE",
+    "Speed": 2000.0
+  },
+  "1192341548": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TRAILER_QUADMG",
+    "Damage": 75.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TRAILER_QUADMG",
+    "Speed": 800.0
+  },
+  "2156678476": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TRAILER_DUALAA",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TRAILER_DUALAA",
+    "Speed": 2000.0
+  },
+  "341154295": {
+    "Audio": "AUDIO_ITEM_GR_VEHICLE_TRAILER_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TRAILER_MISSILE",
+    "Speed": 2000.0
+  },
+  "1100844565": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_TULA_NOSEMG",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TULA_NOSEMG",
+    "Speed": 10000.0
+  },
+  "1217122433": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_TULA_MG",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TULA_MG",
+    "Speed": 2000.0
+  },
+  "2966510603": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_TULA_DUAL_MG",
+    "Damage": 167.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TULA_DUALMG",
+    "Speed": 2000.0
+  },
+  "376489128": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_TULA_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TULA_MINIGUN",
+    "Speed": 2000.0
+  },
+  "4094131943": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_VIGILANTE_MG",
+    "Speed": 10000.0
+  },
+  "1347266149": {
+    "Audio": "AUDIO_ITEM_VEHICLE_SPACE_ROCKET",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_VIGILANTE_MISSILE",
+    "Speed": 2000.0
+  },
+  "1856325840": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB_STANDARD_WIDE",
+    "Speed": 2000.0
+  },
+  "1150790720": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_VOLATOL_DUAL_MG",
+    "Damage": 250.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_VOLATOL_DUALMG",
+    "Speed": 4000.0
+  },
+  "3936892403": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_COMET_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_COMET_MG",
+    "Speed": 10000.0
+  },
+  "3177079402": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_REVOLTER_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_REVOLTER_MG",
+    "Speed": 10000.0
+  },
+  "3946965070": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_SAVESTRA_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SAVESTRA_MG",
+    "Speed": 10000.0
+  },
+  "2275421702": {
+    "Audio": "AUDIO_ITEM_XM_VEHICLE_VISERIS_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_VISERIS_MG",
+    "Speed": 10000.0
+  },
+  "1599495177": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_IMPALER2_50CAL",
+    "Speed": 10000.0
+  },
+  "2361261192": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_IMPALER3_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "3059926651": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_IMPERATOR_50CAL",
+    "Speed": 10000.0
+  },
+  "2014823718": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_IMPERATOR2_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "4161575695": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DOMINATOR4_50CAL",
+    "Speed": 10000.0
+  },
+  "3022285407": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_DOMINATOR5_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "984313451": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SLAMVAN4_50CAL",
+    "Speed": 10000.0
+  },
+  "1368736686": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SLAMVAN5_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "3948829706": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BRUTUS_50CAL",
+    "Speed": 10000.0
+  },
+  "1757914307": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BRUTUS2_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "1790524546": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ZR380_50CAL",
+    "Speed": 10000.0
+  },
+  "570463164": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_DUAL_50_CAL_LASER_TURRET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ZR3802_50CAL_LASER",
+    "Speed": 10000.0
+  },
+  "926602556": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_JB700_MG",
+    "Speed": 10000.0
+  },
+  "1392289305": {
+    "Audio": "audio_item_vehicle_weapon_minitank_mg",
+    "Damage": 25.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RCTANK_GUN",
+    "Speed": 2000.0
+  },
+  "4109257098": {
+    "Audio": "audio_item_vehicle_weapon_mini_flamethrower",
+    "Damage": 175.0,
+    "DamageType": "BULLET",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RCTANK_FLAME",
+    "Speed": 2000.0
+  },
+  "1995916491": {
+    "Audio": "audio_item_vehicle_weapon_minitank_rocket",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RCTANK_ROCKET",
+    "Speed": 2000.0
+  },
+  "1475488848": {
+    "Audio": "audio_item_vehicle_weapon_minitank_plasma_cannon",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RCTANK_LAZER",
+    "Speed": 2000.0
+  },
+  "4098147528": {
+    "Audio": "AUDIO_ITEM_SM_VEHICLE_WEAPON_BOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_BOMB_WATER",
+    "Speed": 2000.0
+  },
+  "738733437": {
+    "Audio": "AUDIO_ITEM_MISSILE_DEFENCE_CANNON",
+    "Damage": 30.0,
+    "DamageType": "NONE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_AIR_DEFENCE_GUN",
+    "Speed": 2000.0
+  },
+  "317205821": {
+    "Audio": "AUDIO_ITEM_AUTOSHOTGUN",
+    "Damage": 27.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_AUTOSHOTGUN",
+    "Speed": 2000.0
+  },
+  "3441901897": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BATTLEAXE",
+    "Speed": 2000.0
+  },
+  "4192643659": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BOTTLE",
+    "Speed": 2000.0
+  },
+  "2132975508": {
+    "Audio": "AUDIO_ITEM_BULLPUPRIFLE",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BULLPUPRIFLE",
+    "Speed": 2000.0
+  },
+  "3959029566": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 20.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_CANNON_BLAZER",
+    "Speed": 10000.0
+  },
+  "171789620": {
+    "Audio": "AUDIO_ITEM_COMBAT_PDW",
+    "Damage": 28.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMBATPDW",
+    "Speed": 2000.0
+  },
+  "125959754": {
+    "Audio": "AUDIO_ITEM_COMPACTLAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMPACTLAUNCHER",
+    "Speed": 2000.0
+  },
+  "1649403952": {
+    "Audio": "AUDIO_ITEM_COMPACT_RIFLE",
+    "Damage": 34.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMPACTRIFLE",
+    "Speed": 2000.0
+  },
+  "2460120199": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DAGGER",
+    "Speed": 2000.0
+  },
+  "4019527611": {
+    "Audio": "AUDIO_ITEM_DB_SHOTGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DBSHOTGUN",
+    "Speed": 2000.0
+  },
+  "2138347493": {
+    "Audio": "AUDIO_ITEM_FIREWORK",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FIREWORK",
+    "Speed": 2000.0
+  },
+  "1198879012": {
+    "Audio": "AUDIO_ITEM_FLARE_GUN",
+    "Damage": 10.0,
+    "DamageType": "BULLET",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FLAREGUN",
+    "Speed": 2000.0
+  },
+  "2343591895": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FLASHLIGHT",
+    "Speed": 2000.0
+  },
+  "3794977420": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GARBAGEBAG",
+    "Speed": 2000.0
+  },
+  "1627465347": {
+    "Audio": "AUDIO_ITEM_GUSENBERG",
+    "Damage": 34.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GUSENBERG",
+    "Speed": 2000.0
+  },
+  "3494679629": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HANDCUFFS",
+    "Speed": 2000.0
+  },
+  "4191993645": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HATCHET",
+    "Speed": 2000.0
+  },
+  "3523564046": {
+    "Audio": "AUDIO_ITEM_HEAVYPISTOL",
+    "Damage": 40.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEAVYPISTOL",
+    "Speed": 2000.0
+  },
+  "984333226": {
+    "Audio": "AUDIO_ITEM_HEAVYSHOTGUN",
+    "Damage": 117.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEAVYSHOTGUN",
+    "Speed": 2000.0
+  },
+  "1672152130": {
+    "Audio": "AUDIO_ITEM_HOMING_LAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HOMINGLAUNCHER",
+    "Speed": 2000.0
+  },
+  "3638508604": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_KNUCKLE",
+    "Speed": 2000.0
+  },
+  "3713923289": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MACHETE",
+    "Speed": 2000.0
+  },
+  "3675956304": {
+    "Audio": "AUDIO_ITEM_MACHINE_PISTOL",
+    "Damage": 27.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MACHINEPISTOL",
+    "Speed": 2000.0
+  },
+  "3696079510": {
+    "Audio": "AUDIO_ITEM_MARKSMAN_PTL",
+    "Damage": 220.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MARKSMANPISTOL",
+    "Speed": 2000.0
+  },
+  "3342088282": {
+    "Audio": "AUDIO_ITEM_DMRSNIPER",
+    "Damage": 65.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MARKSMANRIFLE",
+    "Speed": 5000.0
+  },
+  "3173288789": {
+    "Audio": "AUDIO_ITEM_MINISMG",
+    "Damage": 22.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MINISMG",
+    "Speed": 2000.0
+  },
+  "2828843422": {
+    "Audio": "AUDIO_ITEM_MUSKET",
+    "Damage": 165.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MUSKET",
+    "Speed": 5000.0
+  },
+  "3125143736": {
+    "Audio": "AUDIO_ITEM_PIPEBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PIPEBOMB",
+    "Speed": 2000.0
+  },
+  "2484171525": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_POOLCUE",
+    "Speed": 2000.0
+  },
+  "2874559379": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PROXMINE",
+    "Speed": 2000.0
+  },
+  "1834241177": {
+    "Audio": "AUDIO_ITEM_RAILGUN",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RAILGUN",
+    "Speed": 2000.0
+  },
+  "3249783761": {
+    "Audio": "AUDIO_ITEM_REVOLVER",
+    "Damage": 160.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_REVOLVER",
+    "Speed": 2000.0
+  },
+  "2725352035": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_UNARMED",
+    "Speed": 2000.0
+  },
+  "4194021054": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ANIMAL",
+    "Speed": 2000.0
+  },
+  "148160082": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COUGAR",
+    "Speed": 2000.0
+  },
+  "2578778090": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_KNIFE",
+    "Speed": 2000.0
+  },
+  "1737195953": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_NIGHTSTICK",
+    "Speed": 2000.0
+  },
+  "1317494643": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HAMMER",
+    "Speed": 2000.0
+  },
+  "2508868239": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BAT",
+    "Speed": 2000.0
+  },
+  "1141786504": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GOLFCLUB",
+    "Speed": 2000.0
+  },
+  "2227010557": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_CROWBAR",
+    "Speed": 2000.0
+  },
+  "453432689": {
+    "Audio": "AUDIO_ITEM_PISTOL",
+    "Damage": 26.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PISTOL",
+    "Speed": 2000.0
+  },
+  "1593441988": {
+    "Audio": "AUDIO_ITEM_COMBATPISTOL",
+    "Damage": 27.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMBATPISTOL",
+    "Speed": 2000.0
+  },
+  "584646201": {
+    "Audio": "AUDIO_ITEM_APPISTOL",
+    "Damage": 28.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_APPISTOL",
+    "Speed": 2000.0
+  },
+  "2578377531": {
+    "Audio": "AUDIO_ITEM_PISTOL50",
+    "Damage": 51.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PISTOL50",
+    "Speed": 2000.0
+  },
+  "324215364": {
+    "Audio": "AUDIO_ITEM_MICROSMG",
+    "Damage": 21.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MICROSMG",
+    "Speed": 2000.0
+  },
+  "736523883": {
+    "Audio": "AUDIO_ITEM_SMG",
+    "Damage": 22.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SMG",
+    "Speed": 2000.0
+  },
+  "4024951519": {
+    "Audio": "AUDIO_ITEM_ASSAULTSMG",
+    "Damage": 23.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ASSAULTSMG",
+    "Speed": 2000.0
+  },
+  "3220176749": {
+    "Audio": "AUDIO_ITEM_ASSAULTRIFLE",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ASSAULTRIFLE",
+    "Speed": 2000.0
+  },
+  "2210333304": {
+    "Audio": "AUDIO_ITEM_CARBINERIFLE",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_CARBINERIFLE",
+    "Speed": 2000.0
+  },
+  "2937143193": {
+    "Audio": "AUDIO_ITEM_ADVANCEDRIFLE",
+    "Damage": 34.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ADVANCEDRIFLE",
+    "Speed": 2000.0
+  },
+  "2634544996": {
+    "Audio": "AUDIO_ITEM_MG",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MG",
+    "Speed": 2000.0
+  },
+  "2144741730": {
+    "Audio": "AUDIO_ITEM_COMBATMG",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMBATMG",
+    "Speed": 2000.0
+  },
+  "487013001": {
+    "Audio": "AUDIO_ITEM_PUMPSHOTGUN",
+    "Damage": 29.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PUMPSHOTGUN",
+    "Speed": 2000.0
+  },
+  "2017895192": {
+    "Audio": "AUDIO_ITEM_SAWNOFFSHOTGUN",
+    "Damage": 40.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SAWNOFFSHOTGUN",
+    "Speed": 2000.0
+  },
+  "3800352039": {
+    "Audio": "AUDIO_ITEM_ASSAULTSHOTGUN",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ASSAULTSHOTGUN",
+    "Speed": 2000.0
+  },
+  "2640438543": {
+    "Audio": "AUDIO_ITEM_BULLPUPSHOTGUN",
+    "Damage": 14.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BULLPUPSHOTGUN",
+    "Speed": 2000.0
+  },
+  "911657153": {
+    "Audio": "AUDIO_ITEM_STUNGUN",
+    "Damage": 1.0,
+    "DamageType": "ELECTRIC",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_STUNGUN",
+    "Speed": 2000.0
+  },
+  "100416529": {
+    "Audio": "AUDIO_ITEM_SNIPERRIFLE",
+    "Damage": 101.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SNIPERRIFLE",
+    "Speed": 5000.0
+  },
+  "205991906": {
+    "Audio": "AUDIO_ITEM_HEAVYSNIPER",
+    "Damage": 216.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEAVYSNIPER",
+    "Speed": 5000.0
+  },
+  "856002082": {
+    "Audio": "AUDIO_ITEM_REMOTESNIPER",
+    "Damage": 101.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_REMOTESNIPER",
+    "Speed": 2000.0
+  },
+  "2726580491": {
+    "Audio": "AUDIO_ITEM_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GRENADELAUNCHER",
+    "Speed": 2000.0
+  },
+  "1305664598": {
+    "Audio": "AUDIO_ITEM_GRENADELAUNCHER",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GRENADELAUNCHER_SMOKE",
+    "Speed": 2000.0
+  },
+  "2982836145": {
+    "Audio": "AUDIO_ITEM_RPG",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RPG",
+    "Speed": 2000.0
+  },
+  "375527679": {
+    "Audio": "AUDIO_ITEM_RPG",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PASSENGER_ROCKET",
+    "Speed": 2000.0
+  },
+  "324506233": {
+    "Audio": "AUDIO_ITEM_RPG",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_AIRSTRIKE_ROCKET",
+    "Speed": 2000.0
+  },
+  "1752584910": {
+    "Audio": "AUDIO_ITEM_RPG",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_STINGER",
+    "Speed": 2000.0
+  },
+  "1119849093": {
+    "Audio": "AUDIO_ITEM_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MINIGUN",
+    "Speed": 2000.0
+  },
+  "2481070269": {
+    "Audio": "AUDIO_ITEM_GRENADE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GRENADE",
+    "Speed": 2000.0
+  },
+  "741814745": {
+    "Audio": "AUDIO_ITEM_STICKYBOMB",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_STICKYBOMB",
+    "Speed": 2000.0
+  },
+  "4256991824": {
+    "Audio": "AUDIO_ITEM_SMOKEGRENADE",
+    "Damage": 0.0,
+    "DamageType": "SMOKE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SMOKEGRENADE",
+    "Speed": 2000.0
+  },
+  "2694266206": {
+    "Audio": "AUDIO_ITEM_SMOKEGRENADE",
+    "Damage": 0.0,
+    "DamageType": "SMOKE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BZGAS",
+    "Speed": 2000.0
+  },
+  "615608432": {
+    "Audio": "AUDIO_ITEM_MOLOTOV",
+    "Damage": 0.0,
+    "DamageType": "FIRE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MOLOTOV",
+    "Speed": 2000.0
+  },
+  "101631238": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "FIRE_EXTINGUISHER",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FIREEXTINGUISHER",
+    "Speed": 2000.0
+  },
+  "883325847": {
+    "Audio": "AUDIO_ITEM_PETROLCAN",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PETROLCAN",
+    "Speed": 2000.0
+  },
+  "4256881901": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "BULLET",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DIGISCANNER",
+    "Speed": 2000.0
+  },
+  "2294779575": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BRIEFCASE",
+    "Speed": 2000.0
+  },
+  "28811031": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BRIEFCASE_02",
+    "Speed": 2000.0
+  },
+  "600439132": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BALL",
+    "Speed": 2000.0
+  },
+  "1233104067": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FLARE",
+    "Speed": 2000.0
+  },
+  "1945616459": {
+    "Audio": "AUDIO_ITEM_VEHICLE_TANK",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TANK",
+    "Speed": 2000.0
+  },
+  "4171469727": {
+    "Audio": "AUDIO_ITEM_VEHICLE_SPACE_ROCKET",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SPACE_ROCKET",
+    "Speed": 2000.0
+  },
+  "3473446624": {
+    "Audio": "AUDIO_ITEM_VEHICLE_SPACE_ROCKET",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLANE_ROCKET",
+    "Speed": 2000.0
+  },
+  "4026335563": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "ELECTRIC",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_LASER",
+    "Speed": 2000.0
+  },
+  "1259576109": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_BULLET",
+    "Speed": 2000.0
+  },
+  "1186503822": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_BUZZARD",
+    "Speed": 10000.0
+  },
+  "2669318622": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_HUNTER",
+    "Speed": 2000.0
+  },
+  "3800181289": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_LAZER",
+    "Speed": 2000.0
+  },
+  "1566990507": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "ELECTRIC",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ENEMY_LASER",
+    "Speed": 2000.0
+  },
+  "3450622333": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "NONE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_SEARCHLIGHT",
+    "Speed": 2000.0
+  },
+  "3530961278": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "NONE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RADAR",
+    "Speed": 2000.0
+  },
+  "3204302209": {
+    "Audio": "AUDIO_ITEM_RPG",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_VEHICLE_ROCKET",
+    "Speed": 2000.0
+  },
+  "1223143800": {
+    "Audio": "",
+    "Damage": 0.1,
+    "DamageType": "BARBED_WIRE",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BARBED_WIRE",
+    "Speed": 2000.0
+  },
+  "4284007675": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DROWNING",
+    "Speed": 2000.0
+  },
+  "1936677264": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DROWNING_IN_VEHICLE",
+    "Speed": 2000.0
+  },
+  "2339582971": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BLEEDING",
+    "Speed": 2000.0
+  },
+  "2461879995": {
+    "Audio": "",
+    "Damage": 20.0,
+    "DamageType": "ELECTRIC",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ELECTRIC_FENCE",
+    "Speed": 2000.0
+  },
+  "539292904": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_EXPLOSION",
+    "Speed": 2000.0
+  },
+  "3452007600": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FALL",
+    "Speed": 2000.0
+  },
+  "910830060": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_EXHAUSTION",
+    "Speed": 2000.0
+  },
+  "3425972830": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "WATER_CANNON",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HIT_BY_WATER_CANNON",
+    "Speed": 2000.0
+  },
+  "133987706": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RAMMED_BY_CAR",
+    "Speed": 2000.0
+  },
+  "2741846334": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RUN_OVER_BY_CAR",
+    "Speed": 2000.0
+  },
+  "341774354": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "FALL",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HELI_CRASH",
+    "Speed": 2000.0
+  },
+  "2971687502": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "UNKNOWN",
+    "FireType": "NONE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_ROTORS",
+    "Speed": 2000.0
+  },
+  "3750660587": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "FIRE",
+    "FireType": "NONE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FIRE",
+    "Speed": 2000.0
+  },
+  "3854032506": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ANIMAL_RETRIEVER",
+    "Speed": 2000.0
+  },
+  "3146768957": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SMALL_DOG",
+    "Speed": 2000.0
+  },
+  "743550225": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_TIGER_SHARK",
+    "Speed": 2000.0
+  },
+  "3030980043": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HAMMERHEAD_SHARK",
+    "Speed": 2000.0
+  },
+  "4198358245": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_KILLER_WHALE",
+    "Speed": 2000.0
+  },
+  "861723357": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BOAR",
+    "Speed": 2000.0
+  },
+  "1205296881": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PIG",
+    "Speed": 2000.0
+  },
+  "1161062353": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COYOTE",
+    "Speed": 2000.0
+  },
+  "4106648222": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DEER",
+    "Speed": 2000.0
+  },
+  "955837630": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEN",
+    "Speed": 2000.0
+  },
+  "2793925639": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RABBIT",
+    "Speed": 2000.0
+  },
+  "3799318422": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_CAT",
+    "Speed": 2000.0
+  },
+  "94548753": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COW",
+    "Speed": 2000.0
+  },
+  "1834887169": {
+    "Audio": "AUDIO_ITEM_GRENADE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BIRD_CRAP",
+    "Speed": 2000.0
+  },
+  "126349499": {
+    "Audio": "AUDIO_ITEM_SNOWBALL",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SNOWBALL",
+    "Speed": 2000.0
+  },
+  "3218215474": {
+    "Audio": "AUDIO_ITEM_SNSPISTOL",
+    "Damage": 28.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SNSPISTOL",
+    "Speed": 2000.0
+  },
+  "3231910285": {
+    "Audio": "AUDIO_ITEM_CARBINE_SPECIAL",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SPECIALCARBINE",
+    "Speed": 2000.0
+  },
+  "940833800": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_STONE_HATCHET",
+    "Speed": 2000.0
+  },
+  "3756226112": {
+    "Audio": "AUDIO_ITEM_MELEE_SWITCHBLADE",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SWITCHBLADE",
+    "Speed": 2000.0
+  },
+  "889061222": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ARENA_MACHINE_GUN",
+    "Speed": 2000.0
+  },
+  "1686798800": {
+    "Audio": "AUDIO_ITEM_VEHICLE_WEAPON_MISSILE",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ARENA_HOMING_MISSILE",
+    "Speed": 2000.0
+  },
+  "961495388": {
+    "Audio": "AUDIO_ITEM_ASSAULTRIFLE_MK2",
+    "Damage": 40.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_ASSAULTRIFLE_MK2",
+    "Speed": 2000.0
+  },
+  "2228681469": {
+    "Audio": "AUDIO_ITEM_BULLPUP_RIFLE_MK2",
+    "Damage": 33.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_BULLPUPRIFLE_MK2",
+    "Speed": 2000.0
+  },
+  "4208062921": {
+    "Audio": "AUDIO_ITEM_CARBINERIFLE_MK2",
+    "Damage": 33.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_CARBINERIFLE_MK2",
+    "Speed": 2000.0
+  },
+  "3686625920": {
+    "Audio": "AUDIO_ITEM_COMBATMG_MK2",
+    "Damage": 47.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMBATMG_MK2",
+    "Speed": 2000.0
+  },
+  "2548703416": {
+    "Audio": "AUDIO_ITEM_DOUBLEACTION_REVOLVER",
+    "Damage": 81.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_DOUBLEACTION",
+    "Speed": 2000.0
+  },
+  "3676729658": {
+    "Audio": "audio_item_emp_launcher",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_EMPLAUNCHER",
+    "Speed": 2000.0
+  },
+  "3347935668": {
+    "Audio": "audio_item_heavy_rifle",
+    "Damage": 34.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEAVYRIFLE",
+    "Speed": 2000.0
+  },
+  "177293209": {
+    "Audio": "AUDIO_ITEM_HEAVYSNIPER_MK2",
+    "Damage": 230.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HEAVYSNIPER_MK2",
+    "Speed": 5000.0
+  },
+  "1785463520": {
+    "Audio": "AUDIO_ITEM_MARKSMAN_RIFLE_MK2",
+    "Damage": 75.0,
+    "DamageType": "BULLET",
+    "FireType": "DELAYED_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MARKSMANRIFLE_MK2",
+    "Speed": 5000.0
+  },
+  "3219281620": {
+    "Audio": "AUDIO_ITEM_PISTOL_MK2",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PISTOL_MK2",
+    "Speed": 2000.0
+  },
+  "1432025498": {
+    "Audio": "AUDIO_ITEM_PUMP_SHOTGUN_MK2",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_PUMPSHOTGUN_MK2",
+    "Speed": 2000.0
+  },
+  "3415619887": {
+    "Audio": "AUDIO_ITEM_HEAVY_REVOLVER_MK2",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_REVOLVER_MK2",
+    "Speed": 2000.0
+  },
+  "2024373456": {
+    "Audio": "AUDIO_ITEM_SMG_MK2",
+    "Damage": 25.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SMG_MK2",
+    "Speed": 2000.0
+  },
+  "2285322324": {
+    "Audio": "AUDIO_ITEM_SNS_PISTOL_MK2",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SNSPISTOL_MK2",
+    "Speed": 2000.0
+  },
+  "2939590305": {
+    "Audio": "AUDIO_ITEM_RAYPISTOL",
+    "Damage": 10.0,
+    "DamageType": "BULLET",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RAYPISTOL",
+    "Speed": 2000.0
+  },
+  "1198256469": {
+    "Audio": "AUDIO_ITEM_RAYCARBINE",
+    "Damage": 45.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RAYCARBINE",
+    "Speed": 2000.0
+  },
+  "3056410471": {
+    "Audio": "AUDIO_ITEM_RAYMINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_RAYMINIGUN",
+    "Speed": 2000.0
+  },
+  "2526821735": {
+    "Audio": "AUDIO_ITEM_CARBINE_SPECIAL_MK2",
+    "Damage": 32.5,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_SPECIALCARBINE_MK2",
+    "Speed": 2000.0
+  },
+  "3041872152": {
+    "Audio": "AUDIO_ITEM_ARMORDILLO_TURRET",
+    "Damage": 150.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_BOXVILLE",
+    "Speed": 2000.0
+  },
+  "1155224728": {
+    "Audio": "AUDIO_ITEM_ARMORDILLO_TURRET",
+    "Damage": 150.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_INSURGENT",
+    "Speed": 2000.0
+  },
+  "729375873": {
+    "Audio": "AUDIO_ITEM_VALKYRIE_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_LIMO",
+    "Speed": 2000.0
+  },
+  "2144528907": {
+    "Audio": "AUDIO_ITEM_TECHNICAL_TURRET",
+    "Damage": 200.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_TECHNICAL",
+    "Speed": 2000.0
+  },
+  "1097917585": {
+    "Audio": "AUDIO_ITEM_VALKYRIE_NOSE",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_NOSE_TURRET_VALKYRIE",
+    "Speed": 5000.0
+  },
+  "2756787765": {
+    "Audio": "AUDIO_ITEM_VALKYRIE_MINIGUN",
+    "Damage": 30.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_TURRET_VALKYRIE",
+    "Speed": 2000.0
+  },
+  "50118905": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 20.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RUINER_BULLET",
+    "Speed": 10000.0
+  },
+  "84788907": {
+    "Audio": "AUDIO_ITEM_VEHICLE_SPACE_ROCKET",
+    "Damage": 0.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "PROJECTILE",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_RUINER_ROCKET",
+    "Speed": 2000.0
+  },
+  "1638077257": {
+    "Audio": "AUDIO_ITEM_VEHICLE_PLAYER_BULLET",
+    "Damage": 30.0,
+    "DamageType": "EXPLOSIVE",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": true,
+    "Name": "VEHICLE_WEAPON_PLAYER_SAVAGE",
+    "Speed": 2000.0
+  },
+  "137902532": {
+    "Audio": "AUDIO_ITEM_VINTAGE_PISTOL",
+    "Damage": 34.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_VINTAGEPISTOL",
+    "Speed": 2000.0
+  },
+  "419712736": {
+    "Audio": "",
+    "Damage": 0.0,
+    "DamageType": "MELEE",
+    "FireType": "MELEE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_WRENCH",
+    "Speed": 2000.0
+  },
+  "727643628": {
+    "Audio": "audio_item_ceramic_pistol",
+    "Damage": 32.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_CERAMICPISTOL",
+    "Speed": 2000.0
+  },
+  "94989220": {
+    "Audio": "audio_item_combat_shotgun",
+    "Damage": 31.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_COMBATSHOTGUN",
+    "Speed": 2000.0
+  },
+  "406929569": {
+    "Audio": "AUDIO_ITEM_PETROLCAN",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_FERTILIZERCAN",
+    "Speed": 2000.0
+  },
+  "1470379660": {
+    "Audio": "audio_item_gadget_pistol",
+    "Damage": 195.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_GADGETPISTOL",
+    "Speed": 2000.0
+  },
+  "3126027122": {
+    "Audio": "AUDIO_ITEM_PETROLCAN",
+    "Damage": 0.0,
+    "DamageType": "NONE",
+    "FireType": "VOLUMETRIC_PARTICLE",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_HAZARDCAN",
+    "Speed": 2000.0
+  },
+  "2636060646": {
+    "Audio": "AUDIO_ITEM_Bullpup",
+    "Damage": 37.5,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_MILITARYRIFLE",
+    "Speed": 2000.0
+  },
+  "2441047180": {
+    "Audio": "audio_item_navy_revolver",
+    "Damage": 160.0,
+    "DamageType": "BULLET",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_NAVYREVOLVER",
+    "Speed": 2000.0
+  },
+  "1171102963": {
+    "Audio": "AUDIO_ITEM_STUNGUN",
+    "Damage": 20.0,
+    "DamageType": "ELECTRIC",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_STUNGUN_MP",
+    "Speed": 2000.0
+  },
+  "849905853": {
+    "Audio": "AUDIO_ITEM_TRANQUILIZER",
+    "Damage": 1.0,
+    "DamageType": "TRANQUILIZER",
+    "FireType": "INSTANT_HIT",
+    "IsVehicleWeapon": false,
+    "Name": "WEAPON_TRANQUILIZER",
+    "Speed": 2000.0
+  }
+}

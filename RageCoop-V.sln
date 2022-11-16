@@ -21,9 +21,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RageCoop.Client.CefHost", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{70A1F09D-648D-4C8B-8947-E920B1A587A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefTest", "Tools\CefTest\CefTest.csproj", "{874944F4-2D01-4423-B55C-C651CCBA6630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CefTest", "Tools\CefTest\CefTest.csproj", "{874944F4-2D01-4423-B55C-C651CCBA6630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataDumper", "Tools\DataDumper\DataDumper.csproj", "{6387D897-09AF-4464-B440-80438E3BB8D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataDumper", "Tools\DataDumper\DataDumper.csproj", "{6387D897-09AF-4464-B440-80438E3BB8D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

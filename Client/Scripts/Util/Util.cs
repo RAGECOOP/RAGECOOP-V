@@ -11,6 +11,7 @@ using LemonUI.Elements;
 using Newtonsoft.Json;
 using RageCoop.Core;
 using Font = GTA.UI.Font;
+using static RageCoop.Client.Shared;
 
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 
@@ -18,7 +19,6 @@ namespace RageCoop.Client
 {
     internal static class Util
     {
-        public static string SettingsPath = "RageCoop\\Settings.json";
 
         /// <summary>
         ///     The location of the cursor on screen between 0 and 1.

@@ -21,6 +21,7 @@ using Console = GTA.Console;
 using Control = GTA.Control;
 using Screen = System.Windows.Forms.Screen;
 using Script = GTA.Script;
+using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client
 {
@@ -57,36 +58,22 @@ namespace RageCoop.Client
         /// </summary>
         public Main()
         {
-            Util.StartUpCheck();
+            Util.StartUpCheck(); 
+
+            Directory.CreateDirectory(DataPath);
             Console.Info(
                 $"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
             try
             {
                 Settings = Util.ReadSettings();
-                if (Settings.DataDirectory.StartsWith("Scripts"))
-                {
-                    var defaultDir = new Settings().DataDirectory;
-                    Console.Warning("Data directory must be outside scripts folder, migrating to default direcoty: " +
-                                    defaultDir);
-                    if (Directory.Exists(Settings.DataDirectory))
-                    {
-                        CoreUtils.CopyFilesRecursively(new DirectoryInfo(Settings.DataDirectory),
-                            new DirectoryInfo(defaultDir));
-                        Directory.Delete(Settings.DataDirectory, true);
-                    }
-
-                    Settings.DataDirectory = defaultDir;
-                    Util.SaveSettings();
-                }
             }
             catch
             {
-                // GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
+                Notification.Show("Malformed configuration, overwriting with default values...");
                 Settings = new Settings();
                 Util.SaveSettings();
             }
 
-            Directory.CreateDirectory(Settings.DataDirectory);
             Logger = new Logger()
             {
                 Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath) },
@@ -152,9 +139,6 @@ namespace RageCoop.Client
             Util.NativeMemory();
             Counter.Restart();
         }
-
-
-        public static string LogPath => $"{Settings.DataDirectory}\\RageCoop.Client.log";
 
         private static void OnAborted(object sender, EventArgs e)
         {
@@ -264,13 +248,13 @@ namespace RageCoop.Client
             {
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
                         $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60),
                         $"S: {NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
             }
 
             MainChat.Tick();
@@ -484,7 +468,10 @@ namespace RageCoop.Client
                 Resources.Unload();
             });
             Memory.RestorePatches();
-            CefManager.CleanUp();
+            if (CefRunning)
+            {
+                CefManager.CleanUp();
+            }
             HookManager.CleanUp();
             DownloadManager.Cleanup();
             Voice.ClearAll();

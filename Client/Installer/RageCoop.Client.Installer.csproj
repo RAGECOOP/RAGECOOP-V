@@ -11,16 +11,6 @@
 		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <Compile Remove="Resources\**" />
-	  <EmbeddedResource Remove="Resources\**" />
-	  <None Remove="Resources\**" />
-	  <Page Remove="Resources\**" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Remove="bg.png" />
-	</ItemGroup>
-
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 		<OutDir>..\..\bin\Debug\Client</OutDir>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,9 +24,8 @@
 
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Core\RageCoop.Core.csproj" />
-	  <ProjectReference Include="..\Loader\RageCoop.Client.Loader.csproj" />
-	  <ProjectReference Include="..\Scripts\RageCoop.Client.csproj" />
+		<ProjectReference Include="..\Loader\RageCoop.Client.Loader.csproj" />
+		<ProjectReference Include="..\Scripts\RageCoop.Client.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -59,10 +48,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Costura.Fody" Version="5.7.0">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+		<PackageReference Include="Costura.Fody" Version="5.7.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 </Project>

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RageCoop.Client.Scripting;
 using RageCoop.Core;
+using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client
 {
@@ -45,6 +47,7 @@ namespace RageCoop.Client
             {
                 try
                 {
+                    Directory.CreateDirectory(ResourceFolder);
                     Main.Resources.Load(ResourceFolder, _resources.ToArray());
                     return new Packets.FileTransferResponse { ID = 0, Response = FileResponse.Loaded };
                 }
@@ -57,8 +60,8 @@ namespace RageCoop.Client
             });
         }
 
-        public static string ResourceFolder => Path.GetFullPath(Path.Combine(Main.Settings.DataDirectory, "Resources",
-            Main.Settings.LastServerAddress.Replace(":", ".")));
+        public static string ResourceFolder => Path.GetFullPath(Path.Combine(DataPath, "Resources",
+            API.ServerEndPoint.ToString().Replace(":", ".")));
 
         public static event EventHandler<string> DownloadCompleted;
 

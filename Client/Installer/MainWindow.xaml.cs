@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using RageCoop.Core;
+using static RageCoop.Client.Shared;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
@@ -101,7 +102,7 @@ namespace RageCoop.Client.Installer
                 checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
-                var settingsPath = Path.Combine(root, Util.SettingsPath);
+                var settingsPath = Path.Combine(root, SettingsPath);
                 Settings settings = null;
                 try
                 {
@@ -171,7 +172,7 @@ namespace RageCoop.Client.Installer
                 }
 
                 UpdateStatus("Completed!");
-                MessageBox.Show("Installation sucessful!");
+                MessageBox.Show("Installation successful!");
                 Environment.Exit(0);
             }
         }

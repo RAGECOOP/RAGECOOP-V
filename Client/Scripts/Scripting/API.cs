@@ -86,24 +86,6 @@ namespace RageCoop.Client.Scripting
         public static class Events
         {
             /// <summary>
-            ///     This is equivalent of <see cref="Script.KeyDown" />
-            /// </summary>
-            /// <remarks>
-            ///     Calling <see cref="GTA.Script.Yield" /> in the handler will interfer other scripts, subscribe to
-            ///     <see cref="GTA.Script.KeyDown" /> instead.
-            /// </remarks>
-            [Obsolete] public static KeyEventHandler OnKeyDown;
-
-            /// <summary>
-            ///     This is equivalent of <see cref="Script.KeyUp" />
-            /// </summary>
-            /// <remarks>
-            ///     Calling <see cref="GTA.Script.Yield" /> in the handler will interfer other scripts, subscribe to
-            ///     <see cref="GTA.Script.KeyUp" /> instead.
-            /// </remarks>
-            [Obsolete] public static KeyEventHandler OnKeyUp;
-
-            /// <summary>
             ///     The local player is dead
             /// </summary>
             public static event EmptyEvent OnPlayerDied;
@@ -127,16 +109,6 @@ namespace RageCoop.Client.Scripting
             ///     A local ped is deleted
             /// </summary>
             public static event EventHandler<SyncedPed> OnPedDeleted;
-
-            /// <summary>
-            ///     This is equivalent of <see cref="GTA.Script.Tick" />.
-            /// </summary>
-            /// <remarks>
-            ///     Calling <see cref="GTA.Script.Yield" /> in the handler will interfer other scripts, subscribe to
-            ///     <see cref="GTA.Script.Tick" /> instead.
-            /// </remarks>
-            [Obsolete]
-            public static event EmptyEvent OnTick;
 
             #region DELEGATES
 
@@ -178,22 +150,7 @@ namespace RageCoop.Client.Scripting
             {
                 OnPlayerDied?.Invoke();
             }
-
-            internal static void InvokeTick()
-            {
-                OnTick?.Invoke();
-            }
-
-            internal static void InvokeKeyDown(object s, KeyEventArgs e)
-            {
-                OnKeyDown?.Invoke(s, e);
-            }
-
-            internal static void InvokeKeyUp(object s, KeyEventArgs e)
-            {
-                OnKeyUp?.Invoke(s, e);
-            }
-
+            
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
                 var args = new CustomEventReceivedArgs { Hash = p.Hash, Args = p.Args };

@@ -9,6 +9,7 @@ using GTA.Native;
 using RageCoop.Client.CefHost;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
+using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client.GUI
 {
@@ -27,22 +28,12 @@ namespace RageCoop.Client.GUI
         {
             Main.CefRunning = true;
             HookManager.Initialize();
-            CefController.Initialize(@"RageCoop\SubProcess\RageCoop.Client.CefHost.exe");
+            CefController.Initialize(CefSubProcessPath);
             CefController.OnCefMessage = m => API.Logger.Debug(m);
             HookManager.AddOverLay(CefOverlay);
         }
 
         public static CefClient ActiveClient { get; set; }
-
-        public static void Test()
-        {
-            var c = CreateClient(new Size(640, 480));
-            c.Scale = 0.8f;
-            c.Opacity = 128;
-            Script.Wait(2000);
-            c.Controller.LoadUrl("https://ragecoop.online/");
-            ActiveClient = c;
-        }
 
         public static void Tick()
         {

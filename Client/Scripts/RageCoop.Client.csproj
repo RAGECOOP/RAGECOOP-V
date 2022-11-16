@@ -45,7 +45,6 @@
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
     <Compile Include="Menus\Sub\ServersMenu.cs" />
     <Compile Include="Menus\Sub\SettingsMenu.cs" />
-    <Compile Include="Menus\Sub\UpdateMenu.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
     <Compile Include="Networking\HolePunch.cs" />
@@ -54,6 +53,11 @@
     <Compile Include="Networking\Send.cs" />
     <Compile Include="Networking\Statistics.cs" />
     <Compile Include="PlayerList.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssemblyInfo.tt</DependentUpon>
+    </Compile>
     <Compile Include="Scripting\API.cs" />
     <Compile Include="Scripting\BaseScript.cs" />
     <Compile Include="Scripting\ClientScript.cs" />
@@ -71,11 +75,11 @@
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Voice.cs" />
-    <Compile Include="Util\AddOnDataProvider.cs" />
     <Compile Include="Util\Memory.cs" />
     <Compile Include="Util\NativeCaller.cs" />
     <Compile Include="Util\PedConfigFlags.cs" />
     <Compile Include="Util\PedExtensions.cs" />
+    <Compile Include="Shared\Shared.cs" />
     <Compile Include="Util\TaskType.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="Util\VehicleExtensions.cs" />
@@ -143,6 +147,9 @@
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -183,8 +190,13 @@
     <PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
 			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
 		</PostBuildEvent>
+    <PostBuildEvent Condition="'$(Configuration)' != 'API' AND '$(SolutionDir)' != '*Undefined*'">
+			copy "$(SolutionDir)Client\Data" "..\Data" /y
+		</PostBuildEvent>
     <PreBuildEvent Condition=" '$(SolutionDir)' != '*Undefined*'">
 			dotnet build -c $(Configuration) "$(SolutionDir)Client\CefHost\RageCoop.Client.CefHost.csproj"
 		</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' != 'API'">
   </PropertyGroup>
 </Project>

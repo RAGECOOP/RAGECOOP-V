@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 using GTA;
 using GTA.Math;
 using Lidgren.Network;
@@ -42,7 +43,7 @@ namespace RageCoop.Core
             "ScriptHookVDotNet"
         };
 
-        public static string FormatToSharpStyle(string input, int offset = 14)
+        public static string FormatToSharpStyle(string input, int offset)
         {
             var ss = input.Substring(offset).Split("_".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             // Replace first character with upper case
@@ -354,6 +355,35 @@ namespace RageCoop.Core
         {
             return new StreamWriter(File.Open(path, mode, access, share));
         }
+
+
+        public static float GetFloat(this XmlNode n)
+        {
+            return float.Parse(n.Attributes["value"].Value);
+        }
+
+        /// <summary>
+        /// Generate jenkins one-at-a-time hash from specified string (lower)
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static uint JoaatHash(string key)
+        {
+            var i = 0;
+            uint hash = 0;
+            while (i != key.Length)
+            {
+                hash += char.ToLowerInvariant(key[i++]);
+                hash += hash << 10;
+                hash ^= hash >> 6;
+            }
+
+            hash += hash << 3;
+            hash ^= hash >> 11;
+            hash += hash << 15;
+            return hash;
+        }
+
     }
 
     internal class IpInfo

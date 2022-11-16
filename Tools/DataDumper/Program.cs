@@ -6,60 +6,59 @@ using Formatting = Newtonsoft.Json.Formatting;
 
 namespace DataDumper;
 
-internal class WeaponInfo
+
+[Flags]
+public enum GenFlags
 {
-    public string Audio;
-    public float Damage;
-    public string DamageType;
-    public string FireType;
-    public bool IsVehicleWeapon;
-    public string Name;
-    public float Speed;
-
-    public WeaponInfo(XmlNode node)
-    {
-        if (node.Attributes["type"].Value != "CWeaponInfo") throw new Exception("Not a CWeaponInfo node");
-        foreach (XmlNode info in node.ChildNodes)
-            switch (info.Name)
-            {
-                case "Name":
-                    Name = info.InnerText;
-                    break;
-                case "Audio":
-                    Audio = info.InnerText;
-                    break;
-                case "FireType":
-                    FireType = info.InnerText;
-                    break;
-                case "DamageType":
-                    DamageType = info.InnerText;
-                    break;
-                case "Damage":
-                    Damage = info.GetFloat();
-                    break;
-                case "Speed":
-                    Speed = info.GetFloat();
-                    break;
-            }
-
-        IsVehicleWeapon = Name.StartsWith("VEHICLE_WEAPON");
-    }
+    WeaponInfo = 1,
+    WeaponHash = 2,
+    VehicleWeaponInfo = 4,
+    Animations = 8,
+    All = ~0
 }
-
 public static class Program
 {
-    public static float GetFloat(this XmlNode n)
+    public static GenFlags ToGenerate = GenFlags.All;
+    public static void Main(string[] args)
     {
-        return float.Parse(n.Attributes["value"].Value);
-    }
+        if (args.Length > 0 && Enum.TryParse<GenFlags>(args[0], true, out var flags))
+        {
+            ToGenerate = flags;
+        }
+        Directory.CreateDirectory("out");
 
-    public static void Main()
-    {
-        Dictionary<uint, WeaponInfo> weapons = new();
-        foreach (var f in Directory.GetFiles("meta", "*.meta")) Parse(f, weapons);
-        Directory.CreateDirectory("Weapons");
-        File.WriteAllText("Weapons\\Weapons.json", JsonConvert.SerializeObject(weapons, Formatting.Indented));
-        DumpWeaponHash(weapons, true);
+        #region META
+        // Dumps from the game's xml documents, needs to have all *.meta file extracted to "meta" directory. OpenIV is recommended
+
+        if (ToGenerate.HasFlag(GenFlags.WeaponInfo))
+        {
+            Dictionary<uint, WeaponInfo> weapons = new();
+            foreach (var f in Directory.GetFiles("meta", "*.meta")) Parse(f, weapons);
+            File.WriteAllText("out/Weapons.json", JsonConvert.SerializeObject(weapons, Formatting.Indented));
+            if (ToGenerate.HasFlag(GenFlags.WeaponHash))
+            {
+                DumpWeaponHash(weapons, true);
+            }
+        }
+
+        #endregion
+
+
+        #region EXTERNAL
+        // External data from DurtyFree's data dumps: https://github.com/DurtyFree/gta-v-data-dumps
+
+        Directory.CreateDirectory("ext");
+        if (ToGenerate.HasFlag(GenFlags.VehicleWeaponInfo))
+        {
+            VehicleWeaponInfo.Dump("ext/vehicles.json", "out/VehicleWeapons.json");
+        }
+
+        if (ToGenerate.HasFlag(GenFlags.Animations))
+        {
+            AnimDic.Dump("ext/animDictsCompact.json", "out/Animations.json");
+        }
+
+        #endregion
     }
 
     private static void Parse(string filename, Dictionary<uint, WeaponInfo> weap)
@@ -85,7 +84,7 @@ public static class Program
                 {
                     var info = new WeaponInfo(n);
                     if (!info.Name.StartsWith("VEHICLE_WEAPON") && !info.Name.StartsWith("WEAPON")) continue;
-                    var hash = Hash(info.Name);
+                    var hash = CoreUtils.JoaatHash(info.Name);
                     if (weap.ContainsKey(hash))
                         weap[hash] = info;
                     else
@@ -95,7 +94,7 @@ public static class Program
     }
 
     private static void DumpWeaponHash(Dictionary<uint, WeaponInfo> weapons, bool sort = false,
-        string path = @"Weapons\WeaponHash.cs")
+        string path = @"out/WeaponHash.cs")
     {
         StringBuilder output = new();
         List<string> lines = new();
@@ -111,7 +110,7 @@ public static class Program
         output.Append("public enum VehicleWeaponHash : uint\r\n{\r\n\tInvalid = 0xFFFFFFFF,");
         lines = new List<string>();
         foreach (var info in vehWeaps)
-            lines.Add($"{CoreUtils.FormatToSharpStyle(info.Value.Name)} = {info.Key.ToHex()}");
+            lines.Add($"{CoreUtils.FormatToSharpStyle(info.Value.Name, 14)} = {info.Key.ToHex()}");
         if (sort) lines.Sort();
         foreach (var l in lines) output.Append($"\r\n\t{l},");
         output.Append("\r\n}");
@@ -125,21 +124,4 @@ public static class Program
         return nodes;
     }
 
-    private static uint Hash(string key)
-    {
-        key = key.ToLower();
-        var i = 0;
-        uint hash = 0;
-        while (i != key.Length)
-        {
-            hash += key[i++];
-            hash += hash << 10;
-            hash ^= hash >> 6;
-        }
-
-        hash += hash << 3;
-        hash ^= hash >> 11;
-        hash += hash << 15;
-        return hash;
-    }
 }

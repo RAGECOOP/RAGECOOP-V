@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using GTA;
@@ -264,32 +265,7 @@ namespace RageCoop.Client.Scripting
 
         private static InputArgument GetInputArgument(object obj)
         {
-            // Implicit conversion
-            switch (obj)
-            {
-                case byte _:
-                    return (byte)obj;
-                case short _:
-                    return (short)obj;
-                case ushort _:
-                    return (ushort)obj;
-                case int _:
-                    return (int)obj;
-                case uint _:
-                    return (uint)obj;
-                case long _:
-                    return (long)obj;
-                case ulong _:
-                    return (ulong)obj;
-                case float _:
-                    return (float)obj;
-                case bool _:
-                    return (bool)obj;
-                case string _:
-                    return obj as string;
-                default:
-                    return null;
-            }
+            return Unsafe.As<InputArgument>(obj);
         }
     }
 }

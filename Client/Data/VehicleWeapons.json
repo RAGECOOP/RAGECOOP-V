@@ -1,0 +1,4287 @@
+[
+  {
+    "Hash": 1181327175,
+    "Name": "akula",
+    "Weapons": {
+      "3048454573": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 76,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AKULA_TURRET_SINGLE"
+      },
+      "2092838988": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 90,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 91,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 92,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 93,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 94,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 95,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 96,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 97,
+            "BoneName": "weapon_2h"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AKULA_MISSILE"
+      },
+      "476907586": {
+        "Bones": [
+          {
+            "BoneID": 42847,
+            "BoneIndex": 80,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42846,
+            "BoneIndex": 84,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AKULA_TURRET_DUAL"
+      },
+      "431576697": {
+        "Bones": [
+          {
+            "BoneID": 42639,
+            "BoneIndex": 100,
+            "BoneName": "weapon_4b"
+          },
+          {
+            "BoneID": 42638,
+            "BoneIndex": 104,
+            "BoneName": "weapon_4a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AKULA_MINIGUN"
+      },
+      "2282558706": {
+        "Bones": [
+          {
+            "BoneID": 42622,
+            "BoneIndex": 63,
+            "BoneName": "weapon_5a"
+          },
+          {
+            "BoneID": 42623,
+            "BoneIndex": 64,
+            "BoneName": "weapon_5b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AKULA_BARRAGE"
+      }
+    }
+  },
+  {
+    "Hash": 837858166,
+    "Name": "annihilator",
+    "Weapons": {
+      "1186503822": {
+        "Bones": [
+          {
+            "BoneID": 42817,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1d"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 37,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLAYER_BUZZARD"
+      },
+      "4171469727": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 295054921,
+    "Name": "annihilator2",
+    "Weapons": {
+      "3405172033": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 39,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 42,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ANNIHILATOR2_MINI"
+      },
+      "3345729207": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 73,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 74,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 75,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 76,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 77,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 78,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 79,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 80,
+            "BoneName": "weapon_2h"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ANNIHILATOR2_MISSILE"
+      },
+      "903400592": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 84,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 85,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ANNIHILATOR2_BARRAGE"
+      }
+    }
+  },
+  {
+    "Hash": 562680400,
+    "Name": "apc",
+    "Weapons": {
+      "328167896": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 44,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_APC_CANNON"
+      },
+      "1151689097": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 63,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 65,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 67,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 69,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 71,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 73,
+            "BoneName": "weapon_2f"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_APC_MISSILE"
+      },
+      "190244068": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 81,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_APC_MG"
+      }
+    }
+  },
+  {
+    "Hash": 159274291,
+    "Name": "ardent",
+    "Weapons": {
+      "3293463361": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 64,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ARDENT_MG"
+      }
+    }
+  },
+  {
+    "Hash": 2176659152,
+    "Name": "avenger",
+    "Weapons": {
+      "2556895291": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 66,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AVENGER_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 408970549,
+    "Name": "avenger2",
+    "Weapons": {
+      "2556895291": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 56,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_AVENGER_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 4081974053,
+    "Name": "barrage",
+    "Weapons": {
+      "4148791700": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 60,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BARRAGE_TOP_MG"
+      },
+      "1000258817": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 63,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BARRAGE_TOP_MINIGUN"
+      },
+      "1200179045": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 86,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BARRAGE_REAR_MG"
+      },
+      "525623141": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 87,
+            "BoneName": "weapon_4a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BARRAGE_REAR_MINIGUN"
+      },
+      "2756453005": {
+        "Bones": [
+          {
+            "BoneID": 42622,
+            "BoneIndex": 90,
+            "BoneName": "weapon_5a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BARRAGE_REAR_GL"
+      }
+    }
+  },
+  {
+    "Hash": 2704629607,
+    "Name": "blazer5",
+    "Weapons": {
+      "3959029566": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 17,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 18,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_CANNON_BLAZER"
+      }
+    }
+  },
+  {
+    "Hash": 4262088844,
+    "Name": "bombushka",
+    "Weapons": {
+      "741027160": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 81,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 83,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BOMBUSHKA_DUALMG"
+      },
+      "3628350041": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 89,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 91,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BOMBUSHKA_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 682434785,
+    "Name": "boxville5",
+    "Weapons": {
+      "3041872152": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_BOXVILLE"
+      }
+    }
+  },
+  {
+    "Hash": 668439077,
+    "Name": "bruiser",
+    "Weapons": {
+      "3611149825": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 66,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 68,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUISER_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 2600885406,
+    "Name": "bruiser2",
+    "Weapons": {
+      "3611149825": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 45,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 47,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUISER_50CAL"
+      },
+      "1030357398": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 49,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 51,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUISER2_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 2252616474,
+    "Name": "bruiser3",
+    "Weapons": {
+      "3611149825": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 50,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 52,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUISER_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 2139203625,
+    "Name": "brutus",
+    "Weapons": {
+      "3948829706": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 84,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUTUS_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 2403970600,
+    "Name": "brutus2",
+    "Weapons": {
+      "3948829706": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 76,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUTUS_50CAL"
+      },
+      "1757914307": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 93,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUTUS2_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 2038858402,
+    "Name": "brutus3",
+    "Weapons": {
+      "3948829706": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 84,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_BRUTUS_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 3675036420,
+    "Name": "buffalo4",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 86,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 88,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 788747387,
+    "Name": "buzzard",
+    "Weapons": {
+      "1186503822": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 26,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLAYER_BUZZARD"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 22,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 27,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      },
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 45,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 745926877,
+    "Name": "Buzzard2",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 1254014755,
+    "Name": "caracara",
+    "Weapons": {
+      "1817275304": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 80,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_CARACARA_MG"
+      },
+      "1338760315": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 92,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_CARACARA_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 3493417227,
+    "Name": "cerberus",
+    "Weapons": {
+      "3003147322": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 90,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_FLAMETHROWER"
+      }
+    }
+  },
+  {
+    "Hash": 679453769,
+    "Name": "cerberus2",
+    "Weapons": {
+      "2182329506": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 54,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_FLAMETHROWER_SCIFI"
+      }
+    }
+  },
+  {
+    "Hash": 1909700336,
+    "Name": "cerberus3",
+    "Weapons": {
+      "3003147322": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_FLAMETHROWER"
+      }
+    }
+  },
+  {
+    "Hash": 3379732821,
+    "Name": "champion",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 60,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 61,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 3602674979,
+    "Name": "chernobog",
+    "Weapons": {
+      "2722615358": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_CHERNO_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1561920505,
+    "Name": "comet4",
+    "Weapons": {
+      "3936892403": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 25,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 27,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_COMET_MG"
+      }
+    }
+  },
+  {
+    "Hash": 4267640610,
+    "Name": "deathbike",
+    "Weapons": {
+      "490982948": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 7,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 10,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DEATHBIKE_DUALMINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 2482017624,
+    "Name": "deathbike2",
+    "Weapons": {
+      "3909880809": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 6,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 9,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DEATHBIKE2_MINIGUN_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 2920466844,
+    "Name": "deathbike3",
+    "Weapons": {
+      "490982948": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 7,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 10,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DEATHBIKE_DUALMINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 1532171089,
+    "Name": "deity",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 96,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 98,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 1483171323,
+    "Name": "deluxo",
+    "Weapons": {
+      "2600428406": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 84,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 86,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DELUXO_MG"
+      },
+      "3036244276": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 76,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 78,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 80,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 82,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DELUXO_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1033245328,
+    "Name": "Dinghy",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 276773164,
+    "Name": "dinghy2",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 509498602,
+    "Name": "dinghy3",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 867467158,
+    "Name": "dinghy4",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 3314393930,
+    "Name": "dinghy5",
+    "Weapons": {
+      "3014743549": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 28,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_DINGHY5_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 3606777648,
+    "Name": "dominator4",
+    "Weapons": {
+      "4161575695": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 59,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 60,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOMINATOR4_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 2919906639,
+    "Name": "dominator5",
+    "Weapons": {
+      "4161575695": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOMINATOR4_50CAL"
+      },
+      "3022285407": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 41,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 42,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOMINATOR5_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 3001042683,
+    "Name": "dominator6",
+    "Weapons": {
+      "4161575695": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 55,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 56,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOMINATOR4_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 1897744184,
+    "Name": "dune3",
+    "Weapons": {
+      "3507816399": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 33,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DUNE_MG"
+      },
+      "2700898573": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 42,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DUNE_GRENADELAUNCHER"
+      },
+      "1416047217": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 50,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DUNE_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 1938952078,
+    "Name": "firetruk",
+    "Weapons": {
+      "1741783703": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_WATER_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 744705981,
+    "Name": "Frogger",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 1949211328,
+    "Name": "frogger2",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 10,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 4033620423,
+    "Name": "granger2",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 29,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 31,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 4262731174,
+    "Name": "halftrack",
+    "Weapons": {
+      "1331922171": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 71,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 73,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HALFTRACK_DUALMG"
+      },
+      "1226518132": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 88,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 90,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 92,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 94,
+            "BoneName": "weapon_2d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HALFTRACK_QUADMG"
+      }
+    }
+  },
+  {
+    "Hash": 2310691317,
+    "Name": "havok",
+    "Weapons": {
+      "855547631": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 13,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HAVOK_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 4252008158,
+    "Name": "hunter",
+    "Weapons": {
+      "1119518887": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 26,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HUNTER_MG"
+      },
+      "153396725": {
+        "Bones": [
+          {
+            "BoneID": 42864,
+            "BoneIndex": 71,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 72,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 73,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 74,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 75,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 76,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 77,
+            "BoneName": "weapon_2h"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 78,
+            "BoneName": "weapon_2f"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HUNTER_MISSILE"
+      },
+      "704686874": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 28,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HUNTER_CANNON"
+      },
+      "785467445": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_HUNTER_BARRAGE"
+      }
+    }
+  },
+  {
+    "Hash": 970385471,
+    "Name": "hydra",
+    "Weapons": {
+      "3800181289": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 28,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 29,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLAYER_LAZER"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 37,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 44,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 956849991,
+    "Name": "ignus2",
+    "Weapons": {
+      "3868422746": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_IGNUS2_TURRET_MINI"
+      }
+    }
+  },
+  {
+    "Hash": 1009171724,
+    "Name": "impaler2",
+    "Weapons": {
+      "1599495177": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 64,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPALER2_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 2370166601,
+    "Name": "impaler3",
+    "Weapons": {
+      "1599495177": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 75,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 76,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPALER2_50CAL"
+      },
+      "2361261192": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 85,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 86,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPALER3_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 2550461639,
+    "Name": "impaler4",
+    "Weapons": {
+      "1599495177": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 64,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPALER2_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 444994115,
+    "Name": "imperator",
+    "Weapons": {
+      "3059926651": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 86,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 88,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPERATOR_50CAL"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 91,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 92,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      }
+    }
+  },
+  {
+    "Hash": 1637620610,
+    "Name": "imperator2",
+    "Weapons": {
+      "3059926651": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 66,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 68,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPERATOR_50CAL"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 71,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 72,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      },
+      "2014823718": {
+        "Bones": [
+          {
+            "BoneID": 42847,
+            "BoneIndex": 97,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42846,
+            "BoneIndex": 99,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPERATOR2_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 3539435063,
+    "Name": "imperator3",
+    "Weapons": {
+      "3059926651": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 86,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 88,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_IMPERATOR_50CAL"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 91,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 92,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      }
+    }
+  },
+  {
+    "Hash": 2434067162,
+    "Name": "insurgent",
+    "Weapons": {
+      "1155224728": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 49,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_INSURGENT"
+      }
+    }
+  },
+  {
+    "Hash": 2071877360,
+    "Name": "insurgent2",
+    "Weapons": {
+      "1155224728": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_TURRET_INSURGENT"
+      }
+    }
+  },
+  {
+    "Hash": 2370534026,
+    "Name": "insurgent3",
+    "Weapons": {
+      "1155224728": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 81,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_INSURGENT"
+      },
+      "2861067768": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 86,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_INSURGENT_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 628003514,
+    "Name": "issi4",
+    "Weapons": {
+      "1984488269": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 12,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 14,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ISSI4_50CAL"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 16,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 18,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      }
+    }
+  },
+  {
+    "Hash": 1537277726,
+    "Name": "issi5",
+    "Weapons": {
+      "1984488269": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 29,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 32,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ISSI4_50CAL"
+      },
+      "1988061477": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 30,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 33,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ISSI5_50CAL_LASER"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 20,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 22,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      }
+    }
+  },
+  {
+    "Hash": 1239571361,
+    "Name": "issi6",
+    "Weapons": {
+      "1984488269": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 12,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 14,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ISSI4_50CAL"
+      },
+      "1663705853": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 16,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 18,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MORTAR_KINETIC"
+      }
+    }
+  },
+  {
+    "Hash": 394110044,
+    "Name": "jb7002",
+    "Weapons": {
+      "926602556": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 54,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_JB700_MG"
+      }
+    }
+  },
+  {
+    "Hash": 461465043,
+    "Name": "jubilee",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 75,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 77,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 2859440138,
+    "Name": "khanjali",
+    "Weapons": {
+      "507170720": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 75,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_KHANJALI_CANNON"
+      },
+      "2206953837": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 74,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_KHANJALI_CANNON_HEAVY"
+      },
+      "711953949": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 82,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_KHANJALI_MG"
+      },
+      "394659298": {
+        "Bones": [
+          {
+            "BoneID": 42640,
+            "BoneIndex": 89,
+            "BoneName": "weapon_4c"
+          },
+          {
+            "BoneID": 42641,
+            "BoneIndex": 90,
+            "BoneName": "weapon_4d"
+          },
+          {
+            "BoneID": 42639,
+            "BoneIndex": 91,
+            "BoneName": "weapon_4b"
+          },
+          {
+            "BoneID": 42638,
+            "BoneIndex": 92,
+            "BoneName": "weapon_4a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_KHANJALI_GL"
+      }
+    }
+  },
+  {
+    "Hash": 1336872304,
+    "Name": "kosatka",
+    "Weapons": {
+      "1658983438": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 40,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 41,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 42,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 43,
+            "BoneName": "weapon_1d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_KOSATKA_TORPEDO"
+      }
+    }
+  },
+  {
+    "Hash": 3013282534,
+    "Name": "Lazer",
+    "Weapons": {
+      "3800181289": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 22,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLAYER_LAZER"
+      },
+      "3473446624": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 23,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 41,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLANE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 4180339789,
+    "Name": "limo2",
+    "Weapons": {
+      "729375873": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 79,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_LIMO"
+      }
+    }
+  },
+  {
+    "Hash": 2634305738,
+    "Name": "maverick",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 45,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 2044532910,
+    "Name": "menacer",
+    "Weapons": {
+      "1155224728": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 74,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_INSURGENT"
+      },
+      "2861067768": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 78,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_INSURGENT_MINIGUN"
+      },
+      "3754621092": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 90,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 91,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MENACER_MG"
+      }
+    }
+  },
+  {
+    "Hash": 2531412055,
+    "Name": "microlight",
+    "Weapons": {
+      "3303022956": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 33,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MICROLIGHT_MG"
+      }
+    }
+  },
+  {
+    "Hash": 3040635986,
+    "Name": "minitank",
+    "Weapons": {
+      "1392289305": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 13,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RCTANK_GUN"
+      },
+      "4109257098": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 14,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RCTANK_FLAME"
+      },
+      "1995916491": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 15,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RCTANK_ROCKET"
+      },
+      "1475488848": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 16,
+            "BoneName": "weapon_4a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RCTANK_LAZER"
+      }
+    }
+  },
+  {
+    "Hash": 3545667823,
+    "Name": "mogul",
+    "Weapons": {
+      "4128808778": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 57,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MOGUL_NOSE"
+      },
+      "3857952303": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 68,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 70,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MOGUL_DUALNOSE"
+      },
+      "3808236382": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 77,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MOGUL_TURRET"
+      },
+      "3123149825": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 86,
+            "BoneName": "weapon_4a"
+          },
+          {
+            "BoneID": 42639,
+            "BoneIndex": 88,
+            "BoneName": "weapon_4b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MOGUL_DUALTURRET"
+      }
+    }
+  },
+  {
+    "Hash": 1565978651,
+    "Name": "molotok",
+    "Weapons": {
+      "1595421922": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 56,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 57,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MG"
+      },
+      "3393648765": {
+        "Bones": [
+          {
+            "BoneID": 42868,
+            "BoneIndex": 27,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42870,
+            "BoneIndex": 28,
+            "BoneName": "weapon_2i"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 29,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 30,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 31,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 41,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 42,
+            "BoneName": "weapon_2h"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 43,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 44,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42871,
+            "BoneIndex": 45,
+            "BoneName": "weapon_2j"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1721676810,
+    "Name": "monster3",
+    "Weapons": {
+      "3853407197": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 55,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MONSTER3_GLKIN"
+      }
+    }
+  },
+  {
+    "Hash": 840387324,
+    "Name": "monster4",
+    "Weapons": {
+      "3853407197": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 55,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MONSTER3_GLKIN"
+      }
+    }
+  },
+  {
+    "Hash": 3579220348,
+    "Name": "monster5",
+    "Weapons": {
+      "3853407197": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 55,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MONSTER3_GLKIN"
+      }
+    }
+  },
+  {
+    "Hash": 1945374990,
+    "Name": "mule4",
+    "Weapons": {
+      "2220197671": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MULE4_MG"
+      },
+      "1198717003": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 37,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 39,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MULE4_MISSILE"
+      },
+      "3708963429": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 45,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 46,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42848,
+            "BoneIndex": 47,
+            "BoneName": "weapon_3c"
+          },
+          {
+            "BoneID": 42849,
+            "BoneIndex": 48,
+            "BoneName": "weapon_3d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MULE4_TURRET_GL"
+      }
+    }
+  },
+  {
+    "Hash": 433954513,
+    "Name": "nightshark",
+    "Weapons": {
+      "2786772340": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 1,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 2,
+            "BoneName": "weapon_1d"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 3,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 4,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_NIGHTSHARK_MG"
+      }
+    }
+  },
+  {
+    "Hash": 1036591958,
+    "Name": "nokota",
+    "Weapons": {
+      "1595421922": {
+        "Bones": [
+          {
+            "BoneID": 42816,
+            "BoneIndex": 19,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 20,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42818,
+            "BoneIndex": 28,
+            "BoneName": "weapon_1e"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1d"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 39,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42819,
+            "BoneIndex": 41,
+            "BoneName": "weapon_1f"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MG"
+      },
+      "3393648765": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 21,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 22,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 23,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 24,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 25,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 26,
+            "BoneName": "weapon_2e"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 884483972,
+    "Name": "oppressor",
+    "Weapons": {
+      "3643944669": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 22,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_OPPRESSOR_MG"
+      },
+      "2344076862": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 12,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 14,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 16,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 18,
+            "BoneName": "weapon_2d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_OPPRESSOR_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 2069146067,
+    "Name": "oppressor2",
+    "Weapons": {
+      "3796180438": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 11,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 12,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_OPPRESSOR2_MG"
+      },
+      "3595383913": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 17,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 20,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_OPPRESSOR2_CANNON"
+      },
+      "1966766321": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 27,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 28,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42848,
+            "BoneIndex": 29,
+            "BoneName": "weapon_3c"
+          },
+          {
+            "BoneID": 42849,
+            "BoneIndex": 30,
+            "BoneName": "weapon_3d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_OPPRESSOR2_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1416466158,
+    "Name": "paragon2",
+    "Weapons": {
+      "749486726": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 78,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 79,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PARAGON2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 3624880708,
+    "Name": "patriot3",
+    "Weapons": {
+      "3940737434": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 88,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 90,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_GRANGER2_MG"
+      }
+    }
+  },
+  {
+    "Hash": 4018222598,
+    "Name": "patrolboat",
+    "Weapons": {
+      "3746472001": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 11,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_PATROLBOAT_50CAL"
+      },
+      "1278194921": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 3,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 4,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PATROLBOAT_DUALMG"
+      }
+    }
+  },
+  {
+    "Hash": 353883353,
+    "Name": "polmav",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 2,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 1653666139,
+    "Name": "pounder2",
+    "Weapons": {
+      "2263283790": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 91,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 94,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_POUNDER2_MINI"
+      },
+      "162065050": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 63,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 64,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_POUNDER2_MISSILE"
+      },
+      "2456521956": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 69,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42848,
+            "BoneIndex": 71,
+            "BoneName": "weapon_3c"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 73,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42849,
+            "BoneIndex": 75,
+            "BoneName": "weapon_3d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_POUNDER2_BARRAGE"
+      },
+      "2467888918": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 85,
+            "BoneName": "weapon_4a"
+          },
+          {
+            "BoneID": 42639,
+            "BoneIndex": 86,
+            "BoneName": "weapon_4b"
+          },
+          {
+            "BoneID": 42640,
+            "BoneIndex": 87,
+            "BoneName": "weapon_4c"
+          },
+          {
+            "BoneID": 42641,
+            "BoneIndex": 88,
+            "BoneName": "weapon_4d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_POUNDER2_GL"
+      }
+    }
+  },
+  {
+    "Hash": 3806844075,
+    "Name": "Predator",
+    "Weapons": {
+      "3530961278": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 10,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RADAR"
+      }
+    }
+  },
+  {
+    "Hash": 2908775872,
+    "Name": "pyro",
+    "Weapons": {
+      "1595421922": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 3,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 18,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MG"
+      },
+      "3393648765": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 12,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 13,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 14,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 15,
+            "BoneName": "weapon_2h"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 26,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 27,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 28,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 29,
+            "BoneName": "weapon_2g"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 3884762073,
+    "Name": "revolter",
+    "Weapons": {
+      "3177079402": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 64,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_REVOLTER_MG"
+      }
+    }
+  },
+  {
+    "Hash": 782665360,
+    "Name": "RHINO",
+    "Weapons": {
+      "1945616459": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TANK"
+      }
+    }
+  },
+  {
+    "Hash": 2601952180,
+    "Name": "riot2",
+    "Weapons": {
+      "1741783703": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 57,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_WATER_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 3319621991,
+    "Name": "rogue",
+    "Weapons": {
+      "158495693": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 47,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 62,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ROGUE_MG"
+      },
+      "3878337474": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 49,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 64,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ROGUE_CANNON"
+      },
+      "1820910717": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 45,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 60,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ROGUE_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 941494461,
+    "Name": "ruiner2",
+    "Weapons": {
+      "50118905": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 65,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 66,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RUINER_BULLET"
+      },
+      "84788907": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 67,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 68,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 69,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 70,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 71,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 72,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 73,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 74,
+            "BoneName": "weapon_2h"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_RUINER_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 4212341271,
+    "Name": "savage",
+    "Weapons": {
+      "1638077257": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 46,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_PLAYER_SAVAGE"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 14,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 15,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 18,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 19,
+            "BoneName": "weapon_2d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 903794909,
+    "Name": "savestra",
+    "Weapons": {
+      "3946965070": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 79,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 81,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SAVESTRA_MG"
+      }
+    }
+  },
+  {
+    "Hash": 3147997943,
+    "Name": "scarab",
+    "Weapons": {
+      "562032424": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCARAB_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 1542143200,
+    "Name": "scarab2",
+    "Weapons": {
+      "562032424": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 31,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCARAB_50CAL"
+      },
+      "3794660812": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 32,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCARAB2_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 3715219435,
+    "Name": "scarab3",
+    "Weapons": {
+      "562032424": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 35,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCARAB_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 3656405053,
+    "Name": "scramjet",
+    "Weapons": {
+      "231629074": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 44,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 45,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCRAMJET_MG"
+      },
+      "3169388763": {
+        "Bones": [
+          {
+            "BoneID": 42865,
+            "BoneIndex": 46,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 47,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 48,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 49,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SCRAMJET_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 3902291871,
+    "Name": "seabreeze",
+    "Weapons": {
+      "1371067624": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 46,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEABREEZE_MG"
+      }
+    }
+  },
+  {
+    "Hash": 3568198617,
+    "Name": "seasparrow",
+    "Weapons": {
+      "855547631": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HAVOK_MINIGUN"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42864,
+            "BoneIndex": 42,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 43,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 44,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 45,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 1229411063,
+    "Name": "seasparrow2",
+    "Weapons": {
+      "2431961420": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEASPARROW2_MINIGUN"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42864,
+            "BoneIndex": 40,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 41,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 42,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 43,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 1593933419,
+    "Name": "seasparrow3",
+    "Weapons": {
+      "2431961420": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 34,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SEASPARROW2_MINIGUN"
+      },
+      "4171469727": {
+        "Bones": [
+          {
+            "BoneID": 42864,
+            "BoneIndex": 38,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 39,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 40,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 41,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPACE_ROCKET"
+      }
+    }
+  },
+  {
+    "Hash": 2233918197,
+    "Name": "slamvan4",
+    "Weapons": {
+      "984313451": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 76,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 78,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SLAMVAN4_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 373261600,
+    "Name": "slamvan5",
+    "Weapons": {
+      "984313451": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 51,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SLAMVAN4_50CAL"
+      },
+      "1368736686": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 56,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 58,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SLAMVAN5_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 1742022738,
+    "Name": "slamvan6",
+    "Weapons": {
+      "984313451": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 76,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 78,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SLAMVAN4_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 219613597,
+    "Name": "speedo4",
+    "Weapons": {
+      "3355244860": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 60,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 62,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPEEDO4_MG"
+      },
+      "3595964737": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 47,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPEEDO4_TURRET_MG"
+      },
+      "2667462330": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 55,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SPEEDO4_TURRET_MINI"
+      }
+    }
+  },
+  {
+    "Hash": 2594093022,
+    "Name": "starling",
+    "Weapons": {
+      "1595421922": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 12,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 24,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MG"
+      },
+      "3393648765": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 16,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 18,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 20,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 28,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 30,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 32,
+            "BoneName": "weapon_2d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_DOGFIGHTER_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1692272545,
+    "Name": "strikeforce",
+    "Weapons": {
+      "955522731": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 71,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_STRIKEFORCE_CANNON"
+      },
+      "519052682": {
+        "Bones": [
+          {
+            "BoneID": 42866,
+            "BoneIndex": 33,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 34,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 35,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 65,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 66,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 67,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_STRIKEFORCE_MISSILE"
+      },
+      "968648323": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_STRIKEFORCE_BARRAGE"
+      }
+    }
+  },
+  {
+    "Hash": 886810209,
+    "Name": "stromberg",
+    "Weapons": {
+      "1176362416": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 84,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 85,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_MG"
+      },
+      "3565779982": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 54,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 55,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 56,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 57,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_MISSILE"
+      },
+      "3884172218": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 53,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 58,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_TORPEDO"
+      }
+    }
+  },
+  {
+    "Hash": 710198397,
+    "Name": "supervolito",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 2623428164,
+    "Name": "supervolito2",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 3955379698,
+    "Name": "swift",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 1075432268,
+    "Name": "swift2",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 3084515313,
+    "Name": "tampa3",
+    "Weapons": {
+      "2656583842": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 68,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 70,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 72,
+            "BoneName": "weapon_1d"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 74,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TAMPA_MISSILE"
+      },
+      "1015268368": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 76,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 78,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TAMPA_MORTAR"
+      },
+      "3670375085": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 84,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TAMPA_FIXEDMINIGUN"
+      },
+      "1744687076": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 92,
+            "BoneName": "weapon_4a"
+          },
+          {
+            "BoneID": 42639,
+            "BoneIndex": 94,
+            "BoneName": "weapon_4b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TAMPA_DUALMINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 2198148358,
+    "Name": "technical",
+    "Weapons": {
+      "2144528907": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_TECHNICAL"
+      }
+    }
+  },
+  {
+    "Hash": 1180875963,
+    "Name": "technical2",
+    "Weapons": {
+      "2144528907": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 54,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_TECHNICAL"
+      }
+    }
+  },
+  {
+    "Hash": 1356124575,
+    "Name": "technical3",
+    "Weapons": {
+      "2144528907": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 67,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_TECHNICAL"
+      },
+      "3683206664": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 79,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TECHNICAL_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 2306538597,
+    "Name": "terbyte",
+    "Weapons": {
+      "1987049393": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42820,
+            "BoneIndex": 39,
+            "BoneName": "weapon_1g"
+          },
+          {
+            "BoneID": 42821,
+            "BoneIndex": 40,
+            "BoneName": "weapon_1h"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 41,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42822,
+            "BoneIndex": 42,
+            "BoneName": "weapon_1i"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 43,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42823,
+            "BoneIndex": 44,
+            "BoneName": "weapon_1j"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 45,
+            "BoneName": "weapon_1d"
+          },
+          {
+            "BoneID": 42824,
+            "BoneIndex": 46,
+            "BoneName": "weapon_1k"
+          },
+          {
+            "BoneID": 42818,
+            "BoneIndex": 47,
+            "BoneName": "weapon_1e"
+          },
+          {
+            "BoneID": 42825,
+            "BoneIndex": 48,
+            "BoneName": "weapon_1l"
+          },
+          {
+            "BoneID": 42819,
+            "BoneIndex": 49,
+            "BoneName": "weapon_1f"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_HACKER_MISSILE"
+      },
+      "2011877270": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_HACKER_MISSILE_HOMING"
+      }
+    }
+  },
+  {
+    "Hash": 1489874736,
+    "Name": "thruster",
+    "Weapons": {
+      "1697521053": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 27,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 32,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_THRUSTER_MG"
+      },
+      "1177935125": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 36,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 39,
+            "BoneName": "weapon_2b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_THRUSTER_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 1455990255,
+    "Name": "toreador",
+    "Weapons": {
+      "1176362416": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 67,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 68,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_MG"
+      },
+      "3565779982": {
+        "Bones": [
+          {
+            "BoneID": 42864,
+            "BoneIndex": 108,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 109,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 110,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 113,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_MISSILE"
+      },
+      "3884172218": {
+        "Bones": [
+          {
+            "BoneID": 42847,
+            "BoneIndex": 111,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42846,
+            "BoneIndex": 112,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_SUBCAR_TORPEDO"
+      }
+    }
+  },
+  {
+    "Hash": 1502869817,
+    "Name": "trailerlarge",
+    "Weapons": {
+      "3846072740": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 37,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_MOBILEOPS_CANNON"
+      }
+    }
+  },
+  {
+    "Hash": 2413121211,
+    "Name": "trailersmall2",
+    "Weapons": {
+      "1192341548": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 32,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 34,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42816,
+            "BoneIndex": 36,
+            "BoneName": "weapon_1c"
+          },
+          {
+            "BoneID": 42817,
+            "BoneIndex": 38,
+            "BoneName": "weapon_1d"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TRAILER_QUADMG"
+      },
+      "341154295": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 59,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 61,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 63,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 65,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 67,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 69,
+            "BoneName": "weapon_2f"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TRAILER_MISSILE"
+      },
+      "2156678476": {
+        "Bones": [
+          {
+            "BoneID": 42847,
+            "BoneIndex": 78,
+            "BoneName": "weapon_3b"
+          },
+          {
+            "BoneID": 42846,
+            "BoneIndex": 80,
+            "BoneName": "weapon_3a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TRAILER_DUALAA"
+      }
+    }
+  },
+  {
+    "Hash": 1043222410,
+    "Name": "tula",
+    "Weapons": {
+      "1100844565": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 51,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 52,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TULA_NOSEMG"
+      },
+      "1217122433": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 67,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TULA_MG"
+      },
+      "2966510603": {
+        "Bones": [
+          {
+            "BoneID": 42846,
+            "BoneIndex": 76,
+            "BoneName": "weapon_3a"
+          },
+          {
+            "BoneID": 42847,
+            "BoneIndex": 79,
+            "BoneName": "weapon_3b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TULA_DUALMG"
+      },
+      "376489128": {
+        "Bones": [
+          {
+            "BoneID": 42638,
+            "BoneIndex": 85,
+            "BoneName": "weapon_4a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TULA_MINIGUN"
+      }
+    }
+  },
+  {
+    "Hash": 2694714877,
+    "Name": "valkyrie",
+    "Weapons": {
+      "1097917585": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 50,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_NOSE_TURRET_VALKYRIE"
+      },
+      "2756787765": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 59,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_VALKYRIE"
+      }
+    }
+  },
+  {
+    "Hash": 1543134283,
+    "Name": "valkyrie2",
+    "Weapons": {
+      "2756787765": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 54,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_TURRET_VALKYRIE"
+      }
+    }
+  },
+  {
+    "Hash": 3052358707,
+    "Name": "vigilante",
+    "Weapons": {
+      "4094131943": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 42,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 43,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_VIGILANTE_MG"
+      },
+      "1347266149": {
+        "Bones": [
+          {
+            "BoneID": 42862,
+            "BoneIndex": 23,
+            "BoneName": "weapon_2a"
+          },
+          {
+            "BoneID": 42863,
+            "BoneIndex": 25,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42864,
+            "BoneIndex": 27,
+            "BoneName": "weapon_2c"
+          },
+          {
+            "BoneID": 42865,
+            "BoneIndex": 29,
+            "BoneName": "weapon_2d"
+          },
+          {
+            "BoneID": 42866,
+            "BoneIndex": 31,
+            "BoneName": "weapon_2e"
+          },
+          {
+            "BoneID": 42867,
+            "BoneIndex": 33,
+            "BoneName": "weapon_2f"
+          },
+          {
+            "BoneID": 42868,
+            "BoneIndex": 35,
+            "BoneName": "weapon_2g"
+          },
+          {
+            "BoneID": 42869,
+            "BoneIndex": 37,
+            "BoneName": "weapon_2h"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_VIGILANTE_MISSILE"
+      }
+    }
+  },
+  {
+    "Hash": 3903371924,
+    "Name": "viseris",
+    "Weapons": {
+      "2275421702": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 78,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 80,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_VISERIS_MG"
+      }
+    }
+  },
+  {
+    "Hash": 447548909,
+    "Name": "volatol",
+    "Weapons": {
+      "1150790720": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 20,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 21,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_VOLATOL_DUALMG"
+      }
+    }
+  },
+  {
+    "Hash": 2449479409,
+    "Name": "volatus",
+    "Weapons": {
+      "3450622333": {
+        "Bones": [],
+        "Name": "VEHICLE_WEAPON_SEARCHLIGHT"
+      }
+    }
+  },
+  {
+    "Hash": 540101442,
+    "Name": "zr380",
+    "Weapons": {
+      "1790524546": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 57,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 63,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ZR380_50CAL"
+      }
+    }
+  },
+  {
+    "Hash": 3188846534,
+    "Name": "zr3802",
+    "Weapons": {
+      "1790524546": {
+        "Bones": [
+          {
+            "BoneID": 42815,
+            "BoneIndex": 60,
+            "BoneName": "weapon_1b"
+          },
+          {
+            "BoneID": 42814,
+            "BoneIndex": 66,
+            "BoneName": "weapon_1a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ZR380_50CAL"
+      },
+      "570463164": {
+        "Bones": [
+          {
+            "BoneID": 42863,
+            "BoneIndex": 58,
+            "BoneName": "weapon_2b"
+          },
+          {
+            "BoneID": 42862,
+            "BoneIndex": 62,
+            "BoneName": "weapon_2a"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ZR3802_50CAL_LASER"
+      }
+    }
+  },
+  {
+    "Hash": 2816263004,
+    "Name": "zr3803",
+    "Weapons": {
+      "1790524546": {
+        "Bones": [
+          {
+            "BoneID": 42814,
+            "BoneIndex": 53,
+            "BoneName": "weapon_1a"
+          },
+          {
+            "BoneID": 42815,
+            "BoneIndex": 59,
+            "BoneName": "weapon_1b"
+          }
+        ],
+        "Name": "VEHICLE_WEAPON_ZR380_50CAL"
+      }
+    }
+  }
+]
