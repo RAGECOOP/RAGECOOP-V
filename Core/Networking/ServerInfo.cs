@@ -10,11 +10,11 @@ namespace RageCoop.Core
     {
 #pragma warning disable 1591
         public string address { get; set; }
-        public string port { get; set; }
+        public int port { get; set; }
         public string name { get; set; }
         public string version { get; set; }
-        public string players { get; set; }
-        public string maxPlayers { get; set; }
+        public int players { get; set; }
+        public int maxPlayers { get; set; }
         public string country { get; set; }
         public string description { get; set; }
         public string website { get; set; }

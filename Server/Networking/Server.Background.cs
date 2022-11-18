@@ -98,12 +98,12 @@ public partial class Server
             var serverInfo = new ServerInfo
             {
                 address = IpInfo.Address,
-                port = Settings.Port.ToString(),
+                port = Settings.Port,
                 country = IpInfo.Country,
                 name = Settings.Name,
                 version = Version.ToString(),
-                players = MainNetServer.ConnectionsCount.ToString(),
-                maxPlayers = Settings.MaxPlayers.ToString(),
+                players = MainNetServer.ConnectionsCount,
+                maxPlayers = Settings.MaxPlayers,
                 description = Settings.Description,
                 website = Settings.Website,
                 gameMode = Settings.GameMode,
@@ -112,7 +112,7 @@ public partial class Server
                 useZT = Settings.UseZeroTier,
                 ztID = Settings.UseZeroTier ? Settings.ZeroTierNetworkID : "",
                 ztAddress = Settings.UseZeroTier
-                    ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(":")).First()
+                    ? ZeroTierHelper.Networks[Settings.ZeroTierNetworkID].Addresses.Where(x => !x.Contains(':')).First()
                     : "0.0.0.0",
                 publicKeyModulus = Convert.ToBase64String(pModulus),
                 publicKeyExponent = Convert.ToBase64String(pExpoenet)
