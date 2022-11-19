@@ -133,12 +133,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\$(Configuration)\Client\SubProcess\ref\RageCoop.Client.CefHost.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet">
-      <HintPath>..\..\libs\ScriptHookVDotNet.dll</HintPath>
-    </Reference>
     <Reference Include="ScriptHookVDotNet3">
       <HintPath>..\..\libs\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
+    <Reference Include="ScriptHookVDotNet">
+	    <HintPath>..\..\libs\ScriptHookVDotNet.asi</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">

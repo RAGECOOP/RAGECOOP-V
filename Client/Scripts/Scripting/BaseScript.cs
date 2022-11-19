@@ -265,7 +265,32 @@ namespace RageCoop.Client.Scripting
 
         private static InputArgument GetInputArgument(object obj)
         {
-            return Unsafe.As<InputArgument>(obj);
+            // Implicit conversion
+            switch (obj)
+            {
+                case byte stuff:
+                    return stuff;
+                case short stuff:
+                    return stuff;
+                case ushort stuff:
+                    return stuff;
+                case int stuff:
+                    return stuff;
+                case uint stuff:
+                    return stuff;
+                case long stuff:
+                    return stuff;
+                case ulong stuff:
+                    return stuff;
+                case float stuff:
+                    return stuff;
+                case bool stuff:
+                    return stuff;
+                case string stuff:
+                    return stuff;
+                default:
+                    return null;
+            }
         }
     }
 }
