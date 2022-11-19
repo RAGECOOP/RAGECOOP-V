@@ -64,14 +64,14 @@
     <Compile Include="Scripting\Resources.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Sync\Entities\Ped\SyncedPed.Members.cs" />
+    <Compile Include="Sync\Entities\Ped\SyncedPed.Variables.cs" />
     <Compile Include="Sync\Entities\Ped\SyncedPed.Animations.cs" />
     <Compile Include="Sync\Entities\SyncedEntity.cs" />
     <Compile Include="Sync\Entities\Ped\SyncedPed.cs" />
     <Compile Include="Sync\Entities\SyncedProjectile.cs" />
     <Compile Include="Sync\Entities\SyncedProp.cs" />
     <Compile Include="Sync\Entities\Vehicle\SyncedVehicle.cs" />
-    <Compile Include="Sync\Entities\Vehicle\SyncedVehicle.Members.cs" />
+    <Compile Include="Sync\Entities\Vehicle\SyncedVehicle.Variables.cs" />
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Voice.cs" />
@@ -105,6 +105,9 @@
       <HintPath>..\..\libs\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NativeInvoker">
+      <HintPath>..\..\libs\NativeInvoker.dll</HintPath>
+    </Reference>
     <Reference Include="NAudio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NAudio.2.1.0\lib\net472\NAudio.dll</HintPath>
     </Reference>
@@ -133,12 +136,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\$(Configuration)\Client\SubProcess\ref\RageCoop.Client.CefHost.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet3">
+    <Reference Include="ScriptHookVDotNet">
+      <HintPath>..\..\libs\ScriptHookVDotNet.asi</HintPath>
+    </Reference>
+    <Reference Include="ScriptHookVDotNet3, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\libs\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet">
-	    <HintPath>..\..\libs\ScriptHookVDotNet.asi</HintPath>
-    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />

@@ -29,6 +29,14 @@ namespace RageCoop.Client.Menus
             "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends",
             Main.Settings.Voice);
 
+        private static readonly NativeCheckboxItem _showBlip = new NativeCheckboxItem("Show player blip",
+            "Show other player's nametag on your screen, only effective if server didn't disable nametag display",
+            Main.Settings.ShowPlayerBlip); 
+        
+        private static readonly NativeCheckboxItem _showNametag = new NativeCheckboxItem("Show player nametag",
+            "Show other player's blip on map, can be overridden by server resource ",
+            Main.Settings.ShowPlayerNameTag);
+
         private static readonly NativeItem _menuKey =
             new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
 
@@ -51,6 +59,8 @@ namespace RageCoop.Client.Menus
             _menuKey.Activated += ChaneMenuKey;
             _passengerKey.Activated += ChangePassengerKey;
             _vehicleSoftLimit.Activated += VehicleSoftLimitActivated;
+            _showBlip.Activated += (s, e) => Main.Settings.ShowPlayerBlip = _showBlip.Checked;
+            _showNametag.Activated += (s, e) => Main.Settings.ShowPlayerNameTag = _showNametag.Checked;
 
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);
@@ -59,6 +69,8 @@ namespace RageCoop.Client.Menus
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
+            Menu.Add(_showBlip);
+            Menu.Add(_showNametag);
         }
 
         private static void DisableVoiceCheckboxChanged(object sender, EventArgs e)

@@ -16726,6 +16726,80 @@
             An enumeration of fonts the game supports.
             </summary>
         </member>
+        <member name="F:GTA.UI.Font.ChaletLondon">
+            <summary>
+            <para>This font is for the standard font.</para>
+            <para>
+            Chalet London 1960 from House Industries will be used when the game language is set to a non-CJK language.
+            The alternative standard font that contains appropriate CJK characters will be used when the game language is set to a CJK language.
+            </para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.HouseScript">
+            <summary>
+            <para>This font is for the cursive font.</para>
+            <para>
+            Sign Painter House Brush from House Industries will be used when the game language is set to a non-CJK language.
+            The standard font, which is the same as <see cref="F:GTA.UI.Font.ChaletLondon"/>, will be used when the game language is set to a CJK language unless the player have custom font files installed.
+            </para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.Monospace">
+            <summary>
+            <para>This font contains upper ASCII characters and some other shapes such as ones for tags.</para>
+            <para>This font style specifies the same font unless the player have custom font files installed.</para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.Leaderboard">
+            <summary>
+            <para>This font contains only Chevron arrows, some shield symbols, and hexagons.</para>
+            <para>This font style specifies the same font unless the player have custom font files installed.</para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.ChaletComprimeCologne">
+            <summary>
+            <para>
+            This font is for the condensed font for gamer tags or the distance info on the radar.
+            You should use <see cref="F:GTA.UI.Font.ChaletComprimeCologneNotGamerName"/> if you want to draw strings with condensed font if possible but strings can contain some CJK characters (e.g. localized strings from gxt files).
+            </para>
+            <para>
+            The native functions for text drawing will use the condensed font Chalet Comprim? Cologne 1960 regardness of the game language setting.
+            The natives will draw strings that contain only non-CJK characters without any trouble,
+            but without having custom font files installed, the natives will draw rectangles (a.k.a. tofus) instead of CJK characters because Chalet Comprim? Cologne 1960 doesn't contain any CJK characters.
+            </para>
+            <para>This font style specifies the same font unless the player have custom font files installed.</para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.FixedWidthNumbersStyle">
+            <summary>
+            <para>This font contains only glyphs of numbers (0 to 9), dollar sign, asterisk, plus sign, colon, semicolon, equals sign, slash, and backslash in ASCII.</para>
+            <para>This font style specifies the same font unless the player have custom font files installed.</para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.ChaletComprimeCologneNotGamerName">
+            <summary>
+            <para>
+            This font is for the condensed font for generic uses.
+            Consider using <see cref="F:GTA.UI.Font.ChaletComprimeCologne"/> instead when the texts you want to draw only contain only non-CJK characters.
+            </para>
+            <para>
+            The native functions for text drawing will use the condensed font Chalet Comprim? Cologne 1960 when the game language is set to a non-CJK language,
+            but they will use the standard font, which is the same as <see cref="F:GTA.UI.Font.ChaletLondon"/>, when the game language is set to a CJK language (unless the player have custom font files installed).
+            </para>
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.Pricedown">
+            <summary>
+            Pricedown will be used when the game language is set to a non-CJK language.
+            The standard font, which is the same as <see cref="F:GTA.UI.Font.ChaletLondon"/>, will be used when the game language is set to a CJK language unless the player have custom font files installed.
+            </summary>
+        </member>
+        <member name="F:GTA.UI.Font.Taxi">
+            <summary>
+            The font for taxi will be used when the game language is set to a non-CJK language. The font does contain invisible glyphs for lower characters.
+            The standard font, which is the same as <see cref="F:GTA.UI.Font.ChaletLondon"/>, will be used when the game language is set to a CJK language unless the player have custom font files installed.
+            </summary>
+        </member>
         <member name="T:GTA.UI.Hud">
             <summary>
             Methods to manipulate the HUD (heads-up-display) of the game.
@@ -18677,133 +18751,6 @@
             <param name="right">The right <see cref="T:GTA.AnimatedBuilding"/>.</param>
             <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
         </member>
-        <member name="M:GTA.InteriorInstance.FromHandle(System.Int32)">
-            <summary>
-            Creates a new instance of an <see cref="T:GTA.InteriorInstance"/> from the given handle.
-            </summary>
-            <param name="handle">The interior instance handle.</param>
-            <returns>
-            Returns a <see cref="T:GTA.InteriorInstance"/> if this handle corresponds to a <see cref="T:GTA.InteriorInstance"/>.
-            Returns <see langword="null" /> if no <see cref="T:GTA.InteriorInstance"/> exists this the specified <paramref name="handle"/>
-            </returns>
-        </member>
-        <member name="P:GTA.InteriorInstance.Handle">
-            <summary>
-            The handle of this <see cref="T:GTA.Building"/>. This property is provided mainly for safer instance handling, but this is also used for equality comparison.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorInstance.MemoryAddress">
-            <summary>
-            Gets the memory address where the <see cref="T:GTA.InteriorInstance"/> is stored in memory.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorInstance.Model">
-            <summary>
-            Gets the model of this <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorInstance.Matrix">
-            <summary>
-            Gets this <see cref="T:GTA.InteriorInstance"/>s matrix which stores position and rotation information.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorInstance.Rotation">
-            <summary>
-            Gets the rotation of this <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-            <value>
-            The yaw, pitch, roll rotation values in degree.
-            </value>
-        </member>
-        <member name="P:GTA.InteriorInstance.Quaternion">
-            <summary>
-            Gets the quaternion of this <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorInstance.Position">
-            <summary>
-            Gets or sets the position of this <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-            <value>
-            The position in world space.
-            </value>
-        </member>
-        <member name="P:GTA.InteriorInstance.InteriorProxy">
-            <summary>
-            Gets the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> this <see cref="T:GTA.InteriorInstance"/> is loaded from.
-            </summary>
-            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorInstance"/> does not exist or SHVDN could not find the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> pool for some reason.</remarks>
-        </member>
-        <member name="M:GTA.InteriorInstance.Exists">
-            <summary>
-            Determines if this <see cref="T:GTA.InteriorInstance"/> exists.
-            </summary>
-            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorInstance"/> exists; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorInstance.Equals(System.Object)">
-            <summary>
-            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
-            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorInstance"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorInstance.op_Equality(GTA.InteriorInstance,GTA.InteriorInstance)">
-            <summary>
-            Determines if two <see cref="T:GTA.InteriorInstance"/>s refer to the same entity.
-            </summary>
-            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
-            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
-            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorInstance.op_Inequality(GTA.InteriorInstance,GTA.InteriorInstance)">
-            <summary>
-            Determines if two <see cref="T:GTA.InteriorInstance"/>s don't refer to the same entity.
-            </summary>
-            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
-            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
-            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="F:GTA.EntityPopulationType.Unknown">
-            <summary>
-            The game does not automatically delete entities when this value is set.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.RandomPermanent">
-            <summary>
-            The game does not automatically delete entities when this value is set.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.RandomParked">
-            <summary>
-            This value is set when parked vehicles are created.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.RandomScenario">
-            <summary>
-            This value is set when scenario peds are created.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.RandomAmbient">
-            <summary>
-            This value is set when ambient entities are created or when SET_ENTITY_AS_NO_LONGER_NEEDED is called.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.Permanent">
-            <summary>
-            The game does not automatically delete entities when this value is set.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.Mission">
-            <summary>
-            This value is set when entities are created via native functions or when SET_ENTITY_AS_MISSION_ENTITY is called.
-            The game does not automatically delete entities when this value is set.
-            </summary>
-        </member>
-        <member name="F:GTA.EntityPopulationType.Replay">
-            <summary>
-            The game does not automatically delete entities when this value is set.
-            </summary>
-        </member>
         <member name="M:GTA.Building.FromHandle(System.Int32)">
             <summary>
             Creates a new instance of an <see cref="T:GTA.Building"/> from the given handle.
@@ -18883,156 +18830,6 @@
             <param name="left">The left <see cref="T:GTA.Building"/>.</param>
             <param name="right">The right <see cref="T:GTA.Building"/>.</param>
             <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="F:GTA.VehicleType.None">
-            <summary>
-            The default/invalid type.
-            </summary>
-            <remarks>
-            The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_NONE</c>.
-            The hash value for <c>VEHICLE_TYPE_NONE</c> is <c>0x2F2B9BC</c> (hashed by Jenkins one-at-a-time hash but without lowercase conversion before hashing).
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Automobile">
-            <summary>
-            The non-special automobile type, such as general cars, taxis, trucks, and tanks.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_CAR</c>.</para>
-            <para>The internal class in memory is <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Plane">
-            <summary>
-            The airplane type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_PLANE</c>.</para>
-            <para>The internal class in memory is <c>CPlane</c>, which is a subclass of <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Trailer">
-            <summary>
-            The trailer type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAILER</c>.</para>
-            <para>The internal class in memory is <c>CTrailer</c>, which is a subclass of <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.QuadBike">
-            <summary>
-            The non-special quad bike type. Also includes tricycles, such as <see cref="F:GTA.VehicleHash.Chimera"/>, <see cref="F:GTA.VehicleHash.RRocket"/>, and <see cref="F:GTA.VehicleHash.Stryder"/>.
-            </summary>
-            <remarks>
-            <para>Amphibious quad bikes are not classified as this type but classified as <see cref="F:GTA.VehicleType.AmphibiousQuadBike"/>.</para>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_QUADBIKE</c>.</para>
-            <para>The internal class in memory is <c>CQuadBike</c>, which is a subclass of <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.SubmarineCar">
-            <summary>
-            The submarine car type for the submarine cars, which can travel underwater like submarines.
-            </summary>
-            <remarks>
-            <para>Amphibious automobiles are not classified as this type but classified as <see cref="F:GTA.VehicleType.AmphibiousAutomobile"/>.</para>
-            <para>Submarines are not classified as this type but classified as <see cref="F:GTA.VehicleType.Submarine"/>.</para>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_SUBMARINECAR</c>.</para>
-            <para>The internal class in memory is <c>CSubmarineCar</c>, which is a subclass of <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.AmphibiousAutomobile">
-            <summary>
-            The amphibious automobile type.
-            </summary>
-            <remarks>
-            <para>Submarine cars are not classified as this type but classified as <see cref="F:GTA.VehicleType.SubmarineCar"/>.</para>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AMPHIBIOUS_AUTOMOBILE</c>.</para>
-            <para>The internal class in memory is <c>CAmphibiousAutomobile</c>, which is a subclass of <c>CAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.AmphibiousQuadBike">
-            <summary>
-            The amphibious quad bike type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AMPHIBIOUS_QUADBIKE</c>.</para>
-            <para>The internal class in memory is <c>CAmphibiousQuadBike</c>, which is a subclass of <c>CAmphibiousAutomobile</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Helicopter">
-            <summary>
-            The helicopter type. <see cref="F:GTA.VehicleHash.Thruster"/> is also classified as this type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_HELI</c>.</para>
-            <para>The internal class in memory is <c>CHeli</c>, which is a subclass of <c>CAutomobile</c> via <c>CRotaryWingAircraft</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Blimp">
-            <summary>
-            The blimp type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BLIMP</c>.</para>
-            <para>The internal class in memory is <c>CBlimp</c>, which is a subclass of <c>CHeli</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Autogyro">
-            <summary>
-            The autogyro type, which is not used in the stock game.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AUTOGYRO</c>.</para>
-            <para>The internal class in memory is <c>CAutogyro</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Motorcycle">
-            <summary>
-            The motorcycle type.
-            </summary>
-            <remarks>
-            <para>Tricycles are not classified as this type but classified as <see cref="F:GTA.VehicleType.QuadBike"/>.</para>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BIKE</c>.</para>
-            <para>The internal class in memory is <c>CBike</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Bicycle">
-            <summary>
-            The bicycle type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BICYCLE</c>.</para>
-            <para>The internal class in memory is <c>CBmx</c>, which is a subclass of <c>CBike</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Boat">
-            <summary>
-            The boat type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BOAT</c>.</para>
-            <para>The internal class in memory is <c>CBoat</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Train">
-            <summary>
-            The train type.
-            </summary>
-            <remarks>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAIN</c>.</para>
-            <para>The internal class in memory is <c>CTrain</c>.</para>
-            </remarks>
-        </member>
-        <member name="F:GTA.VehicleType.Submarine">
-            <summary>
-            The submarine type.
-            </summary>
-            <remarks>
-            <para>Submarine cars are not classified as this type but classified as <see cref="F:GTA.VehicleType.SubmarineCar"/>.</para>
-            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAIN</c>.</para>
-            <para>The internal class in memory is <c>CSubmarine</c></para>
-            </remarks>
         </member>
         <member name="M:GTA.Entity.FromHandle(System.Int32)">
             <summary>
@@ -20013,6 +19810,139 @@
             <param name="right">The right <see cref="T:GTA.Entity"/>.</param>
             <returns><c>true</c> if <paramref name="left"/> does not have the same properties as <paramref name="right"/>; otherwise, <c>false</c>.</returns>
         </member>
+        <member name="M:GTA.EntityDamageRecordCollection.GetAllDamageRecords">
+            <summary>
+            Gets all the <see cref="T:GTA.EntityDamageRecord" /> at the moment.
+            The return array can contain up to 3 <see cref="T:GTA.EntityDamageRecord" />s.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.Unknown">
+            <summary>
+            The game does not automatically delete entities when this value is set.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.RandomPermanent">
+            <summary>
+            The game does not automatically delete entities when this value is set.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.RandomParked">
+            <summary>
+            This value is set when parked vehicles are created.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.RandomScenario">
+            <summary>
+            This value is set when scenario peds are created.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.RandomAmbient">
+            <summary>
+            This value is set when ambient entities are created or when SET_ENTITY_AS_NO_LONGER_NEEDED is called.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.Permanent">
+            <summary>
+            The game does not automatically delete entities when this value is set.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.Mission">
+            <summary>
+            This value is set when entities are created via native functions or when SET_ENTITY_AS_MISSION_ENTITY is called.
+            The game does not automatically delete entities when this value is set.
+            </summary>
+        </member>
+        <member name="F:GTA.EntityPopulationType.Replay">
+            <summary>
+            The game does not automatically delete entities when this value is set.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorInstance.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.InteriorInstance"/> from the given handle.
+            </summary>
+            <param name="handle">The interior instance handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.InteriorInstance"/> if this handle corresponds to a <see cref="T:GTA.InteriorInstance"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.InteriorInstance"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.InteriorInstance.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.Building"/>. This property is provided mainly for safer instance handling, but this is also used for equality comparison.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.InteriorInstance"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Model">
+            <summary>
+            Gets the model of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Matrix">
+            <summary>
+            Gets this <see cref="T:GTA.InteriorInstance"/>s matrix which stores position and rotation information.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Rotation">
+            <summary>
+            Gets the rotation of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <value>
+            The yaw, pitch, roll rotation values in degree.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorInstance.Quaternion">
+            <summary>
+            Gets the quaternion of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorInstance.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorInstance.InteriorProxy">
+            <summary>
+            Gets the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> this <see cref="T:GTA.InteriorInstance"/> is loaded from.
+            </summary>
+            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorInstance"/> does not exist or SHVDN could not find the <see cref="P:GTA.InteriorInstance.InteriorProxy"/> pool for some reason.</remarks>
+        </member>
+        <member name="M:GTA.InteriorInstance.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.InteriorInstance"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorInstance"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorInstance"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.op_Equality(GTA.InteriorInstance,GTA.InteriorInstance)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorInstance"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorInstance.op_Inequality(GTA.InteriorInstance,GTA.InteriorInstance)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorInstance"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorInstance"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorInstance"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
         <member name="P:GTA.Model.Hash">
             <summary>
             Gets the hash for this <see cref="T:GTA.Model"/>.
@@ -20490,10 +20420,29 @@
             Gets a collection of the <see cref="T:GTA.PedBone"/>s in this <see cref="T:GTA.Ped"/>.
             </summary>
         </member>
+        <member name="P:GTA.Ped.AlwaysKeepTask">
+            <summary>
+            <para>
+            Sets whether this <see cref="T:GTA.Ped"/> keeps their tasks when they are marked as no longer needed by <see cref="M:GTA.Entity.MarkAsNoLongerNeeded"/> or gets cleaned up by the mission script.
+            Despite the property name, this property does not determine whether permanent events can interrupt the <see cref="T:GTA.Ped"/>'s tasks (e.g. seeing hated peds or getting shot at).
+            </para>
+            <para>
+            If set to <see langword="false" />, this <see cref="T:GTA.Ped"/>'s task will be immediately cleared and start some ambient tasks (most likely start wandering) when they are marked as no longer needed.
+            </para>
+            <para>
+            If set to <see langword="true" />, this <see cref="T:GTA.Ped"/> will keep their task until they have nothing to do (where their task stacks only contains <c>CTaskDoNothing</c>).
+            Once this <see cref="T:GTA.Ped"/> has nothing to do, their task will clear and they'll start some ambient tasks (one-time-only).
+            </para>
+            </summary>
+        </member>
         <member name="P:GTA.Ped.BlockPermanentEvents">
             <summary>
             Sets whether permanent events are blocked for this <see cref="T:GTA.Ped"/>.
-             If permanent events are blocked, this <see cref="T:GTA.Ped"/> will only do as it's told, and won't flee when shot at, etc.
+            <para>
+            If set to <see langword="true" />, this <see cref="T:GTA.Ped"/> will no longer react to permanent events and will only do as they're told.
+            For example, the <see cref="T:GTA.Ped"/> will not flee when get shot at and they will not begin combat even if the decision maker specifies that seeing a hated ped should.
+            However, the <see cref="T:GTA.Ped"/> will still respond to temporary events like walking around other peds or vehicles even if this property is set to <see langword="true" />.
+            </para>
             </summary>
             <value>
               <see langword="true" /> if permanent events are blocked; otherwise, <see langword="false" />.
@@ -20897,6 +20846,31 @@
         <member name="P:GTA.RelationshipGroup.NativeValue">
             <summary>
             Gets the native representation of this <see cref="T:GTA.RelationshipGroup"/>.
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.DontSteerAroundPlayerPed">
+            <summary>Don't steer around the player ped even if <see cref="F:GTA.VehicleDrivingFlags.AvoidPeds"/> is set.</summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.GoOffRoadWhenAvoiding">
+            <summary>
+            Make the <see cref="T:GTA.Ped"/> prefer to go off the road rather than enter oncoming lanes when avoiding (steering around) obstacles if the correct lanes are full.
+            Even if this value is set, the <see cref="T:GTA.Ped"/> will try to steer around obstacles by entering other correct lanes if the correct lanes are not full. 
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.AllowGoingWrongWay">
+            <summary>
+            Allow the <see cref="T:GTA.Ped"/> to drive into the oncoming traffic if the correct lanes are full.
+            Even if this value is set, the <see cref="T:GTA.Ped"/> will try to reach the correct lanes again as soon as possible. 
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.UseWanderFallbackInsteadOfStraightLine">
+            <summary>
+            If pathfinding fails, cruise randomly instead of going on a straight line.
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.AdjustCruiseSpeedBasedOnRoadSpeed">
+            <summary>
+            Limit the speed based on the road speed if the max cruise speed for driving tasks exceeds the road speed. Only works when the car mission is set to MISSION_CRUISE.
             </summary>
         </member>
         <member name="P:GTA.Projectile.Owner">
@@ -21825,6 +21799,156 @@
             <para>Doesn't allow players to exit the <see cref="T:GTA.Vehicle"/> with the exit vehicle key or button.</para>
             </summary>
         </member>
+        <member name="F:GTA.VehicleType.None">
+            <summary>
+            The default/invalid type.
+            </summary>
+            <remarks>
+            The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_NONE</c>.
+            The hash value for <c>VEHICLE_TYPE_NONE</c> is <c>0x2F2B9BC</c> (hashed by Jenkins one-at-a-time hash but without lowercase conversion before hashing).
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Automobile">
+            <summary>
+            The non-special automobile type, such as general cars, taxis, trucks, and tanks.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_CAR</c>.</para>
+            <para>The internal class in memory is <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Plane">
+            <summary>
+            The airplane type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_PLANE</c>.</para>
+            <para>The internal class in memory is <c>CPlane</c>, which is a subclass of <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Trailer">
+            <summary>
+            The trailer type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAILER</c>.</para>
+            <para>The internal class in memory is <c>CTrailer</c>, which is a subclass of <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.QuadBike">
+            <summary>
+            The non-special quad bike type. Also includes tricycles, such as <see cref="F:GTA.VehicleHash.Chimera"/>, <see cref="F:GTA.VehicleHash.RRocket"/>, and <see cref="F:GTA.VehicleHash.Stryder"/>.
+            </summary>
+            <remarks>
+            <para>Amphibious quad bikes are not classified as this type but classified as <see cref="F:GTA.VehicleType.AmphibiousQuadBike"/>.</para>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_QUADBIKE</c>.</para>
+            <para>The internal class in memory is <c>CQuadBike</c>, which is a subclass of <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.SubmarineCar">
+            <summary>
+            The submarine car type for the submarine cars, which can travel underwater like submarines.
+            </summary>
+            <remarks>
+            <para>Amphibious automobiles are not classified as this type but classified as <see cref="F:GTA.VehicleType.AmphibiousAutomobile"/>.</para>
+            <para>Submarines are not classified as this type but classified as <see cref="F:GTA.VehicleType.Submarine"/>.</para>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_SUBMARINECAR</c>.</para>
+            <para>The internal class in memory is <c>CSubmarineCar</c>, which is a subclass of <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.AmphibiousAutomobile">
+            <summary>
+            The amphibious automobile type.
+            </summary>
+            <remarks>
+            <para>Submarine cars are not classified as this type but classified as <see cref="F:GTA.VehicleType.SubmarineCar"/>.</para>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AMPHIBIOUS_AUTOMOBILE</c>.</para>
+            <para>The internal class in memory is <c>CAmphibiousAutomobile</c>, which is a subclass of <c>CAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.AmphibiousQuadBike">
+            <summary>
+            The amphibious quad bike type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AMPHIBIOUS_QUADBIKE</c>.</para>
+            <para>The internal class in memory is <c>CAmphibiousQuadBike</c>, which is a subclass of <c>CAmphibiousAutomobile</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Helicopter">
+            <summary>
+            The helicopter type. <see cref="F:GTA.VehicleHash.Thruster"/> is also classified as this type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_HELI</c>.</para>
+            <para>The internal class in memory is <c>CHeli</c>, which is a subclass of <c>CAutomobile</c> via <c>CRotaryWingAircraft</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Blimp">
+            <summary>
+            The blimp type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BLIMP</c>.</para>
+            <para>The internal class in memory is <c>CBlimp</c>, which is a subclass of <c>CHeli</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Autogyro">
+            <summary>
+            The autogyro type, which is not used in the stock game.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_AUTOGYRO</c>.</para>
+            <para>The internal class in memory is <c>CAutogyro</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Motorcycle">
+            <summary>
+            The motorcycle type.
+            </summary>
+            <remarks>
+            <para>Tricycles are not classified as this type but classified as <see cref="F:GTA.VehicleType.QuadBike"/>.</para>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BIKE</c>.</para>
+            <para>The internal class in memory is <c>CBike</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Bicycle">
+            <summary>
+            The bicycle type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BICYCLE</c>.</para>
+            <para>The internal class in memory is <c>CBmx</c>, which is a subclass of <c>CBike</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Boat">
+            <summary>
+            The boat type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_BOAT</c>.</para>
+            <para>The internal class in memory is <c>CBoat</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Train">
+            <summary>
+            The train type.
+            </summary>
+            <remarks>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAIN</c>.</para>
+            <para>The internal class in memory is <c>CTrain</c>.</para>
+            </remarks>
+        </member>
+        <member name="F:GTA.VehicleType.Submarine">
+            <summary>
+            The submarine type.
+            </summary>
+            <remarks>
+            <para>Submarine cars are not classified as this type but classified as <see cref="F:GTA.VehicleType.SubmarineCar"/>.</para>
+            <para>The corresponding name in vehicles.meta for this value is <c>VEHICLE_TYPE_TRAIN</c>.</para>
+            <para>The internal class in memory is <c>CSubmarine</c></para>
+            </remarks>
+        </member>
         <member name="P:GTA.VehicleWheel.Vehicle">
             <summary>
             Gets the <see cref="P:GTA.VehicleWheel.Vehicle"/>this <see cref="T:GTA.VehicleWheel"/> belongs to.
@@ -22449,6 +22573,134 @@
             This value also represents the exe version 1.0.2372.2 for non-Steam version. 1.0.2372.2 basically works in the same way as 1.0.2372.0 but with bug fixes.
             </summary>
         </member>
+        <member name="M:GTA.InteriorProxy.FromHandle(System.Int32)">
+            <summary>
+            Creates a new instance of an <see cref="T:GTA.InteriorProxy"/> from the given handle.
+            </summary>
+            <param name="handle">The interior proxy handle.</param>
+            <returns>
+            Returns a <see cref="T:GTA.InteriorProxy"/> if this handle corresponds to a <see cref="T:GTA.InteriorProxy"/>.
+            Returns <see langword="null" /> if no <see cref="T:GTA.Entity"/> exists this the specified <paramref name="handle"/>
+            </returns>
+        </member>
+        <member name="P:GTA.InteriorProxy.Handle">
+            <summary>
+            The handle of this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.NativeValue">
+            <summary>
+            The handle of this <see cref="T:GTA.InteriorProxy"/> translated to a native value.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.MemoryAddress">
+            <summary>
+            Gets the memory address where the <see cref="T:GTA.InteriorProxy"/> is stored in memory.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.Position">
+            <summary>
+            Gets or sets the position of this <see cref="T:GTA.AnimatedBuilding"/>.
+            </summary>
+            <value>
+            The position in world space.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorProxy.CurrentInteriorInstance">
+            <summary>
+            Gets the current <see cref="T:GTA.InteriorInstance"/> this <see cref="T:GTA.InteriorProxy"/> is using.
+            </summary>
+            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorProxy"/> is not using any <see cref="T:GTA.InteriorInstance"/>.</remarks>
+        </member>
+        <member name="P:GTA.InteriorProxy.Model">
+            <summary>
+            Gets the model this <see cref="T:GTA.InteriorProxy"/> will load.
+            </summary>
+        </member>
+        <member name="P:GTA.InteriorProxy.IsDisabled">
+            <summary>
+            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely.
+            </summary>
+            <value>
+            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely; otherwise, <see langword="false" />.
+            </value>
+        </member>
+        <member name="P:GTA.InteriorProxy.IsCapped">
+            <summary>
+            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
+            Doors can be loaded and the collision is not necessarily completely disabled (e.g. collisions for bullets and projectiles can work).
+            </summary>
+            <value>
+            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior; otherwise, <see langword="false" />.
+            </value>
+        </member>
+        <member name="M:GTA.InteriorProxy.Refresh">
+            <summary>
+            Refreshs the current <see cref="T:GTA.InteriorInstance"/> if loaded. Does not change the memory address or handle of the <see cref="T:GTA.InteriorInstance"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.Disable(System.Boolean)">
+            <summary>
+            Disables the interior, making <see cref="T:GTA.InteriorProxy"/> behave as if interior is not loaded completely. Does not prevent from having a <see cref="T:GTA.InteriorInstance"/>.
+            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.Cap(System.Boolean)">
+            <summary>
+            Caps the interior so this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
+            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.PinInMemory">
+            <summary>
+            Makes this <see cref="T:GTA.InteriorProxy"/> keep the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.UnpinFromMemory">
+            <summary>
+            Lets this <see cref="T:GTA.InteriorProxy"/> free the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
+            </summary>
+        </member>
+        <member name="M:GTA.InteriorProxy.GetInteriorProxyFromGameplayCam">
+            <summary>
+            Gets the <see cref="T:GTA.InteriorProxy"/> if the gameplay camera is in a interior.
+            </summary>
+            <remarks>returns <see langword="null" /> if the gameplay camera is not in any interior space.</remarks>
+        </member>
+        <member name="M:GTA.InteriorProxy.Exists">
+            <summary>
+            Determines if this <see cref="T:GTA.InteriorProxy"/> exists.
+            </summary>
+            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> exists; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.Equals(System.Object)">
+            <summary>
+            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorProxy"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
+            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorProxy"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Equality(GTA.InteriorProxy,GTA.InteriorProxy)">
+            <summary>
+            Determines if two <see cref="T:GTA.InteriorProxy"/>s refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.InteriorProxy"/>.</param>
+            <param name="right">The right <see cref="T:GTA.InteriorProxy"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Inequality(GTA.InteriorProxy,GTA.InteriorProxy)">
+            <summary>
+            Determines if two <see cref="T:GTA.Entity"/>s don't refer to the same entity.
+            </summary>
+            <param name="left">The left <see cref="T:GTA.Entity"/>.</param>
+            <param name="right">The right <see cref="T:GTA.Entity"/>.</param>
+            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:GTA.InteriorProxy.op_Implicit(GTA.InteriorProxy)~GTA.Native.InputArgument">
+            <summary>
+            Converts an <see cref="T:GTA.Entity"/> to a native input argument.
+            </summary>
+        </member>
         <member name="F:GTA.Language.Chinese">
             <summary>Traditional Chinese</summary>
         </member>
@@ -23049,140 +23301,6 @@
             The handle of the object translated to a native value.
             </summary>
         </member>
-        <member name="M:GTA.InteriorProxy.FromHandle(System.Int32)">
-            <summary>
-            Creates a new instance of an <see cref="T:GTA.InteriorProxy"/> from the given handle.
-            </summary>
-            <param name="handle">The interior proxy handle.</param>
-            <returns>
-            Returns a <see cref="T:GTA.InteriorProxy"/> if this handle corresponds to a <see cref="T:GTA.InteriorProxy"/>.
-            Returns <see langword="null" /> if no <see cref="T:GTA.Entity"/> exists this the specified <paramref name="handle"/>
-            </returns>
-        </member>
-        <member name="P:GTA.InteriorProxy.Handle">
-            <summary>
-            The handle of this <see cref="T:GTA.InteriorProxy"/>.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorProxy.NativeValue">
-            <summary>
-            The handle of this <see cref="T:GTA.InteriorProxy"/> translated to a native value.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorProxy.MemoryAddress">
-            <summary>
-            Gets the memory address where the <see cref="T:GTA.InteriorProxy"/> is stored in memory.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorProxy.Position">
-            <summary>
-            Gets or sets the position of this <see cref="T:GTA.AnimatedBuilding"/>.
-            </summary>
-            <value>
-            The position in world space.
-            </value>
-        </member>
-        <member name="P:GTA.InteriorProxy.CurrentInteriorInstance">
-            <summary>
-            Gets the current <see cref="T:GTA.InteriorInstance"/> this <see cref="T:GTA.InteriorProxy"/> is using.
-            </summary>
-            <remarks>returns <see langword="null" /> if this <see cref="T:GTA.InteriorProxy"/> is not using any <see cref="T:GTA.InteriorInstance"/>.</remarks>
-        </member>
-        <member name="P:GTA.InteriorProxy.Model">
-            <summary>
-            Gets the model this <see cref="T:GTA.InteriorProxy"/> will load.
-            </summary>
-        </member>
-        <member name="P:GTA.InteriorProxy.IsDisabled">
-            <summary>
-            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely.
-            </summary>
-            <value>
-            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will behave as if interior is not loaded completely; otherwise, <see langword="false" />.
-            </value>
-        </member>
-        <member name="P:GTA.InteriorProxy.IsCapped">
-            <summary>
-            Gets a value indicating whether this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
-            Doors can be loaded and the collision is not necessarily completely disabled (e.g. collisions for bullets and projectiles can work).
-            </summary>
-            <value>
-            <see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior; otherwise, <see langword="false" />.
-            </value>
-        </member>
-        <member name="M:GTA.InteriorProxy.Refresh">
-            <summary>
-            Refreshs the current <see cref="T:GTA.InteriorInstance"/> if loaded. Does not change the memory address or handle of the <see cref="T:GTA.InteriorInstance"/>.
-            </summary>
-        </member>
-        <member name="M:GTA.InteriorProxy.Disable(System.Boolean)">
-            <summary>
-            Disables the interior, making <see cref="T:GTA.InteriorProxy"/> behave as if interior is not loaded completely. Does not prevent from having a <see cref="T:GTA.InteriorInstance"/>.
-            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
-            </summary>
-        </member>
-        <member name="M:GTA.InteriorProxy.Cap(System.Boolean)">
-            <summary>
-            Caps the interior so this <see cref="T:GTA.InteriorProxy"/> will only load a few elements of the interior.
-            Does nothing if the player <see cref="T:GTA.Ped"/> is in this <see cref="T:GTA.InteriorProxy"/>.
-            </summary>
-        </member>
-        <member name="M:GTA.InteriorProxy.PinInMemory">
-            <summary>
-            Makes this <see cref="T:GTA.InteriorProxy"/> keep the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
-            </summary>
-        </member>
-        <member name="M:GTA.InteriorProxy.UnpinFromMemory">
-            <summary>
-            Lets this <see cref="T:GTA.InteriorProxy"/> free the <see cref="T:GTA.InteriorProxy"/> this <see cref="T:GTA.InteriorProxy"/> is loaded.
-            </summary>
-        </member>
-        <member name="M:GTA.InteriorProxy.GetInteriorProxyFromGameplayCam">
-            <summary>
-            Gets the <see cref="T:GTA.InteriorProxy"/> if the gameplay camera is in a interior.
-            </summary>
-            <remarks>returns <see langword="null" /> if the gameplay camera is not in any interior space.</remarks>
-        </member>
-        <member name="M:GTA.InteriorProxy.Exists">
-            <summary>
-            Determines if this <see cref="T:GTA.InteriorProxy"/> exists.
-            </summary>
-            <returns><see langword="true" /> if this <see cref="T:GTA.InteriorProxy"/> exists; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorProxy.Equals(System.Object)">
-            <summary>
-            Determines if an <see cref="T:System.Object"/> refers to the same entity as this <see cref="T:GTA.InteriorProxy"/>.
-            </summary>
-            <param name="obj">The <see cref="T:System.Object"/> to check.</param>
-            <returns><see langword="true" /> if the <paramref name="obj"/> is the same entity as this <see cref="T:GTA.InteriorProxy"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorProxy.op_Equality(GTA.InteriorProxy,GTA.InteriorProxy)">
-            <summary>
-            Determines if two <see cref="T:GTA.InteriorProxy"/>s refer to the same entity.
-            </summary>
-            <param name="left">The left <see cref="T:GTA.InteriorProxy"/>.</param>
-            <param name="right">The right <see cref="T:GTA.InteriorProxy"/>.</param>
-            <returns><see langword="true" /> if <paramref name="left"/> is the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorProxy.op_Inequality(GTA.InteriorProxy,GTA.InteriorProxy)">
-            <summary>
-            Determines if two <see cref="T:GTA.Entity"/>s don't refer to the same entity.
-            </summary>
-            <param name="left">The left <see cref="T:GTA.Entity"/>.</param>
-            <param name="right">The right <see cref="T:GTA.Entity"/>.</param>
-            <returns><see langword="true" /> if <paramref name="left"/> is not the same entity as <paramref name="right"/>; otherwise, <see langword="false" />.</returns>
-        </member>
-        <member name="M:GTA.InteriorProxy.op_Implicit(GTA.InteriorProxy)~GTA.Native.InputArgument">
-            <summary>
-            Converts an <see cref="T:GTA.Entity"/> to a native input argument.
-            </summary>
-        </member>
-        <member name="M:GTA.EntityDamageRecordCollection.GetAllDamageRecords">
-            <summary>
-            Gets all the <see cref="T:GTA.EntityDamageRecord" /> at the moment.
-            The return array can contain up to 3 <see cref="T:GTA.EntityDamageRecord" />s.
-            </summary>
-        </member>
         <member name="P:GTA.RaycastResult.Result">
             <summary>
             Gets the result code.
@@ -23486,12 +23604,6 @@
             <param name="section">The section where the value is.</param>
             <param name="name">The name of the key the values are saved at.</param>
         </member>
-        <member name="F:GTA.WeaponAttachmentPoint.Flash">
-            <summary> Used for <see cref="F:GTA.WeaponHash.Flashlight"/>. </summary>
-        </member>
-        <member name="F:GTA.WeaponAttachmentPoint.GunGripR">
-            <summary> Used for <see cref="F:GTA.WeaponComponentHash.GunrunMk2Upgrade"/>. </summary>
-        </member>
         <member name="P:GTA.WeaponAsset.Hash">
             <summary>
             Gets the hash for this <see cref="T:GTA.WeaponAsset"/>.
@@ -23533,6 +23645,12 @@
             <summary>
             Tells the game we have finished using this <see cref="T:GTA.WeaponAsset"/> and it can be freed from memory.
             </summary>
+        </member>
+        <member name="F:GTA.WeaponAttachmentPoint.Flash">
+            <summary> Used for <see cref="F:GTA.WeaponHash.Flashlight"/>. </summary>
+        </member>
+        <member name="F:GTA.WeaponAttachmentPoint.GunGripR">
+            <summary> Used for <see cref="F:GTA.WeaponComponentHash.GunrunMk2Upgrade"/>. </summary>
         </member>
         <member name="M:GTA.WeaponCollection.Give(GTA.WeaponHash,System.Int32,System.Boolean,System.Boolean)">
             <summary>

@@ -12,7 +12,7 @@ namespace RageCoop.Client
     {
         private readonly string[] _currentAnimation = new string[2] { "", "" };
         private byte[] _lastClothes;
-        internal bool _lastDriveBy;
+        private bool _lastDriveBy;
         private bool _lastInCover;
         private bool _lastIsJumping;
         private bool _lastRagdoll;
@@ -24,7 +24,7 @@ namespace RageCoop.Client
         internal BlipSprite BlipSprite = 0;
         internal PedDataFlags Flags;
 
-        private bool LastMoving;
+        private bool _lastMoving;
         internal Blip PedBlip = null;
         internal VehicleSeat Seat;
 

@@ -29,9 +29,7 @@ namespace RageCoop.Client
             MainPed = p;
             OwnerID = Main.LocalPlayerID;
 
-            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
-            // MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
         }
 
         /// <summary>
@@ -53,7 +51,7 @@ namespace RageCoop.Client
 
             if (IsPlayer) RenderNameTag();
 
-            // Check if all data avalible
+            // Check if all data available
             if (!IsReady) return;
 
             // Skip update if no new sync message has arrived.
@@ -63,13 +61,16 @@ namespace RageCoop.Client
                 if (!CreateCharacter())
                     return;
 
-            // Need to update state
             if (LastFullSynced >= LastUpdated)
             {
                 if (MainPed != null && Model != MainPed.Model.Hash)
                     if (!CreateCharacter())
                         return;
 
+                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255)
+                {
+                    BlipColor = (BlipColor)255;
+                }
                 if ((byte)BlipColor == 255 && PedBlip != null)
                 {
                     PedBlip.Delete();
@@ -154,7 +155,7 @@ namespace RageCoop.Client
 
         private void RenderNameTag()
         {
-            if (!Owner.DisplayNameTag || MainPed == null || !MainPed.IsVisible ||
+            if (!Owner.DisplayNameTag || !Main.Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
                 !MainPed.IsInRange(Main.PlayerPosition, 40f)) return;
 
             var targetPos = MainPed.Bones[Bone.IKHead].Position + Vector3.WorldUp * 0.5f;
@@ -506,7 +507,6 @@ namespace RageCoop.Client
 
         private void WalkTo()
         {
-            MainPed.Task.ClearAll();
             Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
             var predictPosition = Predict(Position) + Velocity;
             var range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
@@ -523,7 +523,7 @@ namespace RageCoop.Client
                         Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, nrange);
                     }
 
-                    LastMoving = true;
+                    _lastMoving = true;
                     break;
                 case 2:
                     if (!MainPed.IsRunning || range > 0.50f)
@@ -532,7 +532,7 @@ namespace RageCoop.Client
                         Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
                     }
 
-                    LastMoving = true;
+                    _lastMoving = true;
                     break;
                 case 3:
                     if (!MainPed.IsSprinting || range > 0.75f)
@@ -543,13 +543,17 @@ namespace RageCoop.Client
                         Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
                     }
 
-                    LastMoving = true;
+                    _lastMoving = true;
                     break;
                 default:
-                    if (LastMoving)
+                    if (_lastMoving)
                     {
                         MainPed.Task.StandStill(2000);
-                        LastMoving = false;
+                        _lastMoving = false;
+                    }
+                    if (MainPed.IsTaskActive(TaskType.CTaskDiveToGround))
+                    {
+                        MainPed.Task.ClearAll();
                     }
 
                     break;
