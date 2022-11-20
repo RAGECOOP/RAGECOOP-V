@@ -31,8 +31,8 @@ namespace RageCoop.Client.Menus
 
         private static readonly NativeCheckboxItem _showBlip = new NativeCheckboxItem("Show player blip",
             "Show other player's nametag on your screen, only effective if server didn't disable nametag display",
-            Main.Settings.ShowPlayerBlip); 
-        
+            Main.Settings.ShowPlayerBlip);
+
         private static readonly NativeCheckboxItem _showNametag = new NativeCheckboxItem("Show player nametag",
             "Show other player's blip on map, can be overridden by server resource ",
             Main.Settings.ShowPlayerNameTag);
@@ -59,8 +59,16 @@ namespace RageCoop.Client.Menus
             _menuKey.Activated += ChaneMenuKey;
             _passengerKey.Activated += ChangePassengerKey;
             _vehicleSoftLimit.Activated += VehicleSoftLimitActivated;
-            _showBlip.Activated += (s, e) => Main.Settings.ShowPlayerBlip = _showBlip.Checked;
-            _showNametag.Activated += (s, e) => Main.Settings.ShowPlayerNameTag = _showNametag.Checked;
+            _showBlip.Activated += (s, e) =>
+            {
+                Main.Settings.ShowPlayerBlip = _showBlip.Checked;
+                Util.SaveSettings();
+            };
+            _showNametag.Activated += (s, e) =>
+            {
+                Main.Settings.ShowPlayerNameTag = _showNametag.Checked;
+                Util.SaveSettings();
+            };
 
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);

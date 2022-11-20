@@ -161,7 +161,8 @@ namespace RageCoop.Client
             _predictedPosition = Predict(Position);
             var current = MainVehicle.ReadPosition();
             var distSquared = current.DistanceToSquared(_predictedPosition);
-            var cali = _predictedPosition - current + 0.5f * (Velocity - MainVehicle.Velocity);
+            var cali = _predictedPosition - current;
+            if (!IsTrain) { cali += 0.5f * (Velocity - MainVehicle.Velocity); }
             if (distSquared > 10 * 10)
             {
                 MainVehicle.Position = _predictedPosition;
