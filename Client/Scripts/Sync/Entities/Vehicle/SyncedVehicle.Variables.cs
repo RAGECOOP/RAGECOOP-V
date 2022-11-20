@@ -59,7 +59,11 @@ namespace RageCoop.Client
         internal bool HasRoof;
         internal bool IsSubmarineCar;
         internal bool IsDeluxo;
-
+        internal bool IsTrain;
+        internal Vector3 TopExtent;
+        internal Vector3 FrontExtent;
+        internal Vector3 LeftExtent;
+        internal Vector3 RightExtent;
         #endregion
 
         #region PRIVATE

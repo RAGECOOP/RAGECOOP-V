@@ -11,24 +11,10 @@ namespace RageCoop.Client
     /// </summary>
     public partial class SyncedVehicle : SyncedEntity
     {
-        /// <summary>
-        ///     VehicleSeat,ID
-        /// </summary>
         internal override void Update()
         {
-#if DEBUG_VEH
-            foreach(var s in _predictedTrace)
-            {
-                World.DrawMarker(MarkerType.DebugSphere, s, default, default, new Vector3(0.3f, 0.3f, 0.3f), Color.AliceBlue);
-            }
-            foreach (var s in _orgTrace)
-            {
-                World.DrawMarker(MarkerType.DebugSphere, s, default, default, new Vector3(0.3f, 0.3f, 0.3f), Color.Orange);
-            }
-#endif
 
-
-            // Check if all data avalible
+            // Check if all data available
             if (!IsReady || Owner == null) return;
 
             // Check existence
@@ -174,10 +160,9 @@ namespace RageCoop.Client
         {
             _predictedPosition = Predict(Position);
             var current = MainVehicle.ReadPosition();
-            var dist = current.DistanceTo(_predictedPosition);
-            var cali = dist * (_predictedPosition - current);
-            if (Velocity.Length() < 0.1) cali *= 10;
-            if (dist > 10)
+            var distSquared = current.DistanceToSquared(_predictedPosition);
+            var cali = _predictedPosition - current + 0.5f * (Velocity - MainVehicle.Velocity);
+            if (distSquared > 10 * 10)
             {
                 MainVehicle.Position = _predictedPosition;
                 MainVehicle.Velocity = Velocity;
@@ -185,17 +170,15 @@ namespace RageCoop.Client
                 return;
             }
 
-            if (dist > 0.03) MainVehicle.Velocity = Velocity + cali;
+            // Calibrate rotation
+            var curQuat = MainVehicle.Quaternion;
+            MainVehicle.ApplyForce(Quaternion * TopExtent - curQuat * TopExtent, TopExtent);
+            MainVehicle.ApplyForce(Quaternion * FrontExtent - curQuat * FrontExtent, FrontExtent);
 
-            Vector3 calirot;
-            if (IsFlipped || (calirot = GetCalibrationRotation()).Length() > 50)
-            {
-                MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
-                MainVehicle.RotationVelocity = RotationVelocity;
-                return;
-            }
-
-            MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
+            // Calibrate position
+            if (distSquared < 0.03 * 0.03) return;
+            if (!IsTrain && distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
+            else MainVehicle.ApplyForce(cali);
         }
 
         private Vector3 GetCalibrationRotation()
@@ -273,6 +256,12 @@ namespace RageCoop.Client
             HasRoof = MainVehicle.HasRoof;
             IsSubmarineCar = MainVehicle.IsSubmarineCar;
             IsDeluxo = MainVehicle.Model == 1483171323;
+            IsTrain = MainVehicle.IsTrain;
+            var (rbl, ftr) = MainVehicle.Model.Dimensions;
+            FrontExtent = new Vector3(0, ftr.Y, 0);
+            TopExtent = new Vector3(0, 0, ftr.Z);
+            LeftExtent = new Vector3(rbl.X, 0, 0);
+            RightExtent = new Vector3(ftr.X, 0, 0);
         }
 
         /// <summary>

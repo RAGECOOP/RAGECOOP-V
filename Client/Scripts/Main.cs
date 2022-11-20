@@ -123,7 +123,7 @@ namespace RageCoop.Client
                 };
                 return;
             }
-
+            
             BaseScript.OnStart();
             SyncedPedsGroup = World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral,
@@ -217,7 +217,7 @@ namespace RageCoop.Client
             {
                 return;
             }
-            else if (!_gameLoaded && (_gameLoaded = true))
+            if (!_gameLoaded && (_gameLoaded = true))
             {
 #if !NON_INTERACTIVE
                 Notification.Show(NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!",
