@@ -20320,6 +20320,148 @@
             Tells the game we have finished using this <see cref="T:GTA.Model"/> and it can be freed from memory.
             </summary>
         </member>
+        <member name="T:GTA.EnterVehicleFlags">
+            <summary>
+            Set of flags to define the behaviour of the enter and exit vehicle tasks.
+            Shares the same flags with <see cref="T:GTA.LeaveVehicleFlags"/>.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.ResumeIfInterupted">
+            <summary>
+            Resume the enter vehicle task even if the task is interupted (bumped, shot).
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.WarpToDoor">
+            <summary>
+            Warp the <see cref="T:GTA.Ped"/> to entry point ready to open the door/enter seat.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.JackAnyone">
+            <summary>
+            Allow the <see cref="T:GTA.Ped"/> to jack regardless of relationship status if they have to jack someone to complete the enter vehicle task.
+            Without this flag, the <see cref="T:GTA.Ped"/> won't jack those they respect or like where the relationship is set to <see cref="F:GTA.Relationship.Companion"/> or <see cref="F:GTA.Relationship.Respect"/> towards them,
+            but may jack those they don't respect or like.
+            Without this flag, the <see cref="T:GTA.Ped"/> will abort the enter vehicle task if they have to jack one of those who respect or like to complete the enter vehicle task.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.WarpIn">
+            <summary>
+            Warp the <see cref="T:GTA.Ped"/> onto the <see cref="T:GTA.Vehicle"/>.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.DontCloseDoor">
+            <summary>
+            Dont close the vehicle door.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.WarpIfDoorIsBlocked">
+            <summary>
+            Allow ped to warp to the seat if entry is blocked.
+            If the shuffle link to that seat is blocked by someone but the entry point for the shuffle link is not directly blocked, the <see cref="T:GTA.Ped"/> won't warp.
+            Consider using <see cref="F:GTA.EnterVehicleFlags.WarpIfShuffleLinkIsBlocked"/> if you want the <see cref="T:GTA.Ped"/> to warp when the direct door and the shuffle link to that seat is blocked by someone.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.UseLeftEntry">
+            <summary>
+            Use entry/exit point on the left hand side.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.UseRightEntry">
+            <summary>
+            Use entry/exit point on the right hand side.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.JustPullPedOut">
+            <summary>
+            When jacking just open the door and/or pull the ped out, but don't get in.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.BlockSeatShuffling">
+            <summary>
+            Disable shuffling, forcing ped to use direct door only.
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.WarpIfShuffleLinkIsBlocked">
+            <summary>
+            Allow ped to warp if the direct door is blocked and the shuffle link to that seat is blocked by someone.
+            Unlike <see cref="F:GTA.EnterVehicleFlags.WarpIfDoorIsBlocked"/>, this flag allows the the <see cref="T:GTA.Ped"/> to warp when the direct door and the shuffle link to that seat is blocked by someone (regardless of whether the door linked to the shuffle link is directly blocked).
+            </summary>
+        </member>
+        <member name="F:GTA.EnterVehicleFlags.DontJackAnyone">
+            <summary>
+            Never jack anyone when entering/exiting.
+            This flag takes precedence over <see cref="F:GTA.EnterVehicleFlags.AllowJacking"/>.
+            </summary>
+        </member>
+        <member name="T:GTA.LeaveVehicleFlags">
+            <summary>
+            Set of flags to define the behaviour of the enter and exit vehicle tasks.
+            Shares the same flags with <see cref="T:GTA.EnterVehicleFlags"/>.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.WarpOut">
+            <summary>
+            Warp the ped out of the vehicle.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.DontWaitForVehicleToStop">
+            <summary>
+            Don't wait for the vehicle to stop before exiting.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.LeaveDoorOpen">
+            <summary>
+            Dont close the vehicle door.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.WarpIfDoorIsBlocked">
+            <summary>
+            Allow ped to warp to the seat if entry is blocked. The player <see cref="T:GTA.Ped"/> will warp out of the vehicle without any flags if the entry is blocked.
+            If the shuffle link to that seat is blocked by someone but the entry point for the shuffle link is not directly blocked, the <see cref="T:GTA.Ped"/> won't warp.
+            Consider using <see cref="F:GTA.LeaveVehicleFlags.WarpIfShuffleLinkIsBlocked"/> if you want the <see cref="T:GTA.Ped"/> to warp when the direct door and the shuffle link to that seat is blocked by someone.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.BailOut">
+            <summary>
+            Jump out of the vehicle regardness of its speed.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.DontDefaultWarpIfDoorBlocked">
+            <summary>
+            <see cref="M:GTA.TaskInvoker.LeaveVehicle(GTA.LeaveVehicleFlags)"/> (or <c>TASK_LEAVE_ANY_VEHICLE</c>) auto defaults the <see cref="F:GTA.LeaveVehicleFlags.WarpIfDoorIsBlocked"/>, set this flag to not set that.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.FromLeftSide">
+            <summary>
+            Use entry/exit point on the left hand side.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.FromRightSide">
+            <summary>
+            Use entry/exit point on the right hand side.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.BlockSeatShuffling">
+            <summary>
+            Disable shuffling, forcing ped to use direct door only.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.WarpIfShuffleLinkIsBlocked">
+            <summary>
+            Allow ped to warp if the direct door is blocked and the shuffle link to that seat is blocked by someone. The player <see cref="T:GTA.Ped"/> will warp out of the vehicle without any flags if the entry is blocked.
+            Unlike <see cref="F:GTA.LeaveVehicleFlags.WarpIfDoorIsBlocked"/>, this flag allows the the <see cref="T:GTA.Ped"/> to warp when the direct door and the shuffle link to that seat is blocked by someone (regardless of whether the door linked to the shuffle link is directly blocked).
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.DontJackAnyone">
+            <summary>
+            Never jack anyone when entering/exiting.
+            </summary>
+        </member>
+        <member name="F:GTA.LeaveVehicleFlags.WaitForEntryPointToBeClear">
+            <summary>
+            Wait for our entry point to be clear of peds before exiting.
+            </summary>
+        </member>
         <member name="M:GTA.Ped.Clone(System.Single)">
             <summary>
             Spawn an identical clone of this <see cref="T:GTA.Ped"/>.
@@ -20849,7 +20991,7 @@
             </summary>
         </member>
         <member name="F:GTA.VehicleDrivingFlags.DontSteerAroundPlayerPed">
-            <summary>Don't steer around the player ped even if <see cref="F:GTA.VehicleDrivingFlags.AvoidPeds"/> is set.</summary>
+            <summary>Don't steer around the player ped even if <see cref="F:GTA.VehicleDrivingFlags.SteerAroundPeds"/> is set.</summary>
         </member>
         <member name="F:GTA.VehicleDrivingFlags.GoOffRoadWhenAvoiding">
             <summary>
@@ -20868,9 +21010,24 @@
             If pathfinding fails, cruise randomly instead of going on a straight line.
             </summary>
         </member>
+        <member name="F:GTA.VehicleDrivingFlags.PreventBackgroundPathfinding">
+            <summary>
+            Only works when the car mission is set to MISSION_CRUISE.
+            </summary>
+        </member>
         <member name="F:GTA.VehicleDrivingFlags.AdjustCruiseSpeedBasedOnRoadSpeed">
             <summary>
             Limit the speed based on the road speed if the max cruise speed for driving tasks exceeds the road speed. Only works when the car mission is set to MISSION_CRUISE.
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.PlaneTaxiMode">
+            <summary>
+            Only works for planes using <c>MISSION_GOTO</c>, will cause them to drive along the ground instead of fly.
+            </summary>
+        </member>
+        <member name="F:GTA.VehicleDrivingFlags.ForceStraightLine">
+            <summary>
+            Force to go to the target directly instead of following the nodes regardless of the distance config for driving or vehicle mission tasks at which the ai switches to heading for the target directly.
             </summary>
         </member>
         <member name="P:GTA.Projectile.Owner">
@@ -21727,6 +21884,12 @@
             <value>
               <see langword="true" /> if this <see cref="T:GTA.Vehicle"/> has forks; otherwise, <see langword="false" />.
             </value>
+        </member>
+        <member name="M:GTA.Vehicle.StartParachuting(System.Boolean)">
+            <summary>
+            Open the vehicle's parachute (if any)
+            </summary>
+            <param name="allowPlayerToCancel">Whether to allow the player to cancel parachuting before the vehicle lands</param>
         </member>
         <member name="M:GTA.Vehicle.GetAllLoadedModelsAppropriateForAmbientVehicles">
             <summary>

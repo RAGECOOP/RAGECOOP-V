@@ -177,7 +177,7 @@ namespace RageCoop.Client
 
             // Calibrate position
             if (distSquared < 0.03 * 0.03) return;
-            if (!IsTrain && distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
+            if (IsTrain || distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
             else MainVehicle.ApplyForce(cali);
         }
 
