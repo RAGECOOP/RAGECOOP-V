@@ -89,11 +89,11 @@ namespace RageCoop.Client
                 if (HasRoof && MainVehicle.RoofState != RoofState) MainVehicle.RoofState = RoofState;
 
                 if (HasRocketBoost && Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) !=
-                    MainVehicle.IsRocketBoostActive())
-                    MainVehicle.SetRocketBoostActive(Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive));
-                if (HasParachute && Flags.HasFlag(VehicleDataFlags.IsParachuteActive) !=
-                    MainVehicle.IsParachuteActive())
-                    MainVehicle.SetParachuteActive(Flags.HasFlag(VehicleDataFlags.IsParachuteActive));
+                    MainVehicle.IsRocketBoostActive)
+                    MainVehicle.IsRocketBoostActive = Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive);
+                if (HasParachute && Flags.HasFlag(VehicleDataFlags.IsParachuteActive) &&
+                    !MainVehicle.IsParachuteDeployed)
+                    MainVehicle.StartParachuting(false);
                 if (IsSubmarineCar)
                 {
                     if (Transformed)
@@ -101,13 +101,13 @@ namespace RageCoop.Client
                         if (!_lastTransformed)
                         {
                             _lastTransformed = true;
-                            Function.Call(Hash._TRANSFORM_VEHICLE_TO_SUBMARINE, MainVehicle.Handle, false);
+                            Function.Call(Hash.TRANSFORM_TO_SUBMARINE, MainVehicle.Handle, false);
                         }
                     }
                     else if (_lastTransformed)
                     {
                         _lastTransformed = false;
-                        Function.Call(Hash._TRANSFORM_SUBMARINE_TO_VEHICLE, MainVehicle.Handle, false);
+                        Function.Call(Hash.TRANSFORM_TO_CAR, MainVehicle.Handle, false);
                     }
                 }
                 else if (IsDeluxo)

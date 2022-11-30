@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GTA;
 using GTA.Native;
 using GTA.UI;
+using RageCoop.Client.Menus;
 
 namespace RageCoop.Client
 {
@@ -33,8 +34,19 @@ namespace RageCoop.Client
 
         private void OnTick(object sender, EventArgs e)
         {
-            DoQueuedActions();
-            if (Game.IsLoading || !Networking.IsOnServer) return;
+            if (Game.IsLoading) return;
+
+            try
+            {
+                CoopMenu.MenuPool.Process();
+                DoQueuedActions();
+            }
+            catch (Exception ex)
+            {
+                Main.Logger.Error(ex);
+            }
+
+            if (!Networking.IsOnServer) return;
 
             Game.DisableControlThisFrame(Control.FrontendPause);
 

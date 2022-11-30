@@ -34,6 +34,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Console.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="DevTools\DevTool.cs" />
     <Compile Include="GUI\CefClient.cs" />

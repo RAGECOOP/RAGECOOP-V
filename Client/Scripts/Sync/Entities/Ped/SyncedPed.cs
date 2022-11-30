@@ -216,7 +216,7 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
             Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
-            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            // Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);

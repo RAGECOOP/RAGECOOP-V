@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 using GTA;
 using GTA.UI;
 using SHVDN;
@@ -10,26 +11,26 @@ using Script = GTA.Script;
 
 namespace RageCoop.Client.Loader
 {
+    [ScriptAttributes(Author = "RageCoop", NoScriptThread = true,
+        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     public class Main : Script
     {
         private static readonly string GameDir = Directory.GetParent(typeof(ScriptDomain).Assembly.Location).FullName;
         private static readonly string ScriptsLocation = Path.Combine(GameDir, "RageCoop", "Scripts");
-        private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
-        private static int MainThreadID;
+        private bool _loaded;
 
         public Main()
         {
-            if (LoaderContext.PrimaryDomain != null)
-                throw new InvalidOperationException(
-                    "Improperly placed loader assembly, please re-install to fix this issue");
+            if (LoaderContext.PrimaryDomain != null) return;
             Tick += OnTick;
-            ScriptDomain.CurrentDomain.Tick += DomainTick;
+            KeyDown += (s, e) => LoaderContext.KeyEventAll(e.KeyCode, true);
+            KeyUp += (s, e) => LoaderContext.KeyEventAll(e.KeyCode, false);
             Aborted += (s, e) => LoaderContext.UnloadAll();
         }
 
         private void OnTick(object sender, EventArgs e)
         {
-            while (Game.IsLoading) Yield();
+            if (!_loaded) { _loaded = !Game.IsLoading; return; }
             LoaderContext.CheckForUnloadRequest();
             if (!LoaderContext.IsLoaded(ScriptsLocation))
             {
@@ -37,32 +38,11 @@ namespace RageCoop.Client.Loader
                 {
                     Notification.Show("~r~Main assembly is missing, please re-install the client");
                     Abort();
+                    return;
                 }
-
                 LoaderContext.Load(ScriptsLocation);
             }
-        }
-
-        internal static void QueueToMainThread(Action task)
-        {
-            if (Thread.CurrentThread.ManagedThreadId != MainThreadID)
-                TaskQueue.Enqueue(task);
-            else
-                task();
-        }
-
-        private static void DomainTick()
-        {
-            if (MainThreadID == default) MainThreadID = Thread.CurrentThread.ManagedThreadId;
-            while (TaskQueue.TryDequeue(out var task))
-                try
-                {
-                    task.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Console.Error(ex.ToString());
-                }
+            LoaderContext.TickAll();
         }
     }
 }

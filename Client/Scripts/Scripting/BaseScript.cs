@@ -49,7 +49,7 @@ namespace RageCoop.Client.Scripting
                                 var weather1 = default(int);
                                 var weather2 = default(int);
                                 var percent2 = default(float);
-                                Function.Call(Hash._GET_WEATHER_TYPE_TRANSITION, &weather1, &weather2, &percent2);
+                                Function.Call(Hash.GET_CURR_WEATHER_STATE, &weather1, &weather2, &percent2);
                                 API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes,
                                     time.Seconds, weather1, weather2, percent2);
                             }
@@ -63,7 +63,7 @@ namespace RageCoop.Client.Scripting
         private static void WeatherTimeSync(CustomEventReceivedArgs e)
         {
             World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
-            Function.Call(Hash._SET_WEATHER_TYPE_TRANSITION, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
+            Function.Call(Hash.SET_CURR_WEATHER_STATE, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 
         private static void SetDisplayNameTag(CustomEventReceivedArgs e)

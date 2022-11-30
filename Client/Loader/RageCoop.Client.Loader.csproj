@@ -30,12 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ScriptHookVDotNet">
-      <HintPath>..\..\libs\ScriptHookVDotNet.dll</HintPath>
-    </Reference>
-    <Reference Include="ScriptHookVDotNet3">
+    <Reference Include="ScriptHookVDotNet3, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>True</SpecificVersion>
       <HintPath>..\..\libs\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
+
+	  <Reference Include="ScriptHookVDotNet">
+		  <HintPath>..\..\libs\ScriptHookVDotNet.asi</HintPath>
+	  </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -47,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Console.cs" />
     <Compile Include="LoaderContext.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

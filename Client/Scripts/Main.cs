@@ -28,7 +28,7 @@ namespace RageCoop.Client
     /// <summary>
     ///     Don't use it!
     /// </summary>
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false,
+    [ScriptAttributes(Author = "RageCoop", NoScriptThread = true,
         SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class Main : Script
     {
@@ -61,8 +61,6 @@ namespace RageCoop.Client
             Util.StartUpCheck();
 
             Directory.CreateDirectory(DataPath);
-            Console.Info(
-                $"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
             try
             {
                 Settings = Util.ReadSettings();
@@ -104,7 +102,6 @@ namespace RageCoop.Client
                         break;
                 }
             };
-            ScriptDomain.CurrentDomain.Tick += DomainTick;
             Resources = new Resources();
             if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
@@ -123,7 +120,9 @@ namespace RageCoop.Client
                 };
                 return;
             }
-            
+            Logger.Info(
+                $"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
+
             BaseScript.OnStart();
             SyncedPedsGroup = World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral,
@@ -146,7 +145,6 @@ namespace RageCoop.Client
             {
                 WorldThread.Instance?.Abort();
                 DevTool.Instance?.Abort();
-                ScriptDomain.CurrentDomain.Tick -= DomainTick;
                 CleanUp("Abort");
                 WorldThread.DoQueuedActions();
             }
@@ -155,34 +153,6 @@ namespace RageCoop.Client
                 Logger.Error(ex);
             }
         }
-
-        private static void DomainTick()
-        {
-            while (TaskQueue.TryDequeue(out var task))
-            {
-                try
-                {
-                    task.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
-            }
-
-            if (Networking.IsOnServer)
-            {
-                try
-                {
-                    EntityPool.DoSync();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
-            }
-        }
-
         /// <summary>
         ///     Queue an action to main thread and wait for execution to complete, must be called from script thread.
         /// </summary>
@@ -225,9 +195,17 @@ namespace RageCoop.Client
 #endif
             }
 
-#if !NON_INTERACTIVE
-            CoopMenu.MenuPool.Process();
-#endif
+            while (TaskQueue.TryDequeue(out var task))
+            {
+                try
+                {
+                    task.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex);
+                }
+            }
 
             if (CefRunning)
             {
@@ -239,7 +217,16 @@ namespace RageCoop.Client
                 return;
             }
 
-            if (Game.TimeScale != 1)
+            try
+            {
+                EntityPool.DoSync();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+
+            if (Game.TimeScale != 1.0f)
             {
                 Game.TimeScale = 1;
             }
@@ -248,13 +235,13 @@ namespace RageCoop.Client
             {
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
                         $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60),
                         $"S: {NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
             }
 
             MainChat.Tick();

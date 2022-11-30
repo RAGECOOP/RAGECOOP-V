@@ -40,7 +40,7 @@ namespace RageCoop.Client.GUI
             if (ActiveClient != null)
             {
                 Game.DisableAllControlsThisFrame();
-                Function.Call(Hash._SET_MOUSE_CURSOR_ACTIVE_THIS_FRAME);
+                Function.Call(Hash.SET_MOUSE_CURSOR_THIS_FRAME);
                 ActiveClient.Tick();
             }
         }
