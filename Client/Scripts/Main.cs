@@ -16,12 +16,10 @@ using RageCoop.Client.GUI;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
-using SHVDN;
 using static RageCoop.Client.Shared;
 using Console = GTA.Console;
 using Control = GTA.Control;
 using Screen = System.Windows.Forms.Screen;
-using Script = GTA.Script;
 
 namespace RageCoop.Client
 {
@@ -120,6 +118,7 @@ namespace RageCoop.Client
                 };
                 return;
             }
+
             Logger.Info(
                 $"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
 
@@ -153,6 +152,7 @@ namespace RageCoop.Client
                 Logger.Error(ex);
             }
         }
+
         /// <summary>
         ///     Queue an action to main thread and wait for execution to complete, must be called from script thread.
         /// </summary>
@@ -187,6 +187,7 @@ namespace RageCoop.Client
             {
                 return;
             }
+
             if (!_gameLoaded && (_gameLoaded = true))
             {
 #if !NON_INTERACTIVE
@@ -235,13 +236,13 @@ namespace RageCoop.Client
             {
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
                         $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
                 new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60),
                         $"S: {NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f)
-                { Alignment = Alignment.Center }.Draw();
+                    { Alignment = Alignment.Center }.Draw();
             }
 
             MainChat.Tick();

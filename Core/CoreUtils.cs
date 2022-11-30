@@ -17,7 +17,6 @@ using GTA.Math;
 using Lidgren.Network;
 using Newtonsoft.Json;
 using RageCoop.Core.Scripting;
-using Console = System.Console;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]

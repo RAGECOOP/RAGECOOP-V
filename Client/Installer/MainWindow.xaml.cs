@@ -54,6 +54,7 @@ namespace RageCoop.Client.Installer
         {
             UpdateStatus("Checking requirements");
             var shvPath = Path.Combine(root, "ScriptHookV.dll");
+            var shvdnPath = Path.Combine(root, "ScriptHookVDotNet3.dll");
             var scriptsPath = Path.Combine(root, "Scripts");
             var installPath = Path.Combine(root, "RageCoop", "Scripts");
             var legacyPath = Path.Combine(scriptsPath, "RageCoop");
@@ -68,8 +69,19 @@ namespace RageCoop.Client.Installer
 
             Directory.CreateDirectory(installPath);
 
-            File.Copy("ScriptHookVDotNet.dll", Path.Combine(root, "ScriptHookVDotNet.asi"), true);
-            File.Copy("ScriptHookVDotNet3.dll", Path.Combine(root, "ScriptHookVDotNet3.dll"), true);
+            if (!File.Exists(shvdnPath))
+            {
+                MessageBox.Show("Please install ScriptHookVDotNet first!");
+                Environment.Exit(1);
+            }
+
+            var shvdnVer = GetVer(shvdnPath);
+            if (shvdnVer < new Version(3, 5, 1))
+            {
+                MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
+                                $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
+                Environment.Exit(1);
+            }
 
 
             UpdateStatus("Removing old versions");
@@ -77,18 +89,19 @@ namespace RageCoop.Client.Installer
             foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
                 File.Delete(f);
 
-            // 1.5 installation check
+            // <= 1.5 installation check
             if (Directory.Exists(legacyPath)) Directory.Delete(legacyPath, true);
 
             foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories)) File.Delete(f);
 
-            if (File.Exists("RageCoop.Core.dll") && File.Exists("RageCoop.Client.dll") &&
-                File.Exists("RageCoop.Client.Loader.dll"))
+            if (File.Exists("Scripts/RageCoop.Core.dll") && File.Exists("Scripts/RageCoop.Client.dll") &&
+                File.Exists("Loader/RageCoop.Client.Loader.dll"))
             {
                 UpdateStatus("Installing...");
                 CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()),
                     new DirectoryInfo(installPath));
-                File.Copy("RageCoop.Client.Loader.dll", Path.Combine(scriptsPath, "RageCoop.Client.Loader.dll"), true);
+                File.Copy("Loader/RageCoop.Client.Loader.dll", Path.Combine(scriptsPath, "RageCoop.Client.Loader.dll"),
+                    true);
                 Finish();
             }
             else
@@ -165,7 +178,7 @@ namespace RageCoop.Client.Installer
                         }
                         catch
                         {
-                            MessageBox.Show("Failed to download ZeroTier, please download it from officail website");
+                            MessageBox.Show("Failed to download ZeroTier, please download it from official website");
                             Process.Start(url);
                         }
                     }
@@ -180,6 +193,11 @@ namespace RageCoop.Client.Installer
         private void UpdateStatus(string status)
         {
             Dispatcher.BeginInvoke(new Action(() => Status.Content = status));
+        }
+
+        private Version GetVer(string location)
+        {
+            return Version.Parse(FileVersionInfo.GetVersionInfo(location).FileVersion);
         }
     }
 }

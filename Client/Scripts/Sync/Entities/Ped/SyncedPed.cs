@@ -67,10 +67,7 @@ namespace RageCoop.Client
                     if (!CreateCharacter())
                         return;
 
-                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255)
-                {
-                    BlipColor = (BlipColor)255;
-                }
+                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
                 if ((byte)BlipColor == 255 && PedBlip != null)
                 {
                     PedBlip.Delete();
@@ -551,10 +548,8 @@ namespace RageCoop.Client
                         MainPed.Task.StandStill(2000);
                         _lastMoving = false;
                     }
-                    if (MainPed.IsTaskActive(TaskType.CTaskDiveToGround))
-                    {
-                        MainPed.Task.ClearAll();
-                    }
+
+                    if (MainPed.IsTaskActive(TaskType.CTaskDiveToGround)) MainPed.Task.ClearAll();
 
                     break;
             }

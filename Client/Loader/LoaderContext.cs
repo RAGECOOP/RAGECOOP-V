@@ -7,7 +7,6 @@ using System.Windows.Forms;
 using GTA.UI;
 using SHVDN;
 using Console = GTA.Console;
-using Script = GTA.Script;
 
 namespace RageCoop.Client.Loader
 {
@@ -68,10 +67,7 @@ namespace RageCoop.Client.Loader
                     // Copy to target domain base directory
                     // Delete loader assembly
                     var loaderPath = Path.Combine(dir, Path.GetFileName(typeof(LoaderContext).Assembly.Location));
-                    if (File.Exists(loaderPath))
-                    {
-                        File.Delete(loaderPath);
-                    }
+                    if (File.Exists(loaderPath)) File.Delete(loaderPath);
 
                     var context = (LoaderContext)newDomain.AppDomain.CreateInstanceFromAndUnwrap(
                         typeof(LoaderContext).Assembly.Location,
@@ -130,10 +126,7 @@ namespace RageCoop.Client.Loader
         {
             lock (_loadedDomains)
             {
-                foreach (var c in _loadedDomains.Values)
-                {
-                    c.DoTick();
-                }
+                foreach (var c in _loadedDomains.Values) c.DoTick();
             }
         }
 
@@ -141,10 +134,7 @@ namespace RageCoop.Client.Loader
         {
             lock (_loadedDomains)
             {
-                foreach (var c in _loadedDomains.Values)
-                {
-                    c.DoKeyEvent(keys, status);
-                }
+                foreach (var c in _loadedDomains.Values) c.DoKeyEvent(keys, status);
             }
         }
 
@@ -162,16 +152,20 @@ namespace RageCoop.Client.Loader
 
         private readonly Action _domainDoTick;
         private readonly Action<Keys, bool> _domainDoKeyEvent;
+
         private LoaderContext()
         {
             AppDomain.CurrentDomain.DomainUnload += (s, e) => Dispose();
 
             var tickMethod = typeof(ScriptDomain).GetMethod("DoTick", BindingFlags.Instance | BindingFlags.NonPublic);
-            var doKeyEventMethod = typeof(ScriptDomain).GetMethod("DoKeyEvent", BindingFlags.Instance | BindingFlags.NonPublic);
+            var doKeyEventMethod =
+                typeof(ScriptDomain).GetMethod("DoKeyEvent", BindingFlags.Instance | BindingFlags.NonPublic);
 
             // Create delegates to avoid using reflection to call method each time, which is slow
             _domainDoTick = (Action)Delegate.CreateDelegate(typeof(Action), CurrentDomain, tickMethod);
-            _domainDoKeyEvent = (Action<Keys, bool>)Delegate.CreateDelegate(typeof(Action<Keys, bool>), CurrentDomain, doKeyEventMethod);
+            _domainDoKeyEvent =
+                (Action<Keys, bool>)Delegate.CreateDelegate(typeof(Action<Keys, bool>), CurrentDomain,
+                    doKeyEventMethod);
 
             Console.Info(
                 $"Loaded domain: {AppDomain.CurrentDomain.FriendlyName}, {AppDomain.CurrentDomain.BaseDirectory}");
@@ -193,11 +187,20 @@ namespace RageCoop.Client.Loader
             CurrentContext.UnloadRequested = true;
         }
 
-        public override object InitializeLifetimeService() => null;
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
 
-        public void DoTick() => _domainDoTick();
+        public void DoTick()
+        {
+            _domainDoTick();
+        }
 
-        public void DoKeyEvent(Keys key, bool status) => _domainDoKeyEvent(key, status);
+        public void DoKeyEvent(Keys key, bool status)
+        {
+            _domainDoKeyEvent(key, status);
+        }
 
         public void Dispose()
         {

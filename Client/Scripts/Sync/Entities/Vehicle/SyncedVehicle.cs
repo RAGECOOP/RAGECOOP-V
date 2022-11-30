@@ -13,7 +13,6 @@ namespace RageCoop.Client
     {
         internal override void Update()
         {
-
             // Check if all data available
             if (!IsReady || Owner == null) return;
 
@@ -162,7 +161,7 @@ namespace RageCoop.Client
             var current = MainVehicle.ReadPosition();
             var distSquared = current.DistanceToSquared(_predictedPosition);
             var cali = _predictedPosition - current;
-            if (!IsTrain) { cali += 0.5f * (Velocity - MainVehicle.Velocity); }
+            if (!IsTrain) cali += 0.5f * (Velocity - MainVehicle.Velocity);
             if (distSquared > 10 * 10)
             {
                 MainVehicle.Position = _predictedPosition;

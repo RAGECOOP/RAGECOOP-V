@@ -102,6 +102,7 @@ namespace RageCoop.Core
     }
 
     #region ===== VEHICLE DATA =====
+
     [Flags]
     internal enum VehicleDataFlags : ushort
     {

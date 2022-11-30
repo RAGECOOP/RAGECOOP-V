@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.IO;
-using System.Threading;
-using System.Windows.Forms;
 using GTA;
 using GTA.UI;
 using SHVDN;
-using Console = GTA.Console;
 using Script = GTA.Script;
 
 namespace RageCoop.Client.Loader
@@ -30,7 +26,12 @@ namespace RageCoop.Client.Loader
 
         private void OnTick(object sender, EventArgs e)
         {
-            if (!_loaded) { _loaded = !Game.IsLoading; return; }
+            if (!_loaded)
+            {
+                _loaded = !Game.IsLoading;
+                return;
+            }
+
             LoaderContext.CheckForUnloadRequest();
             if (!LoaderContext.IsLoaded(ScriptsLocation))
             {
@@ -40,8 +41,10 @@ namespace RageCoop.Client.Loader
                     Abort();
                     return;
                 }
+
                 LoaderContext.Load(ScriptsLocation);
             }
+
             LoaderContext.TickAll();
         }
     }

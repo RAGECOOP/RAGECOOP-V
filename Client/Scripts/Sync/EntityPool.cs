@@ -291,9 +291,6 @@ namespace RageCoop.Client
         private static int vehStatesPerFrame;
         private static int pedStatesPerFrame;
         private static int i;
-        public static Ped[] allPeds = new Ped[0];
-        public static Vehicle[] allVehicles = new Vehicle[0];
-        public static Projectile[] allProjectiles = new Projectile[0];
 
         public static void DoSync()
         {
@@ -302,9 +299,9 @@ namespace RageCoop.Client
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles] = PerfCounter.ElapsedTicks;
 #endif
-            allPeds = World.GetAllPeds();
-            allVehicles = World.GetAllVehicles();
-            allProjectiles = World.GetAllProjectiles();
+            var allPeds = World.GetAllPeds();
+            var allVehicles = World.GetAllVehicles();
+            var allProjectiles = World.GetAllProjectiles();
             vehStatesPerFrame = allVehicles.Length * 2 / (int)Game.FPS + 1;
             pedStatesPerFrame = allPeds.Length * 2 / (int)Game.FPS + 1;
 #if BENCHMARK

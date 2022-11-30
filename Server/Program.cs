@@ -35,7 +35,7 @@ internal class Program
 
             Environment.Exit(i);
         }
-        
+
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
         mainLogger = new Logger
         {

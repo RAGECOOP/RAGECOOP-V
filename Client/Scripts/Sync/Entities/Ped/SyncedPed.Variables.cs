@@ -15,6 +15,8 @@ namespace RageCoop.Client
         private bool _lastDriveBy;
         private bool _lastInCover;
         private bool _lastIsJumping;
+
+        private bool _lastMoving;
         private bool _lastRagdoll;
         private ulong _lastRagdollTime;
         private Dictionary<uint, bool> _lastWeaponComponents;
@@ -23,8 +25,6 @@ namespace RageCoop.Client
         internal float BlipScale = 1;
         internal BlipSprite BlipSprite = 0;
         internal PedDataFlags Flags;
-
-        private bool _lastMoving;
         internal Blip PedBlip = null;
         internal VehicleSeat Seat;
 

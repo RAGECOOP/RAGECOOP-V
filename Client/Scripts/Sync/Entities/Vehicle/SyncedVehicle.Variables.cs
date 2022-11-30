@@ -64,6 +64,7 @@ namespace RageCoop.Client
         internal Vector3 FrontExtent;
         internal Vector3 LeftExtent;
         internal Vector3 RightExtent;
+
         #endregion
 
         #region PRIVATE

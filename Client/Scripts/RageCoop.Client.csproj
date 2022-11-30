@@ -204,6 +204,4 @@
 			dotnet build -c $(Configuration) "$(SolutionDir)Client\CefHost\RageCoop.Client.CefHost.csproj"
 		</PreBuildEvent>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' != 'API'">
-  </PropertyGroup>
 </Project>
