@@ -198,7 +198,7 @@
 			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
 		</PostBuildEvent>
     <PostBuildEvent Condition="'$(Configuration)' != 'API' AND '$(SolutionDir)' != '*Undefined*'">
-			copy "$(SolutionDir)Client\Data" "..\Data" /y
+			xcopy "$(SolutionDir)Client\Data" "..\Data" /i /s
 		</PostBuildEvent>
     <PreBuildEvent Condition=" '$(SolutionDir)' != '*Undefined*'">
 			dotnet build -c $(Configuration) "$(SolutionDir)Client\CefHost\RageCoop.Client.CefHost.csproj"
