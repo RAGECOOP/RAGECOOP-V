@@ -22,19 +22,26 @@ namespace RageCoop.Client
 
         private void OnTick(object sender, EventArgs e)
         {
-            var wb = Game.Player.Character?.Weapons?.CurrentWeaponObject?.Bones["gun_muzzle"];
-            if (wb?.IsValid == true) World.DrawLine(wb.Position, wb.Position + wb.RightVector, Color.Blue);
+            foreach (var p in World.GetAllPeds()) DrawWeaponBone(p);
             if (ToMark == null) return;
 
             if (WeaponUtil.VehicleWeapons.TryGetValue((uint)(int)ToMark.Model, out var info))
                 foreach (var ws in info.Weapons)
-                foreach (var w in ws.Value.Bones)
-                    DrawBone(w.BoneName, ws.Value.Name + ":" + ws.Key.ToHex());
+                    foreach (var w in ws.Value.Bones)
+                        DrawBone(w.BoneName, ws.Value.Name + ":" + ws.Key.ToHex());
             var P = Game.Player.Character;
             var b = ToMark.GetMuzzleBone(P.VehicleWeapon);
             if (b != null) World.DrawLine(b.Position, b.Position + b.ForwardVector * 5, Color.Brown);
         }
 
+        public static void DrawWeaponBone(Ped p)
+        {
+            var wb = p.Weapons?.CurrentWeaponObject?.Bones["gun_muzzle"];
+            if (wb?.IsValid == true) World.DrawLine(wb.Position, wb.Position + wb.RightVector, Color.Blue);
+            if (wb?.IsValid == true) World.DrawLine(wb.Position, wb.Position + wb.ForwardVector, Color.Red);
+            if (wb?.IsValid == true) World.DrawLine(wb.Position, wb.Position + wb.UpVector, Color.Green);
+
+        }
         private void FindAndDraw()
         {
             DrawBone("weapon_1a");

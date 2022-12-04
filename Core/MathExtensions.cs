@@ -22,6 +22,16 @@ namespace RageCoop.Core
             };
         }
 
+        public static Vector3 Limit(this Vector3 v, float length)
+        {
+            // Avoid square root to gain more performance
+            if (v.LengthSquared() > length * length)
+            {
+                return v.Normalized * length;
+            }
+            return v;
+        }
+
         /// <summary>
         /// </summary>
         public static Vector3 ToVector(this Quaternion vec)

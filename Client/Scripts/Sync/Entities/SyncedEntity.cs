@@ -10,13 +10,8 @@ namespace RageCoop.Client
     {
         private float _accumulatedOff;
 
-        /// <summary>
-        /// </summary>
-        protected internal bool _lastFrozen = false;
-
 
         private int _ownerID;
-        public Stopwatch LastSyncedStopWatch = new Stopwatch();
 
         /// <summary>
         ///     Indicates whether the current player is responsible for syncing this entity.
@@ -70,7 +65,11 @@ namespace RageCoop.Client
 
         protected Vector3 Predict(Vector3 input)
         {
-            return (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Velocity + input;
+            return Diff() + input;
+        }
+        protected Vector3 Diff()
+        {
+            return (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Velocity;
         }
 
         protected bool IsOff(float thisOff, float tolerance = 3, float limit = 30)
@@ -90,6 +89,24 @@ namespace RageCoop.Client
         }
 
         #region LAST STATE
+
+        public void SetLastSynced(bool full)
+        {
+            LastSyncInterval = LastSentStopWatch.ElapsedMilliseconds;
+            LastSynced = Main.Ticked;
+            if (full)
+            {
+                LastFullSynced = Main.Ticked;
+            }
+            LastSyncedStopWatch.Restart();
+        }
+
+        public Stopwatch LastSyncedStopWatch = new Stopwatch();
+
+        /// <summary>
+        /// The interval between last sync and the earlier one
+        /// </summary>
+        public long LastSyncInterval;
 
         /// <summary>
         ///     Last time a new sync message arrived.

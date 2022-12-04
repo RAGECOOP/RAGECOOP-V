@@ -466,29 +466,45 @@ namespace RageCoop.Client
 
         private void CheckCurrentWeapon()
         {
-            if (MainPed.Weapons.Current.Hash != (WeaponHash)CurrentWeaponHash ||
-                !WeaponComponents.Compare(_lastWeaponComponents) || (Speed <= 3 && _weaponObj?.IsVisible != true))
+            if (MainPed.VehicleWeapon != VehicleWeapon) MainPed.VehicleWeapon = VehicleWeapon;
+            var compChanged = WeaponComponents != null && WeaponComponents.Count != 0 && WeaponComponents != _lastWeaponComponents && !WeaponComponents.Compare(_lastWeaponComponents);
+            if (_lastWeaponHash != CurrentWeapon || compChanged)
             {
-                new WeaponAsset(CurrentWeaponHash).Request();
-
-                MainPed.Weapons.RemoveAll();
-                _weaponObj = Entity.FromHandle(Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeaponHash, -1,
-                    Position.X, Position.Y, Position.Z, true, 0, 0));
-                if (_weaponObj == null) return;
-                if (CurrentWeaponHash != (uint)WeaponHash.Unarmed)
+                if (_lastWeaponHash == WeaponHash.Unarmed && WeaponObj?.Exists() == true)
                 {
-                    if (WeaponComponents != null && WeaponComponents.Count != 0)
-                        foreach (var comp in WeaponComponents)
-                            if (comp.Value)
-                                Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, _weaponObj, comp.Key);
-                    Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, _weaponObj, MainPed.Handle);
+                    WeaponObj.Delete();
+                }
+                else
+                {
+                    var model = Function.Call<uint>(Hash.GET_WEAPONTYPE_MODEL, CurrentWeapon);
+                    if (!Function.Call<bool>(Hash.HAS_MODEL_LOADED, model))
+                    {
+                        Function.Call(Hash.REQUEST_MODEL, model);
+                        return;
+                    }
+                    if (WeaponObj?.Exists() == true)
+                        WeaponObj.Delete();
+                    MainPed.Weapons.RemoveAll();
+                    WeaponObj = Entity.FromHandle(Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeapon, -1, Position.X, Position.Y, Position.Z, true, 0, 0));
                 }
 
-                _lastWeaponComponents = WeaponComponents;
+                if (compChanged)
+                {
+                    foreach (var comp in WeaponComponents)
+                    {
+                        if (comp.Value)
+                        {
+                            Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, WeaponObj.Handle, comp.Key);
+                        }
+                    }
+                    _lastWeaponComponents = WeaponComponents;
+                }
+                Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, WeaponObj.Handle, MainPed.Handle);
+                _lastWeaponHash = CurrentWeapon;
             }
 
-            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeaponHash) != WeaponTint)
-                Function.Call<int>(Hash.SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeaponHash, WeaponTint);
+            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon) != WeaponTint)
+                Function.Call<int>(Hash.SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon, WeaponTint);
         }
 
         private void DisplayAiming()
@@ -633,6 +649,7 @@ namespace RageCoop.Client
             if (CurrentVehicle?.MainVehicle == null) return;
             switch (Speed)
             {
+                // In vehicle
                 case 4:
                     if (MainPed.CurrentVehicle != CurrentVehicle.MainVehicle || MainPed.SeatIndex != Seat ||
                         (!MainPed.IsSittingInVehicle() && !MainPed.IsBeingJacked))
@@ -640,9 +657,10 @@ namespace RageCoop.Client
                     if (MainPed.IsOnTurretSeat())
                         Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y,
                             AimCoords.Z);
-                    if (MainPed.VehicleWeapon == VehicleWeaponHash.Invalid)
+
+                    // Drive-by
+                    if (VehicleWeapon == VehicleWeaponHash.Invalid)
                     {
-                        // World.DrawMarker(MarkerType.DebugSphere,AimCoords,default,default,new Vector3(0.2f,0.2f,0.2f),Color.AliceBlue);
                         if (IsAiming)
                         {
                             Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed, 0, 0, AimCoords.X, AimCoords.Y,
@@ -660,31 +678,24 @@ namespace RageCoop.Client
                             _lastDriveBy = false;
                         }
                     }
-                    else if (MainPed.VehicleWeapon != (VehicleWeaponHash)CurrentWeaponHash)
-                    {
-                        MainPed.VehicleWeapon = (VehicleWeaponHash)CurrentWeaponHash;
-                    }
-
                     break;
+
+                // Entering vehicle
                 case 5:
                     if (MainPed.VehicleTryingToEnter != CurrentVehicle.MainVehicle ||
                         MainPed.GetSeatTryingToEnter() != Seat)
                         MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle, Seat, -1, 5,
-                            EnterVehicleFlags.AllowJacking);
+                            EnterVehicleFlags.JackAnyone);
                     break;
+
+                // Leaving vehicle
                 case 6:
                     if (!MainPed.IsTaskActive(TaskType.CTaskExitVehicle))
-                        MainPed.Task.LeaveVehicle(CurrentVehicle.Velocity.Length() > 5f
+                        MainPed.Task.LeaveVehicle(CurrentVehicle.Velocity.LengthSquared() > 5 * 5
                             ? LeaveVehicleFlags.BailOut
                             : LeaveVehicleFlags.None);
                     break;
             }
-
-
-            /*
-            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, P,true, 0);
-            return Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, P);
-            */
         }
     }
 }

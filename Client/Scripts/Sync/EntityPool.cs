@@ -239,8 +239,10 @@ namespace RageCoop.Client
         {
             if (!p.IsValid) return;
             if (p.WeaponHash == (WeaponHash)VehicleWeaponHash.Tank)
-                Networking.SendBullet(p.Position, p.Position + p.Velocity, (uint)VehicleWeaponHash.Tank,
-                    ((SyncedVehicle)p.Shooter).MainVehicle.Driver.GetSyncEntity().ID);
+            {
+                Networking.SendBullet(((SyncedVehicle)p.Shooter).MainVehicle.Driver.GetSyncEntity().ID, (uint)VehicleWeaponHash.Tank, p.Position + p.Velocity);
+                return;
+            }
             if (ProjectilesByID.ContainsKey(p.ID))
                 ProjectilesByID[p.ID] = p;
             else

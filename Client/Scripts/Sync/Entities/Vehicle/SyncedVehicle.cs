@@ -22,7 +22,7 @@ namespace RageCoop.Client
                     return;
 
 
-            DisplayVehicle();
+            DisplayVehicle(NeedUpdate);
             // Skip update if no new sync message has arrived.
             if (!NeedUpdate) return;
 
@@ -155,7 +155,7 @@ namespace RageCoop.Client
             LastUpdated = Main.Ticked;
         }
 
-        private void DisplayVehicle()
+        private void DisplayVehicle(bool updated)
         {
             _predictedPosition = Predict(Position);
             var current = MainVehicle.ReadPosition();
@@ -170,37 +170,22 @@ namespace RageCoop.Client
                 return;
             }
 
-            // Calibrate rotation
-            var curQuat = MainVehicle.Quaternion;
-            MainVehicle.ApplyForce(Quaternion * TopExtent - curQuat * TopExtent, TopExtent);
-            MainVehicle.ApplyForce(Quaternion * FrontExtent - curQuat * FrontExtent, FrontExtent);
-
             // Calibrate position
-            if (distSquared < 0.03 * 0.03) return;
-            if (IsTrain || distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
-            else MainVehicle.ApplyForce(cali);
-        }
+            if (distSquared > 0.03 * 0.03)
+            {
+                if (IsTrain || distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
+                else MainVehicle.ApplyForce(cali);
+            }
 
-        private Vector3 GetCalibrationRotation()
-        {
-            var rot = Quaternion.LookRotation(Quaternion * Vector3.RelativeFront, Quaternion * Vector3.RelativeTop)
-                .ToEulerAngles();
-            var curRot = Quaternion.LookRotation(MainVehicle.ReadQuaternion() * Vector3.RelativeFront,
-                MainVehicle.ReadQuaternion() * Vector3.RelativeTop).ToEulerAngles();
+            Quaternion predictedQuat = updated ? Quaternion :
+                Quaternion.Lerp(LastQuaternion, Quaternion, 1 + LastSyncedStopWatch.ElapsedMilliseconds / (float)LastSyncInterval);
+            var curQuat = MainVehicle.Quaternion;
+            MainVehicle.ApplyForce((predictedQuat * TopExtent - curQuat * TopExtent) * RotCalMult, TopExtent);
+            MainVehicle.ApplyForce((predictedQuat * FrontExtent - curQuat * FrontExtent) * RotCalMult, FrontExtent);
+            // MainVehicle.ApplyForce((predictedQuat * BottomExtent - curQuat * BottomExtent) * RotCalMult, BottomExtent);
 
-            var r = (rot - curRot).ToDegree();
-            if (r.X > 180)
-                r.X = r.X - 360;
-            else if (r.X < -180) r.X = 360 + r.X;
 
-            if (r.Y > 180)
-                r.Y = r.Y - 360;
-            else if (r.Y < -180) r.Y = 360 + r.Y;
 
-            if (r.Z > 180)
-                r.Z = r.Z - 360;
-            else if (r.Z < -180) r.Z = 360 + r.Z;
-            return r;
         }
 
         private bool CreateVehicle()
@@ -257,11 +242,13 @@ namespace RageCoop.Client
             IsSubmarineCar = MainVehicle.IsSubmarineCar;
             IsDeluxo = MainVehicle.Model == 1483171323;
             IsTrain = MainVehicle.IsTrain;
-            var (rbl, ftr) = MainVehicle.Model.Dimensions;
-            FrontExtent = new Vector3(0, ftr.Y, 0);
-            TopExtent = new Vector3(0, 0, ftr.Z);
-            LeftExtent = new Vector3(rbl.X, 0, 0);
-            RightExtent = new Vector3(ftr.X, 0, 0);
+            // var (rbl, ftr) = MainVehicle.Model.Dimensions;
+            FrontExtent = new Vector3(0, ExtentLength, 0);
+            RearExtent = -FrontExtent;
+            TopExtent = new Vector3(0, ExtentLength, 5);
+            BottomExtent = -TopExtent;
+            RightExtent = new Vector3(5, ExtentLength, 0);
+            LeftExtent = -RightExtent;
         }
 
         /// <summary>

@@ -25,24 +25,13 @@ namespace RageCoop.Client
             }, ConnectionChannel.SyncEvents, NetDeliveryMethod.ReliableOrdered);
         }
 
-        public static void TriggerBulletShot(uint hash, SyncedPed owner, Vector3 impactPosition)
+        public static void TriggerBulletShot(SyncedPed owner, Vector3 impactPosition)
         {
-            // Main.Logger.Trace($"bullet shot:{(WeaponHash)hash}");
+            var hash = (uint)owner.MainPed.VehicleWeapon;
+            if (hash == (uint)VehicleWeaponHash.Invalid)
+                hash = (uint)owner.MainPed.Weapons.Current.Hash;
 
-            var start = owner.MainPed.GetMuzzlePosition();
-            if (start.DistanceTo(impactPosition) > 10)
-                // Reduce latency
-                start = impactPosition - (impactPosition - start).Normalized * 10;
-            Networking.SendBullet(start, impactPosition, hash, owner.ID);
-        }
-
-        public static void TriggerVehBulletShot(uint hash, Vehicle veh, SyncedPed owner)
-        {
-            int i;
-            if ((i = veh.GetMuzzleIndex(owner.MainPed.VehicleWeapon)) != -1)
-                Networking.SendVehicleBullet(hash, owner, veh.Bones[i]);
-            else
-                Main.Logger.Warning($"Failed to get muzzle info for vehicle:{veh.DisplayName}");
+            Networking.SendBullet(owner.ID, hash, impactPosition);
         }
 
         public static void TriggerNozzleTransform(int vehID, bool hover)
@@ -67,7 +56,7 @@ namespace RageCoop.Client
             var v = EntityPool.GetVehicleByID(p.ID);
             if (v == null) return;
             v.OwnerID = p.NewOwnerID;
-            v.LastSynced = Main.Ticked;
+            v.SetLastSynced(true);
             v.Position = v.MainVehicle.Position;
             v.Quaternion = v.MainVehicle.Quaternion;
         }
@@ -77,42 +66,38 @@ namespace RageCoop.Client
             EntityPool.GetVehicleByID(p.VehicleID)?.MainVehicle?.SetNozzleAngel(p.Hover ? 1 : 0);
         }
 
-        private static void HandleBulletShot(Vector3 start, Vector3 end, uint weaponHash, int ownerID)
+        private static void HandleBulletShot(int ownerID, uint weaponHash, Vector3 end)
         {
-            var p = EntityPool.GetPedByID(ownerID)?.MainPed;
+            var c = EntityPool.GetPedByID(ownerID);
+            var p = c?.MainPed;
             if (p == null)
             {
-                p = Game.Player.Character;
-                Main.Logger.Warning("Failed to find owner for bullet");
+                return;
+                // p = Game.Player.Character;
+                // Main.Logger.Warning("Failed to find owner for bullet");
             }
 
             var damage = (int)p.GetWeaponDamage(weaponHash);
+
+            // Some weapon hash has some firing issue, so we need to replace it with known good ones
             weaponHash = WeaponUtil.GetWeaponFix(weaponHash);
 
+            // Request asset for muzzle flash
             if (!CorePFXAsset.IsLoaded) CorePFXAsset.Request();
+
+            // Request asset for materialising the bullet
             var asset = new WeaponAsset(weaponHash);
             if (!asset.IsLoaded) asset.Request();
-            World.ShootBullet(start, end, p, asset, damage);
-            Prop w;
-            var turret = false;
-            if (((w = p.Weapons.CurrentWeaponObject) != null && p.VehicleWeapon == VehicleWeaponHash.Invalid) ||
-                (turret = p.IsOnTurretSeat()))
-                World.CreateParticleEffectNonLooped(CorePFXAsset,
-                    p.Weapons.Current.Components.GetSuppressorComponent().Active
-                        ? "muz_pistol_silencer"
-                        : ((WeaponHash)weaponHash).GetFlashFX(turret), p.GetMuzzlePosition(),
-                    turret ? p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon).GetRotation() : w.Rotation);
-        }
 
-        public static void HandleVehicleBulletShot(Packets.VehicleBulletShot p)
-        {
-            HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
-            var v = EntityPool.GetPedByID(p.OwnerID)?.MainPed.CurrentVehicle;
-            if (v == null) return;
-            var b = v.Bones[p.Bone];
+            bool isVeh = p.VehicleWeapon != VehicleWeaponHash.Invalid;
+            var bone = c.GetMuzzleBone(isVeh);
+
+            World.ShootBullet(bone.Position, end, p, asset, damage);
+
             World.CreateParticleEffectNonLooped(CorePFXAsset,
-                ((WeaponHash)p.WeaponHash).GetFlashFX(true),
-                b.Position, b.GetRotation());
+                !isVeh && p.Weapons.Current.Components.GetSuppressorComponent().Active
+                    ? "muz_pistol_silencer"
+                    : ((WeaponHash)weaponHash).GetFlashFX(isVeh), bone.Position, isVeh ? bone.GetRotation() : bone.Owner.Rotation);
         }
 
         public static void HandleEvent(PacketType type, NetIncomingMessage msg)
@@ -120,31 +105,26 @@ namespace RageCoop.Client
             switch (type)
             {
                 case PacketType.BulletShot:
-                {
-                    var p = msg.GetPacket<Packets.BulletShot>();
-                    HandleBulletShot(p.StartPosition, p.EndPosition, p.WeaponHash, p.OwnerID);
-                    break;
-                }
-                case PacketType.VehicleBulletShot:
-                {
-                    HandleVehicleBulletShot(msg.GetPacket<Packets.VehicleBulletShot>());
-                    break;
-                }
+                    {
+                        var p = msg.GetPacket<Packets.BulletShot>();
+                        HandleBulletShot(p.OwnerID, p.WeaponHash, p.EndPosition);
+                        break;
+                    }
                 case PacketType.OwnerChanged:
-                {
-                    HandleOwnerChanged(msg.GetPacket<Packets.OwnerChanged>());
-                }
+                    {
+                        HandleOwnerChanged(msg.GetPacket<Packets.OwnerChanged>());
+                    }
                     break;
                 case PacketType.PedKilled:
-                {
-                    HandlePedKilled(msg.GetPacket<Packets.PedKilled>());
-                }
+                    {
+                        HandlePedKilled(msg.GetPacket<Packets.PedKilled>());
+                    }
                     break;
                 case PacketType.NozzleTransform:
-                {
-                    HandleNozzleTransform(msg.GetPacket<Packets.NozzleTransform>());
-                    break;
-                }
+                    {
+                        HandleNozzleTransform(msg.GetPacket<Packets.NozzleTransform>());
+                        break;
+                    }
             }
 
             Networking.Peer.Recycle(msg);
@@ -159,55 +139,42 @@ namespace RageCoop.Client
             var subject = c.MainPed;
 
             // Check bullets
-            if (subject.IsShooting)
+            if (subject.IsShooting && !subject.IsUsingProjectileWeapon())
             {
-                if (!subject.IsUsingProjectileWeapon())
+
+                var i = 0;
+
+                // Some weapon is not instant hit, so we may need to wait a few ticks to get the impact position
+                bool getBulletImpact()
                 {
-                    var i = 0;
-                    Func<bool> getBulletImpact = () =>
+                    var endPos = subject.LastWeaponImpactPosition;
+
+                    // Impact found
+                    if (endPos != default)
                     {
-                        var endPos = subject.LastWeaponImpactPosition;
-                        if (endPos == default)
-                        {
-                            if (++i <= 5) return false;
-
-                            endPos = subject.GetAimCoord();
-                            if (subject.IsInVehicle() && subject.VehicleWeapon != VehicleWeaponHash.Invalid)
-                            {
-                                if (subject.IsOnTurretSeat())
-                                    TriggerBulletShot((uint)subject.VehicleWeapon, c, endPos);
-                                else
-                                    TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle, c);
-                            }
-                            else
-                            {
-                                TriggerBulletShot((uint)subject.Weapons.Current.Hash, c, endPos);
-                            }
-
-                            return true;
-                        }
-
-                        if (subject.IsInVehicle() && subject.VehicleWeapon != VehicleWeaponHash.Invalid)
-                        {
-                            if (subject.IsOnTurretSeat())
-                                TriggerBulletShot((uint)subject.VehicleWeapon, c, endPos);
-                            else
-                                TriggerVehBulletShot((uint)subject.VehicleWeapon, subject.CurrentVehicle, c);
-                        }
-                        else
-                        {
-                            TriggerBulletShot((uint)subject.Weapons.Current.Hash, c, endPos);
-                        }
-
+                        TriggerBulletShot(c, endPos);
                         return true;
-                    };
+                    }
 
-                    if (!getBulletImpact()) API.QueueAction(getBulletImpact);
+                    // Not found, but it's shot from a vehicle
+                    if (subject.VehicleWeapon != VehicleWeaponHash.Invalid)
+                    {
+                        var b = c.GetMuzzleBone(true);
+                        TriggerBulletShot(c, b.Position + b.ForwardVector * 200);
+                        return true;
+                    }
+
+                    // Get impact in next tick
+                    if (++i <= 5) return false;
+
+                    // Exceeded maximum wait of 5 ticks, return (inaccurate) aim coordinate
+                    endPos = subject.GetAimCoord();
+                    TriggerBulletShot(c, endPos);
+                    return true;
+
                 }
-                else if (subject.VehicleWeapon == VehicleWeaponHash.Tank && subject.LastWeaponImpactPosition != default)
-                {
-                    TriggerBulletShot((uint)VehicleWeaponHash.Tank, c, subject.LastWeaponImpactPosition);
-                }
+
+                if (!getBulletImpact()) API.QueueAction(getBulletImpact);
             }
         }
 

@@ -65,8 +65,9 @@ namespace RageCoop.Client
             sp.LastSentStopWatch.Restart();
             if (full)
             {
-                var w = ped.VehicleWeapon;
-                p.CurrentWeaponHash = w != VehicleWeaponHash.Invalid ? (uint)w : (uint)ped.Weapons.Current.Hash;
+                if (p.Speed == 4)
+                    p.VehicleWeapon = ped.VehicleWeapon;
+                p.CurrentWeapon = ped.Weapons.Current.Hash;
                 p.Flags |= PedDataFlags.IsFullSync;
                 p.Clothes = ped.GetPedClothes();
                 p.ModelHash = ped.Model.Hash;
@@ -153,7 +154,7 @@ namespace RageCoop.Client
         public static void SendChatMessage(string message)
         {
             Peer.SendTo(new Packets.ChatMessage(s => Security.Encrypt(s.GetBytes()))
-                    { Username = Main.Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
+            { Username = Main.Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
                 NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
@@ -177,27 +178,14 @@ namespace RageCoop.Client
 
         #region SYNC EVENTS
 
-        public static void SendBullet(Vector3 start, Vector3 end, uint weapon, int ownerID)
+        public static void SendBullet(int ownerID, uint weapon, Vector3 end)
         {
             SendSync(new Packets.BulletShot
             {
-                StartPosition = start,
                 EndPosition = end,
                 OwnerID = ownerID,
                 WeaponHash = weapon
             }, ConnectionChannel.SyncEvents);
-        }
-
-        public static void SendVehicleBullet(uint hash, SyncedPed owner, EntityBone b)
-        {
-            SendSync(new Packets.VehicleBulletShot
-            {
-                StartPosition = b.Position,
-                EndPosition = b.Position + b.ForwardVector,
-                OwnerID = owner.ID,
-                Bone = (ushort)b.Index,
-                WeaponHash = hash
-            });
         }
 
         #endregion

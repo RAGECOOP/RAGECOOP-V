@@ -73,7 +73,7 @@ namespace RageCoop.Client
             if (!IsInCover) return "";
             var altitude = IsInLowCover ? "low" : "high";
 
-            var hands = GetWeaponHandsHeld(CurrentWeaponHash);
+            var hands = GetWeaponHandsHeld((uint)CurrentWeapon);
             if (IsBlindFiring)
             {
                 if (hands == 1) return "cover@weapon@1h";

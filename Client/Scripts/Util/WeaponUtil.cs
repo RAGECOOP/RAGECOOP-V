@@ -102,12 +102,11 @@ namespace RageCoop.Client
             return result;
         }
 
-        public static Vector3 GetMuzzlePosition(this Ped p)
+        public static EntityBone GetMuzzleBone(this SyncedPed p, bool veh)
         {
-            if (p.IsOnTurretSeat()) return p.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon).Position;
-            var wb = p.Weapons?.CurrentWeaponObject?.Bones["gun_muzzle"];
-            if (wb?.IsValid == true) return wb.Position;
-            return p.Bones[Bone.SkelRightHand].Position;
+            if (veh) return p.MainPed.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon);
+
+            return p.MainPed?.Weapons.CurrentWeaponObject?.Bones["gun_muzzle"];
         }
 
         public static float GetWeaponDamage(this Ped P, uint hash)

@@ -68,7 +68,7 @@ namespace RageCoop.Core
                 if (Flags.HasPedFlag(PedDataFlags.IsFullSync))
                 {
                     m.Write(ModelHash);
-                    m.Write(CurrentWeaponHash);
+                    m.Write((uint)CurrentWeapon);
                     m.Write(Clothes);
                     if (WeaponComponents != null)
                     {
@@ -87,6 +87,10 @@ namespace RageCoop.Core
                     }
 
                     m.Write(WeaponTint);
+
+                    // In vehicle
+                    if (Speed == 4)
+                        m.Write((uint)VehicleWeapon);
 
                     m.Write((byte)BlipColor);
                     if ((byte)BlipColor != 255)
@@ -142,7 +146,7 @@ namespace RageCoop.Core
                     ModelHash = m.ReadInt32();
 
                     // Read player weapon hash
-                    CurrentWeaponHash = m.ReadUInt32();
+                    CurrentWeapon = (WeaponHash)m.ReadUInt32();
 
                     // Read player clothes
                     Clothes = m.ReadBytes(36);
@@ -156,6 +160,9 @@ namespace RageCoop.Core
                     }
 
                     WeaponTint = m.ReadByte();
+
+                    if (Speed == 4)
+                        VehicleWeapon = (VehicleWeaponHash)m.ReadUInt32();
 
                     BlipColor = (BlipColor)m.ReadByte();
 
@@ -181,7 +188,9 @@ namespace RageCoop.Core
 
             public int ModelHash { get; set; }
 
-            public uint CurrentWeaponHash { get; set; }
+            public WeaponHash CurrentWeapon { get; set; }
+
+            public VehicleWeaponHash VehicleWeapon { get; set; }
 
             public byte[] Clothes { get; set; }
 

@@ -15,12 +15,12 @@ namespace RageCoop.Client
         private bool _lastDriveBy;
         private bool _lastInCover;
         private bool _lastIsJumping;
-
+        private WeaponHash _lastWeaponHash;
         private bool _lastMoving;
         private bool _lastRagdoll;
         private ulong _lastRagdollTime;
         private Dictionary<uint, bool> _lastWeaponComponents;
-        private Entity _weaponObj;
+        internal Entity WeaponObj;
         internal BlipColor BlipColor = (BlipColor)255;
         internal float BlipScale = 1;
         internal BlipSprite BlipSprite = 0;
@@ -41,16 +41,16 @@ namespace RageCoop.Client
         internal SyncedVehicle CurrentVehicle { get; private set; }
         public bool IsPlayer => OwnerID == ID && ID != 0;
         public Ped MainPed { get; internal set; }
-        internal int Health { get; set; }
+        internal int Health;
 
-        internal Vector3 HeadPosition { get; set; }
-        internal Vector3 RightFootPosition { get; set; }
-        internal Vector3 LeftFootPosition { get; set; }
+        internal Vector3 HeadPosition;
+        internal Vector3 RightFootPosition;
+        internal Vector3 LeftFootPosition;
 
-        internal byte WeaponTint { get; set; }
-        internal byte[] Clothes { get; set; }
+        internal byte WeaponTint;
+        internal byte[] Clothes;
 
-        internal float Heading { get; set; }
+        internal float Heading;
 
         internal ulong LastSpeakingTime { get; set; } = 0;
         internal bool IsSpeaking { get; set; } = false;
@@ -70,9 +70,10 @@ namespace RageCoop.Client
         internal bool IsInCoverFacingLeft => Flags.HasPedFlag(PedDataFlags.IsInCoverFacingLeft);
         internal bool IsBlindFiring => Flags.HasPedFlag(PedDataFlags.IsBlindFiring);
         internal bool IsInStealthMode => Flags.HasPedFlag(PedDataFlags.IsInStealthMode);
-        internal Prop ParachuteProp { get; set; } = null;
-        internal uint CurrentWeaponHash { get; set; }
-        internal Dictionary<uint, bool> WeaponComponents { get; set; } = null;
-        internal Vector3 AimCoords { get; set; }
+        internal Prop ParachuteProp = null;
+        internal WeaponHash CurrentWeapon = WeaponHash.Unarmed;
+        internal VehicleWeaponHash VehicleWeapon = VehicleWeaponHash.Invalid;
+        internal Dictionary<uint, bool> WeaponComponents = null;
+        internal Vector3 AimCoords;
     }
 }

@@ -11,8 +11,7 @@ namespace RageCoop.Core
             public int OwnerID { get; set; }
 
             public uint WeaponHash { get; set; }
-
-            public Vector3 StartPosition { get; set; }
+            
             public Vector3 EndPosition { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
@@ -22,9 +21,6 @@ namespace RageCoop.Core
 
                 // Write weapon hash
                 m.Write(WeaponHash);
-
-                // Write StartPosition
-                m.Write(StartPosition);
 
                 // Write EndPosition
                 m.Write(EndPosition);
@@ -37,11 +33,8 @@ namespace RageCoop.Core
                 // Read OwnerID
                 OwnerID = m.ReadInt32();
 
-                // Read WeponHash
+                // Read WeaponHash
                 WeaponHash = m.ReadUInt32();
-
-                // Read StartPosition
-                StartPosition = m.ReadVector3();
 
                 // Read EndPosition
                 EndPosition = m.ReadVector3();

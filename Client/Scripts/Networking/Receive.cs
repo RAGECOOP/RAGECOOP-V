@@ -307,7 +307,6 @@ namespace RageCoop.Client
             c.Flags = packet.Flags;
             c.Heading = packet.Heading;
             c.Position = packet.Position;
-            c.LastSyncedStopWatch.Restart();
             if (c.IsRagdoll)
             {
                 c.HeadPosition = packet.HeadPosition;
@@ -319,12 +318,14 @@ namespace RageCoop.Client
                 c.VehicleID = packet.VehicleID;
                 c.Seat = packet.Seat;
             }
-
-            c.LastSynced = Main.Ticked;
+            
             if (c.IsAiming) c.AimCoords = packet.AimCoords;
-            if (packet.Flags.HasPedFlag(PedDataFlags.IsFullSync))
+            bool full = packet.Flags.HasPedFlag(PedDataFlags.IsFullSync);
+            if (full)
             {
-                c.CurrentWeaponHash = packet.CurrentWeaponHash;
+                if (packet.Speed == 4)
+                    c.VehicleWeapon = packet.VehicleWeapon;
+                c.CurrentWeapon = packet.CurrentWeapon;
                 c.Clothes = packet.Clothes;
                 c.WeaponComponents = packet.WeaponComponents;
                 c.WeaponTint = packet.WeaponTint;
@@ -332,8 +333,8 @@ namespace RageCoop.Client
                 c.BlipColor = packet.BlipColor;
                 c.BlipSprite = packet.BlipSprite;
                 c.BlipScale = packet.BlipScale;
-                c.LastFullSynced = Main.Ticked;
             }
+            c.SetLastSynced(full);
         }
 
         private static void VehicleSync(Packets.VehicleSync packet)
@@ -345,6 +346,7 @@ namespace RageCoop.Client
             v.OwnerID = packet.OwnerID;
             v.Flags = packet.Flags;
             v.Position = packet.Position;
+            v.LastQuaternion = v.Quaternion;
             v.Quaternion = packet.Quaternion;
             v.SteeringAngle = packet.SteeringAngle;
             v.ThrottlePower = packet.ThrottlePower;
@@ -352,9 +354,8 @@ namespace RageCoop.Client
             v.Velocity = packet.Velocity;
             v.RotationVelocity = packet.RotationVelocity;
             v.DeluxoWingRatio = packet.DeluxoWingRatio;
-            v.LastSynced = Main.Ticked;
-            v.LastSyncedStopWatch.Restart();
-            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync))
+            bool full = packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync);
+            if (full)
             {
                 v.DamageModel = packet.DamageModel;
                 v.EngineHealth = packet.EngineHealth;
@@ -367,8 +368,8 @@ namespace RageCoop.Client
                 v.RadioStation = packet.RadioStation;
                 v.LicensePlate = packet.LicensePlate;
                 v.Livery = packet.Livery;
-                v.LastFullSynced = Main.Ticked;
             }
+            v.SetLastSynced(full);
         }
 
         private static void ProjectileSync(Packets.ProjectileSync packet)
@@ -389,8 +390,7 @@ namespace RageCoop.Client
             p.Shooter = packet.Flags.HasProjDataFlag(ProjectileDataFlags.IsShotByVehicle)
                 ? (SyncedEntity)EntityPool.GetVehicleByID(packet.ShooterID)
                 : EntityPool.GetPedByID(packet.ShooterID);
-            p.LastSynced = Main.Ticked;
-            p.LastSyncedStopWatch.Restart();
+            p.SetLastSynced(false);
         }
 
         /// <summary>

@@ -61,9 +61,13 @@ namespace RageCoop.Client
         internal bool IsDeluxo;
         internal bool IsTrain;
         internal Vector3 TopExtent;
+        internal Vector3 BottomExtent;
         internal Vector3 FrontExtent;
+        internal Vector3 RearExtent;
         internal Vector3 LeftExtent;
         internal Vector3 RightExtent;
+        private const float RotCalMult = 0.2f;
+        private const float ExtentLength = 5;
 
         #endregion
 
@@ -74,9 +78,8 @@ namespace RageCoop.Client
         private bool _lastHornActive;
         private bool _lastTransformed;
         internal int _lastLivery = -1;
-        private readonly List<Vector3> _predictedTrace = new List<Vector3>();
-        private readonly List<Vector3> _orgTrace = new List<Vector3>();
         private Vector3 _predictedPosition;
+        internal Quaternion LastQuaternion;
 
         #endregion
 

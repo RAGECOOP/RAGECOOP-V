@@ -12,6 +12,7 @@ using GTA.UI;
 using LemonUI.Elements;
 using LemonUI.Menus;
 using Lidgren.Network;
+using Newtonsoft.Json.Linq;
 using RageCoop.Client.GUI;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
