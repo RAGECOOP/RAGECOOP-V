@@ -67,23 +67,6 @@ namespace RageCoop.Client
             return b.ForwardVector.ToEulerRotation(b.UpVector);
         }
 
-        public static void StartUpCheck()
-        {
-            if (AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") == null)
-            {
-                var error = "Client not loaded with loader, please re-install using the installer to fix this issue";
-                try
-                {
-                    Notification.Show("~r~" + error);
-                }
-                catch
-                {
-                }
-
-                throw new Exception(error);
-            }
-        }
-
         public static void DrawTextFromCoord(Vector3 coord, string text, float scale = 0.5f, Point offset = default)
         {
             Point toDraw = default;
@@ -106,7 +89,7 @@ namespace RageCoop.Client
             unsafe
             {
                 var res = ResolutionMaintainRatio;
-                if (Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
+                if (Call<bool>(GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
                 {
                     screenPos = new Point((int)(res.Width * x), (int)(y * 1080));
                     return true;
@@ -157,28 +140,28 @@ namespace RageCoop.Client
         public static Vehicle CreateVehicle(Model model, Vector3 position, float heading = 0f)
         {
             if (!model.IsLoaded) return null;
-            return (Vehicle)Entity.FromHandle(Function.Call<int>(Hash.CREATE_VEHICLE, model.Hash, position.X,
+            return (Vehicle)Entity.FromHandle(Call<int>(CREATE_VEHICLE, model.Hash, position.X,
                 position.Y, position.Z, heading, false, false));
         }
 
         public static Ped CreatePed(Model model, Vector3 position, float heading = 0f)
         {
             if (!model.IsLoaded) return null;
-            return (Ped)Entity.FromHandle(Function.Call<int>(Hash.CREATE_PED, 26, model.Hash, position.X, position.Y,
+            return (Ped)Entity.FromHandle(Call<int>(CREATE_PED, 26, model.Hash, position.X, position.Y,
                 position.Z, heading, false, false));
         }
 
         public static void SetOnFire(this Entity e, bool toggle)
         {
             if (toggle)
-                Function.Call(Hash.START_ENTITY_FIRE, e.Handle);
+                Call(START_ENTITY_FIRE, e.Handle);
             else
-                Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
+                Call(STOP_ENTITY_FIRE, e.Handle);
         }
 
         public static void SetFrozen(this Entity e, bool toggle)
         {
-            Function.Call(Hash.FREEZE_ENTITY_POSITION, e, toggle);
+            Call(FREEZE_ENTITY_POSITION, e, toggle);
         }
 
         public static SyncedPed GetSyncEntity(this Ped p)
@@ -200,18 +183,18 @@ namespace RageCoop.Client
         public static void ApplyForce(this Entity e, int boneIndex, Vector3 direction, Vector3 rotation = default,
             ForceType forceType = ForceType.MaxForceRot2)
         {
-            Function.Call(Hash.APPLY_FORCE_TO_ENTITY, e.Handle, forceType, direction.X, direction.Y, direction.Z,
+            Call(APPLY_FORCE_TO_ENTITY, e.Handle, forceType, direction.X, direction.Y, direction.Z,
                 rotation.X, rotation.Y, rotation.Z, boneIndex, false, true, true, false, true);
         }
 
         public static byte GetPlayerRadioIndex()
         {
-            return (byte)Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX);
+            return (byte)Call<int>(GET_PLAYER_RADIO_STATION_INDEX);
         }
 
         public static void SetPlayerRadioIndex(int index)
         {
-            Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
+            Call(SET_RADIO_TO_STATION_INDEX, index);
         }
 
 

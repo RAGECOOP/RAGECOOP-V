@@ -90,29 +90,6 @@ namespace RageCoop.Core
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public static void GetDependencies(Assembly assembly, ref HashSet<string> existing)
-        {
-            if (assembly.FullName.StartsWith("System")) return;
-            foreach (var name in assembly.GetReferencedAssemblies())
-            {
-                if (name.FullName.StartsWith("System")) continue;
-                try
-                {
-                    var asm = Assembly.Load(name);
-                    GetDependencies(asm, ref existing);
-                }
-                catch
-                {
-                }
-            }
-
-            if (!existing.Contains(assembly.FullName))
-            {
-                Console.WriteLine(assembly.FullName);
-                existing.Add(assembly.FullName);
-            }
-        }
-
         public static Version GetLatestVersion(string branch = "dev-nightly")
         {
             var url =

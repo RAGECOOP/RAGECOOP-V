@@ -6,7 +6,6 @@ using GTA.Native;
 using Newtonsoft.Json;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
-using static RageCoop.Client.Shared;
 
 namespace RageCoop.Client
 {
@@ -35,7 +34,7 @@ namespace RageCoop.Client
             if (File.Exists(WeaponFixDataPath))
                 WeaponFix = JsonConvert.DeserializeObject<WeaponFix>(File.ReadAllText(WeaponFixDataPath));
             else
-                API.Logger.Warning("Weapon fix data not found");
+                Main.Logger.Warning("Weapon fix data not found");
         }
 
         public static void DumpWeaponFix(string path)
@@ -47,14 +46,14 @@ namespace RageCoop.Client
             var fix = new WeaponFix();
             foreach (var w in Weapons)
             {
-                Console.Info("Testing " + w.Value.Name);
+                Console.PrintInfo("Testing " + w.Value.Name);
                 if (w.Value.FireType != "PROJECTILE")
                 {
                     var asset = new WeaponAsset(w.Key);
                     asset.Request(1000);
                     World.ShootBullet(pos, pos + Vector3.WorldUp, P, asset, 0, 1000);
-                    if (!Function.Call<bool>(Hash.IS_BULLET_IN_AREA, pos.X, pos.Y, pos.Z, 10f, true) &&
-                        !Function.Call<bool>(Hash.IS_PROJECTILE_IN_AREA, pos.X - 10, pos.Y - 10, pos.Z - 10, pos.X + 10,
+                    if (!Call<bool>(IS_BULLET_IN_AREA, pos.X, pos.Y, pos.Z, 10f, true) &&
+                        !Call<bool>(IS_PROJECTILE_IN_AREA, pos.X - 10, pos.Y - 10, pos.Z - 10, pos.X + 10,
                             pos.Y + 10, pos.Z + 10, true))
                         switch (w.Value.DamageType)
                         {
@@ -112,7 +111,7 @@ namespace RageCoop.Client
         public static float GetWeaponDamage(this Ped P, uint hash)
         {
             var comp = P.Weapons.Current.Components.GetSuppressorComponent();
-            return Function.Call<float>(Hash.GET_WEAPON_DAMAGE, hash,
+            return Call<float>(GET_WEAPON_DAMAGE, hash,
                 comp.Active ? comp.ComponentHash : WeaponComponentHash.Invalid);
         }
 
@@ -194,7 +193,7 @@ namespace RageCoop.Client
 
         public static WeaponGroup GetWeaponGroup(this WeaponHash hash)
         {
-            return Function.Call<WeaponGroup>(Hash.GET_WEAPONTYPE_GROUP, hash);
+            return Call<WeaponGroup>(GET_WEAPONTYPE_GROUP, hash);
         }
     }
 }

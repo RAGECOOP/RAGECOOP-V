@@ -1,5 +1,4 @@
-﻿#undef DEBUG
-using System.Windows.Forms;
+﻿
 
 namespace RageCoop.Client
 {

@@ -204,12 +204,6 @@ namespace RageCoop.Client.Scripting
         public static Version CurrentVersion => Main.Version;
 
         /// <summary>
-        ///     Get a <see cref="Core.Logger" /> that RAGECOOP is currently using.
-        /// </summary>
-        /// <returns></returns>
-        public static Logger Logger => Main.Logger;
-
-        /// <summary>
         ///     Get all players indexed by their ID
         /// </summary>
         public static Dictionary<int, Player> Players => new Dictionary<int, Player>(PlayerList.Players);

@@ -7,8 +7,8 @@ using GTA.UI;
 using LemonUI.Menus;
 using Newtonsoft.Json;
 using RageCoop.Core;
-using static RageCoop.Client.Shared;
-using Console = GTA.Console;
+
+
 
 namespace RageCoop.Client
 {
@@ -40,9 +40,9 @@ namespace RageCoop.Client
                     var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
                     foreach (var anim in anims)
                     foreach (var a in anim.Animations)
-                        if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))
+                        if (Call<bool>(IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))
                         {
-                            Console.Info(anim.DictionaryName + " : " + a);
+                            Console.PrintInfo(anim.DictionaryName + " : " + a);
                             Notification.Show(anim.DictionaryName + " : " + a);
                         }
                 }

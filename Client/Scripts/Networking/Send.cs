@@ -72,7 +72,7 @@ namespace RageCoop.Client
                 p.Clothes = ped.GetPedClothes();
                 p.ModelHash = ped.Model.Hash;
                 p.WeaponComponents = ped.Weapons.Current.GetWeaponComponents();
-                p.WeaponTint = (byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
+                p.WeaponTint = (byte)Call<int>(GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
 
                 Blip b;
                 if (sp.IsPlayer)
@@ -122,7 +122,7 @@ namespace RageCoop.Client
                 byte secondaryColor = 0;
                 unsafe
                 {
-                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                    Call<byte>(GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
                 packet.Flags |= VehicleDataFlags.IsFullSync;
@@ -134,8 +134,8 @@ namespace RageCoop.Client
                 packet.ModelHash = veh.Model.Hash;
                 packet.EngineHealth = veh.EngineHealth;
                 packet.LockStatus = veh.LockStatus;
-                packet.LicensePlate = Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
-                packet.Livery = Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh);
+                packet.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
+                packet.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
                 if (v.MainVehicle == Game.Player.LastVehicle) packet.RadioStation = Util.GetPlayerRadioIndex();
                 if (packet.EngineHealth > v.LastEngineHealth) packet.Flags |= VehicleDataFlags.Repaired;
                 v.LastEngineHealth = packet.EngineHealth;

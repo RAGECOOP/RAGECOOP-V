@@ -100,7 +100,7 @@ namespace RageCoop.Client
         {
             var p = Game.Player.Character;
             // var clipset=p.Gender==Gender.Male? "MOVE_M@TOUGH_GUY@" : "MOVE_F@TOUGH_GUY@";
-            // Function.Call(Hash.SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
+            // Call(SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
             var player = GetPedByID(Main.LocalPlayerID);
             if (player == null)
             {
@@ -297,18 +297,22 @@ namespace RageCoop.Client
         public static void DoSync()
         {
             UpdateTargets();
+
 #if BENCHMARK
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles] = PerfCounter.ElapsedTicks;
 #endif
+
             var allPeds = World.GetAllPeds();
             var allVehicles = World.GetAllVehicles();
             var allProjectiles = World.GetAllProjectiles();
-            vehStatesPerFrame = allVehicles.Length * 2 / (int)Game.FPS + 1;
-            pedStatesPerFrame = allPeds.Length * 2 / (int)Game.FPS + 1;
+            vehStatesPerFrame = allVehicles.Length * 2 / (int)Main.FPS + 1;
+            pedStatesPerFrame = allPeds.Length * 2 / (int)Main.FPS + 1;
+
 #if BENCHMARK
             Debug.TimeStamps[TimeStamp.GetAllEntities] = PerfCounter.ElapsedTicks;
 #endif
+
 
             lock (ProjectilesLock)
             {
@@ -337,6 +341,7 @@ namespace RageCoop.Client
                             p.Update();
                     }
             }
+
 
             i = -1;
 
@@ -514,8 +519,8 @@ namespace RageCoop.Client
 
         private static void SetBudget(int b)
         {
-            Function.Call(Hash.SET_PED_POPULATION_BUDGET, b); // 0 - 3
-            Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
+            Call(SET_PED_POPULATION_BUDGET, b); // 0 - 3
+            Call(SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
         }
 
         public static string DumpDebug()

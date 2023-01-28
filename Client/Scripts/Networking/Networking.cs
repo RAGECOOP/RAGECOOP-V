@@ -95,7 +95,7 @@ namespace RageCoop.Client
                     return;
                 }
 
-                Task.Run(() =>
+                ThreadManager.CreateThread(() =>
                 {
                     try
                     {
@@ -153,7 +153,7 @@ namespace RageCoop.Client
                     }
 
                     IsConnecting = false;
-                });
+                },"Connect");
             }
         }
 

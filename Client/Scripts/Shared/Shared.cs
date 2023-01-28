@@ -1,4 +1,11 @@
-﻿using System.IO;
+﻿global using GTA;
+global using GTA.Native;
+global using static GTA.Native.Function;
+global using static GTA.Native.Hash;
+global using static RageCoop.Client.Shared;
+global using Console = GTA.Console;
+global using static SHVDN.PInvoke;
+using System.IO;
 
 namespace RageCoop.Client
 {

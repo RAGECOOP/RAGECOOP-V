@@ -95,9 +95,9 @@ namespace RageCoop.Client.Menus
                 scaleform.CallFunction("CREATE_CONTAINER");
 
                 scaleform.CallFunction("SET_DATA_SLOT", 0,
-                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
+                    Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
                 scaleform.CallFunction("SET_DATA_SLOT", 1,
-                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
+                    Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
                 scaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
                 scaleform.Render2D();
                 if (Game.IsControlJustPressed(Control.FrontendAccept))

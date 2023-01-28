@@ -33,7 +33,7 @@ namespace RageCoop.Client
                                                        && !CoopMenu.MenuPool.AreAnyVisible
 #endif
                )
-                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, _mainScaleform.Handle,
+                Call(DRAW_SCALEFORM_MOVIE, _mainScaleform.Handle,
                     LeftAlign ? LEFT_POSITION : RIGHT_POSITION, 0.3f,
                     0.28f, 0.6f,
                     255, 255, 255, 255, 0);

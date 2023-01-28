@@ -125,7 +125,7 @@ namespace RageCoop.Client
             Position = (Owner.PacketTravelTime + 0.001f * LastSyncedStopWatch.ElapsedMilliseconds) * Shooter.Velocity +
                        Position;
             var end = Position + Velocity;
-            Function.Call(Hash.SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z,
+            Call(SHOOT_SINGLE_BULLET_BETWEEN_COORDS_IGNORE_ENTITY, Position.X, Position.Y, Position.Z,
                 end.X, end.Y, end.Z, 0, 1, WeaponHash, owner?.Handle ?? 0, 1, 0, -1);
             var ps = World.GetAllProjectiles();
             MainProjectile = ps[ps.Length - 1];

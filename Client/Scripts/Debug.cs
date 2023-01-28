@@ -29,7 +29,7 @@ namespace RageCoop.Client
 
         static Debug()
         {
-            foreach (TimeStamp t in Enum.GetValues(typeof(TimeStamp))) TimeStamps.Add(t, 0);
+            foreach (TimeStamp t in Enum.GetValues<TimeStamp>()) TimeStamps.Add(t, 0);
         }
 
         public static string Dump(this Dictionary<TimeStamp, long> d)

@@ -48,11 +48,11 @@ namespace RageCoop.Client
 
             if (MainVehicle.IsOnFire)
             {
-                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire)) Function.Call(Hash.STOP_ENTITY_FIRE, MainVehicle);
+                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire)) Call(STOP_ENTITY_FIRE, MainVehicle);
             }
             else if (Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
             {
-                Function.Call(Hash.START_ENTITY_FIRE, MainVehicle);
+                Call(START_ENTITY_FIRE, MainVehicle);
             }
 
             if (EngineRunning != MainVehicle.IsEngineRunning) MainVehicle.IsEngineRunning = EngineRunning;
@@ -100,13 +100,13 @@ namespace RageCoop.Client
                         if (!_lastTransformed)
                         {
                             _lastTransformed = true;
-                            Function.Call(Hash.TRANSFORM_TO_SUBMARINE, MainVehicle.Handle, false);
+                            Call(TRANSFORM_TO_SUBMARINE, MainVehicle.Handle, false);
                         }
                     }
                     else if (_lastTransformed)
                     {
                         _lastTransformed = false;
-                        Function.Call(Hash.TRANSFORM_TO_CAR, MainVehicle.Handle, false);
+                        Call(TRANSFORM_TO_CAR, MainVehicle.Handle, false);
                     }
                 }
                 else if (IsDeluxo)
@@ -115,7 +115,7 @@ namespace RageCoop.Client
                     if (IsDeluxoHovering) MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
                 }
 
-                Function.Call(Hash.SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
+                Call(SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
             }
 
             MainVehicle.LockStatus = LockStatus;
@@ -125,7 +125,7 @@ namespace RageCoop.Client
                 if (Flags.HasVehFlag(VehicleDataFlags.Repaired)) MainVehicle.Repair();
                 if (Colors != null && Colors != _lastVehicleColors)
                 {
-                    Function.Call(Hash.SET_VEHICLE_COLOURS, MainVehicle, Colors[0], Colors[1]);
+                    Call(SET_VEHICLE_COLOURS, MainVehicle, Colors[0], Colors[1]);
 
                     _lastVehicleColors = Colors;
                 }
@@ -133,19 +133,19 @@ namespace RageCoop.Client
                 MainVehicle.EngineHealth = EngineHealth;
                 if (Mods != null && !Mods.Compare(_lastVehicleMods))
                 {
-                    Function.Call(Hash.SET_VEHICLE_MOD_KIT, MainVehicle, 0);
+                    Call(SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
                     foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
 
                     _lastVehicleMods = Mods;
                 }
 
-                if (Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle) != LicensePlate)
-                    Function.Call(Hash.SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
+                if (Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle) != LicensePlate)
+                    Call(SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
 
                 if (_lastLivery != Livery)
                 {
-                    Function.Call(Hash.SET_VEHICLE_LIVERY, MainVehicle, Livery);
+                    Call(SET_VEHICLE_LIVERY, MainVehicle, Livery);
                     _lastLivery = Livery;
                 }
 
@@ -295,7 +295,7 @@ namespace RageCoop.Client
         private void StartPedalingAnim(bool fast)
         {
             MainVehicle.Driver?.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1,
-                AnimationFlags.Loop | AnimationFlags.AllowRotation, 1.0f);
+                AnimationFlags.Loop | AnimationFlags.Secondary, 1.0f);
         }
 
         private void StopPedalingAnim(bool fast)

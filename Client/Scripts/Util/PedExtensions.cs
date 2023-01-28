@@ -93,7 +93,7 @@ namespace RageCoop.Client
             var num1 = new OutputArgument();
             var num2 = new OutputArgument();
 
-            if (!Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y,
+            if (!Call<bool>(GET_SCREEN_COORD_FROM_WORLD_COORD, worldCoords.X, worldCoords.Y,
                     worldCoords.Z, num1, num2))
             {
                 screenCoords = new Vector2();
@@ -106,13 +106,13 @@ namespace RageCoop.Client
 
         public static void StayInCover(this Ped p)
         {
-            Function.Call(Hash.TASK_STAY_IN_COVER, p);
+            Call(TASK_STAY_IN_COVER, p);
         }
 
         public static bool IsTurretSeat(this Vehicle veh, int seat)
         {
-            if (Function.Call<bool>(Hash.IS_TURRET_SEAT, veh, seat)) return true;
-            if (!Function.Call<bool>(Hash.DOES_VEHICLE_HAVE_WEAPONS, veh.Handle)) return false;
+            if (Call<bool>(IS_TURRET_SEAT, veh, seat)) return true;
+            if (!Call<bool>(DOES_VEHICLE_HAVE_WEAPONS, veh.Handle)) return false;
 
             switch (seat)
             {
@@ -177,9 +177,9 @@ namespace RageCoop.Client
             var result = new byte[36];
             for (byte i = 0; i < 12; i++)
             {
-                result[i] = (byte)Function.Call<short>(Hash.GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
-                result[i + 12] = (byte)Function.Call<short>(Hash.GET_PED_TEXTURE_VARIATION, ped.Handle, i);
-                result[i + 24] = (byte)Function.Call<short>(Hash.GET_PED_PALETTE_VARIATION, ped.Handle, i);
+                result[i] = (byte)Call<short>(GET_PED_DRAWABLE_VARIATION, ped.Handle, i);
+                result[i + 12] = (byte)Call<short>(GET_PED_TEXTURE_VARIATION, ped.Handle, i);
+                result[i + 24] = (byte)Call<short>(GET_PED_PALETTE_VARIATION, ped.Handle, i);
             }
 
             return result;
@@ -214,13 +214,13 @@ namespace RageCoop.Client
             {
                 flags |= PedDataFlags.IsInCover;
                 if (ped.IsInCoverFacingLeft) flags |= PedDataFlags.IsInCover;
-                if (!Function.Call<bool>(Hash.IS_PED_IN_HIGH_COVER, ped)) flags |= PedDataFlags.IsInLowCover;
+                if (!Call<bool>(IS_PED_IN_HIGH_COVER, ped)) flags |= PedDataFlags.IsInLowCover;
                 if (ped.IsTaskActive(TaskType.CTaskAimGunBlindFire)) flags |= PedDataFlags.IsBlindFiring;
             }
 
             if (ped.IsInvincible) flags |= PedDataFlags.IsInvincible;
 
-            if (Function.Call<bool>(Hash.GET_PED_STEALTH_MOVEMENT, ped)) flags |= PedDataFlags.IsInStealthMode;
+            if (Call<bool>(GET_PED_STEALTH_MOVEMENT, ped)) flags |= PedDataFlags.IsInStealthMode;
 
 
             return flags;
@@ -315,32 +315,29 @@ namespace RageCoop.Client
             }
         }
 
+        static Dictionary<string, int> _vehicleDoors=new()
+            {
+                { "door_dside_f", -1 },
+                { "door_pside_f", 0 },
+                { "door_dside_r", 1 },
+                { "door_pside_r", 2 }
+            };
         public static VehicleSeat GetNearestSeat(this Ped ped, Vehicle veh, float distanceToignoreDoors = 50f)
         {
             var num = 99f;
             var result = -2;
-            var dictionary = new Dictionary<string, int>();
-            dictionary.Add("door_dside_f", -1);
-            dictionary.Add("door_pside_f", 0);
-            dictionary.Add("door_dside_r", 1);
-            dictionary.Add("door_pside_r", 2);
-            foreach (var text in dictionary.Keys)
+            foreach (var text in _vehicleDoors.Keys)
             {
                 var flag = veh.Bones[text].Position != Vector3.Zero;
                 if (flag)
                 {
-                    var num2 = ped.Position.DistanceTo(Function.Call<Vector3>(Hash.GET_WORLD_POSITION_OF_ENTITY_BONE,
-                        new InputArgument[]
-                        {
-                            veh,
-                            veh.Bones[text].Index
-                        }));
+                    var num2 = ped.Position.DistanceTo(Call<Vector3>(GET_WORLD_POSITION_OF_ENTITY_BONE, veh, veh.Bones[text].Index));
                     var flag2 = num2 < distanceToignoreDoors && num2 < num &&
-                                IsSeatUsableByPed(ped, veh, dictionary[text]);
+                                IsSeatUsableByPed(ped, veh, _vehicleDoors[text]);
                     if (flag2)
                     {
                         num = num2;
-                        result = dictionary[text];
+                        result = _vehicleDoors[text];
                     }
                 }
             }
@@ -366,11 +363,7 @@ namespace RageCoop.Client
                 }
                 else
                 {
-                    var num = Function.Call<int>(Hash.GET_RELATIONSHIP_BETWEEN_PEDS, new InputArgument[]
-                    {
-                        ped,
-                        veh.GetPedOnSeat(seat)
-                    });
+                    var num = Call<int>(GET_RELATIONSHIP_BETWEEN_PEDS, ped, veh.GetPedOnSeat(seat));
                     var flag2 = num > 2;
                     if (flag2) result = true;
                 }
@@ -381,7 +374,7 @@ namespace RageCoop.Client
 
         public static bool IsTaskActive(this Ped p, TaskType task)
         {
-            return Function.Call<bool>(Hash.GET_IS_TASK_ACTIVE, p.Handle, task);
+            return Call<bool>(GET_IS_TASK_ACTIVE, p.Handle, task);
         }
 
         public static Vector3 GetAimCoord(this Ped p)
@@ -408,7 +401,7 @@ namespace RageCoop.Client
 
         public static Vector3 GetLookingCoord(this Ped p)
         {
-            if (p == Main.P && Function.Call<int>(Hash.GET_FOLLOW_PED_CAM_VIEW_MODE) == 4)
+            if (p == Main.P && Call<int>(GET_FOLLOW_PED_CAM_VIEW_MODE) == 4)
                 return RaycastEverything(default);
             EntityBone b = p.Bones[Bone.FacialForehead];
             var v = b.UpVector.Normalized;
@@ -417,7 +410,7 @@ namespace RageCoop.Client
 
         public static VehicleSeat GetSeatTryingToEnter(this Ped p)
         {
-            return (VehicleSeat)Function.Call<int>(Hash.GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
+            return (VehicleSeat)Call<int>(GET_SEAT_PED_IS_TRYING_TO_ENTER, p);
         }
 
         #endregion

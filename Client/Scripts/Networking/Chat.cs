@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
 using GTA;
 using GTA.Native;
 
@@ -74,7 +73,7 @@ namespace RageCoop.Client
 
             if (!CurrentFocused) return;
 
-            Function.Call(Hash.DISABLE_ALL_CONTROL_ACTIONS, 0);
+            Call(DISABLE_ALL_CONTROL_ACTIONS, 0);
         }
 
         public void AddMessage(string sender, string msg)
@@ -132,6 +131,9 @@ namespace RageCoop.Client
             StringBuilder receivingBuffer,
             int bufferSize, uint flags, IntPtr kblayout);
 
+        [DllImport("user32.dll")]
+        static extern IntPtr GetKeyboardLayout(uint idThread);
+
         public static string GetCharFromKey(Keys key, bool shift, bool altGr)
         {
             var buf = new StringBuilder(256);
@@ -145,7 +147,7 @@ namespace RageCoop.Client
                 keyboardState[(int)Keys.Menu] = 0xff;
             }
 
-            ToUnicodeEx((uint)key, 0, keyboardState, buf, 256, 0, InputLanguage.CurrentInputLanguage.Handle);
+            ToUnicodeEx((uint)key, 0, keyboardState, buf, 256, 0, GetKeyboardLayout(0));
             return buf.ToString();
         }
     }

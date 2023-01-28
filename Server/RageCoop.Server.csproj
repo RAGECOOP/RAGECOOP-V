@@ -55,7 +55,7 @@
 	<ItemGroup>
 		<PackageReference Include="Costura.Fody" Version="5.7.0">
 			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<IncludeAssets>compile; runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
 		<PackageReference Include="Fody" Version="6.6.3">
@@ -76,8 +76,8 @@
 		<Reference Include="Lidgren.Network">
 			<HintPath>..\libs\Lidgren.Network.dll</HintPath>
 		</Reference>
-		<Reference Include="ScriptHookVDotNet3">
-			<HintPath>..\libs\ScriptHookVDotNet3.dll</HintPath>
+		<Reference Include="ScriptHookVDotNetCore">
+		  <HintPath>..\libs\ScriptHookVDotNetCore.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
@@ -101,8 +101,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(DevEnvDir)' != '*Undefined*'">
-		<Exec
-			Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
+		<Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
 	</Target>
 
 

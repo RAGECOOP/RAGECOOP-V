@@ -1,207 +1,82 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EF56D109-1F22-43E0-9DFF-CFCFB94E0681}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RageCoop.Client</RootNamespace>
-    <AssemblyName>RageCoop.Client</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <OutPutPath>..\..\bin\$(Configuration)\Client\Scripts</OutPutPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-    <AllowedReferenceRelatedFileExtensions>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0-windows</TargetFramework>
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<OutputType>Library</OutputType>
+		<OutDir>..\..\bin\$(Configuration)\Client\Scripts</OutDir>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+		<AllowedReferenceRelatedFileExtensions>
 			.dll
 			.pdb
 		</AllowedReferenceRelatedFileExtensions>
-    <DocumentationFile>..\..\bin\API\RageCoop.Client.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <NoWarn>CS1591</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DefineConstants>DEBUG</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="Console.cs" />
-    <Compile Include="Debug.cs" />
-    <Compile Include="DevTools\DevTool.cs" />
-    <Compile Include="GUI\CefClient.cs" />
-    <Compile Include="GUI\CefManager.cs" />
-    <Compile Include="GUI\HookManager.cs" />
-    <Compile Include="Main.cs" />
-    <Compile Include="Menus\CoopMenu.cs" />
-    <Compile Include="Menus\Sub\DebugMenu.cs" />
-    <Compile Include="Menus\Sub\DevToolMenu.cs" />
-    <Compile Include="Menus\Sub\ServersMenu.cs" />
-    <Compile Include="Menus\Sub\SettingsMenu.cs" />
-    <Compile Include="Networking\Chat.cs" />
-    <Compile Include="Networking\DownloadManager.cs" />
-    <Compile Include="Networking\HolePunch.cs" />
-    <Compile Include="Networking\Networking.cs" />
-    <Compile Include="Networking\Receive.cs" />
-    <Compile Include="Networking\Send.cs" />
-    <Compile Include="Networking\Statistics.cs" />
-    <Compile Include="PlayerList.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyInfo.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Scripting\API.cs" />
-    <Compile Include="Scripting\BaseScript.cs" />
-    <Compile Include="Scripting\ClientScript.cs" />
-    <Compile Include="Scripting\Resources.cs" />
-    <Compile Include="Security.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="Sync\Entities\Ped\SyncedPed.Variables.cs" />
-    <Compile Include="Sync\Entities\Ped\SyncedPed.Animations.cs" />
-    <Compile Include="Sync\Entities\SyncedEntity.cs" />
-    <Compile Include="Sync\Entities\Ped\SyncedPed.cs" />
-    <Compile Include="Sync\Entities\SyncedProjectile.cs" />
-    <Compile Include="Sync\Entities\SyncedProp.cs" />
-    <Compile Include="Sync\Entities\Vehicle\SyncedVehicle.cs" />
-    <Compile Include="Sync\Entities\Vehicle\SyncedVehicle.Variables.cs" />
-    <Compile Include="Sync\EntityPool.cs" />
-    <Compile Include="Sync\SyncEvents.cs" />
-    <Compile Include="Sync\Voice.cs" />
-    <Compile Include="Util\Memory.cs" />
-    <Compile Include="Util\NativeCaller.cs" />
-    <Compile Include="Util\PedConfigFlags.cs" />
-    <Compile Include="Util\PedExtensions.cs" />
-    <Compile Include="Shared\Shared.cs" />
-    <Compile Include="Util\TaskType.cs" />
-    <Compile Include="Util\Util.cs" />
-    <Compile Include="Util\VehicleExtensions.cs" />
-    <Compile Include="Util\WeaponUtil.cs" />
-    <Compile Include="Util\Win32.cs" />
-    <Compile Include="WorldThread.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="BitmapUtil, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libs\BitmapUtil.dll</HintPath>
-    </Reference>
-    <Reference Include="DXHook">
-      <HintPath>..\..\libs\DXHook\DXHook.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=1.4.0.12, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SharpZipLib.1.4.0\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="LemonUI.SHVDN3">
-      <HintPath>..\..\libs\LemonUI.SHVDN3.dll</HintPath>
-    </Reference>
-    <Reference Include="Lidgren.Network">
-      <HintPath>..\..\libs\Lidgren.Network.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NativeInvoker">
-      <HintPath>..\..\libs\NativeInvoker.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.2.1.0\lib\net472\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Asio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.Asio.2.1.0\lib\netstandard2.0\NAudio.Asio.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.Core.2.1.0\lib\netstandard2.0\NAudio.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Midi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.Midi.2.1.0\lib\netstandard2.0\NAudio.Midi.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.Wasapi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.Wasapi.2.1.0\lib\netstandard2.0\NAudio.Wasapi.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.WinForms, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.WinForms.2.1.0\lib\net472\NAudio.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="NAudio.WinMM, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NAudio.WinMM.2.1.0\lib\netstandard2.0\NAudio.WinMM.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="RageCoop.Client.CefHost, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\bin\$(Configuration)\Client\SubProcess\ref\RageCoop.Client.CefHost.dll</HintPath>
-    </Reference>
-    <Reference Include="ScriptHookVDotNet">
-      <HintPath>..\..\libs\ScriptHookVDotNet.asi</HintPath>
-    </Reference>
-    <Reference Include="ScriptHookVDotNet3, Version=3.5.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\libs\ScriptHookVDotNet3.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Drawing.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Drawing.Common.4.5.0\lib\net461\System.Drawing.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Properties\AssemblyInfo.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-    </Content>
-    <Content Include="sharpdx_direct3d11_1_effects_x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Core\RageCoop.Core.csproj">
-      <Project>{cc2e8102-e568-4524-aa1f-f8e0f1cfe58a}</Project>
-      <Name>RageCoop.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Loader\RageCoop.Client.Loader.csproj">
-      <Project>{fc8cbdbb-6dc3-43af-b34d-092e476410a5}</Project>
-      <Name>RageCoop.Client.Loader</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
+		<DocumentationFile>..\..\bin\API\RageCoop.Client.xml</DocumentationFile>
+		<NoWarn>CS1591</NoWarn>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+	</PropertyGroup>
+	<ItemGroup>
+		<TrimmerRootDescriptor Include="Trimming.xml" />
+		<Compile Remove="GUI\**" />
+		<EmbeddedResource Remove="GUI\**" />
+		<None Remove="GUI\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\AssemblyInfo.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>AssemblyInfo.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="LemonUI.SHVDNC">
+			<HintPath>..\..\libs\LemonUI.SHVDNC.dll</HintPath>
+		</Reference>
+		<Reference Include="Lidgren.Network">
+			<HintPath>..\..\libs\Lidgren.Network.dll</HintPath>
+		</Reference>
+		<Reference Include="ScriptHookVDotNetCore">
+		  <HintPath>..\..\libs\ScriptHookVDotNetCore.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\.editorconfig">
+			<Link>.editorconfig</Link>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="icon.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Properties\AssemblyInfo.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+		</Content>
+		<Content Include="sharpdx_direct3d11_1_effects_x64.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+	<ItemGroup>
+		<Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Core\RageCoop.Core.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="NAudio" Version="2.1.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="SharpZipLib" Version="1.4.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.3.0" />
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '*Undefined*' And '$(NoAotCompile)' != 'true'">
+		<Exec Command="dotnet publish &quot;$(ProjectPath)&quot; -o &quot;$(OutDir)\native&quot;  -p:PublishAOT=true -r win-x64 " />
+	</Target>
+	<PropertyGroup Condition="'$(SolutionDir)' != '*Undefined*' AND '$(PublishAot)' != 'true'">
+		<PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
 			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
 		</PostBuildEvent>
-    <PostBuildEvent Condition="'$(Configuration)' != 'API' AND '$(SolutionDir)' != '*Undefined*'">
-			xcopy "$(SolutionDir)Client\Data" "..\Data" /i /s
+		<PostBuildEvent Condition="'$(Configuration)' != 'API'">
+			xcopy "$(SolutionDir)Client\Data" "..\Data" /i /s /y
 		</PostBuildEvent>
-    <PreBuildEvent Condition=" '$(SolutionDir)' != '*Undefined*'">
-			dotnet build -c $(Configuration) "$(SolutionDir)Client\CefHost\RageCoop.Client.CefHost.csproj"
-		</PreBuildEvent>
-  </PropertyGroup>
+	</PropertyGroup>
 </Project>

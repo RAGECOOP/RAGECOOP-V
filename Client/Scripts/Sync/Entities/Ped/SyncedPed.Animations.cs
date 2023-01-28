@@ -12,22 +12,22 @@ namespace RageCoop.Client
 
             if (speaking)
             {
-                Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mic_chatter", "mp_facial");
+                Call(PLAY_FACIAL_ANIM, MainPed.Handle, "mic_chatter", "mp_facial");
                 return;
             }
 
             switch (MainPed.Gender)
             {
                 case Gender.Male:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                    Call(PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
                         "facials@gen_male@variations@normal");
                     break;
                 case Gender.Female:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                    Call(PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
                         "facials@gen_female@variations@normal");
                     break;
                 default:
-                    Function.Call(Hash.PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
+                    Call(PLAY_FACIAL_ANIM, MainPed.Handle, "mood_normal_1",
                         "facials@mime@variations@normal");
                     break;
             }
@@ -41,12 +41,12 @@ namespace RageCoop.Client
             if (ourAnim != null && animDict != null)
             {
                 var flag = AnimationFlags.Loop;
-                if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed, animDict, ourAnim, 3))
+                if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed, animDict, ourAnim, 3))
                 {
                     if (LoadAnim(animDict) == null) return;
 
                     MainPed.Task.ClearAll();
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, animDict, ourAnim, 8f, 10f, -1, flag, -8f, 1, 1, 1);
+                    Call(TASK_PLAY_ANIM, MainPed, animDict, ourAnim, 8f, 10f, -1, flag, -8f, 1, 1, 1);
                 }
             }
         }
@@ -149,9 +149,9 @@ namespace RageCoop.Client
 
         private string LoadAnim(string anim)
         {
-            if (!Function.Call<bool>(Hash.HAS_ANIM_DICT_LOADED, anim))
+            if (!Call<bool>(HAS_ANIM_DICT_LOADED, anim))
             {
-                Function.Call(Hash.REQUEST_ANIM_DICT, anim);
+                Call(REQUEST_ANIM_DICT, anim);
                 return null;
             }
 

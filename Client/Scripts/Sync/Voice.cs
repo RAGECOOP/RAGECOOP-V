@@ -5,6 +5,7 @@ namespace RageCoop.Client
 {
     internal static class Voice
     {
+        private static bool _stopping = false;
         private static WaveInEvent _waveIn;
 
         private static readonly BufferedWaveProvider _waveProvider =
@@ -30,7 +31,8 @@ namespace RageCoop.Client
 
             if (_thread != null && _thread.IsAlive)
             {
-                _thread.Abort();
+                _stopping = true;
+                _thread.Join();
                 _thread = null;
             }
         }
@@ -51,9 +53,9 @@ namespace RageCoop.Client
                 return;
 
             // I tried without thread but the game will lag without
-            _thread = new Thread(() =>
+            _thread = ThreadManager.CreateThread(() =>
             {
-                while (true)
+                while (!_stopping && !Main.IsUnloading)
                     using (var wo = new WaveOutEvent())
                     {
                         wo.Init(_waveProvider);
@@ -61,8 +63,7 @@ namespace RageCoop.Client
 
                         while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(100);
                     }
-            });
-            _thread.Start();
+            },"Voice");
         }
 
         public static void StartRecording()

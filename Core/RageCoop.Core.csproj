@@ -1,61 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AssemblyVersion>0.1</AssemblyVersion>
-    <FileVersion>0.1</FileVersion>
-    <Version>0.1</Version>
-    <DebugType>embedded</DebugType>
-    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Configurations>Debug;Release;API</Configurations>
-	<OutDir>..\bin\$(Configuration)\Core</OutDir>
-  </PropertyGroup>
+	<PropertyGroup>
+		<NoWarn>1701;1702;CS1591</NoWarn>
+		<TargetFrameworks>net7.0</TargetFrameworks>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<AssemblyVersion>0.1</AssemblyVersion>
+		<FileVersion>0.1</FileVersion>
+		<Version>0.1</Version>
+		<DebugType>embedded</DebugType>
+		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Configurations>Debug;Release;API</Configurations>
+		<OutDir>..\bin\$(Configuration)\Core</OutDir>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'API'">
 		<OutDir>..\bin\API</OutDir>
 		<Deterministic>true</Deterministic>
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<ProduceOnlyReferenceAssembly>true</ProduceOnlyReferenceAssembly>
 	</PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="SharpZipLib" Version="1.4.0" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="5.7.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Fody" Version="6.6.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="SharpZipLib" Version="1.4.0" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Lidgren.Network">
-      <HintPath>..\libs\Lidgren.Network.dll</HintPath>
-    </Reference>
-    <Reference Include="ScriptHookVDotNet3">
-      <HintPath>..\libs\ScriptHookVDotNet3.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="Lidgren.Network">
+			<HintPath>..\libs\Lidgren.Network.dll</HintPath>
+		</Reference>
+		<Reference Include="ScriptHookVDotNetCore">
+		  <HintPath>..\libs\ScriptHookVDotNetCore.dll</HintPath>
+		</Reference>
+	</ItemGroup>
 
 </Project>
