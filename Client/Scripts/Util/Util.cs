@@ -197,6 +197,14 @@ namespace RageCoop.Client
             Call(SET_RADIO_TO_STATION_INDEX, index);
         }
 
+        public static EntityPopulationType GetPopulationType(int handle)
+            => (EntityPopulationType)Call<int>(GET_ENTITY_POPULATION_TYPE, handle);
+
+        public static unsafe void DeleteEntity(int handle)
+        {
+            Call(SET_ENTITY_AS_MISSION_ENTITY, handle, false, true);
+            Call(DELETE_ENTITY, &handle);
+        }
 
         [DllImport("kernel32.dll")]
         public static extern ulong GetTickCount64();

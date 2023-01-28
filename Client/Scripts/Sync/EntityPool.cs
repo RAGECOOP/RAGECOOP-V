@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using GTA;
 using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Client.Scripting;
+using SHVDN;
 
 namespace RageCoop.Client
 {
-    internal class EntityPool
+    internal static unsafe class EntityPool
     {
         public static object PedsLock = new object();
 #if BENCHMARK
@@ -303,9 +305,9 @@ namespace RageCoop.Client
             Debug.TimeStamps[TimeStamp.CheckProjectiles] = PerfCounter.ElapsedTicks;
 #endif
 
-            var allPeds = World.GetAllPeds();
-            var allVehicles = World.GetAllVehicles();
-            var allProjectiles = World.GetAllProjectiles();
+            var allPeds = NativeMemory.GetPedHandles();
+            var allVehicles = NativeMemory.GetVehicleHandles();
+            var allProjectiles = NativeMemory.GetProjectileHandles();
             vehStatesPerFrame = allVehicles.Length * 2 / (int)Main.FPS + 1;
             pedStatesPerFrame = allPeds.Length * 2 / (int)Main.FPS + 1;
 
@@ -317,8 +319,8 @@ namespace RageCoop.Client
             lock (ProjectilesLock)
             {
                 foreach (var p in allProjectiles)
-                    if (!ProjectilesByHandle.ContainsKey(p.Handle))
-                        Add(new SyncedProjectile(p));
+                    if (!ProjectilesByHandle.ContainsKey(p))
+                        Add(new SyncedProjectile(Projectile.FromHandle(p)));
 
                 foreach (var p in ProjectilesByID.Values.ToArray())
                     // Outgoing sync
@@ -351,18 +353,19 @@ namespace RageCoop.Client
 
                 foreach (var p in allPeds)
                 {
-                    var c = GetPedByHandle(p.Handle);
-                    if (c == null && p != Game.Player.Character)
+                    var c = GetPedByHandle(p);
+                    if (c == null && p != Game.Player.Character.Handle)
                     {
+                        var type = Util.GetPopulationType(p);
                         if (allPeds.Length > Main.Settings.WorldPedSoftLimit &&
-                            p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
+                            type == EntityPopulationType.RandomAmbient && !Call<bool>(IS_PED_IN_ANY_VEHICLE, p, 0))
                         {
-                            p.Delete();
+                            Util.DeleteEntity(p);
                             continue;
                         }
 
                         // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
-                        c = new SyncedPed(p);
+                        c = new SyncedPed((Ped)Entity.FromHandle(p));
 
                         Add(c);
                     }
@@ -419,27 +422,28 @@ namespace RageCoop.Client
             lock (VehiclesLock)
             {
                 foreach (var veh in allVehicles)
-                    if (!VehiclesByHandle.ContainsKey(veh.Handle))
+                    if (!VehiclesByHandle.ContainsKey(veh))
                     {
+                        var cveh = (Vehicle)Entity.FromHandle(veh);
                         if (allVehicles.Length > Main.Settings.WorldVehicleSoftLimit)
                         {
-                            var type = veh.PopulationType;
+                            var type = cveh.PopulationType;
                             if (type == EntityPopulationType.RandomAmbient || type == EntityPopulationType.RandomParked)
                             {
-                                foreach (var p in veh.Occupants)
+                                foreach (var p in cveh.Occupants)
                                 {
                                     p.Delete();
                                     var c = GetPedByHandle(p.Handle);
                                     if (c != null) RemovePed(c.ID, "ThrottleTraffic");
                                 }
 
-                                veh.Delete();
+                                cveh.Delete();
                                 continue;
                             }
                         }
                         // Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
-                        Add(new SyncedVehicle(veh));
+                        Add(new SyncedVehicle(cveh));
                     }
 #if BENCHMARK
                 Debug.TimeStamps[TimeStamp.AddVehicles] = PerfCounter.ElapsedTicks;
