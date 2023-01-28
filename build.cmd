@@ -5,4 +5,4 @@ dotnet build -c API Server\RageCoop.Server.csproj
 cd %~dp0
 copy .\Client\Scripts\obj\Release\ref\RageCoop.Client.dll .\bin\API\RageCoop.Client.dll  /y
 del .\bin\API\RageCoop.Server.exe
-rmdir .\bin\Release\Client\SubProcess /s /q 
+if exist .\bin\Release\Client\SubProcess rmdir .\bin\Release\Client\SubProcess /s /q 
