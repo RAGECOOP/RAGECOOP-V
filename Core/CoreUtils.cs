@@ -22,6 +22,7 @@ using RageCoop.Core.Scripting;
 [assembly: InternalsVisibleTo("RageCoop.Client")]
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 [assembly: InternalsVisibleTo("DataDumper")]
+[assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("RageCoop.ResourceBuilder")]
 
 namespace RageCoop.Core
