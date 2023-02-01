@@ -1,0 +1,6 @@
+[submodule "libs/Lidgren.Network"]
+	path = libs/Lidgren.Network
+	url = https://github.com/RAGECOOP/lidgren-network-gen3
+[submodule "libs/ScriptHookVDotNetCore"]
+	path = libs/ScriptHookVDotNetCore
+	url = https://github.com/Sardelka9515/scripthookvdotnetcore

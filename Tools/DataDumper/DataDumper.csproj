@@ -5,7 +5,7 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<OutDir>..\..\bin\Tools\DataDumper</OutDir>
+		<OutDir>$(SolutionDir)bin\Tools\DataDumper</OutDir>
 	</PropertyGroup>
 
 	<ItemGroup>

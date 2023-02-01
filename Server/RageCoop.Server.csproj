@@ -73,15 +73,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="Lidgren.Network">
-			<HintPath>..\libs\Lidgren.Network.dll</HintPath>
-		</Reference>
-		<Reference Include="ScriptHookVDotNetCore">
-		  <HintPath>..\libs\ScriptHookVDotNetCore.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Update="Properties\AssemblyInfo.tt">
 			<Generator>TextTemplatingFileGenerator</Generator>
 			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>

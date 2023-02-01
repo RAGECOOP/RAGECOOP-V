@@ -32,17 +32,12 @@
 		<Reference Include="LemonUI.SHVDNC">
 			<HintPath>..\..\libs\LemonUI.SHVDNC.dll</HintPath>
 		</Reference>
-		<Reference Include="Lidgren.Network">
-			<HintPath>..\..\libs\Lidgren.Network.dll</HintPath>
-		</Reference>
-		<Reference Include="ScriptHookVDotNetCore">
-		  <HintPath>..\..\libs\ScriptHookVDotNetCore.dll</HintPath>
-		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\..\.editorconfig">
 			<Link>.editorconfig</Link>
 		</None>
+		<None Include="Scripting\API.Exports.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="icon.png">

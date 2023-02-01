@@ -26,12 +26,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="Lidgren.Network">
-			<HintPath>..\libs\Lidgren.Network.dll</HintPath>
-		</Reference>
-		<Reference Include="ScriptHookVDotNetCore">
-		  <HintPath>..\libs\ScriptHookVDotNetCore.dll</HintPath>
-		</Reference>
+	  <ProjectReference Include="..\libs\Lidgren.Network\Lidgren.Network\Lidgren.Network.csproj" />
+	  <ProjectReference Include="..\libs\ScriptHookVDotNetCore\src\ScriptHookVDotNetCore\ScriptHookVDotNetCore.csproj" />
 	</ItemGroup>
 
 </Project>
