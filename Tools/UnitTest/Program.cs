@@ -39,7 +39,7 @@ namespace UnitTest
                 buf.Write(e.str);
             }
             Console.WriteLine($"Buffer size: {buf.Size}");
-            Console.WriteLine($"Current position: {buf.CurrentIndex}");
+            Console.WriteLine($"Current position: {buf.Position}");
 
             Console.WriteLine("Validating data");
             var reader = new ReadBuffer(buf.Address, buf.Size);

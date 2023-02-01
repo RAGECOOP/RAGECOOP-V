@@ -5,10 +5,21 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    internal unsafe abstract class BufferBase
+    public unsafe abstract class BufferBase
     {
+        /// <summary>
+        /// Size of this buffer in memory
+        /// </summary>
         public int Size { get; protected set; }
-        public int CurrentIndex { get; protected set; }
+
+        /// <summary>
+        /// The current read/write index
+        /// </summary>
+        public int Position { get; protected set; }
+
+        /// <summary>
+        /// Pointer to the start of this buffer
+        /// </summary>
         public byte* Address { get; protected set; }
 
         /// <summary>
@@ -20,9 +31,17 @@ namespace RageCoop.Core
 
         protected T* Alloc<T>(int count = 1) where T : unmanaged
             => (T*)Alloc(count * sizeof(T));
+
+        /// <summary>
+        /// Reset position to the start of this buffer
+        /// </summary>
+        public void Reset()
+        {
+            Position = 0;
+        }
     }
 
-    internal unsafe sealed class WriteBuffer : BufferBase
+    public unsafe sealed class WriteBuffer : BufferBase
     {
         public WriteBuffer(int size)
         {
@@ -49,12 +68,12 @@ namespace RageCoop.Core
 
         protected override byte* Alloc(int cbSize)
         {
-            var index = CurrentIndex;
-            CurrentIndex += cbSize;
+            var index = Position;
+            Position += cbSize;
 
             // Resize the buffer by at least 50% if there's no sufficient space
-            if (CurrentIndex > Size)
-                Resize(Math.Max(CurrentIndex + 1, (int)(Size * 1.5f)));
+            if (Position > Size)
+                Resize(Math.Max(Position + 1, (int)(Size * 1.5f)));
 
             return Address + index;
         }
@@ -113,22 +132,83 @@ namespace RageCoop.Core
             faddr[2] = quat.Z;
             faddr[3] = quat.W;
         }
+
+        public void Write<T>(ReadOnlySpan<T> source) where T : unmanaged
+        {
+            var len = source.Length;
+            fixed (T* pSource = source)
+            {
+                Buffer.MemoryCopy(pSource, Alloc(sizeof(T) * len), len, len);
+            }
+        }
+
+        public void Write<T>(Span<T> source) where T : unmanaged => Write((ReadOnlySpan<T>)source);
+
+        /// <summary>
+        /// Write an array, prefix the data with its length so it can latter be read using <see cref="ReadBuffer.ReadArray{T}"/>
+        /// </summary>
+        public void WriteArray<T>(T[] values) where T : unmanaged
+        {
+            var len = values.Length;
+            WriteVal(len);
+            fixed (T* pFrom = values)
+            {
+                Buffer.MemoryCopy(pFrom, Alloc(sizeof(T) * len), len, len);
+            }
+        }
+
+        /// <summary>
+        /// Allocate a byte array on managed heap and copy the data of specified size to it 
+        /// </summary>
+        /// <param name="cbSize"></param>
+        /// <returns>The newly created managed byte array</returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public byte[] ToByteArray(int cbSize)
+        {
+            if (cbSize > Size)
+                throw new ArgumentOutOfRangeException(nameof(cbSize));
+
+            var result = new byte[cbSize];
+            fixed (byte* pResult = result)
+            {
+                Buffer.MemoryCopy(Address, pResult, Size, Size);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Free the associated memory allocated on the unmanaged heap
+        /// </summary>
+        public void Free() => Marshal.FreeHGlobal((IntPtr)Address);
     }
 
-    internal unsafe sealed class ReadBuffer : BufferBase
+    public unsafe sealed class ReadBuffer : BufferBase
     {
-        public ReadBuffer(byte* address, int size)
+        /// <summary>
+        /// Initialize an empty instance, needs to call <see cref="Initialise(byte*, int)"/> before reading data
+        /// </summary>
+        public ReadBuffer()
+        {
+
+        }
+        public ReadBuffer(byte* address, int size) => Initialise(address, size);
+
+        public void Initialise(byte* address, int size)
         {
             Address = address;
             Size = size;
+            Reset();
         }
 
         protected override byte* Alloc(int cbSize)
         {
-            var index = CurrentIndex;
-            CurrentIndex += cbSize;
+            if (Address == null)
+                throw new NullReferenceException("Address is null");
 
-            if (CurrentIndex > Size)
+            var index = Position;
+            Position += cbSize;
+
+            if (Position > Size)
                 throw new InvalidOperationException("Attempting to read beyond the existing buffer");
 
             return Address + index;
@@ -177,6 +257,37 @@ namespace RageCoop.Core
                 Z = faddr[2],
                 W = faddr[3],
             };
+        }
+
+        /// <summary>
+        /// Read a span of type <typeparamref name="T"/> from current position to <paramref name="destination"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="destination"></param>
+        public void Read<T>(Span<T> destination) where T : unmanaged
+        {
+            var len = destination.Length;
+            fixed (T* pTo = destination)
+            {
+                Buffer.MemoryCopy(Alloc(len * sizeof(T)), pTo, len, len);
+            }
+        }
+
+        /// <summary>
+        /// Reads an array previously written using <see cref="WriteBuffer.WriteArray{T}(T[])"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T[] ReadArray<T>() where T : unmanaged
+        {
+            var len = ReadVal<int>();
+            var from = Alloc<T>(len);
+            var result = new T[len];
+            fixed (T* pTo = result)
+            {
+                Buffer.MemoryCopy(from, pTo, len, len);
+            }
+            return result;
         }
     }
 }

@@ -12,25 +12,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        /// <summary>
-        ///     Used to reslove entity handle in a <see cref="Packets.CustomEvent" />
-        /// </summary>
-        private static readonly Func<byte, NetIncomingMessage, object> _resolveHandle = (t, reader) =>
-        {
-            switch (t)
-            {
-                case 50:
-                    return EntityPool.ServerProps[reader.ReadInt32()].MainProp?.Handle;
-                case 51:
-                    return EntityPool.GetPedByID(reader.ReadInt32())?.MainPed?.Handle;
-                case 52:
-                    return EntityPool.GetVehicleByID(reader.ReadInt32())?.MainVehicle?.Handle;
-                case 60:
-                    return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
-                default:
-                    throw new ArgumentException("Cannot resolve server side argument: " + t);
-            }
-        };
+        
 
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
 

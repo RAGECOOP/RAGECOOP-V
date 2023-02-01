@@ -1,5 +1,8 @@
-﻿using System;
+﻿using GTA;
+using GTA.Math;
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -94,7 +97,7 @@ namespace RageCoop.Core.Scripting
 
     /// <summary>
     /// </summary>
-    public static class CustomEvents
+    public static partial class CustomEvents
     {
         internal static readonly CustomEventHash OnPlayerDied = "RageCoop.OnPlayerDied";
         internal static readonly CustomEventHash SetWeather = "RageCoop.SetWeather";
@@ -116,17 +119,177 @@ namespace RageCoop.Core.Scripting
         internal static readonly CustomEventHash WeatherTimeSync = "RageCoop.WeatherTimeSync";
         internal static readonly CustomEventHash IsHost = "RageCoop.IsHost";
 
-        /// <summary>
-        ///     Get event hash from string.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        ///     This method is obsoete, you should use implicit operator or <see cref="CustomEventHash.FromString(string)" />
-        /// </remarks>
-        [Obsolete]
-        public static int Hash(string s)
+        #region TYPE CONSTANTS
+
+        public const byte T_BYTE = 1;
+        public const byte T_SHORT = 2;
+        public const byte T_USHORT = 3;
+        public const byte T_INT = 4;
+        public const byte T_UINT = 5;
+        public const byte T_LONG = 6;
+        public const byte T_ULONG = 7;
+        public const byte T_FLOAT = 8;
+        public const byte T_BOOL = 9;
+        public const byte T_STR = 10;
+        public const byte T_VEC3 = 11;
+        public const byte T_QUAT = 12;
+        public const byte T_MODEL = 13;
+        public const byte T_VEC2 = 14;
+        public const byte T_BYTEARR = 15;
+        public const byte T_ID_PROP = 50;
+        public const byte T_ID_PED = 51;
+        public const byte T_ID_VEH = 52;
+        public const byte T_ID_BLIP = 60;
+
+        #endregion
+
+        public static void WriteObjects(WriteBuffer b, params object[] objs)
         {
-            return CustomEventHash.FromString(s);
+            b.WriteVal(objs.Length);
+            foreach(var obj in objs)
+            {
+                switch (obj)
+                {
+                    case byte value:
+                        b.WriteVal(T_BYTE);
+                        b.WriteVal(value);
+                        break;
+                    case short value:
+                        b.WriteVal(T_SHORT);
+                        b.WriteVal(value);
+                        break;
+                    case ushort value:
+                        b.WriteVal(T_USHORT);
+                        b.WriteVal(value);
+                        break;
+                    case int value:
+                        b.WriteVal(T_INT);
+                        b.WriteVal(value);
+                        break;
+                    case uint value:
+                        b.WriteVal(T_UINT);
+                        b.WriteVal(value);
+                        break;
+                    case long value:
+                        b.WriteVal(T_LONG);
+                        b.WriteVal(value);
+                        break;
+                    case ulong value:
+                        b.WriteVal(T_ULONG);
+                        b.WriteVal(value);
+                        break;
+                    case float value:
+                        b.WriteVal(T_FLOAT);
+                        b.WriteVal(value);
+                        break;
+                    case bool value:
+                        b.WriteVal(T_BOOL);
+                        b.WriteVal(value);
+                        break;
+                    case string value:
+                        b.WriteVal(T_STR);
+                        b.Write(value);
+                        break;
+                    case Vector2 value:
+                        b.WriteVal(T_VEC2);
+                        b.Write(ref value);
+                        break;
+                    case Vector3 value:
+                        b.WriteVal(T_VEC3);
+                        b.Write(ref value);
+                        break;
+                    case Quaternion value:
+                        b.WriteVal(T_QUAT);
+                        b.Write(ref value);
+                        break;
+                    case Model value:
+                        b.WriteVal(T_MODEL);
+                        b.WriteVal(value);
+                        break;
+                    case byte[] value:
+                        b.WriteVal(T_BYTEARR);
+                        b.WriteArray(value);
+                        break;
+                    case Tuple<byte, byte[]> value:
+                        b.WriteVal(value.Item1);
+                        b.Write(new ReadOnlySpan<byte>(value.Item2));
+                        break;
+                    default:
+                        throw new Exception("Unsupported object type: " + obj.GetType());
+                }
+            }
         }
+        public static object[] ReadObjects(ReadBuffer r)
+        {
+            var Args = new object[r.ReadVal<int>()];
+            for (var i = 0; i < Args.Length; i++)
+            {
+                var type = r.ReadVal<byte>();
+                switch (type)
+                {
+                    case T_BYTE:
+                        Args[i] = r.ReadVal<byte>();
+                        break;
+                    case T_SHORT:
+                        Args[i] = r.ReadVal<short>();
+                        break;
+                    case T_USHORT:
+                        Args[i] = r.ReadVal<ushort>();
+                        break;
+                    case T_INT:
+                        Args[i] = r.ReadVal<int>();
+                        break;
+                    case T_UINT:
+                        Args[i] = r.ReadVal<uint>();
+                        break;
+                    case T_LONG:
+                        Args[i] = r.ReadVal<long>();
+                        break;
+                    case T_ULONG:
+                        Args[i] = r.ReadVal<ulong>();
+                        break;
+                    case T_FLOAT:
+                        Args[i] = r.ReadVal<float>();
+                        break;
+                    case T_BOOL:
+                        Args[i] = r.ReadVal<bool>();
+                        break;
+                    case T_STR:
+                        r.Read(out string str);
+                        Args[i] = str;
+                        break;
+                    case T_VEC3:
+                        r.Read(out Vector3 vec);
+                        Args[i] = vec;
+                        break;
+                    case T_QUAT:
+                        r.Read(out Quaternion quat);
+                        Args[i] = quat;
+                        break;
+                    case T_MODEL:
+                        Args[i] = r.ReadVal<Model>();
+                        break;
+                    case T_VEC2:
+                        r.Read(out Vector2 vec2);
+                        Args[i] = vec2;
+                        break;
+                    case T_BYTEARR:
+                        Args[i] = r.ReadArray<byte>();
+                        break;
+                    case T_ID_BLIP:
+                    case T_ID_PED:
+                    case T_ID_PROP:
+                    case T_ID_VEH:
+                        Args[i] = IdToHandle(type,r.ReadVal<int>());
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unexpected type: {type}");
+                }
+            }
+            return Args;
+        }
+
+        [LibraryImport("RageCoop.Client.dll")]
+        public static partial int IdToHandle(byte type,int id);
     }
 }

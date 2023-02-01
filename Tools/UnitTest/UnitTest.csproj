@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,12 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\RageCoop.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="ScriptHookVDotNetCore">
-      <HintPath>..\..\libs\ScriptHookVDotNetCore.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

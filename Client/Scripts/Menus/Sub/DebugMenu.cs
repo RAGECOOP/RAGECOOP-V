@@ -42,6 +42,16 @@ namespace RageCoop.Client
                     DiagnosticMenu.Add(
                         new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
             };
+            ShowNetworkInfoItem.CheckboxChanged += (s, e) =>
+            {
+                Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked;
+            };
+            ShowOwnerItem.CheckboxChanged += (s, e) =>
+            {
+                Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
+                Util.SaveSettings();
+            };
+#if DEBUG
             SimulatedLatencyItem.Activated += (s, e) =>
             {
                 try
@@ -55,16 +65,8 @@ namespace RageCoop.Client
                     Main.Logger.Error(ex);
                 }
             };
-            ShowNetworkInfoItem.CheckboxChanged += (s, e) =>
-            {
-                Networking.ShowNetworkInfo = ShowNetworkInfoItem.Checked;
-            };
-            ShowOwnerItem.CheckboxChanged += (s, e) =>
-            {
-                Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
-                Util.SaveSettings();
-            };
             Menu.Add(SimulatedLatencyItem);
+#endif
             Menu.Add(ShowNetworkInfoItem);
             Menu.Add(ShowOwnerItem);
             Menu.AddSubMenu(DiagnosticMenu);

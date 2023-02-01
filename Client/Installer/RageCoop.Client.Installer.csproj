@@ -49,9 +49,4 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="ScriptHookVDotNetCore">
-      <HintPath>..\..\libs\ScriptHookVDotNetCore.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>

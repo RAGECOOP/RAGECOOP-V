@@ -31,7 +31,6 @@ namespace RageCoop.Client
         static Networking()
         {
             Security = new Security(Main.Logger);
-            Packets.CustomEvent.ResolveHandle = _resolveHandle;
         }
 
         public static float Latency => ServerConnection.AverageRoundtripTime / 2;
@@ -65,12 +64,14 @@ namespace RageCoop.Client
                 var config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
                     AutoFlushSendQueue = false,
-                    SimulatedMinimumLatency = SimulatedLatency,
-                    SimulatedRandomLatency = 0,
                     AcceptIncomingConnections = true,
                     MaximumConnections = 32,
                     PingInterval = 5
                 };
+#if DEBUG
+                config.SimulatedMinimumLatency = SimulatedLatency;
+                config.SimulatedRandomLatency = 0;
+#endif
 
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
                 config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
@@ -153,7 +154,7 @@ namespace RageCoop.Client
                     }
 
                     IsConnecting = false;
-                },"Connect");
+                }, "Connect");
             }
         }
 

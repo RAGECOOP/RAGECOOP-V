@@ -34,12 +34,6 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="..\..\.editorconfig">
-			<Link>.editorconfig</Link>
-		</None>
-		<None Include="Scripting\API.Exports.cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<Content Include="icon.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>

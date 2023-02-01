@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading;
 using GTA;
 using Lidgren.Network;
@@ -30,7 +31,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     ///     Provides vital functionality to interact with RAGECOOP
     /// </summary>
-    public static class API
+    public static unsafe partial class API
     {
         #region INTERNAL
 
@@ -270,6 +271,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Disconnect from current server or cancel the connection attempt.
         /// </summary>
+        [UnmanagedCallersOnly(EntryPoint = "Disconnect")]
         public static void Disconnect()
         {
             if (Networking.IsOnServer || Networking.IsConnecting) Networking.ToggleConnection(null);
@@ -369,9 +371,9 @@ namespace RageCoop.Client.Scripting
             };
             DownloadManager.DownloadCompleted += handler;
             Networking.GetResponse<Packets.FileTransferResponse>(new Packets.FileTransferRequest
-                {
-                    Name = name
-                },
+            {
+                Name = name
+            },
                 p =>
                 {
                     if (p.Response != FileResponse.Loaded)

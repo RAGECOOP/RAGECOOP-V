@@ -1,3 +1,4 @@
+git submodule update --init
 if exist "bin" rmdir /s /q "bin"
 dotnet build -c Release
 dotnet build -c API Core\RageCoop.Core.csproj

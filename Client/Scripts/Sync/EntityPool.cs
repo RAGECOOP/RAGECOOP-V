@@ -84,14 +84,10 @@ namespace RageCoop.Client
         #region PEDS
 
         public static SyncedPed GetPedByID(int id)
-        {
-            return PedsByID.TryGetValue(id, out var p) ? p : null;
-        }
+            => PedsByID.TryGetValue(id, out var p) ? p : null;
 
         public static SyncedPed GetPedByHandle(int handle)
-        {
-            return PedsByHandle.TryGetValue(handle, out var p) ? p : null;
-        }
+            => PedsByHandle.TryGetValue(handle, out var p) ? p : null;
 
         public static List<int> GetPedIDs()
         {
@@ -179,14 +175,10 @@ namespace RageCoop.Client
         #region VEHICLES
 
         public static SyncedVehicle GetVehicleByID(int id)
-        {
-            return VehiclesByID.TryGetValue(id, out var v) ? v : null;
-        }
+            => VehiclesByID.TryGetValue(id, out var v) ? v : null;
 
         public static SyncedVehicle GetVehicleByHandle(int handle)
-        {
-            return VehiclesByHandle.TryGetValue(handle, out var v) ? v : null;
-        }
+            => VehiclesByHandle.TryGetValue(handle, out var v) ? v : null;
 
         public static List<int> GetVehicleIDs()
         {
@@ -233,9 +225,7 @@ namespace RageCoop.Client
         #region PROJECTILES
 
         public static SyncedProjectile GetProjectileByID(int id)
-        {
-            return ProjectilesByID.TryGetValue(id, out var p) ? p : null;
-        }
+            => ProjectilesByID.TryGetValue(id, out var p) ? p : null;
 
         public static void Add(SyncedProjectile p)
         {
@@ -287,6 +277,16 @@ namespace RageCoop.Client
         {
             return ProjectilesByID.ContainsKey(id);
         }
+
+        #endregion
+
+        #region SERVER OBJECTS
+        
+        public static SyncedProp GetPropByID(int id)
+            => ServerProps.TryGetValue(id, out var p) ? p : null;
+
+        public static Blip GetBlipByID(int id)
+            => ServerBlips.TryGetValue(id, out var p) ? p : null;
 
         #endregion
 
