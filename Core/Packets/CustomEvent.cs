@@ -27,11 +27,11 @@ namespace RageCoop.Core
                 m.Write(Hash);
                 if (Args != null)
                 {
-                    lock (WriteBufferShared)
+                    lock (SharedWriter)
                     {
-                        WriteBufferShared.Reset();
-                        CustomEvents.WriteObjects(WriteBufferShared, Args);
-                        Payload = WriteBufferShared.ToByteArray(WriteBufferShared.Position);
+                        SharedWriter.Reset();
+                        CustomEvents.WriteObjects(SharedWriter, Args);
+                        Payload = SharedWriter.ToByteArray(SharedWriter.Position);
                     }
                 }
                 m.Write(Payload);
@@ -44,10 +44,10 @@ namespace RageCoop.Core
                 Payload = m.ReadBytes(m.LengthBytes - m.PositionInBytes);
                 fixed (byte* p = Payload)
                 {
-                    lock (ReadBufferShared)
+                    lock (SharedReader)
                     {
-                        ReadBufferShared.Initialise(p,Payload.Length);
-                        Args = CustomEvents.ReadObjects(ReadBufferShared);
+                        SharedReader.Initialise(p, Payload.Length);
+                        Args = CustomEvents.ReadObjects(SharedReader);
                     }
                 }
             }

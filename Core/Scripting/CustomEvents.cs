@@ -143,10 +143,10 @@ namespace RageCoop.Core.Scripting
 
         #endregion
 
-        public static void WriteObjects(WriteBuffer b, params object[] objs)
+        public static void WriteObjects(BufferWriter b, params object[] objs)
         {
             b.WriteVal(objs.Length);
-            foreach(var obj in objs)
+            foreach (var obj in objs)
             {
                 switch (obj)
                 {
@@ -219,7 +219,7 @@ namespace RageCoop.Core.Scripting
                 }
             }
         }
-        public static object[] ReadObjects(ReadBuffer r)
+        public static object[] ReadObjects(BufferReader r)
         {
             var Args = new object[r.ReadVal<int>()];
             for (var i = 0; i < Args.Length; i++)
@@ -280,7 +280,7 @@ namespace RageCoop.Core.Scripting
                     case T_ID_PED:
                     case T_ID_PROP:
                     case T_ID_VEH:
-                        Args[i] = IdToHandle(type,r.ReadVal<int>());
+                        Args[i] = IdToHandle(type, r.ReadVal<int>());
                         break;
                     default:
                         throw new InvalidOperationException($"Unexpected type: {type}");
@@ -290,6 +290,6 @@ namespace RageCoop.Core.Scripting
         }
 
         [LibraryImport("RageCoop.Client.dll")]
-        public static partial int IdToHandle(byte type,int id);
+        public static partial int IdToHandle(byte type, int id);
     }
 }

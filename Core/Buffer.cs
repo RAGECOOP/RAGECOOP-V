@@ -5,7 +5,7 @@ using GTA.Math;
 
 namespace RageCoop.Core
 {
-    public unsafe abstract class BufferBase
+    public unsafe abstract class Buffer
     {
         /// <summary>
         /// Size of this buffer in memory
@@ -41,9 +41,9 @@ namespace RageCoop.Core
         }
     }
 
-    public unsafe sealed class WriteBuffer : BufferBase
+    public unsafe sealed class BufferWriter : Buffer
     {
-        public WriteBuffer(int size)
+        public BufferWriter(int size)
         {
             Resize(size);
         }
@@ -59,7 +59,7 @@ namespace RageCoop.Core
             var newAddr = (byte*)Marshal.AllocHGlobal(size);
             if (Address != null)
             {
-                Buffer.MemoryCopy(Address, newAddr, size, Size);
+                System.Buffer.MemoryCopy(Address, newAddr, size, Size);
                 Marshal.FreeHGlobal((IntPtr)Address);
             }
             Size = size;
@@ -138,14 +138,14 @@ namespace RageCoop.Core
             var len = source.Length;
             fixed (T* pSource = source)
             {
-                Buffer.MemoryCopy(pSource, Alloc(sizeof(T) * len), len, len);
+                System.Buffer.MemoryCopy(pSource, Alloc(sizeof(T) * len), len, len);
             }
         }
 
         public void Write<T>(Span<T> source) where T : unmanaged => Write((ReadOnlySpan<T>)source);
 
         /// <summary>
-        /// Write an array, prefix the data with its length so it can latter be read using <see cref="ReadBuffer.ReadArray{T}"/>
+        /// Write an array, prefix the data with its length so it can latter be read using <see cref="BufferReader.ReadArray{T}"/>
         /// </summary>
         public void WriteArray<T>(T[] values) where T : unmanaged
         {
@@ -153,7 +153,7 @@ namespace RageCoop.Core
             WriteVal(len);
             fixed (T* pFrom = values)
             {
-                Buffer.MemoryCopy(pFrom, Alloc(sizeof(T) * len), len, len);
+                System.Buffer.MemoryCopy(pFrom, Alloc(sizeof(T) * len), len, len);
             }
         }
 
@@ -171,7 +171,7 @@ namespace RageCoop.Core
             var result = new byte[cbSize];
             fixed (byte* pResult = result)
             {
-                Buffer.MemoryCopy(Address, pResult, Size, Size);
+                System.Buffer.MemoryCopy(Address, pResult, cbSize, cbSize);
             }
             return result;
         }
@@ -182,16 +182,16 @@ namespace RageCoop.Core
         public void Free() => Marshal.FreeHGlobal((IntPtr)Address);
     }
 
-    public unsafe sealed class ReadBuffer : BufferBase
+    public unsafe sealed class BufferReader : Buffer
     {
         /// <summary>
         /// Initialize an empty instance, needs to call <see cref="Initialise(byte*, int)"/> before reading data
         /// </summary>
-        public ReadBuffer()
+        public BufferReader()
         {
 
         }
-        public ReadBuffer(byte* address, int size) => Initialise(address, size);
+        public BufferReader(byte* address, int size) => Initialise(address, size);
 
         public void Initialise(byte* address, int size)
         {
@@ -269,12 +269,12 @@ namespace RageCoop.Core
             var len = destination.Length;
             fixed (T* pTo = destination)
             {
-                Buffer.MemoryCopy(Alloc(len * sizeof(T)), pTo, len, len);
+                System.Buffer.MemoryCopy(Alloc(len * sizeof(T)), pTo, len, len);
             }
         }
 
         /// <summary>
-        /// Reads an array previously written using <see cref="WriteBuffer.WriteArray{T}(T[])"/>
+        /// Reads an array previously written using <see cref="BufferWriter.WriteArray{T}(T[])"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -285,7 +285,7 @@ namespace RageCoop.Core
             var result = new T[len];
             fixed (T* pTo = result)
             {
-                Buffer.MemoryCopy(from, pTo, len, len);
+                System.Buffer.MemoryCopy(from, pTo, len, len);
             }
             return result;
         }

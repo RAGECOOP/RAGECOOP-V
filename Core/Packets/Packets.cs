@@ -152,8 +152,8 @@ namespace RageCoop.Core
 
     internal abstract class Packet : IPacket
     {
-        public static WriteBuffer WriteBufferShared = new(1024);
-        public static ReadBuffer ReadBufferShared = new();
+        public static BufferWriter SharedWriter = new(1024);
+        public static BufferReader SharedReader = new();
 
         public abstract PacketType Type { get; }
 

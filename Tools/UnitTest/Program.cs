@@ -1,5 +1,6 @@
 ﻿using GTA.Math;
 using RageCoop.Core;
+using RageCoop.Core.Scripting;
 using System.Security.Cryptography;
 
 namespace UnitTest
@@ -28,7 +29,7 @@ namespace UnitTest
         {
             TestElement[] test = new TestElement[1024];
             Console.WriteLine("Testing buffers");
-            var buf = new WriteBuffer(1024);
+            var buf = new BufferWriter(1024);
             for (int i = 0; i < 1024; i++)
             {
                 var e = test[i] = new TestElement(i);
@@ -42,7 +43,7 @@ namespace UnitTest
             Console.WriteLine($"Current position: {buf.Position}");
 
             Console.WriteLine("Validating data");
-            var reader = new ReadBuffer(buf.Address, buf.Size);
+            var reader = new BufferReader(buf.Address, buf.Size);
             for (int i = 0; i < 1024; i++)
             {
                 var e = test[i];
@@ -69,6 +70,23 @@ namespace UnitTest
             }
 
             Console.WriteLine("Buffers OK");
+
+            Console.WriteLine("Testing CustomEvents");
+            var objs = new object[] { (byte)236, (short)82, (ushort)322, 
+                "test", 123, 123U, 456UL, 345L, 5F, new Vector2(15, 54), new Vector3(22, 45, 25), new Quaternion(2, 3, 222, 5) };
+
+            buf.Reset();
+            CustomEvents.WriteObjects(buf, objs);
+            var payload = buf.ToByteArray(buf.Position);
+            fixed(byte* p = payload)
+            {
+                reader.Initialise(p, payload.Length);
+            }
+
+            if (!CustomEvents.ReadObjects(reader).SequenceEqual(objs))
+                throw new Exception("CustomEvents fail");
+
+            Console.WriteLine("CustomEvents OK");
         }
     }
 }
