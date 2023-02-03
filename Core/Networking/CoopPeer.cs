@@ -34,6 +34,7 @@ namespace RageCoop.Core
             _stopping = true;
             Shutdown("Bye!");
             ListenerThread.Join();
+            Join();
         }
 
         public void SendTo(Packet p, NetConnection connection, ConnectionChannel channel = ConnectionChannel.Default,

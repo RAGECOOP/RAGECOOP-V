@@ -101,10 +101,9 @@ namespace RageCoop.Client
                 WorldThread.DoQueuedActions();
                 if (IsUnloading)
                 {
-                    ThreadManager.OnUnload();
                     Logger.Dispose();
-                    Networking.Peer?.Shutdown("bye");
-                    Thread.Sleep(1000);
+                    Networking.Peer?.Dispose();
+                    ThreadManager.OnUnload();
                 }
             }
             catch (Exception ex)
