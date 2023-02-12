@@ -4,7 +4,7 @@ global using static GTA.Native.Function;
 global using static GTA.Native.Hash;
 global using static RageCoop.Client.Shared;
 global using Console = GTA.Console;
-global using static SHVDN.PInvoke;
+global using static RageCoop.Core.Shared;
 using System.IO;
 
 namespace RageCoop.Client

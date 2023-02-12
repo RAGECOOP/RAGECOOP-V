@@ -4,6 +4,7 @@ using System.Drawing;
 using GTA;
 using GTA.UI;
 using LemonUI.Menus;
+using RageCoop.Client.Scripting;
 
 namespace RageCoop.Client.Menus
 {
@@ -66,8 +67,7 @@ namespace RageCoop.Client.Menus
             };
             _showNametag.Activated += (s, e) =>
             {
-                Main.Settings.ShowPlayerNameTag = _showNametag.Checked;
-                Util.SaveSettings();
+                API.Config.ShowPlayerNameTag = _showNametag.Checked;
             };
 
             Menu.Add(_disableTrafficItem);

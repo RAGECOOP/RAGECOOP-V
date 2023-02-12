@@ -10,47 +10,11 @@ using RageCoop.Core.Scripting;
 
 namespace RageCoop.Client.Scripting
 {
-    /// <summary>
-    /// </summary>
-    public class ClientResource
-    {
-        /// <summary>
-        ///     Name of the resource
-        /// </summary>
-        public string Name { get; internal set; }
-
-        /// <summary>
-        ///     Directory where the scripts is loaded from
-        /// </summary>
-        public string ScriptsDirectory { get; internal set; }
-
-        /// <summary>
-        ///     A resource-specific folder that can be used to store your files.
-        /// </summary>
-        public string DataFolder { get; internal set; }
-
-        /// <summary>
-        ///     Get all <see cref="ClientScript" /> instance in this resource.
-        /// </summary>
-        public List<ClientScript> Scripts { get; internal set; } = new List<ClientScript>();
-
-        /// <summary>
-        ///     Get the <see cref="ResourceFile" /> where this script is loaded from.
-        /// </summary>
-        public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
-
-        /// <summary>
-        ///     A <see cref="Core.Logger" /> instance that can be used to debug your resource.
-        /// </summary>
-        public Logger Logger { get; internal set; }
-    }
-
     internal class Resources
     {
         public static string TempPath;
 
-        internal readonly ConcurrentDictionary<string, ClientResource> LoadedResources =
-            new ConcurrentDictionary<string, ClientResource>();
+        internal readonly ConcurrentDictionary<string, ClientResource> LoadedResources = new();
 
         static Resources()
         {
@@ -86,7 +50,7 @@ namespace RageCoop.Client.Scripting
             }
 
             Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).Where(x => x.CanBeIgnored())
-                .ForEach(x => File.Delete(x));
+                .ForEach(File.Delete);
 
             // TODO Core.ScheduleLoad()...
         }

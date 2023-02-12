@@ -107,12 +107,12 @@ namespace RageCoop.Client
             Settings settings;
             try
             {
-                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
+                settings = JsonDeserialize<Settings>(File.ReadAllText(path));
             }
             catch (Exception ex)
             {
                 Main.Logger?.Error(ex);
-                File.WriteAllText(path, JsonConvert.SerializeObject(settings = new Settings(), Formatting.Indented));
+                File.WriteAllText(path, JsonSerialize(settings = new Settings()));
             }
 
             return settings;
@@ -126,7 +126,7 @@ namespace RageCoop.Client
                 settings = settings ?? Main.Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
-                File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
+                File.WriteAllText(path, JsonSerialize(settings));
                 return true;
             }
             catch (Exception ex)

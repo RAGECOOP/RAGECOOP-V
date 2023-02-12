@@ -115,7 +115,7 @@ namespace RageCoop.Client
         }
 
         #endregion
-
+        /*
         public static Image CaptureWindow(IntPtr handle)
         {
             var windowDC = User32.GetWindowDC(handle);
@@ -134,7 +134,7 @@ namespace RageCoop.Client
             User32.ReleaseDC(handle, windowDC);
             return image;
         }
-
+        */
         public static void ClearLastError()
         {
             SetLastErrorEx(0, 0);

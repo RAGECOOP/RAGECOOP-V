@@ -96,6 +96,7 @@ namespace RageCoop.Core.Scripting
     }
 
     /// <summary>
+    /// Common processing for custome client\server events
     /// </summary>
     public static partial class CustomEvents
     {

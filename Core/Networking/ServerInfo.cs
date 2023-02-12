@@ -8,7 +8,6 @@ namespace RageCoop.Core
     [Serializable]
     public class ServerInfo
     {
-#pragma warning disable 1591
         public string address { get; set; }
         public int port { get; set; }
         public string name { get; set; }

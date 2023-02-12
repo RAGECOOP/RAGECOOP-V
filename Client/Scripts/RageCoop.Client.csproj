@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net7.0-windows</TargetFramework>
+		<NoAotCompile>false</NoAotCompile>
+		<TargetFramework>net7.0</TargetFramework>
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 		<OutputType>Library</OutputType>
 		<OutDir>..\..\bin\$(Configuration)\Client\Scripts</OutDir>
@@ -20,6 +21,9 @@
 		<Compile Remove="GUI\**" />
 		<EmbeddedResource Remove="GUI\**" />
 		<None Remove="GUI\**" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Scripting\ClientScript.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Properties\AssemblyInfo.cs">
@@ -50,6 +54,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\Core\RageCoop.Core.csproj" />
+		<ProjectReference Include="..\Scripting\RageCoop.Client.Scripting.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="NAudio" Version="2.1.0" />

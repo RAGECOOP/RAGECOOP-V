@@ -37,7 +37,7 @@ namespace RageCoop.Client
             {
                 if (File.Exists(AnimationsDataPath))
                 {
-                    var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
+                    var anims = JsonDeserialize<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
                     foreach (var anim in anims)
                     foreach (var a in anim.Animations)
                         if (Call<bool>(IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))

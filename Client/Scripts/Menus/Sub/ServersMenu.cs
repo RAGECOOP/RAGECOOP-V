@@ -58,7 +58,7 @@ namespace RageCoop.Client.Menus
             List<ServerInfo> serverList = null;
             var realUrl = Main.Settings.MasterServer;
             serverList = null;
-            try { serverList = JsonConvert.DeserializeObject<List<ServerInfo>>(DownloadString(realUrl)); }
+            try { serverList = JsonDeserialize<List<ServerInfo>>(DownloadString(realUrl)); }
             catch (Exception ex) { Main.Logger.Error(ex); }
 
             // Need to be processed in main thread

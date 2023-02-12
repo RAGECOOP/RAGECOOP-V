@@ -1,15 +1,17 @@
 ﻿#undef DEBUG
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Threading;
-using GTA;
 using Lidgren.Network;
 using Newtonsoft.Json;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
+
+[assembly: InternalsVisibleTo("CodeGen")] // For generating api bridge
 
 namespace RageCoop.Client.Scripting
 {
@@ -31,7 +33,7 @@ namespace RageCoop.Client.Scripting
     /// <summary>
     ///     Provides vital functionality to interact with RAGECOOP
     /// </summary>
-    public static unsafe partial class API
+    internal static unsafe partial class API
     {
         #region INTERNAL
 
@@ -78,6 +80,17 @@ namespace RageCoop.Client.Scripting
             ///     Get or set scale of player's blip
             /// </summary>
             public static float BlipScale { get; set; } = 1;
+
+            public static bool ShowPlayerNameTag
+            {
+                get => Main.Settings.ShowPlayerNameTag;
+                set
+                {
+                    if (value == ShowPlayerNameTag) return;
+                    Main.Settings.ShowPlayerNameTag = value;
+                    Util.SaveSettings();
+                }
+            }
         }
 
         /// <summary>
@@ -207,7 +220,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Get all players indexed by their ID
         /// </summary>
-        public static Dictionary<int, Player> Players => new Dictionary<int, Player>(PlayerList.Players);
+        public static Dictionary<int, Player> Players => new(PlayerList.Players);
 
         #endregion
 
@@ -255,57 +268,6 @@ namespace RageCoop.Client.Scripting
             WorldThread.QueueAction(a);
         }
 
-
-        /// <summary>
-        ///     Connect to a server
-        /// </summary>
-        /// <param name="address">Address of the server, e.g. 127.0.0.1:4499</param>
-        /// <exception cref="InvalidOperationException">When a connection is active or being established</exception>
-        public static void Connect(string address)
-        {
-            if (Networking.IsOnServer || Networking.IsConnecting)
-                throw new InvalidOperationException("Cannot connect to server when another connection is active");
-            Networking.ToggleConnection(address);
-        }
-
-        /// <summary>
-        ///     Disconnect from current server or cancel the connection attempt.
-        /// </summary>
-        [UnmanagedCallersOnly(EntryPoint = "Disconnect")]
-        public static void Disconnect()
-        {
-            if (Networking.IsOnServer || Networking.IsConnecting) Networking.ToggleConnection(null);
-        }
-
-        /// <summary>
-        ///     List all servers from master server address
-        /// </summary>
-        /// <returns></returns>
-        public static List<ServerInfo> ListServers()
-        {
-            return JsonConvert.DeserializeObject<List<ServerInfo>>(
-                HttpHelper.DownloadString(Main.Settings.MasterServer));
-        }
-
-        /// <summary>
-        ///     Send a local chat message to this player
-        /// </summary>
-        /// <param name="from">Name of the sender</param>
-        /// <param name="message">The player's message</param>
-        public static void LocalChatMessage(string from, string message)
-        {
-            Main.MainChat.AddMessage(from, message);
-        }
-
-        /// <summary>
-        ///     Send a chat message or command to server/other players
-        /// </summary>
-        /// <param name="message"></param>
-        public static void SendChatMessage(string message)
-        {
-            Networking.SendChatMessage(message);
-        }
-
         /// <summary>
         ///     Send an event and data to the server.
         /// </summary>
@@ -315,13 +277,7 @@ namespace RageCoop.Client.Scripting
         ///     types
         /// </param>
         public static void SendCustomEvent(CustomEventHash eventHash, params object[] args)
-        {
-            Networking.Peer.SendTo(new Packets.CustomEvent
-            {
-                Args = args,
-                Hash = eventHash
-            }, Networking.ServerConnection, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
-        }
+        => SendCustomEvent(CustomEventFlags.None, eventHash, args);
 
         /// <summary>
         ///     Send an event and data to the server
@@ -346,8 +302,7 @@ namespace RageCoop.Client.Scripting
         ///     backgound thread, use <see cref="QueueAction(Action)" /> in the handler to dispatch code to script thread.
         /// </summary>
         /// <param name="hash">
-        ///     An unique identifier of the event, you can hash your event name with
-        ///     <see cref="Core.Scripting.CustomEvents.Hash(string)" />
+        ///     An unique identifier of the event
         /// </param>
         /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
         public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
@@ -384,6 +339,102 @@ namespace RageCoop.Client.Scripting
                 });
         }
 
+
+
+        /// <summary>
+        ///     Connect to a server
+        /// </summary>
+        /// <param name="address">Address of the server, e.g. 127.0.0.1:4499</param>
+        /// <exception cref="InvalidOperationException">When a connection is active or being established</exception>
+        [Remoting]
+        public static void Connect(string address)
+        {
+            if (Networking.IsOnServer || Networking.IsConnecting)
+                throw new InvalidOperationException("Cannot connect to server when another connection is active");
+            Networking.ToggleConnection(address);
+        }
+
+        /// <summary>
+        ///     Disconnect from current server or cancel the connection attempt.
+        /// </summary>
+        [Remoting]
+        public static void Disconnect()
+        {
+            if (Networking.IsOnServer || Networking.IsConnecting) Networking.ToggleConnection(null);
+        }
+
+        /// <summary>
+        ///     List all servers from master server address
+        /// </summary>
+        /// <returns></returns>
+        [Remoting]
+        public static List<ServerInfo> ListServers()
+        {
+            return JsonDeserialize<List<ServerInfo>>(
+                HttpHelper.DownloadString(Main.Settings.MasterServer));
+        }
+
+        /// <summary>
+        ///     Send a local chat message to this player
+        /// </summary>
+        /// <param name="from">Name of the sender</param>
+        /// <param name="message">The player's message</param>
+        [Remoting]
+        public static void LocalChatMessage(string from, string message)
+        {
+            Main.MainChat.AddMessage(from, message);
+        }
+
+        /// <summary>
+        ///     Send a chat message or command to server/other players
+        /// </summary>
+        /// <param name="message"></param>
+        [Remoting]
+        public static void SendChatMessage(string message)
+        {
+            if (!IsOnServer)
+                throw new InvalidOperationException("Not on server");
+            Networking.SendChatMessage(message);
+        }
+
+        [Remoting]
+        public static ClientResource GetResource(string name)
+        {
+            if (Main.Resources.LoadedResources.TryGetValue(name, out var resource))
+                return resource;
+
+            return null;
+        }
+
+
+        [Remoting(GenBridge = false)]
+        public static object GetProperty(string name)
+            => typeof(API).GetProperty(name, BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+
+        [Remoting(GenBridge = false)]
+        public static void SetProperty(string name, string jsonVal)
+        {
+            var prop = typeof(API).GetProperty(name, BindingFlags.Static | BindingFlags.Public); ;
+            if (prop == null)
+                throw new KeyNotFoundException($"Property {name} was not found");
+            prop.SetValue(null, JsonDeserialize(jsonVal, prop.PropertyType));
+        }
+
+        [Remoting]
+        public static object GetConfig(string name)
+            => typeof(Config).GetProperty(name, BindingFlags.Static | BindingFlags.Public)?.GetValue(null);
+
+        [Remoting]
+        public static void SetConfig(string name, string jsonVal)
+        {
+            var prop = typeof(Config).GetProperty(name, BindingFlags.Static | BindingFlags.Public);
+            if (prop == null)
+                throw new KeyNotFoundException($"Property {name} was not found");
+            prop.SetValue(null, JsonDeserialize(jsonVal, prop.PropertyType));
+        }
+
         #endregion
+
+
     }
 }

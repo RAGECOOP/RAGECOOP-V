@@ -24,9 +24,9 @@ namespace RageCoop.Core
             }
 
             Console.WriteLine("Deserializing");
-            var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(input));
+            var anims = JsonDeserialize<AnimDic[]>(File.ReadAllText(input));
             Console.WriteLine("Serializing");
-            File.WriteAllText(output, JsonConvert.SerializeObject(anims, Formatting.Indented));
+            File.WriteAllText(output, JsonSerialize(anims));
             return anims;
         }
     }
@@ -113,12 +113,11 @@ namespace RageCoop.Core
             }
 
             Console.WriteLine("Deserializing");
-            var infos = JsonConvert.DeserializeObject<VehicleInfo[]>(File.ReadAllText(input));
+            var infos = JsonDeserialize<VehicleInfo[]>(File.ReadAllText(input));
             Console.WriteLine("Serializing");
             File.WriteAllText(output,
-                JsonConvert.SerializeObject(
-                    infos.Select(FromVehicle).Where(x => x != null),
-                    Formatting.Indented));
+                JsonSerialize(
+                    infos.Select(FromVehicle).Where(x => x != null)));
         }
 
         public static VehicleWeaponInfo FromVehicle(VehicleInfo info)

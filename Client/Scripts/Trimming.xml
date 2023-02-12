@@ -1,7 +1,9 @@
 ﻿<linker>
 	<assembly fullname="RageCoop.Client" preserve="all" />
+	<assembly fullname="RageCoop.Client.Scripting" preserve="all" />
 	<assembly fullname="RageCoop.Core" preserve="all" />
 	<assembly fullname="System.Collections">
 		<type fullname="System.Collections.Generic.List`1" preserve="all" />
+		<type fullname="System.Collections.Generic.Dictionary`2" preserve="all" />
 	</assembly>
 </linker>

@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{70A1F09D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataDumper", "Tools\DataDumper\DataDumper.csproj", "{6387D897-09AF-4464-B440-80438E3BB8D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RageCoop.Client.Scripting", "RageCoop.Client.Scripting\RageCoop.Client.Scripting.csproj", "{FE47AFBA-0613-4378-B318-892DEB7B3D88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RageCoop.Client.Scripting", "Client\Scripting\RageCoop.Client.Scripting.csproj", "{FE47AFBA-0613-4378-B318-892DEB7B3D88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "Tools\UnitTest\UnitTest.csproj", "{4FE96671-3DC5-4394-B2E3-584399E57310}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lidgren.Network", "libs\Lidgren.Network\Lidgren.Network\Lidgren.Network.csproj", "{02616B5A-2A68-42AA-A91E-311EF95FCF44}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptHookVDotNetCore.Generator", "libs\ScriptHookVDotNetCore\src\ScriptHookVDotNetCore.Generator\ScriptHookVDotNetCore.Generator.csproj", "{2C08A5AF-C189-4350-B54F-3D23379E9E1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeGen", "Tools\CodeGen\CodeGen.csproj", "{C4CF8A98-7393-42BD-97A1-2E850D12890A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -164,6 +166,18 @@ Global
 		{2C08A5AF-C189-4350-B54F-3D23379E9E1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2C08A5AF-C189-4350-B54F-3D23379E9E1D}.Release|x64.ActiveCfg = Release|Any CPU
 		{2C08A5AF-C189-4350-B54F-3D23379E9E1D}.Release|x64.Build.0 = Release|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.API|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.API|Any CPU.Build.0 = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.API|x64.ActiveCfg = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.API|x64.Build.0 = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Debug|x64.Build.0 = Debug|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Release|x64.ActiveCfg = Release|Any CPU
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -177,6 +191,7 @@ Global
 		{B15EDABB-30AF-475A-823D-ACB9F75CFE13} = {1AF84C35-B86B-46BB-9FDB-ACB7787E582A}
 		{02616B5A-2A68-42AA-A91E-311EF95FCF44} = {1AF84C35-B86B-46BB-9FDB-ACB7787E582A}
 		{2C08A5AF-C189-4350-B54F-3D23379E9E1D} = {1AF84C35-B86B-46BB-9FDB-ACB7787E582A}
+		{C4CF8A98-7393-42BD-97A1-2E850D12890A} = {70A1F09D-648D-4C8B-8947-E920B1A587A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6CC7EA75-E4FF-4534-8EB6-0AEECF2620B7}

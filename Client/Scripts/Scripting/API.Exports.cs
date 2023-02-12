@@ -1,87 +1,94 @@
 ﻿using Lidgren.Network;
+using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using static RageCoop.Core.Scripting.CustomEvents;
 
 namespace RageCoop.Client.Scripting
 {
-    public static unsafe partial class API
+    internal static unsafe partial class API
     {
-        [UnmanagedCallersOnly(EntryPoint = "Connect")]
-        public static void Connect(char* address) => Connect(new string(address));
+        [ThreadStatic]
+        static string _lastResult;
 
-        [UnmanagedCallersOnly(EntryPoint = "GetLocalPlayerID")]
-        public static int GetLocalPlayerID() => LocalPlayerID;
-
-        /// <summary>
-        /// Get configuration value
-        /// </summary>
-        /// <param name="szName">The name of the config</param>
-        /// <param name="buf">Buffer to store retrived value</param>
-        /// <param name="bufSize">Buffer size</param>
-        /// <returns>The string length of returned value, not including the null terminator</returns>
-
-        [UnmanagedCallersOnly(EntryPoint = "GetConfigValue")]
-        public static int GetConfigValue(char* szName, char* buf, int bufSize)
+        [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResult))]
+        public static int GetLastResult(char* buf, int cbBufSize)
         {
-            var name = new string(szName);
-            var value = name switch
-            {
-                nameof(Config.EnableAutoRespawn) => Config.EnableAutoRespawn.ToString(),
-                nameof(Config.Username) => Config.Username.ToString(),
-                nameof(Config.BlipColor) => Config.BlipColor.ToString(),
-                nameof(Config.BlipScale) => Config.BlipScale.ToString(),
-                nameof(Config.BlipSprite) => Config.BlipSprite.ToString(),
-                _ => null
-            };
-
-            if (value == null)
+            if (_lastResult == null)
                 return 0;
 
-            fixed (char* p = value)
+            fixed (char* pErr = _lastResult)
             {
-                var cbRequired = (value.Length + 1) * sizeof(char);
-                Buffer.MemoryCopy(p, buf, bufSize, cbRequired);
-                return value.Length;
+                var cbToCopy = sizeof(char) * (_lastResult.Length + 1);
+                System.Buffer.MemoryCopy(pErr, buf, cbToCopy, Math.Min(cbToCopy, cbBufSize));
+                if (cbToCopy > cbBufSize && cbBufSize > 0)
+                {
+                    buf[cbBufSize / sizeof(char) - 1] = '\0'; // Always add null terminator
+                }
+                return _lastResult.Length;
+            }
+        }
+        public static void SetLastResult(string msg) => _lastResult = msg;
+
+        [UnmanagedCallersOnly(EntryPoint = nameof(SetLastResult))]
+        public static void SetLastResult(char* msg)
+        {
+            try
+            {
+                SetLastResult(msg == null ? null : new string(msg));
+            }
+            catch (Exception ex)
+            {
+                SHVDN.PInvoke.MessageBoxA(default, ex.ToString(), "error", default);
             }
         }
 
-        [UnmanagedCallersOnly(EntryPoint = "SetConfigValue")]
-        public static void SetConfigValue(char* szName, char* szValue)
+        [UnmanagedCallersOnly(EntryPoint = nameof(GetEventHash))]
+        public static CustomEventHash GetEventHash(char* name) => new string(name);
+
+        [UnmanagedCallersOnly(EntryPoint = nameof(SendCustomEvent))]
+        public static void SendCustomEvent(CustomEventFlags flags, int hash, byte* data, int cbData)
         {
-            var name = new string(szName);
-            var value = new string(szValue);
-            switch (name)
+            var payload = new byte[cbData];
+            Marshal.Copy((IntPtr)data, payload, 0, cbData);
+            Networking.Peer.SendTo(new Packets.CustomEvent()
             {
-                case nameof(Config.EnableAutoRespawn): Config.EnableAutoRespawn = bool.Parse(value); break;
-                case nameof(Config.Username): Config.Username = value; break;
-                case nameof(Config.BlipColor): Config.BlipColor = Enum.Parse<BlipColor>(value); break;
-                case nameof(Config.BlipScale): Config.BlipScale = float.Parse(value); break;
-                case nameof(Config.BlipSprite): Config.BlipSprite = Enum.Parse<BlipSprite>(value); break;
-            };
+                Flags = flags,
+                Payload = payload,
+                Hash = hash
+            }, Networking.ServerConnection, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
         }
 
-        [UnmanagedCallersOnly(EntryPoint = "LocalChatMessage")]
-        public static void LocalChatMessage(char* from, char* msg) => LocalChatMessage(new string(from), new string(msg));
-
-        [UnmanagedCallersOnly(EntryPoint = "SendChatMessage")]
-        public static void SendChatMessage(char* msg) => SendChatMessage(new string(msg));
-
-        [UnmanagedCallersOnly(EntryPoint = "GetEventHash")]
-        public static CustomEventHash GetEventHash(char* name)=>new string(name);
-
-        public static void SendCustomEvent(int hash, CustomEventFlags flags, byte* data, int cbData)
+        [UnmanagedCallersOnly(EntryPoint = nameof(InvokeCommand))]
+        public static int InvokeCommand(char* name, int argc, char** argv)
         {
-
+            try
+            {
+                var args = new string[argc];
+                for (int i = 0; i < argc; i++)
+                {
+                    args[i] = new(argv[i]);
+                }
+                _lastResult = _invokeCommand(new string(name), args);
+                return _lastResult.Length;
+            }
+            catch (Exception ex)
+            {
+                Main.Logger.Error(ex);
+                SetLastResult(ex.ToString());
+                return 0;
+            }
         }
+
+        [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResultLenInChars))]
+        public static int GetLastResultLenInChars() => _lastResult?.Length ?? 0;
 
         /// <summary>
         ///     Convert Entity ID to handle
         /// </summary>
-        [UnmanagedCallersOnly(EntryPoint = "IdToHandle")]
+        [UnmanagedCallersOnly(EntryPoint = nameof(IdToHandle))]
         public static int IdToHandle(byte type, int id)
         {
             return type switch

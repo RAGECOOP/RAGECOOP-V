@@ -20,6 +20,7 @@ using RageCoop.Core.Scripting;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
+[assembly: InternalsVisibleTo("RageCoop.Client.Scripting")]
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 [assembly: InternalsVisibleTo("DataDumper")]
 [assembly: InternalsVisibleTo("UnitTest")]
@@ -289,7 +290,7 @@ namespace RageCoop.Core
                 throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
 
             var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            return JsonConvert.DeserializeObject<IpInfo>(content);
+            return JsonDeserialize<IpInfo>(content);
         }
 
         public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)

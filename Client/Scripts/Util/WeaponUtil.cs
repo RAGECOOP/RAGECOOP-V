@@ -25,14 +25,14 @@ namespace RageCoop.Client
         static WeaponUtil()
         {
             // Parse and load to memory
-            foreach (var w in JsonConvert.DeserializeObject<VehicleWeaponInfo[]>(
+            foreach (var w in JsonDeserialize<VehicleWeaponInfo[]>(
                          File.ReadAllText(VehicleWeaponDataPath))) VehicleWeapons.Add(w.Hash, w);
 
-            Weapons = JsonConvert.DeserializeObject<Dictionary<uint, WeaponInfo>>(
+            Weapons = JsonDeserialize<Dictionary<uint, WeaponInfo>>(
                 File.ReadAllText(WeaponInfoDataPath));
 
             if (File.Exists(WeaponFixDataPath))
-                WeaponFix = JsonConvert.DeserializeObject<WeaponFix>(File.ReadAllText(WeaponFixDataPath));
+                WeaponFix = JsonDeserialize<WeaponFix>(File.ReadAllText(WeaponFixDataPath));
             else
                 Main.Logger.Warning("Weapon fix data not found");
         }
@@ -73,7 +73,7 @@ namespace RageCoop.Client
                 }
             }
 
-            File.WriteAllText(path, JsonConvert.SerializeObject(fix, Formatting.Indented));
+            File.WriteAllText(path, JsonSerialize(fix));
 
             P.IsInvincible = false;
         }

@@ -79,8 +79,7 @@ public partial class Server
 
         if (!CanAnnounce)
         {
-            var existing = JsonConvert
-                .DeserializeObject<List<ServerInfo>>(
+            var existing = JsonDeserialize<List<ServerInfo>>(
                     HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer)))
                 .Where(x => x.address == IpInfo.Address).FirstOrDefault();
             if (existing != null)
@@ -117,7 +116,7 @@ public partial class Server
                 publicKeyModulus = Convert.ToBase64String(pModulus),
                 publicKeyExponent = Convert.ToBase64String(pExpoenet)
             };
-            var msg = JsonConvert.SerializeObject(serverInfo);
+            var msg = JsonSerialize(serverInfo);
 
             var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
             response = httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"))

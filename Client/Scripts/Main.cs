@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using GTA;
 using GTA.Math;
@@ -122,7 +123,7 @@ namespace RageCoop.Client
 
             Resources = new Resources();
 
-            
+
 
             Logger.Info(
                 $"Main script initialized");
@@ -135,7 +136,7 @@ namespace RageCoop.Client
 
             Util.NativeMemory();
             Counter.Restart();
-            
+
         }
         protected override void OnTick()
         {
@@ -237,6 +238,23 @@ namespace RageCoop.Client
                 return;
             }
 
+            if (e.KeyCode == Keys.U)
+            {
+                foreach (var prop in typeof(APIBridge).GetProperties(BindingFlags.Public | BindingFlags.Static))
+                {
+                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
+                }
+                foreach (var prop in typeof(APIBridge.Config).GetProperties(BindingFlags.Public | BindingFlags.Static))
+                {
+                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
+                }
+            }
+
+
+            if (e.KeyCode == Keys.I)
+            {
+                APIBridge.SendChatMessage("hello there");
+            }
 #if CEF
             if (CefRunning)
             {
@@ -263,14 +281,14 @@ namespace RageCoop.Client
                 if (Game.IsControlPressed(Control.FrontendPause))
                 {
                     Call(ACTIVATE_FRONTEND_MENU,
-                        Call<int>(GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                        SHVDN.NativeMemory.GetHashKey("FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
                 }
 
                 if (Game.IsControlPressed(Control.FrontendPauseAlternate) && Settings.DisableAlternatePause)
                 {
                     Call(ACTIVATE_FRONTEND_MENU,
-                        Call<int>(GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                        SHVDN.NativeMemory.GetHashKey("FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
                 }
             }
