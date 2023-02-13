@@ -59,7 +59,7 @@ namespace RageCoop.Client.Menus
             var realUrl = Main.Settings.MasterServer;
             serverList = null;
             try { serverList = JsonDeserialize<List<ServerInfo>>(DownloadString(realUrl)); }
-            catch (Exception ex) { Main.Logger.Error(ex); }
+            catch (Exception ex) { Log.Error(ex); }
 
             // Need to be processed in main thread
             API.QueueAction(() =>

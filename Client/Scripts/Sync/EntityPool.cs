@@ -102,11 +102,11 @@ namespace RageCoop.Client
             var player = GetPedByID(Main.LocalPlayerID);
             if (player == null)
             {
-                Main.Logger.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
+                Log.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
                 var c = new SyncedPed(p);
                 Main.LocalPlayerID = c.OwnerID = c.ID;
                 Add(c);
-                Main.Logger.Debug($"Local player ID is:{c.ID}");
+                Log.Debug($"Local player ID is:{c.ID}");
                 PlayerList.SetPlayer(c.ID, Main.Settings.Username);
                 return true;
             }
@@ -155,7 +155,7 @@ namespace RageCoop.Client
                 if (p != null)
                 {
                     if (PedsByHandle.ContainsKey(p.Handle)) PedsByHandle.Remove(p.Handle);
-                    // Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
+                    // Log.Debug($"Removing ped {c.ID}. Reason:{reason}");
                     p.AttachedBlip?.Delete();
                     p.Kill();
                     p.Model.MarkAsNoLongerNeeded();
@@ -208,7 +208,7 @@ namespace RageCoop.Client
                 if (veh != null)
                 {
                     if (VehiclesByHandle.ContainsKey(veh.Handle)) VehiclesByHandle.Remove(veh.Handle);
-                    // Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
+                    // Log.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
                     veh.AttachedBlip?.Delete();
                     veh.Model.MarkAsNoLongerNeeded();
                     veh.MarkAsNoLongerNeeded();
@@ -255,7 +255,7 @@ namespace RageCoop.Client
                 if (p != null)
                 {
                     if (ProjectilesByHandle.ContainsKey(p.Handle)) ProjectilesByHandle.Remove(p.Handle);
-                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    Log.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
                     p.Explode();
                 }
 
@@ -364,7 +364,7 @@ namespace RageCoop.Client
                             continue;
                         }
 
-                        // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
+                        // Log.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
                         c = new SyncedPed((Ped)Entity.FromHandle(p));
 
                         Add(c);
@@ -441,7 +441,7 @@ namespace RageCoop.Client
                                 continue;
                             }
                         }
-                        // Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
+                        // Log.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
                         Add(new SyncedVehicle(cveh));
                     }

@@ -40,15 +40,15 @@ namespace RageCoop.Client
                     catch (ThreadInterruptedException) { }
                     catch (Exception ex)
                     {
-                        Main.Logger.Error($"Unhandled exception caught in thread {Environment.CurrentManagedThreadId}", ex);
+                        Log.Error($"Unhandled exception caught in thread {Environment.CurrentManagedThreadId}", ex);
                     }
                     finally
                     {
-                        Main.Logger.Debug($"Thread stopped: " + Environment.CurrentManagedThreadId);
+                        Log.Debug($"Thread stopped: " + Environment.CurrentManagedThreadId);
                     }
                 });
                 created.Name = name;
-                Main.Logger.Debug($"Thread created: {name}, id: {created.ManagedThreadId}");
+                Log.Debug($"Thread created: {name}, id: {created.ManagedThreadId}");
                 _threads.Add(created);
                 if (startNow) created.Start();
                 return created;
@@ -63,7 +63,7 @@ namespace RageCoop.Client
                 {
                     if (thread.IsAlive)
                     {
-                        Main.Logger.Debug($"Waiting for thread {thread.ManagedThreadId} to stop");
+                        Log.Debug($"Waiting for thread {thread.ManagedThreadId} to stop");
                         // thread.Interrupt(); PlatformNotSupportedException ?
                         thread.Join();
                     }

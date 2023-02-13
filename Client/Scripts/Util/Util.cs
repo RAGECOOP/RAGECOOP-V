@@ -111,7 +111,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Main.Logger?.Error(ex);
+                Log?.Error(ex);
                 File.WriteAllText(path, JsonSerialize(settings = new Settings()));
             }
 
@@ -131,7 +131,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Main.Logger?.Error(ex);
+                Log?.Error(ex);
                 return false;
             }
         }

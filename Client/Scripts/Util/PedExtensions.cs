@@ -309,7 +309,7 @@ namespace RageCoop.Client
                 case WeaponHash.MG:
                     return new string[2] { "weapons@machinegun@mg_str", "reload_aim" };
                 default:
-                    Main.Logger.Warning(
+                    Log.Warning(
                         $"~r~Reloading failed! Weapon ~g~[{ped.Weapons.Current.Hash}]~r~ could not be found!");
                     return null;
             }

@@ -168,7 +168,7 @@ namespace RageCoop.Client.Scripting
             {
                 var args = new CustomEventReceivedArgs { Hash = p.Hash, Args = p.Args };
 
-                // Main.Logger.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
+                // Log.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
 
                 if (CustomEventHandlers.TryGetValue(p.Hash, out var handlers))
                     handlers.ForEach(x => { x.Invoke(args); });
@@ -400,7 +400,7 @@ namespace RageCoop.Client.Scripting
         [Remoting]
         public static ClientResource GetResource(string name)
         {
-            if (Main.Resources.LoadedResources.TryGetValue(name, out var resource))
+            if (MainRes.LoadedResources.TryGetValue(name, out var resource))
                 return resource;
 
             return null;

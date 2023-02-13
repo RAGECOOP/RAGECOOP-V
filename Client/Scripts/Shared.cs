@@ -3,6 +3,7 @@ global using GTA.Native;
 global using static GTA.Native.Function;
 global using static GTA.Native.Hash;
 global using static RageCoop.Client.Shared;
+global using static RageCoop.Client.Main;
 global using Console = GTA.Console;
 global using static RageCoop.Core.Shared;
 using System.IO;

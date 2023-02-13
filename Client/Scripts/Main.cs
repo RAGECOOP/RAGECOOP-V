@@ -31,10 +31,10 @@ namespace RageCoop.Client
         internal static Settings Settings = null;
         internal static Chat MainChat = null;
         internal static Stopwatch Counter = new Stopwatch();
-        internal static Logger Logger = null;
+        internal static Logger Log = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Resources Resources = null;
+        internal static Resources MainRes = null;
 
         public static Ped P;
         public static float FPS;
@@ -59,7 +59,7 @@ namespace RageCoop.Client
                 Util.SaveSettings();
             }
 
-            Logger = new Logger()
+            Log = new Logger()
             {
                 Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath) },
 #if DEBUG
@@ -68,7 +68,7 @@ namespace RageCoop.Client
                 LogLevel = Settings.LogLevel,
 #endif
             };
-            Logger.OnFlush += (line, formatted) =>
+            Log.OnFlush += (line, formatted) =>
             {
                 switch (line.LogLevel)
                 {
@@ -102,14 +102,14 @@ namespace RageCoop.Client
                 WorldThread.DoQueuedActions();
                 if (IsUnloading)
                 {
-                    Logger.Dispose();
+                    Log.Dispose();
                     Networking.Peer?.Dispose();
                     ThreadManager.OnUnload();
                 }
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Log.Error(ex);
             }
         }
         protected override void OnStart()
@@ -121,11 +121,11 @@ namespace RageCoop.Client
                 throw new NotSupportedException("Please update your GTA5 to v1.0.1290 or newer!");
             }
 
-            Resources = new Resources();
+            MainRes = new Resources();
 
 
 
-            Logger.Info(
+            Log.Info(
                 $"Main script initialized");
 
             BaseScript.OnStart();
@@ -160,7 +160,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Log.Error(ex);
             }
 
 
@@ -198,7 +198,7 @@ namespace RageCoop.Client
                     {
                         P.Health = 1;
                         Game.Player.WantedLevel = 0;
-                        Logger.Debug("Player died.");
+                        Log.Debug("Player died.");
                         API.Events.InvokePlayerDied();
                     }
 
@@ -387,14 +387,14 @@ namespace RageCoop.Client
                 Notification.Show("~g~Connected!");
             });
 
-            Logger.Info(">> Connected <<");
+            Log.Info(">> Connected <<");
         }
 
         public static void CleanUp(string reason)
         {
             if (reason != "Abort")
             {
-                Logger.Info($">> Disconnected << reason: {reason}");
+                Log.Info($">> Disconnected << reason: {reason}");
                 API.QueueAction(() => { Notification.Show("~r~Disconnected: " + reason); });
             }
 
@@ -412,7 +412,7 @@ namespace RageCoop.Client
                 Call(SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 LocalPlayerID = default;
-                Resources.Unload();
+                MainRes.Unload();
             });
             Memory.RestorePatches();
 #if CEF

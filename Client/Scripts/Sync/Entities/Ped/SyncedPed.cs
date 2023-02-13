@@ -175,7 +175,7 @@ namespace RageCoop.Client
             {
                 if (MainPed.Exists())
                 {
-                    // Main.Logger.Debug($"Removing ped {ID}. Reason:CreateCharacter");
+                    // Log.Debug($"Removing ped {ID}. Reason:CreateCharacter");
                     MainPed.Kill();
                     MainPed.MarkAsNoLongerNeeded();
                     MainPed.Delete();

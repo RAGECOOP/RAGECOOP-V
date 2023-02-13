@@ -50,7 +50,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Main.Logger.Error(ex);
+                Log.Error(ex);
             }
 
             if (!Networking.IsOnServer) return;
@@ -139,7 +139,7 @@ namespace RageCoop.Client
                     if (c == null || (c.IsLocal && ped.Handle != Game.Player.Character.Handle &&
                                       ped.PopulationType != EntityPopulationType.Mission))
                     {
-                        Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        Log.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
                         ped.CurrentVehicle?.Delete();
                         ped.Kill();
                         ped.Delete();
@@ -154,7 +154,7 @@ namespace RageCoop.Client
                         // Don't delete player's vehicle
                         continue;
                     if (v == null || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
-                        // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+                        // Log.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 
                         veh.Delete();
                 }
@@ -181,7 +181,7 @@ namespace RageCoop.Client
                     }
                     catch (Exception ex)
                     {
-                        Main.Logger.Error(ex);
+                        Log.Error(ex);
                         QueuedActions.Remove(action);
                     }
             }

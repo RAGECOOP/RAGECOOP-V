@@ -34,7 +34,7 @@ namespace RageCoop.Client
             if (File.Exists(WeaponFixDataPath))
                 WeaponFix = JsonDeserialize<WeaponFix>(File.ReadAllText(WeaponFixDataPath));
             else
-                Main.Logger.Warning("Weapon fix data not found");
+                Log.Warning("Weapon fix data not found");
         }
 
         public static void DumpWeaponFix(string path)

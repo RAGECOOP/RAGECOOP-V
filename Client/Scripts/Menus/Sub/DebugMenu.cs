@@ -62,7 +62,7 @@ namespace RageCoop.Client
                 }
                 catch (Exception ex)
                 {
-                    Main.Logger.Error(ex);
+                    Log.Error(ex);
                 }
             };
             Menu.Add(SimulatedLatencyItem);

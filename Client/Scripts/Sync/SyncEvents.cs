@@ -74,7 +74,7 @@ namespace RageCoop.Client
             {
                 return;
                 // p = Game.Player.Character;
-                // Main.Logger.Warning("Failed to find owner for bullet");
+                // Log.Warning("Failed to find owner for bullet");
             }
 
             var damage = (int)p.GetWeaponDamage(weaponHash);

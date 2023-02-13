@@ -34,7 +34,7 @@ namespace RageCoop.Client.Scripting
 
         public Resources()
         {
-            Logger = Main.Logger;
+            Logger = Log;
         }
 
         private Logger Logger { get; }
@@ -52,20 +52,18 @@ namespace RageCoop.Client.Scripting
             Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).Where(x => x.CanBeIgnored())
                 .ForEach(File.Delete);
 
-            // TODO Core.ScheduleLoad()...
+            // TODO: Core.ScheduleLoad()...
         }
 
         public void Unload()
         {
-            // TODO Core.ScheduleUnload()...
+            // TODO: Core.ScheduleUnload()...
         }
 
         private ClientResource Unpack(string zipPath, string dataFolderRoot)
         {
             var r = new ClientResource
             {
-                Logger = Logger,
-                Scripts = new List<ClientScript>(),
                 Name = Path.GetFileNameWithoutExtension(zipPath),
                 DataFolder = Path.Combine(dataFolderRoot, Path.GetFileNameWithoutExtension(zipPath)),
                 ScriptsDirectory = Path.Combine(TempPath, Path.GetFileNameWithoutExtension(zipPath))
@@ -86,7 +84,6 @@ namespace RageCoop.Client.Scripting
                     IsDirectory = true,
                     Name = dir.Substring(scriptsDir.Length + 1).Replace('\\', '/')
                 });
-            var assemblies = new Dictionary<ResourceFile, Assembly>();
             foreach (var file in Directory.GetFiles(scriptsDir, "*", SearchOption.AllDirectories))
             {
                 if (Path.GetFileName(file).CanBeIgnored())
@@ -105,9 +102,8 @@ namespace RageCoop.Client.Scripting
                 }
 
                 var relativeName = file.Substring(scriptsDir.Length + 1).Replace('\\', '/');
-                var rfile = new ResourceFile
+                var rfile = new ClientFile
                 {
-                    GetStream = () => { return new FileStream(file, FileMode.Open, FileAccess.Read); },
                     IsDirectory = false,
                     Name = relativeName
                 };

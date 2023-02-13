@@ -50,11 +50,11 @@ namespace RageCoop.Client
                                 if (PlayerList.Players.TryGetValue(p.ID, out var player))
                                 {
                                     player.Connection = message.SenderConnection;
-                                    Main.Logger.Debug($"Direct connection to {player.Username} established");
+                                    Log.Debug($"Direct connection to {player.Username} established");
                                 }
                                 else
                                 {
-                                    Main.Logger.Info(
+                                    Log.Info(
                                         $"Unidentified peer connection from {message.SenderEndPoint} was rejected.");
                                     message.SenderConnection.Disconnect("eat poop");
                                 }
@@ -104,7 +104,7 @@ namespace RageCoop.Client
                                 }
                                 else
                                 {
-                                    Main.Logger.Debug("Did not find a request handler of type: " + realType);
+                                    Log.Debug("Did not find a request handler of type: " + realType);
                                 }
 
                                 break;
@@ -123,8 +123,8 @@ namespace RageCoop.Client
                             Notification.Show($"~r~~h~Packet Error {ex.Message}");
                             return true;
                         });
-                        Main.Logger.Error($"[{packetType}] {ex.Message}");
-                        Main.Logger.Error(ex);
+                        Log.Error($"[{packetType}] {ex.Message}");
+                        Log.Error(ex);
                         Peer.Shutdown($"Packet Error [{packetType}]");
                     }
 
@@ -156,7 +156,7 @@ namespace RageCoop.Client
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
-                    Main.Logger.Trace(message.ReadString());
+                    Log.Trace(message.ReadString());
                     break;
             }
 
@@ -277,7 +277,7 @@ namespace RageCoop.Client
         {
             var c = EntityPool.GetPedByID(packet.ID);
             if (c == null)
-                // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+                // Log.Debug($"Creating character for incoming sync:{packet.ID}");
                 EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
             var flags = packet.Flags;
             c.ID = packet.ID;
@@ -360,7 +360,7 @@ namespace RageCoop.Client
             if (p == null)
             {
                 if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) return;
-                // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
+                // Log.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
             }
 

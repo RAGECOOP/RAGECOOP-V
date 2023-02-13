@@ -30,7 +30,7 @@ namespace RageCoop.Client
 
         static Networking()
         {
-            Security = new Security(Main.Logger);
+            Security = new Security(Log);
         }
 
         public static float Latency => ServerConnection.AverageRoundtripTime / 2;
@@ -113,7 +113,7 @@ namespace RageCoop.Client
                             }
                             catch (Exception ex)
                             {
-                                Main.Logger.Error(ex);
+                                Log.Error(ex);
                             }
                         };
                         API.QueueAction(() => { Notification.Show("~y~Trying to connect..."); });
@@ -149,7 +149,7 @@ namespace RageCoop.Client
                     }
                     catch (Exception ex)
                     {
-                        Main.Logger.Error("Cannot connect to server: ", ex);
+                        Log.Error("Cannot connect to server: ", ex);
                         API.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
                     }
 
@@ -185,7 +185,7 @@ namespace RageCoop.Client
             };
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
-            Main.Logger.Debug($"player connected:{p.Username}");
+            Log.Debug($"player connected:{p.Username}");
             API.QueueAction(() =>
                 Notification.Show($"~h~{p.Username}~h~ connected."));
         }

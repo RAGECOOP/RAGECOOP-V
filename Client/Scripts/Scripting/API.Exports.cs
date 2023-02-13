@@ -76,7 +76,7 @@ namespace RageCoop.Client.Scripting
             }
             catch (Exception ex)
             {
-                Main.Logger.Error(ex);
+                Log.Error(ex);
                 SetLastResult(ex.ToString());
                 return 0;
             }
