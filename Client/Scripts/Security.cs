@@ -6,11 +6,9 @@ namespace RageCoop.Client
 {
     internal class Security
     {
-        private readonly Logger Logger;
 
-        public Security(Logger logger)
+        public Security()
         {
-            Logger = logger;
             ClientAes.GenerateKey();
             ClientAes.GenerateIV();
         }

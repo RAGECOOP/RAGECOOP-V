@@ -9,7 +9,7 @@ namespace RageCoop.Client
         {
             ThreadManager.CreateThread(() =>
             {
-                while (!Main.IsUnloading)
+                while (!IsUnloading)
                 {
                     var bu = Networking.Peer.Statistics.SentBytes;
                     var bd = Networking.Peer.Statistics.ReceivedBytes;

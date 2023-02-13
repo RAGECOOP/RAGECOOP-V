@@ -53,11 +53,11 @@ namespace RageCoop.Client.Scripting
             /// </summary>
             public static string Username
             {
-                get => Main.Settings.Username;
+                get => Settings.Username;
                 set
                 {
                     if (Networking.IsOnServer || string.IsNullOrEmpty(value)) return;
-                    Main.Settings.Username = value;
+                    Settings.Username = value;
                 }
             }
 
@@ -83,11 +83,11 @@ namespace RageCoop.Client.Scripting
 
             public static bool ShowPlayerNameTag
             {
-                get => Main.Settings.ShowPlayerNameTag;
+                get => Settings.ShowPlayerNameTag;
                 set
                 {
                     if (value == ShowPlayerNameTag) return;
-                    Main.Settings.ShowPlayerNameTag = value;
+                    Settings.ShowPlayerNameTag = value;
                     Util.SaveSettings();
                 }
             }
@@ -183,7 +183,7 @@ namespace RageCoop.Client.Scripting
         ///     Get the local player's ID
         /// </summary>
         /// <returns>PlayerID</returns>
-        public static int LocalPlayerID => Main.LocalPlayerID;
+        public static int LocalPlayerID => LocalPlayerID;
 
         /// <summary>
         ///     Check if player is connected to a server
@@ -205,7 +205,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Check if the RAGECOOP chat is visible
         /// </summary>
-        public static bool IsChatFocused => Main.MainChat.Focused;
+        public static bool IsChatFocused => MainChat.Focused;
 
         /// <summary>
         ///     Check if the RAGECOOP list of players is visible
@@ -215,7 +215,7 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Get the version of RAGECOOP
         /// </summary>
-        public static Version CurrentVersion => Main.Version;
+        public static Version CurrentVersion => Main.ModVersion;
 
         /// <summary>
         ///     Get all players indexed by their ID
@@ -371,7 +371,7 @@ namespace RageCoop.Client.Scripting
         public static List<ServerInfo> ListServers()
         {
             return JsonDeserialize<List<ServerInfo>>(
-                HttpHelper.DownloadString(Main.Settings.MasterServer));
+                HttpHelper.DownloadString(Settings.MasterServer));
         }
 
         /// <summary>
@@ -382,7 +382,7 @@ namespace RageCoop.Client.Scripting
         [Remoting]
         public static void LocalChatMessage(string from, string message)
         {
-            Main.MainChat.AddMessage(from, message);
+            MainChat.AddMessage(from, message);
         }
 
         /// <summary>

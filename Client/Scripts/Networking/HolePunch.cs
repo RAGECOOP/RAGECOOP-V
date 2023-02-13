@@ -32,7 +32,7 @@ namespace RageCoop.Client
                         var msg = Networking.Peer.CreateMessage();
                         new Packets.HolePunch
                         {
-                            Puncher = Main.LocalPlayerID,
+                            Puncher = LocalPlayerID,
                             Status = p.HolePunchStatus
                         }.Pack(msg);
                         Networking.Peer.SendUnconnectedMessage(msg,
@@ -75,7 +75,7 @@ namespace RageCoop.Client
                     {
                         Log.Debug("Connecting to peer: " + from);
                         var msg = Networking.Peer.CreateMessage();
-                        new Packets.P2PConnect { ID = Main.LocalPlayerID }.Pack(msg);
+                        new Packets.P2PConnect { ID = LocalPlayerID }.Pack(msg);
                         puncher.Connection = Networking.Peer.Connect(from, msg);
                         Networking.Peer.FlushSendQueue();
                     }

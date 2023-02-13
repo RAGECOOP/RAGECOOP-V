@@ -22,15 +22,15 @@ namespace RageCoop.Client
     [ScriptAttributes(Author = "RageCoop", SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V", NoScriptThread = true)]
     internal class Main : Script
     {
-        internal static Version Version = typeof(Main).Assembly.GetName().Version;
+        internal static Version ModVersion = typeof(Main).Assembly.GetName().Version;
 
         internal static int LocalPlayerID = 0;
 
         internal static RelationshipGroup SyncedPedsGroup;
 
-        internal static Settings Settings = null;
+        internal static ClientSettings Settings = null;
         internal static Chat MainChat = null;
-        internal static Stopwatch Counter = new Stopwatch();
+        internal static Stopwatch Counter = new();
         internal static Logger Log = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
@@ -55,7 +55,7 @@ namespace RageCoop.Client
             catch
             {
                 Notification.Show("Malformed configuration, overwriting with default values...");
-                Settings = new Settings();
+                Settings = new();
                 Util.SaveSettings();
             }
 
@@ -102,9 +102,8 @@ namespace RageCoop.Client
                 WorldThread.DoQueuedActions();
                 if (IsUnloading)
                 {
-                    Log.Dispose();
-                    Networking.Peer?.Dispose();
                     ThreadManager.OnUnload();
+                    Log.Dispose();
                 }
             }
             catch (Exception ex)
@@ -236,18 +235,6 @@ namespace RageCoop.Client
             {
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
-            }
-
-            if (e.KeyCode == Keys.U)
-            {
-                foreach (var prop in typeof(APIBridge).GetProperties(BindingFlags.Public | BindingFlags.Static))
-                {
-                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
-                }
-                foreach (var prop in typeof(APIBridge.Config).GetProperties(BindingFlags.Public | BindingFlags.Static))
-                {
-                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
-                }
             }
 
 
@@ -390,16 +377,18 @@ namespace RageCoop.Client
             Log.Info(">> Connected <<");
         }
 
+        private static readonly object _cleanupLock = new();
         public static void CleanUp(string reason)
         {
-            if (reason != "Abort")
+            lock (_cleanupLock)
             {
-                Log.Info($">> Disconnected << reason: {reason}");
-                API.QueueAction(() => { Notification.Show("~r~Disconnected: " + reason); });
-            }
 
-            API.QueueAction(() =>
-            {
+                if (reason != "Abort")
+                {
+                    Log.Info($">> Disconnected << reason: {reason}"); 
+                    Notification.Show("~r~Disconnected: " + reason);
+                }
+
                 if (MainChat.Focused)
                 {
                     MainChat.Focused = false;
@@ -413,8 +402,7 @@ namespace RageCoop.Client
                 CoopMenu.DisconnectedMenuSetting();
                 LocalPlayerID = default;
                 MainRes.Unload();
-            });
-            Memory.RestorePatches();
+                Memory.RestorePatches();
 #if CEF
             if (CefRunning)
             {
@@ -422,8 +410,11 @@ namespace RageCoop.Client
             }
 #endif
 
-            DownloadManager.Cleanup();
-            Voice.ClearAll();
+                DownloadManager.Cleanup();
+                Voice.ClearAll();
+                Networking.Peer?.Dispose();
+                Networking.Peer = null;
+            }
         }
 
     }

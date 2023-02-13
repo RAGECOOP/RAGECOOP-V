@@ -37,9 +37,9 @@ namespace RageCoop.Client.Scripting
                 e => { Notification.Show($"~h~{e.Args[0]}~h~ died."); });
             ThreadManager.CreateThread(() =>
              {
-                 while (!Main.IsUnloading)
+                 while (!IsUnloading)
                  {
-                     if (_isHost)
+                     if (Networking.IsOnServer && _isHost)
                          API.QueueAction(() =>
                          {
                              unsafe
@@ -56,7 +56,7 @@ namespace RageCoop.Client.Scripting
 
                      Thread.Sleep(1000);
                  }
-             },"BaseScript");
+             }, "BaseScript");
         }
 
         private static void WeatherTimeSync(CustomEventReceivedArgs e)
@@ -103,7 +103,7 @@ namespace RageCoop.Client.Scripting
             {
                 ID = (int)e.Args[0],
                 MainVehicle = veh,
-                OwnerID = Main.LocalPlayerID
+                OwnerID = LocalPlayerID
             };
             EntityPool.Add(v);
         }
@@ -173,7 +173,7 @@ namespace RageCoop.Client.Scripting
                     EntityPool.ServerProps.Add(id, prop = new SyncedProp(id));
             }
 
-            prop.LastSynced = Main.Ticked + 1;
+            prop.LastSynced = Ticked + 1;
             prop.Model = (Model)e.Args[1];
             prop.Position = (Vector3)e.Args[2];
             prop.Rotation = (Vector3)e.Args[3];

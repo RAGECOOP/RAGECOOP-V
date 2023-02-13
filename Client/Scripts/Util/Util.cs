@@ -99,31 +99,31 @@ namespace RageCoop.Client
             return false;
         }
 
-        public static Settings ReadSettings(string path = null)
+        public static ClientSettings ReadSettings(string path = null)
         {
             path = path ?? SettingsPath;
 
             Directory.CreateDirectory(Directory.GetParent(path).FullName);
-            Settings settings;
+            ClientSettings settings;
             try
             {
-                settings = JsonDeserialize<Settings>(File.ReadAllText(path));
+                settings = JsonDeserialize<ClientSettings>(File.ReadAllText(path));
             }
             catch (Exception ex)
             {
                 Log?.Error(ex);
-                File.WriteAllText(path, JsonSerialize(settings = new Settings()));
+                File.WriteAllText(path, JsonSerialize(settings = new ClientSettings()));
             }
 
             return settings;
         }
 
-        public static bool SaveSettings(string path = null, Settings settings = null)
+        public static bool SaveSettings(string path = null, ClientSettings settings = null)
         {
             try
             {
                 path = path ?? SettingsPath;
-                settings = settings ?? Main.Settings;
+                settings = settings ?? Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
                 File.WriteAllText(path, JsonSerialize(settings));

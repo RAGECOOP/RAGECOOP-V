@@ -55,7 +55,7 @@ namespace RageCoop.Client
             // I tried without thread but the game will lag without
             _thread = ThreadManager.CreateThread(() =>
             {
-                while (!_stopping && !Main.IsUnloading)
+                while (!_stopping && !IsUnloading)
                     using (var wo = new WaveOutEvent())
                     {
                         wo.Init(_waveProvider);

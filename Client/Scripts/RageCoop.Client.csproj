@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<NoAotCompile>true</NoAotCompile>
+		<NoAotCompile>false</NoAotCompile>
 		<TargetFramework>net7.0</TargetFramework>
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 		<OutputType>Library</OutputType>

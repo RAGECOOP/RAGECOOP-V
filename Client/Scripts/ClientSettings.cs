@@ -5,7 +5,7 @@ namespace RageCoop.Client
     /// <summary>
     ///     Don't use it!
     /// </summary>
-    public class Settings
+    public class ClientSettings
     {
         /// <summary>
         ///     LogLevel for RageCoop.

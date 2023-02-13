@@ -152,7 +152,7 @@ namespace RageCoop.Client
                 MainVehicle.SetDamageModel(DamageModel);
             }
 
-            LastUpdated = Main.Ticked;
+            LastUpdated = Ticked;
         }
 
         private void DisplayVehicle(bool updated)
@@ -226,7 +226,7 @@ namespace RageCoop.Client
             ID = EntityPool.RequestNewID();
             MainVehicle = v;
             MainVehicle.CanPretendOccupants = false;
-            OwnerID = Main.LocalPlayerID;
+            OwnerID = LocalPlayerID;
             SetUpFixedData();
         }
 
@@ -261,7 +261,7 @@ namespace RageCoop.Client
         internal SyncedVehicle(int id)
         {
             ID = id;
-            LastSynced = Main.Ticked;
+            LastSynced = Ticked;
         }
 
         #endregion

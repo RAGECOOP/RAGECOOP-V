@@ -10,13 +10,13 @@ namespace RageCoop.Client
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Debug", "Debug settings")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         public static NativeMenu DiagnosticMenu = new NativeMenu("RAGECOOP", "Diagnostic", "Performence and Diagnostic")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         public static NativeItem SimulatedLatencyItem =
@@ -48,7 +48,7 @@ namespace RageCoop.Client
             };
             ShowOwnerItem.CheckboxChanged += (s, e) =>
             {
-                Main.Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
+                Settings.ShowEntityOwnerName = ShowOwnerItem.Checked;
                 Util.SaveSettings();
             };
 #if DEBUG

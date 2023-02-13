@@ -29,7 +29,7 @@ namespace RageCoop.Client
 
             if (Util.GetTickCount64() - _lastUpdate >= 1000) Update();
 
-            if (Util.GetTickCount64() - Pressed < 5000 && !Main.MainChat.Focused
+            if (Util.GetTickCount64() - Pressed < 5000 && !MainChat.Focused
 #if !NON_INTERACTIVE
                                                        && !CoopMenu.MenuPool.AreAnyVisible
 #endif
@@ -160,7 +160,7 @@ namespace RageCoop.Client
         /// <summary>
         ///     Player round-trip time in seconds, will be the rtt to server if not using P2P connection.
         /// </summary>
-        public float Ping => Main.LocalPlayerID == ID ? Networking.Latency * 2 :
+        public float Ping => LocalPlayerID == ID ? Networking.Latency * 2 :
             HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer * 2;
 
         public float PacketTravelTime => HasDirectConnection

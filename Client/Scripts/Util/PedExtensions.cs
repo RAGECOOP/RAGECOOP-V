@@ -401,7 +401,7 @@ namespace RageCoop.Client
 
         public static Vector3 GetLookingCoord(this Ped p)
         {
-            if (p == Main.P && Call<int>(GET_FOLLOW_PED_CAM_VIEW_MODE) == 4)
+            if (p == P && Call<int>(GET_FOLLOW_PED_CAM_VIEW_MODE) == 4)
                 return RaycastEverything(default);
             EntityBone b = p.Bones[Bone.FacialForehead];
             var v = b.UpVector.Normalized;

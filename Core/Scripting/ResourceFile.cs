@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 
 namespace RageCoop.Core.Scripting
@@ -20,6 +21,7 @@ namespace RageCoop.Core.Scripting
         /// <summary>
         ///     Get a stream that can be used to read file content.
         /// </summary>
+        [JsonIgnore]
         public Func<Stream> GetStream { get; internal set; }
     }
 }

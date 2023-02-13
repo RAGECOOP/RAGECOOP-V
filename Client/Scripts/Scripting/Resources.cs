@@ -32,12 +32,6 @@ namespace RageCoop.Client.Scripting
             Directory.CreateDirectory(TempPath);
         }
 
-        public Resources()
-        {
-            Logger = Log;
-        }
-
-        private Logger Logger { get; }
 
         public void Load(string path, string[] zips)
         {
@@ -45,7 +39,7 @@ namespace RageCoop.Client.Scripting
             foreach (var zip in zips)
             {
                 var zipPath = Path.Combine(path, zip);
-                Logger?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
+                Log?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
                 Unpack(zipPath, Path.Combine(path, "Data"));
             }
 
@@ -94,7 +88,7 @@ namespace RageCoop.Client.Scripting
                     }
                     catch (Exception ex)
                     {
-                        Logger.Warning(
+                        Log.Warning(
                             $"Failed to delete API assembly: {file}. This may or may cause some unexpected behaviours.\n{ex}");
                     }
 

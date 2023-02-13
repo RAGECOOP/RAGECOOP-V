@@ -54,8 +54,8 @@ namespace RageCoop.Client
                         p.Seat = ped.SeatIndex;
                     if (!veh.IsLocal && p.Speed == 4 && p.Seat == VehicleSeat.Driver)
                     {
-                        veh.OwnerID = Main.LocalPlayerID;
-                        SyncEvents.TriggerChangeOwner(veh.ID, Main.LocalPlayerID);
+                        veh.OwnerID = LocalPlayerID;
+                        SyncEvents.TriggerChangeOwner(veh.ID, LocalPlayerID);
                     }
                 }
 
@@ -154,14 +154,14 @@ namespace RageCoop.Client
         public static void SendChatMessage(string message)
         {
             Peer.SendTo(new Packets.ChatMessage(s => Security.Encrypt(s.GetBytes()))
-            { Username = Main.Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
+            { Username = Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
                 NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
 
         public static void SendVoiceMessage(byte[] buffer, int recorded)
         {
-            SendSync(new Packets.Voice { ID = Main.LocalPlayerID, Buffer = buffer, Recorded = recorded },
+            SendSync(new Packets.Voice { ID = LocalPlayerID, Buffer = buffer, Recorded = recorded },
                 ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
         }
 

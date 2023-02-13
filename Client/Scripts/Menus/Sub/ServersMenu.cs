@@ -23,7 +23,7 @@ namespace RageCoop.Client.Menus
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         internal static NativeItem ResultItem = null;
@@ -56,7 +56,7 @@ namespace RageCoop.Client.Menus
         private static void GetAllServers()
         {
             List<ServerInfo> serverList = null;
-            var realUrl = Main.Settings.MasterServer;
+            var realUrl = Settings.MasterServer;
             serverList = null;
             try { serverList = JsonDeserialize<List<ServerInfo>>(DownloadString(realUrl)); }
             catch (Exception ex) { Log.Error(ex); }
@@ -105,7 +105,7 @@ namespace RageCoop.Client.Menus
 
                             CoopMenu.Menu.Visible = true;
 #endif
-                            Main.Settings.LastServerAddress = address;
+                            Settings.LastServerAddress = address;
                             Util.SaveSettings();
                         }
                         catch (Exception ex)

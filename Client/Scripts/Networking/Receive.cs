@@ -39,7 +39,7 @@ namespace RageCoop.Client
                                 var p = new Packets.HandshakeSuccess();
                                 p.Deserialize(response);
                                 foreach (var player in p.Players) PlayerList.SetPlayer(player.ID, player.Username);
-                                Main.Connected();
+                                Connected();
                             }
                             else
                             {
@@ -62,7 +62,7 @@ namespace RageCoop.Client
 
                             break;
                         case NetConnectionStatus.Disconnected:
-                            if (message.SenderConnection == ServerConnection) Main.CleanUp(reason);
+                            if (message.SenderConnection == ServerConnection) API.QueueAction(() => CleanUp(reason));
                             break;
                     }
 
@@ -205,7 +205,7 @@ namespace RageCoop.Client
 
                     API.QueueAction(() =>
                     {
-                        Main.MainChat.AddMessage(packet.Username, packet.Message);
+                        MainChat.AddMessage(packet.Username, packet.Message);
                         return true;
                     });
                 }
@@ -213,7 +213,7 @@ namespace RageCoop.Client
 
                 case PacketType.Voice:
                 {
-                    if (Main.Settings.Voice)
+                    if (Settings.Voice)
                     {
                         var packet = new Packets.Voice();
                         packet.Deserialize(msg);
@@ -221,7 +221,7 @@ namespace RageCoop.Client
 
                         var player = EntityPool.GetPedByID(packet.ID);
                         player.IsSpeaking = true;
-                        player.LastSpeakingTime = Main.Ticked;
+                        player.LastSpeakingTime = Ticked;
 
                         Voice.AddVoiceData(packet.Buffer, packet.Recorded);
                     }

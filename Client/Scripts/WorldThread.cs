@@ -35,7 +35,7 @@ namespace RageCoop.Client
                 Yield(); 
 
             Notification.Show(NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!",
-                   $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
+                   $"Press ~g~{Settings.MenuKey}~s~ to open the menu.");
         }
         protected override void OnTick()
         {
@@ -57,12 +57,12 @@ namespace RageCoop.Client
 
             Game.DisableControlThisFrame(Control.FrontendPause);
 
-            if (Main.Settings.DisableAlternatePause) Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
+            if (Settings.DisableAlternatePause) Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
             Call(SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
 
-            if (Main.Settings.ShowEntityOwnerName)
+            if (Settings.ShowEntityOwnerName)
                 unsafe
                 {
                     int handle;

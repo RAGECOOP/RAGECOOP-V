@@ -17,7 +17,7 @@ namespace RageCoop.Client
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         private static readonly NativeCheckboxItem enableItem = new NativeCheckboxItem("Show weapon bones");
@@ -40,7 +40,7 @@ namespace RageCoop.Client
                     var anims = JsonDeserialize<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
                     foreach (var anim in anims)
                     foreach (var a in anim.Animations)
-                        if (Call<bool>(IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))
+                        if (Call<bool>(IS_ENTITY_PLAYING_ANIM, P, anim.DictionaryName, a, 3))
                         {
                             Console.PrintInfo(anim.DictionaryName + " : " + a);
                             Notification.Show(anim.DictionaryName + " : " + a);

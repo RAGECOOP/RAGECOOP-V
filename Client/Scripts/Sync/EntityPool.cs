@@ -49,8 +49,8 @@ namespace RageCoop.Client
         {
             foreach (var ped in PedsByID.Values.ToArray())
             {
-                if ((keepPlayer && ped.ID == Main.LocalPlayerID) ||
-                    (keepMine && ped.OwnerID == Main.LocalPlayerID)) continue;
+                if ((keepPlayer && ped.ID == LocalPlayerID) ||
+                    (keepMine && ped.OwnerID == LocalPlayerID)) continue;
                 RemovePed(ped.ID);
             }
 
@@ -59,7 +59,7 @@ namespace RageCoop.Client
 
             foreach (var id in VehiclesByID.Keys.ToArray())
             {
-                if (keepMine && VehiclesByID[id].OwnerID == Main.LocalPlayerID) continue;
+                if (keepMine && VehiclesByID[id].OwnerID == LocalPlayerID) continue;
                 RemoveVehicle(id);
             }
 
@@ -67,7 +67,7 @@ namespace RageCoop.Client
             VehiclesByHandle.Clear();
 
             foreach (var p in ProjectilesByID.Values.ToArray())
-                if (p.Shooter.ID != Main.LocalPlayerID && p.MainProjectile != null && p.MainProjectile.Exists())
+                if (p.Shooter.ID != LocalPlayerID && p.MainProjectile != null && p.MainProjectile.Exists())
                     p.MainProjectile.Delete();
             ProjectilesByID.Clear();
             ProjectilesByHandle.Clear();
@@ -99,15 +99,15 @@ namespace RageCoop.Client
             var p = Game.Player.Character;
             // var clipset=p.Gender==Gender.Male? "MOVE_M@TOUGH_GUY@" : "MOVE_F@TOUGH_GUY@";
             // Call(SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
-            var player = GetPedByID(Main.LocalPlayerID);
+            var player = GetPedByID(LocalPlayerID);
             if (player == null)
             {
                 Log.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
                 var c = new SyncedPed(p);
-                Main.LocalPlayerID = c.OwnerID = c.ID;
+                LocalPlayerID = c.OwnerID = c.ID;
                 Add(c);
                 Log.Debug($"Local player ID is:{c.ID}");
-                PlayerList.SetPlayer(c.ID, Main.Settings.Username);
+                PlayerList.SetPlayer(c.ID, Settings.Username);
                 return true;
             }
 
@@ -308,8 +308,8 @@ namespace RageCoop.Client
             var allPeds = NativeMemory.GetPedHandles();
             var allVehicles = NativeMemory.GetVehicleHandles();
             var allProjectiles = NativeMemory.GetProjectileHandles();
-            vehStatesPerFrame = allVehicles.Length * 2 / (int)Main.FPS + 1;
-            pedStatesPerFrame = allPeds.Length * 2 / (int)Main.FPS + 1;
+            vehStatesPerFrame = allVehicles.Length * 2 / (int)FPS + 1;
+            pedStatesPerFrame = allPeds.Length * 2 / (int)FPS + 1;
 
 #if BENCHMARK
             Debug.TimeStamps[TimeStamp.GetAllEntities] = PerfCounter.ElapsedTicks;
@@ -357,7 +357,7 @@ namespace RageCoop.Client
                     if (c == null && p != Game.Player.Character.Handle)
                     {
                         var type = Util.GetPopulationType(p);
-                        if (allPeds.Length > Main.Settings.WorldPedSoftLimit &&
+                        if (allPeds.Length > Settings.WorldPedSoftLimit &&
                             type == EntityPopulationType.RandomAmbient && !Call<bool>(IS_PED_IN_ANY_VEHICLE, p, 0))
                         {
                             Util.DeleteEntity(p);
@@ -417,7 +417,7 @@ namespace RageCoop.Client
 #endif
             }
 
-            var check = Main.Ticked % 100 == 0;
+            var check = Ticked % 100 == 0;
             i = -1;
             lock (VehiclesLock)
             {
@@ -425,7 +425,7 @@ namespace RageCoop.Client
                     if (!VehiclesByHandle.ContainsKey(veh))
                     {
                         var cveh = (Vehicle)Entity.FromHandle(veh);
-                        if (allVehicles.Length > Main.Settings.WorldVehicleSoftLimit)
+                        if (allVehicles.Length > Settings.WorldVehicleSoftLimit)
                         {
                             var type = cveh.PopulationType;
                             if (type == EntityPopulationType.RandomAmbient || type == EntityPopulationType.RandomParked)
@@ -489,7 +489,7 @@ namespace RageCoop.Client
         {
             Networking.Targets = new List<NetConnection>(PlayerList.Players.Count) { Networking.ServerConnection };
             foreach (var p in PlayerList.Players.Values.ToArray())
-                if (p.HasDirectConnection && p.Position.DistanceTo(Main.PlayerPosition) < 500)
+                if (p.HasDirectConnection && p.Position.DistanceTo(PlayerPosition) < 500)
                     Networking.Targets.Add(p.Connection);
         }
 

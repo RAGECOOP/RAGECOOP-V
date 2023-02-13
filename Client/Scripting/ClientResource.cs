@@ -1,4 +1,6 @@
-﻿using RageCoop.Core.Scripting;
+﻿using Newtonsoft.Json;
+using RageCoop.Core.Scripting;
+using SHVDN;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +30,6 @@ namespace RageCoop.Client.Scripting
         public string DataFolder { get; internal set; }
 
         /// <summary>
-        ///     Get all <see cref="ClientScript" /> instance in this resource.
-        /// </summary>
-        public List<ClientScript> Scripts { get; internal set; } = new List<ClientScript>();
-
-        /// <summary>
         ///     Get the <see cref="ResourceFile" /> where this script is loaded from.
         /// </summary>
         public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
@@ -40,21 +37,16 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     A <see cref="Core.Logger" /> instance that can be used to debug your resource.
         /// </summary>
-        public Core.Logger Logger { get; internal set; }
+        [JsonIgnore]
+        // TODO: call the api and use logging sinks
+        public Core.Logger Logger => throw new NotImplementedException();
+
+        /// <summary>
+        ///     Get all <see cref="ClientScript" /> instance in this resource.
+        /// </summary>
+        [JsonIgnore]
+        public List<ClientScript> Scripts { get; } = SHVDN.Core.ListScripts().OfType<ClientScript>().ToList();
+
     }
 
-    public class PlayerInfo
-    {
-        public byte HolePunchStatus { get; internal set; }
-        public bool IsHost { get; internal set; }
-        public string Username { get; internal set; }
-        public int ID { get; internal set; }
-        public int EntityHandle { get; internal set; }
-        public IPEndPoint InternalEndPoint { get; internal set; }
-        public IPEndPoint ExternalEndPoint { get; internal set; }
-        public float Ping { get; internal set; }
-        public float PacketTravelTime { get; internal set; }
-        public bool DisplayNameTag { get; internal set; }
-        public bool HasDirectConnection { get; internal set; }
-    }
 }

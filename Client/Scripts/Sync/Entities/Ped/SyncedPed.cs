@@ -27,7 +27,7 @@ namespace RageCoop.Client
             p.CanWrithe = false;
             p.IsOnlyDamagedByPlayer = false;
             MainPed = p;
-            OwnerID = Main.LocalPlayerID;
+            OwnerID = LocalPlayerID;
 
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
         }
@@ -38,7 +38,7 @@ namespace RageCoop.Client
         internal SyncedPed(int id)
         {
             ID = id;
-            LastSynced = Main.Ticked;
+            LastSynced = Ticked;
         }
 
         internal override void Update()
@@ -67,7 +67,7 @@ namespace RageCoop.Client
                     if (!CreateCharacter())
                         return;
 
-                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
+                if (!Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
                 if ((byte)BlipColor == 255 && PedBlip != null)
                 {
                     PedBlip.Delete();
@@ -134,7 +134,7 @@ namespace RageCoop.Client
 
             if (IsSpeaking)
             {
-                if (Main.Ticked - LastSpeakingTime < 10)
+                if (Ticked - LastSpeakingTime < 10)
                 {
                     DisplaySpeaking(true);
                 }
@@ -147,13 +147,13 @@ namespace RageCoop.Client
                 }
             }
 
-            LastUpdated = Main.Ticked;
+            LastUpdated = Ticked;
         }
 
         private void RenderNameTag()
         {
-            if (!Owner.DisplayNameTag || !Main.Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
-                !MainPed.IsInRange(Main.PlayerPosition, 40f)) return;
+            if (!Owner.DisplayNameTag || !Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
+                !MainPed.IsInRange(PlayerPosition, 40f)) return;
 
             var targetPos = MainPed.Bones[Bone.IKHead].Position + Vector3.WorldUp * 0.5f;
             Point toDraw = default;
@@ -204,7 +204,7 @@ namespace RageCoop.Client
             MainPed.CanWrithe = false;
             MainPed.CanBeDraggedOutOfVehicle = true;
             MainPed.IsOnlyDamagedByPlayer = false;
-            MainPed.RelationshipGroup = Main.SyncedPedsGroup;
+            MainPed.RelationshipGroup = SyncedPedsGroup;
             MainPed.IsFireProof = false;
             MainPed.IsExplosionProof = false;
 
@@ -397,7 +397,7 @@ namespace RageCoop.Client
                 if (!_lastRagdoll)
                 {
                     _lastRagdoll = true;
-                    _lastRagdollTime = Main.Ticked;
+                    _lastRagdollTime = Ticked;
                 }
 
                 return;
@@ -599,7 +599,7 @@ namespace RageCoop.Client
 
                 MainPed.Velocity = Velocity + 5 * dist * (predicted - MainPed.ReadPosition());
             }
-            else if (Main.Ticked - _lastRagdollTime < 10)
+            else if (Ticked - _lastRagdollTime < 10)
             {
             }
             else if (IsRagdoll)

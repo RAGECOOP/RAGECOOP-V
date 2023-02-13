@@ -18,7 +18,7 @@ namespace RageCoop.Client
         private static Thread _watcher = new(() => _removeStopped());
         private static void _removeStopped()
         {
-            while (!Main.IsUnloading)
+            while (!IsUnloading)
             {
                 lock (_threads)
                 {
@@ -57,6 +57,7 @@ namespace RageCoop.Client
 
         public static void OnUnload()
         {
+            Log.Debug("Stopping background threads");
             lock (_threads)
             {
                 foreach (var thread in _threads)
@@ -69,9 +70,9 @@ namespace RageCoop.Client
                     }
                 }
                 _threads.Clear();
-                _threads = null;
-                _watcher.Join();
             }
+            Log.Debug("Stopping thread watcher");
+            _watcher.Join();
         }
     }
 }
