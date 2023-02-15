@@ -15,20 +15,6 @@ using System.Threading;
 
 namespace RageCoop.Client.Scripting
 {
-    /// <summary>
-    /// </summary>
-    public class CustomEventReceivedArgs : EventArgs
-    {
-        /// <summary>
-        ///     The event hash
-        /// </summary>
-        public int Hash { get; set; }
-
-        /// <summary>
-        ///     Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion
-        /// </summary>
-        public object[] Args { get; set; }
-    }
 
     /// <summary>
     ///     Provides vital functionality to interact with RAGECOOP
@@ -37,8 +23,8 @@ namespace RageCoop.Client.Scripting
     {
         #region INTERNAL
 
-        internal static Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers =
-            new Dictionary<int, List<Action<CustomEventReceivedArgs>>>();
+        internal static Dictionary<int, List<CustomEventHandler>> CustomEventHandlers =
+            new();
 
         #endregion
 
@@ -166,12 +152,26 @@ namespace RageCoop.Client.Scripting
 
             internal static void InvokeCustomEventReceived(Packets.CustomEvent p)
             {
-                var args = new CustomEventReceivedArgs { Hash = p.Hash, Args = p.Args };
 
                 // Log.Debug($"CustomEvent:\n"+args.Args.DumpWithType());
 
                 if (CustomEventHandlers.TryGetValue(p.Hash, out var handlers))
-                    handlers.ForEach(x => { x.Invoke(args); });
+                {
+                    fixed (byte* pData = p.Payload)
+                    {
+                        foreach (var handler in handlers)
+                        {
+                            try
+                            {
+                                handler.Invoke(p.Hash, pData, p.Payload.Length);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error("InvokeCustomEvent", ex);
+                            }
+                        }
+                    }
+                }
             }
 
             #endregion
@@ -290,9 +290,12 @@ namespace RageCoop.Client.Scripting
         /// </param>
         public static void SendCustomEvent(CustomEventFlags flags, CustomEventHash eventHash, params object[] args)
         {
+            var writer = GetWriter();
+            CustomEvents.WriteObjects(writer, args);
             Networking.Peer.SendTo(new Packets.CustomEvent(flags)
             {
-                Args = args,
+
+                Payload = writer.ToByteArray(writer.Position),
                 Hash = eventHash
             }, Networking.ServerConnection, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
         }
@@ -310,7 +313,7 @@ namespace RageCoop.Client.Scripting
             lock (CustomEventHandlers)
             {
                 if (!CustomEventHandlers.TryGetValue(hash, out var handlers))
-                    CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
+                    CustomEventHandlers.Add(hash, handlers = new());
                 handlers.Add(handler);
             }
         }

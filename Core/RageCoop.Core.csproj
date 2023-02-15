@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<ImplicitUsings>true</ImplicitUsings>
 		<NoWarn>1701;1702;CS1591</NoWarn>
 		<TargetFrameworks>net7.0</TargetFrameworks>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>

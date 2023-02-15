@@ -12,10 +12,6 @@ namespace RageCoop.Client.Scripting
     {
         static readonly ThreadLocal<char[]> _resultBuf = new(() => new char[4096]);
 
-        static readonly ThreadLocal<BufferWriter> _bufWriter = new(() => new(4096));
-
-        static readonly ThreadLocal<BufferReader> _bufReader = new(() => new());
-
         /// <summary>
         /// Copy content of string to a sequential block of memory
         /// </summary>
@@ -91,8 +87,7 @@ namespace RageCoop.Client.Scripting
 
         public static void SendCustomEvent(CustomEventFlags flags, CustomEventHash hash, params object[] args)
         {
-            var writer = _bufWriter.Value;
-            writer.Reset();
+            var writer = GetWriter();
             CustomEvents.WriteObjects(writer, args);
             SendCustomEvent(flags, hash, writer.Address, writer.Position);
         }

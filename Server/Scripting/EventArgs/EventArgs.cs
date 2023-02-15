@@ -25,23 +25,26 @@ public class ChatEventArgs : EventArgs
 
 /// <summary>
 /// </summary>
-public class CustomEventReceivedArgs : EventArgs
+public class CustomEventReceivedArgs : Core.Scripting.CustomEventReceivedArgs
 {
     /// <summary>
     ///     The <see cref="RageCoop.Server.Client" /> that triggered this event
     /// </summary>
-    public Client Client { get; set; }
+    public Client Client
+    {
+        get => Tag as Client;
+        set => Tag = value;
+    }
 
-    /// <summary>
-    ///     The event hash
-    /// </summary>
-    public int Hash { get; set; }
-
-    /// <summary>
-    ///     Supported types: byte, short, ushort, int, uint, long, ulong, float, bool, string, Vector3, Quaternion, Vector2
-    ///     <see cref="ServerObject.Handle" />
-    /// </summary>
-    public object[] Args { get; set; }
+    public static CustomEventReceivedArgs From(Core.Scripting.CustomEventReceivedArgs e)
+    {
+        return new CustomEventReceivedArgs
+        {
+            Args = e.Args,
+            Tag = e.Tag,
+            Hash = e.Hash,
+        };
+    }
 }
 
 /// <summary>

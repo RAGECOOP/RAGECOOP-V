@@ -19,7 +19,7 @@ public class ServerEvents
 
     #region INTERNAL
 
-    internal Dictionary<int, List<Action<CustomEventReceivedArgs>>> CustomEventHandlers = new();
+    internal Dictionary<int, List<CustomEventHandler>> CustomEventHandlers = new();
 
     #endregion
 
@@ -138,10 +138,25 @@ public class ServerEvents
         OnPlayerDisconnected?.Invoke(this, client);
     }
 
-    internal void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
+    internal unsafe void InvokeCustomEventReceived(Packets.CustomEvent p, Client sender)
     {
-        var args = new CustomEventReceivedArgs { Hash = p.Hash, Args = p.Args, Client = sender };
-        if (CustomEventHandlers.TryGetValue(p.Hash, out var handlers)) handlers.ForEach(x => { x.Invoke(args); });
+        if (CustomEventHandlers.TryGetValue(p.Hash, out var handlers))
+        {
+            fixed (byte* pData = p.Payload)
+            {
+                foreach (var handler in handlers)
+                {
+                    try
+                    {
+                        handler.Invoke(p.Hash, pData, p.Payload.Length, sender);
+                    }
+                    catch (Exception ex)
+                    {
+                        Server.Logger?.Error("InvokeCustomEvent", ex);
+                    }
+                }
+            }
+        }
     }
 
     internal void InvokePlayerUpdate(Client client)
@@ -351,9 +366,11 @@ public class API
     public void SendCustomEvent(CustomEventFlags flags, List<Client> targets, CustomEventHash eventHash,
         params object[] args)
     {
+        var writer = GetWriter();
+        CustomEvents.WriteObjects(writer, args);
         var p = new Packets.CustomEvent(flags)
         {
-            Args = args,
+            Payload = writer.ToByteArray(writer.Position),
             Hash = eventHash
         };
         if (targets == null)
@@ -383,8 +400,11 @@ public class API
         lock (Events.CustomEventHandlers)
         {
             if (!Events.CustomEventHandlers.TryGetValue(hash, out var handlers))
-                Events.CustomEventHandlers.Add(hash, handlers = new List<Action<CustomEventReceivedArgs>>());
-            handlers.Add(handler);
+                Events.CustomEventHandlers.Add(hash, handlers = new());
+            handlers.Add(new Action<Core.Scripting.CustomEventReceivedArgs>((e) =>
+            {
+                handler.Invoke(CustomEventReceivedArgs.From(e));
+            }));
         }
     }
 

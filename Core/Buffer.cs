@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using GTA.Math;
 
 namespace RageCoop.Core
@@ -43,6 +44,11 @@ namespace RageCoop.Core
 
     public unsafe sealed class BufferWriter : Buffer
     {
+        /// <summary>
+        /// Gets a thread local instance of this writer
+        /// </summary>
+        public static readonly ThreadLocal<BufferWriter> ThreadLocal = new(() => new(4096));
+
         public BufferWriter(int size)
         {
             Resize(size);
@@ -184,6 +190,11 @@ namespace RageCoop.Core
 
     public unsafe sealed class BufferReader : Buffer
     {
+        /// <summary>
+        /// Gets a thread local instance of this reader
+        /// </summary>
+        public static readonly ThreadLocal<BufferReader> ThreadLocal = new(() => new());
+
         /// <summary>
         /// Initialize an empty instance, needs to call <see cref="Initialise(byte*, int)"/> before reading data
         /// </summary>

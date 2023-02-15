@@ -237,11 +237,6 @@ namespace RageCoop.Client
                 return;
             }
 
-
-            if (e.KeyCode == Keys.I)
-            {
-                APIBridge.SendChatMessage("hello there");
-            }
 #if CEF
             if (CefRunning)
             {
