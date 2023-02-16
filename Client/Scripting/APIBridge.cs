@@ -119,5 +119,10 @@ namespace RageCoop.Client.Scripting
 
         [LibraryImport("RageCoop.Client.dll")]
         private static partial int GetLastResultLenInChars();
+
+        [LibraryImport("RageCoop.Client.dll")]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static partial bool RegisterCustomEventHandler(CustomEventHash hash, IntPtr ptrHandler);
+
     }
 }

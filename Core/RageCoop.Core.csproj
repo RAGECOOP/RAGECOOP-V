@@ -16,9 +16,6 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'API'">
 		<OutDir>..\bin\API</OutDir>
-		<Deterministic>true</Deterministic>
-		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-		<ProduceOnlyReferenceAssembly>true</ProduceOnlyReferenceAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>

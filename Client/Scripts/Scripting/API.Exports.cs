@@ -3,6 +3,7 @@ using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using static RageCoop.Core.Scripting.CustomEvents;
 
@@ -84,6 +85,26 @@ namespace RageCoop.Client.Scripting
 
         [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResultLenInChars))]
         public static int GetLastResultLenInChars() => _lastResult?.Length ?? 0;
+
+        [UnmanagedCallersOnly(EntryPoint = nameof(RegisterCustomEventHandler))]
+        public static bool RegisterCustomEventHandler(CustomEventHash hash, IntPtr ptrHandler)
+        {
+            try
+            {
+                lock (CustomEventHandlers)
+                {
+                    if (!CustomEventHandlers.TryGetValue(hash, out var handlers))
+                        CustomEventHandlers.Add(hash, handlers = new());
+                    handlers.Add(new(ptrHandler));
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(nameof(RegisterCustomEventHandler), ex);
+                return false;
+            }
+        }
 
         /// <summary>
         ///     Convert Entity ID to handle

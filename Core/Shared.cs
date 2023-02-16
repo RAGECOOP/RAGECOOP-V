@@ -27,10 +27,10 @@ namespace RageCoop.Core
         /// Shortcut to <see cref="BufferReader.ThreadLocal"/>
         /// </summary>
         /// <returns></returns>
-        public static unsafe BufferReader GetReader(byte* data=null,int cbData=0)
+        public static unsafe BufferReader GetReader(byte* data = null, int cbData = 0)
         {
             var reader = BufferReader.ThreadLocal.Value;
-            reader.Initialise(data,cbData);
+            reader.Initialise(data, cbData);
             return reader;
         }
 
@@ -39,8 +39,9 @@ namespace RageCoop.Core
         /// Shortcut to <see cref="BufferWriter.ThreadLocal"/>
         /// </summary>
         /// <returns></returns>
-        public static BufferWriter GetWriter(bool reset=true) {
-            var writer=BufferWriter.ThreadLocal.Value;
+        public static BufferWriter GetWriter(bool reset = true)
+        {
+            var writer = BufferWriter.ThreadLocal.Value;
             if (reset)
             {
                 writer.Reset();

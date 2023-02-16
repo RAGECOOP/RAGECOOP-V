@@ -197,7 +197,6 @@ namespace RageCoop.Client.Scripting
                 return;
             }
 
-            var t = returnType;
             var id = (int)e.Args[1];
 
 

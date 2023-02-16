@@ -183,7 +183,7 @@ namespace RageCoop.Client.Scripting
         ///     Get the local player's ID
         /// </summary>
         /// <returns>PlayerID</returns>
-        public static int LocalPlayerID => LocalPlayerID;
+        public static int LocalPlayerID => Main.LocalPlayerID;
 
         /// <summary>
         ///     Check if player is connected to a server

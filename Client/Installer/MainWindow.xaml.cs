@@ -115,14 +115,14 @@ namespace RageCoop.Client.Installer
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
                 var settingsPath = Path.Combine(root, SettingsPath);
-                Settings settings = null;
+                ClientSettings settings = null;
                 try
                 {
                     settings = Util.ReadSettings(settingsPath);
                 }
                 catch
                 {
-                    settings = new Settings();
+                    settings = new();
                 }
 
                 if (File.Exists(menyooConfig))

@@ -15,6 +15,7 @@
 		<NoWarn>CS1591</NoWarn>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<TrimmerRootDescriptor Include="Trimming.xml" />

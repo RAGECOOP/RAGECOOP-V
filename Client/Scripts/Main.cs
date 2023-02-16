@@ -236,7 +236,6 @@ namespace RageCoop.Client
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
             }
-
 #if CEF
             if (CefRunning)
             {
