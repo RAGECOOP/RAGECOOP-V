@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -33,7 +34,7 @@ namespace RageCoop.Client.Scripting
         }
 
 
-        public void Load(string path, string[] zips)
+        public unsafe void Load(string path, string[] zips)
         {
             LoadedResources.Clear();
             foreach (var zip in zips)
@@ -42,19 +43,45 @@ namespace RageCoop.Client.Scripting
                 Log?.Info($"Loading resource: {Path.GetFileNameWithoutExtension(zip)}");
                 Unpack(zipPath, Path.Combine(path, "Data"));
             }
-
-            Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories).Where(x => x.CanBeIgnored())
-                .ForEach(File.Delete);
-
-            // TODO: Core.ScheduleLoad()...
         }
 
-        public void Unload()
+        public unsafe void Unload()
         {
-            // TODO: Core.ScheduleUnload()...
+            HashSet<IntPtr> modules = new();
+            foreach (var res in LoadedResources.Values)
+            {
+                foreach (var module in res.Modules)
+                {
+                    fixed (char* pModulePath = module)
+                    {
+                        Log.Debug($"Unloading module: {module}");
+                        SHVDN.Core.ScheduleUnload(pModulePath);
+                        var hModule = Util.GetModuleHandleW(module);
+                        if (hModule == IntPtr.Zero)
+                            Log.Warning("Failed to get module handler for " + Path.GetFileName(module));
+                        else
+                            modules.Add(hModule);
+                    }
+                }
+            }
+
+            // Unregister associated handler
+            foreach (var handlers in API.CustomEventHandlers.Values)
+            {
+                foreach (var handler in handlers.ToArray())
+                {
+                    if (modules.Contains((IntPtr)handler.Module))
+                    {
+                        Log.Debug($"Unregister handler from module {handler.Module}");
+                        handlers.Remove(handler);
+                    }
+                }
+            }
+
+            LoadedResources.Clear();
         }
 
-        private ClientResource Unpack(string zipPath, string dataFolderRoot)
+        private unsafe ClientResource Unpack(string zipPath, string dataFolderRoot)
         {
             var r = new ClientResource
             {
@@ -73,10 +100,11 @@ namespace RageCoop.Client.Scripting
 
 
             foreach (var dir in Directory.GetDirectories(scriptsDir, "*", SearchOption.AllDirectories))
-                r.Files.Add(dir, new ResourceFile
+                r.Files.Add(dir, new ClientFile
                 {
                     IsDirectory = true,
-                    Name = dir.Substring(scriptsDir.Length + 1).Replace('\\', '/')
+                    Name = dir.Substring(scriptsDir.Length + 1).Replace('\\', '/'),
+                    FullPath = dir
                 });
             foreach (var file in Directory.GetFiles(scriptsDir, "*", SearchOption.AllDirectories))
             {
@@ -99,9 +127,18 @@ namespace RageCoop.Client.Scripting
                 var rfile = new ClientFile
                 {
                     IsDirectory = false,
-                    Name = relativeName
+                    Name = relativeName,
+                    FullPath = file
                 };
                 r.Files.Add(relativeName, rfile);
+                if (file.EndsWith(".dll"))
+                {
+                    fixed (char* pModulePath = file)
+                    {
+                        SHVDN.Core.ScheduleLoad(pModulePath);
+                        r.Modules.Add(file);
+                    }
+                }
             }
 
             LoadedResources.TryAdd(r.Name, r);

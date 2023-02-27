@@ -86,26 +86,6 @@ namespace RageCoop.Client.Scripting
         [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResultLenInChars))]
         public static int GetLastResultLenInChars() => _lastResult?.Length ?? 0;
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(RegisterCustomEventHandler))]
-        public static bool RegisterCustomEventHandler(CustomEventHash hash, IntPtr ptrHandler)
-        {
-            try
-            {
-                lock (CustomEventHandlers)
-                {
-                    if (!CustomEventHandlers.TryGetValue(hash, out var handlers))
-                        CustomEventHandlers.Add(hash, handlers = new());
-                    handlers.Add(new(ptrHandler));
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(nameof(RegisterCustomEventHandler), ex);
-                return false;
-            }
-        }
-
         /// <summary>
         ///     Convert Entity ID to handle
         /// </summary>
@@ -120,6 +100,17 @@ namespace RageCoop.Client.Scripting
                 T_ID_BLIP => EntityPool.GetBlipByID(id)?.Handle ?? 0,
                 _ => 0,
             };
+        }
+
+        /// <summary>
+        /// Enqueue a message to the main logger
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="msg"></param>
+        [UnmanagedCallersOnly(EntryPoint = nameof(LogEnqueue))]
+        public static void LogEnqueue(LogLevel level, char* msg)
+        {
+            Log.Enqueue((int)level, new(msg));
         }
     }
 }

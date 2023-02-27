@@ -22,6 +22,11 @@ internal class Resources
         Logger = server.Logger;
     }
 
+    static Resources()
+    {
+        CoreUtils.ForceLoadAllAssemblies();
+    }
+
     public bool IsLoaded { get; private set; }
 
     public void LoadAll()
@@ -263,7 +268,7 @@ internal class Resources
                 }
 
                 if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent(),
-                        ConnectionChannel.RequestResponse, 30000)?.Response == FileResponse.Loaded)
+                        ConnectionChannel.File, 30000)?.Response == FileResponse.Loaded)
                 {
                     client.IsReady = true;
                     Server.API.Events.InvokePlayerReady(client);

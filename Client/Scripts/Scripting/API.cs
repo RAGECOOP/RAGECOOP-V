@@ -4,8 +4,10 @@ using Newtonsoft.Json;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using SHVDN;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -309,14 +311,8 @@ namespace RageCoop.Client.Scripting
         /// </param>
         /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
         public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
-        {
-            lock (CustomEventHandlers)
-            {
-                if (!CustomEventHandlers.TryGetValue(hash, out var handlers))
-                    CustomEventHandlers.Add(hash, handlers = new());
-                handlers.Add(handler);
-            }
-        }
+            => RegisterCustomEventHandler(hash, (CustomEventHandler)handler);
+
 
         /// <summary>
         /// </summary>
@@ -400,12 +396,32 @@ namespace RageCoop.Client.Scripting
             Networking.SendChatMessage(message);
         }
 
+        /// <summary>
+        /// Get the <see cref="ClientResource"/> with this name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         [Remoting]
         public static ClientResource GetResource(string name)
         {
             if (MainRes.LoadedResources.TryGetValue(name, out var resource))
                 return resource;
 
+            return null;
+        }
+
+        /// <summary>
+        /// Get <see cref="ClientResource"/> that contains the specified file
+        /// </summary>
+        /// <returns></returns>
+        [Remoting]
+        public static ClientResource GetResouceFromFilePath(string filePath)
+        {
+            foreach (var res in MainRes.LoadedResources)
+            {
+                if (res.Value.Files.Any(file => file.Value.FullPath.ToLower() == filePath.ToLower()))
+                    return res.Value;
+            }
             return null;
         }
 
@@ -434,6 +450,33 @@ namespace RageCoop.Client.Scripting
             if (prop == null)
                 throw new KeyNotFoundException($"Property {name} was not found");
             prop.SetValue(null, JsonDeserialize(jsonVal, prop.PropertyType));
+        }
+
+
+
+        /// <summary>
+        ///     Register an handler to the specifed event hash, one event can have multiple handlers. This will be invoked from
+        ///     backgound thread, use <see cref="QueueAction(Action)" /> in the handler to dispatch code to script thread.
+        /// </summary>
+        /// <param name="hash">
+        ///     An unique identifier of the event
+        /// </param>
+        /// <param name="handler">An handler to be invoked when the event is received from the server. </param>
+        [Remoting]
+        public static void RegisterCustomEventHandler(CustomEventHash hash, CustomEventHandler handler)
+        {
+            if (handler.Module == default)
+                throw new ArgumentException("Module not specified");
+
+            if (handler.FunctionPtr == default)
+                throw new ArgumentException("Function pointer not specified");
+
+            lock (CustomEventHandlers)
+            {
+                if (!CustomEventHandlers.TryGetValue(hash, out var handlers))
+                    CustomEventHandlers.Add(hash, handlers = new());
+                handlers.Add(handler);
+            }
         }
 
         #endregion

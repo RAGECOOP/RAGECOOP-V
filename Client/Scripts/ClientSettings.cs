@@ -46,7 +46,7 @@ namespace RageCoop.Client
         /// <summary>
         ///     The key to open menu
         /// </summary>
-        public Keys MenuKey { get; set; } = Keys.F9;
+        public Keys MenuKey { get; set; } = Keys.F7;
 
         /// <summary>
         ///     The key to enter a vehicle as passenger.

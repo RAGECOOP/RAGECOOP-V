@@ -11,7 +11,7 @@ namespace RageCoop.Client.Scripting
     public static unsafe partial class APIBridge
     {
         static readonly ThreadLocal<char[]> _resultBuf = new(() => new char[4096]);
-
+        static List<CustomEventHandler> _handlers = new();
         /// <summary>
         /// Copy content of string to a sequential block of memory
         /// </summary>
@@ -85,12 +85,17 @@ namespace RageCoop.Client.Scripting
             }
         }
 
+        public static void SendCustomEvent(CustomEventHash hash, params object[] args)
+            => SendCustomEvent(CustomEventFlags.None, hash, args);
         public static void SendCustomEvent(CustomEventFlags flags, CustomEventHash hash, params object[] args)
         {
             var writer = GetWriter();
             CustomEvents.WriteObjects(writer, args);
             SendCustomEvent(flags, hash, writer.Address, writer.Position);
         }
+
+        public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
+            => RegisterCustomEventHandler(hash, (CustomEventHandler)handler);
 
         internal static string GetPropertyAsJson(string name) => InvokeCommandAsJson("GetProperty", name);
         internal static string GetConfigAsJson(string name) => InvokeCommandAsJson("GetConfig", name);
@@ -120,9 +125,7 @@ namespace RageCoop.Client.Scripting
         [LibraryImport("RageCoop.Client.dll")]
         private static partial int GetLastResultLenInChars();
 
-        [LibraryImport("RageCoop.Client.dll")]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static partial bool RegisterCustomEventHandler(CustomEventHash hash, IntPtr ptrHandler);
-
+        [LibraryImport("RageCoop.Client.dll", StringMarshalling = StringMarshalling.Utf16)]
+        public static partial void LogEnqueue(LogLevel level, string msg);
     }
 }

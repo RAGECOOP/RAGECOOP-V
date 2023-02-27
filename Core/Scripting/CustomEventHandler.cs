@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 
 namespace RageCoop.Core.Scripting
 {
@@ -22,20 +23,32 @@ namespace RageCoop.Core.Scripting
     }
     public unsafe class CustomEventHandler
     {
+        // Make sure the handler doesn't get GC'd
+        static List<CustomEventHandler> _handlers = new();
+
         [ThreadStatic]
         static object _tag;
-        public CustomEventHandler(IntPtr func)
+        public CustomEventHandler()
         {
-            FunctionPtr = func;
-            if (Path.GetFileName(Environment.ProcessPath).ToLower() == "gtav.exe")
+            lock (_handlers)
             {
-                Module = SHVDN.Core.CurrentModule;
+                _handlers.Add(this);
             }
         }
+        public CustomEventHandler(IntPtr func) : this()
+        {
+            FunctionPtr = (ulong)func;
+            Module = (ulong)SHVDN.Core.CurrentModule;
+        }
 
+        [JsonIgnore]
         private CustomEventHandlerDelegate _managedHandler; // Used to keep GC reference
-        public IntPtr FunctionPtr { get; }
-        public IntPtr Module { get; }
+
+        [JsonProperty]
+        public ulong FunctionPtr { get; private set; }
+
+        [JsonProperty]
+        public ulong Module { get; private set; }
 
         /// <summary>
         /// 

@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -30,9 +31,9 @@ namespace RageCoop.Core
 {
     internal static class CoreUtils
     {
-        private static readonly Random random = new Random();
+        private static readonly Random random = new();
 
-        private static readonly HashSet<string> ToIgnore = new HashSet<string>
+        private static readonly HashSet<string> ToIgnore = new()
         {
             "RageCoop.Client",
             "RageCoop.Client.Loader",
@@ -41,7 +42,8 @@ namespace RageCoop.Core
             "RageCoop.Server",
             "ScriptHookVDotNet2",
             "ScriptHookVDotNet3",
-            "ScriptHookVDotNet"
+            "ScriptHookVDotNet",
+            "ScriptHookVDotNetCore"
         };
 
         public static string FormatToSharpStyle(string input, int offset)
@@ -106,7 +108,20 @@ namespace RageCoop.Core
 
         public static bool CanBeIgnored(this string name)
         {
-            return ToIgnore.Contains(Path.GetFileNameWithoutExtension(name));
+            name = Path.GetFileNameWithoutExtension(name);
+            return ToIgnore.Contains(name) || AssemblyLoadContext.Default.Assemblies.Any(x => x.GetName().Name == name);
+        }
+
+        public static void ForceLoadAllAssemblies()
+        {
+            foreach (var a in AssemblyLoadContext.Default.Assemblies)
+                LoadAllReferencedAssemblies(a.GetName());
+        }
+
+        public static void LoadAllReferencedAssemblies(this AssemblyName assembly)
+        {
+            foreach (var child in Assembly.Load(assembly).GetReferencedAssemblies())
+                LoadAllReferencedAssemblies(child);
         }
 
         public static string ToFullPath(this string path)

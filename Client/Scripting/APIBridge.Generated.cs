@@ -36,10 +36,10 @@ namespace RageCoop.Client.Scripting
         public static void LocalChatMessage(System.String from, System.String message) => InvokeCommand("LocalChatMessage", from, message);
         public static void SendChatMessage(System.String message) => InvokeCommand("SendChatMessage", message);
         public static RageCoop.Client.Scripting.ClientResource GetResource(System.String name) => InvokeCommand<RageCoop.Client.Scripting.ClientResource>("GetResource", name);
+        public static RageCoop.Client.Scripting.ClientResource GetResouceFromFilePath(System.String filePath) => InvokeCommand<RageCoop.Client.Scripting.ClientResource>("GetResouceFromFilePath", filePath);
         public static System.Object GetConfig(System.String name) => InvokeCommand<System.Object>("GetConfig", name);
         public static void SetConfig(System.String name, System.String jsonVal) => InvokeCommand("SetConfig", name, jsonVal);
-
-
+        public static void RegisterCustomEventHandler(RageCoop.Core.Scripting.CustomEventHash hash, RageCoop.Core.Scripting.CustomEventHandler handler) => InvokeCommand("RegisterCustomEventHandler", hash, handler);
         #endregion
     }
 }

@@ -17,35 +17,38 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Name of the resource
         /// </summary>
+        [JsonProperty]
         public string Name { get; internal set; }
 
         /// <summary>
         ///     Directory where the scripts is loaded from
         /// </summary>
+        [JsonProperty]
         public string ScriptsDirectory { get; internal set; }
 
         /// <summary>
         ///     A resource-specific folder that can be used to store your files.
         /// </summary>
+        [JsonProperty]
         public string DataFolder { get; internal set; }
 
         /// <summary>
-        ///     Get the <see cref="ResourceFile" /> where this script is loaded from.
+        ///     Get the <see cref="ClientFile" /> where this script is loaded from.
         /// </summary>
-        public Dictionary<string, ResourceFile> Files { get; internal set; } = new Dictionary<string, ResourceFile>();
+        [JsonProperty]
+        public Dictionary<string, ClientFile> Files { get; internal set; } = new Dictionary<string, ClientFile>();
+
+        /// <summary>
+        /// List of the path of loaded modules, don't modify
+        /// </summary>
+        [JsonProperty]
+        public List<string> Modules = new();
 
         /// <summary>
         ///     A <see cref="Core.Logger" /> instance that can be used to debug your resource.
         /// </summary>
         [JsonIgnore]
-        // TODO: call the api and use logging sinks
-        public Core.Logger Logger => throw new NotImplementedException();
-
-        /// <summary>
-        ///     Get all <see cref="ClientScript" /> instance in this resource.
-        /// </summary>
-        [JsonIgnore]
-        public List<ClientScript> Scripts { get; } = SHVDN.Core.ListScripts().OfType<ClientScript>().ToList();
+        public ResourceLogger Logger => ResourceLogger.Default;
 
     }
 

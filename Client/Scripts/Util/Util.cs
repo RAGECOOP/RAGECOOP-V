@@ -17,7 +17,7 @@ using Font = GTA.UI.Font;
 
 namespace RageCoop.Client
 {
-    internal static class Util
+    internal static partial class Util
     {
         /// <summary>
         ///     The location of the cursor on screen between 0 and 1.
@@ -206,10 +206,12 @@ namespace RageCoop.Client
             Call(DELETE_ENTITY, &handle);
         }
 
-        [DllImport("kernel32.dll")]
-        public static extern ulong GetTickCount64();
+        [LibraryImport("kernel32.dll")]
+        public static partial ulong GetTickCount64();
 
-
+        [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial IntPtr GetModuleHandleW([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
+        
         #region -- POINTER --
 
         private static int _steeringAngleOffset { get; set; }

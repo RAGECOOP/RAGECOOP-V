@@ -11,11 +11,13 @@ namespace RageCoop.Core.Scripting
         /// <summary>
         ///     Full name with relative path of this file
         /// </summary>
+        [JsonProperty]
         public string Name { get; internal set; }
 
         /// <summary>
         ///     Whether this is a directory
         /// </summary>
+        [JsonProperty]
         public bool IsDirectory { get; internal set; }
 
         /// <summary>

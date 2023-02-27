@@ -47,6 +47,10 @@ public class ServerResource : PluginLoader
 
     internal static ServerResource LoadFrom(string resDir, string dataFolder, Logger logger = null)
     {
+        string mainAssemblyPath = Path.Combine(resDir, Path.GetFileName(resDir) + ".dll");
+        if (!File.Exists(mainAssemblyPath))
+            throw new FileNotFoundException($"Main assemby not found: {mainAssemblyPath}");
+
         var runtimeLibs = Path.Combine(resDir, "RuntimeLibs", CoreUtils.GetInvariantRID());
         if (Directory.Exists(runtimeLibs))
         {
@@ -61,16 +65,18 @@ public class ServerResource : PluginLoader
             CoreUtils.CopyFilesRecursively(new DirectoryInfo(runtimeLibs), new DirectoryInfo(resDir));
         }
 
-        var conf = new PluginConfig(Path.GetFullPath(Path.Combine(resDir, Path.GetFileName(resDir) + ".dll")))
+        var conf = new PluginConfig(Path.GetFullPath(mainAssemblyPath))
         {
             PreferSharedTypes = true,
             EnableHotReload = false,
             IsUnloadable = false,
             LoadInMemory = true
         };
-        ServerResource r = new(conf);
-        r.Logger = logger;
-        r.Name = Path.GetFileName(resDir);
+        ServerResource r = new(conf)
+        {
+            Logger = logger,
+            Name = Path.GetFileName(resDir)
+        };
         if (!File.Exists(conf.MainAssemblyPath))
         {
             r.Dispose();

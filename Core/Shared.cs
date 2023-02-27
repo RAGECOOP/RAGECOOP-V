@@ -1,11 +1,29 @@
 ﻿global using static RageCoop.Core.Shared;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
+using System.Reflection;
 
 namespace RageCoop.Core
 {
+    public class JsonDontSerialize : Attribute
+    {
+
+    }
+
     internal class Shared
     {
+        static Type JsonTypeCheck(Type type)
+        {
+            if (type.GetCustomAttribute<JsonDontSerialize>() != null)
+                throw new TypeAccessException($"The type {type} cannot be serialized");
+            return type;
+        }
+        static object JsonTypeCheck(object obj)
+        {
+            JsonTypeCheck(obj.GetType());
+            return obj;
+        }
         public static readonly JsonSerializerSettings JsonSettings = new();
         static Shared()
         {
@@ -16,12 +34,12 @@ namespace RageCoop.Core
 
         public static object JsonDeserialize(string text, Type type)
         {
-            return JsonConvert.DeserializeObject(text, type, JsonSettings);
+            return JsonConvert.DeserializeObject(text, JsonTypeCheck(type), JsonSettings);
         }
 
         public static T JsonDeserialize<T>(string text) => (T)JsonDeserialize(text, typeof(T));
 
-        public static string JsonSerialize(object obj) => JsonConvert.SerializeObject(obj, JsonSettings);
+        public static string JsonSerialize(object obj) => JsonConvert.SerializeObject(JsonTypeCheck(obj), JsonSettings);
 
         /// <summary>
         /// Shortcut to <see cref="BufferReader.ThreadLocal"/>

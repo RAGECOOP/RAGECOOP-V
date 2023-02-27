@@ -52,7 +52,7 @@ public static class EntryPoint
     }
 
     [UnmanagedCallersOnly(EntryPoint = "OnKeyboard")]
-    public unsafe static void OnKeyboard(int key, ushort repeats, bool scanCode, bool isExtended, bool isWithAlt, bool wasDownBefore, bool isUpNow)
+    public unsafe static void OnKeyboard(uint key, ushort repeats, bool scanCode, bool isExtended, bool isWithAlt, bool wasDownBefore, bool isUpNow)
     {
         try
         {
