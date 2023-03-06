@@ -38,7 +38,7 @@ namespace RageCoop.Core.Scripting
         public CustomEventHandler(IntPtr func) : this()
         {
             FunctionPtr = (ulong)func;
-            Module = (ulong)SHVDN.Core.CurrentModule;
+            Directory = SHVDN.Core.CurrentDirectory;
         }
 
         [JsonIgnore]
@@ -48,7 +48,7 @@ namespace RageCoop.Core.Scripting
         public ulong FunctionPtr { get; private set; }
 
         [JsonProperty]
-        public ulong Module { get; private set; }
+        public string Directory { get; private set; }
 
         /// <summary>
         /// 

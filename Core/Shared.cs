@@ -15,13 +15,13 @@ namespace RageCoop.Core
     {
         static Type JsonTypeCheck(Type type)
         {
-            if (type.GetCustomAttribute<JsonDontSerialize>() != null)
+            if (type?.GetCustomAttribute<JsonDontSerialize>() != null)
                 throw new TypeAccessException($"The type {type} cannot be serialized");
             return type;
         }
         static object JsonTypeCheck(object obj)
         {
-            JsonTypeCheck(obj.GetType());
+            JsonTypeCheck(obj?.GetType());
             return obj;
         }
         public static readonly JsonSerializerSettings JsonSettings = new();

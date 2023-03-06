@@ -1,9 +1,9 @@
 ﻿using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: DisableRuntimeMarshalling]
 [assembly: InternalsVisibleTo("RageCoop.Client")] // For debugging
 
 namespace RageCoop.Client.Scripting
@@ -11,7 +11,28 @@ namespace RageCoop.Client.Scripting
     public static unsafe partial class APIBridge
     {
         static readonly ThreadLocal<char[]> _resultBuf = new(() => new char[4096]);
-        static List<CustomEventHandler> _handlers = new();
+        static readonly List<CustomEventHandler> _handlers = new();
+
+        static APIBridge()
+        {
+            if (SHVDN.Core.GetPtr == null)
+                throw new InvalidOperationException("Game not running");
+
+            foreach(var fd in typeof(APIBridge).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                var importAttri = fd.GetCustomAttribute<ApiImportAttribute>();
+                if (importAttri == null)
+                    continue;
+                importAttri.EntryPoint ??= fd.Name;
+                var key = $"RageCoop.Client.Scripting.API.{importAttri.EntryPoint}";
+                var fptr = SHVDN.Core.GetPtr(key);
+                if (fptr == default)
+                    throw new KeyNotFoundException($"Failed to find function pointer: {key}");
+                
+                fd.SetValue(null,fptr);
+            }
+        }
+
         /// <summary>
         /// Copy content of string to a sequential block of memory
         /// </summary>
@@ -56,10 +77,13 @@ namespace RageCoop.Client.Scripting
             var argv = StringArrayToMemory(args.Select(JsonSerialize).ToArray());
             try
             {
-                var resultLen = InvokeCommandAsJsonUnsafe(name, argc, argv);
-                if (resultLen == 0)
-                    throw new Exception(GetLastResult());
-                return GetLastResult();
+                fixed(char* pName = name)
+                {
+                    var resultLen = InvokeCommandAsJsonUnsafe(pName, argc, argv);
+                    if (resultLen == 0)
+                        throw new Exception(GetLastResult());
+                    return GetLastResult();
+                }
             }
             finally
             {
@@ -77,7 +101,7 @@ namespace RageCoop.Client.Scripting
             var cbBufSize = _resultBuf.Value.Length * sizeof(char);
             fixed (char* pBuf = _resultBuf.Value)
             {
-                if (GetLastResult(pBuf, cbBufSize) > 0)
+                if (GetLastResultUnsafe(pBuf, cbBufSize) > 0)
                 {
                     return new string(pBuf);
                 }
@@ -91,7 +115,7 @@ namespace RageCoop.Client.Scripting
         {
             var writer = GetWriter();
             CustomEvents.WriteObjects(writer, args);
-            SendCustomEvent(flags, hash, writer.Address, writer.Position);
+            SendCustomEventUnsafe(flags, hash, writer.Address, writer.Position);
         }
 
         public static void RegisterCustomEventHandler(CustomEventHash hash, Action<CustomEventReceivedArgs> handler)
@@ -107,25 +131,31 @@ namespace RageCoop.Client.Scripting
         internal static void SetConfig(string name, object val) => InvokeCommand("SetConfig", name, val);
 
 
-        [LibraryImport("RageCoop.Client.dll", StringMarshalling = StringMarshalling.Utf16)]
-        public static partial CustomEventHash GetEventHash(string name);
+        [ApiImport]
+        public static delegate* unmanaged<char*, CustomEventHash> GetEventHash;
 
-        [LibraryImport("RageCoop.Client.dll", StringMarshalling = StringMarshalling.Utf16)]
-        internal static partial void SetLastResult(string msg);
+        [ApiImport]
+        private static delegate* unmanaged<char*,void> SetLastResult;
 
-        [LibraryImport("RageCoop.Client.dll")]
-        private static partial int GetLastResult(char* buf, int cbBufSize);
+        [ApiImport(EntryPoint = "GetLastResult")]
+        private static delegate* unmanaged<char*, int, int> GetLastResultUnsafe;
 
-        [LibraryImport("RageCoop.Client.dll", EntryPoint = "InvokeCommand", StringMarshalling = StringMarshalling.Utf16)]
-        private static partial int InvokeCommandAsJsonUnsafe(string name, int argc, char** argv);
+        [ApiImport(EntryPoint = "InvokeCommand")]
+        private static delegate* unmanaged<char*, int, char**, int> InvokeCommandAsJsonUnsafe;
 
-        [LibraryImport("RageCoop.Client.dll")]
-        private static partial void SendCustomEvent(CustomEventFlags flags, int hash, byte* data, int cbData);
+        [ApiImport(EntryPoint = "SendCustomEvent")]
+        private static delegate* unmanaged<CustomEventFlags, int, byte*, int, void> SendCustomEventUnsafe;
 
-        [LibraryImport("RageCoop.Client.dll")]
-        private static partial int GetLastResultLenInChars();
+        [ApiImport]
+        private static delegate* unmanaged<int> GetLastResultLenInChars;
 
-        [LibraryImport("RageCoop.Client.dll", StringMarshalling = StringMarshalling.Utf16)]
-        public static partial void LogEnqueue(LogLevel level, string msg);
+        [ApiImport]
+        public static delegate* unmanaged<LogLevel, char*, void> LogEnqueue;
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    class ApiImportAttribute : Attribute
+    {
+        public string EntryPoint;
     }
 }

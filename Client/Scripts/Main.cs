@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using GTA;
 using GTA.Math;
@@ -34,7 +35,7 @@ namespace RageCoop.Client
         internal static Logger Log = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Resources MainRes = null;
+        internal static Scripting.Resources MainRes = null;
 
         public static Ped P;
         public static float FPS;
@@ -61,7 +62,8 @@ namespace RageCoop.Client
 
             Log = new Logger()
             {
-                Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath) },
+                FlushImmediately = true,
+                Writers = null,
 #if DEBUG
                 LogLevel = 0,
 #else
@@ -70,26 +72,11 @@ namespace RageCoop.Client
             };
             Log.OnFlush += (line, formatted) =>
             {
-                switch (line.LogLevel)
-                {
-#if DEBUG
-                    // case LogLevel.Trace:
-                    case LogLevel.Debug:
-                        Console.PrintInfo(line.Message);
-                        break;
-#endif
-                    case LogLevel.Info:
-                        Console.PrintInfo(line.Message);
-                        break;
-                    case LogLevel.Warning:
-                        Console.PrintWarning(line.Message);
-                        break;
-                    case LogLevel.Error:
-                        Console.PrintError(line.Message);
-                        break;
-                }
+                SHVDN.Logger.Write(line.Message, (uint)line.LogLevel);
             };
 
+            // Run static constructor to register all function pointers and remoting entries
+            RuntimeHelpers.RunClassConstructor(typeof(API).TypeHandle);
         }
 
         protected override void OnAborted(AbortedEventArgs e)
@@ -120,7 +107,7 @@ namespace RageCoop.Client
                 throw new NotSupportedException("Please update your GTA5 to v1.0.1290 or newer!");
             }
 
-            MainRes = new Resources();
+            MainRes = new();
 
 
 
@@ -220,6 +207,22 @@ namespace RageCoop.Client
         protected override void OnKeyUp(GTA.KeyEventArgs e)
         {
             base.OnKeyUp(e);
+
+            if (e.KeyCode == Keys.U)
+            {
+                foreach (var prop in typeof(APIBridge).GetProperties(BindingFlags.Public | BindingFlags.Static))
+                {
+                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
+                }
+                foreach (var prop in typeof(APIBridge.Config).GetProperties(BindingFlags.Public | BindingFlags.Static))
+                {
+                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
+                }
+            }
+            if (e.KeyCode == Keys.I)
+            {
+                APIBridge.SendChatMessage("test");
+            }
 #if CEF
             if (CefRunning)
             {
@@ -379,23 +382,23 @@ namespace RageCoop.Client
 
                 if (reason != "Abort")
                 {
-                    Log.Info($">> Disconnected << reason: {reason}"); 
+                    Log.Info($">> Disconnected << reason: {reason}");
                     Notification.Show("~r~Disconnected: " + reason);
                 }
 
-                if (MainChat.Focused)
+                if (MainChat?.Focused == true)
                 {
                     MainChat.Focused = false;
                 }
 
                 PlayerList.Cleanup();
-                MainChat.Clear();
+                MainChat?.Clear();
                 EntityPool.Cleanup();
                 WorldThread.Traffic(true);
                 Call(SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 LocalPlayerID = default;
-                MainRes.Unload();
+                MainRes?.Unload();
                 Memory.RestorePatches();
 #if CEF
             if (CefRunning)

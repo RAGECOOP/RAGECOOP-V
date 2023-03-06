@@ -14,9 +14,13 @@ namespace RageCoop.Client
     /// </summary>
     internal static class ThreadManager
     {
-        private static List<Thread> _threads = new();
-        private static Thread _watcher = new(() => _removeStopped());
-        private static void _removeStopped()
+        private static readonly List<Thread> _threads = new();
+        private static readonly Thread _watcher = new(RemoveStopped);
+        static ThreadManager()
+        {
+            _watcher.Start();
+        }
+        private static void RemoveStopped()
         {
             while (!IsUnloading)
             {
@@ -46,8 +50,10 @@ namespace RageCoop.Client
                     {
                         Log.Debug($"Thread stopped: " + Environment.CurrentManagedThreadId);
                     }
-                });
-                created.Name = name;
+                })
+                {
+                    Name = name
+                };
                 Log.Debug($"Thread created: {name}, id: {created.ManagedThreadId}");
                 _threads.Add(created);
                 if (startNow) created.Start();

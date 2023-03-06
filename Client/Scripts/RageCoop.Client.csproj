@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<EnableDynamicLoading>true</EnableDynamicLoading>
 		<NoAotCompile>false</NoAotCompile>
 		<TargetFramework>net7.0</TargetFramework>
 		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
@@ -63,9 +64,6 @@
 		<PackageReference Include="SharpZipLib" Version="1.4.0" />
 		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.3.0" />
 	</ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '*Undefined*' And '$(NoAotCompile)' != 'true'">
-		<Exec Command="dotnet publish &quot;$(ProjectPath)&quot; -o &quot;$(OutDir)\native&quot;  -p:PublishAOT=true -r win-x64 " />
-	</Target>
 	<PropertyGroup Condition="'$(SolutionDir)' != '*Undefined*' AND '$(PublishAot)' != 'true'">
 		<PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
 			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"

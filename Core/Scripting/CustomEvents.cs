@@ -2,6 +2,7 @@
 using GTA.Math;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -290,7 +291,20 @@ namespace RageCoop.Core.Scripting
             return Args;
         }
 
-        [LibraryImport("RageCoop.Client.dll")]
-        public static partial int IdToHandle(byte type, int id);
+        static unsafe delegate* unmanaged<byte, int, int> _idToHandlePtr;
+        public static unsafe int IdToHandle(byte type, int id)
+        {
+            if (_idToHandlePtr == default)
+            {
+                if (SHVDN.Core.GetPtr == default)
+                    throw new InvalidOperationException("Not client");
+
+                _idToHandlePtr = (delegate* unmanaged<byte, int, int>)SHVDN.Core.GetPtr("RageCoop.Client.Scripting.API.IdToHandle");
+                if (_idToHandlePtr == default)
+                    throw new KeyNotFoundException("IdToHandle function not found");
+            }
+
+            return _idToHandlePtr(type, id);
+        }
     }
 }

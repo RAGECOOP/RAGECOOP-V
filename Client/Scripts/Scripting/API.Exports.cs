@@ -3,6 +3,8 @@ using RageCoop.Core;
 using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using static RageCoop.Core.Scripting.CustomEvents;
@@ -11,6 +13,23 @@ namespace RageCoop.Client.Scripting
 {
     internal static unsafe partial class API
     {
+        static API()
+        {
+            RegisterFunctionPointers();
+        }
+
+        static void RegisterFunctionPointers()
+        {
+            foreach (var method in typeof(API).GetMethods(BindingFlags.Public | BindingFlags.Static))
+            {
+                var attri = method.GetCustomAttribute<UnmanagedCallersOnlyAttribute>();
+                if (attri == null) continue;
+                Debug.Assert(attri.EntryPoint == method.Name);
+                SHVDN.Core.SetPtr($"{typeof(API).FullName}.{method.Name}", method.MethodHandle.GetFunctionPointer());
+                Log.Debug($"Registered function pointer for {method.DeclaringType}.{method.Name}");
+            }
+        }
+
         [ThreadStatic]
         static string _lastResult;
 

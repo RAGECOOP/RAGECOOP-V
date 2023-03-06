@@ -12,13 +12,16 @@ namespace RageCoop.Client.Scripting
         public static readonly ResourceLogger Default = new();
         public ResourceLogger()
         {
-            FlushImmediately= true;
+            FlushImmediately = true;
             OnFlush += FlushToMainModule;
         }
 
-        private void FlushToMainModule(LogLine line, string fomatted)
+        private unsafe void FlushToMainModule(LogLine line, string fomatted)
         {
-            APIBridge.LogEnqueue(line.LogLevel, line.Message);
+            fixed (char* pMsg = line.Message)
+            {
+                APIBridge.LogEnqueue(line.LogLevel, pMsg);
+            }
         }
 
     }

@@ -38,9 +38,9 @@ namespace RageCoop.Client
             {
                 DiagnosticMenu.Clear();
                 DiagnosticMenu.Add(new NativeItem("EntityPool", EntityPool.DumpDebug()));
-                foreach (var pair in Debug.TimeStamps)
-                    DiagnosticMenu.Add(
-                        new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
+                // foreach (var pair in Debug.TimeStamps)
+                //     DiagnosticMenu.Add(
+                //         new NativeItem(pair.Key.ToString(), pair.Value.ToString(), pair.Value.ToString()));
             };
             ShowNetworkInfoItem.CheckboxChanged += (s, e) =>
             {

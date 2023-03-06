@@ -50,7 +50,7 @@ namespace RageCoop.Core
 
         internal Logger()
         {
-            Name = Process.GetCurrentProcess().Id.ToString();
+            Name = Environment.ProcessId.ToString();
             if (!FlushImmediately)
             {
                 LoggerThread = new Thread(() =>
@@ -164,7 +164,7 @@ namespace RageCoop.Core
                     while (_queuedLines.TryDequeue(out var line))
                     {
                         var formatted = Format(line);
-                        Writers.ForEach(x =>
+                        Writers?.ForEach(x =>
                         {
                             try
                             {

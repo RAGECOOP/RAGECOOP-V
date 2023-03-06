@@ -465,8 +465,8 @@ namespace RageCoop.Client.Scripting
         [Remoting]
         public static void RegisterCustomEventHandler(CustomEventHash hash, CustomEventHandler handler)
         {
-            if (handler.Module == default)
-                throw new ArgumentException("Module not specified");
+            if (handler.Directory == default)
+                throw new ArgumentException("Script directory not specified");
 
             if (handler.FunctionPtr == default)
                 throw new ArgumentException("Function pointer not specified");

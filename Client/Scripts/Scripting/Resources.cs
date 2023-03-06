@@ -65,6 +65,8 @@ namespace RageCoop.Client.Scripting
                 }
             }
 
+            // TODO
+            /*
             // Unregister associated handler
             foreach (var handlers in API.CustomEventHandlers.Values)
             {
@@ -77,7 +79,7 @@ namespace RageCoop.Client.Scripting
                     }
                 }
             }
-
+            */
             LoadedResources.Clear();
         }
 

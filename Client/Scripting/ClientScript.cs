@@ -20,7 +20,8 @@ namespace RageCoop.Client.Scripting
         static unsafe ClientScript()
         {
             char* buf = stackalloc char[260];
-            SHVDN.PInvoke.GetModuleFileNameW(SHVDN.Core.CurrentModule, buf, 260);
+            // TODO: needs some fix up here
+            // SHVDN.PInvoke.GetModuleFileNameW(SHVDN.Core.CurrentModule, buf, 260);
             if (Marshal.GetLastWin32Error() != 0)
                 throw new Win32Exception("Failed to get path for current module");
             FullPath = new(buf);
@@ -37,12 +38,14 @@ namespace RageCoop.Client.Scripting
             {
                 Logger.Warning("No file associated with curent script was found");
             }
-
-            Tick += DoQueuedJobs;
         }
         protected void QueueAction(Func<bool> action) => _jobQueue.Enqueue(action);
         protected void QueueAction(Action action) => QueueAction(() => { action(); return true; });
-
+        protected override void OnTick()
+        {
+            base.OnTick();
+            DoQueuedJobs();
+        }
         private void DoQueuedJobs()
         {
             while (_reAdd.TryDequeue(out var toAdd))
