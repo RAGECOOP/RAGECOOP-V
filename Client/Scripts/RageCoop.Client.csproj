@@ -3,19 +3,15 @@
 		<EnableDynamicLoading>true</EnableDynamicLoading>
 		<NoAotCompile>false</NoAotCompile>
 		<TargetFramework>net7.0</TargetFramework>
-		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 		<OutputType>Library</OutputType>
 		<OutDir>..\..\bin\$(Configuration)\Client\Scripts</OutDir>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<AllowedReferenceRelatedFileExtensions>
 			.dll
 			.pdb
 		</AllowedReferenceRelatedFileExtensions>
-		<DocumentationFile>..\..\bin\API\RageCoop.Client.xml</DocumentationFile>
 		<NoWarn>CS1591</NoWarn>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 	</PropertyGroup>
 	<ItemGroup>
@@ -28,28 +24,9 @@
 	  <Compile Remove="Scripting\ClientScript.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Update="Properties\AssemblyInfo.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>AssemblyInfo.tt</DependentUpon>
-		</Compile>
-	</ItemGroup>
-	<ItemGroup>
 		<Reference Include="LemonUI.SHVDNC">
 			<HintPath>..\..\libs\LemonUI.SHVDNC.dll</HintPath>
 		</Reference>
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="icon.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Properties\AssemblyInfo.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-		</Content>
-		<Content Include="sharpdx_direct3d11_1_effects_x64.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 	</ItemGroup>
 	<ItemGroup>
 		<Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -64,12 +41,24 @@
 		<PackageReference Include="SharpZipLib" Version="1.4.0" />
 		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.3.0" />
 	</ItemGroup>
-	<PropertyGroup Condition="'$(SolutionDir)' != '*Undefined*' AND '$(PublishAot)' != 'true'">
-		<PostBuildEvent Condition=" '$(DevEnvDir)' != '*Undefined*'">
-			"$(DevEnvDir)TextTransform.exe" -a !!BuildConfiguration!$(Configuration) "$(ProjectDir)Properties\AssemblyInfo.tt"
-		</PostBuildEvent>
-		<PostBuildEvent Condition="'$(Configuration)' != 'API'">
-			xcopy "$(SolutionDir)Client\Data" "..\Data" /i /s /y
-		</PostBuildEvent>
-	</PropertyGroup>
+
+	<ItemGroup>
+		<None Update="Properties\AssemblyInfo.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Properties\AssemblyInfo.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AssemblyInfo.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(DevEnvDir)' != '*Undefined*'">
+		<Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
+	</Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '*Undefined*' and '$(Configuration)' != 'API'">
+		<Exec Command="xcopy &quot;$(SolutionDir)Client\Data&quot; &quot;$(OutDir)..\Data&quot; /i /s /y" />
+	</Target>
 </Project>
