@@ -39,12 +39,6 @@ namespace RageCoop.Client.Scripting
         public Dictionary<string, ClientFile> Files { get; internal set; } = new Dictionary<string, ClientFile>();
 
         /// <summary>
-        /// List of the path of loaded modules, don't modify
-        /// </summary>
-        [JsonProperty]
-        public List<string> Modules = new();
-
-        /// <summary>
         ///     A <see cref="Core.Logger" /> instance that can be used to debug your resource.
         /// </summary>
         [JsonIgnore]

@@ -11,29 +11,16 @@ namespace RageCoop.Client.Scripting
     [ScriptAttributes(NoDefaultInstance = true)]
     public abstract class ClientScript : Script
     {
-        ConcurrentQueue<Func<bool>> _jobQueue = new();
-        Queue<Func<bool>> _reAdd = new();
-        /// <summary>
-        /// Fully qualified path to the module that the current script runs in.
-        /// </summary>
-        public static readonly string FullPath;
-        static unsafe ClientScript()
-        {
-            char* buf = stackalloc char[260];
-            // TODO: needs some fix up here
-            // SHVDN.PInvoke.GetModuleFileNameW(SHVDN.Core.CurrentModule, buf, 260);
-            if (Marshal.GetLastWin32Error() != 0)
-                throw new Win32Exception("Failed to get path for current module");
-            FullPath = new(buf);
-        }
-
+        readonly ConcurrentQueue<Func<bool>> _jobQueue = new();
+        readonly Queue<Func<bool>> _reAdd = new();
         public ClientScript()
         {
-            CurrentResource = APIBridge.GetResouceFromFilePath(FullPath);
+            var dir = SHVDN.Core.CurrentDirectory;
+            CurrentResource = APIBridge.GetResourceFromPath(dir);
             if (CurrentResource == null)
                 throw new Exception("No resource associated with this script is found");
 
-            CurrentFile = CurrentResource.Files.Values.FirstOrDefault(x => x?.FullPath?.ToLower() == FullPath.ToLower());
+            CurrentFile = CurrentResource.Files.Values.FirstOrDefault(x => x?.FullPath?.ToLower() == FilePath?.ToLower());
             if (CurrentFile == null)
             {
                 Logger.Warning("No file associated with curent script was found");

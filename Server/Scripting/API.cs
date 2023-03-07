@@ -359,7 +359,7 @@ public class API
     /// <param name="flags"></param>
     /// <param name="eventHash">An unique identifier of the event/> to get it from a string</param>
     /// <param name="args">
-    ///     The objects conataing your data, see <see cref="Scripting.CustomEventReceivedArgs.Args" /> for
+    ///     The objects conataing your data, see <see cref="Core.Scripting.CustomEventReceivedArgs.Args" /> for
     ///     supported types.
     /// </param>
     /// <param name="targets">The target clients to send. Leave it null to send to all clients</param>

@@ -7,6 +7,7 @@ using RageCoop.Core.Scripting;
 using SHVDN;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -411,16 +412,17 @@ namespace RageCoop.Client.Scripting
         }
 
         /// <summary>
-        /// Get <see cref="ClientResource"/> that contains the specified file
+        /// Get <see cref="ClientResource"/> that contains the specified file or directory
         /// </summary>
         /// <returns></returns>
         [Remoting]
-        public static ClientResource GetResouceFromFilePath(string filePath)
+        public static ClientResource GetResourceFromPath(string path)
         {
-            foreach (var res in MainRes.LoadedResources)
+            path = Path.GetFullPath(path).ToLower();
+            foreach (var res in MainRes.LoadedResources.Values)
             {
-                if (res.Value.Files.Any(file => file.Value.FullPath.ToLower() == filePath.ToLower()))
-                    return res.Value;
+                if (res.ScriptsDirectory.ToLower() == path || res.Files.Any(file => file.Value.FullPath.ToLower() == path))
+                    return res;
             }
             return null;
         }

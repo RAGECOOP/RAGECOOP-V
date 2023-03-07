@@ -35,7 +35,7 @@ namespace RageCoop.Client
         internal static Logger Log = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Scripting.Resources MainRes = null;
+        internal static Resources MainRes = null;
 
         public static Ped P;
         public static float FPS;
@@ -207,22 +207,6 @@ namespace RageCoop.Client
         protected override void OnKeyUp(GTA.KeyEventArgs e)
         {
             base.OnKeyUp(e);
-
-            if (e.KeyCode == Keys.U)
-            {
-                foreach (var prop in typeof(APIBridge).GetProperties(BindingFlags.Public | BindingFlags.Static))
-                {
-                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
-                }
-                foreach (var prop in typeof(APIBridge.Config).GetProperties(BindingFlags.Public | BindingFlags.Static))
-                {
-                    Console.PrintInfo($"{prop.Name}: {JsonSerialize(prop.GetValue(null))}");
-                }
-            }
-            if (e.KeyCode == Keys.I)
-            {
-                APIBridge.SendChatMessage("test");
-            }
 #if CEF
             if (CefRunning)
             {
@@ -386,19 +370,19 @@ namespace RageCoop.Client
                     Notification.Show("~r~Disconnected: " + reason);
                 }
 
-                if (MainChat?.Focused == true)
+                if (MainChat.Focused)
                 {
                     MainChat.Focused = false;
                 }
 
                 PlayerList.Cleanup();
-                MainChat?.Clear();
+                MainChat.Clear();
                 EntityPool.Cleanup();
                 WorldThread.Traffic(true);
                 Call(SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 LocalPlayerID = default;
-                MainRes?.Unload();
+                MainRes.Unload();
                 Memory.RestorePatches();
 #if CEF
             if (CefRunning)

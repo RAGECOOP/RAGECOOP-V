@@ -8,18 +8,18 @@ using System.Reflection;
 using ICSharpCode.SharpZipLib.Zip;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using SHVDN;
 
 namespace RageCoop.Client.Scripting
 {
     internal class Resources
     {
-        public static string TempPath;
+        public static string TempPath = Path.Combine(Path.GetTempPath(), "RageCoop");
 
         internal readonly ConcurrentDictionary<string, ClientResource> LoadedResources = new();
 
         static Resources()
         {
-            TempPath = Path.Combine(Path.GetTempPath(), "RageCoop");
             if (Directory.Exists(TempPath))
                 try
                 {
@@ -47,39 +47,24 @@ namespace RageCoop.Client.Scripting
 
         public unsafe void Unload()
         {
-            HashSet<IntPtr> modules = new();
-            foreach (var res in LoadedResources.Values)
+            var dirs = LoadedResources.Values.Select(x => x.ScriptsDirectory);
+            foreach (var dir in dirs)
             {
-                foreach (var module in res.Modules)
-                {
-                    fixed (char* pModulePath = module)
-                    {
-                        Log.Debug($"Unloading module: {module}");
-                        SHVDN.Core.ScheduleUnload(pModulePath);
-                        var hModule = Util.GetModuleHandleW(module);
-                        if (hModule == IntPtr.Zero)
-                            Log.Warning("Failed to get module handler for " + Path.GetFileName(module));
-                        else
-                            modules.Add(hModule);
-                    }
-                }
+                SHVDN.Core.RuntimeController.RequestUnload(dir);
             }
 
-            // TODO
-            /*
             // Unregister associated handler
             foreach (var handlers in API.CustomEventHandlers.Values)
             {
                 foreach (var handler in handlers.ToArray())
                 {
-                    if (modules.Contains((IntPtr)handler.Module))
+                    if (dirs.Contains(handler.Directory, StringComparer.OrdinalIgnoreCase))
                     {
-                        Log.Debug($"Unregister handler from module {handler.Module}");
                         handlers.Remove(handler);
+                        Log.Debug($"Unregistered handler from script directory {handler.Directory}");
                     }
                 }
             }
-            */
             LoadedResources.Clear();
         }
 
@@ -110,21 +95,6 @@ namespace RageCoop.Client.Scripting
                 });
             foreach (var file in Directory.GetFiles(scriptsDir, "*", SearchOption.AllDirectories))
             {
-                if (Path.GetFileName(file).CanBeIgnored())
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Warning(
-                            $"Failed to delete API assembly: {file}. This may or may cause some unexpected behaviours.\n{ex}");
-                    }
-
-                    continue;
-                }
-
                 var relativeName = file.Substring(scriptsDir.Length + 1).Replace('\\', '/');
                 var rfile = new ClientFile
                 {
@@ -133,16 +103,8 @@ namespace RageCoop.Client.Scripting
                     FullPath = file
                 };
                 r.Files.Add(relativeName, rfile);
-                if (file.EndsWith(".dll"))
-                {
-                    fixed (char* pModulePath = file)
-                    {
-                        SHVDN.Core.ScheduleLoad(pModulePath);
-                        r.Modules.Add(file);
-                    }
-                }
             }
-
+            SHVDN.Core.RuntimeController.RequestLoad(scriptsDir);
             LoadedResources.TryAdd(r.Name, r);
             return r;
         }

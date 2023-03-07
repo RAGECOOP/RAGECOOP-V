@@ -103,7 +103,6 @@ internal class Resources
                             zip.AddDirectory(dir[(resourceFolder.Length + 1)..]);
                         foreach (var file in Directory.GetFiles(resourceFolder, "*", SearchOption.AllDirectories))
                         {
-                            if (Path.GetFileName(file).CanBeIgnored()) continue;
                             zip.Add(file, file[(resourceFolder.Length + 1)..]);
                         }
 

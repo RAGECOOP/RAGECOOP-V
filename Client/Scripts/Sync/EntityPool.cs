@@ -425,6 +425,8 @@ namespace RageCoop.Client
                     if (!VehiclesByHandle.ContainsKey(veh))
                     {
                         var cveh = (Vehicle)Entity.FromHandle(veh);
+                        if (cveh == null)
+                            continue;
                         if (allVehicles.Length > Settings.WorldVehicleSoftLimit)
                         {
                             var type = cveh.PopulationType;

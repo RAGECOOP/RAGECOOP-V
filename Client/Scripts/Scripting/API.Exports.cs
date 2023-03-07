@@ -22,10 +22,10 @@ namespace RageCoop.Client.Scripting
         {
             foreach (var method in typeof(API).GetMethods(BindingFlags.Public | BindingFlags.Static))
             {
-                var attri = method.GetCustomAttribute<UnmanagedCallersOnlyAttribute>();
+                var attri = method.GetCustomAttribute<ApiExportAttribute>();
                 if (attri == null) continue;
-                Debug.Assert(attri.EntryPoint == method.Name);
-                SHVDN.Core.SetPtr($"{typeof(API).FullName}.{method.Name}", method.MethodHandle.GetFunctionPointer());
+                attri.EntryPoint ??= method.Name;
+                SHVDN.Core.SetPtr($"{typeof(API).FullName}.{attri.EntryPoint}", method.MethodHandle.GetFunctionPointer());
                 Log.Debug($"Registered function pointer for {method.DeclaringType}.{method.Name}");
             }
         }
@@ -33,7 +33,7 @@ namespace RageCoop.Client.Scripting
         [ThreadStatic]
         static string _lastResult;
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResult))]
+        [ApiExportAttribute(EntryPoint = nameof(GetLastResult))]
         public static int GetLastResult(char* buf, int cbBufSize)
         {
             if (_lastResult == null)
@@ -52,7 +52,7 @@ namespace RageCoop.Client.Scripting
         }
         public static void SetLastResult(string msg) => _lastResult = msg;
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(SetLastResult))]
+        [ApiExportAttribute(EntryPoint = nameof(SetLastResult))]
         public static void SetLastResult(char* msg)
         {
             try
@@ -65,10 +65,10 @@ namespace RageCoop.Client.Scripting
             }
         }
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(GetEventHash))]
+        [ApiExportAttribute(EntryPoint = nameof(GetEventHash))]
         public static CustomEventHash GetEventHash(char* name) => new string(name);
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(SendCustomEvent))]
+        [ApiExportAttribute(EntryPoint = nameof(SendCustomEvent))]
         public static void SendCustomEvent(CustomEventFlags flags, int hash, byte* data, int cbData)
         {
             var payload = new byte[cbData];
@@ -81,7 +81,7 @@ namespace RageCoop.Client.Scripting
             }, Networking.ServerConnection, ConnectionChannel.Event, NetDeliveryMethod.ReliableOrdered);
         }
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(InvokeCommand))]
+        [ApiExportAttribute(EntryPoint = nameof(InvokeCommand))]
         public static int InvokeCommand(char* name, int argc, char** argv)
         {
             try
@@ -102,13 +102,13 @@ namespace RageCoop.Client.Scripting
             }
         }
 
-        [UnmanagedCallersOnly(EntryPoint = nameof(GetLastResultLenInChars))]
+        [ApiExportAttribute(EntryPoint = nameof(GetLastResultLenInChars))]
         public static int GetLastResultLenInChars() => _lastResult?.Length ?? 0;
 
         /// <summary>
         ///     Convert Entity ID to handle
         /// </summary>
-        [UnmanagedCallersOnly(EntryPoint = nameof(IdToHandle))]
+        [ApiExportAttribute(EntryPoint = nameof(IdToHandle))]
         public static int IdToHandle(byte type, int id)
         {
             return type switch
@@ -126,10 +126,15 @@ namespace RageCoop.Client.Scripting
         /// </summary>
         /// <param name="level"></param>
         /// <param name="msg"></param>
-        [UnmanagedCallersOnly(EntryPoint = nameof(LogEnqueue))]
+        [ApiExportAttribute(EntryPoint = nameof(LogEnqueue))]
         public static void LogEnqueue(LogLevel level, char* msg)
         {
             Log.Enqueue((int)level, new(msg));
+        }
+
+        class ApiExportAttribute : Attribute
+        {
+            public string EntryPoint;
         }
     }
 }
