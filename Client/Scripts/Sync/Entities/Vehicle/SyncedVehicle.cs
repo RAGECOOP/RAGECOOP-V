@@ -174,7 +174,7 @@ namespace RageCoop.Client
             if (distSquared > 0.03 * 0.03)
             {
                 if (IsTrain || distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
-                else MainVehicle.ApplyForce(cali, default, ForceType.InternalImpulse);
+                else MainVehicle.ApplyWorldForceCenterOfMass(cali, ForceType.InternalImpulse, true);
             }
 
             Quaternion predictedQuat = updated ? Quaternion :
