@@ -74,7 +74,7 @@ namespace RageCoop.Client
         #region PRIVATE
 
         private byte[] _lastVehicleColors = { 0, 0 };
-        private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
+        private Dictionary<int, int> _lastVehicleMods = new();
         private bool _lastHornActive;
         private bool _lastTransformed;
         internal int _lastLivery = -1;

@@ -640,7 +640,7 @@ namespace RageCoop.Client
                 // localRagdoll
                 var force = Velocity - MainPed.Velocity + 5 * dist * (predicted - MainPed.ReadPosition());
                 if (force.Length() > 20) force = force.Normalized * 20;
-                MainPed.ApplyForce(force);
+                MainPed.ApplyForce(force, default, ForceType.InternalImpulse);
             }
         }
 

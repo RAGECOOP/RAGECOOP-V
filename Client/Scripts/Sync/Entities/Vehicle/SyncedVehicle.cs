@@ -174,17 +174,15 @@ namespace RageCoop.Client
             if (distSquared > 0.03 * 0.03)
             {
                 if (IsTrain || distSquared > 20 * 20) MainVehicle.Velocity = Velocity + cali;
-                else MainVehicle.ApplyForce(cali);
+                else MainVehicle.ApplyForce(cali, default, ForceType.InternalImpulse);
             }
 
             Quaternion predictedQuat = updated ? Quaternion :
                 Quaternion.Lerp(LastQuaternion, Quaternion, 1 + LastSyncedStopWatch.ElapsedMilliseconds / (float)LastSyncInterval);
             var curQuat = MainVehicle.Quaternion;
-            MainVehicle.ApplyForce((predictedQuat * TopExtent - curQuat * TopExtent) * RotCalMult, TopExtent);
-            MainVehicle.ApplyForce((predictedQuat * FrontExtent - curQuat * FrontExtent) * RotCalMult, FrontExtent);
+            MainVehicle.ApplyForce((predictedQuat * TopExtent - curQuat * TopExtent) * RotCalMult, TopExtent, ForceType.InternalImpulse);
+            MainVehicle.ApplyForce((predictedQuat * FrontExtent - curQuat * FrontExtent) * RotCalMult, FrontExtent, ForceType.InternalImpulse);
             // MainVehicle.ApplyForce((predictedQuat * BottomExtent - curQuat * BottomExtent) * RotCalMult, BottomExtent);
-
-
 
         }
 

@@ -36,7 +36,6 @@ namespace RageCoop.Client
 
         public static string BasePath = GetBasePath();
         public static string DataPath = Path.Combine(BasePath, "Data");
-        public static string LogPath = Path.Combine(DataPath, "RageCoop.Client.log");
         public static string SettingsPath = Path.Combine(DataPath, "Setting.json");
 
         public static string VehicleWeaponDataPath = Path.Combine(DataPath, "VehicleWeapons.json");
