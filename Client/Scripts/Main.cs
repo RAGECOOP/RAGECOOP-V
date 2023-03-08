@@ -42,12 +42,14 @@ namespace RageCoop.Client
         private static bool _lastDead;
         public static bool CefRunning;
         public static bool IsUnloading { get; private set; }
+        public static Script Instance { get; private set; }
 
         /// <summary>
         ///     Don't use it!
         /// </summary>
         public Main()
         {
+            Instance = this;
             Directory.CreateDirectory(DataPath);
             try
             {
@@ -72,7 +74,7 @@ namespace RageCoop.Client
             };
             Log.OnFlush += (line, formatted) =>
             {
-                SHVDN.Logger.Write(line.Message, (uint)line.LogLevel);
+                SHVDN.Logger.Write($"[RageCoop] {line.Message}", (uint)line.LogLevel);
             };
 
             // Run static constructor to register all function pointers and remoting entries
