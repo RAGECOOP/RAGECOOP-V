@@ -178,8 +178,8 @@ namespace RageCoop.Client
             }
 
             // Calibrate rotation
-            var diff = MainVehicle.ReadQuaternion().Differentiate(Quaternion);
-            MainVehicle.WorldRotationVelocity = diff.ToEulerAngles()*RotCalMult;
+            var diff = Quaternion.Diff(MainVehicle.ReadQuaternion());
+            MainVehicle.WorldRotationVelocity = diff.ToEulerAngles() * RotCalMult;
         }
 
         private bool CreateVehicle()

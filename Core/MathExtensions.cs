@@ -128,9 +128,9 @@ namespace RageCoop.Core
             return q.ToEulerAngles().ToDegree();
         }
 
-        public static Quaternion Differentiate(this Quaternion p, Quaternion q)
+        public static Quaternion Diff(this Quaternion to, Quaternion from)
         {
-            return q * Quaternion.Invert(p);
+            return to * Quaternion.Invert(from);
         }
 
         public static Vector3 ToEulerAngles(this Quaternion q)

@@ -14,10 +14,6 @@ namespace RageCoop.Client
     internal static unsafe class EntityPool
     {
         public static object PedsLock = new object();
-#if BENCHMARK
-        private static Stopwatch PerfCounter = new Stopwatch();
-        private static Stopwatch PerfCounter2 = Stopwatch.StartNew();
-#endif
 
         #region ACTIVE INSTANCES
 
@@ -281,7 +277,7 @@ namespace RageCoop.Client
         #endregion
 
         #region SERVER OBJECTS
-        
+
         public static SyncedProp GetPropByID(int id)
             => ServerProps.TryGetValue(id, out var p) ? p : null;
 
@@ -300,20 +296,12 @@ namespace RageCoop.Client
         {
             UpdateTargets();
 
-#if BENCHMARK
-            PerfCounter.Restart();
-            Debug.TimeStamps[TimeStamp.CheckProjectiles] = PerfCounter.ElapsedTicks;
-#endif
-
             var allPeds = NativeMemory.GetPedHandles();
             var allVehicles = NativeMemory.GetVehicleHandles();
             var allProjectiles = NativeMemory.GetProjectileHandles();
             vehStatesPerFrame = allVehicles.Length * 2 / (int)FPS + 1;
             pedStatesPerFrame = allPeds.Length * 2 / (int)FPS + 1;
 
-#if BENCHMARK
-            Debug.TimeStamps[TimeStamp.GetAllEntities] = PerfCounter.ElapsedTicks;
-#endif
 
 
             lock (ProjectilesLock)
@@ -357,8 +345,9 @@ namespace RageCoop.Client
                     if (c == null && p != Game.Player.Character.Handle)
                     {
                         var type = Util.GetPopulationType(p);
-                        if (allPeds.Length > Settings.WorldPedSoftLimit &&
-                            type == EntityPopulationType.RandomAmbient && !Call<bool>(IS_PED_IN_ANY_VEHICLE, p, 0))
+                        if (allPeds.Length > Settings.WorldPedSoftLimit
+                            && type == EntityPopulationType.RandomAmbient
+                            && !Call<bool>(IS_PED_IN_ANY_VEHICLE, p, 0))
                         {
                             Util.DeleteEntity(p);
                             continue;
@@ -370,9 +359,6 @@ namespace RageCoop.Client
                         Add(c);
                     }
                 }
-#if BENCHMARK
-                Debug.TimeStamps[TimeStamp.AddPeds] = PerfCounter.ElapsedTicks;
-#endif
                 var ps = PedsByID.Values.ToArray();
                 pedStateIndex += pedStatesPerFrame;
                 if (pedStateIndex >= ps.Length) pedStateIndex = 0;
@@ -389,32 +375,17 @@ namespace RageCoop.Client
                     // Outgoing sync
                     if (c.IsLocal)
                     {
-#if BENCHMARK
-                        var start = PerfCounter2.ElapsedTicks;
-#endif
                         // event check
                         SyncEvents.Check(c);
 
                         Networking.SendPed(c, i - pedStateIndex < pedStatesPerFrame);
-#if BENCHMARK
-                        Debug.TimeStamps[TimeStamp.SendPed] = PerfCounter2.ElapsedTicks-start;
-#endif
                     }
                     else // Incoming sync
                     {
-#if BENCHMARK
-                        var start = PerfCounter2.ElapsedTicks;
-#endif
                         c.Update();
                         if (c.IsOutOfSync) RemovePed(c.ID, "OutOfSync");
-#if BENCHMARK
-                        Debug.TimeStamps[TimeStamp.UpdatePed] = PerfCounter2.ElapsedTicks-start;
-#endif
                     }
                 }
-#if BENCHMARK
-                Debug.TimeStamps[TimeStamp.PedTotal] = PerfCounter.ElapsedTicks;
-#endif
             }
 
             var check = Ticked % 100 == 0;
@@ -430,7 +401,8 @@ namespace RageCoop.Client
                         if (allVehicles.Length > Settings.WorldVehicleSoftLimit)
                         {
                             var type = cveh.PopulationType;
-                            if (type == EntityPopulationType.RandomAmbient || type == EntityPopulationType.RandomParked)
+                            if (type == EntityPopulationType.RandomAmbient 
+                                || type == EntityPopulationType.RandomParked)
                             {
                                 foreach (var p in cveh.Occupants)
                                 {
@@ -447,9 +419,6 @@ namespace RageCoop.Client
 
                         Add(new SyncedVehicle(cveh));
                     }
-#if BENCHMARK
-                Debug.TimeStamps[TimeStamp.AddVehicles] = PerfCounter.ElapsedTicks;
-#endif
                 var vs = VehiclesByID.Values.ToArray();
                 vehStateIndex += vehStatesPerFrame;
                 if (vehStateIndex >= vs.Length) vehStateIndex = 0;
@@ -479,9 +448,6 @@ namespace RageCoop.Client
                     }
                 }
 
-#if BENCHMARK
-                Debug.TimeStamps[TimeStamp.VehicleTotal] = PerfCounter.ElapsedTicks;
-#endif
             }
 
             Networking.Peer.FlushSendQueue();
@@ -521,12 +487,6 @@ namespace RageCoop.Client
             }
 
             return ID;
-        }
-
-        private static void SetBudget(int b)
-        {
-            Call(SET_PED_POPULATION_BUDGET, b); // 0 - 3
-            Call(SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
         }
 
         public static string DumpDebug()

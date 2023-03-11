@@ -255,7 +255,7 @@ namespace RageCoop.Client
             if (IsInParachuteFreeFall)
             {
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
-                MainPed.Quaternion = Rotation.ToQuaternion();
+                MainPed.Rotation = Rotation;
 
                 if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@base", "free_idle", 3))
                 {
@@ -291,8 +291,7 @@ namespace RageCoop.Client
                 }
 
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
-                MainPed.Quaternion = Rotation.ToQuaternion();
-
+                MainPed.Rotation = Rotation;
                 if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@parachute@first_person",
                         "chute_idle_right", 3))
                 {
