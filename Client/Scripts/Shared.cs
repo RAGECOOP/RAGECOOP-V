@@ -10,28 +10,26 @@ using System.IO;
 using System;
 using SHVDN;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace RageCoop.Client
 {
     internal static class Shared
     {
-        private static string GetBasePath()
+        private static unsafe string GetBasePath()
         {
-            FileInfo info;
-            string realScriptDir = Directory.GetParent(Instance.FilePath).FullName;
-        nextTarget:
-            info = new(realScriptDir);
-            if (info.LinkTarget != null)
-            {
-                realScriptDir = info.LinkTarget;
-                goto nextTarget;
-            }
-            if (Path.GetFileName(realScriptDir).ToLower() != "scripts")
-                throw new FileNotFoundException($"Unexpected link target {realScriptDir}");
+            using var fs = File.OpenRead(Instance.FilePath);
+            var buf = stackalloc char[1024];
+            GetFinalPathNameByHandleW(fs.SafeFileHandle.DangerousGetHandle(), buf, 1024, 0);
+            ErrorCheck32();
+            var scriptDir = Directory.GetParent(Marshal.PtrToStringUni((IntPtr)buf)).FullName;
+            if (Path.GetFileName(scriptDir).ToLower() != "scripts")
+                throw new Exception("Unexpected script location");
 
-            var baseDir = Directory.GetParent(realScriptDir).FullName;
-            Logger.Debug($"Base directory is {baseDir}");
-            return baseDir;
+            var result = Directory.GetParent(scriptDir).FullName;
+            Logger.Debug($"Base path is: {result}");
+            return result;
         }
 
         public static string BasePath = GetBasePath();
