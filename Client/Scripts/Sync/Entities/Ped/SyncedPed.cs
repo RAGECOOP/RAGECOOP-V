@@ -669,7 +669,7 @@ namespace RageCoop.Client
                             {
                                 _lastDriveBy = true;
                                 Call(TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z,
-                                    1, 100, 1, FiringPattern.SingleShot);
+                                    100000, 100, 1, FiringPattern.SingleShot);
                             }
                         }
                         else if (_lastDriveBy || MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))

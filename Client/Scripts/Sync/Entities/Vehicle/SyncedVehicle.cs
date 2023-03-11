@@ -177,13 +177,9 @@ namespace RageCoop.Client
                 else MainVehicle.ApplyWorldForceCenterOfMass(cali, ForceType.InternalImpulse, true);
             }
 
-            Quaternion predictedQuat = updated ? Quaternion :
-                Quaternion.Lerp(LastQuaternion, Quaternion, 1 + LastSyncedStopWatch.ElapsedMilliseconds / (float)LastSyncInterval);
-            var curQuat = MainVehicle.Quaternion;
-            MainVehicle.ApplyForce((predictedQuat * TopExtent - curQuat * TopExtent) * RotCalMult, TopExtent, ForceType.InternalImpulse);
-            MainVehicle.ApplyForce((predictedQuat * FrontExtent - curQuat * FrontExtent) * RotCalMult, FrontExtent, ForceType.InternalImpulse);
-            // MainVehicle.ApplyForce((predictedQuat * BottomExtent - curQuat * BottomExtent) * RotCalMult, BottomExtent);
-
+            // Calibrate rotation
+            var diff = MainVehicle.ReadQuaternion().Differentiate(Quaternion);
+            MainVehicle.WorldRotationVelocity = diff.ToEulerAngles()*RotCalMult;
         }
 
         private bool CreateVehicle()
@@ -240,13 +236,6 @@ namespace RageCoop.Client
             IsSubmarineCar = MainVehicle.IsSubmarineCar;
             IsDeluxo = MainVehicle.Model == 1483171323;
             IsTrain = MainVehicle.IsTrain;
-            // var (rbl, ftr) = MainVehicle.Model.Dimensions;
-            FrontExtent = new Vector3(0, ExtentLength, 0);
-            RearExtent = -FrontExtent;
-            TopExtent = new Vector3(0, ExtentLength, 5);
-            BottomExtent = -TopExtent;
-            RightExtent = new Vector3(5, ExtentLength, 0);
-            LeftExtent = -RightExtent;
         }
 
         /// <summary>
