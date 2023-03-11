@@ -152,6 +152,7 @@ namespace RageCoop.Core
 
     internal abstract class Packet : IPacket
     {
+
         public abstract PacketType Type { get; }
 
         public virtual void Deserialize(NetIncomingMessage m)

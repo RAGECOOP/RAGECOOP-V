@@ -33,7 +33,7 @@ namespace RageCoop.Client
                 var packet = new Packets.FileTransferComplete();
                 packet.Deserialize(data);
 
-                Main.Logger.Debug($"Finalizing download:{packet.ID}");
+                Log.Debug($"Finalizing download:{packet.ID}");
                 Complete(packet.ID);
 
                 // Inform the server that the download is completed
@@ -48,13 +48,13 @@ namespace RageCoop.Client
                 try
                 {
                     Directory.CreateDirectory(ResourceFolder);
-                    Main.Resources.Load(ResourceFolder, _resources.ToArray());
+                    MainRes.Load(ResourceFolder, _resources.ToArray());
                     return new Packets.FileTransferResponse { ID = 0, Response = FileResponse.Loaded };
                 }
                 catch (Exception ex)
                 {
-                    Main.Logger.Error("Error occurred when loading server resource");
-                    Main.Logger.Error(ex);
+                    Log.Error("Error occurred when loading server resource");
+                    Log.Error(ex);
                     return new Packets.FileTransferResponse { ID = 0, Response = FileResponse.LoadFailed };
                 }
             });
@@ -68,13 +68,13 @@ namespace RageCoop.Client
         public static bool AddFile(int id, string name, long length)
         {
             var path = $"{ResourceFolder}\\{name}";
-            Main.Logger.Debug($"Downloading file to {path} , id:{id}");
+            Log.Debug($"Downloading file to {path} , id:{id}");
             if (!Directory.Exists(Directory.GetParent(path).FullName))
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
             if (FileAlreadyExists(ResourceFolder, name, length))
             {
-                Main.Logger.Debug($"File already exists! canceling download:{name}");
+                Log.Debug($"File already exists! canceling download:{name}");
                 DownloadCompleted?.Invoke(null, Path.Combine(ResourceFolder, name));
                 return false;
             }
@@ -82,7 +82,7 @@ namespace RageCoop.Client
             /*
             if (!name.EndsWith(".zip"))
             {
-                Main.Logger.Error($"File download blocked! [{name}]");
+                Log.Error($"File download blocked! [{name}]");
                 return false;
             }
             */
@@ -114,7 +114,6 @@ namespace RageCoop.Client
             if (File.Exists(filePath))
             {
                 if (new FileInfo(filePath).Length == length) return true;
-
                 // Delete the file because the length is wrong (maybe the file was updated)
                 File.Delete(filePath);
             }
@@ -129,7 +128,7 @@ namespace RageCoop.Client
                 if (InProgressDownloads.TryGetValue(id, out var file))
                     file.Stream.Write(chunk, 0, chunk.Length);
                 else
-                    Main.Logger.Trace($"Received unhandled file chunk:{id}");
+                    Log.Trace($"Received unhandled file chunk:{id}");
             }
         }
 
@@ -139,12 +138,12 @@ namespace RageCoop.Client
             {
                 InProgressDownloads.Remove(id);
                 f.Dispose();
-                Main.Logger.Info($"Download finished:{f.FileName}");
+                Log.Info($"Download finished:{f.FileName}");
                 DownloadCompleted?.Invoke(null, Path.Combine(ResourceFolder, f.FileName));
             }
             else
             {
-                Main.Logger.Error($"Download not found! {id}");
+                Log.Error($"Download not found! {id}");
             }
         }
 

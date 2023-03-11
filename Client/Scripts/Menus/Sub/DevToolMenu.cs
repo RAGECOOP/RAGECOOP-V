@@ -7,8 +7,8 @@ using GTA.UI;
 using LemonUI.Menus;
 using Newtonsoft.Json;
 using RageCoop.Core;
-using static RageCoop.Client.Shared;
-using Console = GTA.Console;
+
+
 
 namespace RageCoop.Client
 {
@@ -17,7 +17,7 @@ namespace RageCoop.Client
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         private static readonly NativeCheckboxItem enableItem = new NativeCheckboxItem("Show weapon bones");
@@ -37,12 +37,12 @@ namespace RageCoop.Client
             {
                 if (File.Exists(AnimationsDataPath))
                 {
-                    var anims = JsonConvert.DeserializeObject<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
+                    var anims = JsonDeserialize<AnimDic[]>(File.ReadAllText(AnimationsDataPath));
                     foreach (var anim in anims)
                     foreach (var a in anim.Animations)
-                        if (Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, Main.P, anim.DictionaryName, a, 3))
+                        if (Call<bool>(IS_ENTITY_PLAYING_ANIM, P, anim.DictionaryName, a, 3))
                         {
-                            Console.Info(anim.DictionaryName + " : " + a);
+                            Console.PrintInfo(anim.DictionaryName + " : " + a);
                             Notification.Show(anim.DictionaryName + " : " + a);
                         }
                 }

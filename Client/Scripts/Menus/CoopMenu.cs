@@ -20,7 +20,7 @@ namespace RageCoop.Client.Menus
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "MAIN")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         public static PopUp PopUp = new PopUp
@@ -46,7 +46,7 @@ namespace RageCoop.Client.Menus
             ServerIpItem.Activated += ServerIpActivated;
             _serverConnectItem.Activated += (sender, item) =>
             {
-                Networking.ToggleConnection(Main.Settings.LastServerAddress);
+                Networking.ToggleConnection(Settings.LastServerAddress);
             };
 
 
@@ -95,9 +95,9 @@ namespace RageCoop.Client.Menus
                 scaleform.CallFunction("CREATE_CONTAINER");
 
                 scaleform.CallFunction("SET_DATA_SLOT", 0,
-                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
+                    Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendAccept, 0), "Continue");
                 scaleform.CallFunction("SET_DATA_SLOT", 1,
-                    Function.Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
+                    Call<string>((Hash)0x0499D7B09FC9B407, 2, (int)Control.FrontendCancel, 0), "Cancel");
                 scaleform.CallFunction("DRAW_INSTRUCTIONAL_BUTTONS", -1);
                 scaleform.Render2D();
                 if (Game.IsControlJustPressed(Control.FrontendAccept))
@@ -122,7 +122,7 @@ namespace RageCoop.Client.Menus
             var newUsername = Game.GetUserInput(WindowTitle.EnterMessage20, _usernameItem.AltTitle, 20);
             if (!string.IsNullOrWhiteSpace(newUsername))
             {
-                Main.Settings.Username = newUsername;
+                Settings.Username = newUsername;
                 Util.SaveSettings();
 
                 _usernameItem.AltTitle = newUsername;
@@ -132,7 +132,7 @@ namespace RageCoop.Client.Menus
         private static void _passwordActivated(object sender, EventArgs e)
         {
             var newPass = Game.GetUserInput(WindowTitle.EnterMessage20, "", 20);
-            Main.Settings.Password = newPass;
+            Settings.Password = newPass;
             Util.SaveSettings();
             _passwordItem.AltTitle = new string('*', newPass.Length);
         }
@@ -142,7 +142,7 @@ namespace RageCoop.Client.Menus
             var newServerIp = Game.GetUserInput(WindowTitle.EnterMessage60, ServerIpItem.AltTitle, 60);
             if (!string.IsNullOrWhiteSpace(newServerIp) && newServerIp.Contains(":"))
             {
-                Main.Settings.LastServerAddress = newServerIp;
+                Settings.LastServerAddress = newServerIp;
                 Util.SaveSettings();
 
                 ServerIpItem.AltTitle = newServerIp;
@@ -174,20 +174,20 @@ namespace RageCoop.Client.Menus
         #region ITEMS
 
         private static readonly NativeItem _usernameItem = new NativeItem("Username")
-            { AltTitle = Main.Settings.Username };
+            { AltTitle = Settings.Username };
 
         private static readonly NativeItem _passwordItem = new NativeItem("Password")
-            { AltTitle = new string('*', Main.Settings.Password.Length) };
+            { AltTitle = new string('*', Settings.Password.Length) };
 
         public static readonly NativeItem ServerIpItem = new NativeItem("Server IP")
-            { AltTitle = Main.Settings.LastServerAddress };
+            { AltTitle = Settings.LastServerAddress };
 
         internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
 
         private static readonly NativeItem _aboutItem = new NativeItem("About", "~y~SOURCE~s~~n~" +
                 "https://github.com/RAGECOOP~n~" +
                 "~y~VERSION~s~~n~" +
-                Main.Version)
+                Main.ModVersion)
             { LeftBadge = new ScaledTexture("commonmenu", "shop_new_star") };
 
         #endregion

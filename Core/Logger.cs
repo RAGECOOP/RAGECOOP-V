@@ -46,11 +46,11 @@ namespace RageCoop.Core
         public string Name = "Logger";
 
         private bool Stopping;
-        public List<StreamWriter> Writers = new List<StreamWriter> { new StreamWriter(Console.OpenStandardOutput()) };
+        public List<StreamWriter> Writers = new() { new StreamWriter(Console.OpenStandardOutput()) };
 
         internal Logger()
         {
-            Name = Process.GetCurrentProcess().Id.ToString();
+            Name = Environment.ProcessId.ToString();
             if (!FlushImmediately)
             {
                 LoggerThread = new Thread(() =>
@@ -164,20 +164,31 @@ namespace RageCoop.Core
                     while (_queuedLines.TryDequeue(out var line))
                     {
                         var formatted = Format(line);
-                        Writers.ForEach(x =>
+                        Writers?.ForEach(x =>
                         {
-                            x.WriteLine(formatted);
-                            x.Flush();
+                            try
+                            {
+                                x.WriteLine(formatted);
+                                x.Flush();
+                            }
+                            catch (Exception ex)
+                            {
+                                HandleError(ex);
+                            }
                         });
                         OnFlush?.Invoke(line, formatted);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    HandleError(ex);
                 }
             }
         }
-
+        void HandleError(Exception ex)
+        {
+            Console.WriteLine($"Logger {this} flush error: {ex}");
+        }
         public class LogLine
         {
             public LogLevel LogLevel;

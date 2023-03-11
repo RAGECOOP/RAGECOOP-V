@@ -14,25 +14,18 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        public static CoopPeer Peer;
-        public static bool ShowNetworkInfo = false;
-        public static Security Security;
-        public static NetConnection ServerConnection;
-
-        private static readonly Dictionary<int, Action<PacketType, NetIncomingMessage>> PendingResponses =
-            new Dictionary<int, Action<PacketType, NetIncomingMessage>>();
-
-        internal static readonly Dictionary<PacketType, Func<NetIncomingMessage, Packet>> RequestHandlers =
-            new Dictionary<PacketType, Func<NetIncomingMessage, Packet>>();
-
-        internal static float SimulatedLatency = 0;
         public static IPEndPoint _targetServerEP;
 
-        static Networking()
-        {
-            Security = new Security(Main.Logger);
-            Packets.CustomEvent.ResolveHandle = _resolveHandle;
-        }
+        public static CoopPeer Peer;
+        public static bool ShowNetworkInfo = false;
+        public static Security Security = new();
+        public static NetConnection ServerConnection;
+
+        private static readonly Dictionary<int, Action<PacketType, NetIncomingMessage>> PendingResponses = new();
+
+        internal static readonly Dictionary<PacketType, Func<NetIncomingMessage, Packet>> RequestHandlers = new();
+
+        internal static float SimulatedLatency = 0;
 
         public static float Latency => ServerConnection.AverageRoundtripTime / 2;
         public static bool IsConnecting { get; private set; }
@@ -42,35 +35,38 @@ namespace RageCoop.Client
             PublicKey publicKey = null)
         {
             CoopMenu.Menu.Visible = false;
-            Peer?.Shutdown("Bye");
-            if (IsOnServer)
-            {
-                // ?
-            }
-            else if (IsConnecting)
+
+            if (IsConnecting)
             {
                 _publicKeyReceived.Set();
                 IsConnecting = false;
-                Notification.Show("Connection has been canceled");
-            }
-            else
-            {
-                Peer?.Dispose();
+                API.QueueAction(() =>
+                Notification.Show("Connection has been canceled"));
 
+                Peer.Shutdown("bye");
+            }
+            else if (IsOnServer)
+            {
+                Peer.Shutdown("bye");
+            }
+            else 
+            {
                 IsConnecting = true;
-                password = password ?? Main.Settings.Password;
-                username = username ?? Main.Settings.Username;
+                password ??= Settings.Password;
+                username ??= Settings.Username;
 
                 // 623c92c287cc392406e7aaaac1c0f3b0 = RAGECOOP
                 var config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
                     AutoFlushSendQueue = false,
-                    SimulatedMinimumLatency = SimulatedLatency,
-                    SimulatedRandomLatency = 0,
                     AcceptIncomingConnections = true,
                     MaximumConnections = 32,
                     PingInterval = 5
                 };
+#if DEBUG
+                config.SimulatedMinimumLatency = SimulatedLatency;
+                config.SimulatedRandomLatency = 0;
+#endif
 
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
                 config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
@@ -95,7 +91,7 @@ namespace RageCoop.Client
                     return;
                 }
 
-                Task.Run(() =>
+                ThreadManager.CreateThread(() =>
                 {
                     try
                     {
@@ -103,7 +99,7 @@ namespace RageCoop.Client
 
                         // Ensure static constructor invocation
                         DownloadManager.Cleanup();
-                        Peer = new CoopPeer(config);
+                        Peer = new CoopPeer(config,Log);
                         Peer.OnMessageReceived += (s, m) =>
                         {
                             try
@@ -112,7 +108,7 @@ namespace RageCoop.Client
                             }
                             catch (Exception ex)
                             {
-                                Main.Logger.Error(ex);
+                                Log.Error(ex);
                             }
                         };
                         API.QueueAction(() => { Notification.Show("~y~Trying to connect..."); });
@@ -135,9 +131,9 @@ namespace RageCoop.Client
                         var outgoingMessage = Peer.CreateMessage();
                         var handshake = new Packets.Handshake
                         {
-                            PedID = Main.LocalPlayerID,
+                            PedID = LocalPlayerID,
                             Username = username,
-                            ModVersion = Main.Version.ToString(),
+                            ModVersion = Main.ModVersion.ToString(),
                             PasswordEncrypted = Security.Encrypt(password.GetBytes()),
                             InternalEndPoint = new IPEndPoint(CoreUtils.GetLocalAddress(ip[0]), Peer.Port)
                         };
@@ -148,12 +144,12 @@ namespace RageCoop.Client
                     }
                     catch (Exception ex)
                     {
-                        Main.Logger.Error("Cannot connect to server: ", ex);
-                        API.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
+                        Log.Error("Cannot connect to server: ", ex);
+                        API.QueueAction(() => Notification.Show("~r~Cannot connect to server: " + ex.Message));
                     }
 
                     IsConnecting = false;
-                });
+                }, "Connect");
             }
         }
 
@@ -184,7 +180,7 @@ namespace RageCoop.Client
             };
             PlayerList.SetPlayer(packet.PedID, packet.Username);
 
-            Main.Logger.Debug($"player connected:{p.Username}");
+            Log.Debug($"player connected:{p.Username}");
             API.QueueAction(() =>
                 Notification.Show($"~h~{p.Username}~h~ connected."));
         }

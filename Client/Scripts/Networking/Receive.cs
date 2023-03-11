@@ -12,25 +12,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        /// <summary>
-        ///     Used to reslove entity handle in a <see cref="Packets.CustomEvent" />
-        /// </summary>
-        private static readonly Func<byte, NetIncomingMessage, object> _resolveHandle = (t, reader) =>
-        {
-            switch (t)
-            {
-                case 50:
-                    return EntityPool.ServerProps[reader.ReadInt32()].MainProp?.Handle;
-                case 51:
-                    return EntityPool.GetPedByID(reader.ReadInt32())?.MainPed?.Handle;
-                case 52:
-                    return EntityPool.GetVehicleByID(reader.ReadInt32())?.MainVehicle?.Handle;
-                case 60:
-                    return EntityPool.ServerBlips[reader.ReadInt32()].Handle;
-                default:
-                    throw new ArgumentException("Cannot resolve server side argument: " + t);
-            }
-        };
+        
 
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
 
@@ -57,7 +39,7 @@ namespace RageCoop.Client
                                 var p = new Packets.HandshakeSuccess();
                                 p.Deserialize(response);
                                 foreach (var player in p.Players) PlayerList.SetPlayer(player.ID, player.Username);
-                                Main.Connected();
+                                Connected();
                             }
                             else
                             {
@@ -68,11 +50,11 @@ namespace RageCoop.Client
                                 if (PlayerList.Players.TryGetValue(p.ID, out var player))
                                 {
                                     player.Connection = message.SenderConnection;
-                                    Main.Logger.Debug($"Direct connection to {player.Username} established");
+                                    Log.Debug($"Direct connection to {player.Username} established");
                                 }
                                 else
                                 {
-                                    Main.Logger.Info(
+                                    Log.Info(
                                         $"Unidentified peer connection from {message.SenderEndPoint} was rejected.");
                                     message.SenderConnection.Disconnect("eat poop");
                                 }
@@ -80,7 +62,7 @@ namespace RageCoop.Client
 
                             break;
                         case NetConnectionStatus.Disconnected:
-                            if (message.SenderConnection == ServerConnection) Main.CleanUp(reason);
+                            if (message.SenderConnection == ServerConnection) API.QueueAction(() => CleanUp(reason));
                             break;
                     }
 
@@ -122,7 +104,7 @@ namespace RageCoop.Client
                                 }
                                 else
                                 {
-                                    Main.Logger.Debug("Did not find a request handler of type: " + realType);
+                                    Log.Debug("Did not find a request handler of type: " + realType);
                                 }
 
                                 break;
@@ -141,8 +123,8 @@ namespace RageCoop.Client
                             Notification.Show($"~r~~h~Packet Error {ex.Message}");
                             return true;
                         });
-                        Main.Logger.Error($"[{packetType}] {ex.Message}");
-                        Main.Logger.Error(ex);
+                        Log.Error($"[{packetType}] {ex.Message}");
+                        Log.Error(ex);
                         Peer.Shutdown($"Packet Error [{packetType}]");
                     }
 
@@ -174,7 +156,7 @@ namespace RageCoop.Client
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
                 case NetIncomingMessageType.VerboseDebugMessage:
-                    Main.Logger.Trace(message.ReadString());
+                    Log.Trace(message.ReadString());
                     break;
             }
 
@@ -223,7 +205,7 @@ namespace RageCoop.Client
 
                     API.QueueAction(() =>
                     {
-                        Main.MainChat.AddMessage(packet.Username, packet.Message);
+                        MainChat.AddMessage(packet.Username, packet.Message);
                         return true;
                     });
                 }
@@ -231,7 +213,7 @@ namespace RageCoop.Client
 
                 case PacketType.Voice:
                 {
-                    if (Main.Settings.Voice)
+                    if (Settings.Voice)
                     {
                         var packet = new Packets.Voice();
                         packet.Deserialize(msg);
@@ -239,7 +221,7 @@ namespace RageCoop.Client
 
                         var player = EntityPool.GetPedByID(packet.ID);
                         player.IsSpeaking = true;
-                        player.LastSpeakingTime = Main.Ticked;
+                        player.LastSpeakingTime = Ticked;
 
                         Voice.AddVoiceData(packet.Buffer, packet.Recorded);
                     }
@@ -295,7 +277,7 @@ namespace RageCoop.Client
         {
             var c = EntityPool.GetPedByID(packet.ID);
             if (c == null)
-                // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+                // Log.Debug($"Creating character for incoming sync:{packet.ID}");
                 EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
             var flags = packet.Flags;
             c.ID = packet.ID;
@@ -378,7 +360,7 @@ namespace RageCoop.Client
             if (p == null)
             {
                 if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) return;
-                // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
+                // Log.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
                 EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
             }
 

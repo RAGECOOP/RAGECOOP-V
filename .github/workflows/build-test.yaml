@@ -24,6 +24,9 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version:  ${{ matrix.dotnet-version }}
+    
+    - name: Initialise submodules
+      run: git submodule update --init
 
     - name: Restore dependencies
       run: dotnet restore

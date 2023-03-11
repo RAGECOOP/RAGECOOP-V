@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using GTA.UI;
 using LemonUI.Menus;
@@ -22,7 +23,7 @@ namespace RageCoop.Client.Menus
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
             UseMouse = false,
-            Alignment = Main.Settings.FlipMenu ? Alignment.Right : Alignment.Left
+            Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         internal static NativeItem ResultItem = null;
@@ -41,8 +42,7 @@ namespace RageCoop.Client.Menus
                 Menu.Add(ResultItem = new NativeItem("Loading..."));
 
                 // Prevent freezing
-                GetServersThread = new Thread(() => GetAllServers());
-                GetServersThread.Start();
+                GetServersThread = ThreadManager.CreateThread(() => GetAllServers(),"GetServers");
             };
             Menu.Closing += (object sender, CancelEventArgs e) => { CleanUpList(); };
         }
@@ -56,8 +56,10 @@ namespace RageCoop.Client.Menus
         private static void GetAllServers()
         {
             List<ServerInfo> serverList = null;
-            var realUrl = Main.Settings.MasterServer;
-            serverList = JsonConvert.DeserializeObject<List<ServerInfo>>(DownloadString(realUrl));
+            var realUrl = Settings.MasterServer;
+            serverList = null;
+            try { serverList = JsonDeserialize<List<ServerInfo>>(DownloadString(realUrl)); }
+            catch (Exception ex) { Log.Error(ex); }
 
             // Need to be processed in main thread
             API.QueueAction(() =>
@@ -81,7 +83,7 @@ namespace RageCoop.Client.Menus
                     NativeItem tmpItem =
                         new NativeItem($"[{server.country}] {server.name}",
                                 $"~b~{address}~s~~n~~g~Version {server.version}.x~s~")
-                            { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
+                        { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try
@@ -103,7 +105,7 @@ namespace RageCoop.Client.Menus
 
                             CoopMenu.Menu.Visible = true;
 #endif
-                            Main.Settings.LastServerAddress = address;
+                            Settings.LastServerAddress = address;
                             Util.SaveSettings();
                         }
                         catch (Exception ex)
@@ -130,8 +132,8 @@ namespace RageCoop.Client.Menus
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
                 ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-                WebClient client = new WebClient();
-                return client.DownloadString(url);
+                var client = new HttpClient();
+                return client.GetStringAsync(url).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {

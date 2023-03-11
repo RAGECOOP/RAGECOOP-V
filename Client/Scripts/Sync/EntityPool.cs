@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using GTA;
 using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Client.Scripting;
+using SHVDN;
 
 namespace RageCoop.Client
 {
-    internal class EntityPool
+    internal static unsafe class EntityPool
     {
         public static object PedsLock = new object();
 #if BENCHMARK
@@ -47,8 +49,8 @@ namespace RageCoop.Client
         {
             foreach (var ped in PedsByID.Values.ToArray())
             {
-                if ((keepPlayer && ped.ID == Main.LocalPlayerID) ||
-                    (keepMine && ped.OwnerID == Main.LocalPlayerID)) continue;
+                if ((keepPlayer && ped.ID == LocalPlayerID) ||
+                    (keepMine && ped.OwnerID == LocalPlayerID)) continue;
                 RemovePed(ped.ID);
             }
 
@@ -57,7 +59,7 @@ namespace RageCoop.Client
 
             foreach (var id in VehiclesByID.Keys.ToArray())
             {
-                if (keepMine && VehiclesByID[id].OwnerID == Main.LocalPlayerID) continue;
+                if (keepMine && VehiclesByID[id].OwnerID == LocalPlayerID) continue;
                 RemoveVehicle(id);
             }
 
@@ -65,7 +67,7 @@ namespace RageCoop.Client
             VehiclesByHandle.Clear();
 
             foreach (var p in ProjectilesByID.Values.ToArray())
-                if (p.Shooter.ID != Main.LocalPlayerID && p.MainProjectile != null && p.MainProjectile.Exists())
+                if (p.Shooter.ID != LocalPlayerID && p.MainProjectile != null && p.MainProjectile.Exists())
                     p.MainProjectile.Delete();
             ProjectilesByID.Clear();
             ProjectilesByHandle.Clear();
@@ -82,14 +84,10 @@ namespace RageCoop.Client
         #region PEDS
 
         public static SyncedPed GetPedByID(int id)
-        {
-            return PedsByID.TryGetValue(id, out var p) ? p : null;
-        }
+            => PedsByID.TryGetValue(id, out var p) ? p : null;
 
         public static SyncedPed GetPedByHandle(int handle)
-        {
-            return PedsByHandle.TryGetValue(handle, out var p) ? p : null;
-        }
+            => PedsByHandle.TryGetValue(handle, out var p) ? p : null;
 
         public static List<int> GetPedIDs()
         {
@@ -100,16 +98,16 @@ namespace RageCoop.Client
         {
             var p = Game.Player.Character;
             // var clipset=p.Gender==Gender.Male? "MOVE_M@TOUGH_GUY@" : "MOVE_F@TOUGH_GUY@";
-            // Function.Call(Hash.SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
-            var player = GetPedByID(Main.LocalPlayerID);
+            // Call(SET_PED_MOVEMENT_CLIPSET,p,clipset,1f);
+            var player = GetPedByID(LocalPlayerID);
             if (player == null)
             {
-                Main.Logger.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
+                Log.Debug($"Creating SyncEntity for player, handle:{p.Handle}");
                 var c = new SyncedPed(p);
-                Main.LocalPlayerID = c.OwnerID = c.ID;
+                LocalPlayerID = c.OwnerID = c.ID;
                 Add(c);
-                Main.Logger.Debug($"Local player ID is:{c.ID}");
-                PlayerList.SetPlayer(c.ID, Main.Settings.Username);
+                Log.Debug($"Local player ID is:{c.ID}");
+                PlayerList.SetPlayer(c.ID, Settings.Username);
                 return true;
             }
 
@@ -157,7 +155,7 @@ namespace RageCoop.Client
                 if (p != null)
                 {
                     if (PedsByHandle.ContainsKey(p.Handle)) PedsByHandle.Remove(p.Handle);
-                    // Main.Logger.Debug($"Removing ped {c.ID}. Reason:{reason}");
+                    // Log.Debug($"Removing ped {c.ID}. Reason:{reason}");
                     p.AttachedBlip?.Delete();
                     p.Kill();
                     p.Model.MarkAsNoLongerNeeded();
@@ -177,14 +175,10 @@ namespace RageCoop.Client
         #region VEHICLES
 
         public static SyncedVehicle GetVehicleByID(int id)
-        {
-            return VehiclesByID.TryGetValue(id, out var v) ? v : null;
-        }
+            => VehiclesByID.TryGetValue(id, out var v) ? v : null;
 
         public static SyncedVehicle GetVehicleByHandle(int handle)
-        {
-            return VehiclesByHandle.TryGetValue(handle, out var v) ? v : null;
-        }
+            => VehiclesByHandle.TryGetValue(handle, out var v) ? v : null;
 
         public static List<int> GetVehicleIDs()
         {
@@ -214,7 +208,7 @@ namespace RageCoop.Client
                 if (veh != null)
                 {
                     if (VehiclesByHandle.ContainsKey(veh.Handle)) VehiclesByHandle.Remove(veh.Handle);
-                    // Main.Logger.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
+                    // Log.Debug($"Removing vehicle {v.ID}. Reason:{reason}");
                     veh.AttachedBlip?.Delete();
                     veh.Model.MarkAsNoLongerNeeded();
                     veh.MarkAsNoLongerNeeded();
@@ -231,9 +225,7 @@ namespace RageCoop.Client
         #region PROJECTILES
 
         public static SyncedProjectile GetProjectileByID(int id)
-        {
-            return ProjectilesByID.TryGetValue(id, out var p) ? p : null;
-        }
+            => ProjectilesByID.TryGetValue(id, out var p) ? p : null;
 
         public static void Add(SyncedProjectile p)
         {
@@ -263,7 +255,7 @@ namespace RageCoop.Client
                 if (p != null)
                 {
                     if (ProjectilesByHandle.ContainsKey(p.Handle)) ProjectilesByHandle.Remove(p.Handle);
-                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    Log.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
                     p.Explode();
                 }
 
@@ -288,6 +280,16 @@ namespace RageCoop.Client
 
         #endregion
 
+        #region SERVER OBJECTS
+        
+        public static SyncedProp GetPropByID(int id)
+            => ServerProps.TryGetValue(id, out var p) ? p : null;
+
+        public static Blip GetBlipByID(int id)
+            => ServerBlips.TryGetValue(id, out var p) ? p : null;
+
+        #endregion
+
         private static int vehStateIndex;
         private static int pedStateIndex;
         private static int vehStatesPerFrame;
@@ -297,24 +299,28 @@ namespace RageCoop.Client
         public static void DoSync()
         {
             UpdateTargets();
+
 #if BENCHMARK
             PerfCounter.Restart();
             Debug.TimeStamps[TimeStamp.CheckProjectiles] = PerfCounter.ElapsedTicks;
 #endif
-            var allPeds = World.GetAllPeds();
-            var allVehicles = World.GetAllVehicles();
-            var allProjectiles = World.GetAllProjectiles();
-            vehStatesPerFrame = allVehicles.Length * 2 / (int)Game.FPS + 1;
-            pedStatesPerFrame = allPeds.Length * 2 / (int)Game.FPS + 1;
+
+            var allPeds = NativeMemory.GetPedHandles();
+            var allVehicles = NativeMemory.GetVehicleHandles();
+            var allProjectiles = NativeMemory.GetProjectileHandles();
+            vehStatesPerFrame = allVehicles.Length * 2 / (int)FPS + 1;
+            pedStatesPerFrame = allPeds.Length * 2 / (int)FPS + 1;
+
 #if BENCHMARK
             Debug.TimeStamps[TimeStamp.GetAllEntities] = PerfCounter.ElapsedTicks;
 #endif
 
+
             lock (ProjectilesLock)
             {
                 foreach (var p in allProjectiles)
-                    if (!ProjectilesByHandle.ContainsKey(p.Handle))
-                        Add(new SyncedProjectile(p));
+                    if (!ProjectilesByHandle.ContainsKey(p))
+                        Add(new SyncedProjectile(Projectile.FromHandle(p)));
 
                 foreach (var p in ProjectilesByID.Values.ToArray())
                     // Outgoing sync
@@ -338,6 +344,7 @@ namespace RageCoop.Client
                     }
             }
 
+
             i = -1;
 
             lock (PedsLock)
@@ -346,18 +353,19 @@ namespace RageCoop.Client
 
                 foreach (var p in allPeds)
                 {
-                    var c = GetPedByHandle(p.Handle);
-                    if (c == null && p != Game.Player.Character)
+                    var c = GetPedByHandle(p);
+                    if (c == null && p != Game.Player.Character.Handle)
                     {
-                        if (allPeds.Length > Main.Settings.WorldPedSoftLimit &&
-                            p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
+                        var type = Util.GetPopulationType(p);
+                        if (allPeds.Length > Settings.WorldPedSoftLimit &&
+                            type == EntityPopulationType.RandomAmbient && !Call<bool>(IS_PED_IN_ANY_VEHICLE, p, 0))
                         {
-                            p.Delete();
+                            Util.DeleteEntity(p);
                             continue;
                         }
 
-                        // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
-                        c = new SyncedPed(p);
+                        // Log.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
+                        c = new SyncedPed((Ped)Entity.FromHandle(p));
 
                         Add(c);
                     }
@@ -409,32 +417,35 @@ namespace RageCoop.Client
 #endif
             }
 
-            var check = Main.Ticked % 100 == 0;
+            var check = Ticked % 100 == 0;
             i = -1;
             lock (VehiclesLock)
             {
                 foreach (var veh in allVehicles)
-                    if (!VehiclesByHandle.ContainsKey(veh.Handle))
+                    if (!VehiclesByHandle.ContainsKey(veh))
                     {
-                        if (allVehicles.Length > Main.Settings.WorldVehicleSoftLimit)
+                        var cveh = (Vehicle)Entity.FromHandle(veh);
+                        if (cveh == null)
+                            continue;
+                        if (allVehicles.Length > Settings.WorldVehicleSoftLimit)
                         {
-                            var type = veh.PopulationType;
+                            var type = cveh.PopulationType;
                             if (type == EntityPopulationType.RandomAmbient || type == EntityPopulationType.RandomParked)
                             {
-                                foreach (var p in veh.Occupants)
+                                foreach (var p in cveh.Occupants)
                                 {
                                     p.Delete();
                                     var c = GetPedByHandle(p.Handle);
                                     if (c != null) RemovePed(c.ID, "ThrottleTraffic");
                                 }
 
-                                veh.Delete();
+                                cveh.Delete();
                                 continue;
                             }
                         }
-                        // Main.Logger.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
+                        // Log.Debug($"Creating SyncEntity for vehicle, handle:{veh.Handle}");
 
-                        Add(new SyncedVehicle(veh));
+                        Add(new SyncedVehicle(cveh));
                     }
 #if BENCHMARK
                 Debug.TimeStamps[TimeStamp.AddVehicles] = PerfCounter.ElapsedTicks;
@@ -480,7 +491,7 @@ namespace RageCoop.Client
         {
             Networking.Targets = new List<NetConnection>(PlayerList.Players.Count) { Networking.ServerConnection };
             foreach (var p in PlayerList.Players.Values.ToArray())
-                if (p.HasDirectConnection && p.Position.DistanceTo(Main.PlayerPosition) < 500)
+                if (p.HasDirectConnection && p.Position.DistanceTo(PlayerPosition) < 500)
                     Networking.Targets.Add(p.Connection);
         }
 
@@ -514,8 +525,8 @@ namespace RageCoop.Client
 
         private static void SetBudget(int b)
         {
-            Function.Call(Hash.SET_PED_POPULATION_BUDGET, b); // 0 - 3
-            Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
+            Call(SET_PED_POPULATION_BUDGET, b); // 0 - 3
+            Call(SET_VEHICLE_POPULATION_BUDGET, b); // 0 - 3
         }
 
         public static string DumpDebug()

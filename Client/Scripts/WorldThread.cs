@@ -12,8 +12,7 @@ namespace RageCoop.Client
     /// <summary>
     ///     Don't use it!
     /// </summary>
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false,
-        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    [ScriptAttributes(Author = "RageCoop", SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class WorldThread : Script
     {
         public static Script Instance;
@@ -26,14 +25,22 @@ namespace RageCoop.Client
         /// </summary>
         public WorldThread()
         {
-            Util.StartUpCheck();
             Instance = this;
-            Tick += OnTick;
-            Aborted += (sender, e) => { ChangeTraffic(true); };
+            Aborted += (e) => { DoQueuedActions(); ChangeTraffic(true); };
         }
-
-        private void OnTick(object sender, EventArgs e)
+        protected override void OnStart()
         {
+            base.OnStart();
+            while(Game.IsLoading) 
+                Yield(); 
+
+            Notification.Show(NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!",
+                   $"Press ~g~{Settings.MenuKey}~s~ to open the menu.");
+        }
+        protected override void OnTick()
+        {
+            base.OnTick();
+
             if (Game.IsLoading) return;
 
             try
@@ -43,23 +50,23 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                Main.Logger.Error(ex);
+                Log.Error(ex);
             }
 
             if (!Networking.IsOnServer) return;
 
             Game.DisableControlThisFrame(Control.FrontendPause);
 
-            if (Main.Settings.DisableAlternatePause) Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
+            if (Settings.DisableAlternatePause) Game.DisableControlThisFrame(Control.FrontendPauseAlternate);
             // Sets a value that determines how aggressive the ocean waves will be.
             // Values of 2.0 or more make for very aggressive waves like you see during a thunderstorm.
-            Function.Call(Hash.SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
+            Call(SET_DEEP_OCEAN_SCALER, 0.0f); // Works only ~200 meters around the player
 
-            if (Main.Settings.ShowEntityOwnerName)
+            if (Settings.ShowEntityOwnerName)
                 unsafe
                 {
                     int handle;
-                    if (Function.Call<bool>(Hash.GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, 0, &handle))
+                    if (Call<bool>(GET_ENTITY_PLAYER_IS_FREE_AIMING_AT, 0, &handle))
                     {
                         var entity = Entity.FromHandle(handle);
                         if (entity != null)
@@ -76,13 +83,13 @@ namespace RageCoop.Client
 
             if (!_trafficEnabled)
             {
-                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
-                Function.Call(Hash.SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
-                Function.Call(Hash.SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
+                Call(SET_VEHICLE_POPULATION_BUDGET, 0);
+                Call(SET_PED_POPULATION_BUDGET, 0);
+                Call(SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Call(SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Call(SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME, 0f);
+                Call(SUPPRESS_SHOCKING_EVENTS_NEXT_FRAME);
+                Call(SUPPRESS_AGITATION_EVENTS_NEXT_FRAME);
             }
         }
 
@@ -96,35 +103,35 @@ namespace RageCoop.Client
         {
             if (enable)
             {
-                Function.Call(Hash.REMOVE_SCENARIO_BLOCKING_AREAS);
-                Function.Call(Hash.SET_CREATE_RANDOM_COPS, true);
-                Function.Call(Hash.SET_RANDOM_TRAINS, true);
-                Function.Call(Hash.SET_RANDOM_BOATS, true);
-                Function.Call(Hash.SET_GARBAGE_TRUCKS, true);
-                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 3); // 0 - 3
-                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 3); // 0 - 3
-                Function.Call(Hash.SET_ALL_VEHICLE_GENERATORS_ACTIVE);
-                Function.Call(Hash.SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, true);
-                Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, -1);
-                Function.Call(Hash.SET_DISTANT_CARS_ENABLED, true);
-                Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, false);
+                Call(REMOVE_SCENARIO_BLOCKING_AREAS);
+                Call(SET_CREATE_RANDOM_COPS, true);
+                Call(SET_RANDOM_TRAINS, true);
+                Call(SET_RANDOM_BOATS, true);
+                Call(SET_GARBAGE_TRUCKS, true);
+                Call(SET_PED_POPULATION_BUDGET, 3); // 0 - 3
+                Call(SET_VEHICLE_POPULATION_BUDGET, 3); // 0 - 3
+                Call(SET_ALL_VEHICLE_GENERATORS_ACTIVE);
+                Call(SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, true);
+                Call(SET_NUMBER_OF_PARKED_VEHICLES, -1);
+                Call(SET_DISTANT_CARS_ENABLED, true);
+                Call(DISABLE_VEHICLE_DISTANTLIGHTS, false);
             }
             else if (Networking.IsOnServer)
             {
-                Function.Call(Hash.ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f,
+                Call(ADD_SCENARIO_BLOCKING_AREA, -10000.0f, -10000.0f, -1000.0f, 10000.0f, 10000.0f,
                     1000.0f, 0, 1, 1, 1);
-                Function.Call(Hash.SET_CREATE_RANDOM_COPS, false);
-                Function.Call(Hash.SET_RANDOM_TRAINS, false);
-                Function.Call(Hash.SET_RANDOM_BOATS, false);
-                Function.Call(Hash.SET_GARBAGE_TRUCKS, false);
-                Function.Call(Hash.DELETE_ALL_TRAINS);
-                Function.Call(Hash.SET_PED_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_VEHICLE_POPULATION_BUDGET, 0);
-                Function.Call(Hash.SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, false);
-                Function.Call(Hash.SET_FAR_DRAW_VEHICLES, false);
-                Function.Call(Hash.SET_NUMBER_OF_PARKED_VEHICLES, 0);
-                Function.Call(Hash.SET_DISTANT_CARS_ENABLED, false);
-                Function.Call(Hash.DISABLE_VEHICLE_DISTANTLIGHTS, true);
+                Call(SET_CREATE_RANDOM_COPS, false);
+                Call(SET_RANDOM_TRAINS, false);
+                Call(SET_RANDOM_BOATS, false);
+                Call(SET_GARBAGE_TRUCKS, false);
+                Call(DELETE_ALL_TRAINS);
+                Call(SET_PED_POPULATION_BUDGET, 0);
+                Call(SET_VEHICLE_POPULATION_BUDGET, 0);
+                Call(SET_ALL_LOW_PRIORITY_VEHICLE_GENERATORS_ACTIVE, false);
+                Call(SET_FAR_DRAW_VEHICLES, false);
+                Call(SET_NUMBER_OF_PARKED_VEHICLES, 0);
+                Call(SET_DISTANT_CARS_ENABLED, false);
+                Call(DISABLE_VEHICLE_DISTANTLIGHTS, true);
                 foreach (var ped in World.GetAllPeds())
                 {
                     if (ped == Game.Player.Character) continue;
@@ -132,7 +139,7 @@ namespace RageCoop.Client
                     if (c == null || (c.IsLocal && ped.Handle != Game.Player.Character.Handle &&
                                       ped.PopulationType != EntityPopulationType.Mission))
                     {
-                        Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        Log.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
                         ped.CurrentVehicle?.Delete();
                         ped.Kill();
                         ped.Delete();
@@ -147,7 +154,7 @@ namespace RageCoop.Client
                         // Don't delete player's vehicle
                         continue;
                     if (v == null || (v.IsLocal && veh.PopulationType != EntityPopulationType.Mission))
-                        // Main.Logger.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
+                        // Log.Debug($"Removing Vehicle {veh.Handle}. Reason:ClearTraffic");
 
                         veh.Delete();
                 }
@@ -174,7 +181,7 @@ namespace RageCoop.Client
                     }
                     catch (Exception ex)
                     {
-                        Main.Logger.Error(ex);
+                        Log.Error(ex);
                         QueuedActions.Remove(action);
                     }
             }

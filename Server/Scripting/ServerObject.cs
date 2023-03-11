@@ -6,6 +6,7 @@ using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using static RageCoop.Core.Scripting.CustomEvents;
 
 namespace RageCoop.Server.Scripting;
 
@@ -78,11 +79,11 @@ public abstract class ServerObject
         switch (this)
         {
             case ServerProp _:
-                return 50;
+                return T_ID_PROP;
             case ServerPed _:
-                return 51;
+                return T_ID_PED;
             case ServerVehicle _:
-                return 52;
+                return T_ID_VEH;
             default:
                 throw new NotImplementedException();
         }
@@ -280,7 +281,7 @@ public class ServerBlip
     /// <summary>
     ///     Pass this as an argument in CustomEvent or NativeCall to convert this object to handle at client side.
     /// </summary>
-    public Tuple<byte, byte[]> Handle => new(60, BitConverter.GetBytes(ID));
+    public Tuple<byte, byte[]> Handle => new(T_ID_BLIP, BitConverter.GetBytes(ID));
 
     /// <summary>
     ///     Network ID (not handle!)

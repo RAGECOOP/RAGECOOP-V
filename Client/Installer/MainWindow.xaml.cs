@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using RageCoop.Core;
 using static RageCoop.Client.Shared;
@@ -116,14 +115,14 @@ namespace RageCoop.Client.Installer
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
                 var settingsPath = Path.Combine(root, SettingsPath);
-                Settings settings = null;
+                ClientSettings settings = null;
                 try
                 {
                     settings = Util.ReadSettings(settingsPath);
                 }
                 catch
                 {
-                    settings = new Settings();
+                    settings = new();
                 }
 
                 if (File.Exists(menyooConfig))
@@ -141,7 +140,7 @@ namespace RageCoop.Client.Installer
                             Dispatcher.BeginInvoke(new Action(() =>
                                 KeyDown += (s, e) =>
                                 {
-                                    settings.MenuKey = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
+                                    settings.MenuKey = (GTA.Keys)KeyInterop.VirtualKeyFromKey(e.Key);
                                     ae.Set();
                                 }));
                             ae.WaitOne();

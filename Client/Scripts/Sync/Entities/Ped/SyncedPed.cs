@@ -27,7 +27,7 @@ namespace RageCoop.Client
             p.CanWrithe = false;
             p.IsOnlyDamagedByPlayer = false;
             MainPed = p;
-            OwnerID = Main.LocalPlayerID;
+            OwnerID = LocalPlayerID;
 
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
         }
@@ -38,7 +38,7 @@ namespace RageCoop.Client
         internal SyncedPed(int id)
         {
             ID = id;
-            LastSynced = Main.Ticked;
+            LastSynced = Ticked;
         }
 
         internal override void Update()
@@ -67,7 +67,7 @@ namespace RageCoop.Client
                     if (!CreateCharacter())
                         return;
 
-                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
+                if (!Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
                 if ((byte)BlipColor == 255 && PedBlip != null)
                 {
                     PedBlip.Delete();
@@ -134,7 +134,7 @@ namespace RageCoop.Client
 
             if (IsSpeaking)
             {
-                if (Main.Ticked - LastSpeakingTime < 10)
+                if (Ticked - LastSpeakingTime < 10)
                 {
                     DisplaySpeaking(true);
                 }
@@ -147,13 +147,13 @@ namespace RageCoop.Client
                 }
             }
 
-            LastUpdated = Main.Ticked;
+            LastUpdated = Ticked;
         }
 
         private void RenderNameTag()
         {
-            if (!Owner.DisplayNameTag || !Main.Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
-                !MainPed.IsInRange(Main.PlayerPosition, 40f)) return;
+            if (!Owner.DisplayNameTag || !Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
+                !MainPed.IsInRange(PlayerPosition, 40f)) return;
 
             var targetPos = MainPed.Bones[Bone.IKHead].Position + Vector3.WorldUp * 0.5f;
             Point toDraw = default;
@@ -175,7 +175,7 @@ namespace RageCoop.Client
             {
                 if (MainPed.Exists())
                 {
-                    // Main.Logger.Debug($"Removing ped {ID}. Reason:CreateCharacter");
+                    // Log.Debug($"Removing ped {ID}. Reason:CreateCharacter");
                     MainPed.Kill();
                     MainPed.MarkAsNoLongerNeeded();
                     MainPed.Delete();
@@ -204,17 +204,17 @@ namespace RageCoop.Client
             MainPed.CanWrithe = false;
             MainPed.CanBeDraggedOutOfVehicle = true;
             MainPed.IsOnlyDamagedByPlayer = false;
-            MainPed.RelationshipGroup = Main.SyncedPedsGroup;
+            MainPed.RelationshipGroup = SyncedPedsGroup;
             MainPed.IsFireProof = false;
             MainPed.IsExplosionProof = false;
 
-            Function.Call(Hash.SET_PED_DROPS_WEAPONS_WHEN_DEAD, MainPed.Handle, false);
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED, MainPed.Handle, true);
-            Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
-            Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
-            Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
-            // Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
-            Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
+            Call(SET_PED_DROPS_WEAPONS_WHEN_DEAD, MainPed.Handle, false);
+            Call(SET_PED_CAN_BE_TARGETTED, MainPed.Handle, true);
+            Call(SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
+            Call(SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
+            Call(SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
+            // Call(_SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            Call(SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
@@ -244,7 +244,7 @@ namespace RageCoop.Client
         private void SetClothes()
         {
             for (byte i = 0; i < 12; i++)
-                Function.Call(Hash.SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, (int)Clothes[i],
+                Call(SET_PED_COMPONENT_VARIATION, MainPed.Handle, i, (int)Clothes[i],
                     (int)Clothes[i + 12], (int)Clothes[i + 24]);
             _lastClothes = Clothes;
         }
@@ -257,12 +257,12 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
                 MainPed.Quaternion = Rotation.ToQuaternion();
 
-                if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@base", "free_idle", 3))
+                if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@base", "free_idle", 3))
                 {
                     // Skip update if animation is not loaded
                     var dict = LoadAnim("skydive@base");
                     if (dict == null) return;
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed.Handle, dict, "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                    Call(TASK_PLAY_ANIM, MainPed.Handle, dict, "free_idle", 8f, 10f, -1, 0, -8f, 1, 1, 1);
                 }
 
                 return;
@@ -293,12 +293,12 @@ namespace RageCoop.Client
                 MainPed.PositionNoOffset = Vector3.Lerp(MainPed.ReadPosition(), Position + Velocity, 0.5f);
                 MainPed.Quaternion = Rotation.ToQuaternion();
 
-                if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@parachute@first_person",
+                if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "skydive@parachute@first_person",
                         "chute_idle_right", 3))
                 {
                     var dict = LoadAnim("skydive@parachute@first_person");
                     if (dict == null) return;
-                    Function.Call(Hash.TASK_PLAY_ANIM, MainPed, dict, "chute_idle_right", 8f, 10f, -1, 0, -8f, 1, 1, 1);
+                    Call(TASK_PLAY_ANIM, MainPed, dict, "chute_idle_right", 8f, 10f, -1, 0, -8f, 1, 1, 1);
                 }
 
                 return;
@@ -321,7 +321,7 @@ namespace RageCoop.Client
                         _currentAnimation[1] = anim;
                     }
 
-                    if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase", anim, 3))
+                    if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase", anim, 3))
                         MainPed.Task.PlayAnimation("laddersbase", anim, 8f, -1, AnimationFlags.Loop);
                 }
                 else
@@ -334,7 +334,7 @@ namespace RageCoop.Client
                             _currentAnimation[1] = "base_left_hand_up";
                         }
 
-                        if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase",
+                        if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase",
                                 "base_left_hand_up", 3))
                             MainPed.Task.PlayAnimation("laddersbase", "base_left_hand_up", 8f, -1, AnimationFlags.Loop);
                     }
@@ -346,7 +346,7 @@ namespace RageCoop.Client
                             _currentAnimation[1] = "climb_up";
                         }
 
-                        if (!Function.Call<bool>(Hash.IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase", "climb_up",
+                        if (!Call<bool>(IS_ENTITY_PLAYING_ANIM, MainPed.Handle, "laddersbase", "climb_up",
                                 3)) MainPed.Task.PlayAnimation("laddersbase", "climb_up", 8f, -1, AnimationFlags.Loop);
                     }
                 }
@@ -373,8 +373,8 @@ namespace RageCoop.Client
             if (!IsVaulting && MainPed.IsVaulting) MainPed.Task.ClearAllImmediately();
 
             if (IsOnFire && !MainPed.IsOnFire)
-                Function.Call(Hash.START_ENTITY_FIRE, MainPed);
-            else if (!IsOnFire && MainPed.IsOnFire) Function.Call(Hash.STOP_ENTITY_FIRE, MainPed);
+                Call(START_ENTITY_FIRE, MainPed);
+            else if (!IsOnFire && MainPed.IsOnFire) Call(STOP_ENTITY_FIRE, MainPed);
 
             if (IsJumping)
             {
@@ -397,7 +397,7 @@ namespace RageCoop.Client
                 if (!_lastRagdoll)
                 {
                     _lastRagdoll = true;
-                    _lastRagdollTime = Main.Ticked;
+                    _lastRagdollTime = Ticked;
                 }
 
                 return;
@@ -432,7 +432,7 @@ namespace RageCoop.Client
             }
             else if (IsInCover)
             {
-                if (!_lastInCover) Function.Call(Hash.TASK_STAY_IN_COVER, MainPed.Handle);
+                if (!_lastInCover) Call(TASK_STAY_IN_COVER, MainPed.Handle);
 
                 _lastInCover = true;
                 if (IsAiming)
@@ -476,16 +476,16 @@ namespace RageCoop.Client
                 }
                 else
                 {
-                    var model = Function.Call<uint>(Hash.GET_WEAPONTYPE_MODEL, CurrentWeapon);
-                    if (!Function.Call<bool>(Hash.HAS_MODEL_LOADED, model))
+                    var model = Call<uint>(GET_WEAPONTYPE_MODEL, CurrentWeapon);
+                    if (!Call<bool>(HAS_MODEL_LOADED, model))
                     {
-                        Function.Call(Hash.REQUEST_MODEL, model);
+                        Call(REQUEST_MODEL, model);
                         return;
                     }
                     if (WeaponObj?.Exists() == true)
                         WeaponObj.Delete();
                     MainPed.Weapons.RemoveAll();
-                    WeaponObj = Entity.FromHandle(Function.Call<int>(Hash.CREATE_WEAPON_OBJECT, CurrentWeapon, -1, Position.X, Position.Y, Position.Z, true, 0, 0));
+                    WeaponObj = Entity.FromHandle(Call<int>(CREATE_WEAPON_OBJECT, CurrentWeapon, -1, Position.X, Position.Y, Position.Z, true, 0, 0));
                 }
 
                 if (compChanged)
@@ -494,17 +494,17 @@ namespace RageCoop.Client
                     {
                         if (comp.Value)
                         {
-                            Function.Call(Hash.GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, WeaponObj.Handle, comp.Key);
+                            Call(GIVE_WEAPON_COMPONENT_TO_WEAPON_OBJECT, WeaponObj.Handle, comp.Key);
                         }
                     }
                     _lastWeaponComponents = WeaponComponents;
                 }
-                Function.Call(Hash.GIVE_WEAPON_OBJECT_TO_PED, WeaponObj.Handle, MainPed.Handle);
+                Call(GIVE_WEAPON_OBJECT_TO_PED, WeaponObj.Handle, MainPed.Handle);
                 _lastWeaponHash = CurrentWeapon;
             }
 
-            if (Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon) != WeaponTint)
-                Function.Call<int>(Hash.SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon, WeaponTint);
+            if (Call<int>(GET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon) != WeaponTint)
+                Call<int>(SET_PED_WEAPON_TINT_INDEX, MainPed, CurrentWeapon, WeaponTint);
         }
 
         private void DisplayAiming()
@@ -512,7 +512,7 @@ namespace RageCoop.Client
             if (Velocity == default)
                 MainPed.Task.AimAt(AimCoords, 1000);
             else
-                Function.Call(Hash.TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, MainPed.Handle,
+                Call(TASK_GO_TO_COORD_WHILE_AIMING_AT_COORD, MainPed.Handle,
                     Position.X + Velocity.X, Position.Y + Velocity.Y, Position.Z + Velocity.Z,
                     AimCoords.X, AimCoords.Y, AimCoords.Z, 3f, false, 0x3F000000, 0x40800000, false, 512, false, 0);
             SmoothTransition();
@@ -520,7 +520,7 @@ namespace RageCoop.Client
 
         private void WalkTo()
         {
-            Function.Call(Hash.SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
+            Call(SET_PED_STEALTH_MOVEMENT, MainPed, IsInStealthMode, 0);
             var predictPosition = Predict(Position) + Velocity;
             var range = predictPosition.DistanceToSquared(MainPed.ReadPosition());
 
@@ -533,7 +533,7 @@ namespace RageCoop.Client
                         if (nrange > 1.0f) nrange = 1.0f;
 
                         MainPed.Task.GoStraightTo(predictPosition);
-                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, nrange);
+                        Call(SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, nrange);
                     }
 
                     _lastMoving = true;
@@ -542,7 +542,7 @@ namespace RageCoop.Client
                     if (!MainPed.IsRunning || range > 0.50f)
                     {
                         MainPed.Task.RunTo(predictPosition, true);
-                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
+                        Call(SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
                     }
 
                     _lastMoving = true;
@@ -550,10 +550,10 @@ namespace RageCoop.Client
                 case 3:
                     if (!MainPed.IsSprinting || range > 0.75f)
                     {
-                        Function.Call(Hash.TASK_GO_STRAIGHT_TO_COORD, MainPed.Handle, predictPosition.X,
+                        Call(TASK_GO_STRAIGHT_TO_COORD, MainPed.Handle, predictPosition.X,
                             predictPosition.Y, predictPosition.Z, 3.0f, -1, 0.0f, 0.0f);
-                        Function.Call(Hash.SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, MainPed.Handle, 1.49f);
-                        Function.Call(Hash.SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
+                        Call(SET_RUN_SPRINT_MULTIPLIER_FOR_PLAYER, MainPed.Handle, 1.49f);
+                        Call(SET_PED_DESIRED_MOVE_BLEND_RATIO, MainPed.Handle, 1.0f);
                     }
 
                     _lastMoving = true;
@@ -599,7 +599,7 @@ namespace RageCoop.Client
 
                 MainPed.Velocity = Velocity + 5 * dist * (predicted - MainPed.ReadPosition());
             }
-            else if (Main.Ticked - _lastRagdollTime < 10)
+            else if (Ticked - _lastRagdollTime < 10)
             {
             }
             else if (IsRagdoll)
@@ -640,7 +640,7 @@ namespace RageCoop.Client
                 // localRagdoll
                 var force = Velocity - MainPed.Velocity + 5 * dist * (predicted - MainPed.ReadPosition());
                 if (force.Length() > 20) force = force.Normalized * 20;
-                MainPed.ApplyForce(force);
+                MainPed.ApplyWorldForceCenterOfMass(force, ForceType.InternalImpulse, true);
             }
         }
 
@@ -655,7 +655,7 @@ namespace RageCoop.Client
                         (!MainPed.IsSittingInVehicle() && !MainPed.IsBeingJacked))
                         MainPed.SetIntoVehicle(CurrentVehicle.MainVehicle, Seat);
                     if (MainPed.IsOnTurretSeat())
-                        Function.Call(Hash.TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y,
+                        Call(TASK_VEHICLE_AIM_AT_COORD, MainPed.Handle, AimCoords.X, AimCoords.Y,
                             AimCoords.Z);
 
                     // Drive-by
@@ -663,13 +663,13 @@ namespace RageCoop.Client
                     {
                         if (IsAiming)
                         {
-                            Function.Call(Hash.SET_DRIVEBY_TASK_TARGET, MainPed, 0, 0, AimCoords.X, AimCoords.Y,
+                            Call(SET_DRIVEBY_TASK_TARGET, MainPed, 0, 0, AimCoords.X, AimCoords.Y,
                                 AimCoords.Z);
                             if (!_lastDriveBy)
                             {
                                 _lastDriveBy = true;
-                                Function.Call(Hash.TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z,
-                                    1, 100, 1, FiringPattern.SingleShot);
+                                Call(TASK_DRIVE_BY, MainPed, 0, 0, AimCoords.X, AimCoords.Y, AimCoords.Z,
+                                    100000, 100, 1, FiringPattern.SingleShot);
                             }
                         }
                         else if (_lastDriveBy || MainPed.IsTaskActive(TaskType.CTaskAimGunVehicleDriveBy))

@@ -17,7 +17,7 @@ using Font = GTA.UI.Font;
 
 namespace RageCoop.Client
 {
-    internal static class Util
+    internal static partial class Util
     {
         /// <summary>
         ///     The location of the cursor on screen between 0 and 1.
@@ -67,23 +67,6 @@ namespace RageCoop.Client
             return b.ForwardVector.ToEulerRotation(b.UpVector);
         }
 
-        public static void StartUpCheck()
-        {
-            if (AppDomain.CurrentDomain.GetData("RageCoop.Client.LoaderContext") == null)
-            {
-                var error = "Client not loaded with loader, please re-install using the installer to fix this issue";
-                try
-                {
-                    Notification.Show("~r~" + error);
-                }
-                catch
-                {
-                }
-
-                throw new Exception(error);
-            }
-        }
-
         public static void DrawTextFromCoord(Vector3 coord, string text, float scale = 0.5f, Point offset = default)
         {
             Point toDraw = default;
@@ -106,7 +89,7 @@ namespace RageCoop.Client
             unsafe
             {
                 var res = ResolutionMaintainRatio;
-                if (Function.Call<bool>(Hash.GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
+                if (Call<bool>(GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
                 {
                     screenPos = new Point((int)(res.Width * x), (int)(y * 1080));
                     return true;
@@ -116,39 +99,39 @@ namespace RageCoop.Client
             return false;
         }
 
-        public static Settings ReadSettings(string path = null)
+        public static ClientSettings ReadSettings(string path = null)
         {
             path = path ?? SettingsPath;
 
             Directory.CreateDirectory(Directory.GetParent(path).FullName);
-            Settings settings;
+            ClientSettings settings;
             try
             {
-                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(path));
+                settings = JsonDeserialize<ClientSettings>(File.ReadAllText(path));
             }
             catch (Exception ex)
             {
-                Main.Logger?.Error(ex);
-                File.WriteAllText(path, JsonConvert.SerializeObject(settings = new Settings(), Formatting.Indented));
+                Log?.Error(ex);
+                File.WriteAllText(path, JsonSerialize(settings = new ClientSettings()));
             }
 
             return settings;
         }
 
-        public static bool SaveSettings(string path = null, Settings settings = null)
+        public static bool SaveSettings(string path = null, ClientSettings settings = null)
         {
             try
             {
                 path = path ?? SettingsPath;
-                settings = settings ?? Main.Settings;
+                settings = settings ?? Settings;
                 Directory.CreateDirectory(Directory.GetParent(path).FullName);
 
-                File.WriteAllText(path, JsonConvert.SerializeObject(settings, Formatting.Indented));
+                File.WriteAllText(path, JsonSerialize(settings));
                 return true;
             }
             catch (Exception ex)
             {
-                Main.Logger?.Error(ex);
+                Log?.Error(ex);
                 return false;
             }
         }
@@ -157,28 +140,28 @@ namespace RageCoop.Client
         public static Vehicle CreateVehicle(Model model, Vector3 position, float heading = 0f)
         {
             if (!model.IsLoaded) return null;
-            return (Vehicle)Entity.FromHandle(Function.Call<int>(Hash.CREATE_VEHICLE, model.Hash, position.X,
+            return (Vehicle)Entity.FromHandle(Call<int>(CREATE_VEHICLE, model.Hash, position.X,
                 position.Y, position.Z, heading, false, false));
         }
 
         public static Ped CreatePed(Model model, Vector3 position, float heading = 0f)
         {
             if (!model.IsLoaded) return null;
-            return (Ped)Entity.FromHandle(Function.Call<int>(Hash.CREATE_PED, 26, model.Hash, position.X, position.Y,
+            return (Ped)Entity.FromHandle(Call<int>(CREATE_PED, 26, model.Hash, position.X, position.Y,
                 position.Z, heading, false, false));
         }
 
         public static void SetOnFire(this Entity e, bool toggle)
         {
             if (toggle)
-                Function.Call(Hash.START_ENTITY_FIRE, e.Handle);
+                Call(START_ENTITY_FIRE, e.Handle);
             else
-                Function.Call(Hash.STOP_ENTITY_FIRE, e.Handle);
+                Call(STOP_ENTITY_FIRE, e.Handle);
         }
 
         public static void SetFrozen(this Entity e, bool toggle)
         {
-            Function.Call(Hash.FREEZE_ENTITY_POSITION, e, toggle);
+            Call(FREEZE_ENTITY_POSITION, e, toggle);
         }
 
         public static SyncedPed GetSyncEntity(this Ped p)
@@ -197,28 +180,31 @@ namespace RageCoop.Client
             return v;
         }
 
-        public static void ApplyForce(this Entity e, int boneIndex, Vector3 direction, Vector3 rotation = default,
-            ForceType forceType = ForceType.MaxForceRot2)
-        {
-            Function.Call(Hash.APPLY_FORCE_TO_ENTITY, e.Handle, forceType, direction.X, direction.Y, direction.Z,
-                rotation.X, rotation.Y, rotation.Z, boneIndex, false, true, true, false, true);
-        }
-
         public static byte GetPlayerRadioIndex()
         {
-            return (byte)Function.Call<int>(Hash.GET_PLAYER_RADIO_STATION_INDEX);
+            return (byte)Call<int>(GET_PLAYER_RADIO_STATION_INDEX);
         }
 
         public static void SetPlayerRadioIndex(int index)
         {
-            Function.Call(Hash.SET_RADIO_TO_STATION_INDEX, index);
+            Call(SET_RADIO_TO_STATION_INDEX, index);
         }
 
+        public static EntityPopulationType GetPopulationType(int handle)
+            => (EntityPopulationType)Call<int>(GET_ENTITY_POPULATION_TYPE, handle);
 
-        [DllImport("kernel32.dll")]
-        public static extern ulong GetTickCount64();
+        public static unsafe void DeleteEntity(int handle)
+        {
+            Call(SET_ENTITY_AS_MISSION_ENTITY, handle, false, true);
+            Call(DELETE_ENTITY, &handle);
+        }
 
+        [LibraryImport("kernel32.dll")]
+        public static partial ulong GetTickCount64();
 
+        [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        public static partial IntPtr GetModuleHandleW([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
+        
         #region -- POINTER --
 
         private static int _steeringAngleOffset { get; set; }

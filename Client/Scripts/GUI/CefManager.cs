@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using DXHook.Hook.Common;
 using GTA;
 using GTA.Native;
 using RageCoop.Client.CefHost;

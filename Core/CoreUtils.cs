@@ -9,6 +9,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
@@ -20,17 +21,19 @@ using RageCoop.Core.Scripting;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
 [assembly: InternalsVisibleTo("RageCoop.Client")]
+[assembly: InternalsVisibleTo("RageCoop.Client.Scripting")]
 [assembly: InternalsVisibleTo("RageCoop.Client.Installer")]
 [assembly: InternalsVisibleTo("DataDumper")]
+[assembly: InternalsVisibleTo("UnitTest")]
 [assembly: InternalsVisibleTo("RageCoop.ResourceBuilder")]
 
 namespace RageCoop.Core
 {
     internal static class CoreUtils
     {
-        private static readonly Random random = new Random();
+        private static readonly Random random = new();
 
-        private static readonly HashSet<string> ToIgnore = new HashSet<string>
+        private static readonly HashSet<string> ToIgnore = new()
         {
             "RageCoop.Client",
             "RageCoop.Client.Loader",
@@ -39,7 +42,8 @@ namespace RageCoop.Core
             "RageCoop.Server",
             "ScriptHookVDotNet2",
             "ScriptHookVDotNet3",
-            "ScriptHookVDotNet"
+            "ScriptHookVDotNet",
+            "ScriptHookVDotNetCore"
         };
 
         public static string FormatToSharpStyle(string input, int offset)
@@ -90,29 +94,6 @@ namespace RageCoop.Core
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public static void GetDependencies(Assembly assembly, ref HashSet<string> existing)
-        {
-            if (assembly.FullName.StartsWith("System")) return;
-            foreach (var name in assembly.GetReferencedAssemblies())
-            {
-                if (name.FullName.StartsWith("System")) continue;
-                try
-                {
-                    var asm = Assembly.Load(name);
-                    GetDependencies(asm, ref existing);
-                }
-                catch
-                {
-                }
-            }
-
-            if (!existing.Contains(assembly.FullName))
-            {
-                Console.WriteLine(assembly.FullName);
-                existing.Add(assembly.FullName);
-            }
-        }
-
         public static Version GetLatestVersion(string branch = "dev-nightly")
         {
             var url =
@@ -127,7 +108,20 @@ namespace RageCoop.Core
 
         public static bool CanBeIgnored(this string name)
         {
-            return ToIgnore.Contains(Path.GetFileNameWithoutExtension(name));
+            name = Path.GetFileNameWithoutExtension(name);
+            return ToIgnore.Contains(name) || AssemblyLoadContext.Default.Assemblies.Any(x => x.GetName().Name == name);
+        }
+
+        public static void ForceLoadAllAssemblies()
+        {
+            foreach (var a in AssemblyLoadContext.Default.Assemblies)
+                LoadAllReferencedAssemblies(a.GetName());
+        }
+
+        public static void LoadAllReferencedAssemblies(this AssemblyName assembly)
+        {
+            foreach (var child in Assembly.Load(assembly).GetReferencedAssemblies())
+                LoadAllReferencedAssemblies(child);
         }
 
         public static string ToFullPath(this string path)
@@ -311,7 +305,7 @@ namespace RageCoop.Core
                 throw new Exception($"IPv4 request failed! [{(int)response.StatusCode}/{response.ReasonPhrase}]");
 
             var content = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            return JsonConvert.DeserializeObject<IpInfo>(content);
+            return JsonDeserialize<IpInfo>(content);
         }
 
         public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)

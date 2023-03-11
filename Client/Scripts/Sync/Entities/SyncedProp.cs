@@ -39,7 +39,7 @@ namespace RageCoop.Client
             MainProp.Position = Position;
             MainProp.Rotation = Rotation;
             MainProp.SetFrozen(true);
-            LastUpdated = Main.Ticked;
+            LastUpdated = Ticked;
         }
     }
 }

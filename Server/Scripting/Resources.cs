@@ -22,6 +22,11 @@ internal class Resources
         Logger = server.Logger;
     }
 
+    static Resources()
+    {
+        CoreUtils.ForceLoadAllAssemblies();
+    }
+
     public bool IsLoaded { get; private set; }
 
     public void LoadAll()
@@ -98,7 +103,6 @@ internal class Resources
                             zip.AddDirectory(dir[(resourceFolder.Length + 1)..]);
                         foreach (var file in Directory.GetFiles(resourceFolder, "*", SearchOption.AllDirectories))
                         {
-                            if (Path.GetFileName(file).CanBeIgnored()) continue;
                             zip.Add(file, file[(resourceFolder.Length + 1)..]);
                         }
 
@@ -263,7 +267,7 @@ internal class Resources
                 }
 
                 if (Server.GetResponse<Packets.FileTransferResponse>(client, new Packets.AllResourcesSent(),
-                        ConnectionChannel.RequestResponse, 30000)?.Response == FileResponse.Loaded)
+                        ConnectionChannel.File, 30000)?.Response == FileResponse.Loaded)
                 {
                     client.IsReady = true;
                     Server.API.Events.InvokePlayerReady(client);

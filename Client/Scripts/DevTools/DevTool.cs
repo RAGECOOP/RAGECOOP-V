@@ -5,8 +5,7 @@ using RageCoop.Core;
 
 namespace RageCoop.Client
 {
-    [ScriptAttributes(Author = "RageCoop", NoDefaultInstance = false,
-        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    [ScriptAttributes(Author = "RageCoop", SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
     internal class DevTool : Script
     {
         public static Vehicle ToMark;
@@ -14,14 +13,14 @@ namespace RageCoop.Client
 
         public DevTool()
         {
-            Util.StartUpCheck();
             Instance = this;
-            Tick += OnTick;
             Pause();
         }
 
-        private void OnTick(object sender, EventArgs e)
+        protected override void OnTick()
         {
+            base.OnTick();
+
             foreach (var p in World.GetAllPeds()) DrawWeaponBone(p);
             if (ToMark == null) return;
 

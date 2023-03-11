@@ -5,6 +5,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using Lidgren.Network;
+using Newtonsoft.Json;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
@@ -28,12 +29,12 @@ namespace RageCoop.Client
 
             if (Util.GetTickCount64() - _lastUpdate >= 1000) Update();
 
-            if (Util.GetTickCount64() - Pressed < 5000 && !Main.MainChat.Focused
+            if (Util.GetTickCount64() - Pressed < 5000 && !MainChat.Focused
 #if !NON_INTERACTIVE
                                                        && !CoopMenu.MenuPool.AreAnyVisible
 #endif
                )
-                Function.Call(Hash.DRAW_SCALEFORM_MOVIE, _mainScaleform.Handle,
+                Call(DRAW_SCALEFORM_MOVIE, _mainScaleform.Handle,
                     LeftAlign ? LEFT_POSITION : RIGHT_POSITION, 0.3f,
                     0.28f, 0.6f,
                     255, 255, 255, 255, 0);
@@ -57,7 +58,7 @@ namespace RageCoop.Client
 
         public static void SetPlayer(int id, string username, float latency = 0)
         {
-            Main.Logger.Debug($"{id},{username},{latency}");
+            Log.Debug($"{id},{username},{latency}");
             if (Players.TryGetValue(id, out var p))
             {
                 p.Username = username;
@@ -127,9 +128,21 @@ namespace RageCoop.Client
         }
     }
 
-    public class Player
+    internal class Player
     {
         internal float _latencyToServer;
+        internal bool ConnectWhenPunched { get; set; }
+
+        [JsonIgnore]
+        public Blip FakeBlip { get; internal set; }
+        [JsonIgnore]
+        public Vector3 Position { get; internal set; }
+        [JsonIgnore]
+        public SyncedPed Character { get; internal set; }
+
+        [JsonIgnore]
+        public NetConnection Connection { get; internal set; }
+
         public byte HolePunchStatus { get; internal set; } = 1;
         public bool IsHost { get; internal set; }
         public string Username { get; internal set; }
@@ -139,17 +152,15 @@ namespace RageCoop.Client
         /// </summary>
         public int ID { get; internal set; }
 
+        public int EntityHandle => Character?.MainPed?.Handle ?? 0;
+
         public IPEndPoint InternalEndPoint { get; internal set; }
         public IPEndPoint ExternalEndPoint { get; internal set; }
-        internal bool ConnectWhenPunched { get; set; }
-        public Blip FakeBlip { get; internal set; }
-        public Vector3 Position { get; internal set; }
-        public SyncedPed Character { get; internal set; }
 
         /// <summary>
         ///     Player round-trip time in seconds, will be the rtt to server if not using P2P connection.
         /// </summary>
-        public float Ping => Main.LocalPlayerID == ID ? Networking.Latency * 2 :
+        public float Ping => LocalPlayerID == ID ? Networking.Latency * 2 :
             HasDirectConnection ? Connection.AverageRoundtripTime : _latencyToServer * 2;
 
         public float PacketTravelTime => HasDirectConnection
@@ -157,7 +168,6 @@ namespace RageCoop.Client
             : Networking.Latency + _latencyToServer;
 
         public bool DisplayNameTag { get; set; } = true;
-        public NetConnection Connection { get; internal set; }
         public bool HasDirectConnection => Connection?.Status == NetConnectionStatus.Connected;
     }
 }

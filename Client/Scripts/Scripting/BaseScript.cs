@@ -35,34 +35,34 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
             API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied,
                 e => { Notification.Show($"~h~{e.Args[0]}~h~ died."); });
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    if (_isHost)
-                        API.QueueAction(() =>
-                        {
-                            unsafe
-                            {
-                                var time = World.CurrentTimeOfDay;
-                                var weather1 = default(int);
-                                var weather2 = default(int);
-                                var percent2 = default(float);
-                                Function.Call(Hash.GET_CURR_WEATHER_STATE, &weather1, &weather2, &percent2);
-                                API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes,
-                                    time.Seconds, weather1, weather2, percent2);
-                            }
-                        });
+            ThreadManager.CreateThread(() =>
+             {
+                 while (!IsUnloading)
+                 {
+                     if (Networking.IsOnServer && _isHost)
+                         API.QueueAction(() =>
+                         {
+                             unsafe
+                             {
+                                 var time = World.CurrentTimeOfDay;
+                                 var weather1 = default(int);
+                                 var weather2 = default(int);
+                                 var percent2 = default(float);
+                                 Call(GET_CURR_WEATHER_STATE, &weather1, &weather2, &percent2);
+                                 API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes,
+                                     time.Seconds, weather1, weather2, percent2);
+                             }
+                         });
 
-                    Thread.Sleep(1000);
-                }
-            });
+                     Thread.Sleep(1000);
+                 }
+             }, "BaseScript");
         }
 
         private static void WeatherTimeSync(CustomEventReceivedArgs e)
         {
             World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
-            Function.Call(Hash.SET_CURR_WEATHER_STATE, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
+            Call(SET_CURR_WEATHER_STATE, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 
         private static void SetDisplayNameTag(CustomEventReceivedArgs e)
@@ -103,7 +103,7 @@ namespace RageCoop.Client.Scripting
             {
                 ID = (int)e.Args[0],
                 MainVehicle = veh,
-                OwnerID = Main.LocalPlayerID
+                OwnerID = LocalPlayerID
             };
             EntityPool.Add(v);
         }
@@ -173,7 +173,7 @@ namespace RageCoop.Client.Scripting
                     EntityPool.ServerProps.Add(id, prop = new SyncedProp(id));
             }
 
-            prop.LastSynced = Main.Ticked + 1;
+            prop.LastSynced = Ticked + 1;
             prop.Model = (Model)e.Args[1];
             prop.Position = (Vector3)e.Args[2];
             prop.Rotation = (Vector3)e.Args[3];
@@ -193,11 +193,10 @@ namespace RageCoop.Client.Scripting
 
             if (returnType == TypeCode.Empty)
             {
-                Function.Call(hash, arguments.ToArray());
+                Call(hash, arguments.ToArray());
                 return;
             }
 
-            var t = returnType;
             var id = (int)e.Args[1];
 
 
@@ -205,59 +204,59 @@ namespace RageCoop.Client.Scripting
             {
                 case TypeCode.Boolean:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<bool>(hash, arguments.ToArray()));
+                        Call<bool>(hash, arguments.ToArray()));
                     break;
                 case TypeCode.Byte:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<byte>(hash, arguments.ToArray()));
+                        Call<byte>(hash, arguments.ToArray()));
                     break;
                 case TypeCode.Char:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<char>(hash, arguments.ToArray()));
+                        Call<char>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.Single:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<float>(hash, arguments.ToArray()));
+                        Call<float>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.Double:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<double>(hash, arguments.ToArray()));
+                        Call<double>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.Int16:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<short>(hash, arguments.ToArray()));
+                        Call<short>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.Int32:
-                    API.SendCustomEvent(CustomEvents.NativeResponse, id, Function.Call<int>(hash, arguments.ToArray()));
+                    API.SendCustomEvent(CustomEvents.NativeResponse, id, Call<int>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.Int64:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<long>(hash, arguments.ToArray()));
+                        Call<long>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.String:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<string>(hash, arguments.ToArray()));
+                        Call<string>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.UInt16:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<ushort>(hash, arguments.ToArray()));
+                        Call<ushort>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.UInt32:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<uint>(hash, arguments.ToArray()));
+                        Call<uint>(hash, arguments.ToArray()));
                     break;
 
                 case TypeCode.UInt64:
                     API.SendCustomEvent(CustomEvents.NativeResponse, id,
-                        Function.Call<ulong>(hash, arguments.ToArray()));
+                        Call<ulong>(hash, arguments.ToArray()));
                     break;
             }
         }
@@ -288,7 +287,7 @@ namespace RageCoop.Client.Scripting
                 case string stuff:
                     return stuff;
                 default:
-                    return null;
+                    return default;
             }
         }
     }

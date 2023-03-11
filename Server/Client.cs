@@ -198,10 +198,13 @@ public class Client
         try
         {
             var outgoingMessage = Server.MainNetServer.CreateMessage();
+
+            var writer = GetWriter();
+            CustomEvents.WriteObjects(writer, args);;
             new Packets.CustomEvent(flags)
             {
                 Hash = hash,
-                Args = args
+                Payload = writer.ToByteArray(writer.Position)
             }.Pack(outgoingMessage);
             Server.MainNetServer.SendMessage(outgoingMessage, Connection, NetDeliveryMethod.ReliableOrdered,
                 (byte)ConnectionChannel.Event);

@@ -1,57 +1,52 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net48</TargetFramework>
-		<UseWPF>true</UseWPF>
-		<UseWindowsForms>true</UseWindowsForms>
-		<AllowedReferenceRelatedFileExtensions>
+  <PropertyGroup>
+	<NoAotCompile>true</NoAotCompile>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AllowedReferenceRelatedFileExtensions>
 			-
 		</AllowedReferenceRelatedFileExtensions>
-		<Configurations>Debug;Release</Configurations>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutDir>..\..\bin\Debug\Client</OutDir>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<DefineConstants>DEBUG</DefineConstants>
-		<WarningLevel>4</WarningLevel>
-		<NoWarn>1591</NoWarn>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		<OutDir>..\..\bin\Release\Client</OutDir>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-	</PropertyGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\Loader\RageCoop.Client.Loader.csproj" />
-		<ProjectReference Include="..\Scripts\RageCoop.Client.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Resource Include="bg.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Resource.Designer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Resource.resx</DependentUpon>
-		</Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Update="Resource.resx">
-			<Generator>ResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resource.Designer.cs</LastGenOutput>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Costura.Fody" Version="5.7.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
+    <Configurations>Debug;Release</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutDir>..\..\bin\Debug\Client</OutDir>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>DEBUG</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutDir>..\..\bin\Release\Client</OutDir>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Scripts\RageCoop.Client.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="5.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>compile; runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

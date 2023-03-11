@@ -16,7 +16,7 @@ namespace RageCoop.Client
         /// <summary>
         ///     Indicates whether the current player is responsible for syncing this entity.
         /// </summary>
-        public bool IsLocal => OwnerID == Main.LocalPlayerID;
+        public bool IsLocal => OwnerID == LocalPlayerID;
 
         /// <summary>
         ///     Network ID for this entity
@@ -41,7 +41,7 @@ namespace RageCoop.Client
 
         /// <summary>
         /// </summary>
-        public bool IsOutOfSync => Main.Ticked - LastSynced > 200 && ID != 0;
+        public bool IsOutOfSync => Ticked - LastSynced > 200 && ID != 0;
 
         internal bool IsReady => LastSynced > 0 || LastFullSynced == 0;
 
@@ -60,7 +60,7 @@ namespace RageCoop.Client
 
         internal void PauseUpdate(ulong frames)
         {
-            LastUpdated = Main.Ticked + frames;
+            LastUpdated = Ticked + frames;
         }
 
         protected Vector3 Predict(Vector3 input)
@@ -93,10 +93,10 @@ namespace RageCoop.Client
         public void SetLastSynced(bool full)
         {
             LastSyncInterval = LastSentStopWatch.ElapsedMilliseconds;
-            LastSynced = Main.Ticked;
+            LastSynced = Ticked;
             if (full)
             {
-                LastFullSynced = Main.Ticked;
+                LastFullSynced = Ticked;
             }
             LastSyncedStopWatch.Restart();
         }

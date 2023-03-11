@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<NoAotCompile>true</NoAotCompile>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<OutDir>..\..\bin\Tools\DataDumper</OutDir>
+		<OutDir>$(SolutionDir)bin\Tools\DataDumper</OutDir>
 	</PropertyGroup>
 
 	<ItemGroup>

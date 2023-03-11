@@ -27,9 +27,9 @@ namespace RageCoop.Client
 
             if (veh.IsDead) flags |= VehicleDataFlags.IsDead;
 
-            if (Function.Call<bool>(Hash.IS_HORN_ACTIVE, veh.Handle)) flags |= VehicleDataFlags.IsHornActive;
+            if (Call<bool>(IS_HORN_ACTIVE, veh.Handle)) flags |= VehicleDataFlags.IsHornActive;
 
-            if (v.IsSubmarineCar && Function.Call<bool>(Hash.IS_VEHICLE_IN_SUBMARINE_MODE, veh.Handle))
+            if (v.IsSubmarineCar && Call<bool>(IS_VEHICLE_IN_SUBMARINE_MODE, veh.Handle))
                 flags |= VehicleDataFlags.IsTransformed;
 
             if (v.IsAircraft) flags |= VehicleDataFlags.IsAircraft;
@@ -150,7 +150,7 @@ namespace RageCoop.Client
 
         public static void SetDeluxoHoverState(this Vehicle deluxo, bool hover)
         {
-            Function.Call(Hash.SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO, deluxo, hover ? 1f : 0f);
+            Call(SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO, deluxo, hover ? 1f : 0f);
         }
 
         public static bool IsDeluxoHovering(this Vehicle deluxo)
@@ -160,7 +160,7 @@ namespace RageCoop.Client
 
         public static void SetDeluxoWingRatio(this Vehicle v, float ratio)
         {
-            Function.Call(Hash.SET_HOVER_MODE_WING_RATIO, v, ratio);
+            Call(SET_HOVER_MODE_WING_RATIO, v, ratio);
         }
 
         public static float GetDeluxoWingRatio(this Vehicle v)
@@ -170,7 +170,7 @@ namespace RageCoop.Client
 
         public static float GetNozzleAngel(this Vehicle plane)
         {
-            return Function.Call<float>(Hash.GET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane);
+            return Call<float>(GET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane);
         }
 
         public static bool HasNozzle(this Vehicle v)
@@ -199,7 +199,7 @@ namespace RageCoop.Client
 
         public static void SetNozzleAngel(this Vehicle plane, float ratio)
         {
-            Function.Call(Hash.SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
+            Call(SET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane, ratio);
         }
 
         #endregion

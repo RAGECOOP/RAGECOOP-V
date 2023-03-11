@@ -47,15 +47,15 @@ namespace RageCoop.Client
                     var veh = ped.CurrentVehicle?.GetSyncEntity() ??
                               ped.VehicleTryingToEnter?.GetSyncEntity() ?? ped.LastVehicle?.GetSyncEntity();
                     p.VehicleID = veh?.ID ?? 0;
-                    if (p.VehicleID == 0) Main.Logger.Error("Invalid vehicle");
+                    if (p.VehicleID == 0) Log.Error("Invalid vehicle");
                     if (p.Speed == 5)
                         p.Seat = ped.GetSeatTryingToEnter();
                     else
                         p.Seat = ped.SeatIndex;
                     if (!veh.IsLocal && p.Speed == 4 && p.Seat == VehicleSeat.Driver)
                     {
-                        veh.OwnerID = Main.LocalPlayerID;
-                        SyncEvents.TriggerChangeOwner(veh.ID, Main.LocalPlayerID);
+                        veh.OwnerID = LocalPlayerID;
+                        SyncEvents.TriggerChangeOwner(veh.ID, LocalPlayerID);
                     }
                 }
 
@@ -72,7 +72,7 @@ namespace RageCoop.Client
                 p.Clothes = ped.GetPedClothes();
                 p.ModelHash = ped.Model.Hash;
                 p.WeaponComponents = ped.Weapons.Current.GetWeaponComponents();
-                p.WeaponTint = (byte)Function.Call<int>(Hash.GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
+                p.WeaponTint = (byte)Call<int>(GET_PED_WEAPON_TINT_INDEX, ped, ped.Weapons.Current.Hash);
 
                 Blip b;
                 if (sp.IsPlayer)
@@ -110,7 +110,7 @@ namespace RageCoop.Client
             packet.Position = veh.ReadPosition();
             packet.Velocity = veh.Velocity;
             packet.Quaternion = veh.ReadQuaternion();
-            packet.RotationVelocity = veh.RotationVelocity;
+            packet.RotationVelocity = veh.WorldRotationVelocity;
             packet.ThrottlePower = veh.ThrottlePower;
             packet.BrakePower = veh.BrakePower;
             v.LastSentStopWatch.Restart();
@@ -122,7 +122,7 @@ namespace RageCoop.Client
                 byte secondaryColor = 0;
                 unsafe
                 {
-                    Function.Call<byte>(Hash.GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
+                    Call<byte>(GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
                 packet.Flags |= VehicleDataFlags.IsFullSync;
@@ -134,8 +134,8 @@ namespace RageCoop.Client
                 packet.ModelHash = veh.Model.Hash;
                 packet.EngineHealth = veh.EngineHealth;
                 packet.LockStatus = veh.LockStatus;
-                packet.LicensePlate = Function.Call<string>(Hash.GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
-                packet.Livery = Function.Call<int>(Hash.GET_VEHICLE_LIVERY, veh);
+                packet.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
+                packet.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
                 if (v.MainVehicle == Game.Player.LastVehicle) packet.RadioStation = Util.GetPlayerRadioIndex();
                 if (packet.EngineHealth > v.LastEngineHealth) packet.Flags |= VehicleDataFlags.Repaired;
                 v.LastEngineHealth = packet.EngineHealth;
@@ -154,14 +154,14 @@ namespace RageCoop.Client
         public static void SendChatMessage(string message)
         {
             Peer.SendTo(new Packets.ChatMessage(s => Security.Encrypt(s.GetBytes()))
-            { Username = Main.Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
+            { Username = Settings.Username, Message = message }, ServerConnection, ConnectionChannel.Chat,
                 NetDeliveryMethod.ReliableOrdered);
             Peer.FlushSendQueue();
         }
 
         public static void SendVoiceMessage(byte[] buffer, int recorded)
         {
-            SendSync(new Packets.Voice { ID = Main.LocalPlayerID, Buffer = buffer, Recorded = recorded },
+            SendSync(new Packets.Voice { ID = LocalPlayerID, Buffer = buffer, Recorded = recorded },
                 ConnectionChannel.Voice, NetDeliveryMethod.ReliableOrdered);
         }
 

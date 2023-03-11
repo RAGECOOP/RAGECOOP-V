@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 
 namespace RageCoop.Core
@@ -33,8 +34,8 @@ namespace RageCoop.Core
                                                    SecurityProtocolType.Tls;
             ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
 
-            var client = new WebClient();
-            return client.DownloadString(url);
+            var client = new HttpClient();
+            return client.GetStringAsync(url).GetAwaiter().GetResult();
         }
     }
 }

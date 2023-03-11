@@ -49,9 +49,6 @@ namespace RageCoop.Client
 
         #region FIXED-DATA
 
-        internal bool IsFlipped => IsMotorcycle ||
-                                   (Quaternion * Vector3.RelativeTop).Z - (Quaternion * Vector3.RelativeBottom).Z < 0.5;
-
         internal bool IsMotorcycle;
         internal bool IsAircraft;
         internal bool HasRocketBoost;
@@ -60,21 +57,14 @@ namespace RageCoop.Client
         internal bool IsSubmarineCar;
         internal bool IsDeluxo;
         internal bool IsTrain;
-        internal Vector3 TopExtent;
-        internal Vector3 BottomExtent;
-        internal Vector3 FrontExtent;
-        internal Vector3 RearExtent;
-        internal Vector3 LeftExtent;
-        internal Vector3 RightExtent;
-        private const float RotCalMult = 0.2f;
-        private const float ExtentLength = 5;
+        private const float RotCalMult = 10f;
 
         #endregion
 
         #region PRIVATE
 
         private byte[] _lastVehicleColors = { 0, 0 };
-        private Dictionary<int, int> _lastVehicleMods = new Dictionary<int, int>();
+        private Dictionary<int, int> _lastVehicleMods = new();
         private bool _lastHornActive;
         private bool _lastTransformed;
         internal int _lastLivery = -1;

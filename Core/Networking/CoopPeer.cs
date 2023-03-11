@@ -7,15 +7,17 @@ namespace RageCoop.Core
 {
     internal class CoopPeer : NetPeer, IDisposable
     {
-        private readonly Thread ListenerThread;
+        private readonly Logger Log;
+        private readonly Thread _receiver;
         private bool _stopping;
         public EventHandler<NetIncomingMessage> OnMessageReceived;
 
-        public CoopPeer(NetPeerConfiguration config) : base(config)
+        public CoopPeer(NetPeerConfiguration config,Logger logger) : base(config)
         {
+            Log = logger;
             Start();
             NetIncomingMessage msg;
-            ListenerThread = new Thread(() =>
+            _receiver = new Thread(() =>
             {
                 while (!_stopping)
                 {
@@ -23,7 +25,7 @@ namespace RageCoop.Core
                     if (msg != null) OnMessageReceived?.Invoke(this, msg);
                 }
             });
-            ListenerThread.Start();
+            _receiver.Start();
         }
 
         /// <summary>
@@ -32,8 +34,18 @@ namespace RageCoop.Core
         public void Dispose()
         {
             _stopping = true;
-            Shutdown("Bye!");
-            ListenerThread.Join();
+            if (Status == NetPeerStatus.Running)
+            {
+                Shutdown("Bye!");
+            }
+            if (_receiver.IsAlive)
+            {
+                Log?.Debug("Stopping message thread");
+                _receiver.Join();
+            }
+            Log?.Debug("Stopping network thread");
+            Join();
+            Log?.Debug("CoopPeer disposed");
         }
 
         public void SendTo(Packet p, NetConnection connection, ConnectionChannel channel = ConnectionChannel.Default,

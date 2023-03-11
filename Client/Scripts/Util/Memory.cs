@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using GTA;
 using GTA.Math;
 using RageCoop.Core;
-using SHVDN;
+using NativeMemory = SHVDN.NativeMemory;
 
 namespace RageCoop.Client
 {

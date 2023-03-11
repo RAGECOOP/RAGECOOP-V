@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Windows.Forms;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using GTA;
 using GTA.Math;
 using GTA.Native;
@@ -12,53 +14,42 @@ using GTA.UI;
 using LemonUI.Elements;
 using LemonUI.Menus;
 using Lidgren.Network;
-using Newtonsoft.Json.Linq;
-using RageCoop.Client.GUI;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
-using static RageCoop.Client.Shared;
-using Console = GTA.Console;
 using Control = GTA.Control;
-using Screen = System.Windows.Forms.Screen;
-
 namespace RageCoop.Client
 {
-    /// <summary>
-    ///     Don't use it!
-    /// </summary>
-    [ScriptAttributes(Author = "RageCoop", NoScriptThread = true,
-        SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V")]
+    [ScriptAttributes(Author = "RageCoop", SupportURL = "https://github.com/RAGECOOP/RAGECOOP-V", NoScriptThread = true)]
     internal class Main : Script
     {
-        private static bool _gameLoaded = false;
-        internal static Version Version = typeof(Main).Assembly.GetName().Version;
+        internal static Version ModVersion = typeof(Main).Assembly.GetName().Version;
 
         internal static int LocalPlayerID = 0;
 
         internal static RelationshipGroup SyncedPedsGroup;
 
-        internal static new Settings Settings = null;
+        internal static ClientSettings Settings = null;
         internal static Chat MainChat = null;
-        internal static Stopwatch Counter = new Stopwatch();
-        internal static Logger Logger = null;
+        internal static Stopwatch Counter = new();
+        internal static Logger Log = null;
         internal static ulong Ticked = 0;
         internal static Vector3 PlayerPosition;
-        internal static Resources Resources = null;
-        private static readonly ConcurrentQueue<Action> TaskQueue = new ConcurrentQueue<Action>();
+        internal static Resources MainRes = null;
 
         public static Ped P;
         public static float FPS;
         private static bool _lastDead;
         public static bool CefRunning;
+        public static bool IsUnloading { get; private set; }
+        public static Script Instance { get; private set; }
 
         /// <summary>
         ///     Don't use it!
         /// </summary>
         public Main()
         {
-            Util.StartUpCheck();
-
+            Instance = this;
             Directory.CreateDirectory(DataPath);
             try
             {
@@ -67,166 +58,99 @@ namespace RageCoop.Client
             catch
             {
                 Notification.Show("Malformed configuration, overwriting with default values...");
-                Settings = new Settings();
+                Settings = new();
                 Util.SaveSettings();
             }
 
-            Logger = new Logger()
+            Log = new Logger()
             {
-                Writers = new List<StreamWriter> { CoreUtils.OpenWriter(LogPath) },
+                FlushImmediately = true,
+                Writers = null,
 #if DEBUG
                 LogLevel = 0,
 #else
                 LogLevel = Settings.LogLevel,
 #endif
             };
-            Logger.OnFlush += (line, formatted) =>
+            Log.OnFlush += (line, formatted) =>
             {
-                switch (line.LogLevel)
-                {
-#if DEBUG
-                    // case LogLevel.Trace:
-                    case LogLevel.Debug:
-                        Console.Info(line.Message);
-                        break;
-#endif
-                    case LogLevel.Info:
-                        Console.Info(line.Message);
-                        break;
-                    case LogLevel.Warning:
-                        Console.Warning(line.Message);
-                        break;
-                    case LogLevel.Error:
-                        Console.Error(line.Message);
-                        break;
-                }
+                SHVDN.Logger.Write($"[RageCoop] {line.Message}", (uint)line.LogLevel);
             };
-            Resources = new Resources();
+
+            // Run static constructor to register all function pointers and remoting entries
+            RuntimeHelpers.RunClassConstructor(typeof(API).TypeHandle);
+        }
+
+        protected override void OnAborted(AbortedEventArgs e)
+        {
+            base.OnAborted(e);
+            try
+            {
+                IsUnloading = e.IsUnloading;
+                CleanUp("Abort");
+                WorldThread.DoQueuedActions();
+                if (IsUnloading)
+                {
+                    ThreadManager.OnUnload();
+                    Log.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+            }
+        }
+        protected override void OnStart()
+        {
+            base.OnStart();
+
             if (Game.Version < GameVersion.v1_0_1290_1_Steam)
             {
-                Tick += (object sender, EventArgs e) =>
-                {
-                    if (Game.IsLoading)
-                    {
-                        return;
-                    }
-
-                    if (!_gameLoaded)
-                    {
-                        Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
-                        _gameLoaded = true;
-                    }
-                };
-                return;
+                throw new NotSupportedException("Please update your GTA5 to v1.0.1290 or newer!");
             }
 
-            Logger.Info(
-                $"Starting {typeof(Main).FullName}, domain: {AppDomain.CurrentDomain.Id} {AppDomain.CurrentDomain.FriendlyName}");
+            MainRes = new();
+
+
+
+            Log.Info(
+                $"Main script initialized");
 
             BaseScript.OnStart();
             SyncedPedsGroup = World.AddRelationshipGroup("SYNCPED");
             Game.Player.Character.RelationshipGroup.SetRelationshipBetweenGroups(SyncedPedsGroup, Relationship.Neutral,
                 true);
-#if !NON_INTERACTIVE
-#endif
             MainChat = new Chat();
-            Aborted += OnAborted;
-            Tick += OnTick;
-            KeyDown += OnKeyDown;
-            KeyUp += OnKeyUp;
 
             Util.NativeMemory();
             Counter.Restart();
-        }
 
-        private static void OnAborted(object sender, EventArgs e)
-        {
-            try
-            {
-                WorldThread.Instance?.Abort();
-                DevTool.Instance?.Abort();
-                CleanUp("Abort");
-                WorldThread.DoQueuedActions();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
         }
-
-        /// <summary>
-        ///     Queue an action to main thread and wait for execution to complete, must be called from script thread.
-        /// </summary>
-        /// <param name="task"></param>
-        internal static void QueueToMainThreadAndWait(Action task)
+        protected override void OnTick()
         {
-            Exception e = null;
-            TaskQueue.Enqueue(() =>
-            {
-                try
-                {
-                    task();
-                }
-                catch (Exception ex)
-                {
-                    e = ex;
-                }
-            });
-            Yield();
-            if (e != null)
-            {
-                throw e;
-            }
-        }
-
-        private static void OnTick(object sender, EventArgs e)
-        {
+            base.OnTick();
             P = Game.Player.Character;
             PlayerPosition = P.ReadPosition();
             FPS = Game.FPS;
-            if (Game.IsLoading)
-            {
-                return;
-            }
-
-            if (!_gameLoaded && (_gameLoaded = true))
-            {
-#if !NON_INTERACTIVE
-                Notification.Show(NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!",
-                    $"Press ~g~{Settings.MenuKey}~s~ to open the menu.");
-#endif
-            }
-
-            while (TaskQueue.TryDequeue(out var task))
-            {
-                try
-                {
-                    task.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
-            }
-
+#if CEF
             if (CefRunning)
             {
                 CefManager.Tick();
             }
-
+#endif
             if (!Networking.IsOnServer)
             {
                 return;
             }
-
             try
             {
                 EntityPool.DoSync();
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Log.Error(ex);
             }
+
 
             if (Game.TimeScale != 1.0f)
             {
@@ -235,42 +159,42 @@ namespace RageCoop.Client
 
             if (Networking.ShowNetworkInfo)
             {
-                new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 0),
+                new ScaledText(new PointF(200, 0),
                         $"L: {Networking.Latency * 1000:N0}ms", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
-                new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 30),
+                { Alignment = Alignment.Center }.Draw();
+                new ScaledText(new PointF(200, 30),
                         $"R: {NetUtility.ToHumanReadable(Statistics.BytesDownPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
-                new ScaledText(new PointF(Screen.PrimaryScreen.Bounds.Width / 2, 60),
+                { Alignment = Alignment.Center }.Draw();
+                new ScaledText(new PointF(200, 60),
                         $"S: {NetUtility.ToHumanReadable(Statistics.BytesUpPerSecond)}/s", 0.5f)
-                    { Alignment = Alignment.Center }.Draw();
+                { Alignment = Alignment.Center }.Draw();
             }
 
             MainChat.Tick();
             PlayerList.Tick();
             if (!API.Config.EnableAutoRespawn)
             {
-                Function.Call(Hash.PAUSE_DEATH_ARREST_RESTART, true);
-                Function.Call(Hash.IGNORE_NEXT_RESTART, true);
-                Function.Call(Hash.FORCE_GAME_STATE_PLAYING);
-                Function.Call(Hash.TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
+                Call(PAUSE_DEATH_ARREST_RESTART, true);
+                Call(IGNORE_NEXT_RESTART, true);
+                Call(FORCE_GAME_STATE_PLAYING);
+                Call(TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME, "respawn_controller");
                 if (P.IsDead)
                 {
-                    Function.Call(Hash.SET_FADE_OUT_AFTER_DEATH, false);
+                    Call(SET_FADE_OUT_AFTER_DEATH, false);
 
                     if (P.Health != 1)
                     {
                         P.Health = 1;
                         Game.Player.WantedLevel = 0;
-                        Logger.Debug("Player died.");
+                        Log.Debug("Player died.");
                         API.Events.InvokePlayerDied();
                     }
 
-                    GTA.UI.Screen.StopEffects();
+                    Screen.StopEffects();
                 }
                 else
                 {
-                    Function.Call(Hash.DISPLAY_HUD, true);
+                    Call(DISPLAY_HUD, true);
                 }
             }
             else if (P.IsDead && !_lastDead)
@@ -282,27 +206,31 @@ namespace RageCoop.Client
             Ticked++;
         }
 
-        private void OnKeyUp(object sender, KeyEventArgs e)
+        protected override void OnKeyUp(GTA.KeyEventArgs e)
         {
+            base.OnKeyUp(e);
+#if CEF
             if (CefRunning)
             {
                 CefManager.KeyUp(e.KeyCode);
             }
+#endif
         }
 
-        private static void OnKeyDown(object sender, KeyEventArgs e)
+        protected unsafe override void OnKeyDown(KeyEventArgs e)
         {
+            base.OnKeyDown(e);
             if (MainChat.Focused)
             {
                 MainChat.OnKeyDown(e.KeyCode);
                 return;
             }
-
+#if CEF
             if (CefRunning)
             {
                 CefManager.KeyDown(e.KeyCode);
             }
-
+#endif
             if (Networking.IsOnServer)
             {
                 if (Voice.WasInitialized())
@@ -322,15 +250,15 @@ namespace RageCoop.Client
 
                 if (Game.IsControlPressed(Control.FrontendPause))
                 {
-                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU,
-                        Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                    Call(ACTIVATE_FRONTEND_MENU,
+                        SHVDN.NativeMemory.GetHashKey("FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
                 }
 
                 if (Game.IsControlPressed(Control.FrontendPauseAlternate) && Settings.DisableAlternatePause)
                 {
-                    Function.Call(Hash.ACTIVATE_FRONTEND_MENU,
-                        Function.Call<int>(Hash.GET_HASH_KEY, "FE_MENU_VERSION_SP_PAUSE"), false, 0);
+                    Call(ACTIVATE_FRONTEND_MENU,
+                        SHVDN.NativeMemory.GetHashKey("FE_MENU_VERSION_SP_PAUSE"), false, 0);
                     return;
                 }
             }
@@ -423,25 +351,27 @@ namespace RageCoop.Client
             API.QueueAction(() =>
             {
                 WorldThread.Traffic(!Settings.DisableTraffic);
-                Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
+                Call(SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
                 CoopMenu.ConnectedMenuSetting();
                 MainChat.Init();
                 Notification.Show("~g~Connected!");
             });
 
-            Logger.Info(">> Connected <<");
+            Log.Info(">> Connected <<");
         }
 
+        private static readonly object _cleanupLock = new();
         public static void CleanUp(string reason)
         {
-            if (reason != "Abort")
+            lock (_cleanupLock)
             {
-                Logger.Info($">> Disconnected << reason: {reason}");
-                API.QueueAction(() => { Notification.Show("~r~Disconnected: " + reason); });
-            }
 
-            API.QueueAction(() =>
-            {
+                if (reason != "Abort")
+                {
+                    Log.Info($">> Disconnected << reason: {reason}");
+                    Notification.Show("~r~Disconnected: " + reason);
+                }
+
                 if (MainChat.Focused)
                 {
                     MainChat.Focused = false;
@@ -451,23 +381,24 @@ namespace RageCoop.Client
                 MainChat.Clear();
                 EntityPool.Cleanup();
                 WorldThread.Traffic(true);
-                Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
+                Call(SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 LocalPlayerID = default;
-                Resources.Unload();
-            });
-            Memory.RestorePatches();
+                MainRes.Unload();
+                Memory.RestorePatches();
+#if CEF
             if (CefRunning)
             {
                 CefManager.CleanUp();
             }
+#endif
 
-            HookManager.CleanUp();
-            DownloadManager.Cleanup();
-            Voice.ClearAll();
+                DownloadManager.Cleanup();
+                Voice.ClearAll();
+                Networking.Peer?.Dispose();
+                Networking.Peer = null;
+            }
         }
 
-#if !NON_INTERACTIVE
-#endif
     }
 }
