@@ -120,8 +120,18 @@ namespace RageCoop.Core
 
         public static void LoadAllReferencedAssemblies(this AssemblyName assembly)
         {
-            foreach (var child in Assembly.Load(assembly).GetReferencedAssemblies())
-                LoadAllReferencedAssemblies(child);
+            try
+            {
+                foreach (var child in Assembly.Load(assembly).GetReferencedAssemblies())
+                    LoadAllReferencedAssemblies(child);
+            }
+            catch (Exception ex)
+            {
+                if (!assembly.Name.StartsWith("Microsoft.CodeAnalysis"))
+                {
+                    System.Console.WriteLine("Error loading dependency: " + ex);
+                }
+            }
         }
 
         public static string ToFullPath(this string path)
