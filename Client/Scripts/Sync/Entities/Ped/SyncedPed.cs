@@ -149,23 +149,34 @@ namespace RageCoop.Client
 
             LastUpdated = Ticked;
         }
-
         private void RenderNameTag()
         {
-            if (!Owner.DisplayNameTag || !Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible ||
-                !MainPed.IsInRange(PlayerPosition, 40f)) return;
+            if (!Owner.DisplayNameTag || !Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible)
+                return;
 
-            var targetPos = MainPed.Bones[Bone.IKHead].Position + Vector3.WorldUp * 0.5f;
+            float dist = PlayerPosition.DistanceToSquared2D(MainPed.Position);
+            if (dist > 10 * 10f)
+                return;
+
+            float scale = 1f - (0.8f * dist) / 20f;
+            float fontSize = 0.6f * scale;
+            float frameTime = Call<float>(GET_FRAME_TIME);
+            Vector3 headPos = MainPed.Bones[Bone.IKHead].Position;
+            headPos.Z += 0.5f;
+            headPos += Velocity * frameTime;
+
             Point toDraw = default;
-            if (Util.WorldToScreen(targetPos, ref toDraw))
+            if (Util.WorldToScreen(headPos, ref toDraw))
             {
-                toDraw.Y -= 100;
-                new ScaledText(toDraw, Owner.Username, 0.4f, Font.ChaletLondon)
+                _nameTag ??= new ScaledText(toDraw, Owner.Username, fontSize, Font.ChaletLondon)
                 {
-                    Outline = true,
                     Alignment = Alignment.Center,
-                    Color = Owner.HasDirectConnection ? Color.FromArgb(179, 229, 252) : Color.White
-                }.Draw();
+                    Outline = true
+                };
+                _nameTag.Position = toDraw;
+                _nameTag.Scale = fontSize;
+                _nameTag.Color = Owner.HasDirectConnection ? Color.FromArgb(179, 229, 252) : Color.White;
+                _nameTag.Draw();
             }
         }
 

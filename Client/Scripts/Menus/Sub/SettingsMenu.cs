@@ -39,7 +39,7 @@ namespace RageCoop.Client.Menus
             Settings.ShowPlayerNameTag);
 
         private static readonly NativeItem _menuKey =
-            new NativeItem("Menu Key", "The key to open menu", Settings.MenuKey.ToString());
+            new("Menu Key", "The key to open menu", Settings.MenuKey.ToString());
 
         private static readonly NativeItem _passengerKey = new("Passenger Key",
             "The key to enter a vehicle as passenger", Settings.PassengerKey.ToString());

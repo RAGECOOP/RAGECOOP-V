@@ -83,17 +83,14 @@ namespace RageCoop.Client
             }
         }
 
-        public static bool WorldToScreen(Vector3 pos, ref Point screenPos)
+        public static unsafe bool WorldToScreen(Vector3 pos, ref Point screenPos)
         {
             float x, y;
-            unsafe
+            var res = ResolutionMaintainRatio;
+            if (Call<bool>(GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
             {
-                var res = ResolutionMaintainRatio;
-                if (Call<bool>(GET_SCREEN_COORD_FROM_WORLD_COORD, pos.X, pos.Y, pos.Z, &x, &y))
-                {
-                    screenPos = new Point((int)(res.Width * x), (int)(y * 1080));
-                    return true;
-                }
+                screenPos = new Point((int)(res.Width * x), (int)(y * 1080));
+                return true;
             }
 
             return false;

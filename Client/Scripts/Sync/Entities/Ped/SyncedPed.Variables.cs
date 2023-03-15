@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using GTA;
 using GTA.Math;
+using LemonUI.Elements;
 using RageCoop.Core;
 
 namespace RageCoop.Client
@@ -20,6 +21,7 @@ namespace RageCoop.Client
         private bool _lastRagdoll;
         private ulong _lastRagdollTime;
         private Dictionary<uint, bool> _lastWeaponComponents;
+        private ScaledText _nameTag;
         internal Entity WeaponObj;
         internal BlipColor BlipColor = (BlipColor)255;
         internal float BlipScale = 1;
