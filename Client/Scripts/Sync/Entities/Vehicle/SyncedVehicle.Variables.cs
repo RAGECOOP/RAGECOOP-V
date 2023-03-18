@@ -57,7 +57,8 @@ namespace RageCoop.Client
         internal bool IsSubmarineCar;
         internal bool IsDeluxo;
         internal bool IsTrain;
-        private const float RotCalMult = 10f;
+        [DebugTunable]
+        static float RotCalMult = 10f;
 
         #endregion
 

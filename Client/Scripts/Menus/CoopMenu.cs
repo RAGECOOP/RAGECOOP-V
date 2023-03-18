@@ -66,6 +66,7 @@ namespace RageCoop.Client.Menus
             MenuPool.Add(DevToolMenu.Menu);
             MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
+            MenuPool.Add(DebugMenu.TuneMenu);
             MenuPool.Add(ServersMenu.Menu);
             MenuPool.Add(PopUp);
 
@@ -174,13 +175,13 @@ namespace RageCoop.Client.Menus
         #region ITEMS
 
         private static readonly NativeItem _usernameItem = new NativeItem("Username")
-            { AltTitle = Settings.Username };
+        { AltTitle = Settings.Username };
 
         private static readonly NativeItem _passwordItem = new NativeItem("Password")
-            { AltTitle = new string('*', Settings.Password.Length) };
+        { AltTitle = new string('*', Settings.Password.Length) };
 
         public static readonly NativeItem ServerIpItem = new NativeItem("Server IP")
-            { AltTitle = Settings.LastServerAddress };
+        { AltTitle = Settings.LastServerAddress };
 
         internal static readonly NativeItem _serverConnectItem = new NativeItem("Connect");
 
@@ -188,7 +189,7 @@ namespace RageCoop.Client.Menus
                 "https://github.com/RAGECOOP~n~" +
                 "~y~VERSION~s~~n~" +
                 Main.ModVersion)
-            { LeftBadge = new ScaledTexture("commonmenu", "shop_new_star") };
+        { LeftBadge = new ScaledTexture("commonmenu", "shop_new_star") };
 
         #endregion
     }

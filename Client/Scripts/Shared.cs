@@ -15,6 +15,10 @@ using System.Text;
 
 namespace RageCoop.Client
 {
+    [AttributeUsage(AttributeTargets.Field)]
+    class DebugTunableAttribute : Attribute
+    {
+    }
     internal static class Shared
     {
         private static unsafe string GetBasePath()
