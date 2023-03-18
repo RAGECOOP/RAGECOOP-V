@@ -154,11 +154,11 @@ namespace RageCoop.Client
             if (!Owner.DisplayNameTag || !Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible)
                 return;
 
-            float dist = PlayerPosition.DistanceToSquared2D(MainPed.Position);
+            float dist = Call<Vector3>(GET_GAMEPLAY_CAM_COORD).DistanceToSquared(MainPed.Position);
             if (dist > 10 * 10f)
                 return;
 
-            float scale = 1f - (0.8f * dist) / 20f;
+            float scale = 1f - (0.8f * (float)Math.Sqrt(dist)) / 20f;
             float fontSize = 0.6f * scale;
             float frameTime = Call<float>(GET_FRAME_TIME);
             Vector3 headPos = MainPed.Bones[Bone.IKHead].Position;
