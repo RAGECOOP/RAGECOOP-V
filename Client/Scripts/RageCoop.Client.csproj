@@ -42,22 +42,6 @@
 		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.3.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="Properties\AssemblyInfo.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
-	<ItemGroup>
-		<Compile Update="Properties\AssemblyInfo.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>AssemblyInfo.tt</DependentUpon>
-		</Compile>
-	</ItemGroup>
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(DevEnvDir)' != '*Undefined*'">
-		<Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
-	</Target>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '*Undefined*' and '$(Configuration)' != 'API'">
 		<Exec Command="xcopy &quot;$(SolutionDir)Client\Data&quot; &quot;$(OutDir)..\Data&quot; /i /s /y" />
 	</Target>

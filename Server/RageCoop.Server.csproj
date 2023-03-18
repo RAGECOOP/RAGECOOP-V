@@ -46,11 +46,6 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="Properties\AssemblyInfo.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>AssemblyInfo.tt</DependentUpon>
-		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -72,29 +67,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Core\RageCoop.Core.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Properties\AssemblyInfo.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>AssemblyInfo.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
-
+	
 	<ItemGroup>
 		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Properties\AssemblyInfo.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>AssemblyInfo.tt</DependentUpon>
-		</Compile>
-	</ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(DevEnvDir)' != '*Undefined*'">
-		<Exec Command="&quot;$(DevEnvDir)TextTransform.exe&quot; -a !!BuildConfiguration!$(Configuration) &quot;$(ProjectDir)Properties\AssemblyInfo.tt&quot;" />
-	</Target>
-
 
 </Project>
