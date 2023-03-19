@@ -22,7 +22,7 @@ namespace RageCoop.Client
                     return;
 
 
-            DisplayVehicle(NeedUpdate);
+            DisplayVehicle();
             // Skip update if no new sync message has arrived.
             if (!NeedUpdate) return;
 
@@ -158,7 +158,7 @@ namespace RageCoop.Client
             LastUpdated = Ticked;
         }
 
-        private void DisplayVehicle(bool updated)
+        private void DisplayVehicle()
         {
             _predictedPosition = Predict(Position);
             var current = MainVehicle.ReadPosition();
@@ -173,6 +173,8 @@ namespace RageCoop.Client
                 return;
             }
 
+            var stopped = Velocity == Vector3.Zero;
+
             // Calibrate position
             if (distSquared > 0.03 * 0.03)
             {
@@ -180,9 +182,12 @@ namespace RageCoop.Client
                 else MainVehicle.ApplyWorldForceCenterOfMass(cali, ForceType.InternalImpulse, true);
             }
 
-            // Calibrate rotation
-            var diff = Quaternion.Diff(MainVehicle.ReadQuaternion());
-            MainVehicle.WorldRotationVelocity = diff.ToEulerAngles() * RotCalMult;
+            if (NeedUpdate || stopped)
+            {
+                // Calibrate rotation
+                var diff = Quaternion.Diff(MainVehicle.ReadQuaternion());
+                MainVehicle.WorldRotationVelocity = diff.ToEulerAngles() * RotCalMult;
+            }
         }
 
         private bool CreateVehicle()

@@ -57,6 +57,7 @@ namespace RageCoop.Client
         internal bool IsSubmarineCar;
         internal bool IsDeluxo;
         internal bool IsTrain;
+
         [DebugTunable]
         static float RotCalMult = 10f;
 
