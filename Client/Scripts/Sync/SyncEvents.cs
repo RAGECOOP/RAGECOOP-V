@@ -1,6 +1,7 @@
 ﻿using System;
 using GTA;
 using GTA.Math;
+using GTA.Native;
 using Lidgren.Network;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
@@ -23,15 +24,6 @@ namespace RageCoop.Client
                 ID = vehicleID,
                 NewOwnerID = newOwnerID
             }, ConnectionChannel.SyncEvents, NetDeliveryMethod.ReliableOrdered);
-        }
-
-        public static void TriggerBulletShot(SyncedPed owner, Vector3 impactPosition)
-        {
-            var hash = (uint)owner.MainPed.VehicleWeapon;
-            if (hash == (uint)VehicleWeaponHash.Invalid)
-                hash = (uint)owner.MainPed.Weapons.Current.Hash;
-
-            Networking.SendBullet(owner.ID, hash, impactPosition);
         }
 
         public static void TriggerNozzleTransform(int vehID, bool hover)
@@ -89,8 +81,9 @@ namespace RageCoop.Client
             var asset = new WeaponAsset(weaponHash);
             if (!asset.IsLoaded) asset.Request();
 
-            bool isVeh = p.VehicleWeapon != VehicleWeaponHash.Invalid;
-            var bone = c.GetMuzzleBone(isVeh);
+            var vehWeap = p.VehicleWeapon;
+            bool isVeh = vehWeap != VehicleWeaponHash.Invalid;
+            var bone = isVeh ? c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap) : c.MainPed.GetMuzzleBone();
 
             World.ShootBullet(bone.Position, end, p, asset, damage);
 
@@ -148,31 +141,36 @@ namespace RageCoop.Client
                 bool getBulletImpact()
                 {
                     var endPos = subject.LastWeaponImpactPosition;
-
-                    // Impact found
-                    if (endPos != default)
-                    {
-                        TriggerBulletShot(c, endPos);
-                        return true;
-                    }
-
                     var vehWeap = subject.VehicleWeapon;
-
-                    // Not found, but it's shot from a vehicle
-                    if (vehWeap != VehicleWeaponHash.Invalid)
+                    if (vehWeap == VehicleWeaponHash.Invalid)
                     {
-                        var b = c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap);
-                        TriggerBulletShot(c, b.Position + b.ForwardVector * 200);
+                        // Ped weapon sync
+                        var pedWeap = subject.Weapons.Current.Hash;
+                        if (endPos != default)
+                        {
+                            Networking.SendBullet(c.ID, (uint)pedWeap, endPos);
+                            return true;
+                        }
+
+                        // Get impact in next tick
+                        if (++i <= 5) return false;
+
+                        // Exceeded maximum wait of 5 ticks, return (inaccurate) aim coordinate
+                        endPos = subject.GetAimCoord();
+                        Networking.SendBullet(c.ID, (uint)pedWeap, endPos);
                         return true;
                     }
-
-                    // Get impact in next tick
-                    if (++i <= 5) return false;
-
-                    // Exceeded maximum wait of 5 ticks, return (inaccurate) aim coordinate
-                    endPos = subject.GetAimCoord();
-                    TriggerBulletShot(c, endPos);
-                    return true;
+                    else
+                    {
+                        // Veh weapon sync
+                        if (endPos == default)
+                        {
+                            var b = c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap);
+                            endPos = b.Position + b.ForwardVector * 200;
+                        }
+                        Networking.SendBullet(c.ID, (uint)vehWeap, endPos);
+                        return true;
+                    }
 
                 }
 

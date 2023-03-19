@@ -101,11 +101,9 @@ namespace RageCoop.Client
             return result;
         }
 
-        public static EntityBone GetMuzzleBone(this SyncedPed p, bool veh)
+        public static EntityBone GetMuzzleBone(this Ped p)
         {
-            if (veh) return p.MainPed.CurrentVehicle.GetMuzzleBone(p.VehicleWeapon);
-
-            return p.MainPed?.Weapons.CurrentWeaponObject?.Bones["gun_muzzle"];
+            return p.Weapons.CurrentWeaponObject?.Bones["gun_muzzle"];
         }
 
         public static float GetWeaponDamage(this Ped P, uint hash)
