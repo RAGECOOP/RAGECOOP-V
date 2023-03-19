@@ -53,7 +53,7 @@ namespace RageCoop.Client.Installer
         {
             UpdateStatus("Checking requirements");
             var shvPath = Path.Combine(root, "ScriptHookV.dll");
-            var shvdnPath = Path.Combine(root, "ScriptHookVDotNet3.dll");
+            var shvdnPath = Path.Combine(root, "ScriptHookVDotNetCore.dll");
             var scriptsPath = Path.Combine(root, "Scripts");
             var installPath = Path.Combine(root, "RageCoop");
             var legacyPath = Path.Combine(scriptsPath, "RageCoop");

@@ -156,10 +156,12 @@ namespace RageCoop.Client
                         return true;
                     }
 
+                    var vehWeap = subject.VehicleWeapon;
+
                     // Not found, but it's shot from a vehicle
-                    if (subject.VehicleWeapon != VehicleWeaponHash.Invalid)
+                    if (vehWeap != VehicleWeaponHash.Invalid)
                     {
-                        var b = c.GetMuzzleBone(true);
+                        var b = c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap);
                         TriggerBulletShot(c, b.Position + b.ForwardVector * 200);
                         return true;
                     }
