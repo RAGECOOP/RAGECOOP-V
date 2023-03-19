@@ -84,7 +84,11 @@ namespace RageCoop.Client
             var vehWeap = p.VehicleWeapon;
             bool isVeh = vehWeap != VehicleWeaponHash.Invalid;
             var bone = isVeh ? c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap) : c.MainPed.GetMuzzleBone();
-
+            if (bone == null)
+            {
+                Log.Warning($"Failed to find muzzle bone for {(isVeh ? vehWeap : (WeaponHash)weaponHash)}, {(isVeh ? p.CurrentVehicle.DisplayName : "")}");
+                return;
+            }
             World.ShootBullet(bone.Position, end, p, asset, damage);
 
             World.CreateParticleEffectNonLooped(CorePFXAsset,
@@ -165,7 +169,13 @@ namespace RageCoop.Client
                         // Veh weapon sync
                         if (endPos == default)
                         {
-                            var b = c.MainPed.CurrentVehicle.GetMuzzleBone(vehWeap);
+                            var veh = c.MainPed.CurrentVehicle;
+                            var b = veh.GetMuzzleBone(vehWeap);
+                            if (b == null)
+                            {
+                                Log.Warning($"Failed to find muzzle bone for {vehWeap}, {veh.DisplayName}");
+                                return true;
+                            }
                             endPos = b.Position + b.ForwardVector * 200;
                         }
                         Networking.SendBullet(c.ID, (uint)vehWeap, endPos);
