@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Serialization;
 using GTA;
 using GTA.Math;
 using GTA.Native;
 using Lidgren.Network;
-using Newtonsoft.Json;
 using RageCoop.Client.Menus;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;

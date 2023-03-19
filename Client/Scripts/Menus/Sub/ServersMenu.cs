@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading;
 using GTA.UI;
 using LemonUI.Menus;
-using Newtonsoft.Json;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
 

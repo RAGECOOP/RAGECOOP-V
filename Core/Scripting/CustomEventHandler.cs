@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using System.Text.Json.Serialization;
 
 namespace RageCoop.Core.Scripting
 {
@@ -44,10 +44,10 @@ namespace RageCoop.Core.Scripting
         [JsonIgnore]
         private CustomEventHandlerDelegate _managedHandler; // Used to keep GC reference
 
-        [JsonProperty]
+        [JsonInclude]
         public ulong FunctionPtr { get; private set; }
 
-        [JsonProperty]
+        [JsonInclude]
         public string Directory { get; private set; }
 
         /// <summary>

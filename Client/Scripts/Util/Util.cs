@@ -8,7 +8,6 @@ using GTA.Math;
 using GTA.Native;
 using GTA.UI;
 using LemonUI.Elements;
-using Newtonsoft.Json;
 using RageCoop.Core;
 using static RageCoop.Client.Shared;
 using Font = GTA.UI.Font;

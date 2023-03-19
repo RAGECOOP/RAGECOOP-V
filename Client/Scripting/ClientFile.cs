@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using RageCoop.Core.Scripting;
+﻿using RageCoop.Core.Scripting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
@@ -14,7 +14,7 @@ namespace RageCoop.Client.Scripting
             GetStream = GetStreamMethod;
         }
 
-        [JsonProperty]
+        [JsonInclude]
         public string FullPath { get; internal set; }
         Stream GetStreamMethod()
         {

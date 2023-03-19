@@ -1,6 +1,5 @@
 ﻿#undef DEBUG
 using Lidgren.Network;
-using Newtonsoft.Json;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;

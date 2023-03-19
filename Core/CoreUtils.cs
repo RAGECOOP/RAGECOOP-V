@@ -12,11 +12,11 @@ using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml;
 using GTA;
 using GTA.Math;
 using Lidgren.Network;
-using Newtonsoft.Json;
 using RageCoop.Core.Scripting;
 
 [assembly: InternalsVisibleTo("RageCoop.Server")]
@@ -390,9 +390,9 @@ namespace RageCoop.Core
 
     internal class IpInfo
     {
-        [JsonProperty("ip")] public string Address { get; set; }
+        [JsonPropertyName("ip")] public string Address { get; set; }
 
-        [JsonProperty("country")] public string Country { get; set; }
+        [JsonPropertyName("country")] public string Country { get; set; }
     }
 
     internal static class Extensions

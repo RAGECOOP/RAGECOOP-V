@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Newtonsoft.Json;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace RageCoop.Core
 {

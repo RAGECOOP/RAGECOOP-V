@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json;
-using RageCoop.Core.Scripting;
+﻿using RageCoop.Core.Scripting;
 using SHVDN;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace RageCoop.Client.Scripting
@@ -17,25 +17,25 @@ namespace RageCoop.Client.Scripting
         /// <summary>
         ///     Name of the resource
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public string Name { get; internal set; }
 
         /// <summary>
         ///     Directory where the scripts is loaded from
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public string ScriptsDirectory { get; internal set; }
 
         /// <summary>
         ///     A resource-specific folder that can be used to store your files.
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public string DataFolder { get; internal set; }
 
         /// <summary>
         ///     Get the <see cref="ClientFile" /> where this script is loaded from.
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public Dictionary<string, ClientFile> Files { get; internal set; } = new Dictionary<string, ClientFile>();
 
         /// <summary>

@@ -1,8 +1,7 @@
 ﻿global using static RageCoop.Core.Shared;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Reflection;
+using System.Text.Json;
 
 namespace RageCoop.Core
 {
@@ -24,22 +23,23 @@ namespace RageCoop.Core
             JsonTypeCheck(obj?.GetType());
             return obj;
         }
-        public static readonly JsonSerializerSettings JsonSettings = new();
+        public static readonly JsonSerializerOptions JsonSettings = new();
         static Shared()
         {
             JsonSettings.Converters.Add(new IPAddressConverter());
             JsonSettings.Converters.Add(new IPEndPointConverter());
-            JsonSettings.Formatting = Formatting.Indented;
+            JsonSettings.WriteIndented = true;
+            JsonSettings.IncludeFields = true;
         }
 
         public static object JsonDeserialize(string text, Type type)
         {
-            return JsonConvert.DeserializeObject(text, JsonTypeCheck(type), JsonSettings);
+            return JsonSerializer.Deserialize(text, JsonTypeCheck(type), JsonSettings);
         }
 
         public static T JsonDeserialize<T>(string text) => (T)JsonDeserialize(text, typeof(T));
 
-        public static string JsonSerialize(object obj) => JsonConvert.SerializeObject(JsonTypeCheck(obj), JsonSettings);
+        public static string JsonSerialize(object obj) => JsonSerializer.Serialize(JsonTypeCheck(obj), JsonSettings);
 
         /// <summary>
         /// Shortcut to <see cref="BufferReader.ThreadLocal"/>

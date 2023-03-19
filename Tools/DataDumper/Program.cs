@@ -1,8 +1,7 @@
-﻿using System.Text;
+﻿global using static RageCoop.Core.Shared;
+using System.Text;
 using System.Xml;
-using Newtonsoft.Json;
 using RageCoop.Core;
-using Formatting = Newtonsoft.Json.Formatting;
 
 namespace DataDumper;
 
@@ -33,7 +32,7 @@ public static class Program
         {
             Dictionary<uint, WeaponInfo> weapons = new();
             foreach (var f in Directory.GetFiles("meta", "*.meta")) Parse(f, weapons);
-            File.WriteAllText("out/Weapons.json", JsonConvert.SerializeObject(weapons, Formatting.Indented));
+            File.WriteAllText("out/Weapons.json", JsonSerialize(weapons));
             if (ToGenerate.HasFlag(GenFlags.WeaponHash)) DumpWeaponHash(weapons, true);
         }
 

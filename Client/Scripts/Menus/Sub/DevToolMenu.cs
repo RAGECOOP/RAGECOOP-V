@@ -5,7 +5,6 @@ using GTA;
 using GTA.Native;
 using GTA.UI;
 using LemonUI.Menus;
-using Newtonsoft.Json;
 using RageCoop.Core;
 
 

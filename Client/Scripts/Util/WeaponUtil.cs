@@ -3,7 +3,6 @@ using System.IO;
 using GTA;
 using GTA.Math;
 using GTA.Native;
-using Newtonsoft.Json;
 using RageCoop.Client.Scripting;
 using RageCoop.Core;
 

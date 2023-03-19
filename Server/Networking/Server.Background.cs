@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using ICSharpCode.SharpZipLib.Zip;
 using Lidgren.Network;
-using Newtonsoft.Json;
 using RageCoop.Core;
 
 namespace RageCoop.Server;

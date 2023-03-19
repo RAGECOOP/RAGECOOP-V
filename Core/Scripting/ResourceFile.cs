@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace RageCoop.Core.Scripting
 {
@@ -11,13 +11,13 @@ namespace RageCoop.Core.Scripting
         /// <summary>
         ///     Full name with relative path of this file
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public string Name { get; internal set; }
 
         /// <summary>
         ///     Whether this is a directory
         /// </summary>
-        [JsonProperty]
+        [JsonInclude]
         public bool IsDirectory { get; internal set; }
 
         /// <summary>
