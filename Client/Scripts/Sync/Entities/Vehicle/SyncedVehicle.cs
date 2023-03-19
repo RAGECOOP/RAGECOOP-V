@@ -150,6 +150,9 @@ namespace RageCoop.Client
                 }
 
                 MainVehicle.SetDamageModel(DamageModel);
+
+                if (MainVehicle.Handle == V?.Handle && Util.GetPlayerRadioIndex() != RadioStation)
+                    Util.SetPlayerRadioIndex(MainVehicle.Handle, RadioStation);
             }
 
             LastUpdated = Ticked;

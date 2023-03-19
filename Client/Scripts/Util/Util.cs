@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using GTA;
@@ -176,14 +177,24 @@ namespace RageCoop.Client
             return v;
         }
 
+        /// <summary>
+        /// Get the current radio index for player, returns 255 if there's none
+        /// </summary>
+        /// <returns></returns>
         public static byte GetPlayerRadioIndex()
         {
             return (byte)Call<int>(GET_PLAYER_RADIO_STATION_INDEX);
         }
 
-        public static void SetPlayerRadioIndex(int index)
+        public static void SetPlayerRadioIndex(int playerVeh, int index)
         {
-            Call(SET_RADIO_TO_STATION_INDEX, index);
+            if (playerVeh == 0)
+                playerVeh = Call<int>(GET_VEHICLE_PED_IS_IN, P.Handle, false);
+
+            if (index == byte.MaxValue)
+                Call(SET_VEH_RADIO_STATION, playerVeh, "OFF");
+            else
+                Call(SET_RADIO_TO_STATION_INDEX, index);
         }
 
         public static EntityPopulationType GetPopulationType(int handle)
@@ -200,7 +211,7 @@ namespace RageCoop.Client
 
         [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
         public static partial IntPtr GetModuleHandleW([MarshalAs(UnmanagedType.LPWStr)] string lpModuleName);
-        
+
         #region -- POINTER --
 
         private static int _steeringAngleOffset { get; set; }

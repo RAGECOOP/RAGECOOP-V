@@ -53,7 +53,7 @@ namespace RageCoop.Client
                         var attri = field.GetCustomAttribute<DebugTunableAttribute>();
                         if (attri == null)
                             continue;
-                        var item = new NativeItem($"{t}.{field.Name}");
+                        var item = new NativeItem(field.Name);
                         item.AltTitle = field.GetValue(null).ToString();
                         item.Activated += (s, e) =>
                         {

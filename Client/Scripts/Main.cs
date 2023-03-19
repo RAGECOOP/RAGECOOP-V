@@ -38,6 +38,8 @@ namespace RageCoop.Client
         internal static Resources MainRes = null;
 
         public static Ped P;
+        public static Vehicle V;
+        public static Vehicle LastV;
         public static float FPS;
         private static bool _lastDead;
         public static bool CefRunning;
@@ -129,9 +131,23 @@ namespace RageCoop.Client
         protected override void OnTick()
         {
             base.OnTick();
-            P = Game.Player.Character;
+
+            var lastVehicleHandle = Call<int>(GET_PLAYERS_LAST_VEHICLE);
+            var playerHandle = Call<int>(PLAYER_PED_ID);
+
+            if (LastV?.Handle != lastVehicleHandle)
+                LastV = Entity.FromHandle(lastVehicleHandle) as Vehicle;
+
+            if (P?.Handle != playerHandle)
+                P = (Ped)Entity.FromHandle(playerHandle);
+
+            var playerVehHandle = Call<int>(GET_VEHICLE_PED_IS_IN, P.Handle, false);
+            if (V?.Handle != playerVehHandle)
+                V = Entity.FromHandle(playerVehHandle) as Vehicle;
+
             PlayerPosition = P.ReadPosition();
             FPS = Game.FPS;
+
 #if CEF
             if (CefRunning)
             {
