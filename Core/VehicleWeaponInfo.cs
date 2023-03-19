@@ -98,7 +98,7 @@ namespace RageCoop.Core
     {
         public uint Hash;
         public string Name;
-        public Dictionary<uint, WeaponBones> Weapons = new Dictionary<uint, WeaponBones>();
+        public Dictionary<uint, WeaponBones> Weapons = new();
 
         public static void Dump(string input, string output)
         {
