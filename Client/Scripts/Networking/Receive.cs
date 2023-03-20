@@ -12,7 +12,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
-        
+
 
         private static readonly AutoResetEvent _publicKeyReceived = new AutoResetEvent(false);
 
@@ -68,90 +68,90 @@ namespace RageCoop.Client
 
                     break;
                 case NetIncomingMessageType.Data:
-                {
-                    if (message.LengthBytes == 0) break;
-                    var packetType = PacketType.Unknown;
-                    try
                     {
-                        // Get packet type
-                        packetType = (PacketType)message.ReadByte();
+                        if (message.LengthBytes == 0) break;
+                        var packetType = PacketType.Unknown;
+                        try
+                        {
+                            // Get packet type
+                            packetType = (PacketType)message.ReadByte();
+                            switch (packetType)
+                            {
+                                case PacketType.Response:
+                                    {
+                                        var id = message.ReadInt32();
+                                        if (PendingResponses.TryGetValue(id, out var callback))
+                                        {
+                                            callback((PacketType)message.ReadByte(), message);
+                                            PendingResponses.Remove(id);
+                                        }
+
+                                        break;
+                                    }
+                                case PacketType.Request:
+                                    {
+                                        var id = message.ReadInt32();
+                                        var realType = (PacketType)message.ReadByte();
+                                        if (RequestHandlers.TryGetValue(realType, out var handler))
+                                        {
+                                            var response = Peer.CreateMessage();
+                                            response.Write((byte)PacketType.Response);
+                                            response.Write(id);
+                                            handler(message).Pack(response);
+                                            Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered,
+                                                message.SequenceChannel);
+                                            Peer.FlushSendQueue();
+                                        }
+                                        else
+                                        {
+                                            Log.Debug("Did not find a request handler of type: " + realType);
+                                        }
+
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
+                                        break;
+                                    }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            API.QueueAction(() =>
+                            {
+                                Notification.Show($"~r~~h~Packet Error {ex.Message}");
+                                return true;
+                            });
+                            Log.Error($"[{packetType}] {ex.Message}");
+                            Log.Error(ex);
+                            Peer.Shutdown($"Packet Error [{packetType}]");
+                        }
+
+                        break;
+                    }
+                case NetIncomingMessageType.UnconnectedData:
+                    {
+                        var packetType = (PacketType)message.ReadByte();
                         switch (packetType)
                         {
-                            case PacketType.Response:
-                            {
-                                var id = message.ReadInt32();
-                                if (PendingResponses.TryGetValue(id, out var callback))
+                            case PacketType.HolePunch:
                                 {
-                                    callback((PacketType)message.ReadByte(), message);
-                                    PendingResponses.Remove(id);
+                                    HolePunch.Punched(message.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
+                                    break;
                                 }
-
-                                break;
-                            }
-                            case PacketType.Request:
-                            {
-                                var id = message.ReadInt32();
-                                var realType = (PacketType)message.ReadByte();
-                                if (RequestHandlers.TryGetValue(realType, out var handler))
+                            case PacketType.PublicKeyResponse:
                                 {
-                                    var response = Peer.CreateMessage();
-                                    response.Write((byte)PacketType.Response);
-                                    response.Write(id);
-                                    handler(message).Pack(response);
-                                    Peer.SendMessage(response, ServerConnection, NetDeliveryMethod.ReliableOrdered,
-                                        message.SequenceChannel);
-                                    Peer.FlushSendQueue();
+                                    if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) break;
+                                    var packet = message.GetPacket<Packets.PublicKeyResponse>();
+                                    Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
+                                    _publicKeyReceived.Set();
+                                    break;
                                 }
-                                else
-                                {
-                                    Log.Debug("Did not find a request handler of type: " + realType);
-                                }
-
-                                break;
-                            }
-                            default:
-                            {
-                                HandlePacket(packetType, message, message.SenderConnection, ref _recycle);
-                                break;
-                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        API.QueueAction(() =>
-                        {
-                            Notification.Show($"~r~~h~Packet Error {ex.Message}");
-                            return true;
-                        });
-                        Log.Error($"[{packetType}] {ex.Message}");
-                        Log.Error(ex);
-                        Peer.Shutdown($"Packet Error [{packetType}]");
-                    }
 
-                    break;
-                }
-                case NetIncomingMessageType.UnconnectedData:
-                {
-                    var packetType = (PacketType)message.ReadByte();
-                    switch (packetType)
-                    {
-                        case PacketType.HolePunch:
-                        {
-                            HolePunch.Punched(message.GetPacket<Packets.HolePunch>(), message.SenderEndPoint);
-                            break;
-                        }
-                        case PacketType.PublicKeyResponse:
-                        {
-                            if (message.SenderEndPoint.ToString() != _targetServerEP.ToString() || !IsConnecting) break;
-                            var packet = message.GetPacket<Packets.PublicKeyResponse>();
-                            Security.SetServerPublicKey(packet.Modulus, packet.Exponent);
-                            _publicKeyReceived.Set();
-                            break;
-                        }
+                        break;
                     }
-
-                    break;
-                }
                 case NetIncomingMessageType.DebugMessage:
                 case NetIncomingMessageType.ErrorMessage:
                 case NetIncomingMessageType.WarningMessage:
@@ -199,62 +199,62 @@ namespace RageCoop.Client
                     break;
 
                 case PacketType.ChatMessage:
-                {
-                    var packet = new Packets.ChatMessage(b => Security.Decrypt(b));
-                    packet.Deserialize(msg);
-
-                    API.QueueAction(() =>
                     {
-                        MainChat.AddMessage(packet.Username, packet.Message);
-                        return true;
-                    });
-                }
+                        var packet = new Packets.ChatMessage(b => Security.Decrypt(b));
+                        packet.Deserialize(msg);
+
+                        API.QueueAction(() =>
+                        {
+                            MainChat.AddMessage(packet.Username, packet.Message);
+                            return true;
+                        });
+                    }
                     break;
 
                 case PacketType.Voice:
-                {
-                    if (Settings.Voice)
                     {
-                        var packet = new Packets.Voice();
-                        packet.Deserialize(msg);
+                        if (Settings.Voice)
+                        {
+                            var packet = new Packets.Voice();
+                            packet.Deserialize(msg);
 
 
-                        var player = EntityPool.GetPedByID(packet.ID);
-                        player.IsSpeaking = true;
-                        player.LastSpeakingTime = Ticked;
+                            var player = EntityPool.GetPedByID(packet.ID);
+                            player.IsSpeaking = true;
+                            player.LastSpeakingTime = Ticked;
 
-                        Voice.AddVoiceData(packet.Buffer, packet.Recorded);
+                            Voice.AddVoiceData(packet.Buffer, packet.Recorded);
+                        }
                     }
-                }
                     break;
 
                 case PacketType.CustomEvent:
-                {
-                    var packet = new Packets.CustomEvent();
-                    if (((CustomEventFlags)msg.PeekByte()).HasEventFlag(CustomEventFlags.Queued))
                     {
-                        recycle = false;
-                        API.QueueAction(() =>
+                        var packet = new Packets.CustomEvent();
+                        if (((CustomEventFlags)msg.PeekByte()).HasEventFlag(CustomEventFlags.Queued))
+                        {
+                            recycle = false;
+                            API.QueueAction(() =>
+                            {
+                                packet.Deserialize(msg);
+                                API.Events.InvokeCustomEventReceived(packet);
+                                Peer.Recycle(msg);
+                            });
+                        }
+                        else
                         {
                             packet.Deserialize(msg);
                             API.Events.InvokeCustomEventReceived(packet);
-                            Peer.Recycle(msg);
-                        });
+                        }
                     }
-                    else
-                    {
-                        packet.Deserialize(msg);
-                        API.Events.InvokeCustomEventReceived(packet);
-                    }
-                }
                     break;
 
                 case PacketType.FileTransferChunk:
-                {
-                    var packet = new Packets.FileTransferChunk();
-                    packet.Deserialize(msg);
-                    DownloadManager.Write(packet.ID, packet.FileChunk);
-                }
+                    {
+                        var packet = new Packets.FileTransferChunk();
+                        packet.Deserialize(msg);
+                        DownloadManager.Write(packet.ID, packet.FileChunk);
+                    }
                     break;
 
                 default:
@@ -300,7 +300,7 @@ namespace RageCoop.Client
                 c.VehicleID = packet.VehicleID;
                 c.Seat = packet.Seat;
             }
-            
+
             if (c.IsAiming) c.AimCoords = packet.AimCoords;
             bool full = packet.Flags.HasPedFlag(PedDataFlags.IsFullSync);
             if (full)
@@ -349,6 +349,7 @@ namespace RageCoop.Client
                 v.RadioStation = packet.RadioStation;
                 v.LicensePlate = packet.LicensePlate;
                 v.Livery = packet.Livery;
+                v.ExtrasMask = packet.ExtrasMask;
             }
             v.SetLastSynced(full);
         }

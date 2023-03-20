@@ -154,6 +154,16 @@ namespace RageCoop.Client
 
                 if (MainVehicle.Handle == V?.Handle && Util.GetPlayerRadioIndex() != RadioStation)
                     Util.SetPlayerRadioIndex(MainVehicle.Handle, RadioStation);
+
+                if (_lastExtras != ExtrasMask)
+                {
+                    for (int i = 1; i < 15; i++)
+                    {
+                        var on = (ExtrasMask & (ushort)(1 << i)) != 0;
+                        Call(SET_VEHICLE_EXTRA, MainVehicle.Handle, i, !on);
+                    }
+                    _lastExtras = ExtrasMask;
+                }
             }
 
             LastUpdated = Ticked;

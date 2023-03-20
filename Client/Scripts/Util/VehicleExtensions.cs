@@ -58,6 +58,17 @@ namespace RageCoop.Client
             return result;
         }
 
+        public static ushort GetVehicleExtras(this Vehicle veh)
+        {
+            ushort result = 0;
+            for (int i = 1; i < 15; i++)
+            {
+                if (Call<bool>(IS_VEHICLE_EXTRA_TURNED_ON, veh.Handle, i))
+                    result |= (ushort)(1 << i);
+            }
+            return result;
+        }
+
         public static VehicleDamageModel GetVehicleDamageModel(this Vehicle veh)
         {
             // Broken windows

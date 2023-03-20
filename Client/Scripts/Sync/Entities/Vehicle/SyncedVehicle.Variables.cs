@@ -31,6 +31,7 @@ namespace RageCoop.Client
         internal string LicensePlate { get; set; }
         internal int Livery { get; set; } = -1;
         internal VehicleDataFlags Flags { get; set; }
+        internal ushort ExtrasMask;
 
         #endregion
 
@@ -67,6 +68,7 @@ namespace RageCoop.Client
         #region PRIVATE
 
         private (byte, byte) _lastVehicleColors;
+        private ushort _lastExtras;
         private (int, int)[] _lastVehicleMods = Array.Empty<(int, int)>();
         private bool _lastHornActive;
         private bool _lastTransformed;

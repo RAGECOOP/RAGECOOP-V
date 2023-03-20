@@ -99,6 +99,8 @@ namespace RageCoop.Core
                     m.Write(LicensePlate);
 
                     m.Write((byte)(Livery + 1));
+
+                    m.Write(ExtrasMask);
                 }
             }
 
@@ -170,6 +172,8 @@ namespace RageCoop.Core
                     LicensePlate = m.ReadString();
 
                     Livery = m.ReadByte() - 1;
+
+                    ExtrasMask = m.ReadUInt16();
                 }
 
                 #endregion
@@ -198,6 +202,7 @@ namespace RageCoop.Core
             public byte RadioStation { get; set; } = 255;
             public string LicensePlate { get; set; }
 
+            public ushort ExtrasMask;
             #endregion
         }
     }
