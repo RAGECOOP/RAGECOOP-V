@@ -4,6 +4,7 @@ using GTA;
 using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
+using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
 namespace RageCoop.Client
 {
@@ -159,7 +160,12 @@ namespace RageCoop.Client
                 {
                     for (int i = 1; i < 15; i++)
                     {
-                        var on = (ExtrasMask & (ushort)(1 << i)) != 0;
+                        var flag = (ushort)(1 << i);
+                        var hasExtra = (AvalibleExtras & (ushort)(1 << i)) != 0;
+                        if (!hasExtra)
+                            continue;
+
+                        var on = (ExtrasMask & flag) != 0;
                         Call(SET_VEHICLE_EXTRA, MainVehicle.Handle, i, !on);
                     }
                     _lastExtras = ExtrasMask;
@@ -255,6 +261,12 @@ namespace RageCoop.Client
             IsSubmarineCar = MainVehicle.IsSubmarineCar;
             IsDeluxo = MainVehicle.Model == 1483171323;
             IsTrain = MainVehicle.IsTrain;
+            AvalibleExtras = 0;
+            for (int i = 1; i < 15; i++)
+            {
+                if (Call<bool>(DOES_EXTRA_EXIST, MainVehicle.Handle, i))
+                    AvalibleExtras |= (ushort)(1 << i);
+            }
         }
 
         /// <summary>

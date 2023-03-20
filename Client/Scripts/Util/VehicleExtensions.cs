@@ -58,13 +58,15 @@ namespace RageCoop.Client
             return result;
         }
 
-        public static ushort GetVehicleExtras(this Vehicle veh)
+        public static ushort GetVehicleExtras(this SyncedVehicle sv)
         {
             ushort result = 0;
             for (int i = 1; i < 15; i++)
             {
-                if (Call<bool>(IS_VEHICLE_EXTRA_TURNED_ON, veh.Handle, i))
-                    result |= (ushort)(1 << i);
+                var flag = (ushort)(1 << i);
+                var hasExtra = (sv.AvalibleExtras & (ushort)(1 << i)) != 0;
+                if (hasExtra && Call<bool>(IS_VEHICLE_EXTRA_TURNED_ON, sv.MainVehicle.Handle, i))
+                    result |= flag;
             }
             return result;
         }

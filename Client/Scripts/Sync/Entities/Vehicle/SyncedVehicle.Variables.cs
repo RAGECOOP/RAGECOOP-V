@@ -59,6 +59,7 @@ namespace RageCoop.Client
         internal bool IsSubmarineCar;
         internal bool IsDeluxo;
         internal bool IsTrain;
+        internal ushort AvalibleExtras;
 
         [DebugTunable]
         static float RotCalMult = 10f;
@@ -72,9 +73,8 @@ namespace RageCoop.Client
         private (int, int)[] _lastVehicleMods = Array.Empty<(int, int)>();
         private bool _lastHornActive;
         private bool _lastTransformed;
-        internal int _lastLivery = -1;
+        private int _lastLivery = -1;
         private Vector3 _predictedPosition;
-
         #endregion
 
         #region OUTGOING

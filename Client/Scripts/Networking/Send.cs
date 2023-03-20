@@ -136,7 +136,7 @@ namespace RageCoop.Client
                 packet.LockStatus = veh.LockStatus;
                 packet.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
                 packet.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
-                packet.ExtrasMask = v.MainVehicle.GetVehicleExtras();
+                packet.ExtrasMask = v.GetVehicleExtras();
                 packet.RadioStation = v.MainVehicle == LastV
                     ? Util.GetPlayerRadioIndex() : byte.MaxValue;
                 if (packet.EngineHealth > v.LastEngineHealth) packet.Flags |= VehicleDataFlags.Repaired;
