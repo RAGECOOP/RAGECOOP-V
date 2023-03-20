@@ -100,6 +100,8 @@ namespace RageCoop.Core
 
                     m.Write((byte)(Livery + 1));
 
+                    m.Write(HeadlightColor);
+
                     m.Write(ExtrasMask);
                 }
             }
@@ -173,6 +175,8 @@ namespace RageCoop.Core
 
                     Livery = m.ReadByte() - 1;
 
+                    HeadlightColor = m.ReadByte();
+
                     ExtrasMask = m.ReadUInt16();
                 }
 
@@ -198,7 +202,7 @@ namespace RageCoop.Core
             public VehicleLockStatus LockStatus { get; set; }
 
             public int Livery { get; set; } = -1;
-
+            public byte HeadlightColor { get; set; } = 255;
             public byte RadioStation { get; set; } = 255;
             public string LicensePlate { get; set; }
 
