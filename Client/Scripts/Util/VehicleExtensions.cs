@@ -47,10 +47,14 @@ namespace RageCoop.Client
             return flags;
         }
 
-        public static Dictionary<int, int> GetVehicleMods(this VehicleModCollection mods)
+        public static (int, int)[] GetVehicleMods(this VehicleModCollection mods)
         {
-            var result = new Dictionary<int, int>();
-            foreach (var mod in mods.ToArray()) result.Add((int)mod.Type, mod.Index);
+            var modsArr = mods.ToArray();
+            var result = new (int, int)[modsArr.Length];
+            for (int i = 0; i < modsArr.Length; i++)
+            {
+                result[i] = ((int)modsArr[i].Type, modsArr[i].Index);
+            }
             return result;
         }
 

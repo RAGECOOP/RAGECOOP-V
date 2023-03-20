@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GTA;
 using GTA.Math;
@@ -23,7 +24,7 @@ namespace RageCoop.Client
         internal VehicleRoofState RoofState { get; set; }
         internal VehicleDamageModel DamageModel { get; set; }
         internal (byte, byte) Colors { get; set; }
-        internal Dictionary<int, int> Mods { get; set; }
+        internal (int, int)[] Mods { get; set; }
         internal float EngineHealth { get; set; }
         internal VehicleLockStatus LockStatus { get; set; }
         internal byte RadioStation = 255;
@@ -66,7 +67,7 @@ namespace RageCoop.Client
         #region PRIVATE
 
         private (byte, byte) _lastVehicleColors;
-        private Dictionary<int, int> _lastVehicleMods = new();
+        private (int, int)[] _lastVehicleMods = Array.Empty<(int, int)>();
         private bool _lastHornActive;
         private bool _lastTransformed;
         internal int _lastLivery = -1;

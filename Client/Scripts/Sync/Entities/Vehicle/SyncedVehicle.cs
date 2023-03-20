@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using GTA;
 using GTA.Math;
 using GTA.Native;
@@ -131,11 +132,11 @@ namespace RageCoop.Client
                 }
 
                 MainVehicle.EngineHealth = EngineHealth;
-                if (Mods != null && !Mods.Compare(_lastVehicleMods))
+                if (Mods != null && !Mods.SequenceEqual(_lastVehicleMods))
                 {
                     Call(SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
-                    foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Key].Index = mod.Value;
+                    foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Item1].Index = mod.Item2;
 
                     _lastVehicleMods = Mods;
                 }
