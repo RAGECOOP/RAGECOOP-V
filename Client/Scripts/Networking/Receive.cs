@@ -328,7 +328,6 @@ namespace RageCoop.Client
             v.OwnerID = packet.OwnerID;
             v.Flags = packet.Flags;
             v.Position = packet.Position;
-            v.LastQuaternion = v.Quaternion;
             v.Quaternion = packet.Quaternion;
             v.SteeringAngle = packet.SteeringAngle;
             v.ThrottlePower = packet.ThrottlePower;

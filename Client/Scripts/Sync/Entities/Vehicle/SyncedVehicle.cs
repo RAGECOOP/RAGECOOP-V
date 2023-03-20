@@ -123,9 +123,9 @@ namespace RageCoop.Client
             if (LastFullSynced >= LastUpdated)
             {
                 if (Flags.HasVehFlag(VehicleDataFlags.Repaired)) MainVehicle.Repair();
-                if (Colors != null && Colors != _lastVehicleColors)
+                if (Colors != _lastVehicleColors)
                 {
-                    Call(SET_VEHICLE_COLOURS, MainVehicle, Colors[0], Colors[1]);
+                    Call(SET_VEHICLE_COLOURS, MainVehicle, Colors.Item1, Colors.Item2);
 
                     _lastVehicleColors = Colors;
                 }

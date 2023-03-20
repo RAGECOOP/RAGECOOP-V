@@ -57,8 +57,8 @@ namespace RageCoop.Core
                     if (Flags.HasVehFlag(VehicleDataFlags.HasRoof)) m.Write(RoofState);
 
                     // Write vehicle colors
-                    m.Write(Colors[0]);
-                    m.Write(Colors[1]);
+                    m.Write(Colors.Item1);
+                    m.Write(Colors.Item2);
 
                     // Write vehicle mods
                     // Write the count of mods
@@ -136,9 +136,7 @@ namespace RageCoop.Core
                     if (Flags.HasVehFlag(VehicleDataFlags.HasRoof)) RoofState = m.ReadByte();
 
                     // Read vehicle colors
-                    var vehColor1 = m.ReadByte();
-                    var vehColor2 = m.ReadByte();
-                    Colors = new[] { vehColor1, vehColor2 };
+                    Colors = (m.ReadByte(), m.ReadByte());
 
                     // Read vehicle mods
                     // Create new Dictionary
@@ -183,7 +181,7 @@ namespace RageCoop.Core
 
             public float EngineHealth { get; set; }
 
-            public byte[] Colors { get; set; }
+            public (byte, byte) Colors { get; set; }
 
             public Dictionary<int, int> Mods { get; set; }
 

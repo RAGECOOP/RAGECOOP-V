@@ -22,7 +22,7 @@ namespace RageCoop.Client
         internal byte LandingGear { get; set; }
         internal VehicleRoofState RoofState { get; set; }
         internal VehicleDamageModel DamageModel { get; set; }
-        internal byte[] Colors { get; set; }
+        internal (byte, byte) Colors { get; set; }
         internal Dictionary<int, int> Mods { get; set; }
         internal float EngineHealth { get; set; }
         internal VehicleLockStatus LockStatus { get; set; }
@@ -65,13 +65,12 @@ namespace RageCoop.Client
 
         #region PRIVATE
 
-        private byte[] _lastVehicleColors = { 0, 0 };
+        private (byte, byte) _lastVehicleColors;
         private Dictionary<int, int> _lastVehicleMods = new();
         private bool _lastHornActive;
         private bool _lastTransformed;
         internal int _lastLivery = -1;
         private Vector3 _predictedPosition;
-        internal Quaternion LastQuaternion;
 
         #endregion
 

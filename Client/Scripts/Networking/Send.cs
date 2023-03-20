@@ -126,7 +126,7 @@ namespace RageCoop.Client
                 }
 
                 packet.Flags |= VehicleDataFlags.IsFullSync;
-                packet.Colors = new[] { primaryColor, secondaryColor };
+                packet.Colors = (primaryColor, secondaryColor);
                 packet.DamageModel = veh.GetVehicleDamageModel();
                 packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
                 packet.RoofState = (byte)veh.RoofState;
