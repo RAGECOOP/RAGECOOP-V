@@ -350,6 +350,7 @@ namespace RageCoop.Client
                 v.RadioStation = packet.RadioStation;
                 v.LicensePlate = packet.LicensePlate;
                 v.Livery = packet.Livery;
+                v.HeadlightColor = packet.HeadlightColor;
                 v.ExtrasMask = packet.ExtrasMask;
             }
             v.SetLastSynced(full);

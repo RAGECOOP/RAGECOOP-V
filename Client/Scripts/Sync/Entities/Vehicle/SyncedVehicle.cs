@@ -3,6 +3,7 @@ using System.Linq;
 using GTA;
 using GTA.Math;
 using GTA.Native;
+using GTA.UI;
 using RageCoop.Core;
 using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
@@ -159,6 +160,11 @@ namespace RageCoop.Client
                     _lastLivery = Livery;
                 }
 
+                if (_lastHeadlightColor != HeadlightColor)
+                {
+                    Call(SET_VEHICLE_XENON_LIGHT_COLOR_INDEX, MainVehicle.Handle, HeadlightColor);
+                    _lastHeadlightColor = HeadlightColor;
+                }
                 MainVehicle.SetDamageModel(DamageModel);
 
                 if (MainVehicle.Handle == V?.Handle && Util.GetPlayerRadioIndex() != RadioStation)

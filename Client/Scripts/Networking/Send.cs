@@ -136,6 +136,7 @@ namespace RageCoop.Client
                 packet.LockStatus = veh.LockStatus;
                 packet.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
                 packet.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
+                packet.HeadlightColor = (byte)Call<int>(GET_VEHICLE_XENON_LIGHT_COLOR_INDEX, veh);
                 packet.ExtrasMask = v.GetVehicleExtras();
                 packet.RadioStation = v.MainVehicle == LastV
                     ? Util.GetPlayerRadioIndex() : byte.MaxValue;
