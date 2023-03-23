@@ -341,6 +341,7 @@ namespace RageCoop.Client
                 v.DamageModel = packet.DamageModel;
                 v.EngineHealth = packet.EngineHealth;
                 v.Mods = packet.Mods;
+                v.ToggleModsMask = packet.ToggleModsMask;
                 v.Model = packet.ModelHash;
                 v.Colors = packet.Colors;
                 v.LandingGear = packet.LandingGear;

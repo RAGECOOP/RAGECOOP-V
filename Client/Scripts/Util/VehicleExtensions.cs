@@ -47,13 +47,21 @@ namespace RageCoop.Client
             return flags;
         }
 
-        public static (int, int)[] GetVehicleMods(this VehicleModCollection mods)
+        public static (int, int)[] GetVehicleMods(this SyncedVehicle sv, out byte togglesMask)
         {
-            var modsArr = mods.ToArray();
+            var modsArr = sv.MainVehicle.Mods.ToArray();
             var result = new (int, int)[modsArr.Length];
             for (int i = 0; i < modsArr.Length; i++)
             {
                 result[i] = ((int)modsArr[i].Type, modsArr[i].Index);
+            }
+            togglesMask = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                if (Call<bool>(IS_TOGGLE_MOD_ON, sv.MainVehicle.Handle, i + 17))
+                {
+                    togglesMask |= (byte)(1 << i);
+                }
             }
             return result;
         }
@@ -152,17 +160,6 @@ namespace RageCoop.Client
 
             veh.IsLeftHeadLightBroken = model.LeftHeadLightBroken > 0;
             veh.IsRightHeadLightBroken = model.RightHeadLightBroken > 0;
-        }
-
-        public static Dictionary<int, int> GetPassengers(this Vehicle veh)
-        {
-            var ps = new Dictionary<int, int>();
-            var d = veh.Driver;
-            if (d != null && d.IsSittingInVehicle()) ps.Add(-1, d.GetSyncEntity().ID);
-            foreach (var p in veh.Passengers)
-                if (p.IsSittingInVehicle())
-                    ps.Add((int)p.SeatIndex, p.GetSyncEntity().ID);
-            return ps;
         }
 
         public static void SetDeluxoHoverState(this Vehicle deluxo, bool hover)

@@ -63,13 +63,14 @@ namespace RageCoop.Core
                     // Write vehicle mods
                     // Write the count of mods
                     m.Write((short)Mods.Length);
-                    // Loop the dictionary and add the values
                     foreach (var mod in Mods)
                     {
                         // Write the mod value
                         m.Write(mod.Item1);
                         m.Write(mod.Item2);
                     }
+
+                    m.Write(ToggleModsMask);
 
                     if (!DamageModel.Equals(default(VehicleDamageModel)))
                     {
@@ -150,6 +151,8 @@ namespace RageCoop.Core
                         // Read the mod value
                         Mods[i] = (m.ReadInt32(), m.ReadInt32());
 
+                    ToggleModsMask = m.ReadByte();
+                    
                     if (m.ReadBoolean())
                         // Read vehicle damage model
                         DamageModel = new VehicleDamageModel
@@ -189,6 +192,7 @@ namespace RageCoop.Core
 
             public (int, int)[] Mods { get; set; }
 
+            public byte ToggleModsMask;
             public VehicleDamageModel DamageModel { get; set; }
 
             public byte LandingGear { get; set; }

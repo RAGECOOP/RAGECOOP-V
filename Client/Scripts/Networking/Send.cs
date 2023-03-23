@@ -130,7 +130,7 @@ namespace RageCoop.Client
                 packet.DamageModel = veh.GetVehicleDamageModel();
                 packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
                 packet.RoofState = (byte)veh.RoofState;
-                packet.Mods = veh.Mods.GetVehicleMods();
+                packet.Mods = v.GetVehicleMods(out packet.ToggleModsMask);
                 packet.ModelHash = veh.Model.Hash;
                 packet.EngineHealth = veh.EngineHealth;
                 packet.LockStatus = veh.LockStatus;

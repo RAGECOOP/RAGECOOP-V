@@ -131,15 +131,23 @@ namespace RageCoop.Client
 
                     _lastVehicleColors = Colors;
                 }
-
+                
                 MainVehicle.EngineHealth = EngineHealth;
                 if (Mods != null && !Mods.SequenceEqual(_lastVehicleMods))
                 {
                     Call(SET_VEHICLE_MOD_KIT, MainVehicle, 0);
 
                     foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Item1].Index = mod.Item2;
-
+                    
                     _lastVehicleMods = Mods;
+                }
+                if (ToggleModsMask != _lastToggleMods)
+                {
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Call(TOGGLE_VEHICLE_MOD, MainVehicle.Handle, i + 17, (ToggleModsMask & (1 << i)) != 0);
+                    }
+                    _lastToggleMods = ToggleModsMask;
                 }
 
                 if (Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle) != LicensePlate)
