@@ -13,11 +13,11 @@ namespace RageCoop.Core
             public int ShooterID { get; set; }
             public uint WeaponHash { get; set; }
 
-            public Vector3 Position { get; set; }
+            public LVector3 Position { get; set; }
 
-            public Vector3 Rotation { get; set; }
+            public LVector3 Rotation { get; set; }
 
-            public Vector3 Velocity { get; set; }
+            public LVector3 Velocity { get; set; }
 
             public ProjectileDataFlags Flags { get; set; }
 

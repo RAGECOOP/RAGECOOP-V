@@ -31,8 +31,8 @@ namespace RageCoop.Client
         protected override void OnStart()
         {
             base.OnStart();
-            while(Game.IsLoading) 
-                Yield(); 
+            while (Game.IsLoading)
+                Yield();
 
             Notification.Show(NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!",
                    $"Press ~g~{Settings.MenuKey}~s~ to open the menu.");
@@ -40,6 +40,18 @@ namespace RageCoop.Client
         protected override void OnTick()
         {
             base.OnTick();
+
+            if (_sleeping)
+            {
+                Game.Pause(true);
+                while (_sleeping)
+                {
+                    // Don't wait longer than 5 seconds or the game will crash
+                    Thread.Sleep(4500);
+                    Yield();
+                }
+                Game.Pause(false);
+            }
 
             if (Game.IsLoading) return;
 
@@ -223,6 +235,22 @@ namespace RageCoop.Client
             {
                 QueuedActions.Clear();
             }
+        }
+        private static bool _sleeping;
+        [ConsoleCommand("Put the game to sleep state by blocking main thread, press any key in the debug console to resume")]
+        public static void Sleep()
+        {
+            if (_sleeping)
+                throw new InvalidOperationException("Already in sleep state");
+
+            _sleeping = true;
+            Task.Run(() =>
+            {
+                System.Console.WriteLine("Press any key to put the game out of sleep state");
+                System.Console.ReadKey();
+                System.Console.WriteLine("Game resumed");
+                _sleeping = false;
+            });
         }
     }
 }

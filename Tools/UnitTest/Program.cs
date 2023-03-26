@@ -1,6 +1,10 @@
-﻿using GTA.Math;
+﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using GTA.Math;
 using RageCoop.Core;
 using RageCoop.Core.Scripting;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
 namespace UnitTest
@@ -23,10 +27,16 @@ namespace UnitTest
         public Quaternion quat;
         public string str;
     }
-    internal unsafe class Program
+    struct TestStruct
+    {
+        public ulong val1;
+        public ulong val2;
+    }
+    public unsafe partial class Program
     {
         static void Main(string[] args)
         {
+
             TestElement[] test = new TestElement[1024];
             Console.WriteLine("Testing buffers");
             var buf = new BufferWriter(1024);
@@ -72,21 +82,76 @@ namespace UnitTest
             Console.WriteLine("Buffers OK");
 
             Console.WriteLine("Testing CustomEvents");
-            var objs = new object[] { (byte)236, (short)82, (ushort)322, 
+            var objs = new object[] { (byte)236, (short)82, (ushort)322,
                 "test", 123, 123U, 456UL, 345L, 5F, new Vector2(15, 54), new Vector3(22, 45, 25), new Quaternion(2, 3, 222, 5) };
 
             buf.Reset();
             CustomEvents.WriteObjects(buf, objs);
             var payload = buf.ToByteArray(buf.Position);
-            fixed(byte* p = payload)
+            fixed (byte* p = payload)
             {
                 reader.Initialise(p, payload.Length);
             }
-
-            if (!CustomEvents.ReadObjects(reader).SequenceEqual(objs))
+            var result = CustomEvents.ReadObjects(reader);
+            if (!result.SequenceEqual(objs))
                 throw new Exception("CustomEvents fail");
 
             Console.WriteLine("CustomEvents OK");
+
+            var sArr1 = new TestStruct[200];
+            var sArr2 = new TestStruct[200];
+            var sArr3 = new TestStruct[200];
+            for (int i = 0; i < 200; i++)
+            {
+                sArr1[i] = sArr2[i] = new() { val1 = 123, val2 = 456 };
+                sArr3[i] = new() { val1 = 456, val2 = 789 };
+            }
+            fixed (TestStruct* p1 = sArr1, p2 = sArr2, p3 = sArr3)
+            {
+                Debug.Assert(CoreUtils.MemCmp(p1, p2, sizeof(TestStruct)));
+                Debug.Assert(!CoreUtils.MemCmp(p1, p3, sizeof(TestStruct)));
+                Debug.Assert(!CoreUtils.MemCmp(p2, p3, sizeof(TestStruct)));
+            }
+#if !DEBUG
+            var summary = BenchmarkRunner.Run<MemCmpTest>();
+#endif
+
         }
+
+        public class MemCmpTest
+        {
+            private const int N = 10000;
+            TestStruct* p1;
+            TestStruct* p2;
+            TestStruct* p3;
+            int size = sizeof(TestStruct) * N;
+            public MemCmpTest()
+            {
+                p1 = (TestStruct*)Marshal.AllocHGlobal(N * sizeof(TestStruct));
+                p2 = (TestStruct*)Marshal.AllocHGlobal(N * sizeof(TestStruct));
+                p3 = (TestStruct*)Marshal.AllocHGlobal(N * sizeof(TestStruct));
+                for (int i = 0; i < 200; i++)
+                {
+                    p1[i] = p2[i] = new() { val1 = 123, val2 = 456 };
+                    p3[i] = new() { val1 = 456, val2 = 789 };
+                }
+            }
+
+            [Benchmark]
+            public void Simd()
+            {
+                CoreUtils.MemCmp(p1, p2, size);
+            }
+
+            [Benchmark]
+            public void Win32()
+            {
+                memcmp(p1, p2, (UIntPtr)size);
+            }
+        }
+
+
+        [DllImport("msvcrt.dll")]
+        public static extern int memcmp(void* b1, void* b2, UIntPtr count);
     }
 }

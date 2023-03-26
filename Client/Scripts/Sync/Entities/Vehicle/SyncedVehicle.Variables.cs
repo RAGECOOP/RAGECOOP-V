@@ -12,42 +12,23 @@ namespace RageCoop.Client
 
 
         #region -- SYNC DATA --
-
-        internal Vector3 RotationVelocity { get; set; }
-        internal float SteeringAngle { get; set; }
-        internal float ThrottlePower { get; set; }
-        internal float BrakePower { get; set; }
-        internal float DeluxoWingRatio { get; set; } = -1;
-
-
-        internal byte LandingGear { get; set; }
-        internal VehicleRoofState RoofState { get; set; }
-        internal VehicleDamageModel DamageModel { get; set; }
-        internal (byte, byte) Colors { get; set; }
-        internal (int, int)[] Mods { get; set; }
-        internal float EngineHealth { get; set; }
-        internal VehicleLockStatus LockStatus { get; set; }
-        internal byte RadioStation = 255;
-        internal string LicensePlate { get; set; }
-        internal int Livery { get; set; } = -1;
-        internal byte HeadlightColor { get; set; } = 255;
-        internal VehicleDataFlags Flags { get; set; }
-        internal ushort ExtrasMask;
-        internal byte ToggleModsMask;
+        internal VehicleData VD;
+        internal VehicleDataFull VDF;
+        internal VehicleDataVar VDV;
 
         #endregion
 
         #region FLAGS
 
-        internal bool EngineRunning => Flags.HasVehFlag(VehicleDataFlags.IsEngineRunning);
-        internal bool Transformed => Flags.HasVehFlag(VehicleDataFlags.IsTransformed);
-        internal bool HornActive => Flags.HasVehFlag(VehicleDataFlags.IsHornActive);
-        internal bool LightsOn => Flags.HasVehFlag(VehicleDataFlags.AreLightsOn);
-        internal bool BrakeLightsOn => Flags.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
-        internal bool HighBeamsOn => Flags.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
-        internal bool SireneActive => Flags.HasVehFlag(VehicleDataFlags.IsSirenActive);
-        internal bool IsDead => Flags.HasVehFlag(VehicleDataFlags.IsDead);
-        internal bool IsDeluxoHovering => Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering);
+        internal bool EngineRunning => VD.Flags.HasVehFlag(VehicleDataFlags.IsEngineRunning);
+        internal bool Transformed => VD.Flags.HasVehFlag(VehicleDataFlags.IsTransformed);
+        internal bool HornActive => VD.Flags.HasVehFlag(VehicleDataFlags.IsHornActive);
+        internal bool LightsOn => VD.Flags.HasVehFlag(VehicleDataFlags.AreLightsOn);
+        internal bool BrakeLightsOn => VD.Flags.HasVehFlag(VehicleDataFlags.AreBrakeLightsOn);
+        internal bool HighBeamsOn => VD.Flags.HasVehFlag(VehicleDataFlags.AreHighBeamsOn);
+        internal bool SireneActive => VD.Flags.HasVehFlag(VehicleDataFlags.IsSirenActive);
+        internal bool IsDead => VD.Flags.HasVehFlag(VehicleDataFlags.IsDead);
+        internal bool IsDeluxoHovering => VD.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering);
 
         #endregion
 
@@ -69,15 +50,13 @@ namespace RageCoop.Client
         #endregion
 
         #region PRIVATE
-        private byte _lastToggleMods;
-        private (byte, byte) _lastVehicleColors;
-        private ushort _lastExtras;
-        private (int, int)[] _lastVehicleMods = Array.Empty<(int, int)>();
-        private bool _lastHornActive;
-        private bool _lastTransformed;
-        private int _lastLivery = -1;
-        private byte _lastHeadlightColor = 255;
+        private VehicleData _lastVD;
+        private VehicleDataFull _lastVDF;
+        private VehicleDataVar _lastVDV;
         private Vector3 _predictedPosition;
+        internal bool _lastTransformed => _lastVD.Flags.HasVehFlag(VehicleDataFlags.IsTransformed);
+        internal bool _lastHornActive => _lastVD.Flags.HasVehFlag(VehicleDataFlags.IsHornActive);
+
         #endregion
 
         #region OUTGOING

@@ -24,7 +24,7 @@ namespace RageCoop.Core
 {
 
     [Serializable]
-    public struct LVector3 : IEquatable<LVector3>
+    internal struct LVector3 : IEquatable<LVector3>
     {
         /// <summary>
         /// Gets or sets the X component of the vector.

@@ -113,32 +113,6 @@ namespace RageCoop.Core
             Encoding.UTF8.GetBytes(str, new(pBody, cbBody));
         }
 
-        // Struct in GTA.Math have pack/padding for memory alignment, we don't want it to waste the bandwidth
-
-        public void Write(ref Vector2 vec2)
-        {
-            var faddr = Alloc<float>(2);
-            faddr[0] = vec2.X;
-            faddr[1] = vec2.Y;
-        }
-
-        public void Write(ref Vector3 vec3)
-        {
-            var faddr = Alloc<float>(3);
-            faddr[0] = vec3.X;
-            faddr[1] = vec3.Y;
-            faddr[2] = vec3.Z;
-        }
-
-        public void Write(ref Quaternion quat)
-        {
-            var faddr = Alloc<float>(4);
-            faddr[0] = quat.X;
-            faddr[1] = quat.Y;
-            faddr[2] = quat.Z;
-            faddr[3] = quat.W;
-        }
-
         public void Write<T>(ReadOnlySpan<T> source) where T : unmanaged
         {
             var len = source.Length;
@@ -235,39 +209,6 @@ namespace RageCoop.Core
         {
             var cbBody = ReadVal<int>();
             str = Encoding.UTF8.GetString(Alloc(cbBody), cbBody);
-        }
-
-        public void Read(out Vector2 vec)
-        {
-            var faddr = Alloc<float>(2);
-            vec = new()
-            {
-                X = faddr[0],
-                Y = faddr[1],
-            };
-        }
-
-        public void Read(out Vector3 vec)
-        {
-            var faddr = Alloc<float>(3);
-            vec = new()
-            {
-                X = faddr[0],
-                Y = faddr[1],
-                Z = faddr[2],
-            };
-        }
-
-        public void Read(out Quaternion quat)
-        {
-            var faddr = Alloc<float>(4);
-            quat = new()
-            {
-                X = faddr[0],
-                Y = faddr[1],
-                Z = faddr[2],
-                W = faddr[3],
-            };
         }
 
         /// <summary>

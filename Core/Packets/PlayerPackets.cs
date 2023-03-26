@@ -176,7 +176,7 @@ namespace RageCoop.Core
 
             public string Username { get; set; }
             public float Latency { get; set; }
-            public Vector3 Position { get; set; }
+            public LVector3 Position { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
             {

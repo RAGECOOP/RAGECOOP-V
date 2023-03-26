@@ -194,13 +194,28 @@ namespace RageCoop.Core.Scripting
                         break;
                     case Vector2 value:
                         b.WriteVal(T_VEC2);
+                        var vec2 = (LVector2)value;
+                        b.Write(ref vec2);
+                        break;
+                    case LVector2 value:
+                        b.WriteVal(T_VEC2);
                         b.Write(ref value);
                         break;
                     case Vector3 value:
                         b.WriteVal(T_VEC3);
+                        var vec3 = (LVector3)value;
+                        b.Write(ref vec3);
+                        break;
+                    case LVector3 value:
+                        b.WriteVal(T_VEC3);
                         b.Write(ref value);
                         break;
                     case Quaternion value:
+                        b.WriteVal(T_QUAT);
+                        var quat = (LQuaternion)value;
+                        b.Write(ref quat);
+                        break;
+                    case LQuaternion value:
                         b.WriteVal(T_QUAT);
                         b.Write(ref value);
                         break;
@@ -261,19 +276,19 @@ namespace RageCoop.Core.Scripting
                         Args[i] = str;
                         break;
                     case T_VEC3:
-                        r.Read(out Vector3 vec);
-                        Args[i] = vec;
+                        r.Read(out LVector3 vec);
+                        Args[i] = (Vector3)vec;
                         break;
                     case T_QUAT:
-                        r.Read(out Quaternion quat);
-                        Args[i] = quat;
+                        r.Read(out LQuaternion quat);
+                        Args[i] = (Quaternion)quat;
                         break;
                     case T_MODEL:
                         Args[i] = r.ReadVal<Model>();
                         break;
                     case T_VEC2:
-                        r.Read(out Vector2 vec2);
-                        Args[i] = vec2;
+                        r.Read(out LVector2 vec2);
+                        Args[i] = (Vector2)vec2;
                         break;
                     case T_BYTEARR:
                         Args[i] = r.ReadArray<byte>();
