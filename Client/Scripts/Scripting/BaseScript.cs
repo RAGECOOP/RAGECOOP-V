@@ -7,6 +7,7 @@ using GTA.Math;
 using GTA.Native;
 using GTA.UI;
 using RageCoop.Core.Scripting;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RageCoop.Client.Scripting
 {
