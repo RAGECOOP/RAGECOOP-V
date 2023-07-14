@@ -36,7 +36,6 @@
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
     <Compile Include="Menus\Sub\ServersMenu.cs" />
     <Compile Include="Menus\Sub\SettingsMenu.cs" />
-    <Compile Include="Menus\Sub\UpdateMenu.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
     <Compile Include="Networking\HolePunch.cs" />
