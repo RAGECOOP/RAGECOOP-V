@@ -51,7 +51,7 @@ namespace RageCoop.Client
         /// <summary>
         /// Disable world NPC traffic, mission entities won't be affected
         /// </summary>
-        public bool DisableTraffic { get; set; } = true;
+        public bool DisableTraffic { get; set; } = false;
 
         /// <summary>
         /// Bring up pause menu but don't freeze time when FrontEndPauseAlternate(Esc) is pressed.

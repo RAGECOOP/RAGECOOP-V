@@ -53,13 +53,14 @@ namespace RageCoop.Client
                 NetPeerConfiguration config = new NetPeerConfiguration("623c92c287cc392406e7aaaac1c0f3b0")
                 {
                     AutoFlushSendQueue = false,
-                    SimulatedMinimumLatency = SimulatedLatency,
-                    SimulatedRandomLatency = 0,
                     AcceptIncomingConnections = true,
                     MaximumConnections = 32,
                     PingInterval = 5
                 };
-
+#if DEBUG
+                config.SimulatedMinimumLatency = SimulatedLatency;
+                config.SimulatedRandomLatency = 0;
+#endif
                 config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
                 config.EnableMessageType(NetIncomingMessageType.NatIntroductionSuccess);
 
@@ -96,7 +97,12 @@ namespace RageCoop.Client
                         Peer.OnMessageReceived += (s, m) =>
                         {
                             try { ProcessMessage(m); }
-                            catch (Exception ex) { Main.Logger.Error(ex); }
+                            catch (Exception ex)
+                            {
+#if DEBUG
+                                Main.Logger.Error(ex);
+#endif
+                            }
                         };
                         Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
                         Menus.CoopMenu._serverConnectItem.Enabled = false;
