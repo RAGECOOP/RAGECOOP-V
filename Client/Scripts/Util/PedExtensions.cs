@@ -354,7 +354,7 @@ namespace RageCoop.Client
             {
                 result = true;
             }
-            else
+            else if (veh.GetPedOnSeat(seat) != null)
             {
                 var isDead = veh.GetPedOnSeat(seat).IsDead;
                 if (isDead)

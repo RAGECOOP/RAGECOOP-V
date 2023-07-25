@@ -55,7 +55,7 @@ namespace RageCoop.Client.Installer
             var shvPath = Path.Combine(root, "ScriptHookV.dll");
             var shvdnPath = Path.Combine(root, "ScriptHookVDotNetCore.dll");
             var scriptsPath = Path.Combine(root, "Scripts");
-            var installPath = Path.Combine(root, "RageCoop");
+            var installPath = Path.Combine(root, "CoreScripts");
             var legacyPath = Path.Combine(scriptsPath, "RageCoop");
             if (Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName.StartsWith(installPath))
                 throw new InvalidOperationException(
@@ -70,37 +70,35 @@ namespace RageCoop.Client.Installer
 
             if (!File.Exists(shvdnPath))
             {
-                MessageBox.Show("Please install ScriptHookVDotNet first!");
+                MessageBox.Show("Please install ScriptHookVDotNetCore first!");
                 Environment.Exit(1);
             }
 
             var shvdnVer = GetVer(shvdnPath);
-            if (shvdnVer < new Version(3, 5, 1))
+            if (shvdnVer < new Version(1, 2, 1))
             {
-                MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
-                                $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
+                MessageBox.Show("Please update ScriptHookVDotNetCore to latest version!" +
+                                $"\nCurrent version is {shvdnVer}, 1.2.1 or higher is required");
                 Environment.Exit(1);
             }
 
 
             UpdateStatus("Removing old versions");
 
-            foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
-                File.Delete(f);
+            if (Directory.Exists(scriptsPath))
+                foreach (var f in Directory.GetFiles(scriptsPath, "RageCoop.*", SearchOption.AllDirectories))
+                    File.Delete(f);
 
             // <= 1.5 installation check
             if (Directory.Exists(legacyPath)) Directory.Delete(legacyPath, true);
 
             foreach (var f in Directory.GetFiles(installPath, "*.dll", SearchOption.AllDirectories)) File.Delete(f);
 
-            if (File.Exists("Scripts/RageCoop.Core.dll") && File.Exists("Scripts/RageCoop.Client.dll") &&
-                File.Exists("Loader/RageCoop.Client.Loader.dll"))
+            if (File.Exists("Scripts/RageCoop.Core.dll") && File.Exists("Scripts/RageCoop.Client.dll"))
             {
                 UpdateStatus("Installing...");
                 CoreUtils.CopyFilesRecursively(new DirectoryInfo(Directory.GetCurrentDirectory()),
                     new DirectoryInfo(installPath));
-                File.Copy("Loader/RageCoop.Client.Loader.dll", Path.Combine(scriptsPath, "RageCoop.Client.Loader.dll"),
-                    true);
                 Finish();
             }
             else
@@ -114,7 +112,7 @@ namespace RageCoop.Client.Installer
                 checkKeys:
                 UpdateStatus("Checking conflicts");
                 var menyooConfig = Path.Combine(root, @"menyooStuff\menyooConfig.ini");
-                var settingsPath = Path.Combine(root, SettingsPath);
+                var settingsPath = Path.Combine(installPath, "Data", "Setting.json");
                 ClientSettings settings = null;
                 try
                 {

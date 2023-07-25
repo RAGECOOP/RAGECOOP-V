@@ -31,7 +31,10 @@ namespace RageCoop.Core
 {
     internal static class CoreUtils
     {
-        private static readonly Random random = new();
+        internal static Random SafeRandom => _randInstance.Value;
+        private static int _randSeed = Environment.TickCount;
+        private static readonly ThreadLocal<Random> _randInstance
+            = new(() => new Random(Interlocked.Increment(ref _randSeed)));
 
         private static readonly HashSet<string> ToIgnore = new()
         {
@@ -72,7 +75,7 @@ namespace RageCoop.Core
 
         public static int RandInt(int start, int end)
         {
-            return random.Next(start, end);
+            return SafeRandom.Next(start, end);
         }
 
         public static string GetTempDirectory(string dir = null)
@@ -91,7 +94,7 @@ namespace RageCoop.Core
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
+                .Select(s => s[SafeRandom.Next(s.Length)]).ToArray());
         }
 
         public static Version GetLatestVersion(string branch = "dev-nightly")
