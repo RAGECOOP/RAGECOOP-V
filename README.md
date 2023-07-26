@@ -15,7 +15,7 @@ RAGECOOP brings multiplayer experience to the story mode, you can complete missi
 
 # 👁 Requirements
 - ScriptHookV
-- ScriptHookVDotNet 3.5.1 or later
+- ScriptHookVDotNet 3.6.0 or later
 - .NET Framework 4.8 Runtime or SDK
 
 # 📋 Building the project
@@ -49,7 +49,7 @@ Then run `dotnet build` in the solution directory, built binaries are in the `bi
 5. Decent compatibility with other mods, set up a private modded server to have some fun!
 6. Weaponized vehicle sync(WIP).
 7. Optimization for high-Ping condition, play with friends around the world!
-8. Powerful scripting API and resource system, easily [add multiplayer functionality to your mod](HTTPS://docs.ragecoop.online).
+8. Powerful scripting API and resource system, easily [add multiplayer functionality to your mod](HTTPS://docs.ragecoop.com).
 
 # ⚠ Known issues
 
