@@ -36,7 +36,6 @@
     <Compile Include="Menus\Sub\DevToolMenu.cs" />
     <Compile Include="Menus\Sub\ServersMenu.cs" />
     <Compile Include="Menus\Sub\SettingsMenu.cs" />
-    <Compile Include="Menus\Sub\UpdateMenu.cs" />
     <Compile Include="Networking\Chat.cs" />
     <Compile Include="Networking\DownloadManager.cs" />
     <Compile Include="Networking\HolePunch.cs" />
@@ -67,6 +66,7 @@
     <Compile Include="Sync\EntityPool.cs" />
     <Compile Include="Sync\SyncEvents.cs" />
     <Compile Include="Sync\Voice.cs" />
+    <Compile Include="Util\AddOnDataProvider.cs" />
     <Compile Include="Util\Memory.cs" />
     <Compile Include="Util\NativeCaller.cs" />
     <Compile Include="Util\PedConfigFlags.cs" />

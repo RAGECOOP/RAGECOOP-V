@@ -141,7 +141,9 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
+#if DEBUG
                 Main.Logger.Error(ex);
+#endif
             }
 
             if (Networking.ShowNetworkInfo)
@@ -347,7 +349,9 @@ namespace RageCoop.Client
                     }
                     catch (Exception ex)
                     {
+#if DEBUG
                         Logger.Error(ex);
+#endif
                         QueuedActions.Remove(action);
                     }
                 }

@@ -50,7 +50,7 @@ namespace RageCoop.Client
                 flags |= VehicleDataFlags.IsHornActive;
             }
 
-            if (v.IsSubmarineCar && Function.Call<bool>(Hash._GET_IS_SUBMARINE_VEHICLE_TRANSFORMED, veh.Handle))
+            if (v.IsSubmarineCar && Function.Call<bool>(Hash.IS_VEHICLE_IN_SUBMARINE_MODE, veh.Handle))
             {
                 flags |= VehicleDataFlags.IsTransformed;
             }
@@ -89,7 +89,7 @@ namespace RageCoop.Client
         }
         public static bool IsRocketBoostActive(this Vehicle veh)
         {
-            return Function.Call<bool>(Hash._IS_VEHICLE_ROCKET_BOOST_ACTIVE, veh);
+            return Function.Call<bool>(Hash.IS_ROCKET_BOOST_ACTIVE, veh);
         }
         public static bool IsParachuteActive(this Vehicle veh)
         {
@@ -97,7 +97,7 @@ namespace RageCoop.Client
         }
         public static void SetRocketBoostActive(this Vehicle veh, bool toggle)
         {
-            Function.Call(Hash._SET_VEHICLE_ROCKET_BOOST_ACTIVE, veh, toggle);
+            Function.Call(Hash.SET_ROCKET_BOOST_ACTIVE, veh, toggle);
         }
         public static void SetParachuteActive(this Vehicle veh, bool toggle)
         {
@@ -242,7 +242,7 @@ namespace RageCoop.Client
 
         public static void SetDeluxoHoverState(this Vehicle deluxo, bool hover)
         {
-            Function.Call(Hash._SET_VEHICLE_HOVER_TRANSFORM_PERCENTAGE, deluxo, hover ? 1f : 0f);
+            Function.Call(Hash.SET_SPECIAL_FLIGHT_MODE_TARGET_RATIO, deluxo, hover ? 1f : 0f);
         }
         public static bool IsDeluxoHovering(this Vehicle deluxo)
         {
@@ -250,7 +250,7 @@ namespace RageCoop.Client
         }
         public static void SetDeluxoWingRatio(this Vehicle v, float ratio)
         {
-            Function.Call(Hash._SET_SPECIALFLIGHT_WING_RATIO, v, ratio);
+            Function.Call(Hash.SET_HOVER_MODE_WING_RATIO, v, ratio);
         }
         public static float GetDeluxoWingRatio(this Vehicle v)
         {
@@ -258,7 +258,7 @@ namespace RageCoop.Client
         }
         public static float GetNozzleAngel(this Vehicle plane)
         {
-            return Function.Call<float>(Hash._GET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane);
+            return Function.Call<float>(Hash.GET_VEHICLE_FLIGHT_NOZZLE_POSITION, plane);
         }
         public static bool HasNozzle(this Vehicle v)
         {

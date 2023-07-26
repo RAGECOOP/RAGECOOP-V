@@ -28,7 +28,7 @@
         /// <summary>
         /// The website address to be shown on master server
         /// </summary>
-        public string Website { get; set; } = "https://ragecoop.online/";
+        public string Website { get; set; } = "https://ragecoop.com/";
 
         /// <summary>
         /// The description to be shown on master server
@@ -58,7 +58,7 @@
         /// <summary>
         /// Master server address, mostly doesn't need to be changed.
         /// </summary>
-        public string MasterServer { get; set; } = "https://masterserver.ragecoop.online/";
+        public string MasterServer { get; set; } = "https://masterserver.ragecoop.com/";
 
         /// <summary>
         /// See <see cref="Core.Logger.LogLevel"/>.

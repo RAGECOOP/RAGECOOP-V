@@ -7,6 +7,7 @@ on:
       - '*/*'       # matches every branch containing a single '/'
       - '**'        # matches every branch
       - '!main'     # excludes main
+      - '!dev-nightly'     # excludes nightly
 
   pull_request:
     branches: [ "main", "dev-nightly" ]
@@ -42,6 +43,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: RageCoop.Client
-        path: bin/Release/Client/RageCoop
+        path: bin/Release/Client
     - uses: actions/checkout@v2
       

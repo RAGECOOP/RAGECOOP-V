@@ -78,10 +78,10 @@ namespace RageCoop.Client.Installer
                 Environment.Exit(1);
             }
             var shvdnVer = GetVer(shvdnPath);
-            if (shvdnVer < new Version(3, 5, 1))
+            if (shvdnVer < new Version(3, 6, 0))
             {
                 MessageBox.Show("Please update ScriptHookVDotNet to latest version!" +
-                    $"\nCurrent version is {shvdnVer}, 3.5.1 or higher is required");
+                    $"\nCurrent version is {shvdnVer}, 3.6.0 or higher is required");
                 Environment.Exit(1);
             }
             if (File.Exists(lemonPath))

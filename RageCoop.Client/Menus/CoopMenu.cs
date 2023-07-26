@@ -67,16 +67,18 @@ namespace RageCoop.Client.Menus
 
             Menu.AddSubMenu(SettingsMenu.Menu);
             Menu.AddSubMenu(DevToolMenu.Menu);
+#if DEBUG
             Menu.AddSubMenu(DebugMenu.Menu);
-            Menu.AddSubMenu(UpdateMenu.Menu);
+#endif
 
             MenuPool.Add(Menu);
             MenuPool.Add(SettingsMenu.Menu);
             MenuPool.Add(DevToolMenu.Menu);
+#if DEBUG
             MenuPool.Add(DebugMenu.Menu);
             MenuPool.Add(DebugMenu.DiagnosticMenu);
+#endif
             MenuPool.Add(ServersMenu.Menu);
-            MenuPool.Add(UpdateMenu.Menu);
             MenuPool.Add(PopUp);
 
             Menu.Add(_aboutItem);

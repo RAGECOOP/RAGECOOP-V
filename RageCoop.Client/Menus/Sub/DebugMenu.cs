@@ -1,4 +1,5 @@
-﻿using GTA;
+﻿#if DEBUG
+using GTA;
 using LemonUI.Menus;
 using System;
 using System.Drawing;
@@ -56,3 +57,4 @@ namespace RageCoop.Client
 
     }
 }
+#endif

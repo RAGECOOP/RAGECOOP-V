@@ -28,7 +28,7 @@ namespace RageCoop.Client
             MainPed = p;
             OwnerID = Main.LocalPlayerID;
 
-            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             // MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
 
@@ -235,7 +235,7 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_PED_CAN_BE_TARGETTED_BY_PLAYER, MainPed.Handle, Game.Player, true);
             Function.Call(Hash.SET_PED_GET_OUT_UPSIDE_DOWN_VEHICLE, MainPed.Handle, false);
             Function.Call(Hash.SET_CAN_ATTACK_FRIENDLY, MainPed.Handle, true, true);
-            Function.Call(Hash._SET_PED_CAN_PLAY_INJURED_ANIMS, false);
+            Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);
@@ -713,7 +713,7 @@ namespace RageCoop.Client
                 case 5:
                     if (MainPed.VehicleTryingToEnter != CurrentVehicle.MainVehicle || MainPed.GetSeatTryingToEnter() != Seat)
                     {
-                        MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle, Seat, -1, 5, EnterVehicleFlags.AllowJacking);
+                        MainPed.Task.EnterVehicle(CurrentVehicle.MainVehicle, Seat, -1, 5, EnterVehicleFlags.JackAnyone);
                     }
                     break;
                 case 6:

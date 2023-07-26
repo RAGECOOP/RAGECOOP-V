@@ -362,7 +362,7 @@ namespace RageCoop.Client
                     return 30;
 
                 default:
-                    return -1;
+                    return AddOnDataProvider.GetMuzzleIndex(v.Model.Hash);
             }
         }
         public static bool IsUsingProjectileWeapon(this Ped p)

@@ -70,7 +70,6 @@ namespace RageCoop.Client
         private readonly List<Vector3> _predictedTrace = new List<Vector3>();
         private readonly List<Vector3> _orgTrace = new List<Vector3>();
         private Vector3 _predictedPosition;
-        private readonly float _elapsed;
         #endregion
 
         #region OUTGOING

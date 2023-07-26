@@ -149,6 +149,7 @@ namespace RageCoop.Client
                         }
                         catch (Exception ex)
                         {
+#if DEBUG
                             Main.QueueAction(() =>
                             {
                                 GTA.UI.Notification.Show($"~r~~h~Packet Error {ex.Message}");
@@ -157,6 +158,7 @@ namespace RageCoop.Client
                             Main.Logger.Error($"[{packetType}] {ex.Message}");
                             Main.Logger.Error(ex);
                             Peer.Shutdown($"Packet Error [{packetType}]");
+#endif
                         }
                         break;
                     }

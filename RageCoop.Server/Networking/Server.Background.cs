@@ -81,7 +81,7 @@ namespace RageCoop.Server
             }
             if (!CanAnnounce)
             {
-                var existing = JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer))).Where(x => x.address == IpInfo.Address).FirstOrDefault();
+                var existing = JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer))).Where(x => x.address == IpInfo.Address && x.port == Settings.Port.ToString()).FirstOrDefault();
                 if(existing != null)
                 {
                     Logger.Warning("Server info already present in master server, waiting for 10 seconds...");
