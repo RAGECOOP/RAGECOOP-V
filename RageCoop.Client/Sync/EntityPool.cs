@@ -363,7 +363,7 @@ namespace RageCoop.Client
                 foreach (Ped p in allPeds)
                 {
                     SyncedPed c = GetPedByHandle(p.Handle);
-                    if (c == null && (p != Game.Player.Character))
+                    if (c == null && (p != Game.Player.Character) && !Function.Call<bool>(Hash.IS_PLAYER_SWITCH_IN_PROGRESS))
                     {
                         if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
                         {
