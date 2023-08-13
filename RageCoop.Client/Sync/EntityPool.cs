@@ -278,7 +278,7 @@ namespace RageCoop.Client
                         ProjectilesByHandle.Remove(p.Handle);
                     }
                     Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
-                    p.Explode();
+                    if (sp.Exploded) p.Explode();
                 }
                 ProjectilesByID.Remove(id);
             }
@@ -363,7 +363,8 @@ namespace RageCoop.Client
                 foreach (Ped p in allPeds)
                 {
                     SyncedPed c = GetPedByHandle(p.Handle);
-                    if (c == null && (p != Game.Player.Character) && !Function.Call<bool>(Hash.IS_PLAYER_SWITCH_IN_PROGRESS))
+                    List<PedHash> mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
+                    if (c == null && p != Game.Player.Character && !mainCharacters.Contains((PedHash)p.Model.Hash))
                     {
                         if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
                         {
