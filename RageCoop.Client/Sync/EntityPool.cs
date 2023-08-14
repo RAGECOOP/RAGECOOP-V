@@ -277,7 +277,7 @@ namespace RageCoop.Client
                     {
                         ProjectilesByHandle.Remove(p.Handle);
                     }
-                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    //Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
                     if (sp.Exploded) p.Explode();
                 }
                 ProjectilesByID.Remove(id);

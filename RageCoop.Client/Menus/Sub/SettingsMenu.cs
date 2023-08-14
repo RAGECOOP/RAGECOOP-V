@@ -17,6 +17,8 @@ namespace RageCoop.Client.Menus
         private static readonly NativeCheckboxItem _disableTrafficItem = new NativeCheckboxItem("Disable Traffic (NPCs/Vehicles)", "Local traffic only", Main.Settings.DisableTraffic);
         private static readonly NativeCheckboxItem _flipMenuItem = new NativeCheckboxItem("Flip menu", Main.Settings.FlipMenu);
         private static readonly NativeCheckboxItem _disablePauseAlt = new NativeCheckboxItem("Disable Alternate Pause", "Don't freeze game time when Esc pressed", Main.Settings.DisableAlternatePause);
+        private static readonly NativeCheckboxItem _showBlip = new NativeCheckboxItem("Show player blip", "Show other player's blip on map", Main.Settings.ShowPlayerBlip);
+        private static readonly NativeCheckboxItem _showNametag = new NativeCheckboxItem("Show player nametag", "Show other player's nametag on your screen", Main.Settings.ShowPlayerNameTag);
         private static readonly NativeCheckboxItem _disableVoice = new NativeCheckboxItem("Enable voice", "Check your GTA:V settings to find the right key on your keyboard for PushToTalk and talk to your friends", Main.Settings.Voice);
 
         private static readonly NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
@@ -35,6 +37,16 @@ namespace RageCoop.Client.Menus
             _menuKey.Activated += ChaneMenuKey;
             _passengerKey.Activated += ChangePassengerKey;
             _vehicleSoftLimit.Activated += VehicleSoftLimitActivated;
+            _showBlip.Activated += (s, e) =>
+            {
+                Main.Settings.ShowPlayerBlip = _showBlip.Checked;
+                Util.SaveSettings();
+            };
+            _showNametag.Activated += (s, e) =>
+            {
+                Main.Settings.ShowPlayerNameTag = _showNametag.Checked;
+                Util.SaveSettings();
+            };
 
             Menu.Add(_disableTrafficItem);
             Menu.Add(_disablePauseAlt);
@@ -43,6 +55,8 @@ namespace RageCoop.Client.Menus
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
+            Menu.Add(_showBlip);
+            Menu.Add(_showNametag);
         }
 
         private static void DisableVoiceCheckboxChanged(object sender, EventArgs e)

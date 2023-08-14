@@ -76,5 +76,15 @@ namespace RageCoop.Client
         /// Show the owner name of the entity you're aiming at
         /// </summary>
         public bool ShowEntityOwnerName { get; set; } = false;
+
+        /// <summary>
+        ///     Show other player's nametag on your screen
+        /// </summary>
+        public bool ShowPlayerNameTag { get; set; } = true;
+
+        /// <summary>
+        ///     Show other player's blip on map
+        /// </summary>
+        public bool ShowPlayerBlip { get; set; } = true;
     }
 }

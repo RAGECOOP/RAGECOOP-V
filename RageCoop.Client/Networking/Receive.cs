@@ -293,7 +293,7 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
+                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); return true; });
                     }
                     break;
             }

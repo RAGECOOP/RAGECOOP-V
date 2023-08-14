@@ -28,7 +28,7 @@ namespace RageCoop.Client
             MainPed = p;
             OwnerID = Main.LocalPlayerID;
 
-            Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
+            //Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
             MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
             // MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
 
@@ -76,12 +76,13 @@ namespace RageCoop.Client
                     }
                 }
 
-                if (((byte)BlipColor == 255) && (PedBlip != null))
+                if (!Main.Settings.ShowPlayerBlip && (byte)BlipColor != 255) BlipColor = (BlipColor)255;
+                if ((byte)BlipColor == 255 && PedBlip != null)
                 {
                     PedBlip.Delete();
                     PedBlip = null;
                 }
-                else if (((byte)BlipColor != 255) && PedBlip == null)
+                else if ((byte)BlipColor != 255 && PedBlip == null)
                 {
                     PedBlip = MainPed.AddBlip();
 
@@ -170,7 +171,7 @@ namespace RageCoop.Client
 
         private void RenderNameTag()
         {
-            if (!Owner.DisplayNameTag || (MainPed == null) || !MainPed.IsVisible || !MainPed.IsInRange(Main.PlayerPosition, 40f))
+            if (!Owner.DisplayNameTag || !Main.Settings.ShowPlayerNameTag || MainPed == null || !MainPed.IsVisible || !MainPed.IsInRange(Main.PlayerPosition, 40f))
             {
                 return;
             }
@@ -597,6 +598,8 @@ namespace RageCoop.Client
                         MainPed.Task.StandStill(2000);
                         LastMoving = false;
                     }
+
+                    if (MainPed.IsTaskActive(TaskType.CTaskDiveToGround)) MainPed.Task.ClearAll();
                     break;
             }
             SmoothTransition();
