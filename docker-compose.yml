@@ -6,6 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "4499:4499"
+      - "4499:4499/udp"
     volumes:
       - ./Settings.xml:/app/Settings.xml
