@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  ragecoop-v:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4499:4499"
+    volumes:
+      - ./Settings.xml:/app/Settings.xml
