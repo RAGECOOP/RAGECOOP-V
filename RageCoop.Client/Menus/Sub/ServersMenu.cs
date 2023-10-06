@@ -76,7 +76,7 @@ namespace RageCoop.Client.Menus
                 foreach (ServerInfo server in serverList)
                 {
                     string address = $"{server.address}:{server.port}";
-                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}.x~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
+                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try
