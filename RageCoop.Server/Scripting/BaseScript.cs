@@ -38,7 +38,7 @@ namespace RageCoop.Server.Scripting
             });
             API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) =>
             {
-                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x => x != e.Client).ToList(), CustomEvents.OnPlayerDied, e.Client.Username);
+                API.SendCustomEventQueued(API.GetAllClients().Values.Where(x => x != e.Client).ToList(), CustomEvents.OnPlayerDied, e.Args);
             });
             API.Events.OnChatMessage += (s, e) =>
               Server.Logger?.Info((e.Client?.Username ?? e.ClaimedSender ?? "Unknown") + ": " + e.Message);

@@ -170,8 +170,7 @@ namespace RageCoop.Client
                         P.Health = 1;
                         Game.Player.WantedLevel = 0;
                         Main.Logger.Debug("Player died.");
-                        Scripting.API.Events.InvokePlayerDied();
-                        KillMessage();
+                        Scripting.API.Events.InvokePlayerDied(KillMessage());
                     }
                     GTA.UI.Screen.StopEffects();
                 }
@@ -182,8 +181,7 @@ namespace RageCoop.Client
             }
             else if (P.IsDead && !_lastDead)
             {
-                Scripting.API.Events.InvokePlayerDied();
-                KillMessage();
+                Scripting.API.Events.InvokePlayerDied(KillMessage());
             }
 
             _lastDead = P.IsDead;
@@ -395,14 +393,15 @@ namespace RageCoop.Client
             });
         }
 
-        public static void KillMessage()
+        private string KillMessage()
         {
             if (P.Killer != null)
             {
                 var killer = EntityPool.GetPedByHandle(P.Killer.Handle);
                 if (killer != null && killer.ID == killer.Owner.ID)
-                    Scripting.API.SendChatMessage($"Killed by {killer.Owner.Username} ({P.CauseOfDeath})");
+                    return $"~h~{PlayerList.GetPlayer(LocalPlayerID).Username}~h~ was killed by ~h~{killer.Owner.Username}~h~ ({P.CauseOfDeath})";
             }
+            return $"~h~{PlayerList.GetPlayer(LocalPlayerID).Username}~h~ died";
         }
     }
 }
