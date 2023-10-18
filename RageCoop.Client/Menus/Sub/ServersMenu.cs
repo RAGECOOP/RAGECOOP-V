@@ -30,7 +30,7 @@ namespace RageCoop.Client.Menus
         static ServersMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             Menu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {

@@ -28,7 +28,7 @@ namespace RageCoop.Client.Menus
         static SettingsMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _disablePauseAlt.CheckboxChanged += DisablePauseAltCheckboxChanged;
