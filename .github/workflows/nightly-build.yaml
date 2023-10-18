@@ -28,8 +28,6 @@ jobs:
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r win-x64 -o bin/Release/Server/win-x64 -c Release
     - name: Build server linux-x64
       run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-x64 -o bin/Release/Server/linux-x64 -c Release
-    - name: Build server linux-arm
-      run: dotnet publish RageCoop.Server/RageCoop.Server.csproj --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=false -r linux-arm -o bin/Release/Server/linux-arm -c Release
     - uses: vimtor/action-zip@v1
       with:
         files: bin/Release/Client
@@ -44,11 +42,6 @@ jobs:
       with:
         files: bin/Release/Server/linux-x64
         dest: RageCoop.Server-linux-x64.zip
-
-    - uses: vimtor/action-zip@v1
-      with:
-        files: bin/Release/Server/linux-arm
-        dest: RageCoop.Server-linux-arm.zip
 
     - uses: WebFreak001/deploy-nightly@v1.1.0
       env:
@@ -82,17 +75,3 @@ jobs:
         asset_name: RageCoop.Server-linux-x64.zip
         asset_content_type: application/zip
         max_releases: 7
-
-
-    - uses: WebFreak001/deploy-nightly@v1.1.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
-      with:
-        upload_url: https://uploads.github.com/repos/RAGECOOP/RAGECOOP-V/releases/70603992/assets{?name,label} 
-        release_id: 70603992 
-        asset_path: RageCoop.Server-linux-arm.zip
-        asset_name: RageCoop.Server-linux-arm.zip
-        asset_content_type: application/zip
-        max_releases: 7
-    - uses: actions/checkout@v2
-      
