@@ -306,7 +306,7 @@ namespace RageCoop.Client
             if (c == null)
             {
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit)
+                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit || PlayerList.Players.ContainsKey(packet.ID))
                     EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
                 else return;
             }
