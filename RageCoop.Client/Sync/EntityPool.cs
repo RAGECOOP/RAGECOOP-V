@@ -43,7 +43,7 @@ namespace RageCoop.Client
         #endregion
         public static void Cleanup(bool keepPlayer = true, bool keepMine = true)
         {
-            foreach (var ped in PedsByID.Values)
+            foreach (var ped in PedsByID.Values.ToArray())
             {
                 if ((keepPlayer && (ped.ID == Main.LocalPlayerID)) || (keepMine && (ped.OwnerID == Main.LocalPlayerID))) { continue; }
                 RemovePed(ped.ID);

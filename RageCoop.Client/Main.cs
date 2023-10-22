@@ -326,7 +326,8 @@ namespace RageCoop.Client
                 WorldThread.Traffic(true);
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
-                GTA.UI.Notification.Show("~r~Disconnected: " + reason);
+                if (reason != "Abort")
+                    GTA.UI.Notification.Show("~r~Disconnected: " + reason);
                 LocalPlayerID = default;
             });
             Memory.RestorePatches();
