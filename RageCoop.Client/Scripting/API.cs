@@ -91,7 +91,7 @@ namespace RageCoop.Client.Scripting
             /// <summary>
             /// The local player is dead
             /// </summary>
-            public static event EmptyEvent OnPlayerDied;
+            public static event EventHandler<string> OnPlayerDied;
 
             /// <summary>
             /// A local vehicle is spawned
@@ -133,7 +133,7 @@ namespace RageCoop.Client.Scripting
             internal static void InvokeVehicleDeleted(SyncedVehicle v) { OnVehicleDeleted?.Invoke(null, v); }
             internal static void InvokePedSpawned(SyncedPed p) { OnPedSpawned?.Invoke(null, p); }
             internal static void InvokePedDeleted(SyncedPed p) { OnPedDeleted?.Invoke(null, p); }
-            internal static void InvokePlayerDied() { OnPlayerDied?.Invoke(); }
+            internal static void InvokePlayerDied(string m) { OnPlayerDied?.Invoke(null, m); }
             internal static void InvokeTick() { OnTick?.Invoke(); }
 
             internal static void InvokeKeyDown(object s, KeyEventArgs e) { OnKeyDown?.Invoke(s, e); }

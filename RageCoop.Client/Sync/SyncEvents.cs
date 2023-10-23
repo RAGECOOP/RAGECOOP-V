@@ -126,7 +126,7 @@ namespace RageCoop.Client
             }
 
             var p = EntityPool.GetPedByID(ownerID)?.MainPed;
-            if (p == null) { p = Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); }
+            if (p == null) { return; /* p = Game.Player.Character; Main.Logger.Warning("Failed to find owner for bullet"); */ }
             if (!CorePFXAsset.IsLoaded) { CorePFXAsset.Request(); }
             if (_lastWeaponHash != weaponHash)
             {

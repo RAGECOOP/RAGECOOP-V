@@ -43,7 +43,7 @@ namespace RageCoop.Client
         #endregion
         public static void Cleanup(bool keepPlayer = true, bool keepMine = true)
         {
-            foreach (var ped in PedsByID.Values)
+            foreach (var ped in PedsByID.Values.ToArray())
             {
                 if ((keepPlayer && (ped.ID == Main.LocalPlayerID)) || (keepMine && (ped.OwnerID == Main.LocalPlayerID))) { continue; }
                 RemovePed(ped.ID);
@@ -277,8 +277,8 @@ namespace RageCoop.Client
                     {
                         ProjectilesByHandle.Remove(p.Handle);
                     }
-                    Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
-                    p.Explode();
+                    //Main.Logger.Debug($"Removing projectile {sp.ID}. Reason:{reason}");
+                    if (sp.Exploded) p.Explode();
                 }
                 ProjectilesByID.Remove(id);
             }
@@ -363,7 +363,8 @@ namespace RageCoop.Client
                 foreach (Ped p in allPeds)
                 {
                     SyncedPed c = GetPedByHandle(p.Handle);
-                    if (c == null && (p != Game.Player.Character))
+                    List<PedHash> mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
+                    if (c == null && p != Game.Player.Character && !mainCharacters.Contains((PedHash)p.Model.Hash))
                     {
                         if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
                         {

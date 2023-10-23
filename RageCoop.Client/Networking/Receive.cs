@@ -159,6 +159,7 @@ namespace RageCoop.Client
                             Main.Logger.Error(ex);
                             Peer.Shutdown($"Packet Error [{packetType}]");
 #endif
+                            _recycle = false;
                         }
                         break;
                     }
@@ -293,7 +294,7 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
+                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); return true; });
                     }
                     break;
             }
@@ -305,7 +306,9 @@ namespace RageCoop.Client
             if (c == null)
             {
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
+                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit || PlayerList.Players.ContainsKey(packet.ID))
+                    EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
+                else return;
             }
             PedDataFlags flags = packet.Flags;
             c.ID = packet.ID;
@@ -353,7 +356,9 @@ namespace RageCoop.Client
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v == null)
             {
-                EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+                if (EntityPool.allVehicles.Length < Main.Settings.GlobalVehicleSoftLimit)
+                    EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+                else return;
             }
             if (v.IsLocal) { return; }
             v.ID = packet.ID;
@@ -393,7 +398,9 @@ namespace RageCoop.Client
             {
                 if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) { return; }
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
-                EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
+                if (EntityPool.allProjectiles.Length < Main.Settings.GlobalProjectileSoftLimit)
+                    EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
+                else return;
             }
             p.Flags = packet.Flags;
             p.Position = packet.Position;

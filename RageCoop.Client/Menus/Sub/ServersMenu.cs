@@ -30,7 +30,7 @@ namespace RageCoop.Client.Menus
         static ServersMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             Menu.Opening += (object sender, System.ComponentModel.CancelEventArgs e) =>
             {
@@ -76,7 +76,7 @@ namespace RageCoop.Client.Menus
                 foreach (ServerInfo server in serverList)
                 {
                     string address = $"{server.address}:{server.port}";
-                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}.x~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
+                    NativeItem tmpItem = new NativeItem($"[{server.country}] {server.name}", $"~b~{address}~s~~n~~g~Version {server.version}~s~") { AltTitle = $"[{server.players}/{server.maxPlayers}]" };
                     tmpItem.Activated += (object sender, EventArgs e) =>
                     {
                         try
