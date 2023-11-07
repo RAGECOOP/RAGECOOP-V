@@ -3,6 +3,7 @@ using Lidgren.Network;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using System;
+using System.Linq;
 using System.Threading;
 
 namespace RageCoop.Client
@@ -306,7 +307,7 @@ namespace RageCoop.Client
             if (c == null)
             {
                 // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit || PlayerList.Players.ContainsKey(packet.ID))
+                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit + PlayerList.Players.Count || PlayerList.Players.ContainsKey(packet.ID))
                     EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
                 else return;
             }
@@ -356,7 +357,7 @@ namespace RageCoop.Client
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v == null)
             {
-                if (EntityPool.allVehicles.Length < Main.Settings.GlobalVehicleSoftLimit)
+                if (EntityPool.allVehicles.Length < Main.Settings.GlobalVehicleSoftLimit || EntityPool.PedsByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2f))
                     EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
                 else return;
             }

@@ -51,7 +51,7 @@ namespace RageCoop.Client
             PedsByID.Clear();
             PedsByHandle.Clear();
 
-            foreach (int id in new List<int>(VehiclesByID.Keys))
+            foreach (int id in VehiclesByID.Keys.ToArray())
             {
                 if (keepMine && (VehiclesByID[id].OwnerID == Main.LocalPlayerID)) { continue; }
                 RemoveVehicle(id);
@@ -359,11 +359,11 @@ namespace RageCoop.Client
             lock (PedsLock)
             {
                 AddPlayer();
+                var mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
 
                 foreach (Ped p in allPeds)
                 {
                     SyncedPed c = GetPedByHandle(p.Handle);
-                    List<PedHash> mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
                     if (c == null && p != Game.Player.Character && !mainCharacters.Contains((PedHash)p.Model.Hash))
                     {
                         if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
