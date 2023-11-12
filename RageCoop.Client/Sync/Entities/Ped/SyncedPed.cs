@@ -205,7 +205,7 @@ namespace RageCoop.Client
                 MainPed = null;
             }
 
-            if (PedBlip != null && PedBlip.Exists())
+            if (PedBlip != null)
             {
                 PedBlip.Delete();
                 PedBlip = null;
