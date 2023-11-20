@@ -120,7 +120,7 @@ namespace RageCoop.Client
                     if ((c == null) || (c.IsLocal && (ped.Handle != Game.Player.Character.Handle) && ped.PopulationType != EntityPopulationType.Mission))
                     {
 
-                        Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
+                        // Main.Logger.Trace($"Removing ped {ped.Handle}. Reason:RemoveTraffic");
                         ped.CurrentVehicle?.Delete();
                         ped.Kill();
                         ped.Delete();

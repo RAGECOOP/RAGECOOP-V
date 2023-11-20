@@ -306,12 +306,14 @@ namespace RageCoop.Client
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
             if (c == null)
             {
-                // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                if (EntityPool.allPeds.Length < Main.Settings.GlobalPedSoftLimit + PlayerList.Players.Count || PlayerList.Players.ContainsKey(packet.ID))
+                if (EntityPool.PedsByID.Count(x => x.Value.OwnerID == packet.OwnerID) < Main.Settings.WorldPedSoftLimit / PlayerList.Players.Count ||
+                    EntityPool.VehiclesByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2) || packet.ID == packet.OwnerID)
+                {
+                    // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
                     EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
+                }
                 else return;
             }
-            PedDataFlags flags = packet.Flags;
             c.ID = packet.ID;
             c.OwnerID = packet.OwnerID;
             c.Health = packet.Health;
@@ -357,8 +359,12 @@ namespace RageCoop.Client
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v == null)
             {
-                if (EntityPool.allVehicles.Length < Main.Settings.GlobalVehicleSoftLimit || EntityPool.PedsByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2f))
+                if (EntityPool.VehiclesByID.Count(x => x.Value.OwnerID == packet.OwnerID) < Main.Settings.WorldVehicleSoftLimit / PlayerList.Players.Count ||
+                    EntityPool.PedsByID.Any(x => x.Value.VehicleID == packet.ID || x.Value.Position.DistanceTo(packet.Position) < 2))
+                {
+                    // Main.Logger.Debug($"Creating vehicle for incoming sync:{packet.ID}");
                     EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+                }
                 else return;
             }
             if (v.IsLocal) { return; }
@@ -393,15 +399,12 @@ namespace RageCoop.Client
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {
-
             var p = EntityPool.GetProjectileByID(packet.ID);
             if (p == null)
             {
                 if (packet.Flags.HasProjDataFlag(ProjectileDataFlags.Exploded)) { return; }
                 // Main.Logger.Debug($"Creating new projectile: {(WeaponHash)packet.WeaponHash}");
-                if (EntityPool.allProjectiles.Length < Main.Settings.GlobalProjectileSoftLimit)
-                    EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
-                else return;
+                EntityPool.ThreadSafe.Add(p = new SyncedProjectile(packet.ID));
             }
             p.Flags = packet.Flags;
             p.Position = packet.Position;
