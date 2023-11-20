@@ -24,6 +24,7 @@ namespace RageCoop.Client.Menus
         private static readonly NativeItem _menuKey = new NativeItem("Menu Key", "The key to open menu", Main.Settings.MenuKey.ToString());
         private static readonly NativeItem _passengerKey = new NativeItem("Passenger Key", "The key to enter a vehicle as passenger", Main.Settings.PassengerKey.ToString());
         private static readonly NativeItem _vehicleSoftLimit = new NativeItem("Vehicle limit (soft)", "The game won't spawn more NPC traffic if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldVehicleSoftLimit.ToString());
+        private static readonly NativeItem _pedSoftLimit = new NativeItem("Ped limit (soft)", "The game won't spawn more NPCs if the limit is exceeded. \n-1 for unlimited (not recommended).", Main.Settings.WorldPedSoftLimit.ToString());
 
         static SettingsMenu()
         {
@@ -37,6 +38,7 @@ namespace RageCoop.Client.Menus
             _menuKey.Activated += ChaneMenuKey;
             _passengerKey.Activated += ChangePassengerKey;
             _vehicleSoftLimit.Activated += VehicleSoftLimitActivated;
+            _pedSoftLimit.Activated += PedSoftLimitActivated;
             _showBlip.Activated += (s, e) =>
             {
                 Main.Settings.ShowPlayerBlip = _showBlip.Checked;
@@ -55,6 +57,7 @@ namespace RageCoop.Client.Menus
             Menu.Add(_menuKey);
             Menu.Add(_passengerKey);
             Menu.Add(_vehicleSoftLimit);
+            Menu.Add(_pedSoftLimit);
             Menu.Add(_showBlip);
             Menu.Add(_showNametag);
         }
@@ -89,7 +92,19 @@ namespace RageCoop.Client.Menus
                 Main.Settings.WorldVehicleSoftLimit = int.Parse(
                     Game.GetUserInput(WindowTitle.EnterMessage20,
                     Main.Settings.WorldVehicleSoftLimit.ToString(), 20));
-                _menuKey.AltTitle = Main.Settings.WorldVehicleSoftLimit.ToString();
+                _vehicleSoftLimit.AltTitle = Main.Settings.WorldVehicleSoftLimit.ToString();
+                Util.SaveSettings();
+            }
+            catch { }
+        }
+        private static void PedSoftLimitActivated(object sender, EventArgs e)
+        {
+            try
+            {
+                Main.Settings.WorldPedSoftLimit = int.Parse(
+                    Game.GetUserInput(WindowTitle.EnterMessage20,
+                    Main.Settings.WorldPedSoftLimit.ToString(), 20));
+                _pedSoftLimit.AltTitle = Main.Settings.WorldPedSoftLimit.ToString();
                 Util.SaveSettings();
             }
             catch { }

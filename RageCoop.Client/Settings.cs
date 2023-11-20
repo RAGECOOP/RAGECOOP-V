@@ -69,21 +69,6 @@ namespace RageCoop.Client
         public int WorldPedSoftLimit { get; set; } = 30;
 
         /// <summary>
-        /// The mod won't sync more vehicles if the limit is exceeded.
-        /// </summary>
-        public int GlobalVehicleSoftLimit { get; set; } = 100;
-
-        /// <summary>
-        /// The mod won't sync more peds if the limit is exceeded.
-        /// </summary>
-        public int GlobalPedSoftLimit { get; set; } = 100;
-
-        /// <summary>
-        /// The mod won't sync more projectiles if the limit is exceeded.
-        /// </summary>
-        public int GlobalProjectileSoftLimit { get; set; } = 100;
-
-        /// <summary>
         /// The directory where log and resources downloaded from server will be placed.
         /// </summary>
         public string DataDirectory { get; set; } = "Scripts\\RageCoop\\Data";

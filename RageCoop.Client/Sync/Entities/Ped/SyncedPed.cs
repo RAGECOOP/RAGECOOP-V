@@ -141,6 +141,12 @@ namespace RageCoop.Client
                 }
             }
 
+            if (!IsPlayer && Health <= 0 && !MainPed.IsDead)
+            {
+                MainPed.Kill();
+                return;
+            }
+
             if (Speed >= 4)
             {
                 DisplayInVehicle();
@@ -205,7 +211,7 @@ namespace RageCoop.Client
                 MainPed = null;
             }
 
-            if (PedBlip != null && PedBlip.Exists())
+            if (PedBlip != null)
             {
                 PedBlip.Delete();
                 PedBlip = null;
@@ -420,7 +426,7 @@ namespace RageCoop.Client
             }
             _lastIsJumping = false;
 
-            if (IsRagdoll || Health == 0)
+            if (IsRagdoll || (IsPlayer && Health == 0))
             {
                 if (!MainPed.IsRagdoll)
                 {

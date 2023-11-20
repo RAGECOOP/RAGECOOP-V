@@ -51,7 +51,7 @@ namespace RageCoop.Client
             PedsByID.Clear();
             PedsByHandle.Clear();
 
-            foreach (int id in new List<int>(VehiclesByID.Keys))
+            foreach (int id in VehiclesByID.Keys.ToArray())
             {
                 if (keepMine && (VehiclesByID[id].OwnerID == Main.LocalPlayerID)) { continue; }
                 RemoveVehicle(id);
@@ -359,22 +359,24 @@ namespace RageCoop.Client
             lock (PedsLock)
             {
                 AddPlayer();
+                var mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
 
                 foreach (Ped p in allPeds)
                 {
-                    SyncedPed c = GetPedByHandle(p.Handle);
-                    List<PedHash> mainCharacters = new List<PedHash> { PedHash.Michael, PedHash.Franklin, PedHash.Franklin02, PedHash.Trevor };
-                    if (c == null && p != Game.Player.Character && !mainCharacters.Contains((PedHash)p.Model.Hash))
+                    if (!PedsByHandle.ContainsKey(p.Handle) && p != Game.Player.Character && !mainCharacters.Contains((PedHash)p.Model.Hash))
                     {
-                        if (allPeds.Length > Main.Settings.WorldPedSoftLimit && p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
+                        if (PedsByID.Count(x => x.Value.IsLocal) > Main.Settings.WorldPedSoftLimit)
                         {
-                            p.Delete();
-                            continue;
+                            if (p.PopulationType == EntityPopulationType.RandomAmbient && !p.IsInVehicle())
+                            {
+                                p.Delete();
+                                continue;
+                            }
+                            if (p.PopulationType == EntityPopulationType.RandomScenario) continue;
                         }
                         // Main.Logger.Trace($"Creating SyncEntity for ped, handle:{p.Handle}");
-                        c = new SyncedPed(p);
 
-                        Add(c);
+                        Add(new SyncedPed(p));
                     }
                 }
 #if BENCHMARK
@@ -438,10 +440,9 @@ namespace RageCoop.Client
                 {
                     if (!VehiclesByHandle.ContainsKey(veh.Handle))
                     {
-                        if (allVehicles.Length > Main.Settings.WorldVehicleSoftLimit)
+                        if (VehiclesByID.Count(x => x.Value.IsLocal) > Main.Settings.WorldVehicleSoftLimit)
                         {
-                            var type = veh.PopulationType;
-                            if (type == EntityPopulationType.RandomAmbient || type == EntityPopulationType.RandomParked)
+                            if (veh.PopulationType == EntityPopulationType.RandomAmbient || veh.PopulationType == EntityPopulationType.RandomParked)
                             {
                                 foreach (var p in veh.Occupants)
                                 {
