@@ -307,7 +307,8 @@ namespace RageCoop.Client
             if (c == null)
             {
                 if (EntityPool.PedsByID.Count(x => x.Value.OwnerID == packet.OwnerID) < Main.Settings.WorldPedSoftLimit / PlayerList.Players.Count ||
-                    EntityPool.VehiclesByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2) || packet.ID == packet.OwnerID)
+                    /*EntityPool.VehiclesByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2) ||*/ // allows players to exceed the peds limit
+                    packet.ID == packet.OwnerID)
                 {
                     // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
                     EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));

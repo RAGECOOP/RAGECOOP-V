@@ -174,12 +174,12 @@ namespace RageCoop.Client
                     }
                     continue;
                 }
-                else if (door.IsBroken)
+                /*else if (door.IsBroken) // causes break/repair loop in some situations
                 {
                     // The vehicle can only fix a door if the vehicle was completely fixed
                     veh.Repair();
                     return;
-                }
+                }*/
                 if ((model.OpenedDoors & (byte)(1 << i)) != 0)
                 {
                     if ((!door.IsOpen) && (!door.IsBroken))
@@ -196,10 +196,10 @@ namespace RageCoop.Client
                 {
                     veh.Windows[(VehicleWindowIndex)i].Smash();
                 }
-                else if (!veh.Windows[(VehicleWindowIndex)i].IsIntact)
+                /*else if (!veh.Windows[(VehicleWindowIndex)i].IsIntact) // causes smash/repair loop in some situations
                 {
                     veh.Windows[(VehicleWindowIndex)i].Repair();
-                }
+                }*/
             }
 
             foreach (VehicleWheel wheel in veh.Wheels)
