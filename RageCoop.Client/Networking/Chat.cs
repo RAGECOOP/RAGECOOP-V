@@ -31,6 +31,7 @@ namespace RageCoop.Client
         }
 
         private ulong LastMessageTime { get; set; }
+        private Keys LastKey { get; set; }
 
         private bool CurrentHidden { get; set; }
         private bool Hidden
@@ -115,6 +116,10 @@ namespace RageCoop.Client
                 MainScaleForm.CallFunction("PAGE_DOWN");
             }
 
+            if (key == Keys.Menu && LastKey == Keys.ShiftKey)
+                ActivateKeyboardLayout(1, 0);
+            LastKey = key;
+
             string keyChar = GetCharFromKey(key, Game.IsKeyPressed(Keys.ShiftKey), false);
 
             if (keyChar.Length == 0)
@@ -174,5 +179,8 @@ namespace RageCoop.Client
             ToUnicodeEx((uint)key, 0, keyboardState, buf, 256, 0, InputLanguage.CurrentInputLanguage.Handle);
             return buf.ToString();
         }
+
+        [DllImport("user32.dll")]
+        public static extern int ActivateKeyboardLayout(int hkl, uint flags);
     }
 }
