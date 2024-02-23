@@ -7,5 +7,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4499:4499/udp"
+    stdin_open: true
+    tty: true
     volumes:
       - ./Settings.xml:/app/Settings.xml
