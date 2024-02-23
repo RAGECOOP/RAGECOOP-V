@@ -25,7 +25,7 @@ namespace RageCoop.Client
         static DebugMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
 
             DiagnosticMenu.Opening += (sender, e) =>

@@ -3,6 +3,7 @@ using Lidgren.Network;
 using RageCoop.Client.Menus;
 using RageCoop.Core;
 using System;
+using System.Linq;
 using System.Threading;
 
 namespace RageCoop.Client
@@ -159,6 +160,7 @@ namespace RageCoop.Client
                             Main.Logger.Error(ex);
                             Peer.Shutdown($"Packet Error [{packetType}]");
 #endif
+                            _recycle = false;
                         }
                         break;
                     }
@@ -293,7 +295,7 @@ namespace RageCoop.Client
                     {
                         recycle = false;
                         // Dispatch to script thread
-                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); Peer.Recycle(msg); return true; });
+                        Main.QueueAction(() => { SyncEvents.HandleEvent(packetType, msg); return true; });
                     }
                     break;
             }
@@ -304,10 +306,14 @@ namespace RageCoop.Client
             SyncedPed c = EntityPool.GetPedByID(packet.ID);
             if (c == null)
             {
-                // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
-                EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
+                if (EntityPool.PedsByID.Count(x => x.Value.OwnerID == packet.OwnerID) < Main.Settings.WorldPedSoftLimit / PlayerList.Players.Count ||
+                    EntityPool.VehiclesByID.Any(x => x.Value.Position.DistanceTo(packet.Position) < 2) || packet.ID == packet.OwnerID)
+                {
+                    // Main.Logger.Debug($"Creating character for incoming sync:{packet.ID}");
+                    EntityPool.ThreadSafe.Add(c = new SyncedPed(packet.ID));
+                }
+                else return;
             }
-            PedDataFlags flags = packet.Flags;
             c.ID = packet.ID;
             c.OwnerID = packet.OwnerID;
             c.Health = packet.Health;
@@ -353,7 +359,13 @@ namespace RageCoop.Client
             SyncedVehicle v = EntityPool.GetVehicleByID(packet.ID);
             if (v == null)
             {
-                EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+                if (EntityPool.VehiclesByID.Count(x => x.Value.OwnerID == packet.OwnerID) < Main.Settings.WorldVehicleSoftLimit / PlayerList.Players.Count ||
+                    EntityPool.PedsByID.Any(x => x.Value.VehicleID == packet.ID || x.Value.Position.DistanceTo(packet.Position) < 2))
+                {
+                    // Main.Logger.Debug($"Creating vehicle for incoming sync:{packet.ID}");
+                    EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+                }
+                else return;
             }
             if (v.IsLocal) { return; }
             v.ID = packet.ID;
@@ -387,7 +399,6 @@ namespace RageCoop.Client
         }
         private static void ProjectileSync(Packets.ProjectileSync packet)
         {
-
             var p = EntityPool.GetProjectileByID(packet.ID);
             if (p == null)
             {

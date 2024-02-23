@@ -4,6 +4,7 @@ using GTA.Native;
 using RageCoop.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RageCoop.Client
 {
@@ -307,6 +308,16 @@ namespace RageCoop.Client
         }
         private bool CreateVehicle()
         {
+            var existing = World.GetNearbyVehicles(Position, 2).ToList().FirstOrDefault();
+            if (existing != null && existing != MainVehicle)
+            {
+                if (EntityPool.VehiclesByHandle.ContainsKey(existing.Handle))
+                {
+                    EntityPool.RemoveVehicle(ID);
+                    return false;
+                }
+                existing.Delete();
+            }
             MainVehicle?.Delete();
             MainVehicle = Util.CreateVehicle(Model, Position);
             if (!Model.IsInCdImage)
@@ -337,41 +348,5 @@ namespace RageCoop.Client
             Model.MarkAsNoLongerNeeded();
             return true;
         }
-        #region -- PEDALING --
-        /*
-         * Thanks to @oldnapalm.
-         */
-
-        private string PedalingAnimDict()
-        {
-            switch ((VehicleHash)Model)
-            {
-                case VehicleHash.Bmx:
-                    return "veh@bicycle@bmx@front@base";
-                case VehicleHash.Cruiser:
-                    return "veh@bicycle@cruiserfront@base";
-                case VehicleHash.Scorcher:
-                    return "veh@bicycle@mountainfront@base";
-                default:
-                    return "veh@bicycle@roadfront@base";
-            }
-        }
-
-        private string PedalingAnimName(bool fast)
-        {
-            return fast ? "fast_pedal_char" : "cruise_pedal_char";
-        }
-
-        private void StartPedalingAnim(bool fast)
-        {
-            MainVehicle.Driver?.Task.PlayAnimation(PedalingAnimDict(), PedalingAnimName(fast), 8.0f, -8.0f, -1, AnimationFlags.Loop | AnimationFlags.Secondary, 1.0f);
-
-        }
-
-        private void StopPedalingAnim(bool fast)
-        {
-            MainVehicle.Driver.Task.ClearAnimation(PedalingAnimDict(), PedalingAnimName(fast));
-        }
-        #endregion
     }
 }

@@ -30,16 +30,16 @@ namespace RageCoop.Client
         public static void ToggleConnection(string address, string username = null, string password = null, PublicKey publicKey = null)
         {
             Menus.CoopMenu.Menu.Visible = false;
-            Peer?.Shutdown("Bye");
-            if (IsOnServer)
-            {
-                // ?
-            }
-            else if (IsConnecting)
+            if (IsConnecting)
             {
                 _publicKeyReceived.Set();
                 IsConnecting = false;
-                Notification.Show("Connection has been canceled");
+                Main.QueueAction(() => Notification.Show("Connection has been canceled"));
+                Peer?.Shutdown("Bye");
+            }
+            else if (IsOnServer)
+            {
+                Peer?.Shutdown("Bye");
             }
             else
             {
