@@ -103,19 +103,22 @@ namespace RageCoop.Client
             if (v.LastSentStopWatch.ElapsedMilliseconds < SyncInterval) return;
             var veh = v.MainVehicle;
             var packet = SendPackets.VehicelPacket;
-            packet.ID = v.ID;
-            packet.OwnerID = v.OwnerID;
-            packet.Flags = v.GetVehicleFlags();
-            packet.SteeringAngle = veh.SteeringAngle;
-            packet.Position = veh.ReadPosition();
-            packet.Velocity = veh.Velocity;
-            packet.Quaternion = veh.ReadQuaternion();
-            packet.RotationVelocity = veh.WorldRotationVelocity;
-            packet.ThrottlePower = veh.ThrottlePower;
-            packet.BrakePower = veh.BrakePower;
+            packet.ED.ID = v.ID;
+            packet.ED.OwnerID = v.OwnerID;
+            packet.ED.Position = veh.ReadPosition();
+            packet.ED.Velocity = veh.Velocity;
+            packet.ED.Quaternion = veh.ReadQuaternion();
+            packet.ED.ModelHash = veh.Model.Hash;
+            packet.VD.Flags = v.GetVehicleFlags();
+            packet.VD.SteeringAngle = veh.SteeringAngle;
+            packet.VD.ThrottlePower = veh.ThrottlePower;
+            packet.VD.BrakePower = veh.BrakePower;
+            packet.VD.Flags |= VehicleDataFlags.IsFullSync;
+            packet.VD.LockStatus = veh.LockStatus;
+
             v.LastSentStopWatch.Restart();
-            if (packet.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
-                packet.DeluxoWingRatio = v.MainVehicle.GetDeluxoWingRatio();
+            if (packet.VD.Flags.HasVehFlag(VehicleDataFlags.IsDeluxoHovering))
+                packet.VD.DeluxoWingRatio = v.MainVehicle.GetDeluxoWingRatio();
             if (full)
             {
                 byte primaryColor = 0;
@@ -125,23 +128,21 @@ namespace RageCoop.Client
                     Call<byte>(GET_VEHICLE_COLOURS, veh, &primaryColor, &secondaryColor);
                 }
 
-                packet.Flags |= VehicleDataFlags.IsFullSync;
-                packet.Colors = (primaryColor, secondaryColor);
-                packet.DamageModel = veh.GetVehicleDamageModel();
-                packet.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
-                packet.RoofState = (byte)veh.RoofState;
-                packet.Mods = v.GetVehicleMods(out packet.ToggleModsMask);
-                packet.ModelHash = veh.Model.Hash;
-                packet.EngineHealth = veh.EngineHealth;
-                packet.LockStatus = veh.LockStatus;
-                packet.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
-                packet.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
-                packet.HeadlightColor = (byte)Call<int>(GET_VEHICLE_XENON_LIGHT_COLOR_INDEX, veh);
-                packet.ExtrasMask = v.GetVehicleExtras();
-                packet.RadioStation = v.MainVehicle == LastV
+                packet.VDF.LandingGear = veh.IsAircraft ? (byte)veh.LandingGearState : (byte)0;
+                packet.VDF.RoofState = (byte)veh.RoofState;
+                packet.VDF.Colors = (primaryColor, secondaryColor);
+                packet.VDF.DamageModel = veh.GetVehicleDamageModel();
+                packet.VDF.EngineHealth = veh.EngineHealth;
+                packet.VDF.Livery = Call<int>(GET_VEHICLE_LIVERY, veh);
+                packet.VDF.HeadlightColor = (byte)Call<int>(GET_VEHICLE_XENON_LIGHT_COLOR_INDEX, veh);
+                packet.VDF.ExtrasMask = v.GetVehicleExtras();
+                packet.VDF.RadioStation = v.MainVehicle == LastV
                     ? Util.GetPlayerRadioIndex() : byte.MaxValue;
-                if (packet.EngineHealth > v.LastEngineHealth) packet.Flags |= VehicleDataFlags.Repaired;
-                v.LastEngineHealth = packet.EngineHealth;
+                if (packet.VDF.EngineHealth > v.LastEngineHealth) packet.VD.Flags |= VehicleDataFlags.Repaired;
+
+                packet.VDV.Mods = v.GetVehicleMods(out packet.VDF.ToggleModsMask);
+                packet.VDV.LicensePlate = Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, veh);
+                v.LastEngineHealth = packet.VDF.EngineHealth;
             }
 
             SendSync(packet, ConnectionChannel.VehicleSync);

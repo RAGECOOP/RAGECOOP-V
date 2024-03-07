@@ -142,79 +142,6 @@ namespace RageCoop.Core
             return Path.GetFullPath(path);
         }
 
-        public static void GetBytesFromObject(object obj, NetOutgoingMessage m)
-        {
-            switch (obj)
-            {
-                case byte value:
-                    m.Write((byte)0x01);
-                    m.Write(value);
-                    break;
-                case short value:
-                    m.Write((byte)0x02);
-                    m.Write(value);
-                    break;
-                case ushort value:
-                    m.Write((byte)0x03);
-                    m.Write(value);
-                    break;
-                case int value:
-                    m.Write((byte)0x04);
-                    m.Write(value);
-                    break;
-                case uint value:
-                    m.Write((byte)0x05);
-                    m.Write(value);
-                    break;
-                case long value:
-                    m.Write((byte)0x06);
-                    m.Write(value);
-                    break;
-                case ulong value:
-                    m.Write((byte)0x07);
-                    m.Write(value);
-                    break;
-                case float value:
-                    m.Write((byte)0x08);
-                    m.Write(value);
-                    break;
-                case bool value:
-                    m.Write((byte)0x09);
-                    m.Write(value);
-                    break;
-                case string value:
-                    m.Write((byte)0x10);
-                    m.Write(value);
-                    break;
-                case Vector3 value:
-                    m.Write((byte)0x11);
-                    m.Write(value);
-                    break;
-                case Quaternion value:
-                    m.Write((byte)0x12);
-                    m.Write(value);
-                    break;
-                case Model value:
-                    m.Write((byte)0x13);
-                    m.Write(value);
-                    break;
-                case Vector2 value:
-                    m.Write((byte)0x14);
-                    m.Write(value);
-                    break;
-                case byte[] value:
-                    m.Write((byte)0x15);
-                    m.WriteByteArray(value);
-                    break;
-                case Tuple<byte, byte[]> value:
-                    m.Write(value.Item1);
-                    m.Write(value.Item2);
-                    break;
-                default:
-                    throw new Exception("Unsupported object type: " + obj.GetType());
-            }
-        }
-
         public static IPEndPoint StringToEndPoint(string endpointstring)
         {
             return StringToEndPoint(endpointstring, -1);
@@ -389,6 +316,65 @@ namespace RageCoop.Core
             hash += hash << 15;
             return hash;
         }
+
+        public static unsafe bool StructCmp<T>(ref T left, ref T right) where T : unmanaged
+        {
+            fixed (T* pLeft = &left, pRight = &right)
+            {
+                return MemCmp(pLeft, pRight, sizeof(T));
+            }
+        }
+
+
+        public static unsafe bool StructCmp<T>(T left, T right) where T : unmanaged
+        {
+            return MemCmp(&left, &right, sizeof(T));
+        }
+
+        static bool _simdSupported = System.Numerics.Vector<byte>.IsSupported;
+        static int _simdSlots = _simdSupported ? System.Numerics.Vector<byte>.Count : 0;
+
+        /// <summary>
+        /// SIMD-accelerated memory comparer
+        /// </summary>
+        /// <returns></returns>
+        public static unsafe bool MemCmp(void* p1, void* p2, int cbToCompare)
+        {
+            int numVectors = cbToCompare / _simdSlots;
+            int ceiling = numVectors * _simdSlots;
+            if (numVectors > 0)
+            {
+                ReadOnlySpan<System.Numerics.Vector<byte>> leftVecArray = new(p1, numVectors);
+                ReadOnlySpan<System.Numerics.Vector<byte>> rightVecArray = new(p2, numVectors);
+
+                for (int i = 0; i < numVectors; i++)
+                {
+                    if (leftVecArray[i] != rightVecArray[i])
+                        return false;
+                }
+            }
+
+            int numWords = cbToCompare / sizeof(IntPtr);
+            var pwLeft = (IntPtr*)p1;
+            var pwRight = (IntPtr*)p2;
+
+            for (int i = (ceiling / sizeof(IntPtr)); i < numWords; i++)
+            {
+                if (pwLeft[i] != pwRight[i])
+                    return false;
+            }
+
+            var pbLeft = (byte*)p1;
+            var pbRight = (byte*)p2;
+
+            for (int i = ceiling + (numWords * sizeof(IntPtr)); i < cbToCompare; i++)
+            {
+                if (pbLeft[i] != pbRight[i])
+                    return false;
+            }
+
+            return true;
+        }
     }
 
     internal class IpInfo
@@ -408,33 +394,6 @@ namespace RageCoop.Core
         public static string GetString(this byte[] data)
         {
             return Encoding.UTF8.GetString(data);
-        }
-
-        public static byte[] GetBytes(this Vector3 vec)
-        {
-            // 12 bytes
-            return new List<byte[]>
-                { BitConverter.GetBytes(vec.X), BitConverter.GetBytes(vec.Y), BitConverter.GetBytes(vec.Z) }.Join(4);
-        }
-
-        public static byte[] GetBytes(this Vector2 vec)
-        {
-            // 8 bytes
-            return new List<byte[]> { BitConverter.GetBytes(vec.X), BitConverter.GetBytes(vec.Y) }.Join(4);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="qua"></param>
-        /// <returns>An array of bytes with length 16</returns>
-        public static byte[] GetBytes(this Quaternion qua)
-        {
-            // 16 bytes
-            return new List<byte[]>
-            {
-                BitConverter.GetBytes(qua.X), BitConverter.GetBytes(qua.Y), BitConverter.GetBytes(qua.Z),
-                BitConverter.GetBytes(qua.W)
-            }.Join(4);
         }
 
         public static T GetPacket<T>(this NetIncomingMessage msg) where T : Packet, new()

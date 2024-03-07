@@ -29,10 +29,10 @@ namespace RageCoop.Client
             // Skip update if no new sync message has arrived.
             if (!NeedUpdate) return;
 
-            if (SteeringAngle != MainVehicle.SteeringAngle)
-                MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * SteeringAngle);
-            MainVehicle.ThrottlePower = ThrottlePower;
-            MainVehicle.BrakePower = BrakePower;
+            if (VD.SteeringAngle != MainVehicle.SteeringAngle)
+                MainVehicle.CustomSteeringAngle((float)(Math.PI / 180) * VD.SteeringAngle);
+            MainVehicle.ThrottlePower = VD.ThrottlePower;
+            MainVehicle.BrakePower = VD.BrakePower;
 
             if (IsDead)
             {
@@ -51,9 +51,9 @@ namespace RageCoop.Client
 
             if (MainVehicle.IsOnFire)
             {
-                if (!Flags.HasVehFlag(VehicleDataFlags.IsOnFire)) Call(STOP_ENTITY_FIRE, MainVehicle);
+                if (!VD.Flags.HasVehFlag(VehicleDataFlags.IsOnFire)) Call(STOP_ENTITY_FIRE, MainVehicle);
             }
-            else if (Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
+            else if (VD.Flags.HasVehFlag(VehicleDataFlags.IsOnFire))
             {
                 Call(START_ENTITY_FIRE, MainVehicle);
             }
@@ -64,12 +64,7 @@ namespace RageCoop.Client
 
             if (HighBeamsOn != MainVehicle.AreHighBeamsOn) MainVehicle.AreHighBeamsOn = HighBeamsOn;
 
-            if (IsAircraft)
-            {
-                if (LandingGear != (byte)MainVehicle.LandingGearState)
-                    MainVehicle.LandingGearState = (VehicleLandingGearState)LandingGear;
-            }
-            else
+            if (!IsAircraft)
             {
                 if (MainVehicle.HasSiren && SireneActive != MainVehicle.IsSirenActive)
                     MainVehicle.IsSirenActive = SireneActive;
@@ -78,22 +73,18 @@ namespace RageCoop.Client
                 {
                     if (!_lastHornActive)
                     {
-                        _lastHornActive = true;
                         MainVehicle.SoundHorn(99999);
                     }
                 }
-                else if (_lastHornActive)
+                else if (_lastVD.Flags.HasVehFlag(VehicleDataFlags.IsHornActive))
                 {
-                    _lastHornActive = false;
                     MainVehicle.SoundHorn(1);
                 }
 
-                if (HasRoof && MainVehicle.RoofState != RoofState) MainVehicle.RoofState = RoofState;
-
-                if (HasRocketBoost && Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) !=
+                if (HasRocketBoost && VD.Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive) !=
                     MainVehicle.IsRocketBoostActive)
-                    MainVehicle.IsRocketBoostActive = Flags.HasFlag(VehicleDataFlags.IsRocketBoostActive);
-                if (HasParachute && Flags.HasFlag(VehicleDataFlags.IsParachuteActive) &&
+                    MainVehicle.IsRocketBoostActive = VD.Flags.HasVehFlag(VehicleDataFlags.IsRocketBoostActive);
+                if (HasParachute && VD.Flags.HasFlag(VehicleDataFlags.IsParachuteActive) &&
                     !MainVehicle.IsParachuteDeployed)
                     MainVehicle.StartParachuting(false);
                 if (IsSubmarineCar)
@@ -102,75 +93,68 @@ namespace RageCoop.Client
                     {
                         if (!_lastTransformed)
                         {
-                            _lastTransformed = true;
                             Call(TRANSFORM_TO_SUBMARINE, MainVehicle.Handle, false);
                         }
                     }
                     else if (_lastTransformed)
                     {
-                        _lastTransformed = false;
                         Call(TRANSFORM_TO_CAR, MainVehicle.Handle, false);
                     }
                 }
                 else if (IsDeluxo)
                 {
                     MainVehicle.SetDeluxoHoverState(IsDeluxoHovering);
-                    if (IsDeluxoHovering) MainVehicle.SetDeluxoWingRatio(DeluxoWingRatio);
+                    if (IsDeluxoHovering) MainVehicle.SetDeluxoWingRatio(VD.DeluxoWingRatio);
                 }
-
                 Call(SET_VEHICLE_BRAKE_LIGHTS, MainVehicle.Handle, BrakeLightsOn);
+                MainVehicle.LockStatus = VD.LockStatus;
             }
-
-            MainVehicle.LockStatus = LockStatus;
+            _lastVD = VD;
 
             if (LastFullSynced >= LastUpdated)
             {
-                if (Flags.HasVehFlag(VehicleDataFlags.Repaired)) MainVehicle.Repair();
-                if (Colors != _lastVehicleColors)
+                if (IsAircraft)
                 {
-                    Call(SET_VEHICLE_COLOURS, MainVehicle, Colors.Item1, Colors.Item2);
-
-                    _lastVehicleColors = Colors;
+                    if (VDF.LandingGear != (byte)MainVehicle.LandingGearState)
+                        MainVehicle.LandingGearState = (VehicleLandingGearState)VDF.LandingGear;
                 }
-                
-                MainVehicle.EngineHealth = EngineHealth;
-                if (Mods != null && !Mods.SequenceEqual(_lastVehicleMods))
+                if (HasRoof && MainVehicle.RoofState != (VehicleRoofState)VDF.RoofState)
+                    MainVehicle.RoofState = (VehicleRoofState)VDF.RoofState;
+
+                if (VD.Flags.HasVehFlag(VehicleDataFlags.Repaired)) MainVehicle.Repair();
+                if (VDF.Colors != _lastVDF.Colors)
                 {
-                    Call(SET_VEHICLE_MOD_KIT, MainVehicle, 0);
-
-                    foreach (var mod in Mods) MainVehicle.Mods[(VehicleModType)mod.Item1].Index = mod.Item2;
-                    
-                    _lastVehicleMods = Mods;
+                    Call(SET_VEHICLE_COLOURS, MainVehicle, VDF.Colors.Item1, VDF.Colors.Item2);
                 }
-                if (ToggleModsMask != _lastToggleMods)
+
+                MainVehicle.EngineHealth = VDF.EngineHealth;
+
+                if (VDF.ToggleModsMask != _lastVDF.ToggleModsMask)
                 {
                     for (int i = 0; i < 7; i++)
                     {
-                        Call(TOGGLE_VEHICLE_MOD, MainVehicle.Handle, i + 17, (ToggleModsMask & (1 << i)) != 0);
+                        Call(TOGGLE_VEHICLE_MOD, MainVehicle.Handle, i + 17, (VDF.ToggleModsMask & (1 << i)) != 0);
                     }
-                    _lastToggleMods = ToggleModsMask;
                 }
-
-                if (Call<string>(GET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle) != LicensePlate)
-                    Call(SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, LicensePlate);
-
-                if (_lastLivery != Livery)
+                if (VDF.Livery != _lastVDF.Livery)
                 {
-                    Call(SET_VEHICLE_LIVERY, MainVehicle, Livery);
-                    _lastLivery = Livery;
+                    Call(SET_VEHICLE_LIVERY, MainVehicle, VDF.Livery);
                 }
 
-                if (_lastHeadlightColor != HeadlightColor)
+                if (VDF.HeadlightColor != _lastVDF.HeadlightColor)
                 {
-                    Call(SET_VEHICLE_XENON_LIGHT_COLOR_INDEX, MainVehicle.Handle, HeadlightColor);
-                    _lastHeadlightColor = HeadlightColor;
+                    Call(SET_VEHICLE_XENON_LIGHT_COLOR_INDEX, MainVehicle.Handle, VDF.HeadlightColor);
                 }
-                MainVehicle.SetDamageModel(DamageModel);
 
-                if (MainVehicle.Handle == V?.Handle && Util.GetPlayerRadioIndex() != RadioStation)
-                    Util.SetPlayerRadioIndex(MainVehicle.Handle, RadioStation);
+                if (!CoreUtils.StructCmp(VDF.DamageModel, _lastVDF.DamageModel))
+                {
+                    MainVehicle.SetDamageModel(VDF.DamageModel);
+                }
 
-                if (_lastExtras != ExtrasMask)
+                if (MainVehicle.Handle == V?.Handle && Util.GetPlayerRadioIndex() != VDF.RadioStation)
+                    Util.SetPlayerRadioIndex(MainVehicle.Handle, VDF.RadioStation);
+
+                if (VDF.ExtrasMask != _lastVDF.ExtrasMask)
                 {
                     for (int i = 1; i < 15; i++)
                     {
@@ -179,11 +163,21 @@ namespace RageCoop.Client
                         if (!hasExtra)
                             continue;
 
-                        var on = (ExtrasMask & flag) != 0;
+                        var on = (VDF.ExtrasMask & flag) != 0;
                         Call(SET_VEHICLE_EXTRA, MainVehicle.Handle, i, !on);
                     }
-                    _lastExtras = ExtrasMask;
                 }
+                if (VDV.Mods != null && (_lastVDV.Mods == null || !VDV.Mods.SequenceEqual(_lastVDV.Mods)))
+                {
+                    Call(SET_VEHICLE_MOD_KIT, MainVehicle, 0);
+
+                    foreach (var mod in VDV.Mods) MainVehicle.Mods[(VehicleModType)mod.Item1].Index = mod.Item2;
+                }
+                if (VDV.LicensePlate != _lastVDV.LicensePlate)
+                    Call(SET_VEHICLE_NUMBER_PLATE_TEXT, MainVehicle, VDV.LicensePlate);
+
+                _lastVDF = VDF;
+                _lastVDV = VDV;
             }
 
             LastUpdated = Ticked;
@@ -240,13 +234,15 @@ namespace RageCoop.Client
             }
 
             MainVehicle.Quaternion = Quaternion;
-            if (MainVehicle.HasRoof) MainVehicle.RoofState = RoofState;
+            if (MainVehicle.HasRoof) MainVehicle.RoofState = (VehicleRoofState)VDF.RoofState;
             foreach (var w in MainVehicle.Wheels) w.Fix();
             if (IsInvincible) MainVehicle.IsInvincible = true;
             SetUpFixedData();
             Model.MarkAsNoLongerNeeded();
             return true;
         }
+
+
 
         #region -- CONSTRUCTORS --
 

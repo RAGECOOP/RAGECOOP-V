@@ -321,37 +321,21 @@ namespace RageCoop.Client
 
         private static void VehicleSync(Packets.VehicleSync packet)
         {
-            var v = EntityPool.GetVehicleByID(packet.ID);
-            if (v == null) EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ID));
+            var v = EntityPool.GetVehicleByID(packet.ED.ID);
+            if (v == null) EntityPool.ThreadSafe.Add(v = new SyncedVehicle(packet.ED.ID));
             if (v.IsLocal) return;
-            v.ID = packet.ID;
-            v.OwnerID = packet.OwnerID;
-            v.Flags = packet.Flags;
-            v.Position = packet.Position;
-            v.Quaternion = packet.Quaternion;
-            v.SteeringAngle = packet.SteeringAngle;
-            v.ThrottlePower = packet.ThrottlePower;
-            v.BrakePower = packet.BrakePower;
-            v.Velocity = packet.Velocity;
-            v.RotationVelocity = packet.RotationVelocity;
-            v.DeluxoWingRatio = packet.DeluxoWingRatio;
-            bool full = packet.Flags.HasVehFlag(VehicleDataFlags.IsFullSync);
+            v.ID = packet.ED.ID;
+            v.OwnerID = packet.ED.OwnerID;
+            v.Position = packet.ED.Position;
+            v.Quaternion = packet.ED.Quaternion;
+            v.Velocity = packet.ED.Velocity;
+            v.Model = packet.ED.ModelHash;
+            v.VD = packet.VD;
+            bool full = packet.VD.Flags.HasVehFlag(VehicleDataFlags.IsFullSync);
             if (full)
             {
-                v.DamageModel = packet.DamageModel;
-                v.EngineHealth = packet.EngineHealth;
-                v.Mods = packet.Mods;
-                v.ToggleModsMask = packet.ToggleModsMask;
-                v.Model = packet.ModelHash;
-                v.Colors = packet.Colors;
-                v.LandingGear = packet.LandingGear;
-                v.RoofState = (VehicleRoofState)packet.RoofState;
-                v.LockStatus = packet.LockStatus;
-                v.RadioStation = packet.RadioStation;
-                v.LicensePlate = packet.LicensePlate;
-                v.Livery = packet.Livery;
-                v.HeadlightColor = packet.HeadlightColor;
-                v.ExtrasMask = packet.ExtrasMask;
+                v.VDF = packet.VDF;
+                v.VDV = packet.VDV;
             }
             v.SetLastSynced(full);
         }

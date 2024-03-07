@@ -12,7 +12,7 @@ namespace RageCoop.Core
 
             public uint WeaponHash { get; set; }
             
-            public Vector3 EndPosition { get; set; }
+            public LVector3 EndPosition { get; set; }
 
             protected override void Serialize(NetOutgoingMessage m)
             {

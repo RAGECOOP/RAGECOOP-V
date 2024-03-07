@@ -44,13 +44,13 @@ namespace RageCoop.Client.Scripting
                          {
                              unsafe
                              {
-                                 var time = World.CurrentTimeOfDay;
+                                 var date = World.CurrentDate;
                                  var weather1 = default(int);
                                  var weather2 = default(int);
                                  var percent2 = default(float);
                                  Call(GET_CURR_WEATHER_STATE, &weather1, &weather2, &percent2);
-                                 API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes,
-                                     time.Seconds, weather1, weather2, percent2);
+                                 API.SendCustomEvent(CustomEvents.WeatherTimeSync, date.Year, date.Month, date.Day, date.Hour, date.Minute,
+                                 date.Second, weather1, weather2, percent2);
                              }
                          });
 
@@ -61,8 +61,8 @@ namespace RageCoop.Client.Scripting
 
         private static void WeatherTimeSync(CustomEventReceivedArgs e)
         {
-            World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
-            Call(SET_CURR_WEATHER_STATE, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
+            World.CurrentDate = new DateTime((int)e.Args[0], (int)e.Args[1], (int)e.Args[2], (int)e.Args[3], (int)e.Args[4], (int)e.Args[5]);
+            Call(SET_CURR_WEATHER_STATE, (int)e.Args[6], (int)e.Args[7], (float)e.Args[8]);
         }
 
         private static void SetDisplayNameTag(CustomEventReceivedArgs e)

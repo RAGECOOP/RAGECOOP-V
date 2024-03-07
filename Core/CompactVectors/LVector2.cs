@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RageCoop.Core
 {
-    public struct LVector2 : IEquatable<LVector2>
+    internal struct LVector2 : IEquatable<LVector2>
     {
         /// <summary>
         /// Gets or sets the X component of the vector.

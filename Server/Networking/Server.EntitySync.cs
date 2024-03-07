@@ -40,7 +40,7 @@ public partial class Server
     private void VehicleSync(Packets.VehicleSync packet, Client client)
     {
         QueueJob(() => Entities.Update(packet, client));
-        var isPlayer = packet.ID == client.Player?.LastVehicle?.ID;
+        var isPlayer = packet.ED.ID == client.Player?.LastVehicle?.ID;
 
 
         if (Settings.UseP2P) return;
@@ -51,10 +51,10 @@ public partial class Server
             {
                 // Player's vehicle
                 if (Settings.PlayerStreamingDistance != -1 &&
-                    packet.Position.DistanceTo(c.Player.Position) > Settings.PlayerStreamingDistance) continue;
+                    packet.ED.Position.DistanceTo(c.Player.Position) > Settings.PlayerStreamingDistance) continue;
             }
             else if (Settings.NpcStreamingDistance != -1 &&
-                     packet.Position.DistanceTo(c.Player.Position) > Settings.NpcStreamingDistance)
+                     packet.ED.Position.DistanceTo(c.Player.Position) > Settings.NpcStreamingDistance)
             {
                 continue;
             }

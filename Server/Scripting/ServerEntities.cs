@@ -194,14 +194,14 @@ public class ServerEntities
 
     internal void Update(Packets.VehicleSync p, Client sender)
     {
-        if (!Vehicles.TryGetValue(p.ID, out var veh))
+        if (!Vehicles.TryGetValue(p.ED.ID, out var veh))
         {
-            Vehicles.TryAdd(p.ID, veh = new ServerVehicle(Server));
-            veh.ID = p.ID;
+            Vehicles.TryAdd(p.ED.ID, veh = new ServerVehicle(Server));
+            veh.ID = p.ED.ID;
         }
 
-        veh._pos = p.Position + p.Velocity * sender.Latency;
-        veh._quat = p.Quaternion;
+        veh._pos = p.ED.Position + p.ED.Velocity * sender.Latency;
+        veh._quat = p.ED.Quaternion;
         if (veh.Owner != sender)
         {
             if (veh.Owner != null) veh.Owner.EntitiesCount--;

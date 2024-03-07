@@ -8,8 +8,7 @@ using GTA.Math;
 
 namespace RageCoop.Core.CompactVectors
 {
-
-    public struct LQuaternion : IEquatable<LQuaternion>
+    internal struct LQuaternion : IEquatable<LQuaternion>
     {
         /// <summary>
         /// Gets or sets the X component of the quaternion.

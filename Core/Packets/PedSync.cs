@@ -20,15 +20,15 @@ namespace RageCoop.Core
 
             public int Health { get; set; }
 
-            public Vector3 Position { get; set; }
+            public LVector3 Position { get; set; }
 
-            public Vector3 Rotation { get; set; }
+            public LVector3 Rotation { get; set; }
 
-            public Vector3 Velocity { get; set; }
+            public LVector3 Velocity { get; set; }
 
             public byte Speed { get; set; }
 
-            public Vector3 AimCoords { get; set; }
+            public LVector3 AimCoords { get; set; }
 
 
             public float Heading { get; set; }
@@ -178,9 +178,9 @@ namespace RageCoop.Core
 
             #region RAGDOLL
 
-            public Vector3 HeadPosition { get; set; }
-            public Vector3 RightFootPosition { get; set; }
-            public Vector3 LeftFootPosition { get; set; }
+            public LVector3 HeadPosition { get; set; }
+            public LVector3 RightFootPosition { get; set; }
+            public LVector3 LeftFootPosition { get; set; }
 
             #endregion
 
