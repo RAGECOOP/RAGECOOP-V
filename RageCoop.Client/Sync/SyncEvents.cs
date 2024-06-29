@@ -135,7 +135,7 @@ namespace RageCoop.Client
                 _lastWeaponHash = weaponHash;
             }
             if (!_weaponAsset.IsLoaded) { _weaponAsset.Request(); }
-            World.ShootBullet(start, end, p, _weaponAsset, (int)p.GetWeaponDamage(weaponHash));
+            World.ShootSingleBullet(start, end, (int)p.GetWeaponDamage(weaponHash), _weaponAsset, p);
             Prop w;
             if (((w = p.Weapons.CurrentWeaponObject) != null) && (p.VehicleWeapon == VehicleWeaponHash.Invalid))
             {

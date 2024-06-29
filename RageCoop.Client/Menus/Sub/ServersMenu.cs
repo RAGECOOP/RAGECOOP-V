@@ -85,7 +85,7 @@ namespace RageCoop.Client.Menus
                             if (server.useZT)
                             {
                                 address = $"{server.ztAddress}:{server.port}";
-                                Notification.Show($"~y~Joining ZeroTier network... {server.ztID}");
+                                Notification.PostTicker($"~y~Joining ZeroTier network... {server.ztID}", false);
                                 if (ZeroTierHelper.Join(server.ztID) == null)
                                 {
                                     throw new Exception("Failed to obtain ZeroTier network IP");
@@ -102,10 +102,10 @@ namespace RageCoop.Client.Menus
                         }
                         catch (Exception ex)
                         {
-                            Notification.Show($"~r~{ex.Message}");
+                            Notification.PostTicker($"~r~{ex.Message}", false);
                             if (server.useZT)
                             {
-                                Notification.Show($"Make sure ZeroTier is correctly installed, download it from https://www.zerotier.com/");
+                                Notification.PostTicker($"Make sure ZeroTier is correctly installed, download it from https://www.zerotier.com/", false);
                             }
                         }
                     };

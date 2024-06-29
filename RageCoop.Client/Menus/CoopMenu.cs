@@ -99,7 +99,7 @@ namespace RageCoop.Client.Menus
                 Game.DisableAllControlsThisFrame();
                 MenuPool.Process();
 
-                var scaleform = new Scaleform("instructional_buttons");
+                var scaleform = Scaleform.RequestMovie("instructional_buttons");
                 scaleform.CallFunction("CLEAR_ALL");
                 scaleform.CallFunction("TOGGLE_MOUSE_BUTTONS", 0);
                 scaleform.CallFunction("CREATE_CONTAINER");

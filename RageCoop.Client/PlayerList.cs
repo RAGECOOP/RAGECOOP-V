@@ -13,7 +13,7 @@ namespace RageCoop.Client
     {
         private const float LEFT_POSITION = 0.122f;
         private const float RIGHT_POSITION = 0.9f;
-        private static readonly Scaleform _mainScaleform = new Scaleform("mp_mm_card_freemode");
+        private static readonly Scaleform _mainScaleform = Scaleform.RequestMovie("mp_mm_card_freemode");
         private static ulong _lastUpdate = Util.GetTickCount64();
         public static ulong Pressed { get; set; }
 

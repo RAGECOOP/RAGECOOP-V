@@ -31,7 +31,7 @@ namespace RageCoop.Client.Scripting
             API.RegisterCustomEventHandler(CustomEvents.UpdatePedBlip, UpdatePedBlip);
             API.RegisterCustomEventHandler(CustomEvents.IsHost, (e) => { _isHost = (bool)e.Args[0]; });
             API.RegisterCustomEventHandler(CustomEvents.WeatherTimeSync, WeatherTimeSync);
-            API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) => { GTA.UI.Notification.Show((string)e.Args[0]); });
+            API.RegisterCustomEventHandler(CustomEvents.OnPlayerDied, (e) => { GTA.UI.Notification.PostTicker((string)e.Args[0], false); });
             Task.Run(() =>
             {
                 while (true)
@@ -42,12 +42,11 @@ namespace RageCoop.Client.Scripting
                         {
                             unsafe
                             {
-                                var time = World.CurrentTimeOfDay;
                                 int weather1 = default(int);
                                 int weather2 = default(int);
                                 float percent2 = default(float);
                                 Function.Call(Hash.GET_CURR_WEATHER_STATE, &weather1, &weather2, &percent2);
-                                API.SendCustomEvent(CustomEvents.WeatherTimeSync, time.Hours, time.Minutes, time.Seconds, weather1, weather2, percent2);
+                                API.SendCustomEvent(CustomEvents.WeatherTimeSync, GTA.Chrono.GameClock.Hour, GTA.Chrono.GameClock.Minute, GTA.Chrono.GameClock.Second, weather1, weather2, percent2);
                             }
                         });
                     }
@@ -59,7 +58,9 @@ namespace RageCoop.Client.Scripting
 
         private void WeatherTimeSync(CustomEventReceivedArgs e)
         {
-            World.CurrentTimeOfDay = new TimeSpan((int)e.Args[0], (int)e.Args[1], (int)e.Args[2]);
+            GTA.Chrono.GameClock.Hour = (int)e.Args[0];
+            GTA.Chrono.GameClock.Minute = (int)e.Args[1];
+            GTA.Chrono.GameClock.Second = (int)e.Args[2];
             Function.Call(Hash.SET_CURR_WEATHER_STATE, (int)e.Args[3], (int)e.Args[4], (float)e.Args[5]);
         }
 

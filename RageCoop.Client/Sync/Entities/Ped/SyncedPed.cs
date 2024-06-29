@@ -29,7 +29,7 @@ namespace RageCoop.Client
             OwnerID = Main.LocalPlayerID;
 
             //Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisableHurt, true);
             // MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableMelee, true);
 
         }
@@ -245,16 +245,15 @@ namespace RageCoop.Client
             Function.Call(Hash.SET_PED_IS_IGNORED_BY_AUTO_OPEN_DOORS, false);
             Function.Call(Hash.SET_PED_CAN_EVASIVE_DIVE, MainPed.Handle, false);
 
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DrownsInWater, false);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableExplosionReactions, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_AvoidTearGas, false);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_IgnoreBeingOnFire, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableEvasiveDives, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisablePanicInVehicle, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_BlockNonTemporaryEvents, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableShockingEvents, true);
-            MainPed.SetConfigFlag((int)PedConfigFlags.CPED_CONFIG_FLAG_DisableHurt, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DrownsInWater, false);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisableHurt, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisableExplosionReactions, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.AvoidTearGas, false);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.IgnoreBeingOnFire, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisableEvasiveDives, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisablePanicInVehicle, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.BlockNonTemporaryEvents, true);
+            MainPed.SetConfigFlag(PedConfigFlagToggles.DisableShockingEvents, true);
 
             SetClothes();
 
@@ -546,7 +545,7 @@ namespace RageCoop.Client
         {
             if (Velocity == default)
             {
-                MainPed.Task.AimAt(AimCoords, 1000);
+                MainPed.Task.AimGunAtPosition(AimCoords, 1000);
             }
             else
             {

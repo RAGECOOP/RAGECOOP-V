@@ -57,7 +57,7 @@ namespace RageCoop.Client
 
         public Chat()
         {
-            MainScaleForm = new Scaleform("multiplayer_chat");
+            MainScaleForm = Scaleform.RequestMovie("multiplayer_chat");
         }
 
         public void Init()

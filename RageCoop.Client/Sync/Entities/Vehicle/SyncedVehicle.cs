@@ -142,7 +142,7 @@ namespace RageCoop.Client
 
             if (LightsOn != MainVehicle.AreLightsOn)
             {
-                MainVehicle.AreLightsOn = LightsOn;
+                MainVehicle.SetScriptedLightSetting(LightsOn ? ScriptedVehicleLightSetting.SetVehicleLightsOn : ScriptedVehicleLightSetting.SetVehicleLightsOff);
             }
 
             if (HighBeamsOn != MainVehicle.AreHighBeamsOn)
@@ -285,10 +285,10 @@ namespace RageCoop.Client
             if (IsFlipped || (calirot = GetCalibrationRotation()).Length() > 50)
             {
                 MainVehicle.Quaternion = Quaternion.Slerp(MainVehicle.ReadQuaternion(), Quaternion, 0.5f);
-                MainVehicle.RotationVelocity = RotationVelocity;
+                MainVehicle.LocalRotationVelocity = RotationVelocity;
                 return;
             }
-            MainVehicle.RotationVelocity = RotationVelocity + calirot * 0.2f;
+            MainVehicle.LocalRotationVelocity = RotationVelocity + calirot * 0.2f;
         }
         private Vector3 GetCalibrationRotation()
         {

@@ -43,7 +43,7 @@ namespace RageCoop.Client
         public static void ShowTimeStamps()
         {
             GTA.UI.Notification.Hide(_lastNfHandle);
-            _lastNfHandle = GTA.UI.Notification.Show(Debug.TimeStamps.Dump());
+            _lastNfHandle = GTA.UI.Notification.PostTicker(TimeStamps.Dump(), false).Handle;
 
         }
     }
