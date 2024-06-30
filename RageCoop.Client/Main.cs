@@ -53,7 +53,7 @@ namespace RageCoop.Client
             }
             catch
             {
-                GTA.UI.Notification.Show("Malformed configuration, overwriting with default values...");
+                GTA.UI.Notification.PostTicker("Malformed configuration, overwriting with default values...", false);
                 Settings = new Settings();
                 Util.SaveSettings();
             }
@@ -79,7 +79,7 @@ namespace RageCoop.Client
                     }
                     if (!_gameLoaded)
                     {
-                        GTA.UI.Notification.Show("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
+                        GTA.UI.Notification.PostTicker("~r~Please update your GTA5 to v1.0.1290 or newer!", true);
                         _gameLoaded = true;
                     }
                 };
@@ -117,7 +117,7 @@ namespace RageCoop.Client
             else if (!_gameLoaded && (_gameLoaded = true))
             {
 #if !NON_INTERACTIVE
-                GTA.UI.Notification.Show(GTA.UI.NotificationIcon.AllPlayersConf, "RAGECOOP", "Welcome!", $"Press ~g~{Main.Settings.MenuKey}~s~ to open the menu.");
+                GTA.UI.Notification.PostMessageText($"Press ~g~{Settings.MenuKey}~s~ to open the menu.", new GTA.Graphics.TextureAsset("CHAR_ALL_PLAYERS_CONF", "CHAR_ALL_PLAYERS_CONF"), false, GTA.UI.FeedTextIcon.Message, "RAGECOOP", "Welcome!");
 #endif
             }
 
@@ -304,7 +304,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, true);
                 CoopMenu.ConnectedMenuSetting();
                 MainChat.Init();
-                GTA.UI.Notification.Show("~g~Connected!");
+                GTA.UI.Notification.PostTicker("~g~Connected!", false);
             });
 
             Logger.Info(">> Connected <<");
@@ -327,7 +327,7 @@ namespace RageCoop.Client
                 Function.Call(Hash.SET_ENABLE_VEHICLE_SLIPSTREAMING, false);
                 CoopMenu.DisconnectedMenuSetting();
                 if (reason != "Abort")
-                    GTA.UI.Notification.Show("~r~Disconnected: " + reason);
+                    GTA.UI.Notification.PostTicker("~r~Disconnected: " + reason, false);
                 LocalPlayerID = default;
             });
             Memory.RestorePatches();

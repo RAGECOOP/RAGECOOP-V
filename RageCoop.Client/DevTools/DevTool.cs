@@ -162,7 +162,7 @@ namespace RageCoop.Client
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
                 thread.Join();
-                GTA.UI.Notification.Show("Copied to clipboard, please paste it on the GitHub issue page!");
+                GTA.UI.Notification.PostTicker("Copied to clipboard, please paste it on the GitHub issue page!", false);
             }
         }
 

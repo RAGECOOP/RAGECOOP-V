@@ -34,7 +34,7 @@ namespace RageCoop.Client
             {
                 _publicKeyReceived.Set();
                 IsConnecting = false;
-                Main.QueueAction(() => Notification.Show("Connection has been canceled"));
+                Main.QueueAction(() => Notification.PostTicker("Connection has been canceled", false));
                 Peer?.Shutdown("Bye");
             }
             else if (IsOnServer)
@@ -104,7 +104,7 @@ namespace RageCoop.Client
 #endif
                             }
                         };
-                        Main.QueueAction(() => { Notification.Show($"~y~Trying to connect..."); });
+                        Main.QueueAction(() => { Notification.PostTicker($"~y~Trying to connect...", false); });
                         Menus.CoopMenu._serverConnectItem.Enabled = false;
                         Security.Regen();
                         if (publicKey == null)
@@ -139,7 +139,7 @@ namespace RageCoop.Client
                     catch (Exception ex)
                     {
                         Main.Logger.Error("Cannot connect to server: ", ex);
-                        Main.QueueAction(() => Notification.Show("Cannot connect to server: " + ex.Message));
+                        Main.QueueAction(() => Notification.PostTicker("Cannot connect to server: " + ex.Message, false));
                     }
                     IsConnecting = false;
                 });
@@ -159,7 +159,7 @@ namespace RageCoop.Client
 
             Main.Logger.Debug($"player connected:{p.Username}");
             Main.QueueAction(() =>
-            GTA.UI.Notification.Show($"~h~{p.Username}~h~ connected."));
+            Notification.PostTicker($"~h~{p.Username}~h~ connected.", false));
         }
         private static void PlayerDisconnect(Packets.PlayerDisconnect packet)
         {
@@ -169,7 +169,7 @@ namespace RageCoop.Client
             Main.QueueAction(() =>
             {
                 EntityPool.RemoveAllFromPlayer(packet.PedID);
-                GTA.UI.Notification.Show($"~h~{player.Username}~h~ left.");
+                Notification.PostTicker($"~h~{player.Username}~h~ left.", false);
             });
         }
 

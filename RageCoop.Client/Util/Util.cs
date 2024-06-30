@@ -201,7 +201,7 @@ namespace RageCoop.Client
             return v;
         }
 
-        public static void ApplyForce(this Entity e, int boneIndex, Vector3 direction, Vector3 rotation = default(Vector3), ForceType forceType = ForceType.MaxForceRot2)
+        public static void ApplyForce(this Entity e, int boneIndex, Vector3 direction, Vector3 rotation = default(Vector3), ForceType forceType = ForceType.ExternalImpulse)
         {
             Function.Call(Hash.APPLY_FORCE_TO_ENTITY, e.Handle, forceType, direction.X, direction.Y, direction.Z, rotation.X, rotation.Y, rotation.Z, boneIndex, false, true, true, false, true);
         }
@@ -244,7 +244,7 @@ namespace RageCoop.Client
                 }
                 lineList.Add("ReloadKey=Insert");
                 File.WriteAllLines("ScriptHookVDotNet.ini", lineList.ToArray());
-                GTA.UI.Notification.Show("Reload cannot be performed automatically, please type \"Reload()\" manually in the SHVDN console.");
+                GTA.UI.Notification.PostTicker("Reload cannot be performed automatically, please type \"Reload()\" manually in the SHVDN console.", false);
             }
             Keys key = (Keys)Enum.Parse(typeof(Keys), reloadKey, true);
 
@@ -259,7 +259,7 @@ namespace RageCoop.Client
             }
             catch (Exception ex)
             {
-                GTA.UI.Notification.Show(ex.Message);
+                GTA.UI.Notification.PostTicker(ex.Message, false);
             }
 
             PostMessage(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle, WM_KEYDOWN, (int)key, 0);
