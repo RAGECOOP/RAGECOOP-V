@@ -33,33 +33,14 @@ namespace RageCoop.Client
 
     internal static unsafe class Memory
     {
-        public static MemPatch VignettingPatch;
-        public static MemPatch VignettingCallPatch;
-        public static MemPatch TimeScalePatch;
         static Memory()
         {
-            // Weapon/radio wheel slow-mo patch
-            // Thanks @CamxxCore, https://github.com/CamxxCore/GTAVWeaponWheelMod
-            var result = MemScanner.FindPatternBmh("\x38\x51\x64\x74\x19", "xxxxx");
-            if (result == null) { throw new NotSupportedException("Can't find memory pattern to patch weapon/radio slow-mo"); }
-            var address = result + 26;
-            address = address + *(int*)address + 4u;
-            VignettingPatch = new MemPatch(address, new byte[] { RET, 0x90, 0x90, 0x90, 0x90 });
-            VignettingCallPatch = new MemPatch(result + 8, new byte[] { 0x90, 0x90, 0x90, 0x90, 0x90 });
-            TimeScalePatch = new MemPatch(result + 34, new byte[] { XOR_32_64, 0xD2 });
-
         }
         public static void ApplyPatches()
         {
-            VignettingPatch.Install();
-            VignettingCallPatch.Install();
-            TimeScalePatch.Install();
         }
         public static void RestorePatches()
         {
-            VignettingPatch.Uninstall();
-            VignettingCallPatch.Uninstall();
-            TimeScalePatch.Uninstall();
         }
         #region PATCHES
         #endregion

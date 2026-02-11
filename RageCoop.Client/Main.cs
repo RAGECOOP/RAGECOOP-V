@@ -293,7 +293,7 @@ namespace RageCoop.Client
         }
         internal static void Connected()
         {
-            Memory.ApplyPatches();
+            Game.UseMpSelectionWheels(true);
             if (Settings.Voice && !Voice.WasInitialized())
             {
                 Voice.Init();
@@ -330,7 +330,7 @@ namespace RageCoop.Client
                     GTA.UI.Notification.PostTicker("~r~Disconnected: " + reason, false);
                 LocalPlayerID = default;
             });
-            Memory.RestorePatches();
+            Game.UseMpSelectionWheels(false);
             DownloadManager.Cleanup();
             Voice.ClearAll();
             Resources.Unload();
