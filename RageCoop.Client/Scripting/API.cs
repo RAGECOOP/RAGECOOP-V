@@ -334,6 +334,42 @@ namespace RageCoop.Client.Scripting
                 }
             });
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static SyncedPed GetPedById(int id) {
+            return EntityPool.GetPedByID(id);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <returns></returns>
+        public static SyncedPed GetPedByHandle(int handle) {
+            return EntityPool.GetPedByHandle(handle);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static SyncedVehicle GetVehicleById(int id) {
+            return EntityPool.GetVehicleByID(id);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <returns></returns>
+        public static SyncedVehicle GetVehicleByHandle(int handle) {
+            return EntityPool.GetVehicleByHandle(handle);
+        }
         #endregion
     }
 }
