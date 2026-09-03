@@ -3,6 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net48</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath Condition="'$(Configuration)' == 'Debug'">..\bin\Debug\Installer\</OutputPath>
+    <OutputPath Condition="'$(Configuration)' == 'Release'">..\bin\Release\Installer\</OutputPath>
     <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>

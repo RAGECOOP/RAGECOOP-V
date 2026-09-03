@@ -67,7 +67,13 @@ namespace RageCoop.Server
                     catch (Exception ex)
                     {
                         Logger?.Error(ex.InnerException?.Message ?? ex.Message);
-                        return;
+                        if (string.IsNullOrWhiteSpace(Settings.AnnouncedAddress))
+                        {
+                            Logger?.Error("No AnnouncedAddress set, cannot announce to master server.");
+                            return;
+                        }
+                        Logger?.Warning("Using AnnouncedAddress as fallback.");
+                        IpInfo = new IpInfo { Address = Settings.AnnouncedAddress };
                     }
                 }
                 catch (HttpRequestException ex)
@@ -81,7 +87,9 @@ namespace RageCoop.Server
             }
             if (!CanAnnounce)
             {
-                var existing = JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer))).Where(x => x.address == IpInfo.Address && x.port == Settings.Port.ToString()).FirstOrDefault();
+                if (IpInfo == null) return;
+                var effectiveAddress = !string.IsNullOrWhiteSpace(Settings.AnnouncedAddress) ? Settings.AnnouncedAddress : IpInfo.Address;
+                var existing = JsonConvert.DeserializeObject<List<ServerInfo>>(HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer.TrimEnd('/')))).Where(x => x.address == effectiveAddress && x.port == Settings.Port.ToString()).FirstOrDefault();
                 if(existing != null)
                 {
                     Logger.Warning("Server info already present in master server, waiting for 10 seconds...");
@@ -98,6 +106,7 @@ namespace RageCoop.Server
                 var serverInfo = new ServerInfo
                 {
                     address = IpInfo.Address,
+                    announcedAddress = !string.IsNullOrWhiteSpace(Settings.AnnouncedAddress) ? Settings.AnnouncedAddress : null,
                     port = Settings.Port.ToString(),
                     country = IpInfo.Country,
                     name = Settings.Name,
@@ -117,7 +126,7 @@ namespace RageCoop.Server
                 };
                 string msg = JsonConvert.SerializeObject(serverInfo);
 
-                var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
+                var realUrl = Util.GetFinalRedirect(Settings.MasterServer.TrimEnd('/'));
                 response = httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json")).GetAwaiter().GetResult();
             }
             catch (Exception ex)

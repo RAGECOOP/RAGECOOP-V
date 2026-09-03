@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using LemonUI.Menus;
 using System;
 using System.Drawing;
@@ -10,7 +10,6 @@ namespace RageCoop.Client.Menus
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
-            UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
 

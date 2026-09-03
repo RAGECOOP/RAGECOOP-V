@@ -1,4 +1,4 @@
-﻿#if DEBUG
+#if DEBUG
 using GTA;
 using LemonUI.Menus;
 using System;
@@ -10,12 +10,10 @@ namespace RageCoop.Client
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Debug", "Debug settings")
         {
-            UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         public static NativeMenu DiagnosticMenu = new NativeMenu("RAGECOOP", "Diagnostic", "Performence and Diagnostic")
         {
-            UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         public static NativeItem SimulatedLatencyItem = new NativeItem("Simulated network latency", "Simulated network latency in ms (one way)", "0");
