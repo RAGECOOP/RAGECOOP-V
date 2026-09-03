@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using GTA.Native;
 using RageCoop.Core;
 using System;
@@ -144,7 +144,7 @@ namespace RageCoop.Client
             short burstedTires = 0;
             foreach (VehicleWheel wheel in veh.Wheels.GetAllWheels())
             {
-                if (wheel.IsBursted)
+                if (wheel.IsBurst)
                 {
                     burstedTires |= (short)(1 << (int)wheel.BoneId);
                 }
@@ -206,13 +206,13 @@ namespace RageCoop.Client
             {
                 if ((model.BurstedTires & (short)(1 << (int)wheel.BoneId)) != 0)
                 {
-                    if (!wheel.IsBursted)
+                    if (!wheel.IsBurst)
                     {
                         wheel.Puncture();
                         wheel.Burst();
                     }
                 }
-                else if (wheel.IsBursted)
+                else if (wheel.IsBurst)
                 {
                     wheel.Fix();
                 }

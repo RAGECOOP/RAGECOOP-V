@@ -15,7 +15,8 @@ RAGECOOP brings multiplayer experience to the story mode, you can complete missi
 
 # 👁 Requirements
 - ScriptHookV
-- ScriptHookVDotNet 3.6.0 or later
+- ScriptHookVDotNet 3.7.0
+- LemonUISHDN3 2.2 or later
 - .NET Framework 4.8 Runtime or SDK
 
 # 📋 Building the project
@@ -55,6 +56,33 @@ Then run `dotnet build` in the solution directory, built binaries are in the `bi
 
 See [Bugs](https://github.com/RAGECOOP/RAGECOOP-V/issues/33)
 
+# 🐛 Important: SHVDN Timeout Configuration
+
+If RageCoop terminates on startup with the following error in the SHVDN console:
+
+```
+[ERROR] Blocking script! Script RageCoop.Client.Main was terminated because it caused the game to freeze too long.
+```
+
+You need to increase the SHVDN script timeout threshold.
+
+## Fix
+
+1. Navigate to your **GTA V root directory** (where `GTA5.exe` is located)
+2. Open **`ScriptHookVDotNet.ini`** in a text editor
+3. Find the line:
+   ```
+   ScriptTimeoutThreshold=5000
+   ```
+4. Change it to:
+   ```
+   ScriptTimeoutThreshold=15000
+   ```
+5. Save the file and restart GTA V
+
+## Why does this happen?
+
+RageCoop initializes several systems on first load — including voice chat and network components — which can take longer than SHVDN's default 5-second timeout allows. Increasing the threshold to 15 seconds gives RageCoop enough time to finish initializing without being terminated.
 
 # 🔫 Installation
 Refer to the [wiki](https://github.com/RAGECOOP/RAGECOOP-V/wiki)

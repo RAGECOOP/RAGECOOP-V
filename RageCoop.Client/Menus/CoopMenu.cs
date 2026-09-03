@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using GTA.Native;
 using LemonUI;
 using LemonUI.Menus;
@@ -15,7 +15,6 @@ namespace RageCoop.Client.Menus
         public static ObjectPool MenuPool = new ObjectPool();
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "MAIN")
         {
-            UseMouse = false,
             Alignment = Main.Settings.FlipMenu ? GTA.UI.Alignment.Right : GTA.UI.Alignment.Left
         };
         public static PopUp PopUp = new PopUp()

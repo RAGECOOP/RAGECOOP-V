@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using GTA.Math;
 using GTA.Native;
 using LemonUI.Elements;
@@ -468,7 +468,7 @@ namespace RageCoop.Client
                     {
                         _isPlayingAnimation = true;
                         _currentAnimation = reloadingAnim;
-                        MainPed.Task.PlayAnimation(_currentAnimation[0], _currentAnimation[1], 8f, -1, AnimationFlags.AllowRotation | AnimationFlags.UpperBodyOnly);
+                        MainPed.Task.PlayAnimation(_currentAnimation[0], _currentAnimation[1], 8f, -1, AnimationFlags.Secondary | AnimationFlags.UpperBodyOnly);
                     }
                 }
                 */

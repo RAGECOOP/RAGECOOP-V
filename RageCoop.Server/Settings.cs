@@ -61,6 +61,13 @@
         public string MasterServer { get; set; } = "https://masterserver.ragecoop.com/";
 
         /// <summary>
+        /// Optional address to announce to the master server instead of your real public IP.
+        /// Useful for hiding your IP behind a No-IP hostname or similar DDNS service.
+        /// Leave empty to use your real public IP (default behaviour).
+        /// </summary>
+        public string AnnouncedAddress { get; set; } = "";
+
+        /// <summary>
         /// See <see cref="Core.Logger.LogLevel"/>.
         /// </summary>
         public int LogLevel { get; set; } = 0;

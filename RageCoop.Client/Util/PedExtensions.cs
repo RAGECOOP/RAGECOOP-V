@@ -1,4 +1,4 @@
-﻿using GTA;
+using GTA;
 using GTA.Math;
 using GTA.Native;
 using RageCoop.Core;
@@ -468,7 +468,7 @@ namespace RageCoop.Client
             {
                 case -1:
                     return (VehicleHash)veh.Model.Hash == VehicleHash.Rhino
-                        || (VehicleHash)veh.Model.Hash == VehicleHash.Khanjari
+                        || (VehicleHash)veh.Model.Hash == VehicleHash.Khanjali
                         || (VehicleHash)veh.Model.Hash == VehicleHash.FireTruck
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Riot2
                         || (VehicleHash)veh.Model.Hash == VehicleHash.Cerberus

@@ -1,4 +1,3 @@
-﻿
 using GTA;
 using GTA.Math;
 using RageCoop.Core;
@@ -40,8 +39,9 @@ namespace RageCoop.Client
         {
             // Weapon/radio wheel slow-mo patch
             // Thanks @CamxxCore, https://github.com/CamxxCore/GTAVWeaponWheelMod
-            var result = NativeMemory.FindPattern("\x38\x51\x64\x74\x19", "xxxxx");
-            if (result == null) { throw new NotSupportedException("Can't find memory pattern to patch weapon/radio slow-mo"); }
+            var resultPtr = Game.FindPattern("\x38\x51\x64\x74\x19", "xxxxx");
+            if (resultPtr == IntPtr.Zero) { throw new NotSupportedException("Can't find memory pattern to patch weapon/radio slow-mo"); }
+            byte* result = (byte*)resultPtr.ToPointer();
             var address = result + 26;
             address = address + *(int*)address + 4u;
             VignettingPatch = new MemPatch(address, new byte[] { RET, 0x90, 0x90, 0x90, 0x90 });
@@ -91,7 +91,7 @@ namespace RageCoop.Client
             var foundOffsets = new List<int>(100);
             for (int i = 0; i <= range; i++)
             {
-                var val = NativeMemory.ReadFloat(start + i);
+                var val = *(float*)(start + i).ToPointer();
                 if (Math.Abs(val - toSearch) < tolerance)
                 {
                     foundOffsets.Add(i);
