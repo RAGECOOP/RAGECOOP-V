@@ -29,5 +29,11 @@ namespace RageCoop.Core
         public string ztAddress { get; set; }
         public string publicKeyModulus { get; set; }
         public string publicKeyExponent { get; set; }
+
+        /// <summary>
+        /// Optional override for the address shown in the server list (e.g. a No-IP hostname).
+        /// If set, this is used instead of the real public IP detected by the master server.
+        /// </summary>
+        public string announcedAddress { get; set; }
     }
 }

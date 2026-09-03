@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -13,6 +13,7 @@ namespace RageCoop.Client
 {
     internal static unsafe class EntityPool
     {
+        static bool _sendPedErrorLogged = false;
         public static object PedsLock = new object();
 
         #region ACTIVE INSTANCES
@@ -378,7 +379,15 @@ namespace RageCoop.Client
                         // event check
                         SyncEvents.Check(c);
 
-                        Networking.SendPed(c, i - pedStateIndex < pedStatesPerFrame);
+                        try { Networking.SendPed(c, i - pedStateIndex < pedStatesPerFrame); }
+                        catch (Exception ex)
+                        {
+                            if (!_sendPedErrorLogged)
+                            {
+                                Logger.Error("[SendPed] " + ex.ToString());
+                                _sendPedErrorLogged = true;
+                            }
+                        }
                     }
                     else // Incoming sync
                     {

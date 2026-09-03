@@ -1,4 +1,4 @@
-﻿global using GTA;
+global using GTA;
 global using GTA.Native;
 global using static GTA.Native.Function;
 global using static GTA.Native.Hash;
@@ -28,9 +28,7 @@ namespace RageCoop.Client
             GetFinalPathNameByHandleW(fs.SafeFileHandle.DangerousGetHandle(), buf, 1024, 0);
             ErrorCheck32();
             var scriptDir = Directory.GetParent(Marshal.PtrToStringUni((IntPtr)buf)).FullName;
-            if (Path.GetFileName(scriptDir).ToLower() != "scripts")
-                throw new Exception("Unexpected script location");
-
+            // Accept any script directory name (e.g. "CoreScripts\RageCoop" for SHVDNC)
             var result = Directory.GetParent(scriptDir).FullName;
             Logger.Debug($"Base path is: {result}");
             return result;

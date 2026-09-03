@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using GTA;
 using GTA.Math;
 using GTA.Native;
@@ -10,6 +10,7 @@ namespace RageCoop.Client
 {
     internal static partial class Networking
     {
+        static bool _invalidVehicleLogged = false;
         public static int SyncInterval = 30;
         public static List<NetConnection> Targets = new List<NetConnection>();
 
@@ -47,7 +48,11 @@ namespace RageCoop.Client
                     var veh = ped.CurrentVehicle?.GetSyncEntity() ??
                               ped.VehicleTryingToEnter?.GetSyncEntity() ?? ped.LastVehicle?.GetSyncEntity();
                     p.VehicleID = veh?.ID ?? 0;
-                    if (p.VehicleID == 0) Log.Error("Invalid vehicle");
+                    if (p.VehicleID == 0)
+                    {
+                        if (!_invalidVehicleLogged) { Log.Error("Invalid vehicle"); _invalidVehicleLogged = true; }
+                        return;
+                    }
                     if (p.Speed == 5)
                         p.Seat = ped.GetSeatTryingToEnter();
                     else

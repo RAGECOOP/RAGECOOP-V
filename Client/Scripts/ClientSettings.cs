@@ -31,7 +31,7 @@ namespace RageCoop.Client
         /// <summary>
         ///     Don't use it!
         /// </summary>
-        public string MasterServer { get; set; } = "https://test.ragecoop.com/";
+        public string MasterServer { get; set; } = "https://masterserver.ragecoop.com/";
 
         /// <summary>
         ///     Don't use it!

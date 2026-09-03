@@ -11,14 +11,14 @@
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <OutDir>..\..\bin\Debug\Client</OutDir>
+    <OutDir>..\..\bin\Debug\Installer</OutDir>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineConstants>DEBUG</DefineConstants>
     <WarningLevel>4</WarningLevel>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutDir>..\..\bin\Release\Client</OutDir>
+    <OutDir>..\..\bin\Release\Installer</OutDir>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>

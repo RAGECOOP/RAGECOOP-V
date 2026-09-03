@@ -3,4 +3,4 @@
 	url = https://github.com/RAGECOOP/lidgren-network-gen3
 [submodule "libs/ScriptHookVDotNetCore"]
 	path = libs/ScriptHookVDotNetCore
-	url = https://github.com/Sardelka9515/scripthookvdotnetcore
+	url = https://github.com/Draythianna/scripthookvdotnetcore.git

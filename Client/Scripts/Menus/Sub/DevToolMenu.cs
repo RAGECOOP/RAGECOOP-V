@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using GTA;
@@ -15,7 +15,6 @@ namespace RageCoop.Client
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "DevTool", "Internal testing tools")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
@@ -27,7 +26,7 @@ namespace RageCoop.Client
         static DevToolMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             enableItem.Activated += ShowBones;
             enableItem.Checked = false;

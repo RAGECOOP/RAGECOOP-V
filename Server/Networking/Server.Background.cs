@@ -64,7 +64,13 @@ public partial class Server
                 catch (Exception ex)
                 {
                     Logger?.Error(ex.InnerException?.Message ?? ex.Message);
-                    return;
+                    if (string.IsNullOrWhiteSpace(Settings.AnnouncedAddress))
+                    {
+                        Logger?.Error("No AnnouncedAddress set, cannot announce to master server.");
+                        return;
+                    }
+                    Logger?.Warning("Using AnnouncedAddress as fallback.");
+                    IpInfo = new IpInfo { Address = Settings.AnnouncedAddress };
                 }
             }
             catch (HttpRequestException ex)
@@ -78,9 +84,11 @@ public partial class Server
 
         if (!CanAnnounce)
         {
+            if (IpInfo == null) return;
+            var effectiveAddress = !string.IsNullOrWhiteSpace(Settings.AnnouncedAddress) ? Settings.AnnouncedAddress : IpInfo.Address;
             var existing = JsonDeserialize<List<ServerInfo>>(
-                    HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer)))
-                .Where(x => x.address == IpInfo.Address).FirstOrDefault();
+                    HttpHelper.DownloadString(Util.GetFinalRedirect(Settings.MasterServer.TrimEnd('/'))))
+                .Where(x => x.address == effectiveAddress).FirstOrDefault();
             if (existing != null)
             {
                 Logger.Warning("Server info already present in master server, waiting for 10 seconds...");
@@ -96,6 +104,7 @@ public partial class Server
             var serverInfo = new ServerInfo
             {
                 address = IpInfo.Address,
+                announcedAddress = !string.IsNullOrWhiteSpace(Settings.AnnouncedAddress) ? Settings.AnnouncedAddress : null,
                 port = Settings.Port,
                 country = IpInfo.Country,
                 name = Settings.Name,
@@ -117,7 +126,7 @@ public partial class Server
             };
             var msg = JsonSerialize(serverInfo);
 
-            var realUrl = Util.GetFinalRedirect(Settings.MasterServer);
+            var realUrl = Util.GetFinalRedirect(Settings.MasterServer.TrimEnd('/'));
             response = httpClient.PostAsync(realUrl, new StringContent(msg, Encoding.UTF8, "application/json"))
                 .GetAwaiter().GetResult();
         }

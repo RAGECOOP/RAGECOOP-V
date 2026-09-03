@@ -4,7 +4,7 @@
 		<NoAotCompile>false</NoAotCompile>
 		<TargetFramework>net7.0</TargetFramework>
 		<OutputType>Library</OutputType>
-		<OutDir>..\..\bin\$(Configuration)\Client\Scripts</OutDir>
+		<OutDir>..\..\bin\$(Configuration)\Client\CoreScripts\RageCoop</OutDir>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<AllowedReferenceRelatedFileExtensions>
 			.dll
@@ -42,6 +42,6 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(SolutionDir)' != '*Undefined*' and '$(Configuration)' != 'API'">
-		<Exec Command="xcopy &quot;$(SolutionDir)Client\Data&quot; &quot;$(OutDir)..\Data&quot; /i /s /y" />
+		<Exec Command="xcopy &quot;$(SolutionDir)Client\Data&quot; &quot;$(OutDir)Data&quot; /i /s /y" />
 	</Target>
 </Project>

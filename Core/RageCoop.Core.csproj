@@ -12,7 +12,7 @@
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Configurations>Debug;Release;API</Configurations>
-		<OutDir>..\bin\$(Configuration)\Core</OutDir>
+		<OutDir>..\bin\$(Configuration)\Client\CoreScripts\RageCoop\</OutDir>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)' == 'API'">
 		<OutDir>..\bin\API</OutDir>
@@ -27,4 +27,9 @@
 	  <ProjectReference Include="..\libs\ScriptHookVDotNetCore\src\ScriptHookVDotNetCore\ScriptHookVDotNetCore.csproj" />
 	</ItemGroup>
 
+  <Target Name="CopyLidgren" AfterTargets="Build">
+    <Copy SourceFiles="..\libs\Lidgren.Network\Lidgren.Network\bin\$(Configuration)\net7.0\Lidgren.Network.dll"
+          DestinationFolder="$(OutDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
 </Project>

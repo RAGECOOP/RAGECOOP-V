@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -12,20 +12,17 @@ namespace RageCoop.Client
     {
         public static NativeMenu Menu = new("RAGECOOP", "Debug", "Debug settings")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
         public static NativeMenu DiagnosticMenu = new("RAGECOOP", "Diagnostic", "Performence and Diagnostic")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
 
         public static NativeMenu TuneMenu = new("RAGECOOP", "Change tunable values")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
@@ -41,7 +38,7 @@ namespace RageCoop.Client
         static DebugMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             TuneMenu.Opening += (s, e) =>
             {

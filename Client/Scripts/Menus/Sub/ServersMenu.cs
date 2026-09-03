@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -21,7 +21,6 @@ namespace RageCoop.Client.Menus
 
         internal static NativeMenu Menu = new NativeMenu("RAGECOOP", "Servers", "Go to the server list")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
@@ -33,7 +32,7 @@ namespace RageCoop.Client.Menus
         static ServersMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             Menu.Opening += (object sender, CancelEventArgs e) =>
             {

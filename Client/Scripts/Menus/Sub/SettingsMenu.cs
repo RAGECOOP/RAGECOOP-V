@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 
 using GTA;
@@ -12,7 +12,6 @@ namespace RageCoop.Client.Menus
     {
         public static NativeMenu Menu = new NativeMenu("RAGECOOP", "Settings", "Go to the settings")
         {
-            UseMouse = false,
             Alignment = Settings.FlipMenu ? Alignment.Right : Alignment.Left
         };
 
@@ -51,7 +50,7 @@ namespace RageCoop.Client.Menus
         static SettingsMenu()
         {
             Menu.Banner.Color = Color.FromArgb(225, 0, 0, 0);
-            Menu.Title.Color = Color.FromArgb(255, 165, 0);
+            Menu.BannerText.Color = Color.FromArgb(255, 165, 0);
 
             _disableTrafficItem.CheckboxChanged += DisableTrafficCheckboxChanged;
             _disablePauseAlt.CheckboxChanged += DisablePauseAltCheckboxChanged;
